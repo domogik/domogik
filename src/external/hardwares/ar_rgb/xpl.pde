@@ -155,7 +155,6 @@ int parseXpl(byte *received, int len)
                        // 5 : bracket
                        // 6 : body
                        // 7 : final bracket
-    int item_body = 0;
                        
     // Message processing
     // Read each character of the message
@@ -217,7 +216,6 @@ int parseXpl(byte *received, int len)
                     //Serial.print(key);
                     //Serial.print(" : ");
                     //Serial.println(value);
-                    item_body++;
                         
                     // Here, store data in appropriate vars for final processing
                     if (strcmp(key, "device")  == 0) {
