@@ -66,6 +66,8 @@ class WolPing(XplPlugin):
             ip = self._config.query('wol_ping', 'ip-%s' % str(num))
             mac = self._config.query('wol_ping', 'mac-%s' % str(num))
             mac_port = self._config.query('wol_ping', 'wol-port-%s' % str(num))
+            if mac_port == None:
+                mac_port = 7
             if name != None:
                 self.log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%s" % (name, ip, mac, mac_port))
                 self.computers[name] = {"ip" : ip, "mac" : mac, 
