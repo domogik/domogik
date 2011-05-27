@@ -2394,7 +2394,11 @@ target=*
                     my_type = message.data["cfg"+str(idx)+"-type"]
                     my_desc = message.data["cfg"+str(idx)+"-desc"]
                     my_default = message.data["cfg"+str(idx)+"-default"]
-                    my_optionnal = message.data["cfg"+str(idx)+"-opt"]
+                    optkey = "cfg"+str(idx)+"-opt"
+                    if message.data.has_key(optkey):
+                        my_optionnal = message.data[optkey]
+                    else:
+                        my_optionnal = "no"
                     # simple configuration element. 
                     #   "None" because it cames from xpl message
                     if my_interface == "no":

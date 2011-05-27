@@ -25,7 +25,7 @@ List of supported devices :
       <order-id>1</order-id>
       <name>device</name>
       <type>string</type>
-      <description>1-Wire adapter device. For usb : 'u'</description>
+      <description>1-Wire adapter device (usb : 'u')</description>
       <default-value>u</default-value>
     </key>
     <key>
