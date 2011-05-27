@@ -863,6 +863,7 @@ class SysManager(XplPlugin):
                     mess.add_data({'cfg'+str(conf["id"])+'-desc' : conf["desc"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-default' : conf["default"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-int' : conf["interface"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-opt' : conf["optionnal"]})
                 mess.add_data({'type' :  plugin["type"]})
                 mess.add_data({'plugin' :  plugin["name"]})
                 mess.add_data({'description' :  plugin["description"]})
@@ -875,9 +876,9 @@ class SysManager(XplPlugin):
         for hardware in self._hardwares:
             if hardware["name"] == plg:
                 for conf in hardware["configuration"]:
-                    mess.add_data({'config'+str(conf["id"])+'-id' : conf["id"]})
-                    mess.add_data({'config'+str(conf["id"])+'-key' : conf["key"]})
-                    mess.add_data({'config'+str(conf["id"])+'-value' : conf["value"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-id' : conf["id"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-key' : conf["key"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-value' : conf["value"]})
                 mess.add_data({'type' :  hardware["type"]})
                 mess.add_data({'plugin' :  hardware["name"]})
                 mess.add_data({'description' :  hardware["description"]})

@@ -2394,10 +2394,12 @@ target=*
                     my_type = message.data["cfg"+str(idx)+"-type"]
                     my_desc = message.data["cfg"+str(idx)+"-desc"]
                     my_default = message.data["cfg"+str(idx)+"-default"]
+                    my_optionnal = message.data["cfg"+str(idx)+"-opt"]
                     # simple configuration element. 
                     #   "None" because it cames from xpl message
                     if my_interface == "no":
                         config_data.append({"id" : idx+1, 
+                                            "optionnal" : my_optionnal,
                                             "element_type" : "item",
                                             "key" : my_key,
                                             "type" : my_type,
@@ -2412,6 +2414,7 @@ target=*
                             if group["element_type"] == "group":
                                 found = True
                                 group["elements"].append({"id" : idx+1, 
+                                              "optionnal" : my_optionnal,
                                               "key" : my_key,
                                               "type" : my_type,
                                               "description" : my_desc,
@@ -2421,6 +2424,7 @@ target=*
                             config_data.append({"element_type" : "group",
                                                 "elements" : [
                                                        {"id" : idx+1,
+                                                        "optionnal" : my_optionnal,
                                                         "key" : my_key,
                                                         "type" : my_type,
                                                         "description" : my_desc,
@@ -2434,9 +2438,8 @@ target=*
         if my_type == "hardware":
             while loop_again:
                 try:
-                    #id = message.data["config"+str(idx)+"-id"]
-                    key = message.data["config"+str(idx)+"-key"]
-                    value = message.data["config"+str(idx)+"-value"]
+                    key = message.data["cfg"+str(idx)+"-key"]
+                    value = message.data["cfg"+str(idx)+"-value"]
                     config_data.append({"id" : idx+1, 
                                         "key" : key,
                                         "value" : value})

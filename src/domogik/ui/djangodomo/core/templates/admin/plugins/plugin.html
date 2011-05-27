@@ -44,9 +44,16 @@ $(function(){
             var idefault = item['default'];
             var itype = item.type;
             var iprefix = item.prefix;
+            var ioptionnal = item.optionnal;
             var tr = $("<tr id='" + item.key + "'></tr>");
             tr.attr('key_prefix', iprefix);
-            tr.append("<td class='key'>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+            if (ioptionnal == "yes") {
+                optionnalDisplay = "";
+            }
+            else {
+                optionnalDisplay = "*";
+            }
+            tr.append("<td class='key'>" +  ikey + " " + optionnalDisplay + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
             var td = $("<td class='value' type='" + item.type + "'></td>");
             if (itype == 'boolean') {
                 td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");

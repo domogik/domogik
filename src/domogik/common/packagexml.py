@@ -136,6 +136,11 @@ class PackageXml():
                 except IndexError:
                     # no value in interface
                     k_interface = "no"
+                try:
+                    k_optionnal = key.getElementsByTagName("optionnal")[0].firstChild.nodeValue
+                except IndexError:
+                    # Optionnal value
+                    k_optionnal = "no"
                 k_id = key.getElementsByTagName("order-id")[0].firstChild.nodeValue
                 k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
                 k_desc = key.getElementsByTagName("description")[0].firstChild.nodeValue
@@ -147,6 +152,7 @@ class PackageXml():
                     k_default = None
                 self.configuration.append({"id" : k_id,
                                            "interface" : k_interface,
+                                           "optionnal" : k_optionnal,
                                            "key" : k_key,
                                            "desc" : k_desc,
                                            "type" : k_type,
