@@ -95,6 +95,7 @@
             $('#preview').css({
                 backgroundColor: color,
             });
+            $.farbtastic('#colorpicker').setColor(color);
             // call command
             if (dontCallCmd != 1) {
                 rest.get(['command', o.devicetechnology, o.deviceaddress, 'setcolor', color],
@@ -130,7 +131,7 @@
                         $('#colorpicker_off').hide();
                         $('#colorpicker').show();
                         $('#preview').show();
-                        this.resetTimerSetColor(stat.value, 1);
+                        self.setColor(stat.value, 1);
                     }
                 });
             }
@@ -148,7 +149,7 @@
                 $('#colorpicker_off').hide();
                 $('#colorpicker').show();
                 $('#preview').show();
-                this.resetTimerSetColor(value, 1);
+                self.setColor(value, 1);
             }
         },
 
