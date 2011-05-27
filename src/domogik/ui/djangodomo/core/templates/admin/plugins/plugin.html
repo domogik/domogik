@@ -51,9 +51,9 @@ $(function(){
                 optionnalDisplay = "";
             }
             else {
-                optionnalDisplay = "*";
+                optionnalDisplay = "<img src='/design/skins/default/images/required.png' alt='Required'/>";
             }
-            tr.append("<td class='key'>" +  ikey + " " + optionnalDisplay + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+            tr.append("<td class='key'><span>" +  ikey + "</span> " + optionnalDisplay + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
             var td = $("<td class='value' type='" + item.type + "'></td>");
             if (itype == 'boolean') {
                 td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
@@ -274,7 +274,7 @@ $(function(){
                                 if ($(item).attr('key_prefix') != undefined) {
                                     $(item).attr('id', newKey);
                                     $(".value", $(item)).setNotConfigured();
-                                    $(".key", this).text(newKey);
+                                    $(".key span", this).text(newKey);
                                     $("label", this).attr('for', 'value_' + newKey);
                                     $("input", this).attr('id', 'value_' + newKey);
                                     $("input", this).attr('name', 'value_' + newKey);
