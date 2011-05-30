@@ -22,12 +22,12 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Water
+TODO
 
 Implements
 ==========
 
-- WaterManager
+TODO
 
 @author: Fritz <fritz.smh@gmail.com>, BTS Project
 @copyright: (C) 2007-2009 Domogik project
@@ -79,7 +79,7 @@ class BtsGeneral(XplPlugin):
 
        
     def action(self, message):
-        """ water heating instructions
+        """ action on input change
 
             TODO : explain here what is done 
 
