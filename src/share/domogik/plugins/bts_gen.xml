@@ -1,0 +1,54 @@
+<package type="plugin">
+  <name>bts_gen</name>
+  <technology>bts</technology>
+  <description>bts_gen</description>
+  <detail>bts_gen</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/#</documentation>
+  <author>BTS, Fritz</author>
+  <author-email>unkwown, fritz.smh at gmail.com</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>input</name>
+      <type>string</type>
+      <description>IPX800 digital input address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
+      <name>output</name>
+      <type>string</type>
+      <description>IPX800 relay address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>3</order-id>
+      <name>level</name>
+      <type>string</type>
+      <description>IPX800 relay address level (HIGH or LOW)</description>
+      <default-value>HIGH</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/bts_gen.xml"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>bts</id>
+      <name>BTS Project</name>
+      <description>BTS Project</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
+</package>
