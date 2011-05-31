@@ -43,7 +43,7 @@ from django.conf import settings
 
 from domogik.ui.djangodomo.core.models import (
     House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes,
-    Features, FeatureAssociations, Plugins, Accounts, Rest
+    Features, FeatureAssociations, Plugins, Accounts, Rest, Packages
 )
 
 from django_pipes.exceptions import ResourceNotAvailableException
@@ -505,6 +505,33 @@ def admin_tools_rest(request):
         rest=rest_result.rest[0]
     )
 
+@admin_required
+def admin_packages_repositories(request):
+    """
+    Method called when the admin repositories page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    page_title = _("Packages repositories")
+    try:
+        repositories_result = Packages.get_list_repo()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    return __go_to_page(
+        request, 'admin/packages/repositories.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_packages_repositories = "selected",
+        status=status,
+        msg=msg,
+        repositories=repositories_result.repository
+    )
+    
 def index(request):
     """
     Method called when the main page is accessed
