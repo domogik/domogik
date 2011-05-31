@@ -14,7 +14,7 @@
   <configuration-keys/>
   <files>
     <file path="src/share/domogik/hardwares/rfxcom.xml"/>
-    <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom"/>
+    <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"/>
   </files>
   <dependencies/>
   <device_technology>
