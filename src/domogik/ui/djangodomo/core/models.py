@@ -341,3 +341,12 @@ class Stats(pipes.DmgPipe):
         resp = Stats.objects.get({'parameters':str(id) + "/" + key + "/latest"})
         if resp :
             return resp
+
+class Packages(pipes.DmgPipe):
+    uri = settings.INTERNAL_REST_URL + "/package"
+
+    @staticmethod
+    def get_list_repo():
+        resp = Packages.objects.get({'parameters':"list-repo"})
+        if resp :
+            return resp

@@ -1,5 +1,0 @@
-No log files found
-Finding last valid log LSN: file: 1 offset 210224
-Recovery starting from [1][209821]
-Recovery complete at Fri May  6 13:52:02 2011
-Maximum transaction ID 800000f7 Recovery checkpoint [1][210224]

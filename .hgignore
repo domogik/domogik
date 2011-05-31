@@ -6,6 +6,7 @@ syntax: glob
 :2e*
 .Apple*
 .AppleDouble/
+.AppleDesktop/
 .AppleDB/
 *.pyc
 *.pyoeggs/*
