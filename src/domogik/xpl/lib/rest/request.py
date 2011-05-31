@@ -3504,13 +3504,20 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
 
-        by_type = self.get_parameters("by-type")
-        by_repo = self.get_parameters("by-repo")
+        #by_type = self.get_parameters("by-type")
+        #by_repo = self.get_parameters("by-repo")
         pkg_mgr = PackageManager()
+        pkg_list = {}
         for data in pkg_mgr.get_packages_list():
-            if (by_type == None or by_type == data['type']) \
-                and (by_repo == None or by_repo == data['package-url'][0:len(by_repo)]):
-                json_data.add_data(data)
+            #if (by_type == None or by_type == data['type']) \
+            #    and (by_repo == None or by_repo == data['package-url'][0:len(by_repo)]):
+            #    json_data.add_data(data)
+            my_type = data['type']
+            if pkg_list.has_key(my_type):
+                pkg_list[my_type].append(data)
+            else:
+                pkg_list[my_type] = [data]
+        json_data.add_data(pkg_list)
     
         self.send_http_response_ok(json_data.get())
 
@@ -3569,9 +3576,10 @@ target=*
         
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("package")
+        json_data.set_data_type("installed")
 
         # process messages
+        pkg_list = {}
         for message in messages:
             cmd = message.data['command']
             host = message.data["host"]
@@ -3580,14 +3588,20 @@ target=*
             loop_again = True
             while loop_again:
                 try:
-                    json_data.add_data({"fullname" : message.data["fullname"+str(idx)],
-                                        "name" : message.data["name"+str(idx)],
-                                        "release" : message.data["release"+str(idx)],
-                                        "type" : message.data["type"+str(idx)],
-                                        "host" : host})
+                    data = {"fullname" : message.data["fullname"+str(idx)],
+                            "name" : message.data["name"+str(idx)],
+                            "release" : message.data["release"+str(idx)],
+                            "type" : message.data["type"+str(idx)],
+                            "host" : host}
+                    my_type = data['type']
+                    if pkg_list.has_key(my_type):
+                        pkg_list[my_type].append(data)
+                    else:
+                        pkg_list[my_type] = [data]
                     idx += 1
                 except:
                     loop_again = False
+        json_data.add_data(pkg_list)
     
         self.send_http_response_ok(json_data.get())
 
