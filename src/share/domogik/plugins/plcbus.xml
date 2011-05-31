@@ -5,7 +5,7 @@
   <detail>Plcbus is a CPL based protocol to control lights, appliances and others things in your house</detail>
   <version>0.1.0</version>
 <documentation>http://wiki.domogik.org/plugin_plcbus</documentation>
-  <author>François Pinet, Maxence Dunnewind</author>
+  <author>Francois Pinet, Maxence Dunnewind</author>
   <author-email>domopyx at gmail.com ; maxence at dunnewind.net</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
