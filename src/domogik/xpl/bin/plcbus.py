@@ -31,7 +31,7 @@ Implements
 - plcbusMain.plcbus_cmnd_cb(self, message)
 - plcbusMain.plcbus_send_ack(self, message)
 
-@author: FranÃ§ois PINET <domopyx@gmail.com>
+@author: Francois PINET <domopyx@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
