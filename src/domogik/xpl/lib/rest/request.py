@@ -3576,11 +3576,11 @@ target=*
         
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("installed")
+        json_data.set_data_type("package")
 
         # process messages
-        pkg_list = {}
         for message in messages:
+            pkg_list = {}
             cmd = message.data['command']
             host = message.data["host"]
     
@@ -3601,7 +3601,7 @@ target=*
                     idx += 1
                 except:
                     loop_again = False
-        json_data.add_data(pkg_list)
+            json_data.add_data({"host" : host, "installed" : pkg_list})
     
         self.send_http_response_ok(json_data.get())
 
