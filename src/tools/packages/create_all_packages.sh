@@ -33,6 +33,7 @@
 
 SRC_PATH="../../../"
 PLG_XML_PATH="src/share/domogik/plugins/"
+HDW_XML_PATH="src/share/domogik/hardwares/"
 
 if [[ $# -ne 1 ]] ; then
     echo "Usage : $0 <directory>"
@@ -50,13 +51,14 @@ for fic in $(find $SRC_PATH/$PLG_XML_PATH -name "*.xml")
     echo "********************************************************"
   
     ./pkg-mgr.py -f -c -t plugin -o $FOLDER $plugin
+done
 
-    #echo "Continue with next plugin ?"
-    #read resp
-    #if [[ $resp == "o" || $resp == "O" ]] ; then
-    #    echo ""
-    #else
-    #    echo "Exit..."
-    #    exit 0 
-    #fi
+for fic in $(find $SRC_PATH/$HDW_XML_PATH -name "*.xml")
+  do
+    hardware=$(basename $fic | sed "s/\.xml//")
+    echo "********************************************************"
+    echo "*    Generating package for $hardware"
+    echo "********************************************************"
+  
+    ./pkg-mgr.py -f -c -t hardware -o $FOLDER $hardware
 done
