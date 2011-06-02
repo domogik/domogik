@@ -350,3 +350,21 @@ class Packages(pipes.DmgPipe):
         resp = Packages.objects.get({'parameters':"list-repo"})
         if resp :
             return resp
+    
+    @staticmethod
+    def get_list():
+        resp = Packages.objects.get({'parameters':"list"})
+        if resp :
+            return resp
+    
+    @staticmethod
+    def get_list_installed():
+        resp = Packages.objects.get({'parameters':"list-installed"})
+        if resp :
+            return resp
+        
+    @staticmethod
+    def get_install(host, name, release):
+        resp = Packages.objects.get({'parameters':"install/" + host + "/" + name + "/" + release})
+        if resp :
+            return resp

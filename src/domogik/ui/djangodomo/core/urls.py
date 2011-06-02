@@ -56,6 +56,8 @@ urlpatterns = patterns('domogik.ui.djangodomo.core.views',
     url(r'admin/tools/helpers/$', 'admin_tools_helpers', name="admin_tools_helpers_view"),
     url(r'admin/tools/rest/$', 'admin_tools_rest', name="admin_tools_rest_view"),
     url(r'admin/packages/repositories/$', 'admin_packages_repositories', name="admin_packages_repositories_view"),
+    url(r'admin/packages/plugins/$', 'admin_packages_plugins', name="admin_packages_plugins_view"),
+    url(r'admin/packages/install/(?P<package_host>[a-zA-Z0-9_.-]+)/(?P<package_name>[a-zA-Z0-9_.-]+)/(?P<package_release>[a-zA-Z0-9_.-]+)/$', 'admin_packages_install', name="admin_packages_install_view"),
 
     url(r'show/$', 'show_house', name="show_view"),
     url(r'show/house/$', 'show_house', name="show_house_view"),

@@ -41,10 +41,10 @@
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-
+                        $.notification(status, "Package cache updated");
                     } else {
                         /* Error retreving plugin config */
-                        $.notification(data.status, data.description);
+                        $.notification(status, data.description);
                     }
                 }
             );

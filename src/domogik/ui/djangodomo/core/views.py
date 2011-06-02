@@ -33,9 +33,11 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
+from distutils import version
 from django.utils.http import urlquote
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.shortcuts import redirect
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
@@ -531,6 +533,70 @@ def admin_packages_repositories(request):
         msg=msg,
         repositories=repositories_result.repository
     )
+
+@admin_required
+def admin_packages_plugins(request):
+    """
+    Method called when the admin plugins page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    page_title = _("Plugins packages")
+    try:
+        packages_result = Packages.get_list()
+        installed_result = Packages.get_list_installed()
+        rest_info = Rest.get_info()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
+    dmg_version = version.StrictVersion(rest_info.rest[0].info["Domogik release"])
+    for host in installed_result.package:
+        installed = {}
+        if 'plugin' in host.installed:
+            for package in host.installed.plugin:
+                installed[package.name] = version.StrictVersion(package.release)
+        host.available = []
+        for package in packages_result.package[0].plugin:
+            package_min_version = version.StrictVersion(package["domogik-min-release"])
+#            package_version = version.StrictVersion(package.release)
+            package.upgrade_require = (package_min_version > dmg_version)
+            if package.name not in installed:
+                package.install = True
+                host.available.append(package)
+#            elif installed[package.name] < package_version:
+#                package.update = True
+#                host.available.append(package)
+
+    return __go_to_page(
+        request, 'admin/packages/plugins.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_packages_plugins = "selected",
+        status=status,
+        msg=msg,
+        hosts=installed_result.package
+    )
+    
+@admin_required
+def admin_packages_install(request, package_host, package_name, package_release):
+    """
+    Method called for installing a package
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    try:
+        packages_result = Packages.get_install(package_host, package_name, package_release)
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
+    return redirect('admin_packages_plugins_view')
     
 def index(request):
     """

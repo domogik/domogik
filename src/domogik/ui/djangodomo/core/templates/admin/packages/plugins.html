@@ -1,0 +1,110 @@
+{% extends "layout_admin.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-packages.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:4});
+		$("#tabs").tabs();
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{{page_title}}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <div id="tabs">
+        <ul>
+            {% for host in hosts %}
+            <li><a href="#tabs-{{forloop.counter}}">{{host.host}}</a></li>
+            {% endfor %}
+        </ul>
+        {% for host in hosts %}
+        <div id="tabs-{{forloop.counter}}">
+            <section class="subsection">
+                <h2>{% trans "Installed" %}</h2>
+                <table class='simple'>
+                    <thead>
+                        <tr><th>{% trans "Name" %}</th>
+                            <th>{% trans "Release" %}</th>
+                            <th>{% trans "Action" %}</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for package in host.installed.plugin %}
+                        <tr><td>{{package.name}}</td>
+                            <td>{{package.release}}</td>
+                            <td>Enable/Disable</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <section class="subsection">
+                <h2>{% trans "Available" %}</h2>
+                <table class='simple'>
+                    <thead>
+                        <tr><th>{% trans "Techno" %}</th>
+                            <th>{% trans "Name" %}</th>
+                            <th>{% trans "Release" %}</th>
+                            <th>{% trans "Description" %}</th>
+                            <th>{% trans "Author" %}</th>
+                            <th>{% trans "Action" %}</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for package in host.available %}
+                        <tr><td>{{package.techno}}</td>
+                            <td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
+                            <td>{{package.release}}</td>
+                            <td>{{package.desc}}</td>
+                            <td>{{package.author}}</td>
+                            <td>{% if package.upgrade_require and package.install %}
+                                Upgrade domogik, to version package["domogik-min-release"], in order to install
+                                {% else %}{% if package.upgrade_require and package.update %}
+                                    Upgrade domogik, to version package["domogik-min-release"], in order to update
+                                    {% else %}{% if package.install %}
+                                        <a href='{% url admin_packages_install_view host.host package.name package.release %}'>Install Package</a>
+                                        {% else %}
+                                        <a href='{% url admin_packages_install_view host.host package.name package.release %}'>Update Package</a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
