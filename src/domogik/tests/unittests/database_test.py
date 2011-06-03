@@ -537,6 +537,8 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                 d_description='Cold thing')
         device3 = db.add_device(d_name='Lamp', d_address='A1', d_type_id=dty2.id, d_usage_id=du2.id,
                                 d_description='')
+        df_list = db.list_device_features()
+        assert len(df_list) == 4
         df_list = db.list_device_features_by_device_id(device3.id)
         assert len(df_list) == 2
         assert db.get_device_feature_by_id(df_list[0].id) is not None
