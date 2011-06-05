@@ -95,6 +95,12 @@
           <name>Digimax</name>
           <description>Digimax</description>
       </device_type>
+      <device_type>
+          <id>rfxcom.remote</id>
+          <device_technology_id>rfxcom</device_technology_id>
+          <name>Remote</name>
+          <description>Received X10 RF Remote, Medion remote, ATI Remote or ATI Remote Plus</description>
+      </device_type>
   </device_types>
   <device_feature_models>
       <device_feature_model>
@@ -458,15 +464,15 @@
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
       <device_feature_model>
-          <id>rfxcom.digimax.demand</id>
-          <name>Demand</name>
+          <id>rfxcom.remote.keys</id>
+          <name>Keys</name>
           <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.digimax</device_type_id>
+          <device_type_id>rfxcom.remote</device_type_id>
           <parameters>
               {}
           </parameters>
           <value_type>string</value_type>
-          <stat_key>demand</stat_key>
+          <stat_key>keys</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
   </device_feature_models>

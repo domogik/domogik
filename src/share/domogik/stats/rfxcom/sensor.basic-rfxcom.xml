@@ -72,5 +72,17 @@
             </mapping>
         </xpltype>
     </schema>
+    <schema name="remote.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="keys" new_name="keys" />
+            </mapping>
+        </xpltype>
+    </schema>
 </statistic>
 
