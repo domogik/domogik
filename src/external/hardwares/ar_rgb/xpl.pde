@@ -37,9 +37,6 @@ This arduino program may be used without Domogik with any xPL project
 #define OPEN_BRACKET    "{"
 #define CLOSE_BRACKET   "}"
 
-// xpl message type
-//#define XPL_TYPE_LINE 1          // xpl type is on first line
-
 
 
 /***********************************************
@@ -141,20 +138,16 @@ int parseXpl(byte *received, int len)
     char myCommand[16+1];   // setcolor, etc... could be sized up to 128, but we use short commands here
     char myColor[7+1];      // format : #rrggbb
     // Init color to 'None' value
-    sprintf(myColor, "%s", "None");
+    //sprintf(myColor, "%s", "None");
     
     int j=0;
     int line=0;
     int result=0;
     
     int xpl_part = 0;  // 0 : message type
-                       // 1 : bracket
-                       // 2 : header
-                       // 3 : bracket
-                       // 4 : schema
-                       // 5 : bracket
-                       // 6 : body
-                       // 7 : final bracket
+                       // 1 : header
+                       // 2 : schema
+                       // 3 : body
                        
     // Message processing
     // Read each character of the message
@@ -168,20 +161,19 @@ int parseXpl(byte *received, int len)
             line++;
              
             if (strcmp(buffer, OPEN_BRACKET) == 0) {
-                //Serial.println ("Open bracket");
+                Serial.println ("Open bracket");
                 xpl_part++; 
             } 
             else if (strcmp(buffer, CLOSE_BRACKET) == 0) {
-                //Serial.println("Close bracket");                
+                Serial.println("Close bracket");                
                 xpl_part++; 
             }
             else {
             // xpl type (first line)
                 if (xpl_part == 0) {
-                    //Serial.print("Message type : ");
-                    //Serial.println(buffer);
+                    Serial.print("Message type : ");
+                    Serial.println(buffer);
                     sprintf(myType, "%s", buffer);
-                    xpl_part = 1; // next : open bracket for header
                 
                     // eventually add a filter here on xpl type
                     if (strcmp(buffer, "xpl-cmnd")  != 0) {
@@ -189,19 +181,18 @@ int parseXpl(byte *received, int len)
                         return 1;
                     }
                 
-                }         
-                else if (xpl_part == 2) {
+                }   
+                // header      
+                else if (xpl_part == 1) {
                     //If necessary, add code here to check header
-                    xpl_part = 3; // next : close bracket for header
+                    Serial.println("Header");
                 }
                 // schema
-                else if (xpl_part == 4) {
-                    //Serial.print("schema : ");
-                    //Serial.println(buffer);
+                else if (xpl_part == 2) {
+                    Serial.print("schema : ");
+                    Serial.println(buffer);
                     sprintf(mySchema, "%s", buffer);
                        
-                    xpl_part = 5; // next : open bracket for body
-    
                     // eventually add a filter here on schema
                     // warning : if you test on "foo.basic", "foo.basicx" will be accepted unless you add a dedicated test on length
                     if (strcmp(buffer, "arduino.rgb")  != 0) {
@@ -210,12 +201,12 @@ int parseXpl(byte *received, int len)
                     }
                 }
                 // body
-                else if (xpl_part == 6) {
+                else if (xpl_part == 3) {
                     sscanf(buffer, "%[^'=']=%s", key, value);
-                    //Serial.print("Key : value =");
-                    //Serial.print(key);
-                    //Serial.print(" : ");
-                    //Serial.println(value);
+                    Serial.print("Key : value =");
+                    Serial.print(key);
+                    Serial.print(" : ");
+                    Serial.println(value);
                         
                     // Here, store data in appropriate vars for final processing
                     if (strcmp(key, "device")  == 0) {
@@ -239,7 +230,7 @@ int parseXpl(byte *received, int len)
         }
     }
     // End of message
-    if (xpl_part >= 7) {
+    if (xpl_part >= 3) {
         Serial.println("Parsing finished");
 
         // Add here processing about xpl message
@@ -280,5 +271,6 @@ int parseXpl(byte *received, int len)
         return 3;
     }   
 }
+
 
 

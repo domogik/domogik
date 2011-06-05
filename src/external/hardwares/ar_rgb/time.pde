@@ -43,7 +43,7 @@ long previousSecond = 0;
 ***********************************************/
 
 void pulse() {
-    if ((millis() - previousSecond) > 1000) {
+    if (abs(millis() - previousSecond) > 1000) {
         second = 1;
         previousSecond = millis();
     }

@@ -138,8 +138,7 @@ void setup() {
     pinMode(BUTTON_CONTROL, INPUT);
     
     // read analog control value
-    analogControlValue = analogRead(ANALOG_CONTROL);
-    oldAnalogControlValue = analogControlValue;
+    oldAnalogControlValue = analogRead(ANALOG_CONTROL);
     
     // Send a hbeat message on startup
     sendHbeat();

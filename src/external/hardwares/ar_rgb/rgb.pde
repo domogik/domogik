@@ -92,7 +92,7 @@ void setColorOn() {
 /***********************************************
    setColorFromRGB
    Set color to PWM outputs
-   Input : red (int), green (int), blue (int), color in #rrggbb format (char)
+   Input : red (int), green (int), blue (int)
    Output : n/a
 ***********************************************/
 void setColorFromRGB(int redValue, int greenValue, int blueValue) {
