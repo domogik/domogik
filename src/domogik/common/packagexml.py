@@ -316,4 +316,4 @@ class PackageXml():
         print("---------------------------------------------------------")
 
 if __name__ == "__main__":
-    PX = PackageXml("x10_heyu")
+    PX = PackageXml("bts_gen")
