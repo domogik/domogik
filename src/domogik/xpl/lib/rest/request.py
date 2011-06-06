@@ -2300,6 +2300,7 @@ target=*
         json_data.set_data_type("plugin")
 
         # process messages
+        host_list = {}
         for message in messages:
             cmd = message.data['command']
             #host = message.data["host"]
@@ -2314,16 +2315,20 @@ target=*
                     plg_technology = message.data["plugin"+str(idx)+"-techno"]
                     plg_status = message.data["plugin"+str(idx)+"-status"]
                     plg_host = message.data["plugin"+str(idx)+"-host"]
-                    json_data.add_data({"name" : plg_name, 
+                    plugin_data = ({"name" : plg_name, 
                                         "technology" : plg_technology, 
                                         "description" : plg_description, 
                                         "status" : plg_status, 
                                         "type" : plg_type, 
                                         "host" : plg_host})
+                    if host_list.has_key(plg_host):
+                        host_list[plg_host].append(plugin_data)
+                    else:
+                        host_list[plg_host] = [plugin_data]
                     idx += 1
                 except:
                     loop_again = False
-    
+            json_data.add_data(host_list)   
         self.send_http_response_ok(json_data.get())
 
 
