@@ -2186,9 +2186,9 @@ target=*
             if len(self.rest_request) < 3:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
+            self._rest_plugin_start_stop(plugin =  self.rest_request[2], \
                                    command = self.rest_request[0],
-                                   host = self.rest_request[2])
+                                   host = self.rest_request[1])
 
 
         ### plugin config ############################
@@ -2203,10 +2203,10 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 elif len(self.rest_request) == 5:
                     if self.rest_request[2] == "by-name":
-                        self._rest_plugin_config_list(name=self.rest_request[3], hostname=self.rest_request[4])
+                        self._rest_plugin_config_list(name=self.rest_request[4], hostname=self.rest_request[3])
                 elif len(self.rest_request) == 7:
                     if self.rest_request[2] == "by-name" and self.rest_request[5] == "by-key":
-                        self._rest_plugin_config_list(name = self.rest_request[3], hostname=self.rest_request[4], key = self.rest_request[6])
+                        self._rest_plugin_config_list(name = self.rest_request[4], hostname=self.rest_request[3], key = self.rest_request[6])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2226,10 +2226,10 @@ target=*
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 4:
-                    self._rest_plugin_config_del(name=self.rest_request[2], hostname=self.rest_request[3])
+                    self._rest_plugin_config_del(name=self.rest_request[3], hostname=self.rest_request[2])
                 elif len(self.rest_request) == 6:
                     if self.rest_request[4] == "by-key":
-                        self._rest_plugin_config_del_key(name=self.rest_request[2], hostname=self.rest_request[3], key=self.rest_request[5])
+                        self._rest_plugin_config_del_key(name=self.rest_request[3], hostname=self.rest_request[2], key=self.rest_request[5])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
