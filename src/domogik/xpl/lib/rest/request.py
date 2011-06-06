@@ -301,11 +301,11 @@ class ProcessRequest():
 
         # Description and parameters
         info = {}
-        info["REST API release"] = self._rest_api_version
+        info["REST_API_release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
         __import__("domogik")
         dmg = sys.modules["domogik"]
-        info["Domogik release"] = dmg.__version__
+        info["Domogik_release"] = dmg.__version__
 
         # Xml command files
         command = {}
