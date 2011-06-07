@@ -192,7 +192,13 @@ class Manager:
                 message.set_source(self._source)
             if not message.target:
                 message.set_target("*")
-            self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
+            try:
+                self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
+            except:
+                if self.get_stop().is_set():
+                    pass
+                else:
+                    raise
             self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
             self.p.log.warning("Error during send of message")
