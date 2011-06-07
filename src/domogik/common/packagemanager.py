@@ -550,9 +550,9 @@ class PackageManager():
                                  "detail" : pkg_xml.detail,
                                  "author" : pkg_xml.author,
                                  "email" : pkg_xml.email,
-                                 "domogik-min-release" : pkg_xml.domogik_min_release,
+                                 "domogik_min_release" : pkg_xml.domogik_min_release,
                                  "priority" : pkg_xml.priority,
-                                 "package-url" : pkg_xml.package_url})
+                                 "package_url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['name']))
 
     def get_installed_packages_list(self):

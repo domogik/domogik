@@ -641,7 +641,13 @@ class SysManager(XplPlugin):
             #hardware_list = dict(hardwares.load()[1])
 
             # list xml files
-            hardware_list = os.listdir(self._xml_hardware_directory)
+            try:
+                hardware_list = os.listdir(self._xml_hardware_directory)
+            except:
+                msg = "Error accessing hardware directory : %s" % str(traceback.format_exc())
+                print msg
+                self.log.error(msg)
+                return 
 
             state_thread = {}
             for hardware in hardware_list:
@@ -665,8 +671,9 @@ class SysManager(XplPlugin):
                                       "device_id" : plg_xml.device_id})
 
                 except:
-                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
-                    self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
+                    msg = "Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc()))
+                    print msg
+                    self.log.error(msg)
         except NoSectionError:
             pass 
 

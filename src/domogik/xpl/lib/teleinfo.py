@@ -113,7 +113,7 @@ class Teleinfo:
         this method can take time but it enures that the frame returned is valid
         @return frame : list of dict {name, value, checksum}
         """
-        #Get the begin of the frame, markde by \x02
+        #Get the begin of the frame, marked by \x02
         resp = self._ser.readline()
         is_ok = False
         frame = []
@@ -122,7 +122,7 @@ class Teleinfo:
                 while '\x02' not in resp:
                     resp = self._ser.readline()
                 #\x02 is in the last line of a frame, so go until the next one
-                print "* Begin frame"
+                self._log.debug("* Begin frame")
                 resp = self._ser.readline()
                 #A new frame starts
                 #\x03 is the end of the frame
@@ -134,20 +134,20 @@ class Teleinfo:
                         checksum = ' '
                     else:
                         name, value, checksum = resp.replace('\r','').replace('\n','').split()
-                        print "name : %s, value : %s, checksum : %s" % (name, value, checksum)
+                        self._log.debug("name : %s, value : %s, checksum : %s" % (name, value, checksum))
                     if self._is_valid(resp, checksum):
                         frame.append({"name" : name, "value" : value, "checksum" : checksum})
                     else:
-                        print "** FRAME CORRUPTED !"
+                        self._log.debug("** FRAME CORRUPTED !")
                         #This frame is corrupted, we need to wait until the next one
                         frame = []
                         while '\x02' not in resp:
                             resp = self._ser.readline()
-                        print "* New frame after corrupted"
+                        self._log.debug("* New frame after corrupted")
                     resp = self._ser.readline()
                 #\x03 has been detected, that's the last line of the frame
                 if len(resp.replace('\r','').replace('\n','').split()) == 2:
-                    print "* End frame"
+                    self._log.debug("* End frame")
                     #The checksum char is ' '
                     name, value = resp.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
                     checksum = ' '
@@ -155,10 +155,10 @@ class Teleinfo:
                     name, value, checksum = resp.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
                 if self._is_valid(resp, checksum):
                     frame.append({"name" : name, "value" : value, "checksum" : checksum})
-                    print "* End frame, is valid : %s" % frame
+                    self._log.debug("* End frame, is valid : %s" % frame)
                     is_ok = True
                 else:
-                    print "** Last frame invalid"
+                    self._log.debug("** Last frame invalid")
                     resp = self._ser.readline()
             except ValueError:
                 #Badly formatted frame
@@ -173,11 +173,11 @@ class Teleinfo:
         @param frame : the full frame
         @param checksum : the frame checksum
         """
-        print "Check checksum : f = %s, chk = %s" % (frame, checksum)
+        self._log.debug("Check checksum : f = %s, chk = %s" % (frame, checksum))
         datas = ' '.join(frame.split()[0:2])
         my_sum = 0
         for cks in datas:
             my_sum = my_sum + ord(cks)
         computed_checksum = ( my_sum & int("111111", 2) ) + 0x20
-        print "computed_checksum = %s" % chr(computed_checksum)
+        self._log.debug("computed_checksum = %s" % chr(computed_checksum))
         return chr(computed_checksum) == checksum
