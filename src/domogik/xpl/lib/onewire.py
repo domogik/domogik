@@ -42,6 +42,7 @@ class OneWireNetwork
 import ow
 import time
 import traceback
+from threading import Event
 
 
 
@@ -82,13 +83,14 @@ class ComponentDs18b20:
         self.callback = callback
         self.root = self.onewire.get_root()
         self.old_temp = {}
+        self._stop = Event()
         self.start_listening()
 
     def start_listening(self):
         """ 
         Start listening for onewire ds18b20
         """
-        while True:
+        while not self._stop.isSet():
             for comp in self.root.find(type = "DS18B20"):
                 my_id = comp.id
                 try:
@@ -113,8 +115,7 @@ class ComponentDs18b20:
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
-            time.sleep(self.interval)
-
+            self._stop.wait(self.interval)
 
 class ComponentDs18s20:
     """
@@ -135,14 +136,15 @@ class ComponentDs18s20:
         self.callback = callback
         self.root = self.onewire.get_root()
         self.old_temp = {}
-        self.start_listening()
         self.resolution = 12
+        self._stop = Event()
+        self.start_listening()
 
     def start_listening(self):
         """ 
         Start listening for onewire ds18s20
         """
-        while True:
+        while not self._stop.isSet():
             for comp in self.root.find(type = "DS18S20"):
                 my_id = comp.id
                 try:
@@ -167,7 +169,7 @@ class ComponentDs18s20:
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
-            time.sleep(self.interval)
+            self._stop.wait(self.interval)
 
 
 class ComponentDs2401:
@@ -189,13 +191,14 @@ class ComponentDs2401:
         self.callback = callback
         self.root = self.onewire.get_root()
         self.all_ds2401 = {}
+        self._stop = Event()
         self.start_listening()
 
     def start_listening(self):
         """ 
         Start listening for onewire ds2401
         """
-        while True:
+        while not self._stop.isSet():
             actual_ds2401 = {}
             for comp in self.root.find(type = "DS2401"):
                 my_id = comp.id
@@ -224,7 +227,7 @@ class ComponentDs2401:
                                          "type" : "input",
                                          "current" : "LOW"})
                     
-            time.sleep(self.interval)
+            self._stop.wait(self.interval)
  
     
 
