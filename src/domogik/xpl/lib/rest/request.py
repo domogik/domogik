@@ -2328,7 +2328,9 @@ target=*
                     idx += 1
                 except:
                     loop_again = False
-            json_data.add_data(host_list)   
+            for host_name in host_list:
+                json_data.add_data({"host" : host_name, 
+                                    "list" : host_list[host_name]})   
         self.send_http_response_ok(json_data.get())
 
 
