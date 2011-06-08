@@ -64,8 +64,14 @@
                     <tbody>
                     {% for package in host.installed.plugin %}
                         <tr><td>{{package.name}}</td>
-                            <td>{{package.release}}</td>
-                            <td>Enable/Disable</td></tr>
+                            <td>{{package.release}}
+                            {% if package.installed_version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
+                            </td>
+                            <td>{% if package.enabled %}
+                                    <a href='{% url admin_packages_enable_view host.host package.name 'disable' %}'>Disable</a>
+                                {% else %}
+                                    <a href='{% url admin_packages_enable_view host.host package.name 'enable' %}'>Enable</a>
+                                {% endif %}</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -85,7 +91,9 @@
                     {% for package in host.available %}
                         <tr><td>{{package.techno}}</td>
                             <td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
-                            <td>{{package.release}}</td>
+                            <td>{{package.release}}
+                            {% if package.version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
+                            </td>
                             <td>{{package.desc}}</td>
                             <td>{{package.author}}</td>
                             <td>{% if package.upgrade_require and package.install %}
@@ -93,9 +101,9 @@
                                 {% else %}{% if package.upgrade_require and package.update %}
                                     Upgrade domogik, to version package["domogik-min-release"], in order to update
                                     {% else %}{% if package.install %}
-                                        <a href='{% url admin_packages_install_view host.host package.name package.release %}'>Install Package</a>
+                                        <a href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Install Package</a>
                                         {% else %}
-                                        <a href='{% url admin_packages_install_view host.host package.name package.release %}'>Update Package</a>
+                                        <a href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Update Package</a>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}

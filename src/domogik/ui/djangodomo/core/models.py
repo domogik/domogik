@@ -306,6 +306,12 @@ class Plugins(pipes.DmgPipe):
         if resp :
             return resp
 
+    @staticmethod
+    def enable(host, name, action):
+        resp = Plugins.objects.get({'parameters':action + "/" + host + "/" + name})
+        if resp :
+            return resp
+
 class Accounts(pipes.DmgPipe):
     uri = settings.INTERNAL_REST_URL + "/account"
 
@@ -364,7 +370,7 @@ class Packages(pipes.DmgPipe):
             return resp
         
     @staticmethod
-    def get_install(host, name, release):
+    def install(host, name, release):
         resp = Packages.objects.get({'parameters':"install/" + host + "/" + name + "/" + release})
         if resp :
             return resp

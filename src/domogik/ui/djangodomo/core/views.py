@@ -42,6 +42,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.conf import settings
 from distutils2.version import *
+from distutils2.version import IrrationalVersionError
 
 from domogik.ui.djangodomo.core.models import (
     House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes,
@@ -505,29 +506,48 @@ def admin_packages_plugins(request):
     try:
         packages_result = Packages.get_list()
         installed_result = Packages.get_list_installed()
+        plugins_result = Plugins.get_all()
         rest_info = Rest.get_info()
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-
-    dmg_version = NormalizedVersion(rest_info.rest[0].info.Domogik_release)
+    
+    dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
     for host in installed_result.package:
         installed = {}
+        enabled_list = None
+        if plugins_result.plugin:
+            for host2 in plugins_result.plugin[0]:
+                if host2.host == host.host:
+                    enabled_list = host2.list
+        
         if 'plugin' in host.installed:
             for package in host.installed.plugin:
-                installed[package.name] = NormalizedVersion(package.release)
+                try:
+                    installed[package.name] = NormalizedVersion(package.release)
+                except IrrationalVersionError:
+                    package.installed_version_error = True
+        
+                #find enabled plugins
+                if enabled_list:
+                    for plugin in enabled_list:
+                        package.enabled = (plugin.status == 'ON')
+
         host.available = []
         for package in packages_result.package[0].plugin:
-            package_min_version = NormalizedVersion(package.domogik_min_release)
-#            package_version = version.StrictVersion(package.release)
+            package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
+            try:
+                package_version = NormalizedVersion(package.release)
+            except IrrationalVersionError:
+                package.version_error = True
             package.upgrade_require = (package_min_version > dmg_version)
             if package.name not in installed:
                 package.install = True
                 host.available.append(package)
-#            elif installed[package.name] < package_version:
-#                package.update = True
-#                host.available.append(package)
+            elif (not package.installed_version_error) and (not package.version_error) and (installed[package.name] < package_version):
+                package.update = True
+                host.available.append(package)
 
     return __go_to_page(
         request, 'admin/packages/plugins.html',
@@ -547,14 +567,30 @@ def admin_packages_install(request, package_host, package_name, package_release)
     @return an HttpResponse object
     """
     try:
-        packages_result = Packages.get_install(package_host, package_name, package_release)
+        packages_result = Packages.install(package_host, package_name, package_release)
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
     return redirect('admin_packages_plugins_view')
-    
+
+@admin_required
+def admin_packages_enable(request, package_host, package_name, action):
+    """
+    Method called for installing a package
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    try:
+        plugins_result = Plugins.enable(package_host, package_name, action)
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
+    return redirect('admin_packages_plugins_view')
+
 def index(request):
     """
     Method called when the main page is accessed
