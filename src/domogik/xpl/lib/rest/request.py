@@ -2168,7 +2168,7 @@ target=*
             if len(self.rest_request) < 3:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_plugin_detail(self.rest_request[1], self.rest_request[2])
+            self._rest_plugin_detail(self.rest_request[2], self.rest_request[1])
 
 
         ### enable ####################################
