@@ -301,8 +301,8 @@ class Plugins(pipes.DmgPipe):
             return resp
 
     @staticmethod
-    def get_detail(name, host):
-        resp = Plugins.objects.get({'parameters':"detail/" + name + "/" + host})
+    def get_detail(host, name):
+        resp = Plugins.objects.get({'parameters':"detail/" + host + "/" + name})
         if resp :
             return resp
 

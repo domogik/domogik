@@ -83,7 +83,7 @@ $(function(){
             var itype = item.type;
             var iprefix = item.prefix;
             
-            rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
+            rest.get(['plugin', 'config', 'list', 'by-name', '{{ plugin.host }}', '{{ plugin.name }}' , 'by-key', ikey],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -134,8 +134,8 @@ $(function(){
         },
     });
     
-    function deleteConfigKey(name, host, key) {
-        rest.get(['plugin', 'config', 'del', name, host, 'by-key', key],
+    function deleteConfigKey(host, name, key) {
+        rest.get(['plugin', 'config', 'del', host, name, 'by-key', key],
             function(data) {
                 var status = (data.status).toLowerCase();
                 if (status != 'ok') {
@@ -146,8 +146,8 @@ $(function(){
         );
     }
     
-    function deleteConfig(name, host) {
-        rest.get(['plugin', 'config', 'del', name, host],
+    function deleteConfig(host, name) {
+        rest.get(['plugin', 'config', 'del', host, name],
             function(data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
@@ -160,7 +160,7 @@ $(function(){
         );
     }
     
-    function saveConfig(name, host, configuration, nbInterface) {
+    function saveConfig(host, name, configuration, nbInterface) {
         var itemSaved = 0;
         $.each(configuration, function(index, item) {
             var value = null;
@@ -169,7 +169,7 @@ $(function(){
             } else {
                 value = $('#value_' + item.key).val();
             }
-            rest.get(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', item.key, 'value', value],
+            rest.get(['plugin', 'config', 'set', 'hostname', host, 'name', name, 'key', item.key, 'value', value],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -188,7 +188,7 @@ $(function(){
             );
         });
         if (nbInterface != undefined) {
-            rest.get(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', 'nb-int', 'value', nbInterface],
+            rest.get(['plugin', 'config', 'set', 'hostname', host, 'name', name, 'key', 'nb-int', 'value', nbInterface],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status != 'ok') {
@@ -204,7 +204,7 @@ $(function(){
     $('#simple_configuration_items').createConfigurationTable('configuration_items');
 
     /* Get the list of configuration items */
-    rest.get(['plugin', 'detail', '{{ plugin.name }}', '{{ plugin.host }}'],
+    rest.get(['plugin', 'detail', '{{ plugin.host }}', '{{ plugin.name }}'],
         function(data) {
             var status = (data.status).toLowerCase();
             if (status == 'ok') {
@@ -230,7 +230,7 @@ $(function(){
                         $('#group_buttons').append(delInterfaceButton);
 
                         // get number of registered interfaces
-                        rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', 'nb-int'],
+                        rest.get(['plugin', 'config', 'list', 'by-name', '{{ plugin.host }}', '{{ plugin.name }}' , 'by-key', 'nb-int'],
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
@@ -301,7 +301,7 @@ $(function(){
                         delInterfaceButton.click( function() {
                             // delete config data
                             $('tr', '#configuration_items_' + nbInterface).each(function(index, item) {
-                                deleteConfigKey('{{ plugin.name }}', '{{ plugin.host }}', item.id);
+                                deleteConfigKey('{{ plugin.host }}', '{{ plugin.name }}', item.id);
                             });
                             // delete elements from pluginCfg
                             var k = 0;
@@ -315,11 +315,11 @@ $(function(){
                                     nbPluginCfg--;
                                 }
                             }
-                            pluginCfg = pluginCfg2
+                            pluginCfg = pluginCfg2;
                                 
                             // save new nbInterface
                             nbInterface--;
-                            rest.get(['plugin', 'config', 'set', 'name', '{{ plugin.name }}', 'hostname', '{{ plugin.host }}', 'key', 'nb-int', 'value', nbInterface],
+                            rest.get(['plugin', 'config', 'set', 'hostname', '{{ plugin.host }}', 'name', '{{ plugin.name }}', 'key', 'nb-int', 'value', nbInterface],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status != 'ok') {
@@ -340,7 +340,7 @@ $(function(){
                      
                 });
                 
-                rest.get(['plugin', 'config', 'list' ,'by-name', '{{ plugin.name }}', '{{ plugin.host }}'],
+                rest.get(['plugin', 'config', 'list' ,'by-name', '{{ plugin.host }}', '{{ plugin.name }}'],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -356,7 +356,7 @@ $(function(){
                     });
                 $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
                 $("#configurationsubmit").click(function(event) {
-                    saveConfig('{{ plugin.name }}', '{{ plugin.host }}', pluginCfg, nbInterface);
+                    saveConfig('{{ plugin.host }}', '{{ plugin.name }}', pluginCfg, nbInterface);
                     event.stopPropagation();
                 });
             } else {
@@ -367,7 +367,7 @@ $(function(){
     );
 
     $("#configurationdelete").click(function(event) {
-        deleteConfig('{{ plugin.name }}', '{{ plugin.host }}');
+        deleteConfig('{{ plugin.host }}', '{{ plugin.name }}');
     });
 
     function setStatus(status) {
@@ -398,7 +398,7 @@ $(function(){
             .unbind('click')
             .click(function() {
             $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
-            rest.get(['plugin', btaction, '{{ plugin.name }}', '{{ plugin.host }}'],
+            rest.get(['plugin', btaction, '{{ plugin.host }}', '{{ plugin.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');

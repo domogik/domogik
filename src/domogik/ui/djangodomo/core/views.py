@@ -33,7 +33,6 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from distutils import version
 from django.utils.http import urlquote
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -42,6 +41,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.conf import settings
+from distutils2.version import *
 
 from domogik.ui.djangodomo.core.models import (
     House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes,
@@ -376,7 +376,7 @@ def admin_organization_widgets(request):
     )
 
 @admin_required
-def admin_plugins_plugin(request, plugin_name, plugin_host, plugin_type):
+def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
     """
     Method called when the admin plugin command page is accessed
     @param request : HTTP request
@@ -386,7 +386,7 @@ def admin_plugins_plugin(request, plugin_name, plugin_host, plugin_type):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_plugin_detail = Plugins.get_detail(plugin_name, plugin_host)
+        result_plugin_detail = Plugins.get_detail(plugin_host, plugin_name)
         result_all_plugins = Plugins.get_all()
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
@@ -396,49 +396,6 @@ def admin_plugins_plugin(request, plugin_name, plugin_host, plugin_type):
         page_title = _("Plugin")
         return __go_to_page(
             request, 'admin/plugins/plugin.html',
-            page_title,
-            nav1_admin = "selected",
-            nav2_plugins_plugin = "selected",
-            plugins_list=result_all_plugins.plugin,
-            status=status,
-            msg=msg,
-            plugin=result_plugin_detail.plugin[0]
-        )
-    if plugin_type == "hardware":
-        page_title = _("Hardware")
-        return __go_to_page(
-            request, 'admin/plugins/hardware.html',
-            page_title,
-            nav1_admin = "selected",
-            nav2_plugins_plugin = "selected",
-            plugins_list=result_all_plugins.plugin,
-            status=status,
-            msg=msg,
-            plugin=result_plugin_detail.plugin[0]
-        )
-
-# temporary function for test of new plugin page
-@admin_required
-def admin_plugins_plugin2(request, plugin_name, plugin_host, plugin_type):
-    """
-    Method called when the admin plugin command page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
-    try:
-        result_plugin_detail = Plugins.get_detail(plugin_name, plugin_host)
-        result_all_plugins = Plugins.get_all()
-    except BadStatusLine:
-        return render_to_response('error/BadStatusLine.html')
-    except ResourceNotAvailableException:
-        return render_to_response('error/ResourceNotAvailableException.html')
-    if plugin_type == "plugin":
-        page_title = _("Plugin")
-        return __go_to_page(
-            request, 'admin/plugins/plugin2.html',
             page_title,
             nav1_admin = "selected",
             nav2_plugins_plugin = "selected",
@@ -554,15 +511,15 @@ def admin_packages_plugins(request):
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
-    dmg_version = version.StrictVersion(rest_info.rest[0].info["Domogik release"])
+    dmg_version = NormalizedVersion(rest_info.rest[0].info.Domogik_release)
     for host in installed_result.package:
         installed = {}
         if 'plugin' in host.installed:
             for package in host.installed.plugin:
-                installed[package.name] = version.StrictVersion(package.release)
+                installed[package.name] = NormalizedVersion(package.release)
         host.available = []
         for package in packages_result.package[0].plugin:
-            package_min_version = version.StrictVersion(package["domogik-min-release"])
+            package_min_version = NormalizedVersion(package.domogik_min_release)
 #            package_version = version.StrictVersion(package.release)
             package.upgrade_require = (package_min_version > dmg_version)
             if package.name not in installed:

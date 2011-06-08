@@ -33,7 +33,7 @@ $(function(){
     {% endifequal %}
     
     /* Get the list of configuration items */
-    rest.get(['plugin', 'detail', '{{ plugin.name }}', '{{ plugin.host }}'],
+    rest.get(['plugin', 'detail', '{{ plugin.host }}', '{{ plugin.name }}'],
         function(data) {
             var status = (data.status).toLowerCase();
             if (status == 'ok') {
@@ -86,7 +86,7 @@ $(function(){
             .unbind('click')
             .click(function() {
             $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
-            rest.get(['plugin', btaction, '{{ plugin.name }}', '{{ plugin.host }}'],
+            rest.get(['plugin', btaction, '{{ plugin.host }}', '{{ plugin.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');
