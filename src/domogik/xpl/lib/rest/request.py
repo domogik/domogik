@@ -122,6 +122,7 @@ class ProcessRequest():
         self.myxpl = self.handler_params[0].myxpl
         self.log = self.handler_params[0].log
         self.log_dm = self.handler_params[0].log_dm
+        self._package_path = self.handler_params[0]._package_path
         self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
         self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
         self.repo_dir = self.handler_params[0].repo_dir
@@ -3408,8 +3409,18 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
+        ### get-mode ##################################
+        if self.rest_request[0] == "get-mode":
+
+            if len(self.rest_request) == 1:
+                self._rest_package_get_mode()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### list-repo #################################
-        if self.rest_request[0] == "list-repo":
+        elif self.rest_request[0] == "list-repo":
 
             if len(self.rest_request) == 1:
                 self._rest_package_list_repo()
@@ -3465,9 +3476,20 @@ target=*
             self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
             return
 
+    def _rest_package_get_mode(self):
+        """ Get mode (devlopement of install) for packages management
+        """
+        self.log.debug("Package : ask for mode")
 
-
-
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("mode")
+        if self._package_path == None:
+            json_data.add_data("development")
+        else:
+            json_data.add_data("normal")
+    
+        self.send_http_response_ok(json_data.get())
 
     def _rest_package_list_repo(self):
         """ Get repositories list
