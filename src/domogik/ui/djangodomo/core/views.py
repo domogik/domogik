@@ -518,7 +518,7 @@ def admin_packages_plugins(request):
         installed = {}
         enabled_list = None
         if plugins_result.plugin:
-            for host2 in plugins_result.plugin[0]:
+            for host2 in plugins_result.plugin:
                 if host2.host == host.host:
                     enabled_list = host2.list
         
@@ -532,7 +532,8 @@ def admin_packages_plugins(request):
                 #find enabled plugins
                 if enabled_list:
                     for plugin in enabled_list:
-                        package.enabled = (plugin.status == 'ON')
+                        if (plugin.name == package.name):
+                            package.enabled = True
 
         host.available = []
         for package in packages_result.package[0].plugin:
