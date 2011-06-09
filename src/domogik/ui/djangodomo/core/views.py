@@ -68,8 +68,12 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
     response_attr_list['is_user_connected'] = __is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
-    return render_to_response(html_page, response_attr_list,
+    response = render_to_response(html_page, response_attr_list,
                               context_instance=RequestContext(request))
+    response['Pragma'] = 'no-cache'
+    response['Cache-Control'] = 'no-cache, must-revalidate'
+    response['Expires'] = '0'
+    return response
 
 def login(request):
     """
