@@ -496,7 +496,7 @@ def admin_packages_repositories(request):
         repositories=repositories_result.repository
     )
 
-@admin_required
+#@admin_required
 def admin_packages_plugins(request):
     """
     Method called when the admin plugins page is accessed
@@ -532,7 +532,7 @@ def admin_packages_plugins(request):
                     installed[package.name] = NormalizedVersion(package.release)
                 except IrrationalVersionError:
                     package.installed_version_error = True
-        
+                    installed[package.name] = package.release
                 #find enabled plugins
                 if enabled_list:
                     for plugin in enabled_list:
@@ -547,12 +547,14 @@ def admin_packages_plugins(request):
             except IrrationalVersionError:
                 package.version_error = True
             package.upgrade_require = (package_min_version > dmg_version)
+            print installed
             if package.name not in installed:
                 package.install = True
                 host.available.append(package)
-            elif (not package.installed_version_error) and (not package.version_error) and (installed[package.name] < package_version):
-                package.update = True
-                host.available.append(package)
+            elif not hasattr(package, 'installed_version_error') and not hasattr(package, 'version_error'):
+                if (installed[package.name] < package_version):
+                    package.update = True
+                    host.available.append(package)
 
     return __go_to_page(
         request, 'admin/packages/plugins.html',
