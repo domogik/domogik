@@ -250,10 +250,8 @@ class SysManager(XplPlugin):
 
             # define timers
             if self.options.check_hardware:
-                hardware_stop = Event()
                 hardware_timer = XplTimer(15, 
                                           self._check_hardware_status, 
-                                          hardware_stop,
                                           self.myxpl)
                 hardware_timer.start()
 

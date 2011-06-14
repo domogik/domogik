@@ -72,8 +72,7 @@ class PlcBusMain(XplPlugin):
         self.add_stop_cb(self.api.stop)
         if self._probe_inter != 0:
             self._probe_status = {}
-            self._probe_stop = threading.Event()
-            self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self._probe_stop, self.myxpl)
+            self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self.myxpl)
             self._probe_thr.start()
 #            self.register_timer(self._probe_thr)
         self.enable_hbeat()
