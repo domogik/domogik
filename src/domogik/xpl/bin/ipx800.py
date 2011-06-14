@@ -88,7 +88,7 @@ class IPXManager(XplPlugin):
         ### Create IPX objects
         num_ok = 0
         for ipx in self.ipx_list:
-            self.ipx_list[ipx]['obj'] = IPX(self.log, self.send_xpl)
+            self.ipx_list[ipx]['obj'] = IPX(self.log, self.send_xpl, self.get_stop())
             try:
                 self.log.info("Opening IPX800 named '%s' (ip : %s)" % 
                                (ipx, self.ipx_list[ipx]['ip']))
