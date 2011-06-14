@@ -41,7 +41,6 @@ from time import localtime
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
-import threading
 
 TIME_BETWEEN_EACH_MESSAGE = 60
 
@@ -54,10 +53,8 @@ class XPLDateTime(XplPlugin):
     def __init__(self):
         XplPlugin.__init__(self, name = 'xpl_time')
         
-        self._listen_stop = threading.Event()
         self._listen_thr = XplTimer(TIME_BETWEEN_EACH_MESSAGE, \
                                     self._send_datetime,
-                                    self._listen_stop, \
                                     self.myxpl)
         self._listen_thr.start()
         self.enable_hbeat()

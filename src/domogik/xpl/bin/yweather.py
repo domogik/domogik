@@ -90,13 +90,11 @@ class YWeatherManager(XplPlugin):
         for city in self.cities:
             try:
                 self.log.info("Start listening weather for '%s'" % city)
-                self._listen_stop = threading.Event()
                 self._listen_thr = XplTimer(TIME_BETWEEN_EACH_WEATHER_READ, \
                                             self.cities[city]["obj"].get, \
-                                            self._listen_stop, \
                                             self.myxpl)
                 self._listen_thr.start()
-                self.enable_hbeat()               
+                self.enable_hbeat()
             except YWeatherException as err:
                 self.log.error(err.value)
                 print err.value

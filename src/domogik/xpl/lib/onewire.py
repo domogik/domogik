@@ -46,8 +46,6 @@ import traceback
 from threading import Event
 
 
-
-
 class OneWireException(Exception):
     """
     OneWire exception
@@ -61,14 +59,12 @@ class OneWireException(Exception):
         return repr(self.value)
 
 
-
-
 class ComponentDs18b20:
     """
     DS18B20 support
     """
 
-    def __init__(self, log, onewire, interval, resolution, callback):
+    def __init__(self, log, onewire, interval, resolution, callback, stop):
         """
         Return temperature each <interval> seconds
         @param log : log instance
@@ -76,6 +72,7 @@ class ComponentDs18b20:
         @param interval : interval between each data sent
         @param resolution : resolution of data to read
         @param callback : callback to return values
+        @param stop : threading.Event instance
         """
         self._log = log
         self.onewire = onewire
@@ -84,7 +81,7 @@ class ComponentDs18b20:
         self.callback = callback
         self.root = self.onewire.get_root()
         self.old_temp = {}
-        self._stop = Event()
+        self._stop = stop
         self.start_listening()
 
     def start_listening(self):
@@ -123,7 +120,7 @@ class ComponentDs18s20:
     DS18S20 support
     """
 
-    def __init__(self, log, onewire, interval, callback):
+    def __init__(self, log, onewire, interval, callback, stop):
         """
         Return temperature each <interval> seconds
         @param log : log instance
@@ -138,7 +135,7 @@ class ComponentDs18s20:
         self.root = self.onewire.get_root()
         self.old_temp = {}
         self.resolution = 12
-        self._stop = Event()
+        self._stop = stop
         self.start_listening()
 
     def start_listening(self):
@@ -178,7 +175,7 @@ class ComponentDs2401:
     DS2401 support
     """
 
-    def __init__(self, log, onewire, interval, callback):
+    def __init__(self, log, onewire, interval, callback, stop):
         """
         Check component presence each <interval> seconds
         @param log : log instance
@@ -192,7 +189,7 @@ class ComponentDs2401:
         self.callback = callback
         self.root = self.onewire.get_root()
         self.all_ds2401 = {}
-        self._stop = Event()
+        self._stop = stop
         self.start_listening()
 
     def start_listening(self):
@@ -236,7 +233,7 @@ class ComponentDs2438:
     DS2438 support
     """
 
-    def __init__(self, log, onewire, interval, callback):
+    def __init__(self, log, onewire, interval, callback, stop):
         """
         Return temperature each <interval> seconds
         @param log : log instance
@@ -251,6 +248,7 @@ class ComponentDs2438:
         self.root = self.onewire.get_root()
         self.old_temp = {}
         self.old_humidity = {}
+        self._stop = stop
         self.start_listening()
 
     def start_listening(self):

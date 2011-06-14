@@ -39,7 +39,7 @@ Implements
 from domogik.xpl.common.xplconnector import XplTimer
 import socket
 import struct
-from threading import Thread, Event
+from threading import Thread
 import subprocess
 import time
 import traceback
@@ -116,10 +116,8 @@ class Ping:
     def ping(self):
         """ Ping computers
         """
-        self._ping_stop = Event()
         self._ping_thr = XplTimer(self._interval, \
                                   self.ping_list,
-                                  self._ping_stop, \
                                   self.myxpl)
         self._ping_thr.start()
 

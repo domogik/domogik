@@ -377,7 +377,7 @@ class XPLException(Exception):
     xPL exception
     """
 
-    def __init__(self, value):
+    def __init__(self, value):threading.Event()
         self.value = value
 
     def __str__(self):
@@ -392,14 +392,14 @@ class XplTimer():
 #    _callback = None
 #    _timer = None
 
-    def __init__(self, time, cb, stop, manager):
+    def __init__(self, time, cb, manager):
         """
         Constructor : create the internal timer
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
         self._timer = self.__InternalTimer(time, cb, stop, manager.p.log)
-        self._stop = stop
+        self._stop = threading.Event()
         self._manager = manager
         self.log = manager.p.log
         manager.p.register_timer(self)
@@ -416,6 +416,11 @@ class XplTimer():
         Start the timer
         """
         self._timer.start()
+
+    def get_stop(self):
+        """ Returns the threading.Event instance used to stop the XplTimer
+        """
+        return self._stop
 
     def get_timer(self):
         """
