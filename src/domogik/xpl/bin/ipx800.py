@@ -42,6 +42,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.ipx800 import IPXException
 from domogik.xpl.lib.ipx800 import IPX
 import threading
+import traceback
 
 
 class IPXManager(XplPlugin):
@@ -72,11 +73,20 @@ class IPXManager(XplPlugin):
                                        "password" : password,
                                        "ip" : address,
                                        "interval" : float(inter)}
+                num += 1
             else:
                 loop = False
-            num += 1
+
+        # no ipx configured
+        if num == 1:
+            msg = "No ipx800 board configured. Exiting plugin"
+            self.log.info(msg)
+            print(msg)
+            self.force_leave()
+            return
 
         ### Create IPX objects
+        num_ok = 0
         for ipx in self.ipx_list:
             self.ipx_list[ipx]['obj'] = IPX(self.log, self.send_xpl)
             try:
@@ -85,11 +95,19 @@ class IPXManager(XplPlugin):
                 self.ipx_list[ipx]['obj'].open(ipx, self.ipx_list[ipx]['ip'],
                                                self.ipx_list[ipx]['login'],
                                                self.ipx_list[ipx]['password'])
-            except IPXException as err:
-                self.log.error(err.value)
-                print err.value
-                self.force_leave()
-                return
+            except:
+                self.log.error("Error opening board '%s' : %s " % (ipx, traceback.format_exc()))
+                print("Error opening board '%s' : check logs" % ipx)
+            else:
+                num_ok += 1
+
+        # no valid ipx800 board detected
+        if num_ok == 0:
+            msg = "No valid IPX800 board configured. Exiting plugin..."
+            self.log.info(msg)
+            print(msg)
+            self.force_leave()
+            return
 
         ### Start listening each IPX800
         for ipx in self.ipx_list:
@@ -103,9 +121,11 @@ class IPXManager(XplPlugin):
                 ipx_listen.start()
             except IPXException as err:
                 self.log.error(err.value)
-                print err.value
-                self.force_leave()
-                return
+                print(err.value)
+                # we don't quit plugin if an error occured
+                # we can loose a board for a little time
+                #self.force_leave()
+                #return
 
         ### Create listeners for commands
         self.log.info("Creating listener for IPX 800")
