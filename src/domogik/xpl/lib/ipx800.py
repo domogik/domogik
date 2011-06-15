@@ -75,13 +75,15 @@ class IPX:
     """ Library to use IXP800 board
     """
 
-    def __init__(self, log, callback):
+    def __init__(self, log, callback, stop):
         """ Init IPX object
             @param log : log instance
             @param callback : callback
+            @param stop : stop event
         """
         self._log = log
         self._callback = callback
+        self._stop = stop
         self.login = None
         self.password = None
         self.name = ""
@@ -160,9 +162,9 @@ class IPX:
         """ Listen for relay board in background
             @param interval : interval between each read of status
         """
-        while True:
+        while not self._stop.isSet():
             self.get_status()
-            time.sleep(interval)
+            self._stop.wait(interval)
 
 
     def set_relay(self, num, state):
