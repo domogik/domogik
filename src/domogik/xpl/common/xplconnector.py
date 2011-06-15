@@ -405,8 +405,8 @@ class XplTimer():
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        self._timer = self.__InternalTimer(time, cb, stop, manager.p.log)
         self._stop = threading.Event()
+        self._timer = self.__InternalTimer(time, cb, self._stop, manager.p.log)
         self._manager = manager
         self.log = manager.p.log
         manager.p.register_timer(self)
