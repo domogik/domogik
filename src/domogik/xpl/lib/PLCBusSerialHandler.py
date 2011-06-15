@@ -227,30 +227,31 @@ class serialHandler(threading.Thread):
         if self.__myser.inWaiting() < 9:
             time.sleep(0.4)
             return
-        message = self.__myser.read(9) #wait for max 400ms if nothing to read
+        while self.__myser.inWaiting() >= 9:
+            message = self.__myser.read(9) #wait for max 400ms if nothing to read
 #        except IOError:
 #            pass
-        if(message):
-            m_string = hexlify(message)
-            #self.explicit_message(m_string)
-            #if message is likely to be an answer, put it in the right queue
-            #First we check that the message is not from the adapter itself
-            #And simply ignore it if it's the case 
-            print "str : %s" % m_string
-            if self._is_from_myself(m_string):
-                print "from myself"
-                return
-            if self._is_answer(m_string):
-                print "ANSWER : %s" % m_string
-                self._cb(self.explicit_message(m_string))
-            elif self._is_ack(m_string):
-                print "IS ACK : %s, waited ack : %s" % (m_string, self._waited_ack)
-                if (self._waited_ack != None) and self._is_ack_for_message(m_string, self._waited_ack):
-                    self._waited_ack = None
-                    self._ack.set()
-            else:
-                print "QUEUE : %s" % m_string
-                self._cb(self.explicit_message(m_string))
+            if(message):
+                m_string = hexlify(message)
+                #self.explicit_message(m_string)
+                #if message is likely to be an answer, put it in the right queue
+                #First we check that the message is not from the adapter itself
+                #And simply ignore it if it's the case 
+                print "str : %s" % m_string
+                if self._is_from_myself(m_string):
+                    print "from myself"
+                    return
+                if self._is_answer(m_string):
+                    print "ANSWER : %s" % m_string
+                    self._cb(self.explicit_message(m_string))
+                elif self._is_ack(m_string):
+                    print "IS ACK : %s, waited ack : %s" % (m_string, self._waited_ack)
+                    if (self._waited_ack != None) and self._is_ack_for_message(m_string, self._waited_ack):
+                        self._waited_ack = None
+                        self._ack.set()
+                else:
+                    print "QUEUE : %s" % m_string
+                    self._cb(self.explicit_message(m_string))
 
     def stop(self):
         """ Ask the thread to stop, 
