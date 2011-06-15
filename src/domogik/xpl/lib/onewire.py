@@ -46,6 +46,8 @@ import traceback
 from threading import Event
 
 
+
+
 class OneWireException(Exception):
     """
     OneWire exception
@@ -57,6 +59,8 @@ class OneWireException(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
 
 
 class ComponentDs18b20:
