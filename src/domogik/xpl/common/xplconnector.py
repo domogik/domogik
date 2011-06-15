@@ -159,7 +159,7 @@ class Manager:
         self.p.log.debug("Try to enable Heartbeat")
         if self._h_timer == None:
             self._SendHeartbeat()
-            self._h_timer = XplTimer(300, self._SendHeartbeat, self.p.get_stop(), self)
+            self._h_timer = XplTimer(300, self._SendHeartbeat, self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
             Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
