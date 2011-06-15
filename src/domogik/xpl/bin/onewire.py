@@ -109,9 +109,9 @@ class OneWireManager(XplPlugin):
                                             ow, 
                                             float(ds18b20_interval), 
                                             ds18b20_resolution,
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
-                self.add_stop_cb(ds18b20.stop)
                 ds18b20.start()
     
             ### DS18S20 support
@@ -123,9 +123,9 @@ class OneWireManager(XplPlugin):
                                            (self.log,
                                             ow, 
                                             float(ds18s20_interval), 
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
-                self.add_stop_cb(ds18s20.stop)
                 ds18s20.start()
     
             ### DS2401 support
@@ -137,9 +137,9 @@ class OneWireManager(XplPlugin):
                                            (self.log,
                                             ow, 
                                             float(ds2401_interval), 
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
-                self.add_stop_cb(d2401.stop)
                 ds2401.start()
     
             ### DS2438 support
@@ -151,9 +151,9 @@ class OneWireManager(XplPlugin):
                                            (self.log,
                                             ow, 
                                             float(ds2438_interval), 
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
-                self.add_stop_cb(ds2438.stop)
                 ds2438.start()
     
         except:
