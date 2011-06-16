@@ -131,13 +131,19 @@ class BtsGeneral(XplPlugin):
         """ set scenario on or off
             @param message : xpl message
         """
+        activated_scenario = message.data["scenario"]
         if activated_scenario == "bts_gen":
             self.state = "on"
+            msg = XplMessage()
+            msg.set_type("xpl-trig")
+            msg.set_schema('bts.basic')
+            msg.add_data({'scenario' :  "bts_gen"})
+            self.myxpl.send(msg)
         else:
             self.state = "off"
-        msg = "Scenario is %s" % self.state
-        self.log.debug(msg)
-        print(msg)
+        log = "Scenario is %s" % self.state
+        self.log.debug(log)
+        print(log)
 
     def explode(self, input):
         """ Explode an input address
