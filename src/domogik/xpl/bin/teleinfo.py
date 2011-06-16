@@ -92,13 +92,15 @@ class TeleinfoManager(XplPlugin):
             my_temp_message.set_schema("teleinfo.basic")
 
         try:
+            key = None
+            val = None
             for entry in frame:
                 key = re.sub('[^w\.]','',entry["name"].lower())
                 val = re.sub('[^w\.]','',entry["value"].lower())
                 my_temp_message.add_data({ key : val })
             my_temp_message.add_data({"device": "teleinfo"})
         except :
-            self.log.warn("Message ignored : %s" % my_temp_message)
+            self.log.warn("Message ignored : %s ; last key : %s ; last val : %s" % (my_temp_message, key, val))
 
         try:
             self.myxpl.send(my_temp_message)
