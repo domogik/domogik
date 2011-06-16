@@ -42,6 +42,9 @@ from domogik.xpl.common.xplconnector import Listener
 import re
 
 
+INSTANCE_NAME="bts_gen"
+
+
 class BtsGeneral(XplPlugin):
     """ BTS : general scenario
     """
@@ -49,23 +52,23 @@ class BtsGeneral(XplPlugin):
     def __init__(self):
         """ Init plugin
         """
-        XplPlugin.__init__(self, name='bts_gen')
+        XplPlugin.__init__(self, name=INSTANCE_NAME)
 
         # initial state to off
         self.state = "off"
 
         # Get config for input
         self._config = Query(self.myxpl, self.log)
-        input = self._config.query('bts_gen', 'input')
-        self.threshold = self._config.query('bts_gen', 'threshold')
+        input = self._config.query(INSTANCE_NAME, 'input')
+        self.threshold = self._config.query(INSTANCE_NAME, 'threshold')
 
         # Get config for outputs
         self.outputs = {}
         num = 1
         loop = True
         while loop == True:
-            output = self._config.query('bts_gen', 'output-%s' % str(num))
-            level = self._config.query('bts_gen', 'level-%s' % str(num))
+            output = self._config.query(INSTANCE_NAME, 'output-%s' % str(num))
+            level = self._config.query(INSTANCE_NAME, 'level-%s' % str(num))
             if level == "True":
                 level = "HIGH"
             else:
@@ -132,12 +135,12 @@ class BtsGeneral(XplPlugin):
             @param message : xpl message
         """
         activated_scenario = message.data["scenario"]
-        if activated_scenario == "bts_gen":
+        if activated_scenario == INSTANCE_NAME:
             self.state = "on"
             msg = XplMessage()
             msg.set_type("xpl-trig")
             msg.set_schema('bts.basic')
-            msg.add_data({'scenario' :  "bts_gen"})
+            msg.add_data({'scenario' :  INSTANCE_NAME})
             self.myxpl.send(msg)
         else:
             self.state = "off"
