@@ -51,12 +51,13 @@ class BtsGeneral(XplPlugin):
         """
         XplPlugin.__init__(self, name='bts_gen')
 
+        # initial state to off
+        self.state = "off"
+
         # Get config for input
         self._config = Query(self.myxpl, self.log)
         input = self._config.query('bts_gen', 'input')
-        is_logic = self._config.query('bts_gen', 'is-logic')
-        is_threshold = self._config.query('bts_gen', 'is-threshold')
-        threshold = self._config.query('bts_gen', 'threshold')
+        self.threshold = self._config.query('bts_gen', 'threshold')
 
         # Get config for outputs
         self.outputs = {}
@@ -65,8 +66,14 @@ class BtsGeneral(XplPlugin):
         while loop == True:
             output = self._config.query('bts_gen', 'output-%s' % str(num))
             level = self._config.query('bts_gen', 'level-%s' % str(num))
+            if level == "True":
+                level = "HIGH"
+            else:
+                level = "LOW"
             if output != None:
-                self.log.info("Configuration : output=%s, level=%s" % (output, level))
+                msg = "Configuration : output=%s, level=%s" % (output, level)
+                self.log.info(msg)
+                print msg
                 type, address = self.explode(output)
                 self.outputs[output] = {"level" : level,
                                         "type" : type,
@@ -74,6 +81,11 @@ class BtsGeneral(XplPlugin):
             else:
                 loop = False
             num += 1
+
+        # Display scenario state (on/off)
+        msg = "Scenario is %s" % self.state
+        self.log.debug(msg)
+        print(msg)
 
         ### check input type
         # input is "foo:bar" format. foo = type, bar = address
@@ -109,6 +121,24 @@ class BtsGeneral(XplPlugin):
                       'type': 'temp',
                       'device' : input})
 
+        ### Define listener for activations
+        Listener(self.set_state, 
+                 self.myxpl, 
+                 {'schema': 'bts.basic',
+                  'xpltype': 'xpl-cmnd'})
+
+    def set_state(self, message):
+        """ set scenario on or off
+            @param message : xpl message
+        """
+        if activated_scenario == "bts_gen":
+            self.state = "on"
+        else:
+            self.state = "off"
+        msg = "Scenario is %s" % self.state
+        self.log.debug(msg)
+        print(msg)
+
     def explode(self, input):
         """ Explode an input address
             input is "foo:bar" format. foo = type, bar = address
@@ -116,12 +146,15 @@ class BtsGeneral(XplPlugin):
             @param input : input address
             @return : type, address
         """
-        return input.split()[0], input.split()[1]
+        return input.split(":")[0], input.split(":")[1]
        
     def action_ipx800(self, message):
         """ check input and call appropriate action
             @param message : xpl message
         """
+        if self.state == "off":
+            print("Input change but scenario is off : nothing will be done")
+            return
         print("Input change")
         # Get input status
         input_level = message.data['current']
@@ -136,12 +169,15 @@ class BtsGeneral(XplPlugin):
         """ check input and call appropriate action
             @param message : xpl message
         """
+        if self.state == "off":
+            print("Input change but scenario is off : nothing will be done")
+            return
         print("Input change")
         # Get input status
-        input_level = message.data['current']
+        input_temp = message.data['current']
 
         # If input is HIGH
-        if input_level == "HIGH":
+        if input_temp >= self.threshold:
             self.make_action("HIGH")
         else:
             self.make_action("LOW")
@@ -150,6 +186,12 @@ class BtsGeneral(XplPlugin):
         """ make action
             @param action : HIGH, LOW
         """
+        if action == "HIGH":
+            log = "Make action for HIGH or >="
+        else:
+            log = "Make action for LOW or <"
+        self.log.debug(log)
+        print(log)
         for output in self.outputs:
             if action == "HIGH":
                 level = "HIGH"
