@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="bts">
+    <schema name="bts.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device static_name="scenario"/>
+                <value field="scenario" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+
