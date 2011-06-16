@@ -41,6 +41,7 @@ from domogik.xpl.lib.teleinfo import Teleinfo
 from domogik.xpl.lib.teleinfo import TeleinfoException
 from domogik.xpl.common.queryconfig import Query
 import threading
+import re
 
 
 class TeleinfoManager(XplPlugin):
@@ -90,9 +91,14 @@ class TeleinfoManager(XplPlugin):
         else:
             my_temp_message.set_schema("teleinfo.basic")
 
-        for entry in frame:
-            my_temp_message.add_data({entry["name"].lower().strip("\x00\x10") : entry["value"].strip("\x00\x10")})
-        my_temp_message.add_data({"device": "teleinfo"})
+        try:
+            for entry in frame:
+                key = re.sub('[^w\.]','',entry["name"].lower())
+                val = re.sub('[^w\.]','',entry["value"].lower())
+                my_temp_message.add_data({ key : val })
+            my_temp_message.add_data({"device": "teleinfo"})
+        except XplMessageError:
+            self.log.warn("Message ignored : %s" % my_temp_message)
 
         try:
             self.myxpl.send(my_temp_message)
