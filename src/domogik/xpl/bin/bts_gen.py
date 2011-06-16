@@ -77,6 +77,9 @@ class BtsGeneral(XplPlugin):
         # example : ipx800:ipx-btn3
         type, address = self.explode(input)
 
+        # x10 can't be used as input : a physical button action can't be seen
+        # by x10 plugin, so there won't be any xpl-trig message
+
         if type == "ipx800":
             msg = "Input type : ipx800"
             print(msg)
@@ -120,6 +123,7 @@ class BtsGeneral(XplPlugin):
             @param message : xpl message
         """
         print("Input change : make action...")
+
         # Get input status
         input_level = message.data['current']
 
