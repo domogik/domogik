@@ -642,7 +642,7 @@ class SysManager(XplPlugin):
             try:
                 hardware_list = os.listdir(self._xml_hardware_directory)
             except:
-                msg = "Error accessing hardware directory : %s" % str(traceback.format_exc())
+                msg = "Error accessing hardware directory : %s. You should create it" % str(traceback.format_exc())
                 print msg
                 self.log.error(msg)
                 return 

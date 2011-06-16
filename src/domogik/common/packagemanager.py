@@ -362,6 +362,7 @@ class PackageManager():
         self.log("Copying files for %s..." % type)
         try:
             copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
+            self._create_init_py("%s/" % plg_path)
             self._create_init_py("%s/xpl/" % plg_path)
             self._create_init_py("%s/xpl/bin/" % plg_path)
             self._create_init_py("%s/xpl/lib/" % plg_path)
