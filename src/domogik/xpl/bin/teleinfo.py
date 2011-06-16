@@ -97,7 +97,7 @@ class TeleinfoManager(XplPlugin):
                 val = re.sub('[^w\.]','',entry["value"].lower())
                 my_temp_message.add_data({ key : val })
             my_temp_message.add_data({"device": "teleinfo"})
-        except XplMessageError:
+        except :
             self.log.warn("Message ignored : %s" % my_temp_message)
 
         try:
