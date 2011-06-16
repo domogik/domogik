@@ -67,7 +67,10 @@ class BtsGeneral(XplPlugin):
             level = self._config.query('bts_gen', 'level-%s' % str(num))
             if output != None:
                 self.log.info("Configuration : output=%s, level=%s" % (output, level))
-                self.outputs[output] = level
+                type, address = self.explode(output)
+                self.outputs[output] = {"level" : level,
+                                        "type" : type,
+                                        "address" : address}
             else:
                 loop = False
             num += 1
@@ -86,7 +89,7 @@ class BtsGeneral(XplPlugin):
             self.log.info(msg)
 
             ### Define listener for ipx800 input
-            Listener(self.action, 
+            Listener(self.action_ipx800, 
                      self.myxpl, 
                      {'schema': 'sensor.basic',
                       'xpltype': 'xpl-trig',
@@ -99,11 +102,11 @@ class BtsGeneral(XplPlugin):
             self.log.info(msg)
 
             ### Define listener for onewire input
-            Listener(self.action, 
+            Listener(self.action_onewire, 
                      self.myxpl, 
                      {'schema': 'sensor.basic',
                       'xpltype': 'xpl-trig',
-                      'type': 'temperature',
+                      'type': 'temp',
                       'device' : input})
 
     def explode(self, input):
@@ -115,44 +118,86 @@ class BtsGeneral(XplPlugin):
         """
         return input.split()[0], input.split()[1]
        
-    def action(self, message):
-        """ action on input change
-
-            TODO : explain here what is done 
-
+    def action_ipx800(self, message):
+        """ check input and call appropriate action
             @param message : xpl message
         """
-        print("Input change : make action...")
-
+        print("Input change")
         # Get input status
         input_level = message.data['current']
 
         # If input is HIGH
         if input_level == "HIGH":
-            for address in self.outputs:
-                self.set_ipx800_relay(address, self.outputs[address])
-        # If input is LOW, we send opposite values
+            self.make_action("HIGH")
         else:
-            for address in self.outputs:
-                level = self.outputs[address]
+            self.make_action("LOW")
+
+    def action_onewire(self, message):
+        """ check input and call appropriate action
+            @param message : xpl message
+        """
+        print("Input change")
+        # Get input status
+        input_level = message.data['current']
+
+        # If input is HIGH
+        if input_level == "HIGH":
+            self.make_action("HIGH")
+        else:
+            self.make_action("LOW")
+
+    def make_action(self, action):
+        """ make action
+            @param action : HIGH, LOW
+        """
+        for output in self.outputs:
+            if action == "HIGH":
+                level = "HIGH"
+            else:
+                # If input is LOW, we send opposite values
+                level = self.outputs[output]["level"]
                 if level.upper() == "HIGH":
                     level = "LOW"
                 else:
                     level = "HIGH"
-                self.set_ipx800_relay(address, level)
+            if self.outputs[output]["type"] == "ipx800":
+                self.set_ipx800_relay(self.outputs[output]["address"], level)
+            if self.outputs[output]["type"] == "x10":
+                self.set_x10_relay(self.outputs[output]["address"], level)
 
     def set_ipx800_relay(self, address, level):
         """ set an ipx800 relay level at HIGH/LOW
             @param addres : ipx800 relay address
             @param level : HIGH/LOW
         """
-        print("Set '%s' to '%s'" % (address, level))
+        log = "ipx800 : Set '%s' to '%s'" % (address, level)
+        self.log.debug(log)
+        print log
         msg = XplMessage()
         msg.set_type("xpl-cmnd")
         msg.set_schema('control.basic')
         msg.add_data({'device' :  address})
         msg.add_data({'type' :  'output'})
         msg.add_data({'current' :  level})
+        self.myxpl.send(msg)
+
+    def set_x10_relay(self, address, level):
+        """ set a x10 module at on (HIGH)/off(LOW)
+            @param addres : x10 address
+            @param level : HIGH/LOW
+        """
+        log = "x10 : Set '%s' to '%s'" % (address, level)
+        self.log.debug(log)
+        print log
+        msg = XplMessage()
+        msg.set_type("xpl-cmnd")
+        msg.set_schema('x10.basic')
+        msg.add_data({'device' :  address})
+        if level == "HIGH":
+            cmd = "on"
+        else:
+            cmd = "off"
+        msg.add_data({'command' :  cmd})
         self.myxpl.send(msg)
 
 
