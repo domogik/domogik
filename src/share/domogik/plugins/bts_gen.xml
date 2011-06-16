@@ -20,24 +20,45 @@
       <order-id>1</order-id>
       <name>input</name>
       <type>string</type>
-      <description>IPX800 digital input address</description>
+      <description>Input address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>is-logic</name>
+      <type>boolean</type>
+      <description>Action on logical level ?</description>
+      <default-value>True</default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>is-threshold</name>
+      <type>boolean</type>
+      <description>Action on threshold ?</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>threshold</name>
+      <type>string</type>
+      <description>Threshold value</description>
       <default-value></default-value>
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>2</order-id>
+      <order-id>5</order-id>
       <name>output</name>
       <type>string</type>
-      <description>IPX800 relay address</description>
+      <description>Output address</description>
       <default-value></default-value>
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>3</order-id>
+      <order-id>6</order-id>
       <name>level</name>
-      <type>string</type>
-      <description>IPX800 relay address level (HIGH or LOW)</description>
-      <default-value>HIGH</default-value>
+      <type>boolean</type>
+      <description>Output level when input is at logical level 1 or value > threshold (checked = 1, no checked = 0)</description>
+      <default-value>True</default-value>
     </key>
   </configuration-keys>
   <files>

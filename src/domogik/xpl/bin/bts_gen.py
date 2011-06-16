@@ -54,6 +54,9 @@ class BtsGeneral(XplPlugin):
         # Get config for input
         self._config = Query(self.myxpl, self.log)
         input = self._config.query('bts_gen', 'input')
+        is_logic = self._config.query('bts_gen', 'is-logic')
+        is_threshold = self._config.query('bts_gen', 'is-threshold')
+        threshold = self._config.query('bts_gen', 'threshold')
 
         # Get config for outputs
         self.outputs = {}
@@ -69,14 +72,45 @@ class BtsGeneral(XplPlugin):
                 loop = False
             num += 1
 
-        ### Define listener for ipx800 input
-        Listener(self.action, 
-                 self.myxpl, 
-                 {'schema': 'sensor.basic',
-                  'xpltype': 'xpl-trig',
-                  'type': 'input',
-                  'device' : input})
+        ### check input type
+        # input is "foo:bar" format. foo = type, bar = address
+        # example : ipx800:ipx-btn3
+        type, address = self.explode(input)
 
+        if type == "ipx800":
+            msg = "Input type : ipx800"
+            print(msg)
+            self.log.info(msg)
+
+            ### Define listener for ipx800 input
+            Listener(self.action, 
+                     self.myxpl, 
+                     {'schema': 'sensor.basic',
+                      'xpltype': 'xpl-trig',
+                      'type': 'input',
+                      'device' : input})
+
+        if type == "onewire":
+            msg = "Input type : onewire"
+            print(msg)
+            self.log.info(msg)
+
+            ### Define listener for onewire input
+            Listener(self.action, 
+                     self.myxpl, 
+                     {'schema': 'sensor.basic',
+                      'xpltype': 'xpl-trig',
+                      'type': 'temperature',
+                      'device' : input})
+
+    def explode(self, input):
+        """ Explode an input address
+            input is "foo:bar" format. foo = type, bar = address
+            example : ipx800:ipx-btn3
+            @param input : input address
+            @return : type, address
+        """
+        return input.split()[0], input.split()[1]
        
     def action(self, message):
         """ action on input change
