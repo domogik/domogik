@@ -95,8 +95,8 @@ class TeleinfoManager(XplPlugin):
             key = None
             val = None
             for entry in frame:
-                key = re.sub('[^w\.]','',entry["name"].lower())
-                val = re.sub('[^w\.]','',entry["value"].lower())
+                key = re.sub('[^\w\.]','',entry["name"].lower())
+                val = re.sub('[^\w\.]','',entry["value"].lower())
                 my_temp_message.add_data({ key : val })
             my_temp_message.add_data({"device": "teleinfo"})
         except :
