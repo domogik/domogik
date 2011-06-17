@@ -56,6 +56,26 @@
       <name>BTS Project</name>
       <description>BTS Project</description>
   </device_technology>
-  <device_types/>
-  <device_feature_models/>
+  <device_types>
+      <device_type>
+          <id>bts.scenario</id>
+          <device_technology_id>bts</device_technology_id>
+          <name>Scenario</name>
+          <description>Scenario</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>bts.scenario.scenario</id>
+          <name>Scenario</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>bts.scenario</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>scenario</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>
