@@ -18,6 +18,7 @@
             var self = this, o = this.options;
             this.element.addClass("icon32-usage-" + o.usage)
                 .processing();
+            //this._status = $.getStatus();
             var button1 = $("<button id='button1' class='button'>A</button>");
             button1.click(function (e) {self.action1();e.stopPropagation();})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.action1; e.stopPropagation();}});
@@ -29,7 +30,7 @@
             this.element.append(button2);
 
             var button3 = $("<button id='button3' class='button'>C</button>");
-            button1.click(function (e) {self.action3();e.stopPropagation();})
+            button3.click(function (e) {self.action3();e.stopPropagation();})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.action3; e.stopPropagation();}});
             this.element.append(button3);
 
@@ -44,7 +45,7 @@
         action1: function() {
             var self = this, o = this.options;
             this.element.startProcessingState();
-            rest.get(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command],
+            rest.get(['command', o.devicetechnology, "bts_gen", "on"],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -61,7 +62,7 @@
         action2: function() {
             var self = this, o = this.options;
             this.element.startProcessingState();
-            rest.get(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command],
+            rest.get(['command', o.devicetechnology, "bts_gen2", "on"],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -78,7 +79,7 @@
         action3: function() {
             var self = this, o = this.options;
             this.element.startProcessingState();
-            rest.get(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command],
+            rest.get(['command', o.devicetechnology, "bts_gen3", "on"],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -95,13 +96,14 @@
         cancel: function() {
             var self = this, o = this.options;
             this.element.stopProcessingState();
-            this._status.displayStatusError();
+            //this._status.displayStatusError();
         },
 
         /* Valid the processing state */
         valid: function(confirmed) {
             var self = this, o = this.options;
             this.element.stopProcessingState();
+            /*
             if (confirmed) {
                 this._status.displayStatusOk();
                 this.element.doTimeout( 'resetStatus', state_reset_status, function(){
@@ -110,6 +112,7 @@
             } else {
                 self._status.displayResetStatus();                
             }
+            */
         }
     });
 })(jQuery);

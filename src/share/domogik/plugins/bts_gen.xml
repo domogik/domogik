@@ -66,14 +66,14 @@
   </device_types>
   <device_feature_models>
       <device_feature_model>
-          <id>bts.scenario.scenario</id>
+          <id>bts.scenario.trigger</id>
           <name>Scenario</name>
           <feature_type>actuator</feature_type>
           <device_type_id>bts.scenario</device_type_id>
           <parameters>
               {}
           </parameters>
-          <value_type>string</value_type>
+          <value_type>trigger</value_type>
           <stat_key>scenario</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>

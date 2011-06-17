@@ -1,0 +1,16 @@
+<technology id="bts">
+  <command name="on">
+    <schema>bts.basic</schema>
+    <command-key>command</command-key>
+    <address-key>scenario</address-key>
+    <command-xpl-value>on</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>bts.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="scenario" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
