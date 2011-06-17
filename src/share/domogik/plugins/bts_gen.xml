@@ -1,10 +1,10 @@
 <package type="plugin">
   <name>bts_gen</name>
   <technology>bts</technology>
-  <description>bts_gen</description>
-  <detail>bts_gen</detail>
+  <description>Generic scenario template</description>
+  <detail>Generic scenario template</detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/#</documentation>
+  <documentation>http://wiki.domogik.org/plugin_bts_gen</documentation>
   <author>BTS, Fritz</author>
   <author-email>unkwown, fritz.smh at gmail.com</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
@@ -47,9 +47,7 @@
       <default-value>True</default-value>
     </key>
   </configuration-keys>
-  <files>
-    <file path="src/share/domogik/plugins/bts_gen.xml"/>
-  </files>
+  <files/>
   <dependencies/>
   <device_technology>
       <id>bts</id>
