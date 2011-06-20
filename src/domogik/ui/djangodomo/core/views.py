@@ -184,7 +184,7 @@ def __is_user_admin(request):
     user = __get_user_connected(request)
     return user is not None and user['is_admin']
 
-def __is_development_mode(request):
+def __is_normal_mode(request):
     """
     Check if domogik is installed in developper mode
     @param request : HTTP request
@@ -196,7 +196,7 @@ def __is_development_mode(request):
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    return mode.mode[0] == "development"
+    return mode.mode[0] == "normal"
     
 @admin_required
 def admin_management_accounts(request):
@@ -223,7 +223,7 @@ def admin_management_accounts(request):
         nav2_management_accounts = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         accounts_list=result_all_accounts.account,
         people_list=result_all_people.person
     )
@@ -257,7 +257,7 @@ def admin_organization_devices(request):
         nav2_organization_devices = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         id=id,
         devices_list=result_all_devices.device,
         usages_list=result_all_usages.device_usage,
@@ -297,7 +297,7 @@ def admin_organization_rooms(request):
         nav2_organization_rooms = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         id=id,
         rooms_list=result_all_rooms.room,
         house_rooms=result_house_rooms.room,
@@ -331,7 +331,7 @@ def admin_organization_areas(request):
         nav2_organization_areas = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         id=id,
         areas_list=result_all_areas.area
     )
@@ -360,7 +360,7 @@ def admin_organization_house(request):
         nav2_organization_house = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         house=result_house
     )
 
@@ -393,7 +393,7 @@ def admin_organization_widgets(request):
         nav2_organization_widgets = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         areas_list=result_all_areas.area,
         rooms_list=result_all_rooms.room
     )
@@ -425,7 +425,7 @@ def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
             plugins_list=result_all_plugins.plugin,
             status=status,
             msg=msg,
-            development_mode=__is_development_mode(request),
+            normal_mode=__is_normal_mode(request),
             plugin=result_plugin_detail.plugin[0]
         )
     if plugin_type == "hardware":
@@ -438,7 +438,7 @@ def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
             plugins_list=result_all_plugins.plugin,
             status=status,
             msg=msg,
-            development_mode=__is_development_mode(request),
+            normal_mode=__is_normal_mode(request),
             plugin=result_plugin_detail.plugin[0]
         )
 
@@ -487,7 +487,7 @@ def admin_tools_rest(request):
         nav2_tools_rest = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         rest=rest_result.rest[0]
     )
 
@@ -515,7 +515,7 @@ def admin_packages_repositories(request):
         nav2_packages_repositories = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         repositories=repositories_result.repository
     )
 
@@ -586,7 +586,7 @@ def admin_packages_plugins(request):
         nav2_packages_plugins = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request),
+        normal_mode=__is_normal_mode(request),
         hosts=installed_result.package
     )
     
