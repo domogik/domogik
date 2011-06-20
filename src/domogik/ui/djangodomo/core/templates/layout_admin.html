@@ -76,7 +76,7 @@
                     <li><a href="{% url admin_tools_helpers_view %}" class='icon32-menu-helpers {{ nav2_tools_helpers }}'>{% trans "Helpers" %}</a></li>
                     <li><a href="{% url admin_tools_rest_view %}" class='icon32-menu-rest {{ nav2_tools_rest }}'>{% trans "Rest" %}</a></li>
                 </ul>
-                {% if developp %}
+                {% if development_mode %}
                 <div class="subnav2"><a href="#">{% trans "Packages" %}</a></div>
                 <ul>
                     <li><a href="{% url admin_packages_repositories_view %}" class='{{ nav2_packages_repositories }}'>{% trans "Repositories" %}</a></li>
