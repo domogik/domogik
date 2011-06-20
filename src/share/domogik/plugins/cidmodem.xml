@@ -39,7 +39,7 @@
     <file path="src/domogik/xpl/lib/cidmodem.py"/>
   </files>
   <dependencies>
-    <dep name="pySerial > 2.4"/>
+    <dep python="pySerial > 2.4"/>
   </dependencies>
   <device_technology>
       <id>communication</id>

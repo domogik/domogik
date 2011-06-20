@@ -31,7 +31,7 @@
     <file path="src/domogik/xpl/lib/mirror.py"/>
   </files>
   <dependencies>
-    <dep name="pySerial > 2.4"/>
+    <dep python="pySerial > 2.4"/>
   </dependencies>
   <device_technology>
       <id>rfid</id>
