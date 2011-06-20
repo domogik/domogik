@@ -61,6 +61,9 @@ class BtsGeneral(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         input = self._config.query(INSTANCE_NAME, 'input')
         self.threshold = self._config.query(INSTANCE_NAME, 'threshold')
+        msg = "Configuration : input=%s, threshold=%s" % (input, self.threshold)
+        self.log.info(msg)
+        print msg
 
         # Get config for outputs
         self.outputs = {}
