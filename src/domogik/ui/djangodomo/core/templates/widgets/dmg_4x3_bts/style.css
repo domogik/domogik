@@ -1,0 +1,24 @@
+.dmg_4x3_bts {    
+    text-align:center;
+    background-position: 1% 1%;
+    background-repeat: no-repeat;
+}
+
+.dmg_4x3_bts .button {
+    position:absolute;
+    left:2em;
+    width:22em;
+    height:4em;
+}
+
+.dmg_4x3_bts #button1 {
+    top:10%;
+}
+
+.dmg_4x3_bts #button2 {
+    top:40%;
+}
+
+.dmg_4x3_bts #button3 {
+    top:70%;
+}
