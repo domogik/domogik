@@ -112,7 +112,7 @@ class BtsGeneral(XplPlugin):
                      {'schema': 'sensor.basic',
                       'xpltype': 'xpl-trig',
                       'type': 'input',
-                      'device' : input})
+                      'device' : address})
 
         if type == "onewire":
             msg = "Input type : onewire"
@@ -125,7 +125,7 @@ class BtsGeneral(XplPlugin):
                      {'schema': 'sensor.basic',
                       'xpltype': 'xpl-trig',
                       'type': 'temp',
-                      'device' : input})
+                      'device' : address})
 
         ### Define listener for activations
         Listener(self.set_state, 
