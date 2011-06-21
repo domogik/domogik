@@ -43,6 +43,6 @@ def ucode(my_string):
 
     """
     if my_string is not None:
-        return unicode(my_string)
+        return unicode(my_string, "utf-8")
     else:
         return None
