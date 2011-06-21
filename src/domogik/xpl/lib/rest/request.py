@@ -46,6 +46,7 @@ from domogik.common.packagemanager import PackageManager
 from domogik.common.packagexml import PackageXml, PackageException
 import time
 import urllib
+import urlparse
 from socket import gethostname
 import re
 import traceback
@@ -159,7 +160,9 @@ class ProcessRequest():
         self.csv_export = False
 
         # url processing
-        #self.path = urllib.unquote(unicode(self.path))
+        print "before:%s" % self.path
+        self.path = self.fixurl(self.path)
+        print "after:%s" % self.path
 
         # replace password by "***". 
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
@@ -198,8 +201,42 @@ class ProcessRequest():
 
         #### END TEMPORARY DATA ################################
 
-
-
+    def fixurl(self, url):
+        """ translate url in unicode
+            @param url : url to put in unicode
+        """
+        # turn string into unicode
+        if not isinstance(url,unicode):
+            url = url.decode('utf8')
+    
+        # parse it
+        parsed = urlparse.urlsplit(url)
+    
+        # divide the netloc further
+        userpass,at,hostport = parsed.netloc.partition('@')
+        user,colon1,pass_ = userpass.partition(':')
+        host,colon2,port = hostport.partition(':')
+    
+        # encode each component
+        scheme = parsed.scheme.encode('utf8')
+        user = urllib.quote(user.encode('utf8'))
+        colon1 = colon1.encode('utf8')
+        pass_ = urllib.quote(pass_.encode('utf8'))
+        at = at.encode('utf8')
+        host = host.encode('idna')
+        colon2 = colon2.encode('utf8')
+        port = port.encode('utf8')
+        path = '/'.join(  # could be encoded slashes!
+            urllib.quote(urllib.unquote(pce).encode('utf8'),'')
+            for pce in parsed.path.split('/')
+        )
+        query = urllib.quote(urllib.unquote(parsed.query).encode('utf8'),'=&?/')
+        fragment = urllib.quote(urllib.unquote(parsed.fragment).encode('utf8'))
+    
+        # put it back together
+        netloc = ''.join((user,colon1,pass_,at,host,colon2,port))
+        return urllib.unquote(urlparse.urlunsplit((scheme,netloc,path,query,fragment)))
+    
     def do_for_all_methods(self):
         """ Process request
             This function call appropriate functions for processing path
@@ -1373,8 +1410,9 @@ target=*
             elif data == "False":
                 return False
             else:
+                return data
                 #return unicode(urllib.unquote(data), sys.stdin.encoding)
-                return unicode(urllib.unquote(data), "UTF-8")
+                #return unicode(urllib.unquote(data), "UTF-8")
         except KeyError:
             return None
 
