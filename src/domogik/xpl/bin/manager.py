@@ -544,7 +544,8 @@ class SysManager(XplPlugin):
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        mess.set_target("xpl-%s.%s" % (name, self.get_sanitized_hostname()))
+        if name != "*":
+            mess.set_target("xpl-%s.%s" % (name, self.get_sanitized_hostname()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
         my_listener = Listener(self._cb_check_component_is_running, 
