@@ -153,10 +153,11 @@ class SysManager(XplPlugin):
                 else:
                     thr_dbmgr = Thread(None,
                                        self._start_plugin,
-                                       None,
+                                       "start_plugin_dbmgr",
                                        ("dbmgr",
                                         self.get_sanitized_hostname()),
                                        {"ping" : False, "startup" : True})
+                    self.register_thread(thr_dbmgr)
                     thr_dbmgr.start()
     
             #Start rest
@@ -169,26 +170,27 @@ class SysManager(XplPlugin):
                 else:
                     thr_rest = Thread(None,
                                        self._start_plugin,
-                                       None,
+                                       "start_plugin_rest",
                                        ("rest",
                                         self.get_sanitized_hostname()),
                                        {"ping" : False, "startup" : True})
+                    self.register_thread(thr_rest)
                     thr_rest.start()
     
             #Start trigger
-            if self.options.start_trigger:
-                self._inc_startup_lock()
-                if self._check_component_is_running("trigger"):
-                    self.log.warning("Manager started with -t, but a trigger manager is already running")
-                    self._write_fifo("WARN", "Manager started with -t, but a trigger manager is already running\n")
-                else:
-                    thr_trigger = Thread(None,
-                                       self._start_plugin,
-                                       None,
-                                       ("trigger",
-                                        self.get_sanitized_hostname()),
-                                       {"ping" : False, "startup" : True})
-                    thr_trigger.start()
+            #if self.options.start_trigger:
+            #    self._inc_startup_lock()
+            #    if self._check_component_is_running("trigger"):
+            #        self.log.warning("Manager started with -t, but a trigger manager is already running")
+            #        self._write_fifo("WARN", "Manager started with -t, but a trigger manager is already running\n")
+            #    else:
+            #        thr_trigger = Thread(None,
+            #                           self._start_plugin,
+            #                           None,
+            #                           ("trigger",
+            #                            self.get_sanitized_hostname()),
+            #                           {"ping" : False, "startup" : True})
+            #        thr_trigger.start()
 
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
@@ -205,10 +207,11 @@ class SysManager(XplPlugin):
                     self._inc_startup_lock()
                     comp_thread[name] = Thread(None,
                                                    self._start_plugin,
-                                                   None,
+                                                   "start_plugin_%s" % name,
                                                    (name,
                                                     self.get_sanitized_hostname()),
                                                    {"startup" : True})
+                    self.register_thread(comp_thread[name])
                     comp_thread[name].start()
             
             # Define listeners
@@ -245,6 +248,7 @@ class SysManager(XplPlugin):
                 config_files_dir.append(os.path.dirname(fic))
             for direc in set(config_files_dir):
                 wdd = wm.add_watch(direc, mask, rec = True)
+            self.add_stop_cb(notifier.join)
 
             self.enable_hbeat()
             print("Ready!")
@@ -267,9 +271,10 @@ class SysManager(XplPlugin):
                         name = plugin["name"]
                         ping_thread[name] = Thread(None,
                                              self._check_component_is_running,
-                                             None,
+                                             "ping_%s" % name,
                                              (name, None),
                                              {})
+                        self.register(ping_thread[n])
                         ping_thread[name].start()
 
             self.wait()
@@ -359,11 +364,11 @@ class SysManager(XplPlugin):
             self.log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, self.get_sanitized_hostname()))
 
             # start plugin
-            if cmd == "start" and host == self.get_sanitized_hostname() and plg != "rest":
+            if cmd == "start" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
                 self._start_plugin(plg, host) 
 
             # stop plugin
-            if cmd == "stop" and host == self.get_sanitized_hostname() and plg != "rest":
+            if cmd == "stop" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
                 self._stop_plugin(plg, host)
 
             # list plugin
@@ -737,9 +742,10 @@ class SysManager(XplPlugin):
                     # check plugin state (will update component status)
                     state_thread[plg_xml.name] = Thread(None,
                                                    self._check_component_is_running,
-                                                   None,
+                                                   "ping_%s" % plg_xml.name,
                                                    (plg_xml.name, None),
                                                    {})
+                    self.register_thread(state_thread[plg_xml.name])
                     state_thread[plg_xml.name].start()
 
                 except:
