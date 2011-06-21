@@ -127,6 +127,7 @@ header#mainheader #subtitle {
 }
 
 section#mainsection {
+    font-size:1.2em;
     display:block;
 	min-height:40em;
 }
