@@ -553,6 +553,7 @@ class PackageManager():
                                  "email" : pkg_xml.email,
                                  "domogik_min_release" : pkg_xml.domogik_min_release,
                                  "priority" : pkg_xml.priority,
+                                 "dependencies" : pkg_xml.dependencies,
                                  "package_url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['name']))
 

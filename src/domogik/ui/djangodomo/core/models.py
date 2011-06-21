@@ -374,3 +374,9 @@ class Packages(pipes.DmgPipe):
         resp = Packages.objects.get({'parameters':"install/" + host + "/" + name + "/" + release})
         if resp :
             return resp
+    
+    @staticmethod
+    def get_mode():
+        resp = Packages.objects.get({'parameters':"get-mode"})
+        if resp :
+            return resp 

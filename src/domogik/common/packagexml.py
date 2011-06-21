@@ -41,6 +41,7 @@ import traceback
 from xml.sax.saxutils import escape
 import urllib2
 import datetime
+import time #for debug : remove after dev
 
 
 
@@ -183,8 +184,12 @@ class PackageXml():
             self.dependencies = []
             xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
-               data = {"name" :  dep.attributes.get("name").value.strip()}
-               self.dependencies.append(data)
+               if "python" in dep.attributes.keys():
+                   data = {"python" :  dep.attributes.get("python").value.strip()}
+                   self.dependencies.append(data)
+               if "other" in dep.attributes.keys():
+                   data = {"other" :  dep.attributes.get("other").value.strip()}
+                   self.dependencies.append(data)
 
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.name)
@@ -301,7 +306,7 @@ class PackageXml():
         print("Domogik min release : %s" % self.domogik_min_release)
         print("----- Python dependencies -------------------------------")
         for dep in self.dependencies:
-            print("- %s" % dep["name"])
+            print("- %s" % dep)
         print("----- Package files -------------------------------------")
         for my_file in self.files:
             print("- %s" % my_file["path"])
