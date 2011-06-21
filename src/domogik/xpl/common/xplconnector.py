@@ -195,7 +195,7 @@ class Manager:
             try:
                 self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
             except:
-                if self.get_stop().is_set():
+                if self.p.get_stop().is_set():
                     pass
                 else:
                     raise
