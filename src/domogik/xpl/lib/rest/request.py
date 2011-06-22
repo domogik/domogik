@@ -152,7 +152,7 @@ class ProcessRequest():
         self.csv_export = False
 
         # url processing
-        #self.path = urllib.unquote(unicode(self.path))
+        self.path = urllib.unquote(self.path)
 
         # replace password by "***". 
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
