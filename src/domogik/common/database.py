@@ -134,7 +134,7 @@ class DbHelper():
         if engine != None:
             self.__engine = engine
         else:
-            self.__engine = sqlalchemy.create_engine(url, echo = echo_output)
+            self.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8')
         Session = sessionmaker(bind=self.__engine, autoflush=True)
         self.__session = Session()
 
@@ -2459,6 +2459,7 @@ class DbHelper():
 
         """
         # Make sure previously modified objects outer of this method won't be commited
+        self.log.debug("ui item : %s %s" % (ui_item_name, ui_item_value))
         self.__session.expire_all()
         ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
         if ui_item_config is None:
