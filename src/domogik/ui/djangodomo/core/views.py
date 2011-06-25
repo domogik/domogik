@@ -464,7 +464,7 @@ def admin_tools_helpers(request):
     )
 
 @admin_required
-def admin_tools_rest(request):
+def admin_tools_rinor(request):
     """
     Method called when the admin rest page is accessed
     @param request : HTTP request
@@ -473,22 +473,22 @@ def admin_tools_rest(request):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
-    page_title = _("Rest informations")
+    page_title = _("RINOR informations")
     try:
-        rest_result = Rest.get_info()
+        rinor_result = Rest.get_info()
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
-        request, 'admin/tools/rest.html',
+        request, 'admin/tools/rinor.html',
         page_title,
         nav1_admin = "selected",
-        nav2_tools_rest = "selected",
+        nav2_tools_rinor = "selected",
         status=status,
         msg=msg,
         normal_mode=__is_normal_mode(request),
-        rest=rest_result.rest[0]
+        rinor=rinor_result.rest[0]
     )
 
 @admin_required

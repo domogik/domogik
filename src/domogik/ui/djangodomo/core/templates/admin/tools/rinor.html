@@ -41,12 +41,12 @@
         refresh();
         $('body').everyTime('10s', function() {refresh()});
         function refresh() {
-            rinor.get([],
+            rest.get([],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         // Queues
-                        $.each(data.rinor[0].queue, function(index, value) {
+                        $.each(data.rest[0].queue, function(index, value) {
                             var avalue = value.split('/');
                             var valuewidth = avalue[0] * 100 / avalue[1];
                             $("#" + index + " .indicator .valuetxt")
@@ -55,14 +55,14 @@
                                 .width(valuewidth);
                         });
                         
-                        // Events {{rinor.event.Number_of_requests}} / {{rinor.event.Max_size_for_request_queues}}
+                        // Events {{rest.event.Number_of_requests}} / {{rest.event.Max_size_for_request_queues}}
                         $("#request_number").empty();
-                        $("#request_number").append("<li><span class='label'>Number of requests: </span>" + data.rinor[0].event.Number_of_requests + "</li>")
-                        $("#request_number").append("<li><span class='label'>Max size for request queues: </span>" + data.rinor[0].event.Max_size_for_request_queues + "</li>")
+                        $("#request_number").append("<li><span class='label'>Number of requests: </span>" + data.rest[0].event.Number_of_requests + "</li>")
+                        $("#request_number").append("<li><span class='label'>Max size for request queues: </span>" + data.rest[0].event.Max_size_for_request_queues + "</li>")
                         
                         // Request list
                         $('table#request_list tbody').empty();
-                        $.each(data.rinor[0].event.Requests, function(index, request) {
+                        $.each(data.rest[0].event.Requests, function(index, request) {
                             var creation_date = new Date(request.creation_date * 1000);
                             var last_access_date = new Date(request.last_access_date * 1000);
                             $('table#request_list tbody').append("<tr><td>"
@@ -88,7 +88,7 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <h1 class="ident"><span class="title">{% trans "Rinor" %}</span></h1>
+    <h1 class="ident"><span class="title">{% trans "RINOR" %}</span></h1>
     <button id='force_refresh' class='button icon16-action-reset'>{% trans "Force Refresh" %}</button>
 {% endblock %}
 
