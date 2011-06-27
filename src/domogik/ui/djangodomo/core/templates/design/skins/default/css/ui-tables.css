@@ -37,7 +37,6 @@ table.tablesorter {
 	font-family:arial;
 	background-color: #CDCDCD;
 	margin:10px 0pt 15px;
-	font-size: 8pt;
 	width: 100%;
 	text-align: left;
 }
@@ -60,6 +59,11 @@ table.tablesorter tbody td {
 	background-color: #FFF;
 	vertical-align: top;
 }
+
+table.tablesorter tbody td.actions {
+    text-align:center;
+}
+
 table.tablesorter tbody tr.odd td {
 	background-color:#F0F0F6;
 }

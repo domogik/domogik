@@ -550,7 +550,8 @@ def admin_packages_plugins(request):
                     enabled_list = host2.list
         
         if 'plugin' in host.installed:
-            for package in host.installed.plugin:
+            host.installed.packages = host.installed.plugin
+            for package in host.installed.packages:
                 try:
                     installed[package.name] = NormalizedVersion(package.release)
                 except IrrationalVersionError:
@@ -580,10 +581,82 @@ def admin_packages_plugins(request):
                     host.available.append(package)
 
     return __go_to_page(
-        request, 'admin/packages/plugins.html',
+        request, 'admin/packages/packages.html',
         page_title,
         nav1_admin = "selected",
         nav2_packages_plugins = "selected",
+        status=status,
+        msg=msg,
+        normal_mode=__is_normal_mode(request),
+        hosts=installed_result.package
+    )
+
+@admin_required
+def admin_packages_hardwares(request):
+    """
+    Method called when the admin hardwares page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    page_title = _("Hardwares packages")
+    try:
+        packages_result = Packages.get_list()
+        installed_result = Packages.get_list_installed()
+        plugins_result = Plugins.get_all()
+        rest_info = Rest.get_info()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    
+    dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
+    for host in installed_result.package:
+        installed = {}
+        enabled_list = None
+        if plugins_result.plugin:
+            for host2 in plugins_result.plugin:
+                if host2.host == host.host:
+                    enabled_list = host2.list
+        
+        if 'hardware' in host.installed:
+            host.installed.packages = host.installed.hardware
+            for package in host.installed.packages:
+                try:
+                    installed[package.name] = NormalizedVersion(package.release)
+                except IrrationalVersionError:
+                    package.installed_version_error = True
+                    installed[package.name] = package.release
+                #find enabled plugins
+                if enabled_list:
+                    for hardware in enabled_list:
+                        if (hardware.name == package.name):
+                            package.enabled = True
+
+        host.available = []
+        for package in packages_result.package[0].hardware:
+            package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
+            try:
+                package_version = NormalizedVersion(package.release)
+            except IrrationalVersionError:
+                package.version_error = True
+            package.upgrade_require = (package_min_version > dmg_version)
+            print installed
+            if package.name not in installed:
+                package.install = True
+                host.available.append(package)
+            elif not hasattr(package, 'installed_version_error') and not hasattr(package, 'version_error'):
+                if (installed[package.name] < package_version):
+                    package.update = True
+                    host.available.append(package)
+
+    return __go_to_page(
+        request, 'admin/packages/packages.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_packages_hardwares = "selected",
         status=status,
         msg=msg,
         normal_mode=__is_normal_mode(request),
