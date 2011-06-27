@@ -3,7 +3,7 @@
   <technology>online_service</technology>
   <description>Get weather informations from Yahoo! Weather</description>
   <detail>Get current weather informations about your town and give predictions about tomorrow</detail>
-  <version>0.1.0_beta2</version>
+  <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_yweather</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
