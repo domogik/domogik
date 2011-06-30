@@ -58,6 +58,9 @@ from domogik.xpl.common.xplconnector import XplTimer
 from xml.dom import minidom
 from ConfigParser import NoSectionError
 from distutils2.version import VersionPredicate, _split_predicate, IrrationalVersionError
+from distutils2.install import get_infos
+from distutils2.index.simple import Crawler
+import re
 
 
 import domogik.xpl.bin
@@ -67,6 +70,9 @@ import pkgutil
 KILL_TIMEOUT = 2
 PING_DURATION = 10
 WAIT_TIME_BETWEEN_PING = 15
+
+
+PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
 
 class EventHandler(pyinotify.ProcessEvent):
@@ -1009,19 +1015,39 @@ class SysManager(XplPlugin):
         idx = 0
         while message.data.has_key("dep%s" % idx):
             dep = message.data["dep%s" % idx]
-            print dep
+            mess.add_data({"dep%s" % idx : dep})
+            if PATTERN_DISTUTILS_VERSION.findall(dep) == []:
+                msg = "Wrong version format for '%s' : should be 'foo (...)'" % dep
+                self.log.warning(msg)
+                mess.add_data({'error' : msg})
+                self.myxpl.send(mess)
+                return
             try:
                 ver = VersionPredicate(dep)
             except IrrationalVersionError:
-                self.log.warning("Irrational version for '%s'" % dep)
-                mess.add_data({'error' : "Irrational version : %s" % dep})
+                msg = "Irrational version for dependency '%s'" % dep
+                self.log.warning(msg)
+                mess.add_data({'error' : msg})
                 self.myxpl.send(mess)
                 return
+
             if self._pkg_is_dep_installed(ver):
                 installed = "yes"
             else:
                 installed = "no"
-            mess.add_data({"dep%s" % idx : dep})
+                crawler = Crawler()
+                found = False
+                for rel in crawler.get_releases(dep):
+                    if  ver.match(rel._version):
+                        found = True
+                        mess.add_data({"dep%s-candidate" % idx : rel._version})
+                        mess.add_data({"dep%s-cmd-line" % idx : "sudo easy_install %s==%s" % (ver.name, rel._version)})
+                        break
+                if found == False:
+                    msg = "No candidate to dependency '%s' installation found" % ver.name
+                    self.log.warning(msg)
+                    mess.add_data({'error' : msg})
+
             mess.add_data({"dep%s-installed" % idx : installed})
             idx += 1
         self.myxpl.send(mess)
