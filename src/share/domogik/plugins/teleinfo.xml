@@ -39,7 +39,7 @@
     <file path="src/domogik/xpl/lib/teleinfo.py"/>
   </files>
   <dependencies>
-    <dep name="pySerial > 2.4"/>
+    <dep name="pyserial (>=2.5)"/>
   </dependencies>
   <device_technology>
       <id>service</id>

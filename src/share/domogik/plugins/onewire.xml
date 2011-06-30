@@ -112,7 +112,7 @@ List of supported devices :
     <file path="src/domogik/xpl/lib/onewire.py"/>
   </files>
   <dependencies>
-    <dep other="owfs = 2.8.4"/>
+    <dep other="owfs (>=2.8.4)"/>
   </dependencies>
   <device_technology>
       <id>onewire</id>

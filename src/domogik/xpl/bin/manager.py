@@ -44,7 +44,7 @@ import stat
 from threading import Event, currentThread, Thread, enumerate, Lock
 from optparse import OptionParser
 import traceback
-from subprocess import Popen
+from subprocess import Popen, PIPE
 
 from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener 
@@ -57,6 +57,7 @@ from domogik.common.packagexml import PackageXml, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
 from xml.dom import minidom
 from ConfigParser import NoSectionError
+from distutils2.version import VersionPredicate, _split_predicate, IrrationalVersionError
 
 
 import domogik.xpl.bin
@@ -971,6 +972,9 @@ class SysManager(XplPlugin):
         if command == "installed-packages-list":
             self._pkg_list_installed()
 
+        if command == "check-dependencies" and host != "*":
+            self._pkg_check_dependencies(message)
+
         if command == "install" and host != "*":
             self._pkg_install(message)
 
@@ -991,6 +995,54 @@ class SysManager(XplPlugin):
                            'type%s' % idx : package['type']})
             idx += 1
         self.myxpl.send(mess)
+
+    def _pkg_check_dependencies(self, message):
+        """ Check if python dependencies for a package are installed
+            @param message : xpl message received
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' : 'check-dependencies'})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+
+        idx = 0
+        while message.data.has_key("dep%s" % idx):
+            dep = message.data["dep%s" % idx]
+            print dep
+            try:
+                ver = VersionPredicate(dep)
+            except IrrationalVersionError:
+                self.log.warning("Irrational version for '%s'" % dep)
+                mess.add_data({'error' : "Irrational version : %s" % dep})
+                self.myxpl.send(mess)
+                return
+            if self._pkg_is_dep_installed(ver):
+                installed = "yes"
+            else:
+                installed = "no"
+            mess.add_data({"dep%s" % idx : dep})
+            mess.add_data({"dep%s-installed" % idx : installed})
+            idx += 1
+        self.myxpl.send(mess)
+
+    def _pkg_is_dep_installed(self, version):
+        """ Check if dependency is installed
+            @param dep : dependency as VersionPredicate. Example : pyserial >= 2.4
+        """
+        subp = Popen("pip freeze | grep %s" % version.name, stdout=PIPE, shell=True)
+        pid = subp.pid
+        res = subp.stdout.read()
+        subp.communicate()
+        if res == "":
+           return False
+        tab = res.rstrip().split("==")
+        if version.match(tab[1]):
+            return True
+        else:
+            return False
+        return True
+        
 
     def _pkg_install(self, message):
         """ Install a package
