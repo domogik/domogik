@@ -108,8 +108,7 @@ setup(
                       'pyinotify >= 0.8.9', 
                       'pip >= 1.0', 
                       'Distutils2'],
-#                   deprecated, keep for info
-#                   'pySerial > 2.4', 'pyowfs >= 0.1.3'],
+                      'pyserial >= 2.5'],
     zip_safe = False,
     license = 'GPL v3',
     # namespace_packages = ['domogik', 'mpris', 'tools'],
