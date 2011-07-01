@@ -279,7 +279,7 @@ class PackageManager():
         # twice to remove first .gz and then .tar
         name =  os.path.splitext(full_name)[0]
         name =  os.path.splitext(name)[0] 
-        self.log("hardware name : %s" % name)
+        self.log("package name : %s" % name)
 
         # get temp dir to extract data
         my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
