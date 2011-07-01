@@ -3763,6 +3763,7 @@ target=*
                         candidate = "";
     
                     data = {
+                               "name" : my_key,
                                "installed" : installed,
                                "release" : release,
                                "cmd-line" : cmd_line,
