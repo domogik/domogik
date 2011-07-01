@@ -1037,6 +1037,8 @@ class SysManager(XplPlugin):
                 mess.add_data({"dep%s-release" % idx : installed_release})
             else:
                 installed = "no"
+                if installed_release != None:
+                    mess.add_data({"dep%s-release" % idx : installed_release})
                 crawler = Crawler()
                 found = False
                 for rel in crawler.get_releases(dep):
@@ -1068,7 +1070,7 @@ class SysManager(XplPlugin):
         if version.match(tab[1]):
             return True, tab[1]
         else:
-            return False, None
+            return False, tab[1]
         return True, None
         
 
