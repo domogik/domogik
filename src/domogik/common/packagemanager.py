@@ -531,30 +531,33 @@ class PackageManager():
                                                pkg["priority"], 
                                                pkg["desc"]))
 
-    def get_packages_list(self):
+    def get_packages_list(self, fullname = None, release = None):
         """ List all packages in cache folder 
             and return a detailed list
+            @param fullname (optionnal) : fullname of a package
+            @param release (optionnal) : release of a package (to use with name)
             Used by Rest
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                pkg_list.append({"name" : pkg_xml.name,
-                                 "type" : pkg_xml.type,
-                                 "fullname" : pkg_xml.fullname,
-                                 "release" : pkg_xml.release,
-                                 "genrated" : pkg_xml.generated,
-                                 "techno" : pkg_xml.techno,
-                                 "doc" : pkg_xml.doc,
-                                 "desc" : pkg_xml.desc,
-                                 "detail" : pkg_xml.detail,
-                                 "author" : pkg_xml.author,
-                                 "email" : pkg_xml.email,
-                                 "domogik_min_release" : pkg_xml.domogik_min_release,
-                                 "priority" : pkg_xml.priority,
-                                 "dependencies" : pkg_xml.dependencies,
-                                 "package_url" : pkg_xml.package_url})
+                if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
+                    pkg_list.append({"name" : pkg_xml.name,
+                                     "type" : pkg_xml.type,
+                                     "fullname" : pkg_xml.fullname,
+                                     "release" : pkg_xml.release,
+                                     "genrated" : pkg_xml.generated,
+                                     "techno" : pkg_xml.techno,
+                                     "doc" : pkg_xml.doc,
+                                     "desc" : pkg_xml.desc,
+                                     "detail" : pkg_xml.detail,
+                                     "author" : pkg_xml.author,
+                                     "email" : pkg_xml.email,
+                                     "domogik_min_release" : pkg_xml.domogik_min_release,
+                                     "priority" : pkg_xml.priority,
+                                     "dependencies" : pkg_xml.dependencies,
+                                     "package_url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['name']))
 
     def get_installed_packages_list(self):

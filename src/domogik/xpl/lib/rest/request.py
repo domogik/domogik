@@ -3499,6 +3499,17 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
+        ### check-dependencies #######################
+        elif self.rest_request[0] == "check-dependencies":
+            if len(self.rest_request) == 4:
+                self._rest_package_check_dependencies(self.rest_request[1],
+                                           self.rest_request[2],
+                                           self.rest_request[3])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### install ##################################
         elif self.rest_request[0] == "install":
             if len(self.rest_request) == 4:
@@ -3634,10 +3645,8 @@ target=*
             self.log.debug("Installed packages list : end waiting for answers")
         except Empty:
             self.log.debug("Installed packages list : no answer")
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting installed packages list")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("package")
-            self.send_http_response_ok(json_data.get())
+            self.send_http_response_error(999, "No data or timeout on getting installed packages list",
+                                          self.jsonp, self.jsonp_cb)
             return
 
         self.log.debug("Installed packages list : messages received : %s" % str(messages))
@@ -3673,6 +3682,94 @@ target=*
     
         self.send_http_response_ok(json_data.get())
 
+    def _rest_package_check_dependencies(self, host, package, release):
+        """ Send a xpl message to check python dependencies
+            @param host : host targetted
+            @param package : fullname of package (type-name)
+            @param release : package release
+            Return status of each dependency as json
+        """
+        self.log.debug("Package : ask for checking dependencies for a package")
+
+        ### Send xpl message to install package
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "check-dependencies"})
+        message.add_data({"host" : host})
+        pkg_mgr = PackageManager()
+        data = pkg_mgr.get_packages_list(fullname = package, release = release)
+        # if there is no package corresponding
+        if data == []:
+            self.log.debug("No package corresponding to check dependency request")
+            self.send_http_response_error(999, "No package corresponding to request",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        idx = 0
+        for dep in data[0]["dependencies"]:
+            for dep_type in dep:
+                if dep_type == "python":
+                    message.add_data({"dep%s" % idx : dep[dep_type]})
+                    idx += 1
+        self.myxpl.send(message)
+        self.log.debug("Package : send message : %s" % str(message))
+        print str(message)
+
+        ### Wait for answer
+        # get xpl message from queue
+        # make a time loop of one second after first xpl-trig reception
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "check-dependencies"})
+        except Empty:
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on checking dependencies",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package dependencies check : message receive : %s" % str(message))
+        
+        print message
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("dependencies")
+            idx = 0
+            loop_again = True
+            dep_list = []
+            while loop_again:
+                try:
+                    my_key = message.data["dep%s" % idx]
+                    installed = message.data["dep%s-installed" % idx]
+                    if message.data.has_key("dep%s-cmd-line" % idx):
+                        cmd_line = message.data["dep%s-cmd-line" % idx]
+                    else:
+                        cmd_line = "";
+                    if message.data.has_key("dep%s-candidate" % idx):
+                        candidate = message.data["dep%s-candidate" % idx]
+                    else:
+                        candidate = "";
+    
+                    data = {my_key : {
+                               "installed" : installed,
+                               "cmd-line" : cmd_line,
+                               "candidate" : candidate,
+                             }
+                           }
+                    json_data.add_data(data)
+                    idx += 1
+                except:
+                    loop_again = False
+            self.send_http_response_ok(json_data.get())
+
     def _rest_package_install(self, host, package, release):
         """ Send a xpl message to install a package
             @param host : host targetted
@@ -3695,7 +3792,6 @@ target=*
 
         ### Wait for answer
         # get xpl message from queue
-        # make a time loop of one second after first xpl-trig reception
         messages = []
         try:
             self.log.debug("Package install : wait for answer...")
@@ -3705,10 +3801,8 @@ target=*
                                            filter_data = {"command" : "install"})
         except Empty:
             self.log.debug("Package install : no answer")
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on installing package")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("install")
-            self.send_http_response_ok(json_data.get())
+            self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
             return
 
         self.log.debug("Package install : message receive : %s" % str(message))
