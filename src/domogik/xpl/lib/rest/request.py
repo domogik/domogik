@@ -3691,7 +3691,7 @@ target=*
         """
         self.log.debug("Package : ask for checking dependencies for a package")
 
-        ### Send xpl message to install package
+        ### Send xpl message to check dependencies
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.package")
@@ -3749,6 +3749,10 @@ target=*
                 try:
                     my_key = message.data["dep%s" % idx]
                     installed = message.data["dep%s-installed" % idx]
+                    if message.data.has_key("dep%s-release" % idx):
+                        release = message.data["dep%s-release" % idx]
+                    else:
+                        release = "";
                     if message.data.has_key("dep%s-cmd-line" % idx):
                         cmd_line = message.data["dep%s-cmd-line" % idx]
                     else:
@@ -3758,11 +3762,11 @@ target=*
                     else:
                         candidate = "";
     
-                    data = {my_key : {
+                    data = {
                                "installed" : installed,
+                               "release" : release,
                                "cmd-line" : cmd_line,
                                "candidate" : candidate,
-                             }
                            }
                     json_data.add_data(data)
                     idx += 1

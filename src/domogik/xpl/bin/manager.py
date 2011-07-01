@@ -1031,8 +1031,10 @@ class SysManager(XplPlugin):
                 self.myxpl.send(mess)
                 return
 
-            if self._pkg_is_dep_installed(ver):
+            is_installed, installed_release = self._pkg_is_dep_installed(ver)
+            if is_installed:
                 installed = "yes"
+                mess.add_data({"dep%s-release" % idx : installed_release})
             else:
                 installed = "no"
                 crawler = Crawler()
@@ -1061,13 +1063,13 @@ class SysManager(XplPlugin):
         res = subp.stdout.read()
         subp.communicate()
         if res == "":
-           return False
+           return False, None
         tab = res.rstrip().split("==")
         if version.match(tab[1]):
-            return True
+            return True, tab[1]
         else:
-            return False
-        return True
+            return False, None
+        return True, None
         
 
     def _pkg_install(self, message):
