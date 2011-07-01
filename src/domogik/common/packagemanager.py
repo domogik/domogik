@@ -50,6 +50,7 @@ import urllib
 import shutil
 import sys
 from domogik.common import logger
+from distutils2.version import NormalizedVersion, IrrationalVersionError
 
 
 SRC_PATH = "../../../"
@@ -104,6 +105,19 @@ class PackageManager():
         except:
             self.log(str(traceback.format_exc()))
             return
+
+        # check release format
+        try:
+            NormalizedVersion(plg_xml.release)
+        except:
+            self.log("Plugin release '%s' is not valid. Exiting." % plg_xml.release)
+            return
+        try:
+            NormalizedVersion(plg_xml.domogik_min_release)
+        except:
+            self.log("Domogik min release '%s' is not valid. Exiting." % plg_xml.domogik_min_release)
+            return
+
         self.log("Xml file OK")
 
         # check type == plugin
@@ -156,9 +170,27 @@ class PackageManager():
         except:
             self.log(str(traceback.format_exc()))
             return
+
+        try:
+            plg_xml = PackageXml(name)
+        except:
+            self.log(str(traceback.format_exc()))
+            return
+
+        # check release format
+        try:
+            NormalizedVersion(plg_xml.release)
+        except:
+            self.log("Plugin release '%s' is not valid. Exiting." % plg_xml.release)
+            return
+        try:
+            NormalizedVersion(plg_xml.domogik_min_release)
+        except:
+            self.log("Domogik min release '%s' is not valid. Exiting." % plg_xml.domogik_min_release)
+            return
+
         self.log("Xml file OK")
 
-        # check type == hardware
         if plg_xml.type != "hardware":
             self.log("Error : this package is not a hardware")
             return
