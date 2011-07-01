@@ -60,7 +60,9 @@
     <file path="src/domogik/xpl/lib/yweather.py"/>
     <file path="src/share/domogik/stats/online_service/sensor.basic-yweather.xml"/>
   </files>
-  <dependencies/>
+  <dependencies>
+     <dep python="sympy >= 0.5.0"/>
+  </dependencies>
   <device_technology>
       <id>online_service</id>
       <name>Online service</name>
