@@ -43,7 +43,9 @@ def ucode(my_string):
 
     """
     if my_string is not None:
-        return my_string.decode("utf-8")
-        #return unicode(my_string, "utf-8")
+        if type(my_string) == bool:
+            return str(my_string).decode("utf-8")
+        else:
+            return my_string.decode("utf-8")
     else:
         return None
