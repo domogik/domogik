@@ -1084,6 +1084,16 @@ class SysManager(XplPlugin):
         mess.add_data({'command' : 'install'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
 
+        # check if plugin (for a plugin) is running
+        tab = message.data['package'].split("-")
+        print "T=%s" % tab
+        time.sleep(5)
+        if tab[0] == "plugin":
+            if self._check_component_is_running(tab[1]):
+                mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % tab[1]})
+                self.myxpl.send(mess)
+                return
+
         try:
             package = message.data['package']
             release = message.data['release']

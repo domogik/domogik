@@ -50,6 +50,7 @@ import urllib
 import shutil
 import sys
 from domogik.common import logger
+from distutils2.version import NormalizedVersion, IrrationalVersionError
 
 
 SRC_PATH = "../../../"
@@ -104,6 +105,19 @@ class PackageManager():
         except:
             self.log(str(traceback.format_exc()))
             return
+
+        # check release format
+        try:
+            NormalizedVersion(plg_xml.release)
+        except:
+            self.log("Plugin release '%s' is not valid. Exiting." % plg_xml.release)
+            return
+        try:
+            NormalizedVersion(plg_xml.domogik_min_release)
+        except:
+            self.log("Domogik min release '%s' is not valid. Exiting." % plg_xml.domogik_min_release)
+            return
+
         self.log("Xml file OK")
 
         # check type == plugin
@@ -156,9 +170,27 @@ class PackageManager():
         except:
             self.log(str(traceback.format_exc()))
             return
+
+        try:
+            plg_xml = PackageXml(name)
+        except:
+            self.log(str(traceback.format_exc()))
+            return
+
+        # check release format
+        try:
+            NormalizedVersion(plg_xml.release)
+        except:
+            self.log("Plugin release '%s' is not valid. Exiting." % plg_xml.release)
+            return
+        try:
+            NormalizedVersion(plg_xml.domogik_min_release)
+        except:
+            self.log("Domogik min release '%s' is not valid. Exiting." % plg_xml.domogik_min_release)
+            return
+
         self.log("Xml file OK")
 
-        # check type == hardware
         if plg_xml.type != "hardware":
             self.log("Error : this package is not a hardware")
             return
@@ -247,7 +279,7 @@ class PackageManager():
         # twice to remove first .gz and then .tar
         name =  os.path.splitext(full_name)[0]
         name =  os.path.splitext(name)[0] 
-        self.log("hardware name : %s" % name)
+        self.log("package name : %s" % name)
 
         # get temp dir to extract data
         my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
@@ -466,8 +498,8 @@ class PackageManager():
 
 
     def _parse_repository(self, repo_list, cache_folder):
-        """ For each repo, get file list, check if it is higher release and
-            get package's xml
+        """ For each repo, get file list, check if the file has the higher 
+            priority
             @param repo_list : repositories list
             @param cache_folder : package cache folder
         """
@@ -478,12 +510,14 @@ class PackageManager():
         for repo in repo_list:
             file_list.extend(self._get_files_list_from_repository(repo["url"], repo["priority"]))
 
-        # for each package, put it in cache if higher release
+        # for each package, put it in cache if it corresponds to priority
         for file_info in file_list:
             pkg_xml = PackageXml(url = "%s.xml" % file_info["file"])
-            self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.name, pkg_xml.release, file_info["repo_url"]))
-            pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
-
+            priority = self._get_package_priority_in_cache(pkg_xml.fullname, pkg_xml.release)
+            # our package has a prioriry >= to other packages with same name/rel
+            if priority == None or priority < file_info["priority"]:
+                self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
+                pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
 
     def _get_files_list_from_repository(self, url, priority):
         """ Read packages.xml on repository
@@ -530,6 +564,18 @@ class PackageManager():
                                                pkg["release"], 
                                                pkg["priority"], 
                                                pkg["desc"]))
+
+    def _get_package_priority_in_cache(self, fullname, release):
+        """ Get priority of a cache package/release
+            @param fullname : fullname of package
+            @param release : package's release
+        """
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                if fullname == pkg_xml.fullname and release == pkg_xml.release:
+                    return pkg_xml.priority
+        return None
 
     def get_packages_list(self, fullname = None, release = None):
         """ List all packages in cache folder 
