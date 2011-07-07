@@ -107,7 +107,7 @@ setup(
                       'MySQL-python >= 1.2.3c', 
                       'pyinotify >= 0.8.9', 
                       'pip >= 1.0', 
-                      'Distutils2'],
+                      'Distutils2',
                       'pyserial >= 2.5'],
     zip_safe = False,
     license = 'GPL v3',
