@@ -109,7 +109,8 @@ class OneWireManager(XplPlugin):
                                             ow, 
                                             float(ds18b20_interval), 
                                             ds18b20_resolution,
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
                 ds18b20.start()
     
@@ -122,7 +123,8 @@ class OneWireManager(XplPlugin):
                                            (self.log,
                                             ow, 
                                             float(ds18s20_interval), 
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
                 ds18s20.start()
     
@@ -135,7 +137,8 @@ class OneWireManager(XplPlugin):
                                            (self.log,
                                             ow, 
                                             float(ds2401_interval), 
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
                 ds2401.start()
     
@@ -148,7 +151,8 @@ class OneWireManager(XplPlugin):
                                            (self.log,
                                             ow, 
                                             float(ds2438_interval), 
-                                            self.send_xpl),
+                                            self.send_xpl,
+                                            self.get_stop()),
                                            {})
                 ds2438.start()
     
