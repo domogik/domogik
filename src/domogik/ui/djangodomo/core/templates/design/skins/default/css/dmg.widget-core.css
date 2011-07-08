@@ -24,20 +24,23 @@
 .size1x1 { width:5em; height:5em;}
 .shape.size1x1 { line-height:5em;}
 
-.size3x2 { width:21em; height:14em;}
-.shape.size3x2 { line-height:14em;}
+.size3x1 { width:19em; height:5em;}
+.shape.size3x1 { line-height:5em;}
 
-.size3x3 { width:21em; height:21em;}
-.shape.size3x3 { line-height:21em;}
+.size3x2 { width:19em; height:12em;}
+.shape.size3x2 { line-height:12em;}
+
+.size3x3 { width:19em; height:19em;}
+.shape.size3x3 { line-height:19em;}
 
 .size4x1 { width:26em; height:5em;}
 .shape.size4x1 { line-height:5em;}
 
-.size4x2 { width:26em; height:14em;}
-.shape.size4x2 { line-height:14em;}
+.size4x2 { width:26em; height:12em;}
+.shape.size4x2 { line-height:12em;}
 
-.size4x3 { width:26em; height:21em;}
-.shape.size4x3 { line-height:21em;}
+.size4x3 { width:26em; height:19em;}
+.shape.size4x3 { line-height:19em;}
 
 .size4x4 { width:26em; height:26em;}
 .shape.size4x4 { line-height:26em;}
