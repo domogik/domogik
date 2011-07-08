@@ -1,0 +1,46 @@
+.dmg_3x1_basicNoStateActuatorBinary {
+    background-position: .5em 50%;
+    background-repeat: no-repeat;
+}
+
+.dmg_3x1_basicNoStateActuatorBinary .main {
+    position:absolute;
+    top:0;
+    left:4em;
+    height:4.9em;
+    background-color:#434343;
+    width:15em;
+    -moz-border-radius: 0 .8em .8em 0;
+    -webkit-border-radius: 0 .8em .8em 0;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    text-align:center;
+}
+
+.dmg_3x1_basicNoStateActuatorBinary .command {
+  height:3em;
+  line-height: 3em;
+  width:5.5em;
+  -moz-border-radius: .8em;
+  -webkit-border-radius: .8em;
+  position:absolute;
+  bottom:.95em;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  background-color:rgba(0,0,0,0.8);
+  color: #fff;
+  cursor: pointer;
+}
+
+.dmg_3x1_basicNoStateActuatorBinary .command:hover {
+  border:2px solid #ffffff;
+  line-height: 2.6em;
+}
+
+.dmg_3x1_basicNoStateActuatorBinary .on {
+  left: 1.4em;
+}
+
+.dmg_3x1_basicNoStateActuatorBinary .off {
+  left: 8em;
+}
