@@ -175,5 +175,41 @@
           <stat_key>iinst3</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.max_power_1</id>
+          <name>Maximum power on phasis 1</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;A&quot;} 
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>imax1</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.max_power_2</id>
+          <name>Maximum power on phasis 2</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;A&quot;} 
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>imax2</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.max_power_3</id>
+          <name>Maximum power on phasis 3</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;A&quot;} 
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>imax3</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
   </device_feature_models>
 </package>
