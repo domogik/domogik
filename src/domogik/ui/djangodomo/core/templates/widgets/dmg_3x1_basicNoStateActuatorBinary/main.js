@@ -5,7 +5,7 @@
             version: 0.1,
             creator: 'Domogik',
             id: 'dmg_3x1_basicNoStateActuatorBinary',
-            name: 'Large basic widget',
+            name: 'Stateless basic widget',
             description: 'Basic switch widget (x10, broken plcbus, . . .)',
             type: 'actuator.binary',
             height: 1,
