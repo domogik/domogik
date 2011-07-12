@@ -66,6 +66,7 @@ from OpenSSL import SSL
 import SocketServer
 import os
 import errno
+import pyinotify
 
 
 
@@ -101,6 +102,23 @@ QUEUE_EVENT_SIZE = 50
 DEFAULT_REPO_DIR = "/tmp/"
 
 
+
+################################################################################
+class EventHandler(pyinotify.ProcessEvent):
+    """ Check a file for any event (creation, modification, etc)
+    """
+    
+    def set_callback(self, callback):
+        """ set callback to launch external stuff
+        @param callback : callback function
+        """
+        self.my_callback = callback
+
+    def process_default(self, event):
+        """ A file is modified
+        """
+        print("File modified : %s" % event.pathname)
+        self.my_callback()
 
 ################################################################################
 class Rest(XplPlugin):
@@ -319,6 +337,17 @@ class Rest(XplPlugin):
             self.add_stop_cb(self.stop_http)
             self.server = None
             self.start_stats()
+
+            # inotify for command files
+            wm = pyinotify.WatchManager() # Watch manager
+            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
+            notify_handler = EventHandler()
+            notify_handler.set_callback(self.load_xml)
+            notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
+            notifier.start()
+            wdd = wm.add_watch(self._xml_cmd_dir, mask, rec = True)
+            self.add_stop_cb(notifier.join)
+
             # Enable hbeat
             self.enable_hbeat()
             self.start_http()
