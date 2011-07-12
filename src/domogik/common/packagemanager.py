@@ -171,12 +171,6 @@ class PackageManager():
             self.log(str(traceback.format_exc()))
             return
 
-        try:
-            plg_xml = PackageXml(name)
-        except:
-            self.log(str(traceback.format_exc()))
-            return
-
         # check release format
         try:
             NormalizedVersion(plg_xml.release)
