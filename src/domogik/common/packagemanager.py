@@ -459,8 +459,10 @@ class PackageManager():
             repo_list = []
             src_file = open(REPO_SRC_FILE, "r")
             for line in src_file.readlines():
-                repo_list.append({"priority" : line.split()[0],
-                                  "url" : line.split()[1]})
+                # if the line is not a comment
+                if line.strip()[0] != "#": 
+                    repo_list.append({"priority" : line.split()[0],
+                                      "url" : line.split()[1]})
             src_file.close()
         except:
             msg = "Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc()))
