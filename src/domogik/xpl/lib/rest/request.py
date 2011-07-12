@@ -3552,9 +3552,14 @@ target=*
         json_data.set_data_type("repository")
 
         pkg_mgr = PackageManager()
-        for repo in pkg_mgr.get_repositories_list():
-            json_data.add_data({"url" : repo['url'],
-                           "priority" : repo['priority']})
+        try:
+            for repo in pkg_mgr.get_repositories_list():
+                json_data.add_data({"url" : repo['url'],
+                               "priority" : repo['priority']})
+        except PackageException:
+            self.send_http_response_error(999, "Error while listing repositories : check rest.log file",
+                                          self.jsonp, self.jsonp_cb)
+            return
     
         self.send_http_response_ok(json_data.get())
 
