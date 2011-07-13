@@ -460,7 +460,7 @@ def admin_tools_helpers(request):
         nav2_tools_helpers = "selected",
         status=status,
         msg=msg,
-        development_mode=__is_development_mode(request)
+        normal_mode=__is_normal_mode(request),
     )
 
 @admin_required
