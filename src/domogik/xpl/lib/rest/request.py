@@ -42,7 +42,7 @@ from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
-from domogik.common.packagemanager import PackageManager
+from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR
 from domogik.common.packagexml import PackageXml, PackageException
 import time
 import urllib
@@ -3781,7 +3781,9 @@ target=*
             self.send_http_response_ok(json_data.get())
 
     def _rest_package_install(self, host, package, release):
-        """ Send a xpl message to install a package
+        """ Send xpl messages to install a package :
+            - one to manager on target host for "bin" files
+            - one to manager on rinor's host for rest's xml files
             @param host : host targetted
             @param package : fullname of package (type-name)
             @param release : package release
@@ -3789,7 +3791,7 @@ target=*
         """
         self.log.debug("Package : ask for installing a package")
 
-        ### Send xpl message to install package
+        ### Send xpl message to install package bin part
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.package")
@@ -3797,6 +3799,7 @@ target=*
         message.add_data({"host" : host})
         message.add_data({"package" : package})
         message.add_data({"release" : release})
+        message.add_data({"part" : PKG_PART_XPL})
         self.myxpl.send(message)
         self.log.debug("Package : send message : %s" % str(message))
 
@@ -3815,12 +3818,46 @@ target=*
                                           self.jsonp, self.jsonp_cb)
             return
 
-        self.log.debug("Package install : message receive : %s" % str(message))
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_XPL, str(message)))
         
 
         # process message
         if message.data.has_key('error'):
-            self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_XPL, message.data['error']), self.jsonp, self.jsonp_cb)
+            return
+
+        ### Send xpl message to install package's rinor part
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : host})
+        message.add_data({"package" : package})
+        message.add_data({"release" : release})
+        message.add_data({"part" : PKG_PART_RINOR})
+        self.myxpl.send(message)
+        self.log.debug("Package : send message : %s" % str(message))
+
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install"})
+        except Empty:
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
+
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_RINOR, message.data['error']), self.jsonp, self.jsonp_cb)
         else:
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)

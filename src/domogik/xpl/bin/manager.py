@@ -52,7 +52,7 @@ from domogik.xpl.common.xplconnector import READ_NETWORK_TIMEOUT
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.common.packagemanager import PackageManager
+from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR
 from domogik.common.packagexml import PackageXml, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
 from xml.dom import minidom
@@ -68,7 +68,7 @@ import pkgutil
 
 
 KILL_TIMEOUT = 2
-PING_DURATION = 10
+PING_DURATION = 3
 WAIT_TIME_BETWEEN_PING = 15
 
 
@@ -1087,7 +1087,6 @@ class SysManager(XplPlugin):
         # check if plugin (for a plugin) is running
         tab = message.data['package'].split("-")
         print "T=%s" % tab
-        time.sleep(5)
         if tab[0] == "plugin":
             if self._check_component_is_running(tab[1]):
                 mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % tab[1]})
@@ -1097,6 +1096,7 @@ class SysManager(XplPlugin):
         try:
             package = message.data['package']
             release = message.data['release']
+            package_part = message.data['part']
         except KeyError:
             mess.add_data({'error' : 'incomplete xpl message'})
             self.myxpl.send(mess)
@@ -1106,7 +1106,7 @@ class SysManager(XplPlugin):
         mess.add_data({'release' : release})
 
         try:
-            status = self.pkg_mgr.install_package("repo:%s" % package, release)
+            status = self.pkg_mgr.install_package("repo:%s" % package, release, package_part)
             if status != True:
                 mess.add_data({'error' : status})
         except:
