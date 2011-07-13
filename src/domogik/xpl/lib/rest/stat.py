@@ -78,16 +78,14 @@ class StatsManager:
                 self._package_path = cfg_db['package_path']
                 self._log_stats.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
-                directory = "%s/plugins/stats/" % self._package_path
+                self.directory = "%s/plugins/stats/" % self._package_path
             else:
                 self._log_stats.info("No package path defined in config file")
                 self._package_path = None
-                directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
-    
-            files = glob.glob("%s/*/*xml" % directory)
-            stats = {}
+                self.directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
+
             self._db = DbHelper()
-    
+
             ### Rest data
             self.handler_params = handler_params
             self.handler_params.append(self._log_stats)
@@ -96,6 +94,28 @@ class StatsManager:
     
             self._event_requests = self.handler_params[0]._event_requests
             self.get_exception = self.handler_params[0].get_exception
+
+            self.stats = None
+    
+        except :
+            self._log_stats.error("%s" % traceback.format_exc())
+    
+    def load(self):
+        """ (re)load all xml files to (re)create _Stats objects
+        """
+        try:
+            print "load!"
+            ### Clean old _Stat objects ans created Listeners
+            # not the first load : clean
+            if self.stats != None:
+                for cl_techno in self.stats:
+                    for cl_message in self.stats[cl_techno]:
+                        for cl_type in self.stats[cl_techno][cl_message]:
+                             self.myxpl.del_listener(self.stats[cl_techno][cl_message][cl_type].get_listener())
+
+            ### Load files
+            files = glob.glob("%s/*/*xml" % self.directory)
+            self.stats = {}
     
             ### Read xml files
             res = {}
@@ -109,12 +129,12 @@ class StatsManager:
                     self._log_stats.debug("Parsed : %s" % schema_types)
                     if technology not in res:
                         res[technology] = {}
-                        stats[technology] = {}
+                        self.stats[technology] = {}
                     
                     for schema in schema_types:
                         if schema not in res[technology]:
                             res[technology][schema] = {}
-                            stats[technology][schema] = {}
+                            self.stats[technology][schema] = {}
                         for xpl_type in schema_types[schema]:
                             device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
                             res[technology][schema][xpl_type] = {"filter": 
@@ -124,7 +144,7 @@ class StatsManager:
                                     "static_device": static_device,
                                     "device_type": device_type}
                     
-                            stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
+                            self.stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
                             self._log_stats.info("Stat manager starter 1")
         except :
             self._log_stats.error("%s" % traceback.format_exc())
@@ -226,6 +246,11 @@ class StatsManager:
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
             self._technology = technology
+
+        def get_listener(self):
+            """ getter for lsitener object
+            """
+            return self._listener
 
         def _callback(self, message):
             """ Callback for the xpl message

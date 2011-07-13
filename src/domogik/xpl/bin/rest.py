@@ -332,12 +332,6 @@ class Rest(XplPlugin):
             self.xml_date = None
             self.load_xml()
 
-            self.log.info("REST Initialisation OK")
-
-            self.add_stop_cb(self.stop_http)
-            self.server = None
-            self.start_stats()
-
             # inotify for command files
             wm = pyinotify.WatchManager() # Watch manager
             mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
@@ -348,8 +342,25 @@ class Rest(XplPlugin):
             wdd = wm.add_watch(self._xml_cmd_dir, mask, rec = True)
             self.add_stop_cb(notifier.join)
 
+            # inotify for stat files
+            wm_stat = pyinotify.WatchManager() # Watch manager
+            mask_stat = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
+            notify_handler_stat = EventHandler()
+            notify_handler_stat.set_callback(self.reload_stats)
+            notifier_stat = pyinotify.ThreadedNotifier(wm_stat, notify_handler_stat)
+            notifier_stat.start()
+            wdd_stat = wm_stat.add_watch(self._xml_stat_dir, mask_stat, rec = True)
+            self.add_stop_cb(notifier_stat.join)
+
             # Enable hbeat
             self.enable_hbeat()
+
+            # Launch server, stats
+            self.log.info("REST Initialisation OK")
+            self.add_stop_cb(self.stop_http)
+            self.server = None
+            self.start_stats()
+
             self.start_http()
         except :
             self.log.error("%s" % self.get_exception())
@@ -539,9 +550,17 @@ class Rest(XplPlugin):
         """ Start Statistics manager
         """
         print "Start Stats"
-        self.log.info("Starting statistics manager. His logs will be in a dedicated log file")
-        StatsManager(handler_params = [self], xpl = self.myxpl)
+        self.log.info("Starting statistics manager. Its logs will be in a dedicated log file")
+        self.stat_mgr = StatsManager(handler_params = [self], xpl = self.myxpl)
+        self.stat_mgr.load()
         self.log.info("Stat manager started")
+
+    def reload_stats(self):
+        """ Reload Statistics manager
+        """
+        print "Reload Stats"
+        self.log.info("Reloading statistics manager. Its logs will be in a dedicated log file")
+        self.stat_mgr.load()
 
 
 
