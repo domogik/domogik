@@ -71,7 +71,7 @@ class KNX:
     def close(self):
         """ close t
         """
-        subp = subprocess.Popen("kill %s" % self.eibd_pid, shell=True)   
+        subp = subprocess.Popen("kill -15 %s" % self.eibd_pid, shell=True)   
         # TODOD : add check and kill -9 if necessary
 
     def listen(self):                                                   
@@ -99,7 +99,9 @@ class KNX:
  
 
     def write(self, groups, Value):
-	
+        print " je suis dans la lib"
+        print " % s " % groups
+        print " % s " % Value	
 	if Value < 31:
 		os.system("groupswrite ip:127.0.0.1 " % groups % Value)
 	else:

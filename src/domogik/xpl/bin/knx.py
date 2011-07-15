@@ -42,7 +42,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.knx import KNXException
 from domogik.xpl.lib.knx import KNX
 import threading
-
+import subprocess
 
 class KNXManager(XplPlugin):
     """ Implements a listener for KNX command messages 
@@ -84,10 +84,10 @@ class KNXManager(XplPlugin):
             self.force_leave()
             return
 
+
         ### Create listeners for commands
         self.log.info("Creating listener for KNX")
-        # TODO
-
+        Listener(self.knx_cmd, self.myxpl,{'schema':'knx.basic'})
         self.enable_hbeat()
         self.log.info("Plugin ready :)")
 
@@ -96,22 +96,43 @@ class KNXManager(XplPlugin):
         """ Send xpl-trig to give status change
         """
 	command = data[0:4]
-        #print "command= %s" % command
+#        print "command= %s" % data     
+        msg_type="s"
+        if data[-2:-1]==" ":
+            msg_type="l" 
         if command <> 'Read':
-            groups = data[-10:-5]
-	    val=data[-3:-1]
+            groups = data[data.find('to')+2:data.find(':')]
+            groups = groups.strip()
+	    val=data[data.find(':')+1:-1]
+            val = val.strip()
             #print "Data = %s " % data       
             #print "Groupe = %s " % groups 
             #print "Valeur = %s " % val
+            print "type = %s" %msg_type
             msg = XplMessage()
             msg.set_type("xpl-trig")
             msg.set_schema('knx.basic')
+            msg.add_data({'type': command})
             msg.add_data({'groups' :  groups})
-        #msg.add_data({'type' :  msg_type})
-            msg.add_data({'current' :  val})
+            msg.add_data({'data_type' :  msg_type})
+            msg.add_data({'value' :  val})
             self.myxpl.send(msg)
-
-
+               
+    def knx_cmd(self, message):
+        command = message.data['type']
+        groups = message.data['groups']
+        valeur = message.data['value']
+        type = message.data['data_type']
+        #print "%s" %groups
+        #print "%s" %current
+        if type=="Write":
+            if data_type=="l":
+                command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
+            if data_type=="s":
+                command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
+        if type == "Read":
+            command="groupsread ip:127.0.0.1 %s" %groups
+        subp=subprocess.Popen(command, shell=True)
 
 
 
