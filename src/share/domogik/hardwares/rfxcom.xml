@@ -249,7 +249,7 @@
       </device_feature_model>
       <device_feature_model>
           <id>rfxcom.wind.gust</id>
-          <name>gust</name>
+          <name>Gust</name>
           <feature_type>sensor</feature_type>
           <device_type_id>rfxcom.wind</device_type_id>
           <parameters>
