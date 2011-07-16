@@ -66,22 +66,10 @@ function get_widgets_options(id) {
                 this.element.addClass('border');
             }
             if (o.displayname) {
-                base_width = base_height = 53;
-                canvas_width = base_width + 10 + (base_width + 20) * (o.width - 1);
-                canvas_height = base_height + 10 + (base_height + 20) * (o.height - 1);
-                this._identity = $("<canvas class='identity' width='" + canvas_width + "' height='" + canvas_height + "'></canvas>");
-                this.element.append(this._identity);
-                var canvas = this._identity.get(0);
-                if (canvas.getContext) {
-                    var ctx = canvas.getContext('2d');
-                    ctx.beginPath();
-                    ctx.font = "8pt Arial";
-                    ctx.textBaseline = "top"
-                    ctx.fillText(o.devicename, 15, 0);
-                    ctx.translate(0,canvas_height);
-                    ctx.rotate(-(Math.PI/2));
-                    ctx.fillText(o.featurename, 0, 0);
-                }
+                this._devicename = $("<div class='identity identitydevice length" + o.width + "'>" + o.devicename + "</div>");
+                this.element.append(this._devicename);
+                this._featurename = $("<div class='identity identityfeature length" + o.height + "'>" + o.featurename + "</div>");
+                this.element.append(this._featurename);
             }
             
             $(document).bind('dmg_event', function(event, data) {

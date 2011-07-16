@@ -17,9 +17,35 @@
 
 .widget .identity, .shape .identity {
     position:absolute;
-    top: -12px;
-    left: -12px;
+    font-size:0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align:left;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;	/* required for Opera */
+    -ms-text-overflow: ellipsis;	/* required for IE8, allegedly */
 }
+
+.widget .identitydevice, .shape .identitydevice {
+    top: -1.2em;
+    left: 0.2em;
+}
+
+.widget .identityfeature, .shape .identityfeature {
+    bottom: 0.2em;
+    left: -0.2em;
+    -moz-transform-origin:0% 100%;
+	-webkit-transform-origin:0% 100%;
+	-o-transform-origin:0% 100%;
+    -moz-transform:rotate(-90deg);
+	-webkit-transform:rotate(-90deg);
+	-o-transform:rotate(-90deg);
+}
+
+.length1 {width: 6em}
+.length2 {width: 13em}
+.length3 {width: 20em}
+.length4 {width: 27em}
 
 .size1x1 { width:5em; height:5em;}
 .shape.size1x1 { line-height:5em;}
