@@ -504,6 +504,12 @@ def admin_packages_repositories(request):
     page_title = _("Packages repositories")
     try:
         repositories_result = Packages.get_list_repo()
+        if (repositories_result.status == 'OK'):
+            repositories=repositories_result.repository
+        else:
+            repositories=None
+            msg=repositories_result.description
+            status='error'
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
@@ -516,7 +522,7 @@ def admin_packages_repositories(request):
         status=status,
         msg=msg,
         normal_mode=__is_normal_mode(request),
-        repositories=repositories_result.repository
+        repositories=repositories
     )
 
 @admin_required
