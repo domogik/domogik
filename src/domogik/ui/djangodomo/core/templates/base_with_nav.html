@@ -59,11 +59,11 @@
 <script type="text/javascript">
     // <![CDATA[
     {% block js_script %}{% endblock %}
-    {% if status %}
-        $(function(){ 
-        	$.notification("{{status}}", "{{msg}}");
-        });
-    {% endif %}
+    $(function(){
+        {% for message in page_messages %}
+        $.notification("{{message.status}}", "{{message.msg}}");
+        {% endfor %}
+    });
     // ]]>
 </script>
 <title>{% block title %}Domogik{% endblock %}</title>
