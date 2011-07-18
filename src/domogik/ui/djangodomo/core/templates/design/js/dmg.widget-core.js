@@ -1,27 +1,27 @@
 var widgets_list = {
-	'sensor.boolean': [],
-	'sensor.number': [],
-	'sensor.string': [],
-	'actuator.binary': [],
-	'actuator.range': [],
-	'actuator.number': [],
-	'actuator.trigger': [],
-	'actuator.string': []
+    'sensor.boolean': [],
+    'sensor.number': [],
+    'sensor.string': [],
+    'actuator.binary': [],
+    'actuator.range': [],
+    'actuator.number': [],
+    'actuator.trigger': [],
+    'actuator.string': []
 };
 
 var widgets_options = {};
 
 function register_widget(type, id, options) {
-	widgets_list[type].push(id);
+    widgets_list[type].push(id);
     widgets_options[id] = options;
 }
 
 function get_widgets(type) {
-	return widgets_list[type];
+    return widgets_list[type];
 }
 
 function get_widgets_options(id) {
-	return widgets_options[id];
+    return widgets_options[id];
 }
 
 (function($) {
@@ -41,50 +41,41 @@ function get_widgets_options(id) {
     $.ui.widget.subclass("ui.widget_core", {
         // default options
         options: {
-			creator: 'Unknown',
+            creator: 'Unknown',
             name: 'Unknown',
-			description: 'Unknown',
+            description: 'Unknown',
             filters: null,
             width: 1,
             height: 1,
             key: '',
-			displayname: true,
-			displayborder: true,
-			screenshot: null
+            displayname: true,
+            displayborder: true,
+            screenshot: null
         },
-		
-		_init: function() {
-			var self = this, o = this.options;
+    
+        _init: function() {
+            var self = this, o = this.options;
             var types = o.type.split('.');
             this.element.addClass('widget')
-				.addClass(o.id)
+                .addClass(o.id)
                 .addClass(types[0])
                 .addClass(types[1])
-				.addClass('size' + o.width + 'x' + o.height)
+                .addClass('size' + o.width + 'x' + o.height)
                 .attr("tabindex", 0);
             if (o.displayborder) {
-                this.element.addClass('border')
+                this.element.addClass('border');
             }
-			if (o.displayname) {
-	            this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
-	            this.element.append(this._identity);				
-				var canvas = this._identity.get(0);
-				if (canvas.getContext){
-					var ctx = canvas.getContext('2d');
-					ctx.beginPath();
-					ctx.font = "8pt Arial";
-					ctx.textBaseline = "top"
-					ctx.fillText(o.devicename, 15, 0);
-					ctx.translate(0,60);
-					ctx.rotate(-(Math.PI/2));
-					ctx.fillText(o.featurename, 0, 0);  
-				}
-			}
+            if (o.displayname) {
+                this._devicename = $("<div class='identity identitydevice length" + o.width + "'>" + o.devicename + "</div>");
+                this.element.append(this._devicename);
+                this._featurename = $("<div class='identity identityfeature length" + o.height + "'>" + o.featurename + "</div>");
+                this.element.append(this._featurename);
+            }
             
             $(document).bind('dmg_event', function(event, data) {
                 self._eventsHandler(data);
             });
-		},
+        },
         
         _initValues: function(nb) {
             var self = this, o = this.options;

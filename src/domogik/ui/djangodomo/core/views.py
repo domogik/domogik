@@ -52,7 +52,7 @@ from domogik.ui.djangodomo.core.models import (
 from django_pipes.exceptions import ResourceNotAvailableException
 from httplib import BadStatusLine
 
-def __go_to_page(request, html_page, page_title, **attribute_list):
+def __go_to_page(request, html_page, page_title, page_messages, **attribute_list):
     """
     Common method called to go to an html page
     @param request : HTTP request
@@ -62,8 +62,17 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
            put in the HTTP response
     @return an HttpResponse object
     """
+    if (not page_messages) :
+        page_messages = []
+        
+    status = request.GET.get('status', None)
+    msg = request.GET.get('msg', None)
+    if (msg):
+        page_messages.append({'status':status, 'msg':msg })
+        
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
+    response_attr_list['page_messages'] = page_messages
     response_attr_list['rest_url'] = settings.EXTERNAL_REST_URL
     response_attr_list['is_user_connected'] = __is_user_connected(request)
     for attribute in attribute_list:
@@ -82,10 +91,9 @@ def login(request):
     @return an HttpResponse object
     """
     next = request.GET.get('next', '')
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
 
     page_title = _("Login page")
+    page_messages = []
     if request.method == 'POST':
         return auth(request, next)
     else:
@@ -98,9 +106,8 @@ def login(request):
         return __go_to_page(
             request, 'login.html',
             page_title,
+            page_messages,
             next=next,
-            status=status,
-            msg=msg,
             account_list=result_all_accounts.account
         )
 
@@ -205,9 +212,9 @@ def admin_management_accounts(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
+    
+    page_title = _("Accounts management")
+    page_messages = []
     try:
         result_all_accounts = Accounts.get_all_users()
         result_all_people = Accounts.get_all_people()
@@ -215,14 +222,12 @@ def admin_management_accounts(request):
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    page_title = _("Accounts management")
     return __go_to_page(
         request, 'admin/management/accounts.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_management_accounts = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         accounts_list=result_all_accounts.account,
         people_list=result_all_people.person
@@ -236,8 +241,9 @@ def admin_organization_devices(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
+    page_title = _("Devices organization")
+    page_messages = []
+
     id = request.GET.get('id', 0)
     try:
         result_all_devices = Devices.get_all()
@@ -249,14 +255,12 @@ def admin_organization_devices(request):
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
-    page_title = _("Devices organization")
     return __go_to_page(
         request, 'admin/organization/devices.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_organization_devices = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         id=id,
         devices_list=result_all_devices.device,
@@ -272,8 +276,9 @@ def admin_organization_rooms(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
+    page_title = _("Rooms organization")
+    page_messages = []
+
     id = request.GET.get('id', 0)
     try:
         result_all_rooms = Rooms.get_all()
@@ -289,14 +294,12 @@ def admin_organization_rooms(request):
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
-    page_title = _("Rooms organization")
     return __go_to_page(
         request, 'admin/organization/rooms.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_organization_rooms = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         id=id,
         rooms_list=result_all_rooms.room,
@@ -312,8 +315,9 @@ def admin_organization_areas(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
+    page_title = _("Areas organization")
+    page_messages = []
+
     id = request.GET.get('id', 0)
     try:
         result_all_areas = Areas.get_all()
@@ -323,14 +327,12 @@ def admin_organization_areas(request):
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
-    page_title = _("Areas organization")
     return __go_to_page(
         request, 'admin/organization/areas.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_organization_areas = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         id=id,
         areas_list=result_all_areas.area
@@ -343,23 +345,23 @@ def admin_organization_house(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    
+    page_title = _("House organization")
+    page_messages = []
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
     try:
         result_house = House()
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    page_title = _("House organization")
+
     return __go_to_page(
         request, 'admin/organization/house.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_organization_house = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         house=result_house
     )
@@ -372,8 +374,8 @@ def admin_organization_widgets(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
+    page_title = _("Widgets organization")
+    page_messages = []
 
     try:
         result_all_rooms = Rooms.get_all()
@@ -385,14 +387,12 @@ def admin_organization_widgets(request):
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
-    page_title = _("Widgets organization")
     return __go_to_page(
         request, 'admin/organization/widgets.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_organization_widgets = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         areas_list=result_all_areas.area,
         rooms_list=result_all_rooms.room
@@ -406,8 +406,8 @@ def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
+    page_messages = []
+
     try:
         result_plugin_detail = Plugins.get_detail(plugin_host, plugin_name)
         result_all_plugins = Plugins.get_all()
@@ -420,11 +420,10 @@ def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
         return __go_to_page(
             request, 'admin/plugins/plugin.html',
             page_title,
+            page_messages,
             nav1_admin = "selected",
             nav2_plugins_plugin = "selected",
             plugins_list=result_all_plugins.plugin,
-            status=status,
-            msg=msg,
             normal_mode=__is_normal_mode(request),
             plugin=result_plugin_detail.plugin[0]
         )
@@ -433,11 +432,10 @@ def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
         return __go_to_page(
             request, 'admin/plugins/hardware.html',
             page_title,
+            page_messages,
             nav1_admin = "selected",
             nav2_plugins_plugin = "selected",
             plugins_list=result_all_plugins.plugin,
-            status=status,
-            msg=msg,
             normal_mode=__is_normal_mode(request),
             plugin=result_plugin_detail.plugin[0]
         )
@@ -450,16 +448,15 @@ def admin_tools_helpers(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
     page_title = _("Helpers tools")
+    page_messages = []
+
     return __go_to_page(
         request, 'admin/tools/helpers.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_tools_helpers = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
     )
 
@@ -471,9 +468,9 @@ def admin_tools_rinor(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
     page_title = _("RINOR informations")
+    page_messages = []
+
     try:
         rinor_result = Rest.get_info()
     except BadStatusLine:
@@ -483,10 +480,9 @@ def admin_tools_rinor(request):
     return __go_to_page(
         request, 'admin/tools/rinor.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_tools_rinor = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         rinor=rinor_result.rest[0]
     )
@@ -499,11 +495,16 @@ def admin_packages_repositories(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
     page_title = _("Packages repositories")
+    page_messages = []
+    
     try:
         repositories_result = Packages.get_list_repo()
+        if (repositories_result.status == 'OK'):
+            repositories=repositories_result.repository
+        else:
+            repositories=None
+            page_messages.append({'status':'error', 'msg':repositories_result.description})
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
@@ -511,12 +512,11 @@ def admin_packages_repositories(request):
     return __go_to_page(
         request, 'admin/packages/repositories.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_packages_repositories = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
-        repositories=repositories_result.repository
+        repositories=repositories
     )
 
 @admin_required
@@ -527,9 +527,9 @@ def admin_packages_plugins(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
     page_title = _("Plugins packages")
+    page_messages = []
+
     try:
         packages_result = Packages.get_list()
         installed_result = Packages.get_list_installed()
@@ -583,10 +583,9 @@ def admin_packages_plugins(request):
     return __go_to_page(
         request, 'admin/packages/packages.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_packages_plugins = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         hosts=installed_result.package
     )
@@ -599,9 +598,9 @@ def admin_packages_hardwares(request):
     @return an HttpResponse object
     """
 
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
     page_title = _("Hardwares packages")
+    page_messages = []
+
     try:
         packages_result = Packages.get_list()
         installed_result = Packages.get_list_installed()
@@ -655,10 +654,9 @@ def admin_packages_hardwares(request):
     return __go_to_page(
         request, 'admin/packages/packages.html',
         page_title,
+        page_messages,
         nav1_admin = "selected",
         nav2_packages_hardwares = "selected",
-        status=status,
-        msg=msg,
         normal_mode=__is_normal_mode(request),
         hosts=installed_result.package
     )
@@ -701,7 +699,10 @@ def index(request):
     @param request : the HTTP request
     @return an HttpResponse object
     """
+
     page_title = _("Domogik Homepage")
+    page_messages = []
+
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -725,6 +726,7 @@ def index(request):
     return __go_to_page(
         request, 'index.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         device_types=device_types,
         device_usages=device_usages,
@@ -739,7 +741,10 @@ def show_house(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+
     page_title = _("View House")
+    page_messages = []
+
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -761,6 +766,7 @@ def show_house(request):
     return __go_to_page(
         request, 'show/house.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         nav1_show = "selected",
         device_types=device_types,
@@ -777,7 +783,10 @@ def show_house_edit(request, from_page):
     @param request : HTTP request
     @return an HttpResponse object
     """
+
     page_title = _("Edit House")
+    page_messages = []
+
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -794,6 +803,7 @@ def show_house_edit(request, from_page):
     return __go_to_page(
         request, 'show/house.edit.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         nav1_show = "selected",
         from_page = from_page,
@@ -807,6 +817,9 @@ def show_area(request, area_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
+
+    page_messages = []
+
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -830,6 +843,7 @@ def show_area(request, area_id):
     return __go_to_page(
         request, 'show/area.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         nav1_show = "selected",
         device_types=device_types,
@@ -846,6 +860,8 @@ def show_area_edit(request, area_id, from_page):
     @param request : HTTP request
     @return an HttpResponse object
     """
+
+    page_messages = []
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -867,6 +883,7 @@ def show_area_edit(request, area_id, from_page):
     return __go_to_page(
         request, 'show/area.edit.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         nav1_show = "selected",
         from_page = from_page,
@@ -881,6 +898,8 @@ def show_room(request, room_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    
+    page_messages = []
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -901,6 +920,7 @@ def show_room(request, room_id):
     return __go_to_page(
         request, 'show/room.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         nav1_show = "selected",
         device_types=device_types,
@@ -916,6 +936,8 @@ def show_room_edit(request, room_id, from_page):
     @param request : HTTP request
     @return an HttpResponse object
     """
+
+    page_messages = []
     widgets_list = settings.WIDGETS_LIST
 
     try:
@@ -937,6 +959,7 @@ def show_room_edit(request, room_id, from_page):
     return __go_to_page(
         request, 'show/room.edit.html',
         page_title,
+        page_messages,
         widgets=widgets_list,
         nav1_show = "selected",
         from_page = from_page,
