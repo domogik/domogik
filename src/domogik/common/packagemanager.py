@@ -72,6 +72,10 @@ else:
 
 PLUGIN_XML_PATH = "%s/plugins/plugins" % INSTALL_PATH
 
+# type of part for a plugin
+PKG_PART_XPL = "xpl"
+PKG_PART_RINOR = "rinor"
+
 class PackageManager():
     """ Tool to create packages
     """
@@ -249,13 +253,15 @@ class PackageManager():
         self.log("OK")
     
 
-    def install_package(self, path, release = None):
+    def install_package(self, path, release = None, package_part = PKG_PART_XPL):
         """ Install a package
             0. Eventually download package
             1. Extract tar.gz
             2. Install package
             3. Insert data in database
             @param path : path for tar.gz
+            @param release : release to install (default : highest)
+            @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
         #if self.is_root() == False:
         #    self.log("-i option must be used as root")
@@ -332,7 +338,7 @@ class PackageManager():
         self.log("Installing package (plugin)...")
         try:
             if pkg_xml.type in ('plugin', 'hardware'):
-                self._install_plugin_or_hardware(my_tmp_dir, INSTALL_PATH, pkg_xml.type)
+                self._install_plugin_or_hardware(my_tmp_dir, INSTALL_PATH, pkg_xml.type, package_part)
             else:
                 raise "Package type '%s' not installable" % pkg_xml.type
         except:
@@ -365,16 +371,18 @@ class PackageManager():
         tar.close()
 
 
-    def _install_plugin_or_hardware(self, pkg_dir, install_path, type):
+    def _install_plugin_or_hardware(self, pkg_dir, install_path, type, package_part):
         """ Install plugin
             @param pkg_dir : directory where package is extracted
             @param install_path : path where we install packages
             @param type : plugin, hardware
+            @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
 
         ### create needed directories
         # create install directory
         self.log("Creating directories for %s..." % type)
+        # notice : the %ss is not a bug
         plg_path = "%s/%ss/" % (install_path, type)
         try:
             if os.path.isdir(plg_path) == False:
@@ -387,13 +395,18 @@ class PackageManager():
         ### copy files
         self.log("Copying files for %s..." % type)
         try:
-            copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
-            self._create_init_py("%s/" % plg_path)
-            self._create_init_py("%s/xpl/" % plg_path)
-            self._create_init_py("%s/xpl/bin/" % plg_path)
-            self._create_init_py("%s/xpl/lib/" % plg_path)
-            copytree("%s/src/share/domogik" % pkg_dir, "%s/" % plg_path, self.log)
-            copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
+            # xpl/* and plugins/*.xml are installed on target host 
+            if package_part == PKG_PART_XPL:
+                copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
+                self._create_init_py("%s/" % plg_path)
+                self._create_init_py("%s/xpl/" % plg_path)
+                self._create_init_py("%s/xpl/bin/" % plg_path)
+                self._create_init_py("%s/xpl/lib/" % plg_path)
+                copytree("%s/src/share/domogik/%ss" % (pkg_dir, type), "%s/%ss" % (plg_path, type), self.log)
+            if package_part == PKG_PART_RINOR:
+                copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
+                copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
+                copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
         except:
             msg = "Error while copying %s files : %s" % (type, traceback.format_exc())
             self.log(msg)

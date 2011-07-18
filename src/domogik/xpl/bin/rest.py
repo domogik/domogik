@@ -340,7 +340,7 @@ class Rest(XplPlugin):
             notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
             notifier.start()
             wdd = wm.add_watch(self._xml_cmd_dir, mask, rec = True)
-            self.add_stop_cb(notifier.join)
+            self.add_stop_cb(notifier.stop)
 
             # inotify for stat files
             wm_stat = pyinotify.WatchManager() # Watch manager
@@ -350,7 +350,7 @@ class Rest(XplPlugin):
             notifier_stat = pyinotify.ThreadedNotifier(wm_stat, notify_handler_stat)
             notifier_stat.start()
             wdd_stat = wm_stat.add_watch(self._xml_stat_dir, mask_stat, rec = True)
-            self.add_stop_cb(notifier_stat.join)
+            self.add_stop_cb(notifier_stat.stop)
 
             # Enable hbeat
             self.enable_hbeat()
