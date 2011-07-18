@@ -58,6 +58,18 @@
           <stat_key>command</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
+     <device_feature_model>
+          <id>knx.switch.raw</id>
+          <name>Raw</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;command&quot;}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
   </device_feature_models>
 </package>
 

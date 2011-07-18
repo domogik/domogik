@@ -1,0 +1,38 @@
+.dmg_3x1_basicActuatorString {
+    background-position: 90% 50%;
+    background-repeat: no-repeat;
+}
+
+.dmg_3x1_basicActuatorString input {
+    position: absolute;
+    top: 1.5em;
+    left: 1em;
+    border:1px solid #B8B8B8;
+    border-radius: 0.4em;
+    -moz-border-radius: 0.4em;
+    -webkit-border-radius: 0.4em;
+    width:10em;
+}
+
+.dmg_3x1_basicActuatorString .command {
+  height:3em;
+  line-height: 3em;
+  width:5.5em;
+  -moz-border-radius: .8em;
+  -webkit-border-radius: .8em;
+  position:absolute;
+  right:1em;
+  bottom:.95em;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  background-color:rgba(0,0,0,0.8);
+  color: #fff;
+  cursor: pointer;
+}
+
+.dmg_3x1_basicActuatorString .command:hover,
+.dmg_3x1_basicActuatorString .command:focus,
+.dmg_3x1_basicActuatorString .command:active {
+  border:2px solid #ffffff;
+  line-height: 2.6em;
+}
