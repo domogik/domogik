@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="x10">
+    <schema name="knx.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="group"/>
+                <value field="command"/>
+                <value field="data"/>
+                <value field="type"/>
+            </mapping>
+        </xpltype>
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="group"/>
+                <value field="command"/>
+                <value field="data"/>
+                <value field="type"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

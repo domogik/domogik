@@ -26,8 +26,10 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/knx.xml"/>
+    <file path="src/share/domogik/stats/knx/basic.xml"/>
     <file path="src/domogik/xpl/bin/knx.py"/>
     <file path="src/domogik/xpl/lib/knx.py"/>
+    <file path="src/share/domogik/url2xpl/knx/command.xml"/>
   </files>
   <dependencies/>
   <device_technology>
@@ -35,7 +37,27 @@
       <name>KNX</name>
       <description>KNX with Eibd</description>
   </device_technology>
-  <device_types/>
-  <device_feature_models/>
+  <device_types>
+      <device_type>
+          <id>knx.switch</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Switch</name>
+          <description>Switch</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+     <device_feature_model>
+          <id>knx.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;command&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>
 
