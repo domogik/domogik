@@ -293,7 +293,7 @@ class Rest(XplPlugin):
                                                  self._queue_event_size,
                                                  self._queue_event_timeout,
                                                  self._queue_event_life_expectancy)
-            self.add_stop_cb(self._event_requests.set_stop_clean)
+            #self.register_thread(self._event_requests)
     
             # define listeners for queues
             self.log.debug("Create listeners")
@@ -340,7 +340,7 @@ class Rest(XplPlugin):
             notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
             notifier.start()
             wdd = wm.add_watch(self._xml_cmd_dir, mask, rec = True)
-            self.add_stop_cb(notifier.join)
+            self.register_thread(notifier)
 
             # inotify for stat files
             wm_stat = pyinotify.WatchManager() # Watch manager
@@ -350,7 +350,7 @@ class Rest(XplPlugin):
             notifier_stat = pyinotify.ThreadedNotifier(wm_stat, notify_handler_stat)
             notifier_stat.start()
             wdd_stat = wm_stat.add_watch(self._xml_stat_dir, mask_stat, rec = True)
-            self.add_stop_cb(notifier_stat.join)
+            self.register_thread(notifier_stat)
 
             # Enable hbeat
             self.enable_hbeat()
