@@ -132,10 +132,10 @@ class KNXManager(XplPlugin):
         valeur = message.data['data']
         data_type = message.data['type']
         #if type_cmd=="Write":
-        if data_type=="l":
-           command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
         if data_type=="s":
            command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
+        if data_type=="l":
+           command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
         #if type_cmd == "Read":
         #    command="groupsread ip:127.0.0.1 %s" % groups
 
