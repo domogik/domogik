@@ -66,19 +66,10 @@ function get_widgets_options(id) {
                 this.element.addClass('border')
             }
 			if (o.displayname) {
-	            this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
-	            this.element.append(this._identity);				
-				var canvas = this._identity.get(0);
-				if (canvas.getContext){
-					var ctx = canvas.getContext('2d');
-					ctx.beginPath();
-					ctx.font = "6pt Arial";
-					ctx.textBaseline = "top"
-					ctx.fillText(o.devicename, 15, 5);
-					ctx.translate(5,60);
-					ctx.rotate(-(Math.PI/2));
-					ctx.fillText(o.featurename, 0, 0);  
-				}
+                this._devicename = $("<div class='identity identitydevice length" + o.width + "'>" + o.devicename + "</div>");
+                this.element.append(this._devicename);
+                this._featurename = $("<div class='identity identityfeature length" + o.height + "'>" + o.featurename + "</div>");
+                this.element.append(this._featurename);
 			}
             
             $(document).bind('dmg_event', function(event, data) {
