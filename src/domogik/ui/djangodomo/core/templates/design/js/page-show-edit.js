@@ -58,6 +58,9 @@ $(function(){
                 featurename: ui.draggable.data('featurename'),
                 devicename: ui.draggable.data('devicename'),
                 associationid: ui.draggable.data('associationid'),
+                widgetwidth: ui.draggable.data('widgetwidth'),
+                widgetheight: ui.draggable.data('widgetheight'),
+
                 draggable:{
                     helper: false,
                     revert: 'invalid',
@@ -85,21 +88,10 @@ $(function(){
     
     $.fn.extend({
 	    displayName: function(){
-            var devicename = this.data('devicename');
-            var featurename = this.data('featurename');
-            this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
-			this.append(this._identity);				
-			var canvas = this._identity.get(0);
-			if (canvas.getContext){
-				var ctx = canvas.getContext('2d');
-				ctx.beginPath();
-				ctx.font = "6pt Arial";
-				ctx.textBaseline = "top"
-				ctx.fillText(devicename, 15, 5);
-				ctx.translate(5,60);
-				ctx.rotate(-(Math.PI/2));
-				ctx.fillText(featurename, 0, 0);  
-			}
+            _devicename = $("<div class='identity identitydevice length" + this.data('widgetwidth') + "'>" + this.data('devicename') + "</div>");
+            this.append(_devicename);
+            _featurename = $("<div class='identity identityfeature length" + this.data('widgetheight') + "'>" + this.data('featurename') + "</div>");
+            this.append(_featurename);
         },
         hasSize: function(width, height) {
             var id = this.data('widgetid');
@@ -160,6 +152,8 @@ $(function(){
                         $(this).addClass('selected');
                         $('#model').widget_model({
                             widgetid: id,
+                            widgetwidth: o.width,
+                            widgetheight: o.height,
                             featureid: o.featureid,
                             featurename: o.featurename,
                             devicename: o.devicename
@@ -199,6 +193,8 @@ $(function(){
             var model = $('<div></div>');
             model.widget_shape({
                 widgetid: o.widgetid,
+                widgetwidth: o.width,
+                widgetheight: o.height,
                 featureid: o.featureid,
                 featurename: o.featurename,
                 devicename: o.devicename,
@@ -233,11 +229,13 @@ $(function(){
             this.element.attr('role', 'listitem');
 			this.element.addClass('size' + o.width + 'x' + o.height);
             this.element.attr("tabindex", 0);
-            this.element.text(o.width + 'x' + o.height);
+            this.element.append("<div class='sizetext'>" + o.width + 'x' + o.height + "</div>");
             this.element.data({
                 'devicename':o.devicename,
                 'featurename':o.featurename,
                 'featureid':o.featureid,
+                'widgetwidth': o.width,
+                'widgetheight':o.height,
                 'widgetid': o.widgetid,
                 'associationid': o.associationid
             });
@@ -342,7 +340,7 @@ $(function(){
                                             function(data) {
                                                 var status = (data.status).toLowerCase();
                                                 if (status == 'ok') {
-                                                    var model = $("<div id='" + association.id + "' role='listitem'>1x1</div>");
+                                                    var model = $("<div id='" + association.id + "' role='listitem'></div>");
                                                     model.widget_shape({
                                                         widgetid: widget,
                                                         featureid: association.device_feature_id,
