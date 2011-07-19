@@ -26,7 +26,7 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/knx.xml"/>
-    <file path="src/share/domogik/stats/knx/basic.xml"/>
+    <file path="src/share/domogik/stats/knx/knx.basic.xml"/>
     <file path="src/domogik/xpl/bin/knx.py"/>
     <file path="src/domogik/xpl/lib/knx.py"/>
     <file path="src/share/domogik/url2xpl/knx/command.xml"/>
