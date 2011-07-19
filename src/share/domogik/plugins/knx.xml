@@ -30,6 +30,7 @@
     <file path="src/domogik/xpl/bin/knx.py"/>
     <file path="src/domogik/xpl/lib/knx.py"/>
     <file path="src/share/domogik/url2xpl/knx/command.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/ask.xml"/>
   </files>
   <dependencies/>
   <device_technology>
