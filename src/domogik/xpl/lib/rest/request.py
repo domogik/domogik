@@ -3811,7 +3811,10 @@ target=*
             message = self._get_from_queue(self._queue_package, 
                                            "xpl-trig", 
                                            "domogik.package", 
-                                           filter_data = {"command" : "install"})
+                                           filter_data = {"command" : "install",
+                                                          "package" : package,
+                                                          "release" : release,
+                                                          "host" : host})
         except Empty:
             self.log.debug("Package install : no answer")
             self.send_http_response_error(999, "No data or timeout on installing package",
@@ -3831,7 +3834,7 @@ target=*
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.package")
         message.add_data({"command" : "install"})
-        message.add_data({"host" : host})
+        message.add_data({"host" : gethostname().lower()})
         message.add_data({"package" : package})
         message.add_data({"release" : release})
         message.add_data({"part" : PKG_PART_RINOR})
@@ -3846,7 +3849,10 @@ target=*
             message = self._get_from_queue(self._queue_package, 
                                            "xpl-trig", 
                                            "domogik.package", 
-                                           filter_data = {"command" : "install"})
+                                           filter_data = {"command" : "install",
+                                                          "package" : package,
+                                                          "release" : release,
+                                                          "host" : gethostname().lower()})
         except Empty:
             self.log.debug("Package install : no answer")
             self.send_http_response_error(999, "No data or timeout on installing package",
