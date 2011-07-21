@@ -3,8 +3,9 @@
     <schema>knx.basic</schema>
     <command-key>command</command-key>
     <address-key>group</address-key>
-    <command-xpl-value>ask</command-xpl-value>
-    <parameters/>                                                                 </command>
+    <command-xpl-value>Read</command-xpl-value>
+    <parameters/>                                                                                       
+  </command>
   <listener>
     <schema>knx.basic</schema>
     <xpltype>xpl-trig</xpltype>

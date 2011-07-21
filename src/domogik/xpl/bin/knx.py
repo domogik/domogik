@@ -97,37 +97,49 @@ class KNXManager(XplPlugin):
         """
         sender=data[data.find('from')+4:data.find('to')-1]
         sender = sender.strip()
+        groups = 'None'
+        val = 'None'
+        msg_type = 'None'
+        command = 'None'
         if sender<>"pageination":
             #print "%s" %sender
            command = data[0:4]  
-           msg_type="s"
-           if data[-2:-1]==" ":
-               msg_type="l" 
+   
+           groups = data[data.find('to')+2:data.find(':')]
+           groups = groups.strip()
+           groups = groups.replace('/',':')
+
            if command <> 'Read':
-               groups = data[data.find('to')+2:data.find(':')]
-               groups = groups.strip()
-               groups = groups.replace('/',':')
                val=data[data.find(':')+1:-1]
                val = val.strip()
-               msg = XplMessage()
-               if command == 'Writ':
-                  command = 'Write'
-                  msg.set_type("xpl-trig")
-                  msg.set_schema('knx.basic')
-               if command == 'Resp':
-                  command = 'Responce'
-                  msg.set_type("xpl-stat")
-                  msg.set_schema('knx.basic')
-               msg.add_data({'group' :  groups})
-               msg.add_data({'command' : command})
-               msg.add_data({'data': val})
-               msg.add_data({'type' :  msg_type})
-               self.myxpl.send(msg)
-               
+               msg_type = "s"
+               if data[-2:-1]==" ":
+                   msg_type = "l"
+           msg = XplMessage()
+
+           if command == 'Writ':
+              command = 'Write'
+              msg.set_type("xpl-trig")
+              msg.set_schema('knx.basic')
+           if command == 'Resp':
+              command = 'Responce'
+              msg.set_type("xpl-stat")
+              msg.set_schema('knx.basic')
+           if command == 'Read':
+               msg.set_type("xpl-cmnd")
+               msg.set_schema('knx.basic')
+
+           msg.add_data({'command' : command})
+           msg.add_data({'group' :  groups})
+           msg.add_data({'type' :  msg_type})
+           msg.add_data({'data': val})
+           self.myxpl.send(msg)
+                          
     def knx_cmd(self, message):
         type_cmd = message.data['command']
         groups = message.data['group']
         groups = groups.replace(':','/')
+       # print "%s" %message
         if type_cmd=="command":
             valeur = message.data['data']
             data_type = message.data['type']
@@ -135,8 +147,16 @@ class KNXManager(XplPlugin):
                command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
             if data_type=="l":
                command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
-        if type_cmd == "ask":
+        if type_cmd == "Read":
             command="groupread ip:127.0.0.1 %s" % groups
+        if type_cmd == "Responce":
+            data_type=message.data['type']
+            valeur = message.data['data']
+            if data_type=="s":
+                command="groupsresponce ip:127.0.0.1 %s %s" %(groups,valeur)
+            if data_type=="l":
+                command="groupresponce ip:127.0.0.1 %s %s" %(groups,valeur)
+
         subp=subprocess.Popen(command, shell=True)
 
 
