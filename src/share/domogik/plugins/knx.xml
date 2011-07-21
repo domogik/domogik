@@ -31,7 +31,7 @@
     <file path="src/domogik/xpl/lib/knx.py"/>
     <file path="src/share/domogik/url2xpl/knx/command.xml"/>
     <file path="src/share/domogik/url2xpl/knx/ask.xml"/>
-    <file path="src/share/domogik/url2xpl/knx/responce.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/responcefi.xml"/>
   </files>
   <dependencies/>
   <device_technology>
@@ -87,7 +87,7 @@
               {}
           </parameters>
           <value_type>string</value_type>
-          <stat_key>command</stat_key>
+          <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
   </device_feature_models>
