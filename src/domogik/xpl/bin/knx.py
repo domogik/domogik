@@ -106,39 +106,37 @@ class KNXManager(XplPlugin):
            if command <> 'Read':
                groups = data[data.find('to')+2:data.find(':')]
                groups = groups.strip()
-#            print "%s" %groups
                groups = groups.replace('/',':')
-#            print "%s" %groups
                val=data[data.find(':')+1:-1]
                val = val.strip()
                msg = XplMessage()
-               msg.set_type("xpl-trig")
-               msg.set_schema('knx.basic')
-         #   if command == 'Writ':
-         #       command = 'Write'
-         #   if command == 'Resp':
-         #       command = 'Responce'
-            #msg.add_data({'type': command})
+               if command == 'Writ':
+                  command = 'Write'
+                  msg.set_type("xpl-trig")
+                  msg.set_schema('knx.basic')
+               if command == 'Resp':
+                  command = 'Responce'
+                  msg.set_type("xpl-stat")
+                  msg.set_schema('knx.basic')
                msg.add_data({'group' :  groups})
+               msg.add_data({'command' : command})
+               msg.add_data({'data': val})
                msg.add_data({'type' :  msg_type})
-               msg.add_data({'response' :  val})
                self.myxpl.send(msg)
                
     def knx_cmd(self, message):
-        print "%s" % message
-        # type_cmd = message.data['type']
+        type_cmd = message.data['command']
         groups = message.data['group']
         groups = groups.replace(':','/')
-        valeur = message.data['data']
-        data_type = message.data['type']
-        #if type_cmd=="Write":
-        if data_type=="s":
-           command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
-        if data_type=="l":
-           command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
-        #if type_cmd == "Read":
-        #    command="groupsread ip:127.0.0.1 %s" % groups
-
+        if type_cmd=="command":
+            valeur = message.data['data']
+            data_type = message.data['type']
+            if data_type=="s":
+               command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
+            if data_type=="l":
+               command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
+        if type_cmd == "ask":
+            command="groupread ip:127.0.0.1 %s" % groups
         subp=subprocess.Popen(command, shell=True)
 
 

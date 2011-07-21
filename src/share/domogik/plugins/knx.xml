@@ -30,6 +30,7 @@
     <file path="src/domogik/xpl/bin/knx.py"/>
     <file path="src/domogik/xpl/lib/knx.py"/>
     <file path="src/share/domogik/url2xpl/knx/command.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/ask.xml"/>
   </files>
   <dependencies/>
   <device_technology>
@@ -43,6 +44,12 @@
           <device_technology_id>knx</device_technology_id>
           <name>Switch</name>
           <description>Switch</description>
+      </device_type>
+      <device_type>
+          <id>knx.raw</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Raw</name>
+          <description>Raw value</description>
       </device_type>
   </device_types>
   <device_feature_models>
@@ -59,12 +66,24 @@
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
      <device_feature_model>
-          <id>knx.switch.raw</id>
-          <name>Raw</name>
+          <id>knx.raw.write</id>
+          <name>Write</name>
           <feature_type>actuator</feature_type>
-          <device_type_id>knx.switch</device_type_id>
+          <device_type_id>knx.raw</device_type_id>
           <parameters>
               {&quot;command&quot;:&quot;command&quot;}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+     <device_feature_model>
+          <id>knx.raw.read</id>
+          <name>Read</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>knx.raw</device_type_id>
+          <parameters>
+              {}
           </parameters>
           <value_type>string</value_type>
           <stat_key>command</stat_key>
