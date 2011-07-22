@@ -116,7 +116,7 @@ def decode(message):
 
 if __name__ == "__main__":                                                      
     device = "ipt:192.168.0.148"                                                        
-    obj = KNX(None, decode)                                                           
+    obj = KNX(None, decode)                                                     
     obj.open(device)
     obj.listen()           
 
