@@ -90,7 +90,7 @@ QUEUE_COMMAND_SIZE = 1000
 # /event queue config
 EVENT_TIMEOUT = 300  # must be superior than QUEUE_EVENT_TIMEOUT
                      # Value should be > 2*x QUEUE_EVENT_TIMEOUT
-QUEUE_EVENT_TIMEOUT = 120   # If 0, no timeout is set
+QUEUE_EVENT_TIMEOUT = 30   # If 0, no timeout is set
 QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
 
