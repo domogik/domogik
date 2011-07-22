@@ -190,23 +190,19 @@ class EventRequests():
         print "---- GET ----"
         x = 0
         empty = True
-        while not self.get_stop().isSet() and x < (self.queue_timeout*10) and empty == True:
+        while not self.get_stop().isSet() and x < (self.queue_timeout) and empty == True:
             x = x + 0.1
             try:
-                #print "read from queue"
                 (elt_time, elt_data) = self.requests[ticket_id]["queue"].get_nowait()
-                #print "DATA:%s" % elt_data
                 empty = False
 
             # No data
             except Empty:
-                #print "empty"
                 empty = True
                 self.get_stop().wait(0.1)
 
             # Ticket doesn't exists
             except KeyError:
-                #print "bad ticket"
                 self._log.warning("Trying to get an unknown event request (ticket_id=%s). Maybe your ticket expires ?" % ticket_id)
                 return False
 
