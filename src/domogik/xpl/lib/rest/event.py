@@ -189,22 +189,27 @@ class EventRequests():
         """
         print "---- GET ----"
         x = 0
-        while not self.get_stop().isSet() and x < (self.queue_timeout * 10):
+        empty = True
+        while not self.get_stop().isSet() and x < (self.queue_timeout*10) and empty == True:
             x = x + 0.1
             try:
+                #print "read from queue"
                 (elt_time, elt_data) = self.requests[ticket_id]["queue"].get_nowait()
-            # Timeout
+                #print "DATA:%s" % elt_data
+                empty = False
+
+            # No data
             except Empty:
+                #print "empty"
                 empty = True
+                self.get_stop().wait(0.1)
 
             # Ticket doesn't exists
             except KeyError:
+                #print "bad ticket"
                 self._log.warning("Trying to get an unknown event request (ticket_id=%s). Maybe your ticket expires ?" % ticket_id)
-                timer.stop()
                 return False
 
-            empty = False
-            self.get_stop().wait(0.1)
 
         if empty == True:
             # Add ticket id to answer
@@ -221,7 +226,7 @@ class EventRequests():
             # TODO : use queue_life_expectancy in order not to get old data
 
             # Add ticket id to answer
-            elt_data = {}
+            #elt_data = {}
             elt_data["ticket_id"] = str(ticket_id)
 
             # Update access date
