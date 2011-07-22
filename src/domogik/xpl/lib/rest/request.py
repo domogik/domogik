@@ -161,7 +161,7 @@ class ProcessRequest():
 
         # url processing
         #self.path = self.fixurl(self.path)
-        self.path = urllib.unquote(self.path)
+        #self.path = urllib.unquote(self.path)
 
         # replace password by "***". 
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
@@ -179,7 +179,8 @@ class ProcessRequest():
 
         if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
-        tab_path = self.path.split("/")
+        tab_path_quoted = self.path.split("/")
+        tab_path = [urllib.unquote(item) for item in tab_path_quoted]
 
         # Get type of request : /command, /xpl-cmnd, /base, etc
         if len(tab_path) < 2:
