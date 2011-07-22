@@ -63,15 +63,20 @@ class KNX:
         """ open 
             @param device :
         """
+        print "Lancement de EIBD"
         # device example : "ipt:192.168.0.148"
         command = "eibd -i -d -D %s" % device
+        print "lancement de la commande: %s" %command
         subp = subprocess.Popen(command, shell=True)        
         self.eibd_pid = subp.pid 
+
 
     def close(self):
         """ close t
         """
-        subp = subprocess.Popen("kill -15 %s" % self.eibd_pid, shell=True)   
+        #subp = subprocess.Popen("kill -9 %s" % self.eibd_pid, shell=True)   
+        subp = subprocess.Popen("pkill eibd", shell=True)
+
         # TODOD : add check and kill -9 if necessary
 
     def listen(self):                                                   
@@ -80,39 +85,18 @@ class KNX:
                      shell = True,                                              
                      bufsize = 1024,                                            
                      stdout = subprocess.PIPE                                   
-                     ).stdout                                                   
+                     ).stdout                                              
         self._read = True                                                       
-                                                                                
+                                                                        
         while self._read:                                                       
             data = self.pipe.readline()                                         
             if not data:                                                        
                 break                                                           
             self._callback(data) 
-            #print "> %s" % data                                                 
-                                               
-    def stop_listen(self):                                                      
+            #print "> %s" % data                                                                     
+    def stop_listen(self):  
+        print "arret du listen"                                                 
         self._read = False 
-
-    def read(self, groups):
-        command2 = "groupread ip:127.0.0.1 %s" % groups                              
-        subp2 = subprocess.Popen(command2, shell=True) 
- 
-
-    def write(self, groups, Value):
-        print " je suis dans la lib"
-        print " % s " % groups
-        print " % s " % Value	
-	if Value < 31:
-		os.system("groupswrite ip:127.0.0.1 " % groups % Value)
-	else:
-		os.system("groupwrite ip:127.0.0.1 "%groups % Value)
-
-
-
-def decode(message):
-    ''' décodage du message
-    '''
-    print "%s" % message
 
 if __name__ == "__main__":                                                      
     device = "ipt:192.168.0.148"                                                        

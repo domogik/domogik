@@ -64,7 +64,7 @@ class KNXManager(XplPlugin):
             self.knx = KNX(self.log, self.send_xpl)
             self.log.info("Open KNX for device : %s" % device)
             self.knx.open(device)
-            time.sleep(10)
+            time.sleep(1)
 
         except KNXException as err:
             self.log.error(err.value)
@@ -91,6 +91,7 @@ class KNXManager(XplPlugin):
         ### Create listeners for commands
         self.log.info("Creating listener for KNX")
         Listener(self.knx_cmd, self.myxpl,{'schema':'knx.basic'})
+        self.add_stop_cb(self.knx.close)
         self.enable_hbeat()
         self.log.info("Plugin ready :)")
 
