@@ -9,6 +9,9 @@
   <listener>
     <schema>knx.basic</schema>
     <xpltype>xpl-trig</xpltype>
-    <filter/>
+    <filter>
+      <key name="command" value="Read"/>
+      <key name="group" value="@address@"/>
+    </filter>
   </listener>
 </technology>
