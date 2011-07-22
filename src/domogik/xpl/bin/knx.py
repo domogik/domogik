@@ -43,6 +43,7 @@ from domogik.xpl.lib.knx import KNXException
 from domogik.xpl.lib.knx import KNX
 import threading
 import subprocess
+import time
 
 class KNXManager(XplPlugin):
     """ Implements a listener for KNX command messages 
@@ -63,6 +64,8 @@ class KNXManager(XplPlugin):
             self.knx = KNX(self.log, self.send_xpl)
             self.log.info("Open KNX for device : %s" % device)
             self.knx.open(device)
+            time.sleep(10)
+
         except KNXException as err:
             self.log.error(err.value)
             print err.value
@@ -118,14 +121,17 @@ class KNXManager(XplPlugin):
            msg = XplMessage()
 
            if command == 'Writ':
+              print "knx Write xpl-trig"
               command = 'Write'
               msg.set_type("xpl-trig")
               msg.set_schema('knx.basic')
            if command == 'Resp':
-              command = 'Responce'
+              print "knx Response xpl-stat"
+              command = 'Response'
               msg.set_type("xpl-stat")
               msg.set_schema('knx.basic')
            if command == 'Read':
+               print "knx Read xpl-cmnd"
                msg.set_type("xpl-cmnd")
                msg.set_schema('knx.basic')
 
@@ -139,8 +145,10 @@ class KNXManager(XplPlugin):
         type_cmd = message.data['command']
         groups = message.data['group']
         groups = groups.replace(':','/')
-       # print "%s" %message
+        print "%s" %type_cmd
+        command=""
         if type_cmd=="command":
+            print "dmg Write"
             valeur = message.data['data']
             data_type = message.data['type']
             if data_type=="s":
@@ -148,17 +156,20 @@ class KNXManager(XplPlugin):
             if data_type=="l":
                command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
         if type_cmd == "Read":
+            print "dmg Read"
             command="groupread ip:127.0.0.1 %s" % groups
-        if type_cmd == "Responce":
+        if type_cmd == "Response":
+            print "dmg Response"
             data_type=message.data['type']
             valeur = message.data['data']
             if data_type=="s":
-                command="groupsresponce ip:127.0.0.1 %s %s" %(groups,valeur)
+                command="groupsresponse ip:127.0.0.1 %s %s" %(groups,valeur)
             if data_type=="l":
-                command="groupresponce ip:127.0.0.1 %s %s" %(groups,valeur)
-
-        subp=subprocess.Popen(command, shell=True)
-
+                command="groupresponse ip:127.0.0.1 %s %s" %(groups,valeur)
+        if command<>"":
+            subp=subprocess.Popen(command, shell=True)
+        if command=="":
+           print "erreur command non définir, type cmd= %s" %type_cmd
 
 
 if __name__ == "__main__":
