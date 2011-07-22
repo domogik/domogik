@@ -42,6 +42,7 @@ from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
+import datetime
 import traceback
 import glob
 import calendar
@@ -96,15 +97,38 @@ class StatsManager:
             self.get_exception = self.handler_params[0].get_exception
 
             self.stats = None
-    
+
+            ### list of loaded and KO xml files
+            self.xml_date = None
+            self.xml = []
+            self.xml_ko = []
+
         except :
             self._log_stats.error("%s" % traceback.format_exc())
     
+    def get_xml_list(self):
+        """ getter for loaded xml files
+        """
+        return self.xml
+
+    def get_xml_ko_list(self):
+        """ getter for bad xml files
+        """
+        return self.xml_ko
+
+    def get_load_date(self):
+        """ getter for xml last load date
+        """
+        return self.xml_date
+
     def load(self):
         """ (re)load all xml files to (re)create _Stats objects
         """
         try:
-            print "load!"
+            self.xml_date = datetime.datetime.now()
+            self.xml = []
+            self.xml_ko = []
+
             ### Clean old _Stat objects ans created Listeners
             # not the first load : clean
             if self.stats != None:
@@ -121,31 +145,36 @@ class StatsManager:
             res = {}
             for _file in files :
                 if _file[-4:] == ".xml":
-                    self._log_stats.info("Parse file %s" % _file)
-                    doc = minidom.parse(_file)
-                    #Statistic/root node
-                    technology = doc.documentElement.attributes.get("technology").value
-                    schema_types = self.get_schemas_and_types(doc.documentElement)
-                    self._log_stats.debug("Parsed : %s" % schema_types)
-                    if technology not in res:
-                        res[technology] = {}
-                        self.stats[technology] = {}
-                    
-                    for schema in schema_types:
-                        if schema not in res[technology]:
-                            res[technology][schema] = {}
-                            self.stats[technology][schema] = {}
-                        for xpl_type in schema_types[schema]:
-                            device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
-                            res[technology][schema][xpl_type] = {"filter": 
-                                    self.parse_listener(schema_types[schema][xpl_type].getElementsByTagName("listener")[0]),
-                                    "mapping": mapping,
-                                    "device": device,
-                                    "static_device": static_device,
-                                    "device_type": device_type}
-                    
-                            self.stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
-                            self._log_stats.info("Stat manager starter 1")
+                    try:
+                        self._log_stats.info("Parse file %s" % _file)
+                        doc = minidom.parse(_file)
+                        #Statistic/root node
+                        technology = doc.documentElement.attributes.get("technology").value
+                        schema_types = self.get_schemas_and_types(doc.documentElement)
+                        self._log_stats.debug("Parsed : %s" % schema_types)
+                        if technology not in res:
+                            res[technology] = {}
+                            self.stats[technology] = {}
+                        
+                        for schema in schema_types:
+                            if schema not in res[technology]:
+                                res[technology][schema] = {}
+                                self.stats[technology][schema] = {}
+                            for xpl_type in schema_types[schema]:
+                                device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                                res[technology][schema][xpl_type] = {"filter": 
+                                        self.parse_listener(schema_types[schema][xpl_type].getElementsByTagName("listener")[0]),
+                                        "mapping": mapping,
+                                        "device": device,
+                                        "static_device": static_device,
+                                        "device_type": device_type}
+                        
+                                self.stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
+                                self._log_stats.info("One listener created")
+                        self.xml.append(_file)
+                    except:
+                        self._log_stats.error("Error loading xml files '%s' : %s" % (_file, traceback.format_exc()))
+                        self.xml_ko.append(_file)
         except :
             self._log_stats.error("%s" % traceback.format_exc())
 
