@@ -3,7 +3,7 @@
     <schema>knx.basic</schema>
     <command-key>command</command-key>
     <address-key>group</address-key>
-    <command-xpl-value>Responce</command-xpl-value>
+    <command-xpl-value>responce</command-xpl-value>
     <parameters>                                                                                       
       <parameter key="data" location="1"/>                                          <parameter key="type" location="2"/>                 
     </parameters>                                                                
@@ -12,7 +12,7 @@
     <schema>knx.basic</schema>
     <xpltype>xpl-stat</xpltype>
     <filter>
-     <key name="command" value="Responce"/>
+     <key name="command" value="responce"/>
      <key name="group" value="@address@"/>
     </filter>
   </listener>
