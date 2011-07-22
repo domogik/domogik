@@ -231,7 +231,7 @@ class SysManager(XplPlugin):
                 hardware_stop = Event()
                 hardware_timer = XplTimer(20, 
                                           self._check_hardware_status, 
-                                          hardware_stop,
+                                 #         hardware_stop,
                                           self.myxpl)
                 hardware_timer.start()
 
