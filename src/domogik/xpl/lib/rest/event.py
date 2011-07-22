@@ -39,6 +39,7 @@ EventRequests object
 import time
 from Queue import Queue, Empty, Full
 from threading import Thread, Event
+from domogik.xpl.common.xplconnector import XplTimer
 
 
 
@@ -46,11 +47,12 @@ class EventRequests():
     """
     Object where all events queues and ticket id will be stored
     """
-    def __init__(self, log, event_timeout, queue_size, queue_timeout, queue_life_expectancy):
+    def __init__(self, get_stop, log, event_timeout, queue_size, queue_timeout, queue_life_expectancy):
         """ Init Event Requests
             @param queue_size : size of queues for events
         """
         self.requests = {}
+        self.get_stop = get_stop
         self._log = log
         self.event_timeout = event_timeout
         self.queue_size = queue_size
@@ -186,19 +188,25 @@ class EventRequests():
             @return data in queue or False if ticket doesn't exists
         """
         print "---- GET ----"
-        try:
-            (elt_time, elt_data) = self.requests[ticket_id]["queue"].get(True, self.queue_timeout)
-            self.requests[ticket_id]["queue_size"] -= 1
-            # TODO : use queue_life_expectancy in order not to get old data
+        x = 0
+        while not self.get_stop().isSet() and x < (self.queue_timeout * 10):
+            x = x + 0.1
+            try:
+                (elt_time, elt_data) = self.requests[ticket_id]["queue"].get_nowait()
+            # Timeout
+            except Empty:
+                empty = True
 
-            # Add ticket id to answer
-            elt_data["ticket_id"] = str(ticket_id)
+            # Ticket doesn't exists
+            except KeyError:
+                self._log.warning("Trying to get an unknown event request (ticket_id=%s). Maybe your ticket expires ?" % ticket_id)
+                timer.stop()
+                return False
 
-            # Update access date
-            self.requests[ticket_id]["last_access_date"] = time.time()
+            empty = False
+            self.get_stop().wait(0.1)
 
-        # Timeout
-        except Empty:
+        if empty == True:
             # Add ticket id to answer
             elt_data = {}
             elt_data["ticket_id"] = str(ticket_id)
@@ -206,11 +214,25 @@ class EventRequests():
             # Update access date
             self.requests[ticket_id]["last_access_date"] = time.time()
 
-        # Ticket doesn't exists
-        except KeyError:
-            self._log.warning("Trying to get an unknown event request (ticket_id=%s). Maybe your ticket expires ?" % ticket_id)
-            return False
-        return elt_data
+            return elt_data
+
+        else:
+            self.requests[ticket_id]["queue_size"] -= 1
+            # TODO : use queue_life_expectancy in order not to get old data
+
+            # Add ticket id to answer
+            elt_data = {}
+            elt_data["ticket_id"] = str(ticket_id)
+
+            # Update access date
+            self.requests[ticket_id]["last_access_date"] = time.time()
+
+            return elt_data
+
+    def stop_get(self):
+        """ Set the flag for while get_nowait to False
+        """
+        self.listen_queue = False
 
     def list(self):
         """ List queues (used by rest status)

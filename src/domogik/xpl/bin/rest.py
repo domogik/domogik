@@ -288,7 +288,8 @@ class Rest(XplPlugin):
     
             # Queues for /event
             # this queue will be fill by stat manager
-            self._event_requests = EventRequests(self.log,
+            self._event_requests = EventRequests(self.get_stop,
+                                                 self.log,
                                                  self._event_timeout,
                                                  self._queue_event_size,
                                                  self._queue_event_timeout,
