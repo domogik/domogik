@@ -155,6 +155,8 @@ class ProcessRequest():
         self.xml_ko =  self.handler_params[0].xml_ko
         self.xml_date =  self.handler_params[0].xml_date
 
+        self.stat_mgr =  self.handler_params[0].stat_mgr
+
         # global init
         self.jsonp = False
         self.jsonp_cb = ""
@@ -356,14 +358,10 @@ class ProcessRequest():
         command["XML_files_last_load"] = self.xml_date
 
         # Xml stat files
-        # TODO : make a nicer way : in StatsManager class, create a function
-        # that return list of xml files and detail of filters/mappings
         stats = {}
-        xml_stats = []
-        files = glob.glob("%s/*/*xml" % self._xml_stat_dir)
-        for _file in files :
-            xml_stats.append(_file)
-        stats["XML_files"] = xml_stats
+        stats["XML_files_loaded"] = self.stat_mgr.get_xml_list()
+        stats["XML_files_KO"] = self.stat_mgr.get_xml_ko_list()
+        stats["XML_files_last_load"] = self.stat_mgr.get_load_date()
 
         # Queues stats
         queues = {}

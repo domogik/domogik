@@ -104,9 +104,17 @@
     <section class="subsection">
         <h2>{% trans "Statistics" %}</h2>
         <ul class='stats'>
+            <li><span class='label'>XML files last load: </span>{{rinor.stats.XML_files_last_load}}</li>
             <li><span class='label'>XML files loaded: </span>
                 <ul id='fileslist'>
-                {% for file in rinor.stats.XML_files %}
+                {% for file in rinor.stats.XML_files_loaded %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><span class='label'>XML files KO: </span>
+                <ul id='fileslist'>
+                {% for file in rinor.stats.XML_files_KO %}
                     <li>{{ file }}</li>
                 {% endfor %}
                 </ul>
