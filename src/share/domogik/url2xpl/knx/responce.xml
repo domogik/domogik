@@ -10,7 +10,10 @@
   </command>
   <listener>
     <schema>knx.basic</schema>
-    <xpltype>xpl-trig</xpltype>
-    <filter/>
+    <xpltype>xpl-stat</xpltype>
+    <filter>
+     <key name="command" value="Responce"/>
+     <key name="group" value="@address@"/>
+    </filter>
   </listener>
 </technology>
