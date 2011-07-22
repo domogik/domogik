@@ -124,6 +124,13 @@
                 {% endfor %}
                 </ul>
             </li>
+            <li><span class='label'>XML files KO: </span>
+                <ul id='fileslist'>
+                {% for file in rinor.command.XML_files_KO %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
         </ul>
     </section>
     <section class="subsection">

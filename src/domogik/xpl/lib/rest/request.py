@@ -152,6 +152,7 @@ class ProcessRequest():
         self._event_requests =  self.handler_params[0]._event_requests
 
         self.xml =  self.handler_params[0].xml
+        self.xml_ko =  self.handler_params[0].xml_ko
         self.xml_date =  self.handler_params[0].xml_date
 
         # global init
@@ -351,6 +352,7 @@ class ProcessRequest():
         for key in self.xml:
             xml_info.append(key)
         command["XML_files_loaded"] = xml_info
+        command["XML_files_KO"] = self.xml_ko
         command["XML_files_last_load"] = self.xml_date
 
         # Xml stat files
