@@ -1359,8 +1359,8 @@ target=*
             elif data == "False":
                 return False
             else:
+                return data
                 #return unicode(urllib.unquote(data), sys.stdin.encoding)
-                return unicode(urllib.unquote(data), "UTF-8")
         except KeyError:
             return None
 
