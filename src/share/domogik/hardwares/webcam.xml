@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<package type="hardware">
+  <name>webcam</name>
+  <technology>camera</technology>
+  <description>Generic Webcam support</description>
+  <detail>Generic Webcam support</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/</documentation>
+  <author>Ferllings</author>
+  <author-email>ferllings at gmail.com</author-email>
+  <vendor-id>none</vendor-id>
+  <device-id>none</device-id>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys/>
+  <files/>
+  <dependencies/>
+  <device_technology>
+      <id>camera</id>
+      <name>Camera</name>
+      <description>Various cameras support</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>camera.webcam</id>
+          <device_technology_id>camera</device_technology_id>
+          <name>Generic webcam</name>
+          <description>Generic Webcam support</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>camera.webcam.mjpeg</id>
+          <name>MJPEG stream</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>camera.webcam</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>none</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>

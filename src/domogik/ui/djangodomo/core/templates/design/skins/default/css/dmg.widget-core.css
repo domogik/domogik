@@ -74,8 +74,8 @@
 .size5x5 { width:33em; height:33em;}
 .shape.size5x5 .sizetext { line-height:33em;}
 
-.size6x5 { width:40em; height:40em;}
-.shape.size6x5 .sizetext { line-height:40em;}
+.size6x5 { width:40em; height:33em;}
+.shape.size6x5 .sizetext { line-height:33em;}
 
 .shape {
     display:block;
