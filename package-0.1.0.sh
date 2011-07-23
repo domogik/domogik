@@ -1,8 +1,8 @@
 #!/bin/bash
 
-REVISION=5733de79106c
-RELEASE=0.1.0-rc1-$REVISION
-SHORT_RELEASE=0.1.0-rc1  # for base directory
+REVISION=7867a9d4a778
+RELEASE=0.1.0-rc2-$REVISION
+SHORT_RELEASE=0.1.0-rc2  # for base directory
 
 ARCHIVE_NAME=domogik-temp
 ARCHIVE=/tmp/$ARCHIVE_NAME.tgz
