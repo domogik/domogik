@@ -1,0 +1,76 @@
+<package type="plugin">
+  <name>sms</name>
+  <technology>communication</technology>
+  <description>SMS Send</description>
+  <detail>test</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/plugin_sms</documentation>
+  <author>Gizmo - Guillaume MORLET</author>
+  <author-email>contact@gizmo-network.fr</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>login</name>
+      <type>string</type>
+      <description>Login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>password</name>
+      <type>string</type>
+      <description>Password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>phone</name>
+      <type>string</type>
+      <description>Phone Number : 06XXXXXXXX, 07XXXXXXXX, 0033XXXXXXX, +33XXXXXXX</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/sms.xml"/>
+    <file path="src/share/domogik/url2xpl/communication/send.xml"/>
+    <file path="src/domogik/xpl/bin/sms.py"/>
+    <file path="src/domogik/xpl/lib/sms.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>communication</id>
+      <name>communication</name>
+      <description>Telephony, videophone, mails, messaging</description>
+  </device_technology>
+   <device_types>
+     <device_type>
+         <id>communication.sms</id>
+         <device_technology_id>communication</device_technology_id>
+         <name>Sms</name>
+         <description>Short Message S.......????</description>
+     </device_type>
+   </device_types>
+   <device_feature_models>
+     <device_feature_model>
+         <id>communication.sms.send</id>
+         <name>Send</name>
+         <feature_type>actuator</feature_type>
+         <device_type_id>communication.sms</device_type_id>
+         <parameters>
+          {}
+         </parameters>
+         <value_type>trigger</value_type>
+         <stat_key/>
+         <return_confirmation>0</return_confirmation>
+         </device_feature_model>
+     </device_feature_models>
+</package>
+
