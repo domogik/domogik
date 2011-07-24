@@ -55,18 +55,6 @@
   </device_types>
   <device_feature_models>
      <device_feature_model>
-          <id>knx.switch.switch</id>
-          <name>Switch</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.switch</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;command&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
-          </parameters>
-          <value_type>binary</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>1</return_confirmation>
-      </device_feature_model>
-     <device_feature_model>
           <id>knx.raw.write</id>
           <name>Write</name>
           <feature_type>actuator</feature_type>
