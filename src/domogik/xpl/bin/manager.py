@@ -1079,11 +1079,22 @@ class SysManager(XplPlugin):
         """ Install a package
             @param message : xpl message received
         """
+        try:
+            package = message.data['package']
+            release = message.data['release']
+            package_part = message.data['part']
+        except KeyError:
+            mess.add_data({'error' : 'incomplete xpl message'})
+            self.myxpl.send(mess)
+            return
+
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'install'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
+        mess.add_data({'package' : package})
+        mess.add_data({'release' : release})
 
         # check if plugin (for a plugin) is running
         tab = message.data['package'].split("-")
@@ -1094,17 +1105,11 @@ class SysManager(XplPlugin):
                 self.myxpl.send(mess)
                 return
 
-        try:
-            package = message.data['package']
-            release = message.data['release']
-            package_part = message.data['part']
-        except KeyError:
-            mess.add_data({'error' : 'incomplete xpl message'})
+        # check if it is a hardware if current manager handle hardware
+        if tab[0] == "hardware" and self.options.check_hardware == False:
+            mess.add_data({'error' : "This host doesn't handle hardware packages. Please install it on main host"})
             self.myxpl.send(mess)
             return
-
-        mess.add_data({'package' : package})
-        mess.add_data({'release' : release})
 
         try:
             status = self.pkg_mgr.install_package("repo:%s" % package, release, package_part)
