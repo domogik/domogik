@@ -105,7 +105,7 @@ class KNXManager(XplPlugin):
         val = 'None'
         msg_type = 'None'
         command = 'None'
-        if sender<>"pageination":
+        if sender<>"pageinatio":
             #print "%s" %sender
            command = data[0:4]  
    
@@ -120,7 +120,6 @@ class KNXManager(XplPlugin):
                if data[-2:-1]==" ":
                    msg_type = "l"
            msg = XplMessage()
-
            if command == 'Writ':
               print "knx Write xpl-trig"
               command = 'Write'
@@ -129,14 +128,23 @@ class KNXManager(XplPlugin):
            if command == 'Resp':
               print "knx Response xpl-stat"
               command = 'Response'
-              msg.set_type("xpl-stat")
+              if sender<>"0.0.0":
+                  msg.set_type("xpl-stat")
+              else:
+                  msg.set_type("xpl-trig")
               msg.set_schema('knx.basic')
            if command == 'Read':
                print "knx Read xpl-cmnd"
-               msg.set_type("xpl-cmnd")
+               if sender<>"0.0.0":
+                   msg.set_type("xpl-cmnd")
+               else:
+                   msg.set_type("xpl-trig")
                msg.set_schema('knx.basic')
 
-           msg.add_data({'command' : command})
+           if sender<>"0.0.0":
+               msg.add_data({'command' : command})
+           else:
+               msg.add_data({'command': command+' ack'})
            msg.add_data({'group' :  groups})
            msg.add_data({'type' :  msg_type})
            msg.add_data({'data': val})
@@ -148,7 +156,7 @@ class KNXManager(XplPlugin):
         groups = groups.replace(':','/')
         print "%s" %type_cmd
         command=""
-        if type_cmd=="command":
+        if type_cmd=="Write":
             print "dmg Write"
             valeur = message.data['data']
             data_type = message.data['type']

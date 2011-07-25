@@ -1,5 +1,5 @@
 <technology id="knx">
-  <command name="ask">
+  <command name="read">
     <schema>knx.basic</schema>
     <command-key>command</command-key>
     <address-key>group</address-key>
@@ -8,9 +8,9 @@
   </command>
   <listener>
     <schema>knx.basic</schema>
-    <xpltype>xpl-cmnd</xpltype>
+    <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="command" value="Read"/>
+      <key name="command" value="Read ack"/>
       <key name="group" value="@address@"/>
     </filter>
   </listener>

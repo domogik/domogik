@@ -1,18 +1,18 @@
 <technology id="knx">
-  <command name="responce">
+  <command name="response">
     <schema>knx.basic</schema>
     <command-key>command</command-key>
     <address-key>group</address-key>
-    <command-xpl-value>Responce</command-xpl-value>
+    <command-xpl-value>Response</command-xpl-value>
     <parameters>                                                                                       
       <parameter key="data" location="1"/>                                          <parameter key="type" location="2"/>                 
     </parameters>                                                                
   </command>
   <listener>
     <schema>knx.basic</schema>
-    <xpltype>xpl-stat</xpltype>
+    <xpltype>xpl-trig</xpltype>
     <filter>
-     <key name="command" value="Response"/>
+     <key name="command" value="Response ack"/>
      <key name="group" value="@address@"/>
     </filter>
   </listener>
