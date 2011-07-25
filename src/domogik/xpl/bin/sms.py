@@ -59,7 +59,7 @@ class SmsManager(XplPlugin):
         phone = self._config.query('sms', 'phone')
 	self.log.debug("Init info for sms created")
         ### Create Sms objects
-        my_sms = Sms(self.log,login,password,phone)
+        self.my_sms = Sms(self.log,login,password,phone)
 	self.log.debug("Create object for sms created")
         # Create listener
         Listener(self.sms_cb, self.myxpl, {'schema': 'sendmsg.basic','xpltype': 'xpl-cmnd'})
@@ -87,7 +87,7 @@ class SmsManager(XplPlugin):
 
         try:
 	    self.log.debug("call back2")
-            my_sms.send(to,body)
+            self.my_sms.send(to,body)
 	    self.log.debug("call back3")
         except:
                mess = XplMessage()
