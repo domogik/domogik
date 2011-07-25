@@ -156,7 +156,7 @@ class KNXManager(XplPlugin):
         groups = groups.replace(':','/')
         print "%s" %type_cmd
         command=""
-        if type_cmd=="command":
+        if type_cmd=="Write":
             print "dmg Write"
             valeur = message.data['data']
             data_type = message.data['type']

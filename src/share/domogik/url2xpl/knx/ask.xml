@@ -1,5 +1,5 @@
 <technology id="knx">
-  <command name="ask">
+  <command name="read">
     <schema>knx.basic</schema>
     <command-key>command</command-key>
     <address-key>group</address-key>

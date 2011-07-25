@@ -29,8 +29,8 @@
     <file path="src/share/domogik/stats/knx/knx.basic.xml"/>
     <file path="src/domogik/xpl/bin/knx.py"/>
     <file path="src/domogik/xpl/lib/knx.py"/>
-    <file path="src/share/domogik/url2xpl/knx/command.xml"/>
-    <file path="src/share/domogik/url2xpl/knx/ask.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/write.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/read.xml"/>
     <file path="src/share/domogik/url2xpl/knx/response.xml"/>
   </files>
   <dependencies/>
@@ -40,12 +40,6 @@
       <description>KNX with Eibd</description>
   </device_technology>
   <device_types>
-      <device_type>
-          <id>knx.switch</id>
-          <device_technology_id>knx</device_technology_id>
-          <name>Switch</name>
-          <description>Switch</description>
-      </device_type>
       <device_type>
           <id>knx.raw</id>
           <device_technology_id>knx</device_technology_id>
@@ -60,7 +54,7 @@
           <feature_type>actuator</feature_type>
           <device_type_id>knx.raw</device_type_id>
           <parameters>
-              {&quot;command&quot;:&quot;command&quot;}
+              {&quot;command&quot;:&quot;write&quot;}
           </parameters>
           <value_type>string</value_type>
           <stat_key>command</stat_key>
