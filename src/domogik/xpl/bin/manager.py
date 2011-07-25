@@ -94,7 +94,7 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_default(self, event):
         """ A file is modified
         """
-        if event.pathname in self._cfg_files:
+        if event.pathname in self._cfg_files or event.pathname[-4:] == ".xml":
             print("File modified : %s" % event.pathname)
             self.my_callback()
 
@@ -273,7 +273,8 @@ class SysManager(XplPlugin):
             notify_handler.set_config_files(self.get_config_files())
             notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
             notifier.start()
-            config_files_dir = []
+            config_files_dir = [self._xml_plugin_directory,
+                                self._xml_hardware_directory]
             for fic in  self.get_config_files():
                 config_files_dir.append(os.path.dirname(fic))
             for direc in set(config_files_dir):
