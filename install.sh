@@ -84,6 +84,14 @@ function copy_sample_files {
         mkdir $dmg_home
         chown $d_user $dmg_home
     fi
+    # create folders for packages management
+    for pkg_rep in cache plugins plugins/plugins plugins/hardwares plugins/stats plugins/url2xpl
+      do
+        if [ ! -d $dmg_home/$pkg_rep ];then
+            mkdir $dmg_home/$pkg_rep
+            chown $d_user $dmg_home/$pkg_rep
+        fi
+    done
     # Check for old version when .domogik.cfg was in $HOME
     if [ -f $d_home/.domogik.cfg ];then
         mv $d_home/.domogik.cfg $dmg_home/domogik.cfg
@@ -95,13 +103,15 @@ function copy_sample_files {
     else
         keep="y"
         already_cfg=1
-        read -p "You already have a domogik.cfg file. Do you want to keep it ? [Y/n]" keep
+        read -p "You already have Domogik configuration files. Do you want to keep them ? [Y/n]" keep
         if [ "x$keep" = "x" ];then
             keep="y"
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
             chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
+            cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
+            chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
         fi
     fi
     if [ -d "/etc/default/" ];then
@@ -146,6 +156,7 @@ function update_user_config {
     if [ "$keep" = "n" -o "$keep" = "N" ];then
         if [ "$MODE" = "install" ];then
             prefix="/usr/local"
+            sed -i "s;^#package_path.*$;package_path = $dmg_home;" $dmg_home/domogik.cfg
         else
             prefix=$PWD/src
         fi
