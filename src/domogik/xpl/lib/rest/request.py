@@ -342,6 +342,7 @@ class ProcessRequest():
 
         # Description and parameters
         info = {}
+        info["Host"] = gethostname().lower()
         info["REST_API_release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
         __import__("domogik")
