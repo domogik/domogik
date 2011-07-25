@@ -40,7 +40,7 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.sms import Sms
-
+import traceback
 
 class SmsManager(XplPlugin):
     """ Manage Sms
@@ -57,6 +57,7 @@ class SmsManager(XplPlugin):
         login = self._config.query('sms', 'login')
         password = self._config.query('sms', 'password')
         phone = self._config.query('sms', 'phone')
+
 	self.log.debug("Init info for sms created")
         ### Create Sms objects
         self.my_sms = Sms(self.log,login,password,phone)
@@ -73,7 +74,7 @@ class SmsManager(XplPlugin):
             @param message : xPL message detected by listener
         """
         # body contains the message
-	self.log.debug("call back1")
+	self.log.debug("Function call back : entry")
         if 'body' in message.data:
             body = message.data['body']
         else:
@@ -86,15 +87,16 @@ class SmsManager(XplPlugin):
             return
 
         try:
-	    self.log.debug("call back2")
+	    self.log.debug("function call back : before send")
             self.my_sms.send(to,body)
-	    self.log.debug("call back3")
+	    self.log.debug("function call back : after send")
         except:
+	       self.log.error("Error while sending sms : %s" % traceback.format_exc())
                mess = XplMessage()
                mess.set_type('xpl-trig')
                mess.set_schema('sendmsg.confirm')
-               mess.add_data({'status' :  '??5??'})
-               mess.add_data({'error' :  '????'})
+               mess.add_data({'status' :  'Sms not send'})
+               mess.add_data({'error' :  'function send'})
                self.myxpl.send(mess)
                return
 
@@ -104,7 +106,12 @@ class SmsManager(XplPlugin):
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('sendmsg.confirm')
-        mess.add_data({'status' :  '??4??'})
+	if self.my_sms.status_send == 0:
+        	mess.add_data({'status' :  'Sms not send'})
+		mess.add_data({'error' :  self.my_sms.status_error})
+	else:
+        	mess.add_data({'status' :  'Sms send'})
+	
         self.myxpl.send(mess)
 
 if __name__ == "__main__":

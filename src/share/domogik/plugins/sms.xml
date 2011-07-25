@@ -55,7 +55,7 @@
          <id>communication.sms</id>
          <device_technology_id>communication</device_technology_id>
          <name>Sms</name>
-         <description>Short Message S.......????</description>
+         <description>Short Message Service</description>
      </device_type>
    </device_types>
    <device_feature_models>
