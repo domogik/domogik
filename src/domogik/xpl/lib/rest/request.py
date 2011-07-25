@@ -3725,7 +3725,7 @@ target=*
         # make a time loop of one second after first xpl-trig reception
         messages = []
         try:
-            self.log.debug("Package install : wait for answer...")
+            self.log.debug("Package check dependencies : wait for answer...")
             message = self._get_from_queue(self._queue_package, 
                                            "xpl-trig", 
                                            "domogik.package", 
