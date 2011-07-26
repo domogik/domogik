@@ -51,7 +51,7 @@ function start_django {
     if [ -z ${DJANGO_SERVER_PORT} ] ; then
         DJANGO_SERVER_PORT=8000
     fi
-    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/tmp/django.log 2>&1 &"
+    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/var/log/domogik/django.log 2>&1 &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
