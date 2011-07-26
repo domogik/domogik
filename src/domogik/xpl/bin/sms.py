@@ -22,12 +22,12 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Sms Orange Manager
+Sms Manager for orange and sfr operator
 
 Implements
 ==========
 
-- SmsOrangeManager
+- SmsManager
 
 @author: Gizmo - Guillaume MORLET <contact@gizmo-network.fr>
 @copyright: (C) 2007-2011 Domogik project
@@ -39,7 +39,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.sms import Sms
+
 import traceback
 
 class SmsManager(XplPlugin):
@@ -57,8 +57,15 @@ class SmsManager(XplPlugin):
         login = self._config.query('sms', 'login')
         password = self._config.query('sms', 'password')
         phone = self._config.query('sms', 'phone')
+	operator = self._config.query('sms', 'operator')
+	#operator = "orange"
 
-	self.log.debug("Init info for sms created")
+        if (operator == "orange"):
+		from domogik.xpl.lib.sms_orange import Sms
+	if (operator == "sfr"):
+		from domogik.xpl.lib.sms_sfr import Sms
+		
+        self.log.debug("Init info for sms created")
         ### Create Sms objects
         self.my_sms = Sms(self.log,login,password,phone)
 	self.log.debug("Create object for sms created")

@@ -37,6 +37,13 @@
       <description>Phone Number : 06XXXXXXXX, 07XXXXXXXX, 0033XXXXXXX, +33XXXXXXX</description>
       <default-value></default-value>
     </key>
+    <key>
+      <order-id>4</order-id>
+      <name>operator</name>
+      <type>string</type>
+      <description>Operator : orange, sfr</description>
+      <default-value>orange</default-value>
+    </key>
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/sms.xml"/>
