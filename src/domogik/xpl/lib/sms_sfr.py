@@ -104,7 +104,6 @@ class Sms:
 	return 1
 
 
-
     def send(self, to, body):
         """ Send Sms
             @param to : receiver
