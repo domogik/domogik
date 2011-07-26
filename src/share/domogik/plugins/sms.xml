@@ -41,7 +41,7 @@
       <order-id>4</order-id>
       <name>operator</name>
       <type>string</type>
-      <description>Operator : orange, sfr</description>
+      <description>Operator : orange, sfr, bouygues</description>
       <default-value>orange</default-value>
     </key>
   </configuration-keys>
