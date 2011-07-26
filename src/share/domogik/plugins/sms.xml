@@ -51,7 +51,9 @@
     <file path="src/domogik/xpl/bin/sms.py"/>
     <file path="src/domogik/xpl/lib/sms.py"/>
   </files>
-  <dependencies/>
+  <dependencies>                                                                
+     <dep python="mechanize"/>
+  </dependencies> 
   <device_technology>
       <id>communication</id>
       <name>communication</name>

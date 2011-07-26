@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Sms SFR Operator
+Sms Bouygues Operator
 
 Implements
 ==========
@@ -41,7 +41,8 @@ import cookielib
 import urllib
 import re
 
-url_sms = "http://www.sfr.fr/xmscomposer/index.html?todo=compose"
+url_sms = "http://www.espaceclient.bouyguestelecom.fr/ECF/jsf/client/envoiSMS/viewEnvoiSMS.jsf"
+url_sms2 = 'http://www.mobile.service.bbox.bouyguestelecom.fr/services/SMSIHD/sendSMS.phtml'
 url_confirm = 'http://www.sfr.fr/xmscomposer/mc/envoyer-texto-mms/confirm.html'
 service_url = 'http://www.sfr.fr/xmscomposer/j_spring_cas_security_check'
 url_verif_auth = 'https://www.sfr.fr/cas/login?service=http%3A%2F%2Fwww.sfr.fr%2Fxmscomposer%2Fj_spring_cas_security_check'
@@ -67,11 +68,9 @@ class Sms:
       	print browser.geturl()
 	for x in browser.forms():
         	print x	
-	browser.select_form(nr=0)
-	
-        browser['username'] = self.login
-        browser['password'] = self.password
-        browser['remember-me'] = ['on']
+        browser.select_form(name='code')
+        browser['j_username'] = login
+        browser['j_password'] = password
         browser.submit()
 
         return 1
@@ -86,19 +85,16 @@ class Sms:
 		self.status_error = "Sms format phone is bad"
 		return 0
 
-  	browser.open(url_sms)
+  	browser.open(url_sms2)
 	print "sms_send : formulaire sms"
 	for x in browser.forms():
         	print x	
 	browser.select_form(nr=0)
-        browser['msisdns'] = to
-        browser['textMessage'] = body.encode('utf-8')
+        browser['fieldMsisdn'] = to
+        browser['fieldMessage'] = body.encode('utf-8')
         browser.submit()
 	print "sms_send : confirmation sms"
-	for x in browser.forms():
-        	print x	
-	browser.select_form(nr=0)
-        browser.submit()
+
 
 	self.status_send = 1
 	return 1
