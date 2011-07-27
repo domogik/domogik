@@ -40,6 +40,8 @@ Implements
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 import datetime
+from time import localtime
+from optparse import OptionParser
 
 
 class Sniffer(XplPlugin):
@@ -47,7 +49,10 @@ class Sniffer(XplPlugin):
     '''
 
     def __init__(self):
-        XplPlugin.__init__(self, name='sniffer', daemonize=False)
+        parser = OptionParser()
+        parser.add_option("-c", action="store_true", dest="compress", default=False, \
+                help="Diaply data in a compress way")
+        XplPlugin.__init__(self, name='sniffer', daemonize=False, parser=parser)
         Listener(self._sniffer_cb, self.myxpl)
         self.enable_hbeat()
 
@@ -55,7 +60,30 @@ class Sniffer(XplPlugin):
         '''
         Print received message
         '''
-        print "%s - %s" % (datetime.datetime.now(), message)
+        if self.options.compress == False:
+            print "%s - %s" % (datetime.datetime.now(), message)
+        else:
+            ldt = localtime()
+            date = "%s/%s/%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
+            time = "%s:%s:%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
+            display = "%s" % time
+            print "%s - %s %s hop=%s source=%s target=%s" % (display,
+                                                          message.type,
+                                                          message.schema,
+                                                          message.hop_count,
+                                                          message.source,
+                                                          message.target)
+            for elt in message.data:
+                print "  %s=%s" % (elt, message.data[elt])
+
+    def _format(self, number):
+        '''
+        Format the number
+        '''
+        if int(number) < 10:
+            return "0%s" % number
+        else:
+            return number
 
 if __name__ == "__main__":
     S = Sniffer()
