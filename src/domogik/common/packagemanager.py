@@ -348,8 +348,10 @@ class PackageManager():
         self.log("Package successfully extracted.")
 
         # insert data in database
-        pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
-        pkg_data.insert()
+        if pkg_xml.type in ('plugin', 'hardware'):
+            if package_part == PKG_PART_RINOR:
+                pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
+                pkg_data.insert()
 
         self.log("Package installation finished")
         return True
