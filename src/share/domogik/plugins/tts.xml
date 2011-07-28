@@ -1,0 +1,64 @@
+<package type="plugin">
+  <name>tts</name>
+  <technology>communication</technology>
+  <description>TTS</description>
+  <detail>Text To Speech</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/plugin_tts</documentation>
+  <author>Gizmo - Guillaume MORLET</author>
+  <author-email>contact@gizmo-network.fr</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>TTS software</name>
+      <type>string</type>
+      <description>Software not use for this moment.</description>
+      <default-value>default</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/tts.xml"/>
+    <file path="src/share/domogik/url2xpl/communication/tts.xml"/>
+    <file path="src/domogik/xpl/bin/tts.py"/>
+    <file path="src/domogik/xpl/lib/tts.py"/>
+  </files>
+  <dependencies>                                                                
+     <dep python="festival"/>
+  </dependencies> 
+  <device_technology>
+      <id>communication</id>
+      <name>communication</name>
+      <description>Telephony, videophone, mails, messaging</description>
+  </device_technology>
+   <device_types>
+     <device_type>
+         <id>communication.tts</id>
+         <device_technology_id>communication</device_technology_id>
+         <name>TTS</name>
+         <description>Text To Speech</description>
+     </device_type>
+   </device_types>
+   <device_feature_models>
+     <device_feature_model>
+         <id>communication.tts.tts</id>
+         <name>tts</name>
+         <feature_type>actuator</feature_type>
+         <device_type_id>communication.tts</device_type_id>
+         <parameters>
+          {}
+         </parameters>
+         <value_type>trigger</value_type>
+         <stat_key/>
+         <return_confirmation>0</return_confirmation>
+         </device_feature_model>
+     </device_feature_models>
+</package>
+
