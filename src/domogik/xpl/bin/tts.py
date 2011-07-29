@@ -60,7 +60,7 @@ class TtsManager(XplPlugin):
 
         self.log.debug("Init info for tts created")
         ### Create tts objects
-        self.my_tts = Tts(self.log)
+        self.my_tts = Tts(self.log, software)
 	self.log.debug("Create object for tts created")
         # Create listener
         Listener(self.tts_cb, self.myxpl, {'schema': 'tts.basic','xpltype': 'xpl-cmnd'})

@@ -20,8 +20,8 @@
       <order-id>1</order-id>
       <name>TTS software</name>
       <type>string</type>
-      <description>Software not use for this moment.</description>
-      <default-value>default</default-value>
+      <description>Command Line : espeak -v fr %s</description>
+      <default-value>espeak -v fr %s</default-value>
     </key>
   </configuration-keys>
   <files>
@@ -30,9 +30,7 @@
     <file path="src/domogik/xpl/bin/tts.py"/>
     <file path="src/domogik/xpl/lib/tts.py"/>
   </files>
-  <dependencies>                                                                
-     <dep python="festival"/>
-  </dependencies> 
+  <dependencies/>                                                         
   <device_technology>
       <id>communication</id>
       <name>communication</name>
