@@ -1,15 +1,13 @@
 <technology id="communication">
- <command name="send">
+ <command name="send" no-command-key="1" no-address-key="1">
    <schema>sendmsg.basic</schema>
-   <command-key>xxx</command-key>
-   <address-key>to</address-key>
-   <command-xpl-value>xxx</command-xpl-value>
    <parameters>
-     <parameter key="body" location="1"/>
+     <parameter key="to" location="1"/>
+     <parameter key="body" location="2"/>
    </parameters>
  </command>
  <listener>
-   <schema>sendmsg.basic</schema>
+   <schema>sendmsg.confirm</schema>
    <xpltype>xpl-trig</xpltype>
    <filter/>
  </listener>

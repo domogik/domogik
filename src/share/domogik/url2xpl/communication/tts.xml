@@ -1,16 +1,9 @@
 <technology id="communication">
- <command name="tts">
+ <command name="tts" no-command-key="1" no-address-key="1">
    <schema>tts.basic</schema>
-   <command-key>xxx</command-key>
-   <address-key>speech</address-key>
-   <command-xpl-value>xxx</command-xpl-value>
    <parameters>
      <parameter key="speech" location="1"/>
    </parameters>
  </command>
- <listener>
-   <schema>tts.basic</schema>
-   <xpltype>xpl-trig</xpltype>
-   <filter/>
- </listener>
+ <listener/>
 </technology>
