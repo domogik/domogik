@@ -436,24 +436,30 @@ class ProcessRequest():
         self.myxpl.send(XplMessage(message))
 
         ### Wait for answer
-        # get xpl message from queue
-        try:
-            self.log.debug("Command : wait for answer...")
-            msg_cmd = self._get_from_queue(self._queue_command, xpl_type, schema, filters)
-        except Empty:
-            self.log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("response")
-            self.send_http_response_ok(json_data.get())
-            return
+        if schema != None:
+            # get xpl message from queue
+            try:
+                self.log.debug("Command : wait for answer...")
+                msg_cmd = self._get_from_queue(self._queue_command, xpl_type, schema, filters)
+            except Empty:
+                self.log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
+                json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
+                json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+                json_data.set_data_type("response")
+                self.send_http_response_ok(json_data.get())
+                return
+    
+            self.log.debug("Command : message received : %s" % str(msg_cmd))
 
-        self.log.debug("Command : message received : %s" % str(msg_cmd))
+        else:
+            # no listener defined in xml : don't wait for an answer
+            self.log.debug("Command : no listener defined : not waiting for an answer")
 
         ### REST processing finished and OK
         json_data = JSonHelper("OK")
         json_data.set_data_type("response")
-        json_data.add_data({"xpl" : str(msg_cmd)})
+        if schema != None:
+            json_data.add_data({"xpl" : str(msg_cmd)})
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json_data.get())
 
@@ -484,15 +490,28 @@ class ProcessRequest():
         ### Get only <command...> part
         xml_command = xml_data.getElementsByTagName("command")[0]
 
+        no_command_key = False
+        if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-command-key"):
+            if xml_data.getElementsByTagName("command")[0].attributes.get("no-command-key").value == "1":
+                no_command_key = True
+
+        no_address_key = False
+        if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-address-key"):
+            if xml_data.getElementsByTagName("command")[0].attributes.get("no-address-key").value == "1":
+                no_address_key = True
+
         ### Get data from xml
         # Schema
         schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        # command key name 
-        command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
-        #address key name (device)
-        address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
-        # real command value in xpl message
-        command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
+        if no_command_key == False:
+            # command key name 
+            command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
+            # real command value in xpl message
+            command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
+
+        if no_address_key == False:
+            #address key name (device)
+            address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
 
         # Parameters
         #get and count parameters in xml file
@@ -510,7 +529,6 @@ class ProcessRequest():
                     value = None
                 else:
                     value = params[int(loc.value) - 1]
-                print "V=%s" % value
             else:
                 value = static_value.value
             if type(value).__name__ == "str":
@@ -526,9 +544,11 @@ target=*
 }
 %s
 {
-%s=%s
-%s=%s
-""" % (schema, address_key, address, command_key, command_xpl_value)
+""" % (schema)
+        if no_command_key == False:
+            msg += "%s=%s\n" % (command_key, command_xpl_value)
+        if no_address_key == False:
+            msg += "%s=%s\n" % (address_key, address)
         for m_param in parameters_value.keys():
             msg += "%s=%s\n" % (m_param, parameters_value[m_param])
         msg += "}"
@@ -549,7 +569,13 @@ target=*
 
         ### Get data from xml
         # Schema
-        schema = xml_listener.getElementsByTagName("schema")[0].firstChild.nodeValue
+        try:
+            schema = xml_listener.getElementsByTagName("schema")[0].firstChild.nodeValue
+        except IndexError:
+            # no schema data : we suppose we have <listener/>
+            # TODO : do it in a better way than using try: except:
+            return None, None, None
+
         # xpl type
         xpl_type = xml_listener.getElementsByTagName("xpltype")[0].firstChild.nodeValue
 
