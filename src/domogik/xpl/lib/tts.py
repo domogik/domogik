@@ -53,11 +53,15 @@ class Tts:
 	self.status_error = ""
 
     def send(self,speech):
-	cmd = "echo \"%s\" | festival --tts"
+	#cmd = "echo \"%s\" | festival --tts"
+	cmd2 = popen("echo \"%s\" | festival --tts" % speech, shell=True)
+	cmd2.communicate()
 
-	os.system(cmd % speech)
+
+	#os.system(cmd % speech)
 	return 1
 
 if __name__ == "__main__":
-    my_tts = Tts(None)
+    my_tts = Tts(None)    
+    my_tts.send("il y a eu un appel en absence")
 
