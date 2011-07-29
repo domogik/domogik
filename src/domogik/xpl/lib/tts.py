@@ -36,7 +36,7 @@ Implements
 """
 
 import sys
-import os
+from subprocess import Popen
 
 
 
@@ -45,19 +45,25 @@ class Tts:
     """
     
 
-    def __init__(self, log = None):
+    def __init__(self, log = None, software = None):
         """ Init TTS
         """
         self._log = log
  	self.status_send = 0
 	self.status_error = ""
+	if software == None:
+	    self.software = "espeak -v fr %s"
+	else:
+	    self.software = software
 
     def send(self,speech):
-	cmd = "echo \"%s\" | festival --tts"
-
-	os.system(cmd % speech)
+	print self.software
+	msg = self.software % speech
+	cmd = Popen(msg, shell=True)
+	cmd.communicate()
 	return 1
 
 if __name__ == "__main__":
-    my_tts = Tts(None)
+    my_tts = Tts(None)    
+    my_tts.send("il y a eu un appel en absence")
 
