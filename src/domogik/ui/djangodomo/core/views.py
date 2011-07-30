@@ -548,7 +548,9 @@ def admin_packages_plugins(request):
             for host2 in plugins_result.plugin:
                 if host2.host == host.host:
                     enabled_list = host2.list
-        
+        if not enabled_list:
+            page_messages.append({'status':'warning', 'msg':'No plugin enabled'})
+            
         if 'plugin' in host.installed:
             host.installed.packages = host.installed.plugin
             for package in host.installed.packages:
