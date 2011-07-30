@@ -552,11 +552,14 @@ def admin_packages_plugins(request):
         if 'plugin' in host.installed:
             host.installed.packages = host.installed.plugin
             for package in host.installed.packages:
+                installed[package.name] = {}
                 try:
-                    installed[package.name] = NormalizedVersion(package.release)
+                    installed[package.name]['version'] = NormalizedVersion(package.release)
+                    installed[package.name]['version_error'] = False
                 except IrrationalVersionError:
                     package.installed_version_error = True
-                    installed[package.name] = package.release
+                    installed[package.name]['version_error'] = True
+                    installed[package.name]['version'] = package.release
                 #find enabled plugins
                 if enabled_list:
                     for plugin in enabled_list:
@@ -568,15 +571,15 @@ def admin_packages_plugins(request):
             package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
             try:
                 package_version = NormalizedVersion(package.release)
+                package.version_error = False
             except IrrationalVersionError:
                 package.version_error = True
             package.upgrade_require = (package_min_version > dmg_version)
-            print installed
             if package.name not in installed:
                 package.install = True
                 host.available.append(package)
-            elif not hasattr(package, 'installed_version_error') and not hasattr(package, 'version_error'):
-                if (installed[package.name] < package_version):
+            elif not installed[package.name]['version_error'] and not package['version_error']:
+                if (installed[package.name]['version'] < package_version):
                     package.update = True
                     host.available.append(package)
 
@@ -623,11 +626,14 @@ def admin_packages_hardwares(request):
         if 'hardware' in host.installed:
             host.installed.packages = host.installed.hardware
             for package in host.installed.packages:
+                installed[package.name] = {}
                 try:
-                    installed[package.name] = NormalizedVersion(package.release)
+                    installed[package.name]['version'] = NormalizedVersion(package.release)
+                    installed[package.name]['version_error'] = False
                 except IrrationalVersionError:
                     package.installed_version_error = True
-                    installed[package.name] = package.release
+                    installed[package.name]['version_error'] = True
+                    installed[package.name]['version'] = package.release
                 #find enabled plugins
                 if enabled_list:
                     for hardware in enabled_list:
@@ -642,12 +648,12 @@ def admin_packages_hardwares(request):
             except IrrationalVersionError:
                 package.version_error = True
             package.upgrade_require = (package_min_version > dmg_version)
-            print installed
+
             if package.name not in installed:
                 package.install = True
                 host.available.append(package)
-            elif not hasattr(package, 'installed_version_error') and not hasattr(package, 'version_error'):
-                if (installed[package.name] < package_version):
+            elif not installed[package.name]['version_error'] and not package['version_error']:
+                if (installed[package.name]['version'] < package_version):
                     package.update = True
                     host.available.append(package)
 
