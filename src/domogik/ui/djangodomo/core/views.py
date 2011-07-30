@@ -578,8 +578,12 @@ def admin_packages_plugins(request):
             if package.name not in installed:
                 package.install = True
                 host.available.append(package)
-            elif not installed[package.name]['version_error'] and not package['version_error']:
+            # Check if update can be done
+            elif not installed[package.name]['version_error'] and not package.version_error:
                 if (installed[package.name]['version'] < package_version):
+                    package.update = True
+                    host.available.append(package)
+            elif installed[package.name]['version_error'] and not package.version_error:
                     package.update = True
                     host.available.append(package)
 
@@ -645,6 +649,7 @@ def admin_packages_hardwares(request):
             package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
             try:
                 package_version = NormalizedVersion(package.release)
+                package.version_error = False
             except IrrationalVersionError:
                 package.version_error = True
             package.upgrade_require = (package_min_version > dmg_version)
@@ -652,8 +657,12 @@ def admin_packages_hardwares(request):
             if package.name not in installed:
                 package.install = True
                 host.available.append(package)
-            elif not installed[package.name]['version_error'] and not package['version_error']:
+            # Check if update can be done
+            elif not installed[package.name]['version_error'] and not package.version_error:
                 if (installed[package.name]['version'] < package_version):
+                    package.update = True
+                    host.available.append(package)
+            elif installed[package.name]['version_error'] and not package.version_error:
                     package.update = True
                     host.available.append(package)
 
