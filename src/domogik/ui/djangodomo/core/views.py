@@ -519,17 +519,7 @@ def admin_packages_repositories(request):
         repositories=repositories
     )
 
-@admin_required
-def admin_packages_plugins(request):
-    """
-    Method called when the admin plugins page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-
-    page_title = _("Plugins packages")
-    page_messages = []
-
+def __get_packages(type, page_messages):
     try:
         packages_result = Packages.get_list()
         installed_result = Packages.get_list_installed()
@@ -539,20 +529,22 @@ def admin_packages_plugins(request):
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    
+
     dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
     for host in installed_result.package:
         installed = {}
-        enabled_list = None
-        if plugins_result.plugin:
-            for host2 in plugins_result.plugin:
-                if host2.host == host.host:
-                    enabled_list = host2.list
-        if not enabled_list:
-            page_messages.append({'status':'warning', 'msg':'No plugin enabled'})
+        # List enabled plugins
+        if (type == 'plugin'):
+            enabled_list = None
+            if plugins_result.plugin:
+                for host2 in plugins_result.plugin:
+                    if host2.host == host.host:
+                        enabled_list = host2.list
+            if not enabled_list:
+                page_messages.append({'status':'warning', 'msg':'No plugin enabled'})
             
-        if 'plugin' in host.installed:
-            host.installed.packages = host.installed.plugin
+        if type in host.installed:
+            host.installed.packages = host.installed[type]
             for package in host.installed.packages:
                 installed[package.name] = {}
                 try:
@@ -563,13 +555,13 @@ def admin_packages_plugins(request):
                     installed[package.name]['version_error'] = True
                     installed[package.name]['version'] = package.release
                 #find enabled plugins
-                if enabled_list:
+                if type == 'plugin' and enabled_list:
                     for plugin in enabled_list:
                         if (plugin.name == package.name):
                             package.enabled = True
 
         host.available = []
-        for package in packages_result.package[0].plugin:
+        for package in packages_result.package[0][type]:
             package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
             try:
                 package_version = NormalizedVersion(package.release)
@@ -588,7 +580,21 @@ def admin_packages_plugins(request):
             elif installed[package.name]['version_error'] and not package.version_error:
                     package.update = True
                     host.available.append(package)
+    return installed_result.package
 
+@admin_required
+def admin_packages_plugins(request):
+    """
+    Method called when the admin plugins page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+
+    page_title = _("Plugins packages")
+    page_messages = []
+
+    packages = __get_packages('plugin', page_messages)
+    
     return __go_to_page(
         request, 'admin/packages/plugins.html',
         page_title,
@@ -596,7 +602,7 @@ def admin_packages_plugins(request):
         nav1_admin = "selected",
         nav2_packages_plugins = "selected",
         normal_mode=__is_normal_mode(request),
-        hosts=installed_result.package
+        hosts=packages
     )
 
 @admin_required
@@ -610,63 +616,7 @@ def admin_packages_hardwares(request):
     page_title = _("Hardwares packages")
     page_messages = []
 
-    try:
-        packages_result = Packages.get_list()
-        installed_result = Packages.get_list_installed()
-        plugins_result = Plugins.get_all()
-        rest_info = Rest.get_info()
-    except BadStatusLine:
-        return render_to_response('error/BadStatusLine.html')
-    except ResourceNotAvailableException:
-        return render_to_response('error/ResourceNotAvailableException.html')
-    
-    dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
-    for host in installed_result.package:
-        installed = {}
-        enabled_list = None
-        if plugins_result.plugin:
-            for host2 in plugins_result.plugin:
-                if host2.host == host.host:
-                    enabled_list = host2.list
-        
-        if 'hardware' in host.installed:
-            host.installed.packages = host.installed.hardware
-            for package in host.installed.packages:
-                installed[package.name] = {}
-                try:
-                    installed[package.name]['version'] = NormalizedVersion(package.release)
-                    installed[package.name]['version_error'] = False
-                except IrrationalVersionError:
-                    package.installed_version_error = True
-                    installed[package.name]['version_error'] = True
-                    installed[package.name]['version'] = package.release
-                #find enabled plugins
-                if enabled_list:
-                    for hardware in enabled_list:
-                        if (hardware.name == package.name):
-                            package.enabled = True
-
-        host.available = []
-        for package in packages_result.package[0].hardware:
-            package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
-            try:
-                package_version = NormalizedVersion(package.release)
-                package.version_error = False
-            except IrrationalVersionError:
-                package.version_error = True
-            package.upgrade_require = (package_min_version > dmg_version)
-
-            if package.name not in installed:
-                package.install = True
-                host.available.append(package)
-            # Check if update can be done
-            elif not installed[package.name]['version_error'] and not package.version_error:
-                if (installed[package.name]['version'] < package_version):
-                    package.update = True
-                    host.available.append(package)
-            elif installed[package.name]['version_error'] and not package.version_error:
-                    package.update = True
-                    host.available.append(package)
+    packages = __get_packages('hardware', page_messages)
 
     return __go_to_page(
         request, 'admin/packages/hardwares.html',
@@ -675,7 +625,7 @@ def admin_packages_hardwares(request):
         nav1_admin = "selected",
         nav2_packages_hardwares = "selected",
         normal_mode=__is_normal_mode(request),
-        hosts=installed_result.package
+        hosts=packages
     )
     
 @admin_required
