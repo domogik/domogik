@@ -581,7 +581,7 @@ def admin_packages_plugins(request):
                     host.available.append(package)
 
     return __go_to_page(
-        request, 'admin/packages/packages.html',
+        request, 'admin/packages/plugins.html',
         page_title,
         page_messages,
         nav1_admin = "selected",
@@ -652,7 +652,7 @@ def admin_packages_hardwares(request):
                     host.available.append(package)
 
     return __go_to_page(
-        request, 'admin/packages/packages.html',
+        request, 'admin/packages/hardwares.html',
         page_title,
         page_messages,
         nav1_admin = "selected",
