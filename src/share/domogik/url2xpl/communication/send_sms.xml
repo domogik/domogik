@@ -1,5 +1,5 @@
 <technology id="communication">
- <command name="send" no-command-key="1" no-address-key="1">
+ <command name="send_sms" no-command-key="1" no-address-key="1">
    <schema>sendmsg.basic</schema>
    <parameters>
      <parameter key="to" location="1"/>
