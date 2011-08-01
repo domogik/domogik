@@ -491,26 +491,31 @@ class ProcessRequest():
         ### Get only <command...> part
         xml_command = xml_data.getElementsByTagName("command")[0]
 
-        no_command_key = False
-        if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-command-key"):
-            if xml_data.getElementsByTagName("command")[0].attributes.get("no-command-key").value == "1":
-                no_command_key = True
+        #no_command_key = False
+        #if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-command-key"):
+        #    if xml_data.getElementsByTagName("command")[0].attributes.get("no-command-key").value == "1":
+        #        no_command_key = True
 
-        no_address_key = False
-        if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-address-key"):
-            if xml_data.getElementsByTagName("command")[0].attributes.get("no-address-key").value == "1":
-                no_address_key = True
+        #no_address_key = False
+        #if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-address-key"):
+        #    if xml_data.getElementsByTagName("command")[0].attributes.get("no-address-key").value == "1":
+        #        no_address_key = True
 
         ### Get data from xml
         # Schema
         schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        if no_command_key == False:
+        print ">%s" % xml_command.getElementsByTagName("command-xpl-value")
+        if xml_command.getElementsByTagName("command-xpl-value") == []:
+            has_command_key = False
+        else:
             # command key name 
             command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
             # real command value in xpl message
             command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
 
-        if no_address_key == False:
+        if xml_command.getElementsByTagName("address-key") == []:
+            has_address_key = False
+        else:
             #address key name (device)
             address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
 
@@ -546,9 +551,9 @@ target=*
 %s
 {
 """ % (schema)
-        if no_command_key == False:
+        if has_command_key == True:
             msg += "%s=%s\n" % (command_key, command_xpl_value)
-        if no_address_key == False:
+        if has_address_key == True:
             msg += "%s=%s\n" % (address_key, address)
         for m_param in parameters_value.keys():
             msg += "%s=%s\n" % (m_param, parameters_value[m_param])

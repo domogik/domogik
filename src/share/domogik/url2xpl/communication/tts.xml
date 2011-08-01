@@ -1,5 +1,5 @@
 <technology id="communication">
- <command name="tts" no-command-key="1" no-address-key="1">
+ <command name="tts">
    <schema>tts.basic</schema>
    <parameters>
      <parameter key="speech" location="1"/>
