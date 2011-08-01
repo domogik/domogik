@@ -3627,7 +3627,8 @@ target=*
                 pkg_list[my_type].append(data)
             else:
                 pkg_list[my_type] = [data]
-        json_data.add_data(pkg_list)
+        if pkg_list != {}:
+            json_data.add_data(pkg_list)
     
         self.send_http_response_ok(json_data.get())
 
