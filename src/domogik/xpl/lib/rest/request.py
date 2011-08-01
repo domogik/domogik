@@ -504,7 +504,6 @@ class ProcessRequest():
         ### Get data from xml
         # Schema
         schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        print ">%s" % xml_command.getElementsByTagName("command-xpl-value")
         if xml_command.getElementsByTagName("command-xpl-value") == []:
             has_command_key = False
         else:
