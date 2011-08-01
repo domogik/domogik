@@ -67,6 +67,7 @@ import sys
 
 # Time we wait for answers after a multi host list command
 WAIT_FOR_LIST_ANSWERS = 1
+WAIT_FOR_PACKAGE_INSTALLATION = 20
 
 
 #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
@@ -3627,7 +3628,8 @@ target=*
                 pkg_list[my_type].append(data)
             else:
                 pkg_list[my_type] = [data]
-        json_data.add_data(pkg_list)
+        if pkg_list != {}:
+            json_data.add_data(pkg_list)
     
         self.send_http_response_ok(json_data.get())
 
@@ -3840,7 +3842,8 @@ target=*
                                            filter_data = {"command" : "install",
                                                           "package" : package,
                                                           "release" : release,
-                                                          "host" : host})
+                                                          "host" : host},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
             self.log.debug("Package install : no answer")
             self.send_http_response_error(999, "No data or timeout on installing package",
@@ -3878,7 +3881,8 @@ target=*
                                            filter_data = {"command" : "install",
                                                           "package" : package,
                                                           "release" : release,
-                                                          "host" : gethostname().lower()})
+                                                          "host" : gethostname().lower()},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
             self.log.debug("Package install : no answer")
             self.send_http_response_error(999, "No data or timeout on installing package",
