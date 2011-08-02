@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="foscam">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="output"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="output"
+                       filter_key="type" filter_value="output" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

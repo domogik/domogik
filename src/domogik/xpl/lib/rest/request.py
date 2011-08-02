@@ -67,6 +67,7 @@ import sys
 
 # Time we wait for answers after a multi host list command
 WAIT_FOR_LIST_ANSWERS = 1
+WAIT_FOR_PACKAGE_INSTALLATION = 20
 
 
 #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
@@ -490,27 +491,23 @@ class ProcessRequest():
         ### Get only <command...> part
         xml_command = xml_data.getElementsByTagName("command")[0]
 
-        no_command_key = False
-        if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-command-key"):
-            if xml_data.getElementsByTagName("command")[0].attributes.get("no-command-key").value == "1":
-                no_command_key = True
-
-        no_address_key = False
-        if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-address-key"):
-            if xml_data.getElementsByTagName("command")[0].attributes.get("no-address-key").value == "1":
-                no_address_key = True
-
         ### Get data from xml
         # Schema
         schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        if no_command_key == False:
+        if xml_command.getElementsByTagName("command-xpl-value") == []:
+            has_command_key = False
+        else:
             # command key name 
+            has_command_key = True
             command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
             # real command value in xpl message
             command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
 
-        if no_address_key == False:
+        if xml_command.getElementsByTagName("address-key") == []:
+            has_address_key = False
+        else:
             #address key name (device)
+            has_address_key = True
             address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
 
         # Parameters
@@ -545,9 +542,9 @@ target=*
 %s
 {
 """ % (schema)
-        if no_command_key == False:
+        if has_command_key == True:
             msg += "%s=%s\n" % (command_key, command_xpl_value)
-        if no_address_key == False:
+        if has_address_key == True:
             msg += "%s=%s\n" % (address_key, address)
         for m_param in parameters_value.keys():
             msg += "%s=%s\n" % (m_param, parameters_value[m_param])
@@ -3627,7 +3624,8 @@ target=*
                 pkg_list[my_type].append(data)
             else:
                 pkg_list[my_type] = [data]
-        json_data.add_data(pkg_list)
+        if pkg_list != {}:
+            json_data.add_data(pkg_list)
     
         self.send_http_response_ok(json_data.get())
 
@@ -3840,7 +3838,8 @@ target=*
                                            filter_data = {"command" : "install",
                                                           "package" : package,
                                                           "release" : release,
-                                                          "host" : host})
+                                                          "host" : host},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
             self.log.debug("Package install : no answer")
             self.send_http_response_error(999, "No data or timeout on installing package",
@@ -3878,7 +3877,8 @@ target=*
                                            filter_data = {"command" : "install",
                                                           "package" : package,
                                                           "release" : release,
-                                                          "host" : gethostname().lower()})
+                                                          "host" : gethostname().lower()},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
             self.log.debug("Package install : no answer")
             self.send_http_response_error(999, "No data or timeout on installing package",
