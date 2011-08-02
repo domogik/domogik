@@ -8,6 +8,9 @@
   <author>Kriss</author>
   <author-email>Kriss</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
+  <dependencies>
+     <dep python="cjson"/>
+  </dependencies>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -36,7 +39,6 @@
     <file path="src/domogik/xpl/bin/apushnot.py"/>
     <file path="src/domogik/xpl/lib/apushnot.py"/>
   </files>
-  <dependencies/>
   <device_technology>
       <id>notification</id>
       <name>Notification</name>
