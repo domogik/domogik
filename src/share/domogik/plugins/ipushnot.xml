@@ -1,0 +1,48 @@
+<package type="plugin">
+  <name>ipushnot</name>
+  <technology>notification</technology>
+  <description>Send Iphone/Ipad notification</description>
+  <detail>Iphone/Ipad notification system base on external service provide by pushme.to</detail>
+  <version>0.1</version>
+  <documentation>http://wiki.domogik.org</documentation>
+  <author>Kriss</author>
+  <author-email>Kriss</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>pushmenick</name>
+      <type>string</type>
+      <description>Nickname of your pushme.to account</description>
+      <default-value>krissdomogik</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>signature</name>
+      <type>string</type>
+      <description>Signature of notification send by this plugin</description>
+      <default-value>DomogikServer</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/ipushnot.xml"/>
+    <file path="src/domogik/xpl/bin/ipushnot.py"/>
+    <file path="src/domogik/xpl/lib/ipushnot.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>notification</id>
+      <name>Notification</name>
+      <description>Notification to a smartphone</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
+</package>
+

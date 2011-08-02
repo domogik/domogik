@@ -1,0 +1,44 @@
+<package type="plugin">
+  <name>xpl2ser</name>
+  <technology>bridge</technology>
+  <description>forward xpl message from hub to serial device and vice versa</description>
+  <version>0.1.0</version>
+  <detail>When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.
+  </detail>
+  <documentation>#</documentation>
+  <author>Kriss</author>
+  <author-email>#</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>Serial device (ex: /dev/ttyUSB0)</description>
+      <default-value>/dev/xpl2ser</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/xpl2ser.xml"/>
+    <file path="src/domogik/xpl/bin/xpl2ser.py"/>
+    <file path="src/domogik/xpl/lib/xpl2ser.py"/>
+  </files>
+  <dependencies>
+    <dep name="pySerial > 2.4"/>
+  </dependencies>
+  <device_technology>
+      <id>bridge</id>
+      <name>Bridge</name>
+      <description>Bridge from xpl network to a device</description>
+  </device_technology>
+  <device_types>
+  </device_types>
+<device_feature_models/>
+</package>

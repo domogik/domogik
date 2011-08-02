@@ -1,0 +1,48 @@
+<package type="plugin">
+  <name>apushnot</name>
+  <technology>notification</technology>
+  <description>Send Android notification</description>
+  <detail>Android notification system base on external service provide by notifry</detail>
+  <version>0.1</version>
+  <documentation>http://wiki.domogik.org</documentation>
+  <author>Kriss</author>
+  <author-email>Kriss</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>source</name>
+      <type>string</type>
+      <description>a 32 character key generate by Notifry</description>
+      <default-value>krissdomogik</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>title</name>
+      <type>string</type>
+      <description>Title of all your notifications</description>
+      <default-value>DomogikServer</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/apushnot.xml"/>
+    <file path="src/domogik/xpl/bin/apushnot.py"/>
+    <file path="src/domogik/xpl/lib/apushnot.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>notification</id>
+      <name>Notification</name>
+      <description>Notification to a smartphone</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
+</package>
+
