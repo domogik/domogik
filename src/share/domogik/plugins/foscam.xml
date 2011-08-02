@@ -1,0 +1,114 @@
+<package type="plugin">
+  <name>foscam</name>
+  <technology>foscam</technology>
+  <description>Allow you to control embedded foscam relay</description>
+  <detail>This plugin allows to open an close foscam relay, your device must be plug on pin 1 and 2 </detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/plugin_foscam_relay</documentation>
+  <author>Capof</author>
+  <author-email>capof1000 at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>1</order-id>
+      <name>name</name>
+      <type>string</type>
+      <description>To report on widget address</description>
+      <default-value>Camera1</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
+      <name>ip</name>
+      <type>string</type>
+      <description>Camera Ip address</description>
+      <default-value>192.168.1.32</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>3</order-id>
+      <name>port</name>
+      <type>string</type>
+      <description>http port</description>
+     <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>4</order-id>
+      <name>user</name>
+      <type>string</type>
+      <description>User allowed to connect the camera</description>
+      <default-value>admin</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>5</order-id>
+      <name>password</name>
+      <type>string</type>
+      <description>User Password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+	  <interface>yes</interface>
+      <order-id>6</order-id>
+      <name>delay</name>
+      <type>string</type>
+      <description>pulse delay</description>
+      <default-value>5.0</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/foscam.xml"/>
+    <file path="src/share/domogik/stats/foscam/sensor.basic-foscam_relay.xml"/>
+    <file path="src/share/domogik/url2xpl/foscam/foscam.xml"/>
+    <file path="src/domogik/xpl/bin/foscam.py"/>
+    <file path="src/domogik/xpl/lib/foscam.py"/>
+  </files>
+  <dependencies/>
+ <device_technology>
+      <id>foscam</id>
+      <name>Foscam Camera</name>
+      <description>Foscam Camera relay command</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>foscam.relay</id>
+          <device_technology_id>foscam</device_technology_id>
+          <name>Relay</name>
+          <description>Relay</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>foscam.relay.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>foscam.relay</device_type_id>
+          <parameters>
+              {&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>output</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>foscam.relay.trigger</id>
+          <name>Trigger</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>foscam.relay</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;pulse&quot;}
+          </parameters>
+          <value_type>trigger</value_type>
+          <stat_key>output</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>

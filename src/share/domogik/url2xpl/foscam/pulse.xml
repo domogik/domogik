@@ -1,0 +1,21 @@
+<technology id="foscam">
+  <command name="pulse">
+    <schema>control.basic</schema>
+    <command-key>current</command-key>    
+    <address-key>device</address-key>    
+    <command-xpl-value>PULSE</command-xpl-value>
+    <parameters>
+      <parameter key="type" value="output"/>          
+    </parameters>
+  </command>    
+  <listener>
+    <schema>sensor.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="type" value="output" />
+      <key name="current" value="PULSE" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
+
