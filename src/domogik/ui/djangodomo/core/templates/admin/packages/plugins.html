@@ -75,7 +75,11 @@
                                     <a class='buttontext' href='{% url admin_packages_enable_view host.host package.name 'disable' %}'>Disable</a>
                                 {% else %}
                                     <a class='buttontext' href='{% url admin_packages_enable_view host.host package.name 'enable' %}'>Enable</a>
-                                {% endif %}</td></tr>
+                                {% endif %}
+                                {% if package.update_available %}
+                                    <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.update_available %}'>Update Package</a>
+                                {% endif %}
+                            </td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

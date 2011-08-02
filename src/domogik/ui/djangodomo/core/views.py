@@ -542,18 +542,17 @@ def __get_packages(type, page_messages):
                         enabled_list = host2.list
             if not enabled_list:
                 page_messages.append({'status':'warning', 'msg':'No plugin enabled'})
-            
+        
+        # Generate the installed package list
         if type in host.installed:
             host.installed.packages = host.installed[type]
             for package in host.installed.packages:
-                installed[package.name] = {}
+                installed[package.name] = package
                 try:
-                    installed[package.name]['version'] = NormalizedVersion(package.release)
-                    installed[package.name]['version_error'] = False
+                    installed[package.name]['NormalizedVersion'] = NormalizedVersion(package.release)
                 except IrrationalVersionError:
                     package.installed_version_error = True
-                    installed[package.name]['version_error'] = True
-                    installed[package.name]['version'] = package.release
+                    installed[package.name]['NormalizedVersion'] = None
                 #find enabled plugins
                 if type == 'plugin' and enabled_list:
                     for plugin in enabled_list:
@@ -561,25 +560,32 @@ def __get_packages(type, page_messages):
                             package.enabled = True
 
         host.available = []
-        for package in packages_result.package[0][type]:
-            package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
-            try:
-                package_version = NormalizedVersion(package.release)
-                package.version_error = False
-            except IrrationalVersionError:
-                package.version_error = True
-            package.upgrade_require = (package_min_version > dmg_version)
-            if package.name not in installed:
-                package.install = True
-                host.available.append(package)
-            # Check if update can be done
-            elif not installed[package.name]['version_error'] and not package.version_error:
-                if (installed[package.name]['version'] < package_version):
-                    package.update = True
+        if (packages_result.package) :
+            for package in packages_result.package[0][type]:
+                package_min_version = NormalizedVersion(suggest_normalized_version(package.domogik_min_release))
+                try:
+                    package_version = NormalizedVersion(package.release)
+                    package.version_error = False
+                except IrrationalVersionError:
+                    package.version_error = True
+                package.upgrade_require = (package_min_version > dmg_version)
+                print (package.name)
+
+                if package.name not in installed:
+                    package.install = True
                     host.available.append(package)
-            elif installed[package.name]['version_error'] and not package.version_error:
-                    package.update = True
-                    host.available.append(package)
+                # Check if update can be done
+                elif installed[package.name]['NormalizedVersion'] and not package.version_error:
+                    if (installed[package.name]['NormalizedVersion'] < package_version):
+                        print "A %s %s" % (installed[package.name]['NormalizedVersion'], package_version)
+                        installed[package.name]['update_available'] = package_version
+                        package.update = True
+                        host.available.append(package)
+                elif not installed[package.name]['NormalizedVersion'] and not package.version_error:
+                        print "B %s %s" % (installed[package.name]['NormalizedVersion'], package_version)
+                        installed[package.name]['update_available'] = package_version
+                        package.update = True
+                        host.available.append(package)
     return installed_result.package
 
 @admin_required
