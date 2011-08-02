@@ -131,7 +131,7 @@ class SysManager(XplPlugin):
         parser.add_option("-t", 
                           action="store", 
                           dest="custom_ping_duration", 
-                          help="Time for ping duration (defualt : %s)" % PING_DURATION)
+                          help="Time for ping duration (default : %s)" % PING_DURATION)
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
