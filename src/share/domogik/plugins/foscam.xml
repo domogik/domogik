@@ -61,7 +61,7 @@
       <name>delay</name>
       <type>string</type>
       <description>pulse delay</description>
-      <default-value>5.0</default-value>
+      <default-value>5</default-value>
     </key>
   </configuration-keys>
   <files>
