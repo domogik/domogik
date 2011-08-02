@@ -130,6 +130,7 @@ class SysManager(XplPlugin):
                           help="This manager is the one who looks for harware.")
         parser.add_option("-t", 
                           action="store", 
+                          type="int",
                           dest="custom_ping_duration", 
                           help="Time for ping duration (default : %s)" % PING_DURATION)
         XplPlugin.__init__(self, name = 'manager', parser=parser)
