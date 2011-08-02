@@ -491,16 +491,6 @@ class ProcessRequest():
         ### Get only <command...> part
         xml_command = xml_data.getElementsByTagName("command")[0]
 
-        #no_command_key = False
-        #if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-command-key"):
-        #    if xml_data.getElementsByTagName("command")[0].attributes.get("no-command-key").value == "1":
-        #        no_command_key = True
-
-        #no_address_key = False
-        #if xml_data.getElementsByTagName("command")[0].attributes.has_key("no-address-key"):
-        #    if xml_data.getElementsByTagName("command")[0].attributes.get("no-address-key").value == "1":
-        #        no_address_key = True
-
         ### Get data from xml
         # Schema
         schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
@@ -508,6 +498,7 @@ class ProcessRequest():
             has_command_key = False
         else:
             # command key name 
+            has_command_key = True
             command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
             # real command value in xpl message
             command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
@@ -516,6 +507,7 @@ class ProcessRequest():
             has_address_key = False
         else:
             #address key name (device)
+            has_address_key = True
             address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
 
         # Parameters
