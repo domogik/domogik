@@ -108,16 +108,30 @@ class SysManager(XplPlugin):
 
         # Check parameters 
         parser = OptionParser()
-        parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
-                help="Start database manager if not already running.")
-        parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
-                help="Start REST interface manager if not already running.")
-        parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
-            help="Start scenario manager if not already running.")
-        parser.add_option("-p", action="store_true", dest="allow_ping", default=False, \
-            help="Activate background ping for all plugins.")
-        parser.add_option("-H", action="store_true", dest="check_hardware", default=False, \
-            help="This manager is the one who looks for harware.")
+        parser.add_option("-d", 
+                          action="store_true", 
+                          dest="start_dbmgr", 
+                          default=False, \
+                          help="Start database manager if not already running.")
+        parser.add_option("-r", 
+                          action="store_true", 
+                          dest="start_rest", 
+                          default=False, \
+                          help="Start scenario manager if not already running.")
+        parser.add_option("-p", 
+                          action="store_true", 
+                          dest="allow_ping", 
+                          default=False, \
+                          help="Activate background ping for all plugins.")
+        parser.add_option("-H", 
+                          action="store_true", 
+                          dest="check_hardware", 
+                          default=False, \
+                          help="This manager is the one who looks for harware.")
+        parser.add_option("-t", 
+                          action="store", 
+                          dest="custom_ping_duration", 
+                          help="Time for ping duration (defualt : %s)" % PING_DURATION)
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
@@ -156,6 +170,12 @@ class SysManager(XplPlugin):
         self._plugins = []
         self._hardwares = []
         self._hardware_models = []
+
+        if self.options.custom_ping_duration != None:
+            self.ping_duration = self.options.custom_ping_duration
+        else:
+            self.ping_duration = PING_DURATION
+        print "ping duration=%s" % self.ping_duration
         try:
             # Get components:
             self._list_plugins()
@@ -196,21 +216,6 @@ class SysManager(XplPlugin):
                     self.register_thread(thr_rest)
                     thr_rest.start()
     
-            #Start trigger
-            #if self.options.start_trigger:
-            #    self._inc_startup_lock()
-            #    if self._check_component_is_running("trigger"):
-            #        self.log.warning("Manager started with -t, but a trigger manager is already running")
-            #        self._write_fifo("WARN", "Manager started with -t, but a trigger manager is already running\n")
-            #    else:
-            #        thr_trigger = Thread(None,
-            #                           self._start_plugin,
-            #                           None,
-            #                           ("trigger",
-            #                            self.get_sanitized_hostname()),
-            #                           {"ping" : False, "startup" : True})
-            #        thr_trigger.start()
-
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
             self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
@@ -567,7 +572,7 @@ class SysManager(XplPlugin):
                   'xpltype':'xpl-stat', 
                   'xplsource':"xpl-%s.%s" % (name, self.get_sanitized_hostname())},
                  cb_params = {'name' : name})
-        max = PING_DURATION
+        max = self.ping_duration
         while max != 0:
             self.myxpl.send(mess)
             time.sleep(1)
