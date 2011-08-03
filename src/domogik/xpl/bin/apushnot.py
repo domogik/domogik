@@ -57,7 +57,7 @@ class APushNotificationListener(XplPlugin):
 
         # Get configuration
         self._config = Query(self.myxpl, self.log)
-        self._ = str(self._config.query('apushnot','source'))
+        self._source = str(self._config.query('apushnot','source'))
         self._title = str(self._config.query('apushnot','title'))
 
         self.log.debug("Config :  = " + self._source)
@@ -80,7 +80,7 @@ class APushNotificationListener(XplPlugin):
             body = message.data['body']
 
         self.log.debug("Call send_ipn")
-        self.ipn_notification_manager.send_ipn(self._, body, self._title)
+        self.ipn_notification_manager.send_ipn(self._source, body, self._title)
 
 
 if __name__ == "__main__":
