@@ -1,4 +1,4 @@
-#!/usr/bin/python
+!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -64,23 +64,23 @@ class APushNotificationListener(XplPlugin):
         self.log.debug("Config : title = " + self._title)
 
         # Create APushNotification object
-        self.ipn_notification_manager = APushNotification(self.log)
+        self.apn_notification_manager = APushNotification(self.log)
 
         # Create listeners
-        Listener(self.ipn_notification_cb, self.myxpl, {'schema': 'sendmsg.basic', 'xpltype': 'xpl-cmnd'})
+        Listener(self.apn_notification_cb, self.myxpl, {'schema': 'sendmsg.push', 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
 
-    def ipn_notification_cb(self, message):
+    def apn_notification_cb(self, message):
         """ Call Android notification lib
             @param message : message to send
         """
-        self.log.debug("Call ipn_notification_cb")
+        self.log.debug("Call apn_notification_cb")
 
         if 'body' in message.data:
             body = message.data['body']
 
-        self.log.debug("Call send_ipn")
-        self.ipn_notification_manager.send_ipn(self._source, body, self._title)
+        self.log.debug("Call send_apn")
+        self.apn_notification_manager.send_apn(self._source, self._title, body)
 
 
 if __name__ == "__main__":
