@@ -63,6 +63,7 @@ import mimetypes
 from threading import Event
 from Queue import Empty
 import sys
+from subprocess import Popen, PIPE
 
 
 # Time we wait for answers after a multi host list command
@@ -346,9 +347,7 @@ class ProcessRequest():
         info["Host"] = gethostname().lower()
         info["REST_API_release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
-        __import__("domogik")
-        dmg = sys.modules["domogik"]
-        info["Domogik_release"] = dmg.__version__
+        info["Domogik_release"] = self.rest_status_release()
 
         # Xml command files
         command = {}
@@ -392,6 +391,25 @@ class ProcessRequest():
         json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
+
+    def rest_status_release(self):
+        """ Return Domogik release
+        """
+        __import__("domogik")
+        global_release = sys.modules["domogik"]
+
+        subp = Popen("hg log -r tip --template '{branch} ({latesttag}) - {rev} - {date|isodate}'", shell=True, stdout=PIPE, stderr=PIPE)
+        (stdout, stderr) = subp.communicate()
+        #print stdout
+        #print "---"
+        #print stderr
+        print "RET=%s" %  subp.returncode 
+        # if hg id has no error, we are using asource  repository
+        if subp.returncode == 0:
+            return "%s" % (stdout)
+        # else, we use a packaged release
+        else:
+            return global_release
 
 
 ######
