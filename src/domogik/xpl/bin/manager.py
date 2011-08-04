@@ -159,7 +159,7 @@ class SysManager(XplPlugin):
             self.log.info("Set package path to '%s' " % self._package_path)
             print("Set package path to '%s' " % self._package_path)
             sys.path.append(self._package_path)
-            self._xml_plugin_directory = os.path.join(self._package_path, "plugins/plugins/")
+            self._xml_plugin_directory = os.path.join(self._package_path, "plugins/softwares/")
             self._xml_hardware_directory = os.path.join(self._package_path, "plugins/hardwares/")
         else:
             self.log.info("No package path defined in config file")

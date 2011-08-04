@@ -85,7 +85,7 @@ function copy_sample_files {
         chown $d_user $dmg_home
     fi
     # create folders for packages management
-    for pkg_rep in cache plugins plugins/plugins plugins/hardwares plugins/stats plugins/url2xpl
+    for pkg_rep in cache plugins plugins/softwares plugins/hardwares plugins/stats plugins/url2xpl
       do
         if [ ! -d $dmg_home/$pkg_rep ];then
             mkdir $dmg_home/$pkg_rep
