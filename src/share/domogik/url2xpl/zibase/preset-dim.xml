@@ -1,0 +1,19 @@
+<technology id="zibase">
+  <command name="preset-dim">
+    <schema>zibase.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>preset-dim</command-xpl-value>
+    <parameters>
+      <parameter key="preset-dim" location="1"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>zibase.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="preset-dim" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
