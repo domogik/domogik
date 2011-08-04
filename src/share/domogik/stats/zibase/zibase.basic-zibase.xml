@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="zibase">
+    <schema name="zibase.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="command"/>
+                <value field="preset-dim" filter_key="event" filter_value="preset-dim"/>
+            </mapping>
+        </xpltype>
+     </schema>
+</statistic>
