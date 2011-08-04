@@ -70,7 +70,8 @@ if conf.has_key('package_path'):
 else:
     INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
 
-PLUGIN_XML_PATH = "%s/plugins/plugins" % INSTALL_PATH
+PLUGIN_XML_PATH = "%s/plugins/softwares" % INSTALL_PATH
+HARDWARE_XML_PATH = "%s/plugins/softwares" % INSTALL_PATH
 
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
@@ -404,7 +405,11 @@ class PackageManager():
                 self._create_init_py("%s/xpl/" % plg_path)
                 self._create_init_py("%s/xpl/bin/" % plg_path)
                 self._create_init_py("%s/xpl/lib/" % plg_path)
-                copytree("%s/src/share/domogik/%ss" % (pkg_dir, type), "%s/%ss" % (plg_path, type), self.log)
+                if type == "plugin":
+                    type_path = "softwares"
+                if type == "hardware":
+                    type_path = "hardwares"
+                copytree("%s/src/share/domogik/%ss" % (pkg_dir, type), "%s/%s" % (plg_path, type_path), self.log)
             if package_part == PKG_PART_RINOR:
                 copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
                 copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
@@ -622,14 +627,15 @@ class PackageManager():
             and return a detailed list
         """
         pkg_list = []
-        for root, dirs, files in os.walk(PLUGIN_XML_PATH):
-            for f in files:
-                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                pkg_list.append({"fullname" : pkg_xml.fullname,
-                                 "name" : pkg_xml.name,
-                                 "release" : pkg_xml.release,
-                                 "type" : pkg_xml.type,
-                                 "package-url" : pkg_xml.package_url})
+        for rep in [PLUGIN_XML_PATH, HARDWARE_XML_PATH]:
+            for root, dirs, files in os.walk(rep):
+                for f in files:
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                    pkg_list.append({"fullname" : pkg_xml.fullname,
+                                     "name" : pkg_xml.name,
+                                     "release" : pkg_xml.release,
+                                     "type" : pkg_xml.type,
+                                     "package-url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                  k['release']))
 
