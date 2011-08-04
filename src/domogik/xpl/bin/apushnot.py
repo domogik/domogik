@@ -1,4 +1,4 @@
-!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -55,13 +55,33 @@ class APushNotificationListener(XplPlugin):
         # Create logger
         self.log.debug("Listener for Android push notification created")
 
-        # Get configuration
+        # Configuration : list of recipient and source key
+        self.alias_list = {}
+        num = 1
+        loop = True
         self._config = Query(self.myxpl, self.log)
-        self._source = str(self._config.query('apushnot','source'))
-        self._title = str(self._config.query('apushnot','title'))
+        while loop == True:
+            recipient = self._config.query('apushnot', 'name-%s' % str(num))
+            source = self._config.query('apushnot', 'source-%s' % str(num))
+            if recipient != None:
+                self.log.info("Configuration : recipient=%s, source=%s" % 
+                               (recipient, source))
+                print ("Configuration : recipient=%s, source=%s" %
+                               (recipient, source))
+                self.alias_list[recipient] = {"recipient" : recipient,
+                                       "source" : source}
+                num += 1
+            else:
+                loop = False
 
-        self.log.debug("Config :  = " + self._source)
-        self.log.debug("Config : title = " + self._title)
+        # no recipient configured
+        if num == 1:
+            msg = "No recipient configured. Exiting plugin"
+            self.log.info(msg)
+            print(msg)
+            self.force_leave()
+            return
+
 
         # Create APushNotification object
         self.apn_notification_manager = APushNotification(self.log)
@@ -72,15 +92,30 @@ class APushNotificationListener(XplPlugin):
 
     def apn_notification_cb(self, message):
         """ Call Android notification lib
-            @param message : message to send
+            @param message : message from xpl
         """
         self.log.debug("Call apn_notification_cb")
+
+        if 'to' in message.data:
+            to = message.data['to']
+
+        if 'title' in message.data:
+            title = message.data['title']
 
         if 'body' in message.data:
             body = message.data['body']
 
+        for alias in self.alias_list:
+            try :
+                if str(self.alias_list[alias]['recipient']) == str(to):
+                    sourcekey = self.alias_list[alias]['source']
+                    print("sourcekey=",sourcekey)
+            except :
+                self.log.debug("Can't find the recipient")
+
+
         self.log.debug("Call send_apn")
-        self.apn_notification_manager.send_apn(self._source, self._title, body)
+        self.apn_notification_manager.send_apn(sourcekey, title, body)
 
 
 if __name__ == "__main__":
