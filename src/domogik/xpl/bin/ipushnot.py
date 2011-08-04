@@ -41,7 +41,6 @@ Implements
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.lib.ipushnot import IPushNotification
-from domogik.xpl.common.queryconfig import Query
 
 
 class IPushNotificationListener(XplPlugin):
@@ -55,19 +54,11 @@ class IPushNotificationListener(XplPlugin):
         # Create logger
         self.log.debug("Listener for Iphone push notification created")
 
-        # Get configuration
-        self._config = Query(self.myxpl, self.log)
-        self._pushmenick = str(self._config.query('ipushnot','pushmenick'))
-        self._signature = str(self._config.query('ipushnot','signature'))
-
-        self.log.debug("Config : pushmenick = " + self._pushmenick)
-        self.log.debug("Config : signature = " + self._signature)
-
         # Create IPushNotification object
         self.ipn_notification_manager = IPushNotification(self.log)
 
         # Create listeners
-        Listener(self.ipn_notification_cb, self.myxpl, {'schema': 'sendmsg.basic', 'xpltype': 'xpl-cmnd'})
+        Listener(self.ipn_notification_cb, self.myxpl, {'schema': 'sendmsg.push', 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
 
     def ipn_notification_cb(self, message):
@@ -75,12 +66,21 @@ class IPushNotificationListener(XplPlugin):
             @param message : message to send
         """
         self.log.debug("Call ipn_notification_cb")
+        if 'to' in message.data:
+            pushmenick = message.data['to']
 
         if 'body' in message.data:
             body = message.data['body']
 
+        if 'signature' in message.data:
+            signature = message.data['signature']
+
+        self.log.debug("Config : pushmenick = " + pushmenick)
+        self.log.debug("Config : message = " + body)
+        self.log.debug("Config : signature = " + signature)
+
         self.log.debug("Call send_ipn")
-        self.ipn_notification_manager.send_ipn(self._pushmenick, body, self._signature)
+        self.ipn_notification_manager.send_ipn(pushmenick, body, signature)
 
 
 if __name__ == "__main__":
