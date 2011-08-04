@@ -53,7 +53,7 @@ class APushNotification:
             self._log = log
 	    self._log.info("APushNotification:__init")
 
-        def send_ipn(self, source, title, message):
+        def send_apn(self, source, title, message):
             """ Call Notifry HTTP API to send notification
                 @param source : your Notifry ID
 		@param title : notification title
@@ -111,7 +111,7 @@ class Log:
 
 if __name__ == "__main__":
     l = Log()
-    my_ipn = APushNotification(l)
-    my_ipn.send_ipn('2c749dc46381dbc3646ee87ce77184f4', 'Alerte !', 'Une intrusion est detectee dans la cuisine.')
+    my_apn = APushNotification(l)
+    my_apn.send_apn('2c749dc46381dbc3646ee87ce77184f4', 'Alerte !', 'Une intrusion est detectee dans la cuisine.')
 
- 
+
