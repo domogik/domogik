@@ -96,14 +96,18 @@ class APushNotificationListener(XplPlugin):
         """
         self.log.debug("Call apn_notification_cb")
 
+        # mandatory keys
         if 'to' in message.data:
             to = message.data['to']
 
-        if 'title' in message.data:
-            title = message.data['title']
-
         if 'body' in message.data:
             body = message.data['body']
+
+        # optionnal keys
+        if 'title' in message.data:
+            title = message.data['title']
+        else:
+            title = "default title"
 
         for alias in self.alias_list:
             try :
