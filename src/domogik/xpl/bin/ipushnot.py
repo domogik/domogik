@@ -71,22 +71,20 @@ class IPushNotificationListener(XplPlugin):
         if 'to' in message.data:
             pushmenick = message.data['to']
         else:
-            self.log.debug("No recipient was found in the xpl message")
-            self.force_leave()
+            self.log.warning("No recipient was found in the xpl message")
             return
 
         if 'body' in message.data:
             body = message.data['body']
         else:
-            self.log.debug("No message was found in the xpl message")
-            self.force_leave()
+            self.log.warning("No message was found in the xpl message")
             return
 
         # optionnal keys
         if 'signature' in message.data:
             signature = message.data['signature']
         else:
-            self.log.debug("No signature was found in the xpl message")
+            self.log.info("No signature was found in the xpl message, so we use NoSign")
             signature = "NoSign"
 
 
