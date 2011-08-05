@@ -35,6 +35,14 @@
       <description>32 character source key</description>
       <default-value></default-value>
     </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>3</order-id>
+      <name>default-title</name>
+      <type>string</type>
+      <description>a default title for your notification</description>
+      <default-value>default title</default-value>
+    </key>
 
   </configuration-keys>
   <files>

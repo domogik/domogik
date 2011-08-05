@@ -63,13 +63,12 @@ class APushNotificationListener(XplPlugin):
         while loop == True:
             recipient = self._config.query('apushnot', 'name-%s' % str(num))
             source = self._config.query('apushnot', 'source-%s' % str(num))
+            dfltitle = self._config.query('apushnot', 'default-title-%s' % str(num))
             if recipient != None:
-                self.log.info("Configuration : recipient=%s, source=%s" % 
-                               (recipient, source))
-                print ("Configuration : recipient=%s, source=%s" %
-                               (recipient, source))
-                self.alias_list[recipient] = {"recipient" : recipient,
-                                       "source" : source}
+                mess="Configuration : recipient=" + recipient + " , source=" + source + ", default title=" + dfltitle
+                self.log.info(mess)
+                print(mess)
+                self.alias_list[recipient] = {"recipient" : recipient, "source" : source, "dfltitle" : dfltitle}
                 num += 1
             else:
                 loop = False
@@ -99,26 +98,41 @@ class APushNotificationListener(XplPlugin):
         # mandatory keys
         if 'to' in message.data:
             to = message.data['to']
+            for alias in self.alias_list:
+                try:
+                    if str(self.alias_list[alias]['recipient']) == str(to):
+                        sourcekey = self.alias_list[alias]['source']
+                except :
+                    self.log.debug("Can't find the recipient, please check the configuration page of this plugin")
+                    self.force_leave()
+                    return
+        else:
+            self.log.debug("No recipient was found in the xpl message")
+            self.force_leave()
+            return
 
         if 'body' in message.data:
             body = message.data['body']
+        else:
+            self.log.debug("No message was found in the xpl message")
+            self.force_leave()
+            return
 
         # optionnal keys
         if 'title' in message.data:
             title = message.data['title']
         else:
-            title = "default title"
+            for alias in self.alias_list:
+                try:
+                    if str(self.alias_list[alias]['recipient']) == str(to):
+                        title = self.alias_list[alias]['dfltitle']
+                except :
+                    self.log.debug("Can't find the default title of the recipient " + to + " , please check the configuration page of this plugin")
+                    self.force_leave()
+                    return
 
-        for alias in self.alias_list:
-            try :
-                if str(self.alias_list[alias]['recipient']) == str(to):
-                    sourcekey = self.alias_list[alias]['source']
-                    print("sourcekey=",sourcekey)
-            except :
-                self.log.debug("Can't find the recipient")
 
-
-        self.log.debug("Call send_apn")
+        self.log.debug("Call send_apn with following parameters : sourcekey=" + sourcekey + ", title=" + title + ", message=" + body)
         self.apn_notification_manager.send_apn(sourcekey, title, body)
 
 
