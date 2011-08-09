@@ -644,7 +644,10 @@ class SysManager(XplPlugin):
         """ 
         for plugin in self._plugins:
             if plugin["name"] == plg:
-                plugin["status"] = state
+                # if status changed, set new status and send event
+                if plugin["status"] != state:
+                    plugin["status"] = state
+                    self._send_plugin_list()
 
     def _list_hardware_models(self):
         """ List domogik hardware models
