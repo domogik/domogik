@@ -30,6 +30,10 @@ input[type='text'] {
     background-repeat:no-repeat;
 }
 
+input[type='text'].default {
+    color:#767676;
+}
+
 textarea {
     border:1px solid #999;
     -moz-border-radius: 0.4em;

@@ -66,20 +66,29 @@ class IPushNotificationListener(XplPlugin):
             @param message : message to send
         """
         self.log.debug("Call ipn_notification_cb")
+
+        # mandatory keys
         if 'to' in message.data:
             pushmenick = message.data['to']
+        else:
+            self.log.warning("No recipient was found in the xpl message")
+            return
 
         if 'body' in message.data:
             body = message.data['body']
+        else:
+            self.log.warning("No message was found in the xpl message")
+            return
 
+        # optionnal keys
         if 'signature' in message.data:
             signature = message.data['signature']
+        else:
+            self.log.info("No signature was found in the xpl message, so we use NoSign")
+            signature = "NoSign"
 
-        self.log.debug("Config : pushmenick = " + pushmenick)
-        self.log.debug("Config : message = " + body)
-        self.log.debug("Config : signature = " + signature)
 
-        self.log.debug("Call send_ipn")
+        self.log.debug("Call send_ipn with following parameters : pushmenick=" + pushmenick + ", message=" + body + ", signature=" + signature)
         self.ipn_notification_manager.send_ipn(pushmenick, body, signature)
 
 

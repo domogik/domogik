@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="computer">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter>
+                    <key name="type" value="free_space"/>
+                    <key name="type" value="used_space"/>
+                    <key name="type" value="total_space"/>
+                    <key name="type" value="percent_used"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="free_space"
+                       filter_key="type" filter_value="free_space" />
+                <value field="current" new_name="used_space"
+                       filter_key="type" filter_value="used_space" />
+                <value field="current" new_name="total_space"
+                       filter_key="type" filter_value="total_space" />
+                <value field="current" new_name="percent_used"
+                       filter_key="type" filter_value="percent_used" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
