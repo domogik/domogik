@@ -1,0 +1,105 @@
+<package type="plugin">
+  <name>diskfree</name>
+  <technology>computer</technology>
+  <description>Disk usage</description>
+  <detail>Send over xPL disk usage</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/plugin_diskfree</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>interval</name>
+      <type>string</type>
+      <description>Interval between each poll (minute)</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
+      <name>path</name>
+      <type>string</type>
+      <description>Path on filesystem</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/diskfree.xml"/>
+    <file path="src/share/domogik/stats/computer/sensor.basic-diskfree.xml"/>
+    <file path="src/domogik/xpl/bin/diskfree.py"/>
+    <file path="src/domogik/xpl/lib/diskfree.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>computer</id>
+      <name>Computer</name>
+      <description>Computer</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>computer.disk_usage</id>
+          <device_technology_id>computer</device_technology_id>
+          <name>Disk usage</name>
+          <description>Disk usage</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>computer.disk_usage.free_space</id>
+          <name>Free space</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>computer.disk_usage</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>free_space</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>computer.disk_usage.used_space</id>
+          <name>Used space</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>computer.disk_usage</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>used_space</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>computer.disk_usage.total_space</id>
+          <name>Total space</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>computer.disk_usage</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>total_space</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>computer.disk_usage.percent_used</id>
+          <name>Percent used</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>computer.disk_usage</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>percent_used</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
