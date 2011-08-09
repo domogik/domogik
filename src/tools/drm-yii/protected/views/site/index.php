@@ -88,6 +88,7 @@
     ));
     echo CHtml::submitButton('delete selected', array('name'=>'delete'));
     echo CHtml::submitButton('deploy selected', array('name'=>'deploy'));
+    echo CHtml::submitButton('undeploy selected', array('name'=>'undeploy'));
     echo CHtml::submitButton('move selected to :', array('name'=>'move'));
     echo CHtml::dropDownList("destination", null, $repositories);
     echo CHtml::endForm();

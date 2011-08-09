@@ -17,7 +17,7 @@ class SiteController extends Controller
 	}
 
     function updateNfo($path, $msg) {
-        if (!file_put_contents ($path . "/update.nfo" , $msg, FILE_APPEND))
+        if (!file_put_contents ($path . "/update.nfo" , $msg.PHP_EOL, FILE_APPEND))
             throw new CHttpException(403,"Error writing " . $filename);            
 	}
 
@@ -90,6 +90,20 @@ class SiteController extends Controller
         $str .= '</ul>';
         
         Yii::app()->user->setFlash(($return == 0) ? 'info' : 'error', $str);            
+    }
+
+    private function packageUnDeploy($repo, $package)
+	{
+        $srcDir = yii::app()->params['repositories'][$repo]['path'];
+        $xmlfile = Yii::app()->file->set($srcDir . '/' . substr($package, 0, -4) . ".xml", true);
+
+        if ($xmlfile->exists && $xmlfile->delete()) {
+	       $this->updateNfo($srcDir, "Package " . $package . " undeployed in " . $repo);
+            Yii::app()->user->setFlash('info',"Package " . $package . " undeployed in " . $repo);                                
+        } else {
+            Yii::app()->user->setFlash('error',"Package " . $package . "was not undeployed in " . $repo);                
+        }
+     
     }
     
     private function packageMove($repo, $package, $destination)
@@ -185,6 +199,8 @@ class SiteController extends Controller
                     foreach ($_POST['packages'][$repo]  as $package) {
                         if(isset($_POST['deploy']))
                             $this->packageDeploy($repo, $package);
+                        if(isset($_POST['undeploy']))
+                            $this->packageUnDeploy($repo, $package);
                         if(isset($_POST['delete']))
                             $this->packageMove($repo, $package, 'trash');
                         if(isset($_POST['move']))

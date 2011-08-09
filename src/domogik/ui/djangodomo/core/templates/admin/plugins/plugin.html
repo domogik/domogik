@@ -116,6 +116,7 @@ $(function(){
         setNotConfigured: function(defaultValue) {
             this.addClass('icon16-status-warning');
             this.prepend("<span class='offscreen'>No configured</span>");
+            $("input", this).attr("class", "default");
             if ((defaultValue) && (defaultValue != "None")) {
                 $("input", this).val(defaultValue);            
             } else {
