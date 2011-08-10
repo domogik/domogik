@@ -67,7 +67,9 @@
   <files>
     <file path="src/share/domogik/plugins/foscam.xml"/>
     <file path="src/share/domogik/stats/foscam/sensor.basic-foscam_relay.xml"/>
-    <file path="src/share/domogik/url2xpl/foscam/foscam.xml"/>
+    <file path="src/share/domogik/url2xpl/foscam/high.xml"/>
+    <file path="src/share/domogik/url2xpl/foscam/low.xml"/>
+    <file path="src/share/domogik/url2xpl/foscam/pulse.xml"/>
     <file path="src/domogik/xpl/bin/foscam.py"/>
     <file path="src/domogik/xpl/lib/foscam.py"/>
   </files>
