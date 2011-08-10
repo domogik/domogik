@@ -58,9 +58,9 @@ for fic in $INPUT/*.tgz
     tar xvzf $fic info.xml
     if [[ $? -ne 0 ]] ; then
         echo "Error while processing package. Exiting..."
-        exit 1
+    else
+        mv info.xml $package_name.xml
+        cp $fic .
+        rm -f $fic
     fi
-    mv info.xml $package_name.xml
-    cp $fic .
-    rm -f $fic
 done
