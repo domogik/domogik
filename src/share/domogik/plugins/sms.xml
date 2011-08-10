@@ -49,7 +49,9 @@
     <file path="src/share/domogik/plugins/sms.xml"/>
     <file path="src/share/domogik/url2xpl/communication/send_sms.xml"/>
     <file path="src/domogik/xpl/bin/sms.py"/>
-    <file path="src/domogik/xpl/lib/sms.py"/>
+    <file path="src/domogik/xpl/lib/sms_orange.py"/>
+    <file path="src/domogik/xpl/lib/sms_sfr.py"/>
+    <file path="src/domogik/xpl/lib/sms_bouygues.py"/>
   </files>
   <dependencies>                                                                
      <dep python="mechanize"/>
