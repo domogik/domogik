@@ -49,7 +49,8 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.xpl.lib.rest.jsondata import JSonHelper
-from domogik.xpl.lib.rest.event import EventRequests
+from domogik.xpl.lib.rest.event import DmgEvents
+from domogik.xpl.lib.rest.eventrequest import RequestEvents
 from domogik.xpl.lib.rest.stat import StatsManager
 from domogik.xpl.lib.rest.request import ProcessRequest
 from domogik.common.configloader import Loader
@@ -67,6 +68,7 @@ import SocketServer
 import os
 import errno
 import pyinotify
+import calendar
 
 
 
@@ -91,7 +93,8 @@ QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
 # /command queue config
 QUEUE_COMMAND_SIZE = 1000
 
-# /event queue config
+# /events/request queue config
+# /events/domogik queue config
 EVENT_TIMEOUT = 300  # must be superior than QUEUE_EVENT_TIMEOUT
                      # Value should be > 2*x QUEUE_EVENT_TIMEOUT
 QUEUE_EVENT_TIMEOUT = 120   # If 0, no timeout is set
@@ -286,15 +289,29 @@ class Rest(XplPlugin):
             # Queues for /command
             self._queue_command = Queue(self._queue_command_size)
     
-            # Queues for /event
+            # Queues for /events/domogik
+            self._queue_event_dmg = Queue(self._queue_event_size)
+    
+            # Queues for /events/request
             # this queue will be fill by stat manager
-            self._event_requests = EventRequests(self.get_stop,
-                                                 self.log,
-                                                 self._event_timeout,
-                                                 self._queue_event_size,
-                                                 self._queue_event_timeout,
-                                                 self._queue_event_life_expectancy)
+            self._event_requests = RequestEvents(self.get_stop,
+                                                  self.log,
+                                                  self._event_timeout,
+                                                  self._queue_event_size,
+                                                  self._queue_event_timeout,
+                                                  self._queue_event_life_expectancy)
             self.add_stop_cb(self._event_requests.set_stop_clean)
+
+            # Queues for /events/domogik
+            # this queue will be fill by stat manager
+            self._event_dmg = DmgEvents(self.get_stop,
+                                     self.log,
+                                     self._event_timeout,
+                                     self._queue_event_size,
+                                     self._queue_event_timeout,
+                                     self._queue_event_life_expectancy)
+            # notice : adding data in queue is made in _add_to_queue_system_list
+            self.add_stop_cb(self._event_dmg.set_stop_clean)
     
             # define listeners for queues
             self.log.debug("Create listeners")
@@ -327,7 +344,7 @@ class Rest(XplPlugin):
                       'command' : 'stop'})
             Listener(self._add_to_queue_command, self.myxpl, \
                      {'xpltype': 'xpl-trig'})
-    
+ 
             # Load xml files for /command
             self.xml = {}
             self.xml_date = None
@@ -378,6 +395,9 @@ class Rest(XplPlugin):
         """ Add data in a queue
         """
         self._put_in_queue(self._queue_system_list, message)
+        current_date = calendar.timegm(time.gmtime())
+        self._event_dmg.add_in_queues({"timestamp" : current_date,
+                                            "data" : "plugin-list-updated"})
 
     def _add_to_queue_system_detail(self, message):
         """ Add data in a queue

@@ -151,6 +151,7 @@ class ProcessRequest():
         self._queue_system_stop =  self.handler_params[0]._queue_system_stop
         self._queue_command =  self.handler_params[0]._queue_command
 
+        self._event_dmg =  self.handler_params[0]._event_dmg
         self._event_requests =  self.handler_params[0]._event_requests
 
         self.xml =  self.handler_params[0].xml
@@ -381,9 +382,11 @@ class ProcessRequest():
 
         # Events stats
         events = {}
-        events["Number_of_requests"] = self._event_requests.count()
+        events["Number_of_Domogik_events_requests"] = self._event_dmg.count()
+        events["Number_of_devices_events_requests"] = self._event_requests.count()
         events["Max_size_for_request_queues"] = int(self._queue_event_size)
-        events["Requests"] = self._event_requests.list()
+        events["Domogik_requests"] = self._event_dmg.list()
+        events["Devices_requests"] = self._event_requests.list()
 
         data = {"info" : info, "command" : command,
                 "stats" : stats,
@@ -789,6 +792,28 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
+        ### domogik  ######################################
+        if self.rest_request[0] == "domogik":
+
+            #### new
+            if self.rest_request[1] == "new":
+                self._rest_events_domogik_new()
+
+            #### get
+            elif self.rest_request[1] == "get" and len(self.rest_request) == 3:
+                self._rest_events_domogik_get(self.rest_request[2])
+
+            #### free
+            elif self.rest_request[1] == "free" and len(self.rest_request) == 3:
+                self._rest_events_domogik_free(self.rest_request[2])
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
+
         ### request  ######################################
         if self.rest_request[0] == "request":
 
@@ -829,6 +854,42 @@ target=*
             return
 
 
+    def _rest_events_domogik_new(self):
+        """ Create new event request and send data for event
+        """
+        ticket_id = self._event_dmg.new()
+        data = self._event_dmg.get(ticket_id)
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("event")
+        json_data.add_data(data)
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_events_domogik_get(self, ticket_id):
+        """ Get data from event associated to ticket id
+            @param ticket_id : ticket id
+        """
+        data = self._event_dmg.get(ticket_id)
+        if data == False:
+            json_data = JSonHelper("ERROR", 999, "Error in getting event in queue")
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_data_type("event")
+            json_data.add_data(data)
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_events_domogik_free(self, ticket_id):
+        """ Free event queue for ticket id
+            @param ticket_id : ticket id
+        """
+        if self._event_dmg.free(ticket_id):
+            json_data = JSonHelper("OK")
+        else:
+            json_data = JSonHelper("ERROR", 999, "Error when trying to free queue for event")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
+
 
     def _rest_events_request_new(self, device_id_list):
         """ Create new event request and send data for event
@@ -841,9 +902,6 @@ target=*
         json_data.set_data_type("event")
         json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
-
-
-
 
     def _rest_events_request_get(self, ticket_id):
         """ Get data from event associated to ticket id
@@ -858,9 +916,6 @@ target=*
             json_data.add_data(data)
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json_data.get())
-
-
-
 
     def _rest_events_request_free(self, ticket_id):
         """ Free event queue for ticket id

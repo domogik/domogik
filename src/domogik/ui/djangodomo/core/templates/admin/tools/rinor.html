@@ -36,7 +36,8 @@
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
         $.tablesorter.defaults.headers = { 3:{sorter: false} }; 
-        $("#request_list").tablesorter();
+        $("#domogik_request_list").tablesorter();
+        $("#devices_request_list").tablesorter();
         $("#force_refresh").click(function() {refresh()});
         refresh();
         $('body').everyTime('10s', function() {refresh()});
@@ -57,15 +58,32 @@
                         
                         // Events {{rest.event.Number_of_requests}} / {{rest.event.Max_size_for_request_queues}}
                         $("#request_number").empty();
-                        $("#request_number").append("<li><span class='label'>Number of requests: </span>" + data.rest[0].event.Number_of_requests + "</li>")
+                        $("#request_number").append("<li><span class='label'>Number of Domogik requests: </span>" + data.rest[0].event.Number_of_Domogik_events_requests + "</li>")
+                        $("#request_number").append("<li><span class='label'>Number of devices requests: </span>" + data.rest[0].event.Number_of_devices_events_requests + "</li>")
                         $("#request_number").append("<li><span class='label'>Max size for request queues: </span>" + data.rest[0].event.Max_size_for_request_queues + "</li>")
                         
-                        // Request list
-                        $('table#request_list tbody').empty();
-                        $.each(data.rest[0].event.Requests, function(index, request) {
+                        // Domogik Request list
+                        $('table#domogik_request_list tbody').empty();
+                        $.each(data.rest[0].event.Domogik_requests, function(index, request) {
                             var creation_date = new Date(request.creation_date * 1000);
                             var last_access_date = new Date(request.last_access_date * 1000);
-                            $('table#request_list tbody').append("<tr><td>"
+                            $('table#domogik_request_list tbody').append("<tr><td>"
+                                + index + "</td><td>"
+                                + creation_date.toLocaleString() + "</td><td>"
+                                + last_access_date.toLocaleString() + "</td><td>"
+                                + request.queue_size + "</td><td>"
+                                + request.instance.unfinished_tasks + "</td><td>"
+                                + request.instance.maxsize + "</td></tr>");
+                        });
+                        $('#domogik_request_list').trigger("update");
+                        $('#domogik_request_list').trigger("sorton", [[[0,0]]]);
+
+                        // Devices Request list
+                        $('table#devices_request_list tbody').empty();
+                        $.each(data.rest[0].event.Devices_requests, function(index, request) {
+                            var creation_date = new Date(request.creation_date * 1000);
+                            var last_access_date = new Date(request.last_access_date * 1000);
+                            $('table#devices_request_list tbody').append("<tr><td>"
                                 + index + "</td><td>"
                                 + creation_date.toLocaleString() + "</td><td>"
                                 + last_access_date.toLocaleString() + "</td><td>"
@@ -74,8 +92,8 @@
                                 + request.instance.unfinished_tasks + "</td><td>"
                                 + request.instance.maxsize + "</td></tr>");
                         });
-                        $('#request_list').trigger("update");
-                        $('#request_list').trigger("sorton", [[[0,0]]]);
+                        $('#devices_request_list').trigger("update");
+                        $('#devices_request_list').trigger("sorton", [[[0,0]]]);
                     } else {
                         /* Error retreving plugin config */
                         $.notification(data.status, data.description);
@@ -154,7 +172,22 @@
         <h3>{% trans "Requests" %}</h3>
         <ul id='request_number'></ul>
         <br />
-        <table id='request_list' class='tablesorter' cellspacing="1">
+        <table id='domogik_request_list' class='tablesorter' cellspacing="1">
+            <thead>
+                <tr>
+                    <th scope='col'>ID</th>
+                    <th scope='col'>Created</th>
+                    <th scope='col'>Last access</th>
+                    <th scope='col'>Queue size</th>                    
+                    <th scope='col'>Instance Unfinished Tasks</th>
+                    <th scope='col'>Instance Max size</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <br />
+        <table id='devices_request_list' class='tablesorter' cellspacing="1">
             <thead>
                 <tr>
                     <th scope='col'>ID</th>
@@ -169,6 +202,5 @@
             <tbody>
             </tbody>
         </table>
-</table>
     </section>
 {% endblock %}

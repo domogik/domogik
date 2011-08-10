@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 =============
 
-- Events requests management
+- Events management
 
 Implements
 ==========
@@ -43,7 +43,7 @@ from domogik.xpl.common.xplconnector import XplTimer
 
 
 
-class EventRequests():
+class DmgEvents():
     """
     Object where all events queues and ticket id will be stored
     """
@@ -89,9 +89,8 @@ class EventRequests():
         """
         self._stop_clean.set()
 
-    def new(self, device_id_list):
+    def new(self):
         """ Add a new queue and ticket id for a new event
-            @param device_id : id of device to get events from
             @return ticket_id : ticket id
         """
         print "---- NEW ----"
@@ -100,12 +99,11 @@ class EventRequests():
         cur_date = time.time()
         new_data = {"creation_date" :  cur_date,
                     "last_access_date" : cur_date,
-                    "device_id_list" : device_id_list,
                     "queue" : new_queue,
                     "queue_size" : 0}
         self.requests[ticket_id] = new_data
         self.count_request += 1
-        self._log.debug("New event request created (ticket_id=%s) for device(s) : %s" % (ticket_id, str(device_id_list)))
+        self._log.debug("New event created (ticket_id=%s)" % ticket_id)
         return ticket_id
 
     def free(self, ticket_id):
@@ -134,51 +132,31 @@ class EventRequests():
         """
         return self.count_request
 
-    def add_in_queues(self, device_id, data):
+    def add_in_queues(self, data):
         """ Add data in each queue linked to device id
             @param data : data to put in queues
         """
         print "---- ADD ----"
         for req in self.requests:
-            if device_id in self.requests[req]["device_id_list"]:
-                ### clean queue
-                idx = 0
-                queue_size = self.requests[req]["queue"].qsize()
-                actual_time = time.time()
-                while idx < queue_size:
-                    if self.requests[req]["queue"].empty() == False:
-                        (elt_time, elt_data) = self.requests[req]["queue"].get_nowait()
-                        # if there is already data about device_id, we clean it (we don't put it back in queue)
-                        # or if data is too old
-                        # Note : if we get new stats only each 2 minutes, 
-                        #     cleaning about life expectancy will only happen 
-                        #     every 2 minutes instead of every 'life_expectancy'
-                        #     seconds. I supposed that when you got several 
-                        #     technologies, you pass throug this code several 
-                        #     times in a minute. More over,  events are
-                        #     actually (0.1) used only by UI and when you use
-                        #     UI, events are read immediatly. So, I think
-                        #     that cleaning queues here instead of creating
-                        #     a dedicated process which will run in background
-                        #     is a good thing for the moment
-                        if elt_data["device_id"] != device_id and \
-                           actual_time - elt_time < self.queue_life_expectancy:
+            ### clean queue
+            idx = 0
+            queue_size = self.requests[req]["queue"].qsize()
+            actual_time = time.time()
+            while idx < queue_size:
+                if self.requests[req]["queue"].empty() == False:
+                    (elt_time, elt_data) = self.requests[req]["queue"].get_nowait()
+                    # one data suppressed from queue
+                    self.requests[req]["queue_size"] -= 1
+                    
+                idx += 1
 
-                            self.requests[req]["queue"].put((elt_time, elt_data),
-                                                            True, self.queue_timeout) 
-                        else:
-                            # one data suppressed from queue
-                            self.requests[req]["queue_size"] -= 1
-                        
-                    idx += 1
-
-                ### put data in queue
-                try:
-                    self.requests[req]["queue"].put((time.time(), data), 
-                                                    True, self.queue_timeout) 
-                    self.requests[req]["queue_size"] += 1
-                except Full:
-                    self._log.error("Queue for ticket_id '%s' is full. Feel free to adjust Event queues size" % req)
+            ### put data in queue
+            try:
+                self.requests[req]["queue"].put((time.time(), data), 
+                                                True, self.queue_timeout) 
+                self.requests[req]["queue_size"] += 1
+            except Full:
+                self._log.error("Queue for ticket_id '%s' is full. Feel free to adjust Event queues size" % req)
 
 
     def get(self, ticket_id):
@@ -228,6 +206,7 @@ class EventRequests():
             # Update access date
             self.requests[ticket_id]["last_access_date"] = time.time()
 
+            print elt_data
             return elt_data
 
     def stop_get(self):
