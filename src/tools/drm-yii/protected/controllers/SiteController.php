@@ -16,9 +16,9 @@ class SiteController extends Controller
 		);
 	}
 
-    function updateNfo($path, $msg) {
+    private function updateNfo($path, $msg) {
         if (!file_put_contents ($path . "/update.nfo" , $msg.PHP_EOL, FILE_APPEND))
-            throw new CHttpException(403,"Error writing " . $filename);            
+            throw new CHttpException(403,"Error writing " . $path . "/update.nfo");
 	}
 
     private function listDir($name, $detail) {
@@ -115,19 +115,20 @@ class SiteController extends Controller
             if ($srcfile->exists) {
                 $srcfile->move($destpath . '/' . $package);
                 $xmlfile = Yii::app()->file->set($srcpath . '/' . substr($package, 0, -4) . ".xml", true);
-                if ($xmlfile->exists && $xmlfile->delete()) {
-                    Yii::app()->user->setFlash('info',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']);                                
-                } else {
-                    Yii::app()->user->setFlash('error',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']. " but xml file was not deleted");                
+                if ($xmlfile->exists) {
+                    $xmlfile->delete();
+                    if ($xmlfile->exists) {
+                        Yii::app()->user->setFlash('info',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']);                                
+                    } else {
+                        Yii::app()->user->setFlash('error',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']. " but xml file was not deleted");                
+                    }
                 }
-                
-                updateNfo($srcDir, "Package " . $package . " moved to " . $destination);
-	            if ($destination != 'trash') updateNfo($destDir, "Package " . $package . " moved from " . $repo);
+                $this->updateNfo($srcpath, "Package " . $package . " moved to " . $destination);
+	            if ($destination != 'trash') $this->updateNfo($destpath, "Package " . $package . " moved from " . $repo);
             } else {
                 Yii::app()->user->setFlash('error',"Error while moving package to " . yii::app()->params['repositories'][$destination]['label']);            
             }
         }
-        $this->redirect(array('site/index'));   
     }
     
 	/**
@@ -209,7 +210,7 @@ class SiteController extends Controller
                 }
             }
         }
-        $this->redirect(array('site/index'));
+//        $this->redirect(array('site/index'));
     }
     
     public function actionPackagelstGenerate()
