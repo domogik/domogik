@@ -113,18 +113,20 @@ class SiteController extends Controller
             $destpath = yii::app()->params['repositories'][$destination]['path'];
             $srcfile = Yii::app()->file->set($srcpath . '/' . $package, true);
             if ($srcfile->exists) {
-                $srcfile->move($destpath . '/' . $package);
-                $xmlfile = Yii::app()->file->set($srcpath . '/' . substr($package, 0, -4) . ".xml", true);
-                if ($xmlfile->exists) {
-                    $xmlfile->delete();
+                if ($srcfile->move($destpath . '/' . $package)) {
+                    $xmlfile = Yii::app()->file->set($srcpath . '/' . substr($package, 0, -4) . ".xml", true);
                     if ($xmlfile->exists) {
-                        Yii::app()->user->setFlash('info',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']);                                
-                    } else {
-                        Yii::app()->user->setFlash('error',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']. " but xml file was not deleted");                
+                        $xmlfile->delete();
+                        if ($xmlfile->exists) {
+                            Yii::app()->user->setFlash('info',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']);                                
+                        } else {
+                            Yii::app()->user->setFlash('error',"Package " . $package . " moved to " . yii::app()->params['repositories'][$destination]['label']. " but xml file was not deleted");                
+                        }
                     }
-                }
-                $this->updateNfo($srcpath, "Package " . $package . " moved to " . $destination);
-	            if ($destination != 'trash') $this->updateNfo($destpath, "Package " . $package . " moved from " . $repo);
+                    $this->updateNfo($srcpath, "Package " . $package . " moved to " . $destination);
+                    if ($destination != 'trash') $this->updateNfo($destpath, "Package " . $package . " moved from " . $repo);                    
+                } else
+                    throw new CHttpException(403,"Error moving package to " . $destpath . '/' . $package);
             } else {
                 Yii::app()->user->setFlash('error',"Error while moving package to " . yii::app()->params['repositories'][$destination]['label']);            
             }
@@ -210,7 +212,7 @@ class SiteController extends Controller
                 }
             }
         }
-//        $this->redirect(array('site/index'));
+        $this->redirect(array('site/index'));
     }
     
     public function actionPackagelstGenerate()
