@@ -160,6 +160,9 @@ class PackageManager():
                             plg_xml.all_files, 
                             xml_tmp_file)
 
+        # delete temporary xml file
+        os.unlink(xml_tmp_file) 
+
     def _create_package_for_hardware(self, name, output_dir, force):
         """ Create package for a hardware
             1. read xml file to get informations and list of files
