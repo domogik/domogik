@@ -55,7 +55,7 @@ from distutils2.version import NormalizedVersion, IrrationalVersionError
 
 SRC_PATH = "../../../"
 PLG_XML_PATH = "src/share/domogik/plugins/"
-TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
+TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with temp folder
 CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
 REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
 REPO_LST_FILE = "packages.lst"

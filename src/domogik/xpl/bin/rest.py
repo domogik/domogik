@@ -69,10 +69,7 @@ import os
 import errno
 import pyinotify
 import calendar
-
-
-
-
+import tempfile
 
 REST_API_VERSION = "0.2"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
@@ -101,8 +98,11 @@ QUEUE_EVENT_TIMEOUT = 120   # If 0, no timeout is set
 QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
 
+# temp dir
+TMP_DIR = tempfile.gettempdir()
+
 # Repository
-DEFAULT_REPO_DIR = "/tmp/"
+DEFAULT_REPO_DIR = TMP_DIR
 
 
 

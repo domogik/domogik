@@ -61,8 +61,7 @@ from distutils2.version import VersionPredicate, _split_predicate, IrrationalVer
 from distutils2.install import get_infos
 from distutils2.index.simple import Crawler
 import re
-
-
+import tempfile
 import domogik.xpl.bin
 import pkgutil
 
@@ -71,9 +70,9 @@ KILL_TIMEOUT = 2
 PING_DURATION = 3
 WAIT_TIME_BETWEEN_PING = 15
 
-
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
+TMP_DIR = tempfile.gettempdir()
 
 class EventHandler(pyinotify.ProcessEvent):
     """ Check a file for any event (creation, modification, etc)
@@ -140,10 +139,10 @@ class SysManager(XplPlugin):
 
         # Fifo to communicate with the init script
         self._state_fifo = None
-        if os.path.exists("/tmp/dmg-manager-state"):
-            mode = os.stat("/tmp/dmg-manager-state").st_mode
+        if os.path.exists("%s/dmg-manager-state" % TMP_DIR):
+            mode = os.stat("%s/dmg-manager-state" % TMP_DIR).st_mode
             if mode & stat.S_IFIFO == stat.S_IFIFO:
-                self._state_fifo = open("/tmp/dmg-manager-state","w")    
+                self._state_fifo = open("%s/dmg-manager-state" % TMP_DIR,"w")    
                 self._startup_count = 0
                 self._startup_count_lock = Lock()
                 self._write_fifo("NONE","\n")
