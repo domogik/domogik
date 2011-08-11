@@ -59,7 +59,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>computer.disk_usage</device_type_id>
           <parameters>
-              {}
+              {&quot;unit&quot;:&quot;ko&quot;}
           </parameters>
           <value_type>number</value_type>
           <stat_key>free_space</stat_key>
@@ -71,7 +71,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>computer.disk_usage</device_type_id>
           <parameters>
-              {}
+              {&quot;unit&quot;:&quot;ko&quot;}
           </parameters>
           <value_type>number</value_type>
           <stat_key>used_space</stat_key>
@@ -83,7 +83,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>computer.disk_usage</device_type_id>
           <parameters>
-              {}
+              {&quot;unit&quot;:&quot;ko&quot;}
           </parameters>
           <value_type>number</value_type>
           <stat_key>total_space</stat_key>
@@ -95,7 +95,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>computer.disk_usage</device_type_id>
           <parameters>
-              {}
+              {&quot;unit&quot;:&quot;&#37;&quot;}
           </parameters>
           <value_type>number</value_type>
           <stat_key>percent_used</stat_key>
