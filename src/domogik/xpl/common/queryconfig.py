@@ -42,6 +42,7 @@ from threading import Event
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.common.configloader import Loader
 
 
 class Query():
@@ -62,6 +63,18 @@ class Query():
         self._l = {}
         self._result = None
 
+        # Check in config file is target is forced
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+        if conf.has_key('config_provider'):
+            self.target = "xpl-dbmgr.%s" % conf["config_provider"]
+            msg = "Force config provider to '%s'" % self.target
+            print msg
+            self.log.debug(msg)
+        else:
+            self.target = "*"
+
     def __del__(self):
         print "End query"
 
@@ -75,6 +88,7 @@ class Query():
         '''
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
+        mess.set_target(self.target)
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
         mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
@@ -103,6 +117,7 @@ class Query():
         self._l[key] = l
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
+        mess.set_target(self.target)
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
         mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
