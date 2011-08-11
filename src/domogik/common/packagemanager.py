@@ -227,6 +227,9 @@ class PackageManager():
                             plg_xml.all_files, 
                             xml_tmp_file)
 
+        # delete temporary xml file
+        os.unlink(xml_tmp_file) 
+
 
     def _create_tar_gz(self, name, output_dir, files, info_file = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
