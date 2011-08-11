@@ -34,6 +34,7 @@
 
 TMP_DIR=/tmp/domogik-repo
 FILENAME=packages.lst
+PERMISSIONS=777
 
 if [[ $# -ne 1 ]] ; then
     echo "Usage : $0 <directory>"
@@ -81,5 +82,11 @@ done
 mv $TMP_DIR/$FILENAME $FOLDER
 if [[ $? -ne 0 ]] ; then
     echo "Could not move file $TMP_DIR/$FILENAME to $FOLDER"
+    exit 1
+fi
+
+chmod $PERMISSIONS $FOLDER/$FILENAME
+if [[ $? -ne 0 ]] ; then
+    echo "Could not mochange permissions from $FOLDER/$FILENAME to $PERMISSIONS"
     exit 1
 fi

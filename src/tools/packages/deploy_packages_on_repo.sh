@@ -32,6 +32,8 @@
 #@organization: Domogik
 
 
+PERMISSIONS=777
+
 if [[ $# -ne 2 ]] ; then
     echo "Usage : $0 <input directory> <repository directory>"
     echo "This script move a package from input_directory to repository and extract info.xml file to put it on repository with package name"
@@ -60,7 +62,9 @@ for fic in $INPUT/*.tgz
         echo "Error while processing package. Exiting..."
     else
         mv info.xml $package_name.xml
+        chmod $PERMISSIONS $package_name.xml
         cp $fic .
+        chmod $PERMISSIONS ./$(basename $fic)
         rm -f $fic
     fi
 done
