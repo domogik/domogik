@@ -160,9 +160,6 @@ class PackageManager():
                             plg_xml.all_files, 
                             xml_tmp_file)
 
-        # delete temporary xml file
-        os.unlink(xml_tmp_file) 
-
     def _create_package_for_hardware(self, name, output_dir, force):
         """ Create package for a hardware
             1. read xml file to get informations and list of files
@@ -227,9 +224,6 @@ class PackageManager():
                             plg_xml.all_files, 
                             xml_tmp_file)
 
-        # delete temporary xml file
-        os.unlink(xml_tmp_file) 
-
 
     def _create_tar_gz(self, name, output_dir, files, info_file = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
@@ -253,9 +247,14 @@ class PackageManager():
                 self.log("- info.xml")
                 tar.add(info_file, arcname="info.xml")
             tar.close()
+
+            # delete temporary xml file
+            os.unlink(info_file) 
         except: 
             msg = "Error generating package : %s : %s" % (my_tar, traceback.format_exc())
             self.log(msg)
+            # delete temporary xml file
+            os.unlink(info_file) 
             raise PackageException(msg)
         self.log("OK")
     
