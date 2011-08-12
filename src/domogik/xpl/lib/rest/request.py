@@ -42,6 +42,7 @@ from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
+from domogik.xpl.lib.rest.tail import Tail
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR
 from domogik.common.packagexml import PackageXml, PackageException
 import time
@@ -92,7 +93,8 @@ class ProcessRequest():
                  wfile, \
                  rfile, \
                  cb_send_http_response_ok, \
-                 cb_send_http_response_error):
+                 cb_send_http_response_error, \
+                 cb_send_http_response_text_plain):
         """ Create shorter access : self.server.handler_params[0].* => self.*
             First processing on url given
             @param handler_params : parameters given to HTTPHandler
@@ -102,6 +104,8 @@ class ProcessRequest():
                                               REST.send_http_response_ok 
             @param cb_send_http_response_error : callback for function
                                               REST.send_http_response_error 
+            @param cb_send_http_response_text_plain : callback for function
+                                              REST.send_http_response_text_plain 
         """
 
         self.handler_params = handler_params
@@ -117,6 +121,7 @@ class ProcessRequest():
         self.rfile = rfile
         self.send_http_response_ok = cb_send_http_response_ok
         self.send_http_response_error = cb_send_http_response_error
+        self.send_http_response_text_plain = cb_send_http_response_text_plain
         self.xpl_cmnd_schema = None
         self._put_filename = None
 
@@ -274,6 +279,8 @@ class ProcessRequest():
             self.rest_scenario()
         elif self.rest_type == "package":
             self.rest_package()
+        elif self.rest_type == "log":
+            self.rest_log()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -3966,4 +3973,58 @@ target=*
             self.send_http_response_ok(json_data.get())
 
 
+
+######
+# /log processing
+######
+
+    def rest_log(self):
+        """ /log processing
+        """
+        self.log.debug("Log action")
+
+        # parameters initialisation
+        self.parameters = {}
+
+        if len(self.rest_request) < 1:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        ### tail ######################################
+        if self.rest_request[0] == "tail":
+
+            if len(self.rest_request) == 5:
+                self._rest_log_tail(self.rest_request[1],
+                                    self.rest_request[2],
+                                    self.rest_request[3],
+                                    self.rest_request[4])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ####################################
+        else:
+            self.send_http_response_error(999, "Bad operation for /log", self.jsonp, self.jsonp_cb)
+            return
+
+    def _rest_log_tail(self, host, filename, number, offset):
+        """ Send (raw format!!) result of a tail
+            @param host : hostname for file
+            @param filename : filename (without ".log")
+            @param number : number of lines
+            @param offset : offset in lines from end of file
+        """
+        self.log.debug("Log : ask for tail action : %s > %s" % (host, filename))
+
+        if host == gethostname().lower():
+            subdir = ""
+        else:
+            subdir = host.lower()
+        path = "%s/%s/%s.log" % ("/var/log/domogik", subdir, filename) 
+        try:
+            result = Tail(path, int(number), int(offset)).get()
+        except IOError:
+            result = "Unable to read '%s' file" % path
+        self.send_http_response_text_plain(result)
 

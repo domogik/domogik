@@ -804,7 +804,8 @@ class RestHandler(BaseHTTPRequestHandler):
                                  self.wfile, \
                                  self.rfile, \
                                  self.send_http_response_ok, \
-                                 self.send_http_response_error)
+                                 self.send_http_response_error, \
+                                 self.send_http_response_text_plain)
             request.do_for_all_methods()
         except:
             self.server.handler_params[0].log.error("%s" % self.server.handler_params[0].get_exception())
@@ -878,8 +879,28 @@ class RestHandler(BaseHTTPRequestHandler):
             else:
                 raise err
 
-
-
+    def send_http_response_text_plain(self, data = ""):
+        """ Send to browser a HTTP 200 responde
+            200 is the code for "no problem"
+            Send also text plain data
+            @param data : text plain data
+        """
+        self.server.handler_params[0].log.debug("Send HTTP header for OK")
+        try:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.send_header('Expires', '-1')
+            self.send_header('Cache-control', 'no-cache')
+            self.send_header('Content-Length', len(data.encode("utf-8")))
+            self.end_headers()
+            self.wfile.write(data.encode("utf-8"))
+        except IOError as err: 
+            if err.errno == errno.EPIPE:
+                # [Errno 32] Broken pipe : client closed connexion
+                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
+                return
+            else:
+                raise err
 
 
 if __name__ == '__main__':
