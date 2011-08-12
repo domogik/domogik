@@ -4070,7 +4070,7 @@ target=*
             subdir = host.lower()
         path = "%s/%s/%s.log" % (self.log_dir_path, subdir, filename) 
         try:
-            result = Tail(path, int(number), int(offset)).get()
+            result = Tail(path, int(number), int(offset)).get_html()
         except IOError:
             result = "Unable to read '%s' file" % path
         self.send_http_response_text_html(result)
