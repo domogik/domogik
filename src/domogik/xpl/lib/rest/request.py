@@ -94,7 +94,8 @@ class ProcessRequest():
                  rfile, \
                  cb_send_http_response_ok, \
                  cb_send_http_response_error, \
-                 cb_send_http_response_text_plain):
+                 cb_send_http_response_text_plain, \
+                 cb_send_http_response_text_html):
         """ Create shorter access : self.server.handler_params[0].* => self.*
             First processing on url given
             @param handler_params : parameters given to HTTPHandler
@@ -105,7 +106,9 @@ class ProcessRequest():
             @param cb_send_http_response_error : callback for function
                                               REST.send_http_response_error 
             @param cb_send_http_response_text_plain : callback for function
-                                              REST.send_http_response_text_plain 
+                                              REST.send_http_response_text_plain
+            @param cb_send_http_response_text_html : callback for function
+                                              REST.send_http_response_text_html 
         """
 
         self.handler_params = handler_params
@@ -122,6 +125,7 @@ class ProcessRequest():
         self.send_http_response_ok = cb_send_http_response_ok
         self.send_http_response_error = cb_send_http_response_error
         self.send_http_response_text_plain = cb_send_http_response_text_plain
+        self.send_http_response_text_html = cb_send_http_response_text_html
         self.xpl_cmnd_schema = None
         self._put_filename = None
 
@@ -3993,23 +3997,45 @@ target=*
 
         ### tail ######################################
         if self.rest_request[0] == "tail":
-
-            if len(self.rest_request) == 5:
-                self._rest_log_tail(self.rest_request[1],
-                                    self.rest_request[2],
-                                    self.rest_request[3],
-                                    self.rest_request[4])
+    
+            ### txt #######################################
+            if self.rest_request[1] == "txt":
+    
+                if len(self.rest_request) == 6:
+                    self._rest_log_tail_txt(self.rest_request[2],
+                                            self.rest_request[3],
+                                            self.rest_request[4],
+                                            self.rest_request[5])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                    return
+    
+            ### html ######################################
+            if self.rest_request[1] == "html":
+    
+                if len(self.rest_request) == 6:
+                    self._rest_log_tail_html(self.rest_request[2],
+                                             self.rest_request[3],
+                                             self.rest_request[4],
+                                             self.rest_request[5])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                    return
+    
+            ### others ####################################
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
                 return
-
+    
         ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /log", self.jsonp, self.jsonp_cb)
             return
 
-    def _rest_log_tail(self, host, filename, number, offset):
+    def _rest_log_tail_txt(self, host, filename, number, offset):
         """ Send (raw format!!) result of a tail
             @param host : hostname for file
             @param filename : filename (without ".log")
@@ -4028,4 +4054,24 @@ target=*
         except IOError:
             result = "Unable to read '%s' file" % path
         self.send_http_response_text_plain(result)
+
+    def _rest_log_tail_html(self, host, filename, number, offset):
+        """ Send (html format!!) result of a tail
+            @param host : hostname for file
+            @param filename : filename (without ".log")
+            @param number : number of lines
+            @param offset : offset in lines from end of file
+        """
+        self.log.debug("Log : ask for tail action : %s > %s" % (host, filename))
+
+        if host == gethostname().lower():
+            subdir = ""
+        else:
+            subdir = host.lower()
+        path = "%s/%s/%s.log" % (self.log_dir_path, subdir, filename) 
+        try:
+            result = Tail(path, int(number), int(offset)).get()
+        except IOError:
+            result = "Unable to read '%s' file" % path
+        self.send_http_response_text_html(result)
 
