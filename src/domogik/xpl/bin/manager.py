@@ -791,6 +791,7 @@ class SysManager(XplPlugin):
         # Getplugin list
         plugins = Loader('plugins')
         plugin_list = dict(plugins.load(refresh = True)[1])
+        plugin_list["rest"] = "enabled"
         state_thread = {}
         for plugin in plugin_list:
             print(plugin)
