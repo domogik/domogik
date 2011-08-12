@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>  
 <statistic technology="onewire">
     <schema name="sensor.basic">
-        <xpltype type="xpl-trig">
+        <xpltype type="*">
             <listener>
                 <filter>
                     <key name="type" value="temp"/>
@@ -17,20 +17,6 @@
                        filter_key="type" filter_value="input" />
                 <value field="current" new_name="humidity" 
                        filter_key="type" filter_value="humidity" />
-            </mapping>
-        </xpltype>
-        <xpltype type="xpl-stat">
-            <listener>
-                <filter>
-                    <key name="type" value="temp"/>
-                </filter>
-            </listener>
-            <mapping>
-                <device field="device"/>
-                <value field="current" new_name="temperature" 
-                       filter_key="type" filter_value="temp" />
-                <value field="current" new_name="temperature" 
-                       filter_key="type" filter_value="temp" />
             </mapping>
         </xpltype>
     </schema>
