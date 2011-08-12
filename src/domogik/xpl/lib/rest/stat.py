@@ -188,7 +188,11 @@ class StatsManager:
         for schema in schemas:
             res[schema.attributes.get("name").value] = {}
             for xpltype in schema.getElementsByTagName("xpltype"):
-                res[schema.attributes.get("name").value][xpltype.attributes.get("type").value] = xpltype
+                if xpltype.attributes.get("type").value == "*":
+                    res[schema.attributes.get("name").value]["xpl-trig"] = xpltype
+                    res[schema.attributes.get("name").value]["xpl-stat"] = xpltype
+                else:
+                    res[schema.attributes.get("name").value][xpltype.attributes.get("type").value] = xpltype
         return res
 
     def parse_listener(self, node):
