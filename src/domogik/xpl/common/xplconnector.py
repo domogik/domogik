@@ -79,7 +79,7 @@ import traceback
 from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from domogik.common import logger
 from domogik.xpl.common.baseplugin import BasePlugin
-from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 
 READ_NETWORK_TIMEOUT = 2
@@ -123,6 +123,10 @@ class Manager:
         self._broadcast = broadcast
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
+        #UID for the fragment management
+        self._fragment_uid = 1
+        self._sent_fragments_buffer = {}
+        self._received_fragments_buffer = {}
 
         #Define locks
         self._lock_send = threading.Semaphore()
@@ -193,12 +197,22 @@ class Manager:
             if not message.target:
                 message.set_target("*")
             try:
-                self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
+                if len(message.to_packet()) > 1472:
+                    fragments = FragmentedXplMessage.fragment_message(message, self._fragment_uid)
+                    self._sent_fragments_buffer[self._fragment_uid] = fragments
+                    for fragment in fragments.keys():
+                        self.p.log.debug("fragment send")
+                        self._UDPSock.sendto(fragments[fragment].__str__(), (self._broadcast, 3865))
+                else:
+                    self.p.log.debug("normal send")
+                    self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
             except:
                 if self.p.get_stop().is_set():
                     pass
                 else:
                     raise
+            else:
+                self._fragment_uid = self._fragment_uid + 1
             self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
             self.p.log.warning("Error during send of message")
@@ -259,8 +273,24 @@ remote-ip=%s
                             mess = XplMessage(data)
                             if (mess.target == "*" or (mess.target == self._source)) and\
                                 (self._source != mess.source):
-                                for l in self._listeners:
-                                    l.new_message(mess)
+                                update = False
+                                if mess.schema == "fragment.basic":
+                                    key = (mess.source, mess.data["partid"].split(':')[1])
+                                    if not key in self._received_fragments_buffer:
+                                        self._received_fragments_buffer[key] = {}
+                                    self._received_fragments_buffer[key][mess.data["partid"].split('/')[0]] = mess
+                                    if len(self._received_fragments_buffer[key]) == int(mess.data["partid"].split('/')[1].split(':')[0]):
+                                        nf = FragmentedXplMessage()
+                                        for f in self._received_fragments_buffer[key].keys():
+                                            nf.add_fragment(self._received_fragments_buffer[key][f])
+                                        mess = nf.build_message()
+                                        update = True
+                                        del self._received_fragments_buffer[key]
+                                else:
+                                    update = True
+                                if update:
+                                    for l in self._listeners:
+                                        l.new_message(mess)
                                 #Enabling this debug will really polute your logs
                                 #self.log.debug("New message received : %s" % \
                                 #        mess.get_type())

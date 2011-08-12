@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -215,7 +216,13 @@ class XplMessage(object):
         match_single_data_dict = match_single_data.groupdict()
         #self.data.append((match_single_data_dict['data_name'], match_single_data_dict['data_value']))
         key = match_single_data_dict['data_name']
-        self.data[key] = match_single_data_dict['data_value']
+        if key in self.data:
+            if type(self.data[key]) != list:
+                v = self.data[key]
+                self.data[key] = [v]
+            self.data[key].append(match_single_data_dict['data_value'])
+        else:
+            self.data[key] = match_single_data_dict['data_value']
 
     def set_type(self, type_):
         """ Set the message type.
@@ -401,7 +408,11 @@ class XplMessage(object):
         packet += "%s\n" % self.schema
         packet += "{\n"
         for key, value in self.data.iteritems():
-            packet += "%s=%s\n" % (key, value)
+            if type(value) == list:
+                for v in value:
+                    packet += "%s=%s\n" % (key, v)
+            else:
+                packet += "%s=%s\n" % (key, value)
         packet += "}\n"
 
         return packet
@@ -418,3 +429,190 @@ class XplMessage(object):
             return False
         else:
             return True
+
+
+class FragmentedXplMessage(object):
+    """ Defines a fragemented xPL Message
+    """
+    def __init__(self, fragment=None):
+        """ Creates a FragmentedXplMessage instance and start to fill it with fragment
+        @param uid : unique message identifier
+        @param fragment : first fragment of the message
+        @type fragment XplMessage
+        """
+        self._fragments = {}
+        self._message_id = None
+        self._fragment_count = 0
+        self._mess_type = None
+        self._mess_schema = None
+        self._mess_from = None
+        if fragment:
+            self._init_from_fragment(fragment)
+            self.add_fragment(fragment)
+
+    def _init_from_fragment(self, fragment):
+        """ Initialize the object with the first fragment
+        @param fragment : fragment of the message
+        @type fragment : XplMessage
+        @warning the schema will be initialized only with the first fragment
+        """
+        ids = self._extract_ids(fragment)
+        self._message_id = ids[2]
+        self._fragment_count = int(ids[1])
+        self._mess_type = fragment.type
+        self._mess_from = fragment.source
+        self._mess_to = fragment.target
+        if "schema" in fragment.data:
+            self._mess_schema = fragment.data["schema"]
+
+    def add_fragment(self, fragment):
+        """ Add a fragment to the message
+        """
+        ids = self._extract_ids(fragment)
+        if (((not self._mess_schema) and (ids[0] == 1)) or not self._message_id):
+            self._init_from_fragment(fragment)
+        if ids[2] != self._message_id:
+            raise ValueError("The message ID is not the same as previous fragments")
+        if ids[1] != self._fragment_count:
+            raise ValueError("The number of fragments is not the same as previous fragments")
+        self._fragments[int(ids[0])] = fragment
+        
+    def _extract_ids(self, fragment):
+        """ Extract message IDs from a fragment
+        @param fragment : one fragment of the message
+        @type fragment XplMessage
+        
+        @return a tuple with (fragment number, #of fragments, the message ID)
+        @raise ValueError if no message ID can be extracted
+        """
+        if "partid" in fragment.data:
+            partid = fragment.data["partid"]
+            try:
+                parts =  partid.split(':')
+                f_id = parts[0].split('/')[0]
+                f_total = parts[0].split('/')[1]
+                m_id = parts[1]
+            except:
+                raise ValueError, "Can't parse partid"
+            else:
+                return (int(f_id), int(f_total), m_id)
+
+    def generate_missing_request(self, ids=None):
+        """ Generates an XplMessage to request the re-send of some fragments
+        if ids is None, will request all the missing fragments
+        @param ids : list of fragments'id to request
+        @return XplMessage instance to request fragments or None if no fragment were already stored or if all were received
+        """
+        if ((self._fragment_count == 0) or (len(self._fragments) == self._fragment_count)):
+            return None
+
+        msg = XplMessage()
+        msg.set_type("xpl-cmnd")
+        msg.set_target(self._mess_from)
+        msg.set_schema("fragment.request")
+        msg.add_single_data("command","resend")
+        msg.add_single_data("message",self._message_id)
+
+        if ids:
+            for i in ids:
+                msg.add_single_data("part",str(i))
+        else:
+            for i in range(1, self._fragment_count + 1):
+                if i not in self.fragments:
+                    msg.add_single_data("part",str(i))
+        return msg
+
+    def build_message(self):
+        """Build the XplMessage from all fragments
+        @return None if not all fragments are received
+        """
+        if len(self._fragments) != self._fragment_count:
+            return None
+
+        msg = XplMessage()
+        msg.set_type(self._mess_type)
+        msg.set_schema(self._mess_schema)
+        msg.set_source(self._mess_from)
+        msg.set_target(self._mess_to)
+        for i in range(1, self._fragment_count + 1):
+            f = self._fragments[i]
+            for d in f.data.keys():
+                if d not in ["partid","schema"]:
+                    msg.add_single_data(d, f.data[d])
+        return msg
+
+    @staticmethod
+    def fragment_message(message, uid):
+        """ Fill the instance with fragments from the message
+        @param message: XplMessage instance to split
+        @param uid : the unique ID that should identify this message
+        @return an OrderedDict which contains all the fragments
+        """
+        #we use an OrderedDict to store messages until we know the total number of messages
+        message_list = OrderedDict()
+        msg = FragmentedXplMessage.__init_fragment(message, uid)
+        base_len = len(msg.to_packet())
+        f_id = 1
+        for k in message.data:
+            if type(message.data[k]) == list:
+                for l in message.data[k]:
+                    if not FragmentedXplMessage.__try_add_item_to_message(msg, k, l):
+                        message_list[f_id] = msg
+                        msg = FragmentedXplMessage.__init_fragment(message, uid)
+                        FragmentedXplMessage.__try_add_item_to_message(msg, k, l)
+                        f_id = f_id + 1
+            else:
+                if not FragmentedXplMessage.__try_add_item_to_message(msg, k, message.data[k]):
+                    message_list[f_id] = msg
+                    msg = FragmentedXplMessage.__init_fragment(message, uid)
+                    FragmentedXplMessage.__try_add_item_to_message(msg, k, message.data[k])
+                    f_id = f_id + 1
+                    
+        message_list[f_id] = msg
+        return FragmentedXplMessage.__update_fragments_ids(message_list, uid)
+
+    @staticmethod
+    def __update_fragments_ids(fragment_list, uid):
+        """ Update the id of all fragments to set the corect id/total nuber of fragments
+        @param fragment_list : an Ordered list with all fragments
+        @param uid : the unique ID that should identify this message
+        @return The updated OrderedDict
+        """
+        l = len(fragment_list)
+        for f in fragment_list:
+            fragment_list[f].data["partid"] = "%s/%s:%s" % (f, l, uid)
+        return fragment_list
+
+    @staticmethod
+    def __init_fragment(message, uid):
+        """ Create a fragment message and init it from the provider XplMessage
+        @param message : The message to init fragment from
+        @param uid : the unique ID that should identify this message
+        @return a new fragment
+        """
+        msg = XplMessage()
+        msg.set_type(message.type)
+        msg.set_schema("fragment.basic")
+        msg.set_source(message.source)
+        msg.set_target(message.target)
+        msg.add_single_data("partid","##/##:%s" % uid) 
+        msg.add_single_data("schema", message.schema)
+        return msg
+
+    @staticmethod
+    def __try_add_item_to_message(message, item_k, item_v):
+        """ Try to add an item to the message
+        if the message len is < 1472 with the item, then add it
+        else don't.
+        @param message : The XplMessage to add the item to
+        @param item_k : item key
+        @param item_v : item value
+        @return True if the item was correctly added, false otherwise
+        """
+        item = "%s=%s\n" % (item_k, item_v)
+        if len(item) + len(message.to_packet()) < 1472:
+            message.add_single_data(item_k, item_v)
+            return True
+        else:
+            return False
+
