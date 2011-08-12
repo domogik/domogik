@@ -136,6 +136,7 @@ class ProcessRequest():
         self.repo_dir = self.handler_params[0].repo_dir
         self.use_ssl = self.handler_params[0].use_ssl
         self.get_exception = self.handler_params[0].get_exception
+        self.log_dir_path = self.handler_params[0].log_dir_path
 
         self.log.debug("Process request : init")
 
@@ -4021,7 +4022,7 @@ target=*
             subdir = ""
         else:
             subdir = host.lower()
-        path = "%s/%s/%s.log" % ("/var/log/domogik", subdir, filename) 
+        path = "%s/%s/%s.log" % (self.log_dir_path, subdir, filename) 
         try:
             result = Tail(path, int(number), int(offset)).get()
         except IOError:

@@ -164,6 +164,7 @@ class Rest(XplPlugin):
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
+            self.log_dir_path = conf['log_dir_path']
             # plugin installation path
             if conf.has_key('package_path'):
                 self._package_path = conf['package_path']
