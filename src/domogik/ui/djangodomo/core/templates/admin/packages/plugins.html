@@ -40,6 +40,7 @@
         $("#installed_list").tablesorter();
         $.tablesorter.defaults.headers = { 2:{sorter: false},  3:{sorter: false},  5:{sorter: false} }; 
         $("#available_list").tablesorter();
+        $('.package .release span[title]').tooltip_right();
     });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -97,9 +98,9 @@
                     </thead>
                     <tbody>
                     {% for package in host.available %}
-                        <tr><td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
+                        <tr class='package'><td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
                             <td>{{package.techno}}</td>
-                            <td>{{package.release}}
+                            <td class='release'><span title='{{package.package_url}}'>{{package.release}}</span>
                             {% if package.version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
                             </td>
                             <td>{{package.desc}}</td>
