@@ -520,17 +520,16 @@ def admin_packages_repositories(request):
     )
 
 def __get_packages(type, page_messages):
-    try:
-        packages_result = Packages.get_list()
-        installed_result = Packages.get_list_installed()
-        plugins_result = Plugins.get_all()
-        rest_info = Rest.get_info()
-    except BadStatusLine:
-        return render_to_response('error/BadStatusLine.html')
-    except ResourceNotAvailableException:
-        return render_to_response('error/ResourceNotAvailableException.html')
+    packages_result = Packages.get_list()
+    installed_result = Packages.get_list_installed()
+    plugins_result = Plugins.get_all()
+    rest_info = Rest.get_info()
 
-    dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
+    if hasattr(rest_info.rest[0].info, 'Domogik_release'):
+        dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
+    else:
+        page_messages.append({'status':'error', 'msg':'Domogik version number not available'})
+        dmg_version = None
     if (installed_result.status == 'OK'):
         for host in installed_result.package:
             installed = {}
@@ -569,7 +568,8 @@ def __get_packages(type, page_messages):
                         package.version_error = False
                     except IrrationalVersionError:
                         package.version_error = True
-                    package.upgrade_require = (package_min_version > dmg_version)
+                    if (dmg_version) :
+                        package.upgrade_require = (package_min_version > dmg_version)
     
                     if package.name not in installed:
                         package.install = True
@@ -586,7 +586,7 @@ def __get_packages(type, page_messages):
                             host.available.append(package)
     else :
         page_messages.append({'status':'error', 'msg':installed_result.description})
-    return installed_result.package
+    return installed_result.package, page_messages
 
 @admin_required
 def admin_packages_plugins(request):
@@ -598,8 +598,12 @@ def admin_packages_plugins(request):
 
     page_title = _("Plugins packages")
     page_messages = []
-
-    packages = __get_packages('plugin', page_messages)
+    try:
+        packages, page_messages = __get_packages('plugin', page_messages)
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
     
     return __go_to_page(
         request, 'admin/packages/plugins.html',
@@ -622,7 +626,12 @@ def admin_packages_hardwares(request):
     page_title = _("Hardwares packages")
     page_messages = []
 
-    packages = __get_packages('hardware', page_messages)
+    try:
+        packages, page_messages = __get_packages('hardware', page_messages)
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
 
     return __go_to_page(
         request, 'admin/packages/hardwares.html',
