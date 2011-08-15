@@ -48,7 +48,7 @@ from domogik.common.packagexml import PackageXml, PackageException
 import time
 import urllib
 import urlparse
-from socket import gethostname
+#from socket import gethostname
 import re
 import traceback
 import datetime
@@ -130,6 +130,7 @@ class ProcessRequest():
         self._put_filename = None
 
         # shorter access
+        self.get_sanitized_hostname = self.handler_params[0].get_sanitized_hostname
         self._rest_api_version = self.handler_params[0]._rest_api_version
         self.myxpl = self.handler_params[0].myxpl
         self.log = self.handler_params[0].log
@@ -357,7 +358,7 @@ class ProcessRequest():
 
         # Description and parameters
         info = {}
-        info["Host"] = gethostname().lower()
+        info["Host"] = self.get_sanitized_hostname()
         info["REST_API_release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
         info["Domogik_release"] = self.rest_status_release()
@@ -2479,11 +2480,13 @@ target=*
 
 
 
-    def _rest_plugin_detail(self, name, host = gethostname().lower()):
+    def _rest_plugin_detail(self, name, host = None):
         """ Send a xpl message to manager to get plugin list
             Display this list as json
             @param name : name of plugin
         """
+        if host == None:
+            host = self.get_sanitized_hostname()
         self.log.debug("Plugin : ask for plugin detail : %s on %s." % (name, host))
 
         ### Send xpl message to get detail
@@ -2608,12 +2611,15 @@ target=*
 
 
 
-    def _rest_plugin_start_stop(self, command, host = gethostname().lower(), plugin = None):
+    def _rest_plugin_start_stop(self, command, host = None, plugin = None):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
             @param plugin : name of plugin
         """
+        if host == None:
+            host = self.get_sanitized_hostname()
+
         self.log.debug("Plugin : ask for %s %s on %s " % (command, plugin, host))
 
         ### Send xpl message
@@ -3416,14 +3422,14 @@ target=*
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        mess.set_target("xpl-%s.%s" % (name, gethostname().lower()))
+        mess.set_target("xpl-%s.%s" % (name, self.get_sanitized_hostname()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
         Listener(self._cb_check_component_is_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
-                  'xplsource':"xpl-%s.%s" % (name, gethostname().lower())},
+                  'xplsource':"xpl-%s.%s" % (name, self.get_sanitized_hostname())},
                 cb_params = {'name' : name})
         max = PING_DURATION
         while max != 0:
@@ -3940,7 +3946,7 @@ target=*
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.package")
         message.add_data({"command" : "install"})
-        message.add_data({"host" : gethostname().lower()})
+        message.add_data({"host" : self.get_sanitized_hostname()})
         message.add_data({"package" : package})
         message.add_data({"release" : release})
         message.add_data({"part" : PKG_PART_RINOR})
@@ -3958,7 +3964,7 @@ target=*
                                            filter_data = {"command" : "install",
                                                           "package" : package,
                                                           "release" : release,
-                                                          "host" : gethostname().lower()},
+                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
             self.log.debug("Package install : no answer")
@@ -4044,7 +4050,7 @@ target=*
         """
         self.log.debug("Log : ask for tail action : %s > %s" % (host, filename))
 
-        if host == gethostname().lower():
+        if host == self.get_sanitized_hostname():
             subdir = ""
         else:
             subdir = host.lower()
@@ -4064,7 +4070,7 @@ target=*
         """
         self.log.debug("Log : ask for tail action : %s > %s" % (host, filename))
 
-        if host == gethostname().lower():
+        if host == self.get_sanitized_hostname():
             subdir = ""
         else:
             subdir = host.lower()
