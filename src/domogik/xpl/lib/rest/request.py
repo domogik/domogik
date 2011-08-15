@@ -415,7 +415,8 @@ class ProcessRequest():
         __import__("domogik")
         global_release = sys.modules["domogik"]
 
-        subp = Popen("hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'", shell=True, stdout=PIPE, stderr=PIPE)
+        domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
+        subp = Popen("cd %s ; hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
         (stdout, stderr) = subp.communicate()
         # if hg id has no error, we are using asource  repository
         if subp.returncode == 0:
