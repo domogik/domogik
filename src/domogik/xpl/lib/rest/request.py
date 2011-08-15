@@ -362,7 +362,8 @@ class ProcessRequest():
         info["REST_API_release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
         info["Domogik_release"] = self.rest_status_release()
-        info["ferrlings"] = "test"
+        info["ferrlings"] = self.rest_status_release()
+
 
         # Xml command files
         command = {}
