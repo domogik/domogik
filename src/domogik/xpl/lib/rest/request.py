@@ -728,8 +728,12 @@ target=*
         st_to = self.get_parameters("to")
         if st_to != None:
             st_to = float(st_to)
-        st_interval = self.get_parameters("interval").lower()
-        st_selector = self.get_parameters("selector").lower()
+        st_interval = self.get_parameters("interval")
+        if st_interval != None:
+            st_interval = st_interval.lower()
+        st_selector = self.get_parameters("selector")
+        if st_selector != None:
+            st_selector = st_selector.lower()
 
         if self.csv_export == False:
             json_data = JSonHelper("OK")
