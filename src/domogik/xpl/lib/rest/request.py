@@ -360,7 +360,8 @@ class ProcessRequest():
         info = {}
         info["REST_API_release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
-        info["Domogik_release"] = self.rest_status_release()
+        info["Domogik_release"] = self.rest_status_dmg_release()
+        info["Sources_release"] = self.rest_status_src_release()
         info["Host"] = self.get_sanitized_hostname()
 
 
@@ -409,21 +410,25 @@ class ProcessRequest():
         self.send_http_response_ok(json_data.get())
 
 
-    def rest_status_release(self):
-        """ Return Domogik release
+    def rest_status_src_release(self):
+        """ Return sources release
         """
-        __import__("domogik")
-        global_release = sys.modules["domogik"]
-
         domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
         subp = Popen("cd %s ; hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
         (stdout, stderr) = subp.communicate()
-        # if hg id has no error, we are using asource  repository
+        # if hg id has no error, we are using source  repository
         if subp.returncode == 0:
             return "%s" % (stdout)
-        # else, we use a packaged release
+        # else, we send dmg release
         else:
-            return global_release
+            return self.rest_status_dmg_release
+
+    def rest_status_dmg_release(self):
+        """ Return Domogik release
+        """
+        __import__("domogik")
+        global_release = sys.modules["domogik"].__version__
+        return global_release
 
 
 ######
