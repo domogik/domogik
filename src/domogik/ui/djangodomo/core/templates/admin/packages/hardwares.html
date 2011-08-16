@@ -35,7 +35,6 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:4});
-		$("#tabs").tabs();
         $.tablesorter.defaults.headers = { 1:{sorter: false},  2:{sorter: false} }; 
         $("#installed_list").tablesorter();
         $.tablesorter.defaults.headers = { 2:{sorter: false},  3:{sorter: false},  5:{sorter: false} }; 
@@ -50,70 +49,59 @@
 {% endblock %}
 
 {% block right %}
-    <div id="tabs">
-        <ul>
-            {% for host in hosts %}
-            <li><a href="#tabs-{{forloop.counter}}">{{host.host}}</a></li>
+    <section class="subsection">
+        <h2>{% trans "Installed" %}</h2>
+        <table id='installed_list' class='tablesorter'>
+            <thead>
+                <tr><th>{% trans "Name" %}</th>
+                    <th>{% trans "Release" %}</th>
+                    <th>{% trans "Action" %}</th></tr>
+            </thead>
+            <tbody>
+            {% for package in host.installed.packages %}
+                <tr><td>{{package.name}}</td>
+                    <td>{{package.release}}
+                    {% if package.installed_version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
+                    </td>
+                    <td class='actions'></td></tr>
             {% endfor %}
-        </ul>
-        {% for host in hosts %}
-        <div id="tabs-{{forloop.counter}}">
-            <section class="subsection">
-                <h2>{% trans "Installed" %}</h2>
-                <table id='installed_list' class='tablesorter'>
-                    <thead>
-                        <tr><th>{% trans "Name" %}</th>
-                            <th>{% trans "Release" %}</th>
-                            <th>{% trans "Action" %}</th></tr>
-                    </thead>
-                    <tbody>
-                    {% for package in host.installed.packages %}
-                        <tr><td>{{package.name}}</td>
-                            <td>{{package.release}}
-                            {% if package.installed_version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
-                            </td>
-                            <td class='actions'></td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-            <section class="subsection">
-                <h2>{% trans "Available" %}</h2>
-                <table id='available_list' class='tablesorter'>
-                    <thead>
-                        <tr><th>{% trans "Name" %}</th>
-                            <th>{% trans "Techno" %}</th>
-                            <th>{% trans "Release" %}</th>
-                            <th>{% trans "Description" %}</th>
-                            <th>{% trans "Author" %}</th>
-                            <th>{% trans "Action" %}</th></tr>
-                    </thead>
-                    <tbody>
-                    {% for package in host.available %}
-                        <tr class='package'><td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
-                            <td>{{package.techno}}</td>
-                            <td class='release'><span title='{{package.package_url}}'>{{package.release}}</span>
-                            {% if package.version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
-                            </td>
-                            <td>{{package.desc}}</td>
-                            <td>{{package.author}}</td>
-                            <td class='actions'>{% if package.upgrade_require and package.install %}
-                                Upgrade domogik, to version package["domogik-min-release"], in order to install
-                                {% else %}{% if package.upgrade_require and package.update %}
-                                    Upgrade domogik, to version package["domogik-min-release"], in order to update
-                                    {% else %}{% if package.install %}
-                                        <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Install Package</a>
-                                        {% else %}
-                                        <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Update Package</a>
-                                        {% endif %}
-                                    {% endif %}
+            </tbody>
+        </table>
+    </section>
+    <section class="subsection">
+        <h2>{% trans "Available" %}</h2>
+        <table id='available_list' class='tablesorter'>
+            <thead>
+                <tr><th>{% trans "Name" %}</th>
+                    <th>{% trans "Techno" %}</th>
+                    <th>{% trans "Release" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Author" %}</th>
+                    <th>{% trans "Action" %}</th></tr>
+            </thead>
+            <tbody>
+            {% for package in host.available %}
+                <tr class='package'><td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
+                    <td>{{package.techno}}</td>
+                    <td class='release'><span title='{{package.package_url}}'>{{package.release}}</span>
+                    {% if package.version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
+                    </td>
+                    <td>{{package.desc}}</td>
+                    <td>{{package.author}}</td>
+                    <td class='actions'>{% if package.upgrade_require and package.install %}
+                        Upgrade domogik, to version package["domogik-min-release"], in order to install
+                        {% else %}{% if package.upgrade_require and package.update %}
+                            Upgrade domogik, to version package["domogik-min-release"], in order to update
+                            {% else %}{% if package.install %}
+                                <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Install Package</a>
+                                {% else %}
+                                <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Update Package</a>
                                 {% endif %}
-                            </td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-        </div>
-        {% endfor %}
-    </div>
+                            {% endif %}
+                        {% endif %}
+                    </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
 {% endblock %}

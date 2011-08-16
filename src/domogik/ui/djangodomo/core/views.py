@@ -519,17 +519,10 @@ def admin_packages_repositories(request):
         repositories=repositories
     )
 
-def __get_packages(type, page_messages):
+def __get_packages(type, page_messages, dmg_version):
     packages_result = Packages.get_list()
     installed_result = Packages.get_list_installed()
     plugins_result = Plugins.get_all()
-    rest_info = Rest.get_info()
-
-    if hasattr(rest_info.rest[0].info, 'Domogik_release'):
-        dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
-    else:
-        page_messages.append({'status':'error', 'msg':'Domogik version number not available'})
-        dmg_version = None
     if (installed_result.status == 'OK'):
         for host in installed_result.package:
             installed = {}
@@ -599,7 +592,14 @@ def admin_packages_plugins(request):
     page_title = _("Plugins packages")
     page_messages = []
     try:
-        packages, page_messages = __get_packages('plugin', page_messages)
+        rest_info = Rest.get_info()
+        if hasattr(rest_info.rest[0].info, 'Domogik_release'):
+            dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
+        else:
+            page_messages.append({'status':'error', 'msg':'Domogik version number not available'})
+            dmg_version = None
+
+        packages, page_messages = __get_packages('plugin', page_messages, dmg_version)
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
@@ -627,12 +627,24 @@ def admin_packages_hardwares(request):
     page_messages = []
 
     try:
-        packages, page_messages = __get_packages('hardware', page_messages)
+        rest_info = Rest.get_info()
+        if hasattr(rest_info.rest[0].info, 'Domogik_release'):
+            dmg_version = NormalizedVersion(suggest_normalized_version(rest_info.rest[0].info.Domogik_release))
+        else:
+            page_messages.append({'status':'error', 'msg':'Domogik version number not available'})
+            dmg_version = None
+
+        packages, page_messages = __get_packages('hardware', page_messages, dmg_version)
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
+    host = None
+    for h in packages:
+        print "%s %", (h.host, rest_info.rest[0].info.Host)
+        if (h.host == rest_info.rest[0].info.Host) :
+            host = h
     return __go_to_page(
         request, 'admin/packages/hardwares.html',
         page_title,
@@ -640,7 +652,7 @@ def admin_packages_hardwares(request):
         nav1_admin = "selected",
         nav2_packages_hardwares = "selected",
         normal_mode=__is_normal_mode(request),
-        hosts=packages
+        host=host
     )
     
 @admin_required
