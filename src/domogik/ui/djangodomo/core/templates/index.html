@@ -24,14 +24,14 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-core.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-utils.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/ui-processing.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/dmg.widget-core.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/dmg.widget-utils.css" rel="stylesheet" type="text/css" />
 
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/ui-page-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/page-show.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/page-home.css" rel="stylesheet" type="text/css" />
     <link href="/widgets/dmg_4x3_colorPicker/farbtastic.css" rel="stylesheet" type="text/css" />
 	{% for widget in widgets %}
     <link href="/widgets/{{ widget }}/style.css" rel="stylesheet" type="text/css" />

@@ -24,8 +24,8 @@
 {% load text %}
 
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-packages.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/page-admin-packages.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
     <script type="text/javascript" src="/design/js/jquery.tablesorter.min.js"></script>

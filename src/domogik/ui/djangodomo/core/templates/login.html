@@ -21,10 +21,10 @@
 {% load i18n %}
 
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/layout.content.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-login.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.login.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/layout.content.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/page-login.css" rel="stylesheet" type="text/css" />
+    <link href="/design/css/dmg.login.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
     <script type="text/javascript" src="/design/js/dmg.login.js"></script>

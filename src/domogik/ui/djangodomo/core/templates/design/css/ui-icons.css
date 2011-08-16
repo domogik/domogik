@@ -484,24 +484,24 @@
 .icon64-action-processing_ffffff { background-image:url(../images/action/processing_ffffff_64.gif);}
 
 /* technology icons */
-.icon64-technology-x10 {background-image:url(../../../images/technologies/x10_64.png);}
-.icon32-technology-x10 {background-image:url(../../../images/technologies/x10_32.png);}
-.icon16-technology-x10 {background-image:url(../../../images/technologies/x10_16.png);}
-.icon64-technology-plcbus {background-image:url(../../../images/technologies/plcbus_64.png);}
-.icon32-technology-plcbus {background-image:url(../../../images/technologies/plcbus_32.png);}
-.icon16-technology-plcbus {background-image:url(../../../images/technologies/plcbus_16.png);}
-.icon64-technology-computer {background-image:url(../../../images/technologies/computer_64.png);}
-.icon32-technology-computer {background-image:url(../../../images/technologies/computer_32.png);}
-.icon16-technology-computer {background-image:url(../../../images/technologies/computer_16.png);}
-.icon64-technology-onewire {background-image:url(../../../images/technologies/onewire_64.png);}
-.icon32-technology-onewire {background-image:url(../../../images/technologies/onewire_32.png);}
-.icon16-technology-onewire {background-image:url(../../../images/technologies/onewire_16.png);}
-.icon64-technology-rfid {background-image:url(../../../images/technologies/rfid_64.png);}
-.icon32-technology-rfid {background-image:url(../../../images/technologies/rfid_32.png);}
-.icon16-technology-rfid {background-image:url(../../../images/technologies/rfid_16.png);}
-.icon64-technology-rfxcom {background-image:url(../../../images/technologies/rfxcom_64.png);}
-.icon32-technology-rfxcom {background-image:url(../../../images/technologies/rfxcom_32.png);}
-.icon16-technology-rfxcom {background-image:url(../../../images/technologies/rfxcom_16.png);}
+.icon64-technology-x10 {background-image:url(../images/technologies/x10_64.png);}
+.icon32-technology-x10 {background-image:url(../images/technologies/x10_32.png);}
+.icon16-technology-x10 {background-image:url(../images/technologies/x10_16.png);}
+.icon64-technology-plcbus {background-image:url(../images/technologies/plcbus_64.png);}
+.icon32-technology-plcbus {background-image:url(../images/technologies/plcbus_32.png);}
+.icon16-technology-plcbus {background-image:url(../images/technologies/plcbus_16.png);}
+.icon64-technology-computer {background-image:url(../images/technologies/computer_64.png);}
+.icon32-technology-computer {background-image:url(../images/technologies/computer_32.png);}
+.icon16-technology-computer {background-image:url(../images/technologies/computer_16.png);}
+.icon64-technology-onewire {background-image:url(../images/technologies/onewire_64.png);}
+.icon32-technology-onewire {background-image:url(../images/technologies/onewire_32.png);}
+.icon16-technology-onewire {background-image:url(../images/technologies/onewire_16.png);}
+.icon64-technology-rfid {background-image:url(../images/technologies/rfid_64.png);}
+.icon32-technology-rfid {background-image:url(../images/technologies/rfid_32.png);}
+.icon16-technology-rfid {background-image:url(../images/technologies/rfid_16.png);}
+.icon64-technology-rfxcom {background-image:url(../images/technologies/rfxcom_64.png);}
+.icon32-technology-rfxcom {background-image:url(../images/technologies/rfxcom_32.png);}
+.icon16-technology-rfxcom {background-image:url(../images/technologies/rfxcom_16.png);}
 
 /* Status icons */
 .icon64-status-true {background-image:url(../images/status/check_64.png);}
