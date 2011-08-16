@@ -4061,7 +4061,7 @@ target=*
             subdir = ""
         else:
             subdir = host.lower()
-        path = "%s/%s/%s.log" % (self.log_dir_path, subdir, filename) 
+        path = "%s/%s/%s.log" % (self.log_dir_path, subdir, os.path.basename(filename))
         try:
             result = Tail(path, int(number), int(offset)).get()
         except IOError:
@@ -4081,7 +4081,7 @@ target=*
             subdir = ""
         else:
             subdir = host.lower()
-        path = "%s/%s/%s.log" % (self.log_dir_path, subdir, filename) 
+        path = "%s/%s/%s.log" % (self.log_dir_path, subdir, os.path.basename(filename))
         try:
             result = Tail(path, int(number), int(offset)).get_html()
         except IOError:
