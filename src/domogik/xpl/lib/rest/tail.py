@@ -97,7 +97,7 @@ class Tail():
         return "%s%s%s%s%s%s%s%s%s" % (unknown,
                                  date, end_span,
                                  type, end_span,
-                                 text, result
+                                 text, result,
                                  end_span, end_div)
 
     def rblocks(self, f, blocksize=4096):
