@@ -33,6 +33,7 @@ Tail functionnality
 import os
 import itertools
 import re
+import urllib
 
 class Tail():
     """ Tail tool
@@ -54,11 +55,50 @@ class Tail():
     def get_html(self):
         """ return result in html
         """
-        html = re.sub('^.*INFO', 
-                            'XXXXXXX ',
-                            self.result)
-                            #flags = re.MULTILINE)
-        return html
+        result = self.result
+        unknown = "<div class='unknown'>"
+        error = "<div class='error'>"
+        warning = "<div class='warning'>"
+        info = "<div class='info'>"
+        debug = "<div class='debug'>"
+        date = "<span class='date'>"
+        type = "<span class='type'>"
+        text = "<span class='text'>"
+        end_span = "</span>"
+        end_div = "</div>"
+        result = re.sub(r'(.*)(ERROR)(.*)', 
+                            "%s%s%s%s\\1%s%s\\2%s%s\\3" % (end_span,
+                                                           end_div,
+                                                           error, date,
+                                                           end_span, type,
+                                                           end_span, text),
+                            result)
+        result = re.sub(r'(.*)(WARNING)(.*)', 
+                            "%s%s%s%s\\1%s%s\\2%s%s\\3" % (end_span,
+                                                           end_div,
+                                                           warning, date,
+                                                           end_span, type,
+                                                           end_span, text),
+                            result)
+        result = re.sub(r'(.*)(INFO)(.*)', 
+                            "%s%s%s%s\\1%s%s\\2%s%s\\3" % (end_span,
+                                                           end_div,
+                                                           info, date,
+                                                           end_span, type,
+                                                           end_span, text),
+                            result)
+        result = re.sub(r'(.*)(DEBUG)(.*)', 
+                            "%s%s%s%s\\1%s%s\\2%s%s\\3" % (end_span,
+                                                           end_div,
+                                                           debug, date,
+                                                           end_span, type,
+                                                           end_span, text),
+                            result)
+        return "%s%s%s%s%s%s%s%s%s" % (unknown,
+                                 date, end_span,
+                                 type, end_span,
+                                 text, result
+                                 end_span, end_div)
 
     def rblocks(self, f, blocksize=4096):
         """Read file as series of blocks from end of file to start.
