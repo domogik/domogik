@@ -1,3 +1,5 @@
+{% extends "layouts/global.html" %}
+
 {% comment %}
 # Copyright 2011 Domogik project
 
@@ -19,59 +21,21 @@
 {% endcomment %}
 {% load i18n %}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta http-equiv="Cache-Control" content="no-cache" />
-<meta http-equiv="Pragma" content="no-cache" />
-
-<link href="/design/common/css/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
-<link href="/design/common/css/jquery.jgrowl.css" rel="stylesheet" type="text/css"/>
-<link href="/design/common/css/ui.general.css" rel="stylesheet" type="text/css" />
+{% block global_css %}
 <link href="/design/common/css/layout.without_nav.css" rel="stylesheet" type="text/css" />
-<link href="/design/common/css/ui-icons.css" rel="stylesheet" type="text/css" />
-<link href="/design/common/css/dmg.notifications.css" rel="stylesheet" type="text/css" />
-{% block global_css %}{% endblock %}
-{% block css %}{% endblock %}
-<script type="text/javascript">  
-    var rest_url = "{{ rest_url }}"; 
-</script> 
-<script type="text/javascript" src="/design/common/js/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="/design/common/js/jquery-ui-1.8.6.custom.min.js"></script>
-<script type="text/javascript" src="/design/common/js/jquery.qtip-1.0.0-rc3.min.js"></script>
-<script type="text/javascript" src="/design/common/js/jquery.jgrowl_minimized.js"></script>
-<script type="text/javascript" src="/design/common/js/jquery.jsonp-2.1.2.min.js"></script>
-<script type="text/javascript" src="/design/common/js/jquery.ui.subclass.js"></script>
-<script type="text/javascript" src="/design/common/js/main.js"></script>
-<script type="text/javascript" src="/design/common/js/dmg.rest.js"></script>
-<script type="text/javascript" src="/design/common/js/dmg.notifications.js"></script>
-<script type="text/javascript" src="/design/common/js/dmg.browser.js"></script>
+{% endblock %}
 
-{% block global_js_include %}{% endblock %}
-{% block js_include %}{% endblock %}
-<script type="text/javascript">
-    // <![CDATA[
-    {% block js_script %}{% endblock %}
-    $(function(){
-        {% for message in page_messages %}
-        $.notification("{{message.status}}", "{{message.msg}}");
-        {% endfor %}
-    });
-    // ]]>
-</script>
-<title>{% block title %}Domogik{% endblock %}</title>
-</head>
-<body>
+{% block global_js_include %}
+{% endblock %}
+
+{% block body %}
     <div id="content-bgnd">
         <header id="mainheader">
-            <a href="/domogik" id="logo"><img src="/design/common/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
+            <a href="/domogik" id="logo"><img src="/design/common/images/logo_domogik.png" alt="Domogik logo" /></a>
             <div id="title">{% trans "Free home automation under Linux" %}</div>
         </header>
         <section id="mainsection">
             {% block content %}{% endblock %}
         </section>
-		<footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
 	</div>
-</body>
-</html>
+{% endblock %}

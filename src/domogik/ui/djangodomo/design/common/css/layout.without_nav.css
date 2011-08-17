@@ -11,13 +11,7 @@ body {
 
 header#mainheader {
     display:block;
-    border: #B9C248 1px solid;
-    background-color:#9BB528;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#BDCB2F), to(#9BB528));
-    background-image: -moz-linear-gradient(100% 80% 270deg, #BDCB2F, #9BB528);
     padding: 1em;
-	-moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
 	margin:-1px;
 }
 
