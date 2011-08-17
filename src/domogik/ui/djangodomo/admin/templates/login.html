@@ -1,0 +1,77 @@
+<!--
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+-->
+{% extends "layouts/base_without_nav.html" %}
+{% load i18n %}
+
+{% block css %}
+    <link href="/design/common/css/layout.content.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/page-login.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/dmg.login.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/dmg.login.js"></script>
+{% endblock %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block content %}
+        <h1>{% trans "Identification" %}</h1>
+        <form id="loginForm" method="POST" action="{% url login_view %}?next={{next}}">
+            <div class="columnleft">
+                <h2>1. {% trans "Select a user" %}</h2>
+                <div id='resetLogin' class='buttontext'>Change User</div>
+                <input id="loginname" name="login" type="text" />
+                <ul id="users">
+                    {% for account in account_list %}
+                        <li>
+                            <a href="#" id="id{{ account.login }}" onclick="chooseUser('id{{ account.login }}', '{{ account.login }}');">
+                                <img src="/design/common/images/userid.jpg" alt="" width="64" height="64" />{{ account.person.first_name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="columnright">
+                <h2>2. {% trans "Enter your code" %}</h2>
+                {% spaceless %}
+                <div id="code">
+                    <input id="logincode" name="password" type="password" value="" />
+                    <div id='submit' class="buttonok">Ok</div>
+                </div>
+                {% endspaceless %}
+                <ul id="digits">
+                    <li><a href="#" onclick="addDigit('0');">0</a></li>
+                    <li><a href="#" onclick="addDigit('1');">1</a></li>
+                    <li><a href="#" onclick="addDigit('2');">2</a></li>
+                    <li><a href="#" onclick="addDigit('3');">3</a></li>
+                    <li><a href="#" onclick="addDigit('4');">4</a></li>
+                    <li><a href="#" onclick="addDigit('5');">5</a></li>
+                    <li><a href="#" onclick="addDigit('6');">6</a></li>
+                    <li><a href="#" onclick="addDigit('7');">7</a></li>
+                    <li><a href="#" onclick="addDigit('8');">8</a></li>
+                    <li><a href="#" onclick="addDigit('9');">9</a></li>
+                    <li><a href="#" onclick="removeLastDigit();">C</a></li>
+                    <li><a href="#" onclick="resetDigit();">{% trans "Del." %}</a></li>
+                </ul>
+            </div>
+        </form>
+
+{% endblock %}

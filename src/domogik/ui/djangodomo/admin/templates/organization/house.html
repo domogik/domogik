@@ -1,0 +1,75 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block css %}
+    <link href="/design/common/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+        $("#housename").val($("<div/>").html('{{ house.name }}').text());
+        $("#generalsubmit").click(function(){
+            var name = $("#housename").val();
+            if (name) {
+                rest.get(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'name', 'value', name],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $("#housename").removeClass('icon16-status-false');
+                            $("#housename").addClass('icon16-status-true');
+                        } else {
+                            $("#housename").removeClass('icon16-status-true');
+                            $("#housename").addClass('icon16-status-false');
+                            $.notification('error', '{% trans "house name not updated" %} (' + data.description + ')');                                                                      
+                        }
+                    }
+                );            
+            } else {
+                $("#housename").removeClass('icon16-status-true');
+                $("#housename").addClass('icon16-status-false');  
+                $.notification('error', '{% trans "house name can not be empty" %}');                                                                      
+            }
+        });
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "House" %}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Configuration" %}</h2>
+        <form id='generalhouse'>
+            <label for='housename'>{% trans "House name" %}</label>
+            <input type='text' id='housename' name='housename' />
+        </form>
+        <p>
+            <button id='generalsubmit' class='button icon16-action-save'>{% trans "Save" %}</button>
+        </p>
+    </section>
+{% endblock %}

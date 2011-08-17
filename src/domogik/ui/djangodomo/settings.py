@@ -153,9 +153,14 @@ TEMPLATE_DIRS = (
     # "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/usr/local/share/domogik/ui/djangodomo/core/templates/',
-    '%s/templates/' % PROJECT_PATH,
-    '%s/core/templates/' % PROJECT_PATH,
+    '%s/home/templates/' % PROJECT_PATH,
+    '%s/view/templates/' % PROJECT_PATH,
+    '%s/admin/templates/' % PROJECT_PATH,
+    '%s/rinor/templates/' % PROJECT_PATH,
+    '/usr/local/share/domogik/ui/djangodomo/home/templates/',
+    '/usr/local/share/domogik/ui/djangodomo/view/templates/',
+    '/usr/local/share/domogik/ui/djangodomo/admin/templates/',
+    '/usr/local/share/domogik/ui/djangodomo/rinor/templates/',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -172,7 +177,10 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django_pipes', # Used to create Django's model using REST
-    'domogik.ui.djangodomo.core',
+    'domogik.ui.djangodomo.home',
+    'domogik.ui.djangodomo.view',
+    'domogik.ui.djangodomo.admin',
+    'domogik.ui.djangodomo.rinor',
 )
 
 
@@ -192,23 +200,24 @@ except ImportError:
 # List the availables widgets
 WIDGETS_LIST = []
 STATIC_WIDGETS_ROOT = None
-STATIC_DESIGN_ROOT = None 
+#STATIC_DESIGN_ROOT = None 
 
 #Only loads the widgets from the FIRST existing directory in TEMPLATE_DIRS
-for t_path in TEMPLATE_DIRS:
+for t_path in (PROJECT_PATH, '/usr/local/share/domogik/ui/djangodomo/',):
     if os.path.isdir(t_path):
+        STATIC_DESIGN_ROOT = '%s/design' % t_path
         w_path = os.path.join(t_path, "widgets")
+        STATIC_WIDGETS_ROOT = w_path
         if os.path.isdir(w_path):
             for file in os.listdir(w_path):
                 main = os.path.join(w_path, file, "main.js")
                 if os.path.isfile(main):
                     WIDGETS_LIST.append(file)
-        STATIC_WIDGETS_ROOT = w_path
-        STATIC_DESIGN_ROOT = '%s/design' % t_path
         break
 
+
 # For login Auth
-AUTHENTICATION_BACKENDS = ('domogik.ui.djangodomo.core.backends.RestBackend',)
-LOGIN_URL = '/domogik/login'
-LOGOUT_URL = '/domogik/logout'
-LOGIN_REDIRECT_URL = '/domogik'
+AUTHENTICATION_BACKENDS = ('domogik.ui.djangodomo.backends.RestBackend',)
+LOGIN_URL = '/admin/login'
+LOGOUT_URL = '/admin/logout'
+LOGIN_REDIRECT_URL = '/admin/'

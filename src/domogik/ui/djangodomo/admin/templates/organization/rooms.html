@@ -1,0 +1,320 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/common/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/dmg.dragdrop.js"></script>
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+
+        $("#tabs").tabs({'selected': {% get_position rooms_list id 0 %}}).domogik_tabs({
+            addTitle: "{% trans "Add new room" %}",
+            addId: "addDialogButton"
+        });
+        
+        /* Tooltips */
+        $('.buttonside[title], .add').tooltip_left();
+        $('#help_dragdrop').tooltip_content_right({            
+            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the room you want to organize.</li><li>Select the room you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a area in the context menu.</li><li>Press <kbd>Enter</kbd> to move the room to the area.</li></ul>'
+        });
+        
+        /* Drag & Drop */
+        
+        $(".targetdrop").droppable({
+            activeClass: 'state-active',
+            hoverClass: 'state-hover',
+            drop:function(event, ui) {
+                var self = this;
+                ui.draggable.dmg_draggable("option", "waitValidation", true);
+                var itemid = ui.draggable.attr('ddvalue');
+                var targetid = $(this).attr('ddvalue');
+                rest.get(['base', 'room', 'update', 'id', itemid, 'area_id', targetid],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            ui.draggable.dmg_draggable('end');
+                            
+                            // Remove Empty elment if exist
+                            $(".empty", self).remove();
+                            
+                            // Add Item element
+                            var item = ui.draggable.detach();
+                            item.removeAttr('style');
+                            $("ul", self).append(item);
+                            
+                            // Add empty element on empty lists
+                            $(".targetdrop ul").each(function(index){
+                                if ($("li", this).length  == 0) {
+                                    $(this).append("<li class='empty'>Empty</li>");
+                                }
+                            });
+                            return false;                            
+                        } else {
+                            ui.draggable.dmg_draggable('revert');
+                            $.notification('error', data.description);                                          
+                        }
+                    }
+                );
+
+            }
+        });
+        
+        $(".roomitem").dmg_draggable({
+            revert: 'invalid'
+        });
+        
+        /*
+        $('#dragdroprooms').dragdrop_basic({
+            zones : [{
+                zonesselector: ".targetdrop",
+                listselector: ".roomslist",
+                itemselector: ".roomitem",
+                labelselector: "legend",
+                dropcallback: function(self, element, target) {
+                    
+                }
+            }]
+        });*/
+
+        /* Dialogs */
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
+        });
+        
+        $('#roomdialog').dialog_form({
+            tips: "{% trans "Room name is required." %}",
+            tipsid: 'tipsRoom',
+            fields: [
+                {name : 'roomname', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'roomdescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}}
+            ]
+        });
+        
+        /* Add a function to create an room */
+        $('#roomdialog').dialog_form('addbutton', {
+            title: "{% trans "Create new room" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                // Submit form
+                rest.get(['base', 'room', 'add', 'name', values.roomname, 'description', values.roomdescription],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New room added" %} \'' + data.room[0].name + '\'', 'id': data.room[0].id});                                   
+                        } else {
+                            $.notification('error', '{% trans "Room not created" %} (' + data.description + ')');                                                                      
+                        }
+                    }
+                );
+            }
+        });
+    });
+
+{% endblock %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Rooms list" %}</h2>
+        <div id="tabs">
+            {% spaceless %}
+                <ul>
+                    {% for room in rooms_list %}
+                        <li><a id="tab{{ room.id }}" href="#element{{ room.id }}" class="icon16-room-{{ room.config.icon }}">{{ room.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endspaceless %}
+            {% for room in rooms_list %}
+            <div id="element{{ room.id }}" class="tabelement">
+                <script type="text/javascript">
+                    // <![CDATA[
+                    $(function(){
+                        /* Add a function to delete the current room */
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#del{{ room.id }}",
+                            name: "'{{ room.name }}'",
+                            onok: function() {
+                                // Delete ui configuration
+                                rest.get(['base', 'ui_config', 'del', 'by-reference', 'room', '{{ room.id }}'],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            // delete ui_config associations
+                                            rest.get(['base', 'feature_association', 'list', 'by-room', '{{ room.id }}'],
+                                                function(data) {
+                                                    var status = (data.status).toLowerCase();
+                                                    if (status == 'ok') {
+                                                        // Delete ui_config
+                                                        $.each(data.feature_association, function(index, association){
+                                                            rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                function(data) {
+                                                                    var status = (data.status).toLowerCase();
+                                                                    if (status == 'ok') {
+                                                                    } else {
+                                                                        $.notification('error', '{% trans "ui-config for Room features not deleted" %} (' + data.description + ')');                                                                      
+                                                                    }
+                                                                }
+                                                            );
+                                                        });
+                                                        
+                                                        // Delete associated features
+                                                        rest.get(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
+                                                            function(data) {
+                                                                var status = (data.status).toLowerCase();
+                                                                if (status == 'ok') {
+                                                                    // Delete room
+                                                                    rest.get(['base', 'room', 'del', '{{ room.id }}'],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "Room not deleted" %} (' + data.description + ')');                                                                      
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                } else {
+                                                                    $.notification('error', '{% trans "features associations for Room not deleted" %} (' + data.description + ')');                                                                      
+                                                                }
+                                                            }
+                                                        );
+                                                    } else {
+                                                        $.notification('error', '{% trans "Get features associations for Room" %} (' + data.description + ')');                                                                      
+                                                    }
+                                                }
+                                            );
+                                        } else {
+                                            $.notification('error', '{% trans "ui-config for Room not deleted" %} (' + data.description + ')');                                                                      
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                        
+                        $('#icon{{ room.id }}').editable_icon({
+                            type: "room",
+                            list: room_icons,
+                            icon: "{{ room.config.icon }}",
+                            validCallback: function(self, icon) {
+                                $('#icon{{ room.id }}').processing('start');
+                                rest.get(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'icon', 'value', icon],
+                                    function(data) {
+                                        $('#icon{{ room.id }}').processing('stop');
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            self.valid();
+                                            $("#tab{{ room.id }}").removeClass();
+                                            $("#tab{{ room.id }}").addClass("icon16-room-" + icon);
+
+                                            // association section
+                                            $("li.roomitem[ddvalue='{{ room.id }}']").attr('class', 'roomitem icon32-room-' + icon);
+                                        } else {
+                                            self.cancel();
+                                            $.notification('error', data.description);                                          
+                                        }
+                                    }
+                                )
+                            }
+                        });
+                        
+                        $( "#icon{{ room.id }}").processing();
+                        
+                        /* Add a function to update an room */
+                        $('#roomdialog').dialog_form('updbutton', {
+                            title: "{% trans "Update room" %} '{{ room.name }}'",
+                            button: "#update{{ room.id }}",
+                            values: {roomname : '{{ room.name }}', roomdescription : '{{ room.description }}'},
+                            onok: function(values) {
+                                // Submit form
+                                rest.get(['base', 'room', 'update', 'id', '{{ room.id }}', 'name', values.roomname, 'description', values.roomdescription],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
+                                        } else {
+                                            $.notification('error', '{% trans "Room not updated" %} (' + data.description + ')');                                                                      
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                        
+                    });
+                    // ]]>
+                </script>
+                <ul class="actions">
+                    <li><button id='del{{ room.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ room.name }}</span></button></li>
+                    <li><button id="update{{ room.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ room.name }}</span></button></li>
+                </ul>
+                <div class="content">
+                    <div id="icon{{ room.id }}"></div>
+                    <h2 id="zone{{ room.id }}h">{{ room.name }}</h2>
+                    <p>{{ room.description }}</p>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    <div id="roomdialog"></div>
+    <div id="delete_confirmation"></div>
+    
+    <section class="subsection" id="dragdroprooms">
+        <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
+        <fieldset class="targetdrop" ddvalue="" ddname="{% trans 'Unattributed rooms' %}">
+            <legend class='icon16-house-default'>{% trans "House" %}</legend>
+            <ul class="roomslist">
+                {% for room in house_rooms %}
+                <li class="roomitem icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                {% empty %}
+                <li class="empty">{% trans "Empty" %}</li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+        {% for area in areas_list %}
+        <fieldset class="targetdrop" ddvalue='{{ area.id }}' ddname='{{ area.name }}'>
+            <legend class="icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
+            <ul class="roomslist">
+                {% for room in area.room %}
+                <li class="roomitem icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                {% empty %}
+                <li class="empty">{% trans "Empty" %}</li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+        {% endfor %}
+    </section>
+{% endblock %}

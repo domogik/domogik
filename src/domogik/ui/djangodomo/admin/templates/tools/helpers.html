@@ -1,0 +1,119 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block css %}
+    <link href="/design/common/css/page-admin-tools.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
+        var send_id = null;
+        
+		function sendfunction() {
+            var commandline = $.trim($("#commandline").val());
+            if (commandline) {
+                $("#commandsubmit").hide();
+                $("#commandstop").show();
+                $("#commandline").attr('disabled', 'disabled');
+				var li = $("<li class='command'>" + commandline + "</li>");
+				var last = li;
+				li.focus();
+				$("#result").prepend(li);
+				$("#commandline").val('');
+				var commandarray = commandline.split(' ')
+				var command = ['helper'];
+				command = command.concat(commandarray);
+                send_id = rest.get(command,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        $("#commandsubmit").show();
+                        $("#commandstop").hide();
+                        $("#commandline").removeAttr('disabled');
+						if (status == 'ok') {
+							$.each(data.helper, function(index, value) {
+								var text = $("<div/>").text(value).html();
+								li = $("<li>" + text + "</li>");
+								last.after(li);
+								last = li;						
+							});
+						} else {
+							var text = $("<div/>").text(data.description).html()
+							li = $("<li>" + text + "</li>");
+							li.addClass('error');
+							last.after(li);
+							last = li;						
+						}
+                    }
+                );
+            }
+        }
+
+        function stopfunction() {
+            if (send_id) {
+                rest.cancel(send_id);
+                send_id = null;
+                $("#commandsubmit").show();
+                $("#commandstop").hide();
+                $("#commandline").val('');
+                $("#commandline").removeAttr('disabled');
+            }
+        }
+        $("#commandsubmit").click(sendfunction);
+        $("#commandstop").click(stopfunction).hide();
+		$("#commandline").keypress(function(e){
+			if (e.keyCode == 13) {
+		        sendfunction();
+			}
+			e.stopPropagation();
+		});
+		$("#resultclear").click(function(e){
+			$("#result").empty();
+			$("#commandline").val('');
+			$("#commandline").focus();
+		});
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "Home" %}</span></h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Helpers" %}</h2>
+            <label for='commandline'>{% trans "Command" %}</label>
+            <input type='text' id='commandline' name='commandline'>
+            <button id='commandsubmit' class='button icon16-action-down'>{% trans "Send" %}</button>
+            <button id='commandstop' class='button icon16-action-processing_ffffff'>{% trans "Stop" %}</button>
+            <button id='resultclear' class='button icon16-action-reset'>{% trans "clear" %}</button>
+		<ul id='result'>
+		</ul>
+    </section>
+{% endblock %}

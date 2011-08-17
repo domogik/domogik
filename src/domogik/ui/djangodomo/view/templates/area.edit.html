@@ -1,0 +1,111 @@
+{% extends "layouts/base_view.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+{% load i18n %}
+{% load text %}
+
+{% block js_script %}
+    $(function() {
+        $.initAssociations('area', {{ area.id }});
+    });
+{% endblock %}
+
+{% block css %}
+    <link href="/design/common/css/page-show-edit.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/dmg.dragdrop.js"></script>
+    <script type="text/javascript" src="/design/common/js/page-show-edit.js"></script>
+{% endblock %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block breadcrumb %}
+    {% if from_page == 'admin_page' %}
+        <li id='customize'><a href='{% url admin_organization_widgets_view %}' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
+    {% else %}
+        <li id='customize'><a href='{% url view_area_view area.id %}' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
+    {% endif %}
+        <li id='showmodels'><a href='#' class='icon16-action-models'>{% trans "Widgets" %}</a></li>
+{% endblock %}
+
+{% block contentleft %}
+    <section id="mainsection">
+        <div id='area_{{ area.id }}'>
+            <header>
+			    <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block contentright %}
+    <div id='dialog' title='Place yours widgets'>
+        <div id='devices'>
+            <ul>
+            {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
+            {% for usage in usages_list %}
+                <li><div class='usage icon16-usage-{{ usage.grouper.id }}'>{{usage.grouper.name }}</div>
+                    <ul>
+                        {% for device in usage.list %}
+                        <li><button id='showdevice{{device.id}}' deviceid='{{device.id}}' class='device icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.name }} ({{ device.address }})</button></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div id='features'>
+            {% for device in devices_list %}
+            <ul id="features{{device.id}}" class='features'>
+                {% for feature in device.features %}
+                <li><button id='showfeature{{feature.id}}' class='feature' featureid='{{ feature.id }}' devicename='{{device.name }}' featuremodel='{{ feature.device_feature_model.id }}' featurename='{{ feature.device_feature_model.name }}' featuretype='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</button></li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </div>
+        <div id='widgets'>
+            <ul>
+            </ul>
+        </div>
+        <div id='model'>
+            <dl>
+                <dt class='model'></dt>
+                <dd class='dragdrop'>({% trans "Drag & drop this wigdet to the page" %})</dd>
+                <dd class='model'></dd>
+                <dt class='version'>{% trans "Version" %}:</dt>
+                <dd class='version'></dd>
+                <dt class='author'>{% trans "Author" %}:</dt>
+                <dd class='author'></dd>
+                <dt class='description'>{% trans "Description" %}:</dt>
+                <dd class='description'></dd>
+                <dt class='screenshot'>{% trans "Screenshot" %}:</dt>
+                <dd class='screenshot'></dd>
+            </dl>
+        </div>
+    </div>
+{% endblock %}

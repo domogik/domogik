@@ -1,0 +1,107 @@
+{% extends "layouts/global.html" %}
+
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+{% load i18n %}
+
+{% block global_css %}
+<link href="/design/common/css/layout.with_mini_nav.css" rel="stylesheet" type="text/css" />
+<link href="/design/common/css/layout.content.css" rel="stylesheet" type="text/css" />
+<link href="/design/common/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="/design/common/css/dmg.login.css" rel="stylesheet" type="text/css" />
+
+    <link href="/design/common/css/page-show.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-breadcrumb.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-processing.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/dmg.widget-core.css" rel="stylesheet" type="text/css" />    
+    <link href="/design/common/css/dmg.widget-utils.css" rel="stylesheet" type="text/css" />    
+
+    <link href="/design/common/css/ui-page-block.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/widgets/dmg_4x3_colorPicker/farbtastic.css" rel="stylesheet" type="text/css" />
+    {% for widget in widgets %}
+        <link href="/widgets/{{ widget }}/style.css" rel="stylesheet" type="text/css" />
+    {% endfor %}
+
+{% endblock %}
+
+{% block global_js_include %}
+<script type="text/javascript" src="/design/common/js/dmg.icons.js"></script>
+<script type="text/javascript" src="/design/common/js/dmg.tooltips.js"></script>
+<script type="text/javascript" src="/design/common/js/dmg.login.js"></script>
+
+    <script type="text/javascript" src="/design/common/js/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/design/common/js/jquery.ba-dotimeout.min.js"></script>
+    <script type="text/javascript" src="/design/common/js/highcharts-2.1.4.js"></script>
+    <script type="text/javascript" src="/design/common/js/highcharts-exporting-2.1.4.js"></script>
+    <script type="text/javascript" src="/design/common/js/jquery.longclick-0.3.3.min.js"></script>
+    <script type="text/javascript" src="/design/common/js/dmg.processing.js"></script>
+    <script type="text/javascript" src="/design/common/js/dmg.widget-core.js"></script>
+    <script type="text/javascript" src="/design/common/js/dmg.widget-utils.js"></script>
+    <script type="text/javascript" src="/widgets/dmg_4x3_colorPicker/farbtastic.js"></script>
+    {% for widget in widgets %}
+    <script type="text/javascript" src="/widgets/{{ widget }}/main.js"></script>	
+    {% endfor %}
+    <script type="text/javascript">
+        // <![CDATA[
+        $(function(){ 
+            $("#mainbar").hide();
+            $("li#showmenu").click(function(){
+                $("#mainbar").toggle(500);        
+            });
+            $("#nav1 a").tooltip_bottom();
+        });
+        // ]]>
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="mainbar">
+        <nav id="nav1">
+            <ul>
+                <li><a href="{% url view_index_view %}" class="{{ nav1_show_class }}" title="{% trans "View, Control your house" %}">{% trans "Visualization" %}</a></li>
+                <li><a href="{% url admin_index_view %}" class="{% if not is_user_connected %}admin_required{% endif %}" title="{% trans "Configure, Manage" %}">{% trans "Administration" %}</a></li>
+				<li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" title="{% trans "External Wiki page" %}" target='_blank'>{% trans "Help" %}</a></li>
+                <li class="login">
+                    {% if not is_user_connected %}
+                        <a href="{% url login_view %}" title="{% trans "Identify yourself" %}">{% trans "Log in" %}</a>
+                    {% else %}
+                        <a href="{% url logout_view %}" title="{% trans "Disconnect" %} {{ request.session.user.first_name }}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+	<ul class="breadcrumb">
+        	<li><a href='{% url index_view %}' class='homepage'>&nbsp;<span class='offscreen'>Domogik homepage</span></a></li>
+            {% block breadcrumb %}{% endblock %}
+        	<li id='showmenu'><a href='#' class='icon16-action-menu'>Menu</a></li>
+    </ul>
+	<div id="content-bgnd">
+        <div class="columnleft">
+            {% block contentleft %}{% endblock %}
+        </div>
+        <div class="columnright">
+            {% block contentright %}{% endblock %}
+        </div>
+        <div class='clear'></div>
+	</div>
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/common/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion}
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+
+        $("#tabs").tabs({'selected':{% get_position areas_list id 0 %}}).domogik_tabs({
+            addTitle: "{% trans "Add new area" %}",
+            addId: "addDialogButton"
+        });
+
+        /* Tooltips */
+        $('.buttonside[title], .add').tooltip_left();
+        
+        /* Dialogs */
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
+        });
+        
+        $('#areadialog').dialog_form({
+            tips: "{% trans "Area name is required." %}",
+            tipsid: 'tipsArea',
+            fields: [
+                {name : 'areaname', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'areadescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}}
+            ]
+        });
+
+        /* Add a function to create an area */
+        $('#areadialog').dialog_form('addbutton', {
+            title: "{% trans "Create new area" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                // Submit form
+                rest.get(['base', 'area', 'add', 'name', values.areaname, 'description', values.areadescription],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New area added" %} \'' + data.area[0].name + '\'', 'id': data.area[0].id});
+                        } else {
+                            $.notification('error', '{% trans "Area not created" %} (' + data.description + ')');
+                        }
+                    }
+                );
+            }
+        });
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "Areas" %}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Areas list" %}</h2>
+        <div id="tabs">
+            {% spaceless %}
+            <ul>
+                {% for area in areas_list %}
+                    <li><a id="tab{{ area.id }}" href="#element{{ area.id }}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endspaceless %}
+            {% for area in areas_list %}
+            <div id="element{{ area.id }}" class="tabelement">
+                <script type="text/javascript">
+                    // <![CDATA[
+                    $(function(){
+                        /* Add a function to delete the current area */
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#del{{ area.id }}",
+                            name: "'{{ area.name }}'",
+                            onok: function() {
+                                rest.get(['base', 'ui_config', 'del', 'by-reference', 'area', '{{ area.id }}'],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            // delete ui_config associations
+                                            rest.get(['base', 'feature_association', 'list', 'by-area', '{{ area.id }}'],
+                                                function(data) {
+                                                    var status = (data.status).toLowerCase();
+                                                    if (status == 'ok') {
+                                                        // Delete ui_config
+                                                        $.each(data.feature_association, function(index, association){
+                                                            rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                function(data) {
+                                                                    var status = (data.status).toLowerCase();
+                                                                    if (status == 'ok') {
+                                                                    } else {
+                                                                        $.notification('error', '{% trans "ui-config for Area features not deleted" %} (' + data.description + ')');                                                                      
+                                                                    }
+                                                                }
+                                                            );
+                                                        });
+
+                                                        // Delete associated features
+                                                        rest.get(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
+                                                            function(data) {
+                                                                var status = (data.status).toLowerCase();
+                                                                if (status == 'ok') {
+                                                                    // Delete area
+                                                                    rest.get(['base', 'area', 'del', '{{ area.id }}'],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "Area not deleted" %} (' + data.description + ')');
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                } else {
+                                                                    $.notification('error', '{% trans "features associations for Area not deleted" %} (' + data.description + ')');                                                                      
+                                                                }
+                                                            }
+                                                        );
+                                                    } else {
+                                                        $.notification('error', '{% trans "Get features associations for Area" %} (' + data.description + ')');                                                                      
+                                                    }
+                                                }
+                                            );
+                                        } else {
+                                            $.notification('error', '{% trans "ui_config for Area not deleted" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                                                
+                        $('#icon{{ area.id }}').editable_icon({
+                            type: "area",
+                            list: area_icons,
+                            icon: '{{ area.config.icon }}',
+                            validCallback: function(self, icon) {
+                                $('#icon{{ area.id }}').processing('start');
+                                rest.get(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.id }}', 'key', 'icon', 'value', icon],
+                                    function(data) {
+                                        $('#icon{{ area.id }}').processing('stop');
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            self.valid();
+                                            $("#tab{{ area.id }}").removeClass();
+                                            $("#tab{{ area.id }}").addClass("icon16-area-" + icon);
+                                        } else {
+                                            self.cancel();
+                                            $.notification('error', '{% trans "Icon not updated" %} (' + data.description + ')');
+                                        }
+                                    }
+                                )
+                            }
+                        });
+                        
+                        $( "#icon{{ area.id }}").processing();
+                        
+                        /* Add a function to update an area */
+                        $('#areadialog').dialog_form('updbutton', {
+                            title: "{% trans "Update area" %} '{{ area.name }}'",
+                            button: "#update{{ area.id }}",
+                            values: {areaname : '{{ area.name }}', areadescription : '{{ area.description }}'},
+                            onok: function(values) {
+                                // Submit form
+                                rest.get(['base', 'area', 'update', 'id', '{{ area.id }}', 'name', values.areaname, 'description', values.areadescription],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Area" %} \'' + data.area[0].name + '\' {% trans "successfully updated" %}'});
+                                        } else {
+                                            $.notification('error', '{% trans "Area not updated" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                    });
+                    // ]]>
+                </script>
+                <ul class="actions">
+                    <li><button id='del{{ area.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ area.name }}</span></button></li>
+                    <li><button id="update{{ area.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
+                </ul>
+                <div class="content">
+                    <div id="icon{{ area.id }}"></div>
+                    <h2>{{ area.name }}</h2>
+                    <p>{{ area.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    <div id="areadialog"></div>
+    <div id="delete_confirmation"></div>
+{% endblock %}

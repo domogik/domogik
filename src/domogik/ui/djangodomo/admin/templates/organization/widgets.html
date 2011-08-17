@@ -1,0 +1,55 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block css %}
+    <link href="/design/common/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "Widgets" %}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Placement" %}</h2>
+        <p>{% trans "Select a Area/Room to place widgets" %}</p>
+        <ul class='customize_list'>
+            <li><a href="{% url show_edit_house_view 'admin_page' %}" class="icon16-house-default">{% trans "House" %}</a></li>
+        {% for area in areas_list %}
+            <li><a href="{% url show_edit_area_view area.id 'admin_page' %}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
+        {% endfor %}
+        {% for room in rooms_list %}
+            <li><a href="{% url show_edit_room_view room.id 'admin_page' %}" class="icon16-room-{{ room.config.icon }}">{{ room.name }}</a></li>
+        {% endfor %}
+        </ul>
+    </section>
+{% endblock %}

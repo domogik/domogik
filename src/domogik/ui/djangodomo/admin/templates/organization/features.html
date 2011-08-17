@@ -1,0 +1,201 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org> {% endcomment %}
+
+
+{% load i18n %}
+{% load commands %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/common/css/dmg.dragdrop-basic.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-tables.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/dmg.collabsible-list.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/fg.menu.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/dmg.dragdrop-complex.js"></script>
+    <script type="text/javascript" src="/design/common/js/fg.menu.js"></script>
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+        
+        $("#tabsfeatures").tabs();        
+        $("#tabsassociations").tabs();
+        
+        /* Drag & Drop */
+        $('#dragdropfeatures').dragdrop({
+            target: ".targetdrop",
+            choice: "legend",
+            featurename : ".name"
+        });
+
+        $('#dragdropfeatures').dragdrop('addzones', {
+            id: "#tabsfeatures",
+            drag: true,
+            drop: false,
+            droporigin : true,
+            keeptrace: true,
+            dropcallback: function(self, element, target) {
+                var subelement = element.split('-');
+                rest.get(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            self.valid();
+                        } else {
+                            self.cancel();
+                            $.notification('error', data.description);                                          
+                        }
+                    }
+                );
+            }            
+        });
+
+        $('#dragdropfeatures').dragdrop('addzones', {
+            id : "#tabsassociations",
+            drag: true,
+            drop: true,
+            droporigin : false,
+            keeptrace: false,
+            dropcallback: function(self, element, target) {
+                var subelement = element.split('-');
+                var subtarget = target.split('-');
+                rest.get(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            rest.get(['base', 'feature_association', 'add', 'device_id', subelement[1], 'feature_id', subelement[2], 'association_type', subtarget[0], 'association_id', subtarget[1]],
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        self.valid();
+                                    } else {
+                                        self.cancel();
+                                        $.notification('error', data.description);                                          
+                                    }
+                                }
+                            );
+                        } else {
+                            self.cancel();
+                            $.notification('error', data.description);                                          
+                        }
+                    }
+                );
+            }
+        });
+
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans page_title %}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <div id="dragdropfeatures"/>
+        <h2>{% trans "Features list" %}</h2>
+        <div id="tabsfeatures">
+            {% spaceless %}
+            <ul>
+                {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
+                {% for usage in usages_list %}
+                    {% if usage.grouper.id %}
+                        <li><a id="tab{{ usage.grouper.id }}" href="#element{{ usage.grouper.id }}" class="icon16-usage-{{ usage.grouper.id }}">{{ usage.grouper.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% endspaceless %}
+            {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
+            {% for usage in usages_list %}
+                <div id="element{{ usage.grouper.id }}" class="tabelement">
+                    {% for device in usage.list %}
+                        <fieldset class="targetdrop" value='device-{{ device.id }}'>
+                            <legend>{{ device.name }} ({{ device.address }})</legend>
+                            <ul class="draggables">
+                                {% for feature in device.feature %}
+                                    {% if feature.association %}
+                                        <li class='trace' id='feature-{{ device.id }}-{{ feature.id }}_trace'>{{ device.name }} {{ feature.name }}<br/>associated with {{ feature.association.place_type }} {{ feature.association.place_id }}</li>
+                                    {% else %}
+                                        <li class="draggable icon32-usage-{{ usage.grouper.id }} unknown" value="feature-{{ device.id }}-{{ feature.id }}" zoneorigin='target_device-{{ device.id }}'><div id="feature_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name|truncchar:10 }}<br/>{{ feature.name|truncchar:10 }}</span></div></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </fieldset>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        <h2>{% trans "Associations" %}</h2>
+        <div id="tabsassociations">
+            {% spaceless %}
+            <ul>
+                <li><a id="tabhouse" href="#elementhouse" class="">{% trans "House" %}</a></li>
+                <li><a id="tabareas" href="#elementareas" class="">{% trans "Areas" %}</a></li>
+                <li><a id="tabrooms" href="#elementrooms" class="">{% trans "Rooms" %}</a></li>
+            </ul>
+            {% endspaceless %}
+            <div id="elementhouse" class="tabelement">
+                <fieldset class="targetdrop" value='house-0'>
+                    <legend class="choice icon16-house-default">{{ house.name }}</legend>
+                    <ul class="draggables">
+                        {% for association in house_features_associations %}
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                                <div id="feature_{{ association.device_id }}_{{ association.device_feature_id }}">
+                                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_feature.name|truncchar:10 }}</span></div></li>
+                        {% endfor %}
+                    </ul>
+                </fieldset>
+            </div>
+            <div id="elementareas" class="tabelement">
+                {% for area in areas_list %}
+                <fieldset class="targetdrop" value='area-{{ area.id }}'>
+                    <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
+                    <ul class="draggables">
+                        {% for association in area.feature_association %}
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                                <div id="feature_{{ association.device_id }}_{{ association.device_feature_id }}">
+                                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_feature.name|truncchar:10 }}</span></div></li>
+                        {% endfor %}
+                    </ul>
+                </fieldset>
+                {% endfor %}
+            </div>
+            <div id="elementrooms" class="tabelement">
+                {% for room in rooms_list %}
+                <fieldset class="targetdrop" value='room-{{ room.id }}'>
+                    <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
+                    <ul class="draggables">
+                        {% for association in room.feature_association %}
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                                <div id="feature_{{ association.device_id }}_{{ association.device_feature_id }}">
+                                    <span class='name'>{{ association.device.name }}<br/>{{ association.device_feature.name }}</span></div></li>
+                        {% endfor %}
+                    </ul>
+                </fieldset>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

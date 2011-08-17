@@ -1,0 +1,271 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org> {% endcomment %}
+
+
+{% load i18n %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/common/css/ui-tables.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/fg.menu.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/fg.menu.js"></script>
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+        
+        {% regroup devices_list|dictsort:"device_usage_id" by device_usage as grouped_usages_list %}
+        $("#tabs").tabs({'selected': {% get_position grouped_usages_list id 1 %}}).domogik_tabs({
+            addTitle: "{% trans "Add new device" %}",
+            addId: "addDialogButton"
+        });
+        
+        /* Tooltips */
+        $('.add').tooltip_left();
+        $('.buttonicon[title]').tooltip_top();
+        
+        /* Dialogs */
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
+        });
+
+        $('#adddevicedialog').dialog_form({
+            tips: "{% trans "All fields in bold are required." %}",
+            tipsid: 'tipsAddDevice',
+            fields: [
+                {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'adddevicetype', type:'selectipod', label:'Feature', required: true, option: {
+                    initial: {value:'0', label:'Choose a device feature', icone:''},
+                    options: [
+                        {% regroup types_list|dictsort:"device_technology_id" by device_technology as technologies_list %}
+                        {% for technology in technologies_list %}
+                            { label: '{{ technology.grouper.name }}', icon:'icon16-technology-{{ technology.grouper.id }}',
+                                submenu: [
+                                {% for type in technology.list %}
+                                    {value:'{{ type.id }}', label:'{{ type.name }}'},
+                                {% endfor %}
+                                ]
+                            },
+                        {% endfor %}
+                    ]
+                }},
+                {name : 'adddeviceusage', type:'selectipod', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose a usage', icone:''},
+                    options: [
+                    {% for usage in usages_list %}
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}', icon: 'icon16-usage-{{ usage.id }}'},
+                    {% endfor %}
+                    ]
+                }},
+                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
+                {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}}
+            ]
+        });
+
+        $('#upddevicedialog').dialog_form({
+            tips: "{% trans "All fields in bold are required." %}",
+            tipsid: 'tipsUpdDevice',
+            fields: [
+                {name : 'upddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'upddeviceusage', type:'selectipod', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose a usage', icone:''},
+                    options: [
+                    {% for usage in usages_list %}
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}', icon: 'icon16-usage-{{ usage.id }}'},
+                    {% endfor %}
+                    ]
+                }},
+                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
+                {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}}
+            ]
+        });
+        
+        /* Add a function to create a device */
+        $('#adddevicedialog').dialog_form('addbutton', {
+            title: "{% trans "Add new device" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                var self = this;
+                // Submit form
+                rest.get(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\'', 'id': data.device[0].device_usage_id});                                   
+                        } else {
+                            $.notification('error', '{% trans "device not created" %} (' + data.description + ')');                                                                      
+                        }
+                    }
+                );
+            }
+        });
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "Devices" %}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Devices list" %}</h2>
+        <div id="tabs">
+            {% spaceless %}
+            <ul>
+                {% regroup devices_list|dictsort:"device_usage_id" by device_usage as grouped_usages_list %}
+                {% for usage in grouped_usages_list %}
+                    {% if usage.grouper.id %}
+                        <li><a id="tab{{ usage.grouper.id }}" href="#element{{ usage.grouper.id }}" class="icon16-usage-{{ usage.grouper.id }}">{{ usage.grouper.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% endspaceless %}
+            {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
+            {% for usage in usages_list %}
+                {% if usage.grouper.id %}
+                    <div id="element{{ usage.grouper.id }}" class="tabelement">
+                {% endif %}
+                <table class='simple'>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Description" %}</th>
+                        <th>{% trans "Address" %}</th>
+                        <th>{% trans "Reference" %}</th>
+                        <th>{% trans "Type" %}</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for device in usage.list %}
+                    <script type="text/javascript">
+                        // <![CDATA[
+                        $(function(){
+                            /* Add a function to delete the current device */
+                            $('#delete_confirmation').dialog_confirmation('addbutton', {
+                                button: "#del{{ device.id }}",
+                                name: "'{{ device.name }}'",
+                                onok: function() {
+                                    rest.get(['base', 'feature', 'list', 'by-device_id', '{{ device.id }}'],
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.each(data.feature, function(index, feature){
+                                                    rest.get(['base', 'feature_association', 'list', 'by-feature', feature.id],
+                                                        function(data) {
+                                                            var status = (data.status).toLowerCase();
+                                                            if (status == 'ok') {
+                                                                $.each(data.feature_association, function(index, association){
+                                                                    rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "ui-config for features not deleted" %} (' + data.description + ')');                                                                      
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                });
+                                                                rest.get(['base', 'feature_association', 'del', 'feature_id', feature.id],
+                                                                    function(data) {
+                                                                        var status = (data.status).toLowerCase();
+                                                                        if (status == 'ok') {
+                                                                        } else {
+                                                                            $.notification('error', '{% trans "feature_association not deleted" %} (' + data.description + ')');                                                                      
+                                                                        }
+                                                                    }
+                                                                );
+                                                            } else {
+                                                                $.notification('error', '{% trans "Can not get feature_association list for feature" %} (' + data.description + ')');
+                                                            }
+                                                        }
+                                                    );
+                                                });
+                                                
+                                            } else {
+                                                $.notification('error', '{% trans "Can not get feature list for device" %} (' + data.description + ')');
+                                            }
+                                        }
+                                    );
+
+                                    rest.get(['base', 'device', 'del', '{{ device.id }}'],
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Device" %}\'' + data.device[0].name + '\' {% trans "successfully deleted" %}'});
+                                            } else {
+                                                $.notification('error', '{% trans "Device not deleted" %} (' + data.description + ')');
+                                            }
+                                        }
+                                    );
+                                }
+                            });
+                            
+                            /* Add a function to create a device */
+                            $('#upddevicedialog').dialog_form('updbutton', {
+                                title: "{% trans 'Update new device' %}",
+                                button: "#update{{ device.id }}",
+                                values: {upddevicename : '{{ device.name }}', upddevicedescription : '{{ device.description }}', upddeviceaddress : '{{ device.address }}', upddevicereference : '{{ device.reference }}', upddeviceusage : '{{ device.device_usage_id }}'},
+                                onok: function(values) {
+                                    // Submit form
+                                    rest.get(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'usage_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Device" %} \'' + data.device[0].name + '\' {% trans "successfully updated" %}'});
+                                            } else {
+                                                $.notification('error', '{% trans "Device not updated" %} (' + data.description + ')');
+                                            }
+                                        }
+                                    );
+                                }
+                            });
+
+                        });
+                        // ]]>
+                    </script>
+                    <tr class="{% cycle 'odd' 'even' %}">
+                        <td>{{ device.name }}</td>
+                        <td>{{ device.description }}</td>
+                        <td>{{ device.address }}</td>
+                        <td>{{ device.reference }}</td>
+                        <td><div class='icon16-text icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.device_type.device_technology_id }}.{{ device.device_type.name }}</td>
+                        <td>
+                            <ul class="actions">
+                                <li><button id='del{{ device.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ device.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ device.name }}</span></button></li>
+                                <li><button id="update{{ device.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ device.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ device.name }}</span></button></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    <div id="adddevicedialog"></div>
+    <div id="upddevicedialog"></div>
+    <div id="delete_confirmation"></div>
+{% endblock %}

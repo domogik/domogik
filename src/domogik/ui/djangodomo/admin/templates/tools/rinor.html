@@ -1,0 +1,206 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/common/css/page-admin-tools.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-tables.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/jquery.tablesorter.min.js"></script>
+{% endblock %}
+{% block js_script %}
+
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
+        $.tablesorter.defaults.headers = { 3:{sorter: false} }; 
+        $("#domogik_request_list").tablesorter();
+        $("#devices_request_list").tablesorter();
+        $("#force_refresh").click(function() {refresh()});
+        refresh();
+        $('body').everyTime('10s', function() {refresh()});
+        function refresh() {
+            rest.get([],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        // Queues
+                        $.each(data.rest[0].queue, function(index, value) {
+                            var avalue = value.split('/');
+                            var valuewidth = avalue[0] * 100 / avalue[1];
+                            $("#" + index + " .indicator .valuetxt")
+                                .text(value);
+                            $("#" + index + " .indicator .valuegraph")
+                                .width(valuewidth);
+                        });
+                        
+                        // Events {{rest.event.Number_of_requests}} / {{rest.event.Max_size_for_request_queues}}
+                        $("#request_number").empty();
+                        $("#request_number").append("<li><span class='label'>Number of Domogik requests: </span>" + data.rest[0].event.Number_of_Domogik_events_requests + "</li>")
+                        $("#request_number").append("<li><span class='label'>Number of devices requests: </span>" + data.rest[0].event.Number_of_devices_events_requests + "</li>")
+                        $("#request_number").append("<li><span class='label'>Max size for request queues: </span>" + data.rest[0].event.Max_size_for_request_queues + "</li>")
+                        
+                        // Domogik Request list
+                        $('table#domogik_request_list tbody').empty();
+                        $.each(data.rest[0].event.Domogik_requests, function(index, request) {
+                            var creation_date = new Date(request.creation_date * 1000);
+                            var last_access_date = new Date(request.last_access_date * 1000);
+                            $('table#domogik_request_list tbody').append("<tr><td>"
+                                + index + "</td><td>"
+                                + creation_date.toLocaleString() + "</td><td>"
+                                + last_access_date.toLocaleString() + "</td><td>"
+                                + request.queue_size + "</td><td>"
+                                + request.instance.unfinished_tasks + "</td><td>"
+                                + request.instance.maxsize + "</td></tr>");
+                        });
+                        $('#domogik_request_list').trigger("update");
+                        $('#domogik_request_list').trigger("sorton", [[[0,0]]]);
+
+                        // Devices Request list
+                        $('table#devices_request_list tbody').empty();
+                        $.each(data.rest[0].event.Devices_requests, function(index, request) {
+                            var creation_date = new Date(request.creation_date * 1000);
+                            var last_access_date = new Date(request.last_access_date * 1000);
+                            $('table#devices_request_list tbody').append("<tr><td>"
+                                + index + "</td><td>"
+                                + creation_date.toLocaleString() + "</td><td>"
+                                + last_access_date.toLocaleString() + "</td><td>"
+                                + request.device_id_list + "</td><td>"
+                                + request.queue_size + "</td><td>"
+                                + request.instance.unfinished_tasks + "</td><td>"
+                                + request.instance.maxsize + "</td></tr>");
+                        });
+                        $('#devices_request_list').trigger("update");
+                        $('#devices_request_list').trigger("sorton", [[[0,0]]]);
+                    } else {
+                        /* Error retreving plugin config */
+                        $.notification(data.status, data.description);
+                    }
+                }
+            );
+        }
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "RINOR" %}</span></h1>
+    <button id='force_refresh' class='button icon16-action-reset'>{% trans "Force Refresh" %}</button>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Informations" %}</h2>
+        <ul class='infos'>
+            {% for key, value in rinor.info.items %}
+            <li><span class='label'>{{key}}: </span>{{value}}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section class="subsection">
+        <h2>{% trans "Statistics" %}</h2>
+        <ul class='stats'>
+            <li><span class='label'>XML files last load: </span>{{rinor.stats.XML_files_last_load}}</li>
+            <li><span class='label'>XML files loaded: </span>
+                <ul id='fileslist'>
+                {% for file in rinor.stats.XML_files_loaded %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><span class='label'>XML files KO: </span>
+                <ul id='fileslist'>
+                {% for file in rinor.stats.XML_files_KO %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </section>
+    <section class="subsection">
+        <h2>{% trans "Commands" %}</h2>
+        <ul class='commands'>
+            <li><span class='label'>XML files last load: </span>{{rinor.command.XML_files_last_load}}</li>
+            <li><span class='label'>XML files loaded: </span>
+                <ul id='fileslist'>
+                {% for file in rinor.command.XML_files_loaded %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><span class='label'>XML files KO: </span>
+                <ul id='fileslist'>
+                {% for file in rinor.command.XML_files_KO %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </section>
+    <section class="subsection">
+        <h2>{% trans "Queues status" %}</h2>
+        <ul class='queues'>
+            {% for key, value in rinor.queue.items %}
+            <li id="{{key}}"><span class='label'>{{key|switchUnderscore}}: </span><div class='indicator'><div class='valuegraph'></div><div class='valuetxtframe'><div class='valuetxt'></div></div></div></li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section class="subsection">
+        <h2>{% trans "Events status" %}</h2>
+        <h3>{% trans "Requests" %}</h3>
+        <ul id='request_number'></ul>
+        <br />
+        <table id='domogik_request_list' class='tablesorter' cellspacing="1">
+            <thead>
+                <tr>
+                    <th scope='col'>ID</th>
+                    <th scope='col'>Created</th>
+                    <th scope='col'>Last access</th>
+                    <th scope='col'>Queue size</th>                    
+                    <th scope='col'>Instance Unfinished Tasks</th>
+                    <th scope='col'>Instance Max size</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <br />
+        <table id='devices_request_list' class='tablesorter' cellspacing="1">
+            <thead>
+                <tr>
+                    <th scope='col'>ID</th>
+                    <th scope='col'>Created</th>
+                    <th scope='col'>Last access</th>
+                    <th scope='col'>Device id list</th>
+                    <th scope='col'>Queue size</th>                    
+                    <th scope='col'>Instance Unfinished Tasks</th>
+                    <th scope='col'>Instance Max size</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </section>
+{% endblock %}

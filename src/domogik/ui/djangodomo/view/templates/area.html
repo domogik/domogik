@@ -1,0 +1,76 @@
+{% extends "layouts/base_view.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+{% load i18n %}
+{% load text %}
+
+{% block js_script %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
+    $(function() {
+        $.initAssociations('area', {{ area.id }}, device_usages, device_types);
+    });
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/page-show.js"></script>
+{% endblock %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block breadcrumb %}
+	<li><a href='{% url view_house_view %}' class='house'>{{ house.name|default:'House' }}</a></li>
+	<li id='customize'><a href='{% url edit_area_view area.id 'page' %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans 'Customize' %}</a></li>
+{% endblock %}
+
+{% block contentleft %}
+    <section id="mainsection">
+        <div id='area_{{ area.id }}'>
+            <header>
+			    <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block contentright %}
+    {% for room in rooms_list %}
+	    <div id='room_{{ room.id }}' class='block subsection'>
+            <h2 class='header icon64-room-{{ room.config.icon }}'>
+                <a href='{% url view_room_view room.id %}' class="ident">
+                    <span class="title">{{ room.name }}</span>
+                    <br />
+                    <span class="subtitle">{{ room.description }}</span>
+                </a>
+            </h2>
+            <div class="maininfo" role='list'></div>
+            <div class='mainactions' role='list'></div>
+        </div>
+	{% endfor %}
+{% endblock %}

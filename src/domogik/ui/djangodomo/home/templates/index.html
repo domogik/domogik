@@ -1,0 +1,117 @@
+{% extends "layouts/base_home.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+{% load i18n %}
+{% load text %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+{% block css %}
+    <link href="/design/common/css/ui-processing.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/dmg.widget-core.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/dmg.widget-utils.css" rel="stylesheet" type="text/css" />
+
+    <link href="/design/common/css/ui-page-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/page-show.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/page-home.css" rel="stylesheet" type="text/css" />
+    <link href="/widgets/dmg_4x3_colorPicker/farbtastic.css" rel="stylesheet" type="text/css" />
+	{% for widget in widgets %}
+    <link href="/widgets/{{ widget }}/style.css" rel="stylesheet" type="text/css" />
+    {% endfor %}
+
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/design/common/js/jquery.ba-dotimeout.min.js"></script>
+    <script type="text/javascript" src="/design/common/js/highcharts-2.1.4.js"></script>
+    <script type="text/javascript" src="/design/common/js/highcharts-exporting-2.1.4.js"></script>
+    <script type="text/javascript" src="/design/common/js/jquery.longclick-0.3.3.min.js"></script>
+    <script type="text/javascript" src="/design/common/js/dmg.processing.js"></script>
+    <script type="text/javascript" src="/design/common/js/dmg.widget-core.js"></script>
+    <script type="text/javascript" src="/design/common/js/dmg.widget-utils.js"></script>
+    <script type="text/javascript" src="/design/common/js/page-show.js"></script>
+    <script type="text/javascript" src="/widgets/dmg_4x3_colorPicker/farbtastic.js"></script>
+
+	{% for widget in widgets %}
+    <script type="text/javascript" src="/widgets/{{ widget }}/main.js"></script>	
+    {% endfor %}
+{% endblock %}
+{% block js_script %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
+
+    $(function() {
+        $.initAssociations('house', 0, device_usages, device_types);
+
+        {% if not rooms_list and not areas_list %}
+		$.notification("info", "{% trans "No areas or rooms configured yet" %}");
+        {% endif %}
+    });
+{% endblock %}
+{% block content %}
+    <div class="columnleft">
+        <section id="mainsection">
+			<div id='house_0'>
+				<header>
+					<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+					<div class="maininfo" role='list'></div>
+				</header>
+				<div class='actions'>
+					<div class='mainactions' role='list'></div>
+					<div class='otheractions' role='list'></div>
+				</div>
+			</div>
+        </section>
+    </div>
+    <div class="columnright">
+    <ul class='areaslist'>
+		{% if rooms_list %}
+		<li class='areaitem'>
+			<ul class='houselist'>
+				{% for room in rooms_list %}
+					<li class='roomitem'>
+						<a href='{% url view_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+							<span class="title">{{ room.name }}</span>
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
+	    {% endif %}
+    {% for area in areas_list %}
+		<li class='areaitem'>
+			<a href='{% url view_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
+				<span class="title">{{ area.name }}</span>
+			</a>
+			<ul class='roomslist'>
+				{% for room in area.room %}
+					<li class='roomitem'>
+						<a href='{% url view_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+							<span class="title">{{ room.name }}</span>
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
+    {% endfor %}
+    </div>
+    <div class='clear'></div>
+{% endblock %}

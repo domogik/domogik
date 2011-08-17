@@ -1,0 +1,127 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% load text %}
+
+{% block css %}
+    <link href="/design/common/css/page-admin-packages.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-tables.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+    <script type="text/javascript" src="/design/common/js/jquery.tablesorter.min.js"></script>
+{% endblock %}
+{% block js_script %}
+
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:4});
+		$("#tabs").tabs();
+        $.tablesorter.defaults.headers = { 1:{sorter: false},  2:{sorter: false} }; 
+        $("#installed_list").tablesorter();
+        $.tablesorter.defaults.headers = { 2:{sorter: false},  3:{sorter: false},  5:{sorter: false} }; 
+        $("#available_list").tablesorter();
+        $('.package .release span[title]').tooltip_right();
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{{page_title}}</span></h1>
+{% endblock %}
+
+{% block right %}
+    <div id="tabs">
+        <ul>
+            {% for host in hosts %}
+            <li><a href="#tabs-{{forloop.counter}}">{{host.host}}</a></li>
+            {% endfor %}
+        </ul>
+        {% for host in hosts %}
+        <div id="tabs-{{forloop.counter}}">
+            <section class="subsection">
+                <h2>{% trans "Installed" %}</h2>
+                <table id='installed_list' class='tablesorter'>
+                    <thead>
+                        <tr><th>{% trans "Name" %}</th>
+                            <th>{% trans "Release" %}</th>
+                            <th>{% trans "Action" %}</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for package in host.installed.packages %}
+                        <tr><td>{{package.name}}</td>
+                            <td>{{package.release}}
+                            {% if package.installed_version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
+                            </td>
+                            <td class='actions'>{% if package.enabled %}
+                                    <a class='buttontext' href='{% url admin_packages_enable_view host.host package.name 'disable' %}'>Disable</a>
+                                {% else %}
+                                    <a class='buttontext' href='{% url admin_packages_enable_view host.host package.name 'enable' %}'>Enable</a>
+                                {% endif %}
+                                {% if package.update_available %}
+                                    <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.update_available %}'>Update Package</a>
+                                {% endif %}
+                            </td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <section class="subsection">
+                <h2>{% trans "Available" %}</h2>
+                <table id='available_list' class='tablesorter'>
+                    <thead>
+                        <tr><th>{% trans "Name" %}</th>
+                            <th>{% trans "Techno" %}</th>
+                            <th>{% trans "Release" %}</th>
+                            <th>{% trans "Description" %}</th>
+                            <th>{% trans "Author" %}</th>
+                            <th>{% trans "Action" %}</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for package in host.available %}
+                        <tr class='package'><td><a href='{{package.doc}}' target='_blank'>{{package.name}}</a></td>
+                            <td>{{package.techno}}</td>
+                            <td class='release'><span title='{{package.package_url}}'>{{package.release}}</span>
+                            {% if package.version_error %}<div class='error'>Incorrect version number</div>{% endif %}                         
+                            </td>
+                            <td>{{package.desc}}</td>
+                            <td>{{package.author}}</td>
+                            <td class='actions'>{% if package.upgrade_require and package.install %}
+                                Upgrade domogik, to version package["domogik-min-release"], in order to install
+                                {% else %}{% if package.upgrade_require and package.update %}
+                                    Upgrade domogik, to version package["domogik-min-release"], in order to update
+                                    {% else %}{% if package.install %}
+                                        <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Install Package</a>
+                                        {% else %}
+                                        <a class='buttontext' href='{% url admin_packages_install_view host.host package.fullname package.release %}'>Update Package</a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

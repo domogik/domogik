@@ -42,7 +42,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^domogik/', include('domogik.ui.djangodomo.core.urls')),
+    (r'^$', include('domogik.ui.djangodomo.home.urls')),
+    (r'^view/', include('domogik.ui.djangodomo.view.urls')),
+    (r'^admin/', include('domogik.ui.djangodomo.admin.urls')),
+    (r'^rinor/', include('domogik.ui.djangodomo.rinor.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:

@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+-->
+{% extends "layouts/base_without_nav.html" %}
+{% load i18n %}
+
+{% block css %}
+    <link href="/design/common/css/page-error.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block title %}{% trans "Error" %}{% endblock %}
+
+{% block content %}
+    <div id="error">
+        <h1>{% trans "Interface Server not responding" %}</h1>
+        <p>Check if the server is running</p>
+        <p><a href="http://wiki.domogik.org/tiki-index.php?page=Install">How to start the server? (Domogik Wiki)</a></p>
+    </div>
+{% endblock %}

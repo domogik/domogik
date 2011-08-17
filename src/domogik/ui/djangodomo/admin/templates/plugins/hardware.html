@@ -1,0 +1,151 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Fritz <fritz.smh@gmail.com>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block js_script %}
+$(function(){
+    // Accordion
+	$("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:2});
+    
+    {% ifequal plugin.status "ON" %}
+        setStatus(true);
+    {% else %}
+        setStatus(false);
+    {% endifequal %}
+    
+    /* Get the list of configuration items */
+    rest.get(['plugin', 'detail', '{{ plugin.host }}', '{{ plugin.name }}'],
+        function(data) {
+            var status = (data.status).toLowerCase();
+            if (status == 'ok') {
+                // Check configuration items
+                var num_items = data.plugin[0].configuration.length;
+                var options = data.plugin[0].configuration.sort(sortOptions);
+                $.each(options, function(index, item) {
+                    var iid = item.id;
+                    var ikey = item.key;
+                    var ivalue = item.value;
+                    $("#configuration_items tbody").append("<tr id='" + item.id + "'></tr>");
+                    var tr = $("tr#"+iid);
+                    tr.append("<td>" +  ikey + "</td>");
+                    tr.append("<td>" + ivalue + "</td>");
+                });
+                
+            } else {
+                /* Error to get plugin default config */
+                $.notification(data.status, data.description);
+            }
+        }
+    );
+
+    function setStatus(status) {
+        if (status) { //active
+            strstatus = 'up';
+            textstatus = '{% trans "Running" %}';
+            btstrstatus = 'inactive';
+            bttextstatus = '{% trans "Stop plugin" %}';
+            btaction = 'stop';
+            btokmsg = '{% trans "Plugin successfully stopped" %}';
+            bterrormsg = '{% trans "Plugin not stopped" %}';
+        } else { //inactive
+            strstatus = 'down';
+            textstatus = '{% trans "Stopped" %}';
+            btstrstatus = 'active';
+            bttextstatus = '{% trans "Start plugin" %}';
+            btaction = 'start';
+            btokmsg = '{% trans "Plugin successfully started" %}';
+            bterrormsg = '{% trans "Plugin not started" %}';
+        }
+        btstatus = !status;
+
+        $("#iconstatus").empty()
+            .attr('class', "icon16-text-right icon16-status-software-" + strstatus)
+            .html("<span class='label'>{% trans "Status" %}:</span><span class='offscreen'>" + textstatus + "</span>");
+/*
+        $("#buttonstatus").attr('class', 'button icon16-status-' + btstrstatus)
+            .text(bttextstatus)
+            .unbind('click')
+            .click(function() {
+            $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
+            rest.get(['plugin', btaction, '{{ plugin.host }}', '{{ plugin.name }}'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');
+                    if (status == 'ok') {
+                        $.notification('ok', btokmsg);
+                        getPluginsList();
+                        setStatus(btstatus);
+                    } else {
+                        $.notification('error', bterrormsg + ' (' + data.description + ')');
+                        setStatus(!btstatus);
+                    }
+                }
+            );
+        });
+*/
+
+    }
+});
+
+function sortOptions(a, b){
+    return (a.id - b.id) //causes an array to be sorted numerically and ascending
+}
+{% endblock %}
+{% block css %}
+    <link href="/design/common/css/page-admin-plugins.css" rel="stylesheet" type="text/css" />
+    <link href="/design/common/css/ui-tables.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident icon64-plugin-{{ plugin.name }}">
+        <span class="title">{% trans "Plugin" %} '{{ plugin.name }}'</span>
+        <br />
+        <span class="subtitle">{{ plugin.description }}</span>
+    </h1>
+    <ul class='infos'>
+        <li><span class='label'>{% trans "Version" %}:</span> {{ plugin.version }}</li>
+        <li><span class='label'>{% trans "Documentation" %}:</span> <a href='{{ plugin.documentation }}'>Wiki</a></li>
+        <li><span class='label'>{% trans "Host" %}:</span> {{ plugin.host }}</li>
+        {% ifnotequal plugin.name "rest" %}
+            <li><span class='label'>{% trans "Technology" %}:</span> {{ plugin.technology }}</li>
+            <li><div id='iconstatus'></div></li>
+        {% endifnotequal %}
+    </ul>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Configuration" %}</h2>
+        <div id='configuration'>
+            <table id='configuration_items' class='simple'>
+                <thead>
+                    <tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Value" %}</th></tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

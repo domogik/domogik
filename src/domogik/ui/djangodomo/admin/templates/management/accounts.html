@@ -1,0 +1,300 @@
+{% extends "layouts/base_admin.html" %}
+{% comment %}
+# Copyright 2011 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:1});
+        
+        /* Tooltips */
+        $('.buttonside[title]').tooltip_top();
+        
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
+        });
+        
+        $('#addaccountdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsAddAccount',
+            fields: [
+                {name : 'adduserlogin', type:'text', label:'Login', required: true, option: {min: 1, max: 80}},
+                {name : 'adduserfirstname', type:'text', label:'Firstname', required: true, option: {min: 1, max: 80}},
+                {name : 'adduserlastname', type:'text', label:'Lastname', required: true, option: {min: 1, max: 80}},
+                {name : 'adduserpassword', type:'numericpassword', label:'Access code (numeric only)', required: true, option: {min: 1, max: 80}},
+                {name : 'adduseradmin', type:'checkbox', label:'Is admin', required: true}
+            ]
+        });
+        
+        $('#persondialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsAddPerson',
+            fields: [
+                {name : 'personfirstname', type:'text', label:'Firstname', required: true, option: {min: 1, max: 80}},
+                {name : 'personlastname', type:'text', label:'Lastname', required: true, option: {min: 1, max: 80}}
+            ]
+        });
+        
+        /* Add a function to create an account */
+        $('#addaccountdialog').dialog_form('addbutton', {
+            title: "{% trans "Create new account" %}",
+            button: "#addaccountButton",
+            onok: function(values) {
+                // Submit form
+                rest.get(['account', 'user', 'add', 'login', values.adduserlogin, 'password', values.adduserpassword, 'is_admin', values.adduseradmin, 'skin_used', '', 'first_name', values.adduserfirstname, 'last_name', values.adduserlastname],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New account added" %} \'' + data.account[0].login + '\''});
+                        } else {
+                            $.notification('error', '{% trans "Account not created" %} (' + data.description + ')');
+                        }
+                    }
+                );
+            }
+        });
+        
+        /* Add a function to create an person */
+        $('#persondialog').dialog_form('addbutton', {
+            title: "{% trans "Create new person" %}",
+            button: "#addpersonButton",
+            onok: function(values) {
+                // Submit form
+                rest.get(['account', 'person', 'add', 'first_name', values.personfirstname, 'last_name', values.personlastname],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New person added" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\''});
+                        } else {
+                            $.notification('error', '{% trans "Person not created" %} (' + data.description + ')');
+                        }
+                    }
+                );
+            }
+        });
+        
+        $('#updaccountdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsUpdateAccount',
+            fields: [
+                {name : 'upduserlogin', type:'text', label:'Login', required: true, option: {min: 1, max: 80}},
+                {name : 'upduserfirstname', type:'text', label:'Firstname', required: true, option: {min: 1, max: 80}},
+                {name : 'upduserlastname', type:'text', label:'Lastname', required: true, option: {min: 1, max: 80}},
+                {name : 'upduseradmin', type:'checkbox', label:'Is admin', required: true}
+            ]
+        });
+        
+        $('#passwordaccountdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsPasswordAccount',
+            fields: [
+                {name : 'oldpassword', type:'numericpassword', label:'Old access code', required: true, option: {min: 1, max: 80}},
+                {name : 'newpassword', type:'numericpassword', label:'New access code (numeric only)', required: true, option: {min: 1, max: 80}},
+            ]
+        });
+    });
+{% endblock %}
+{% block css %}
+    <link href="/design/common/css/ui-tables.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident">
+        <span class="title">{% trans page_title %}</span>
+    </h1>
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Accounts list" %}</h2>
+        <ul class="actions">
+            <li><button id="addaccountButton" class="icon16-action-add button">{% trans "Add new account" %}</button></li>
+        </ul>
+        <table class='simple'>
+            <tr>
+                <th scope='col'>{% trans "Login" %}</th>
+                <th scope='col'>{% trans "Real name" %}</th>
+                <th scope='col'>{% trans "Admin" %}</th>
+                <th scope='col'>{% trans "Skin" %}</th>
+                <th scope='col'>Actions</th>
+            </tr>
+            {% for account in accounts_list %}
+                <script type="text/javascript">
+                // <![CDATA[
+                    $(function(){
+                        /* Add a onclick function to delete the current account */
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#delaccount{{ account.id }}",
+                            name: "'{{ account.login }}'",
+                            onok: function() {
+                                rest.get(['account', 'user', 'del', '{{ account.id }}'],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
+                                        } else {
+                                            $.notification('error', '{% trans "Account not deleted" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+
+                        /* Add a function to update an account */
+                        $('#updaccountdialog').dialog_form('updbutton', {
+                            title: "{% trans "Update account" %} '{{ account.login }}'",
+                            button: "#updateaccount{{ account.id }}",
+                            values: {upduserlogin : "{{ account.login }}", upduserfirstname: "{{account.person.first_name}}", upduserlastname: "{{account.person.last_name}}", upduseradmin : {{ account.is_admin|lower }} },
+                            onok: function(values) {
+                                // Submit form
+                                rest.get(['account', 'user', 'update', 'id', '{{ account.id }}', 'login', values.upduserlogin, 'is_admin', values.upduseradmin, 'skin_used', '', 'first_name', values.upduserfirstname, 'last_name', values.upduserlastname],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
+                                        } else {
+                                            $.notification('error', '{% trans "Account not updated" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+
+                        /* Add a function to update an password */
+                        $('#passwordaccountdialog').dialog_form('addbutton', {
+                            title: "{% trans "Change password for" %} '{{ account.login }}'",
+                            button: "#password{{ account.id }}",
+                            onok: function(values) {
+                                // Submit form
+                                rest.get(['account', 'user', 'password', 'id', '{{ account.id }}', 'old', values.oldpassword, 'new', values.newpassword],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
+                                        } else {
+                                            $.notification('error', '{% trans "Password not updated" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                    });
+                // ]]>
+                </script>
+                <tr>
+                    <td>{{ account.login }}</td>
+                    <td>{{ account.person.first_name }} {{ account.person.last_name }}</td>
+                    <td><div class='icon16-text icon16-status-{{ account.is_admin|lower }}'><span class='offscreen'>{{ account.is_admin }}</span></div></td>
+                    <td>{{ account.skin_used }}</td>
+                    <td>
+                        <ul class="actions">
+                            <li><button id='delaccount{{ account.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Delete" %} {{ account.login }}</span></button></li>
+                            <li><button id="updateaccount{{ account.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Modify" %} {{ account.login }}</span></button></li>
+                            <li><button id="password{{ account.id }}" class="icon16-action-password buttonicon" title="{% trans "Change password for" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Change password for" %} {{ account.login }}</span></button></li>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <section class="subsection">
+        <h2>{% trans "Peoples list" %}</h2>
+        <ul class="actions">
+            <li><button id="addpersonButton" class="icon16-action-add button">{% trans "Add new person" %}</button></li>
+        </ul>
+        <table class='simple'>
+            <tr>
+                <th scope='col'>{% trans "First name" %}</th>
+                <th scope='col'>{% trans "Last name" %}</th>
+                <th scope='col'>{% trans "Birthday" %}</th>
+                <th scope='col'>Actions</th>
+            </tr>
+            {% for person in people_list %}
+                <script type="text/javascript">
+                // <![CDATA[
+                    $(function(){
+                        /* Add a onclick function to delete the current person */
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#delperson{{ person.id }}",
+                            name: "'{{ person.first_name }} {{ person.last_name }}'",
+                            onok: function() {
+                                rest.get(['account', 'person', 'del', '{{ person.id }}'],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Person" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' {% trans "successfully deleted" %}'});
+                                        } else {
+                                            $.notification('error', '{% trans "Person not deleted" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                        
+                        /* Add a function to update a person */
+                        $('#persondialog').dialog_form('updbutton', {
+                            title: "{% trans "Update person" %} '{{ person.first_name }} {{ person.last_name }}'",
+                            button: "#updateperson{{ person.id }}",
+                            values: {personfirstname : '{{ person.first_name }}', personlastname : '{{ person.last_name }}' },
+                            onok: function(values) {
+                                // Submit form
+                                rest.get(['account', 'person', 'update', 'id', '{{ person.id }}', 'first_name', values.personfirstname, 'last_name', values.personlastname],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Person " %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' updated'});
+                                        } else {
+                                            $.notification('error', '{% trans "Person not updated" %} (' + data.description + ')');
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                    });
+                // ]]>
+                </script>
+                <tr>
+                    <td>{{ person.first_name }}</td>
+                    <td>{{ person.last_name }}</td>
+                    <td>{{ person.birthday }}</td>
+                    <td>
+                        <ul class="actions">
+                            <li><button id='delperson{{ person.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ person.first_name }} {{ person.last_name }}'"><span class='offscreen'>{% trans "Delete" %} {{ person.first_name }} {{ person.last_name }}</span></button></li>
+                            <li><button id="updateperson{{ person.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ person.first_name }} {{ person.last_name }}'"><span class='offscreen'>{% trans "Modify" %} {{ person.first_name }} {{ person.last_name }}</span></button></li>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <div id="addaccountdialog"></div>
+    <div id="updaccountdialog"></div>
+    <div id="persondialog"></div>
+    <div id="passwordaccountdialog"></div>
+    <div id="delete_confirmation"></div>
+{% endblock %}
