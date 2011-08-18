@@ -1,0 +1,54 @@
+{% extends "base_with_mini_nav.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author :  Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
+{% endcomment %}
+
+{% load i18n %}
+
+{% block global_css %}
+    <link rel="icon shortcut" type="image/png" href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/images/device_usage/todo_16.png" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-breadcrumb.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-core.css" rel="stylesheet" type="text/css" />    
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-utils.css" rel="stylesheet" type="text/css" />    
+
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-block.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/widgets/dmg_4x3_colorPicker/farbtastic.css" rel="stylesheet" type="text/css" />
+	{% for widget in widgets %}
+    <link href="/widgets/{{ widget }}/style.css" rel="stylesheet" type="text/css" />
+    {% endfor %}
+{% endblock %}
+
+{% block global_js_include %}
+    <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/design/js/jquery.ba-dotimeout.min.js"></script>
+    <script type="text/javascript" src="/design/js/highcharts-2.1.4.js"></script>
+    <script type="text/javascript" src="/design/js/highcharts-exporting-2.1.4.js"></script>
+    <script type="text/javascript" src="/design/js/jquery.longclick-0.3.3.min.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.processing.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.widget-core.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.widget-utils.js"></script>
+    <script type="text/javascript" src="/widgets/dmg_4x3_colorPicker/farbtastic.js"></script>
+    {% for widget in widgets %}
+    <script type="text/javascript" src="/widgets/{{ widget }}/main.js"></script>	
+    {% endfor %}
+{% endblock %}
