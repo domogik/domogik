@@ -7,7 +7,7 @@ class RestBackend(object):
         try:
             result_auth = Accounts.auth(username, password)
         except ResourceNotAvailableException:
-            return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+            return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
         if result_auth.status == 'OK':
             user = User(username=username, password='in database')
@@ -25,5 +25,5 @@ class RestBackend(object):
         try:
             result_auth = Accounts.get_user(user_id)
         except ResourceNotAvailableException:
-            return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+            return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
         return None

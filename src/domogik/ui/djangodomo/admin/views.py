@@ -102,7 +102,7 @@ def login(request):
         except BadStatusLine:
             HttpResponseRedirect("/rinor/error/BadStatusLine")
         except ResourceNotAvailableException:
-            return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+            return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
         return __go_to_page(
             request, 'login.html',
             page_title,
@@ -129,7 +129,7 @@ def auth(request, next):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     if result_auth.status == 'OK':
         account = result_auth.account[0]
         request.session['user'] = {
@@ -202,7 +202,7 @@ def __is_normal_mode(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     return mode.mode[0] == "normal"
     
 @admin_required
@@ -221,7 +221,7 @@ def admin_management_accounts(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     return __go_to_page(
         request, 'management/accounts.html',
         page_title,
@@ -253,7 +253,7 @@ def admin_organization_devices(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return __go_to_page(
         request, 'organization/devices.html',
@@ -292,7 +292,7 @@ def admin_organization_rooms(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return __go_to_page(
         request, 'organization/rooms.html',
@@ -325,7 +325,7 @@ def admin_organization_areas(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return __go_to_page(
         request, 'organization/areas.html',
@@ -354,7 +354,7 @@ def admin_organization_house(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return __go_to_page(
         request, 'organization/house.html',
@@ -385,7 +385,7 @@ def admin_organization_widgets(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return __go_to_page(
         request, 'organization/widgets.html',
@@ -414,7 +414,7 @@ def admin_plugins_plugin(request, plugin_host, plugin_name, plugin_type):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     if plugin_type == "plugin":
         page_title = _("Plugin")
         return __go_to_page(
@@ -476,7 +476,7 @@ def admin_tools_rinor(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     return __go_to_page(
         request, 'tools/rinor.html',
         page_title,
@@ -508,7 +508,7 @@ def admin_packages_repositories(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     return __go_to_page(
         request, 'packages/repositories.html',
         page_title,
@@ -603,7 +603,7 @@ def admin_packages_plugins(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
     
     return __go_to_page(
         request, 'packages/plugins.html',
@@ -638,7 +638,7 @@ def admin_packages_hardwares(request):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     host = None
     for h in packages:
@@ -667,7 +667,7 @@ def admin_packages_install(request, package_host, package_name, package_release)
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return redirect('admin_packages_plugins_view')
 
@@ -683,6 +683,6 @@ def admin_packages_enable(request, package_host, package_name, action):
     except BadStatusLine:
         HttpResponseRedirect("/rinor/error/BadStatusLine")
     except ResourceNotAvailableException:
-        return HttpResponseRedirect("/rinor/ResourceNotAvailable")
+        return HttpResponseRedirect("/rinor/error/ResourceNotAvailable")
 
     return redirect('admin_packages_plugins_view')
