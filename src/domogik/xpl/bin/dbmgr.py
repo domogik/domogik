@@ -50,7 +50,7 @@ from domogik.common.database import DbHelper
 class DBConnector(XplPlugin):
     '''
     Manage the connection between database and the xPL stuff
-    Should be the *only* object with StatsManager to access the database in the core side
+    Should be the *only* object along with the StatsManager to access to the database on the core side
     '''
 
     def __init__(self):
@@ -204,8 +204,6 @@ class DBConnector(XplPlugin):
         except:
             self.log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
             return "None"
-
-
 
     def _set_config(self, technology, hostname, key, value):
         '''
