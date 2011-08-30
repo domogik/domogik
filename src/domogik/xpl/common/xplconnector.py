@@ -262,8 +262,8 @@ remote-ip=%s
                             self.p.log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
                         except XplMessageError, e:
                             self.p.log.warning("Malformated message received, ignoring it.")
-                            print e
-                            print mess
+                            self.p.log.warning(e)
+                            self.p.log.warning(mess)
         self.p.log.info("self._should_stop set, leave.")
 
     def add_listener(self, listener):
