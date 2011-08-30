@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="tschacon">
+    <schema name="ts.arctech">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="command"/>
+            </mapping>
+        </xpltype>
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="command"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

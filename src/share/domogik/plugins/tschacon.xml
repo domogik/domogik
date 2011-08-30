@@ -1,0 +1,55 @@
+<package type="plugin">
+  <name>tschacon</name>
+  <technology>tschacon</technology>
+  <description>Manage Chacon / Di-O devices through TellStick</description>
+  <detail>Chacon are RF devices</detail>
+  <version>0.1.0</version>
+  <documentation>to do</documentation>
+  <author>Julien Garet</author>
+  <author-email>julien at garet dot info</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/tschacon.xml"/>
+    <file path="src/share/domogik/stats/tschacon/arctech.tschacon.xml"/>
+    <file path="src/share/domogik/url2xpl/tschacon/on.xml"/>
+    <file path="src/share/domogik/url2xpl/tschacon/off.xml"/>
+    <file path="src/domogik/xpl/bin/tschacon.py"/>
+    <file path="src/domogik/xpl/lib/TellStick.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>tschacon</id>
+      <name>tsChacon</name>
+      <description>Manage Chacon/Di-O RF Devices through TellStick</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>tschacon.switch</id>
+          <name>Switch</name>
+          <description>Switch</description>
+          <device_technology_id>tschacon</device_technology_id>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>tschacon.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>tschacon.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
