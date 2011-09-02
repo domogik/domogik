@@ -1181,7 +1181,9 @@ class DeviceStatsTestCase(GenericTestCase):
         ym_list = [(r[0], r[1]) for r in results['values']]
         now = datetime.datetime.now()
         assert (2010, 6) in ym_list
-        assert (now.year, now.month) in ym_list
+        # We use the previous month because it may happen that no data have been inserted for the current month
+        # Especially when we are at the beginning of the month
+        assert (now.year, int(now.month - 1)) in ym_list
 
         # Years
         expected_results = {
