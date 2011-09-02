@@ -98,7 +98,7 @@ setup(
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 
                       'django < 1.3',
-                      'sqlalchemy == 0.6.5', 
+                      'sqlalchemy == 0.7.2', 
                       'simplejson >= 1.9.2',
                       'pyOpenSSL == 0.10', 
                       'httplib2 >= 0.6.0', 
