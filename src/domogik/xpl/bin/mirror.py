@@ -81,8 +81,6 @@ class MirrorManager(XplPlugin):
 
     def send_xpl(self, device, type, current):
         """ Send xPL message on network
-            @param action : action done on mir:ror device
-            @param ztamp_id : id of ztamp put on mir:ror
         """
         print "device:%s, type:%s, current:%s" % (device, type, current)
         msg = XplMessage()
