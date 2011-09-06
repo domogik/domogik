@@ -100,7 +100,7 @@ setup(
                       'django < 1.3',
                       'sqlalchemy == 0.7.2', 
                       'simplejson >= 1.9.2',
-                      'pyOpenSSL == 0.10', 
+                      'pyOpenSSL >= 0.10', 
                       'httplib2 >= 0.6.0', 
                       'django-pipes >= 0.2', 
                       'psutil >= 0.1.3', 
