@@ -58,11 +58,12 @@ def list_all_files(path, dst):
     d.append((dst, files))
     return d
 
-arch = platform.architecture()
+arch = platform.machine()
 hub = {
-    '64bit' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
-    '32bit' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
-    'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub'
+    'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
+    'i686' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
+    'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub',
+    'armv5tel' : 'src/domogik/xpl/tools/arm/xPL_Hub'
 }
 
 d_files = [
