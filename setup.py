@@ -73,8 +73,8 @@ d_files = [
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
 
-if arch[0] in hub.keys():
-    d_files.append(('/usr/local/bin/', [hub[arch[0]]]))
+if arch in hub.keys():
+    d_files.append(('/usr/local/bin/', [hub[arch]]))
 else:
     print "*************** WARNING ***************"
     print "* Can't find an xPL Hub for your arch *"
