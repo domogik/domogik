@@ -83,7 +83,7 @@ class Mirror:
         try:
             self._mirror.close()
         except:
-            error = "Error while closing modem device"
+            error = "Error while closing Mir:ror device"
             raise MirrorException(error)
 
     def listen(self, stop):
