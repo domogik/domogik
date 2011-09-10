@@ -123,6 +123,12 @@ def create_database_from_scratch(url):
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     print("Done.")
 
+"""Initialize the databases
+
+@param create_prod_db : true if the production DB should be (re)created
+@param create_test_db : true if the test DB should be (re)created
+
+"""
 def initialize_db(create_prod_db, create_test_db):
     print("Using database", __db.get_db_type())
     url = __db.get_url_connection_string()
