@@ -146,6 +146,12 @@ def initialize_db(create_prod_db, create_test_db):
         return
     create_database_from_scratch(url)
 
+"""Upgrade process of the database
+
+"""
+def upgrade_db():
+    print("Upgrading the database...")
+
 def usage():
     print("Usage : db_installer [-t, --test] [-p, --prod]")
     print("-t or --test : database for unit tests will created (default is False)")
@@ -172,3 +178,4 @@ if __name__ == "__main__":
         usage()
         sys.exit(2)
     initialize_db(create_prod_db, create_test_db)
+    upgrade_db()
