@@ -43,6 +43,8 @@ from domogik.common import database
 from domogik.common.configloader import Loader
 
 
+__db = database.DbHelper()
+
 ###
 # Installer
 ###
@@ -71,7 +73,6 @@ def __drop_all_tables(engine):
     sql_schema.UIItemConfig.__table__.drop(bind=engine, checkfirst=True)
 
 def create_database_from_scratch(url):
-    db = database.DbHelper()
     print("Creating production database")
     engine = create_engine(url)
     #sql_schema.metadata.drop_all(engine)
@@ -80,52 +81,51 @@ def create_database_from_scratch(url):
     sql_schema.metadata.create_all(engine)
 
     # Initialize default system configuration
-    db.update_system_config()
+    __db.update_system_config()
 
     # Create a default user account
-    db.add_default_user_account()
+    __db.add_default_user_account()
 
     # Create device usages
-    db.add_device_usage(du_id='light', du_name='Light', du_description='Lamp, light usage',
+    __db.add_device_usage(du_id='light', du_name='Light', du_description='Lamp, light usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='appliance', du_name='Appliance', du_description='Appliance usage',
+    __db.add_device_usage(du_id='appliance', du_name='Appliance', du_description='Appliance usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='shutter', du_name='Shutter', du_description='Shutter usage',
+    __db.add_device_usage(du_id='shutter', du_name='Shutter', du_description='Shutter usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Down&quot;, &quot;state1&quot;:&quot;Up&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='air_conditionning', du_name='Air conditioning', du_description='Air conditioning usage',
+    __db.add_device_usage(du_id='air_conditionning', du_name='Air conditioning', du_description='Air conditioning usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&amp;deg;C&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='ventilation', du_name='Ventilation', du_description='Ventilation usage',
+    __db.add_device_usage(du_id='ventilation', du_name='Ventilation', du_description='Ventilation usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='heating', du_name='Heating', du_description='Heating',
+    __db.add_device_usage(du_id='heating', du_name='Heating', du_description='Heating',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&amp;deg;C&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='computer', du_name='Computer', du_description='Desktop computer usage',
+    __db.add_device_usage(du_id='computer', du_name='Computer', du_description='Desktop computer usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='server', du_name='Server', du_description='Server usage',
+    __db.add_device_usage(du_id='server', du_name='Server', du_description='Server usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='telephony', du_name='Telephony', du_description='Phone usage',
+    __db.add_device_usage(du_id='telephony', du_name='Telephony', du_description='Phone usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } } ')
-    db.add_device_usage(du_id='tv', du_name='TV', du_description='Television usage',
+    __db.add_device_usage(du_id='tv', du_name='TV', du_description='Television usage',
                     du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    db.add_device_usage(du_id='water', du_name='Water', du_description='Water service',
+    __db.add_device_usage(du_id='water', du_name='Water', du_description='Water service',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-#    db.add_device_usage(du_id='gas', du_name='Gas', du_description='Gas service',
+#    __db.add_device_usage(du_id='gas', du_name='Gas', du_description='Gas service',
 #                        du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    db.add_device_usage(du_id='electricity', du_name='Electricity', du_description='Electricity service',
+    __db.add_device_usage(du_id='electricity', du_name='Electricity', du_description='Electricity service',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    db.add_device_usage(du_id='temperature', du_name='Temperature', du_description='Temperature',
+    __db.add_device_usage(du_id='temperature', du_name='Temperature', du_description='Temperature',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {&quot;unit&quot;:&quot;&amp;deg;C&quot;}, &quot;string&quot;: {} }}')
-    db.add_device_usage(du_id='mirror', du_name='Mir:ror', du_description='Mir:ror device',
+    __db.add_device_usage(du_id='mirror', du_name='Mir:ror', du_description='Mir:ror device',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    db.add_device_usage(du_id='nanoztag', du_name='Nanoztag', du_description='Nanoztag device',
+    __db.add_device_usage(du_id='nanoztag', du_name='Nanoztag', du_description='Nanoztag device',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
+    __db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     print("Done.")
 
 def initialize_db(create_prod_db, create_test_db):
-    db = database.DbHelper()
-    print("Using database", db.get_db_type())
-    url = db.get_url_connection_string()
+    print("Using database", __db.get_db_type())
+    url = __db.get_url_connection_string()
 
     # For unit tests
     if create_test_db:
