@@ -122,7 +122,7 @@ def create_database_from_scratch(url):
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     print("Done.")
 
-def install(create_prod_db, create_test_db):
+def initialize_db(create_prod_db, create_test_db):
     db = database.DbHelper()
     print("Using database", db.get_db_type())
     url = db.get_url_connection_string()
@@ -165,4 +165,4 @@ if __name__ == "__main__":
         print "You must create either a production database or a test database"
         usage()
         sys.exit(2)
-    install(create_prod_db, create_test_db)
+    initialize_db(create_prod_db, create_test_db)
