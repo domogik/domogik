@@ -43,8 +43,8 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.cm15a import X10API
-
+from domogik.xpl.lib.x10cm15a import X10API
+import os.path
 
 class X10Main(XplPlugin):
     '''Manage x10 technology using cm15a
@@ -55,11 +55,16 @@ class X10Main(XplPlugin):
         Create the X10Main class
         This class is used to connect x10 (through cm15a) to the xPL Network
         """
-        XplPlugin.__init__(self, name = 'cm15a')
+        XplPlugin.__init__(self, name = 'x10cm15a')
         self.log.error("Cm15a correctly started")
-        self._device = ""
+        self._device = "/dev/cm15a0"
+#        self._config = Query(self.myxpl, self.log)
+#        self._device = self._config.query('cm15a', 'cm15a-path')
+        if not os.path.exists(self._device):
+            self.log.error(self._device + " is not present")
+        else:
+            self.log.debug("device present as "+self._device)
         self._config = Query(self.myxpl, self.log)
-        self._device = self._config.query('cm15a', 'cm15a-path')
         try:
             self.__myx10 = X10API(self._device, self.log)
         except Exception:
@@ -69,6 +74,7 @@ class X10Main(XplPlugin):
         #Create listeners
         Listener(self.x10_cmnd_cb, self.myxpl, 
                  {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
+        self.log.debug("Sending hbeat")
         self.enable_hbeat()
         self.log.debug("Cm15a correctly started")
 
