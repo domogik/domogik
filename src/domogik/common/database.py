@@ -2592,7 +2592,8 @@ class DbHelper():
         self.__session.expire_all()
         sys_info = self.__session.query(SystemInfo).first()
         if sys_info is None:
-            sys_info = SystemInfo(db_version=u'0.1.0')
+            # Should never happen as a record should already exists
+            sys_info = SystemInfo(db_version=si_db_version)
         else:
             sys_info.db_version = si_db_version
         self.__session.add(sys_info)
