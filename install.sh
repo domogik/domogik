@@ -343,6 +343,11 @@ update_user_config
 copy_tools
 create_log_dir
 call_db_installer
+
+# Only needed for versions previous to 0.1.0
+echo "DELETE FROM core_system_info;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name
+echo "INSERT INTO core_system_info (db_version) VALUES('0.1.0');"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name
+
 install_plugins
 modify_hosts
 
