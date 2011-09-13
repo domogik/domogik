@@ -2,7 +2,7 @@
   <name>nbz_tts</name>
   <technology>communication</technology>
   <description>Send message to Nabaztag</description>
-  <detail>Nabaztag text_to_speech management is an external service provide by Mindscape</detail>
+  <detail>Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server</detail>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org</documentation>
   <author>Kriss</author>
@@ -17,119 +17,43 @@
       <default-value>False</default-value>
     </key>
     <key>
+      <interface>yes</interface>
       <order-id>1</order-id>
+      <name>name</name>
+      <type>string</type>
+      <description>Name of your Nabaztag.</description>
+      <default-value>Nabaztag</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
       <name>serial</name>
       <type>string</type>
-      <description>Serial of your Nabaztag to control it whith Mindscape's API</description>
+      <description>Serial of your Nabaztag to control it with Wizz.cc's API.</description>
       <default-value>0000000000</default-value>
     </key>
     <key>
-      <order-id>2</order-id>
+      <interface>yes</interface>
+      <order-id>3</order-id>
       <name>token</name>
       <type>string</type>
-      <description>Token of your Nabaztag to control it whith Mindscape's API</description>
+      <description>Token of your Nabaztag to control it with Wizz.cc's API.</description>
       <default-value>0000000000</default-value>
     </key>
     <key>
-      <order-id>3</order-id>
-      <name>voice</name>
-      <type>list</type>
-      <list>
-	<item>AU-Colleen</item>
-	<item>AU-Jon</item>
-	<item>BE-Hendrik</item>
-	<item>BE-Minna</item>
-	<item>BE-Sofie</item>
-	<item>BR-Lygia</item>
-	<item>CA-Antonine</item>
-	<item>CA-Felix</item>
-	<item>CN-Pan</item>
-	<item>CZ-Zdenech</item>
-	<item>DE-Heidi</item>
-	<item>DE-Otto</item>
-	<item>DE-Sarah</item>
-	<item>DE-Steffi</item>
-	<item>DE-Yannick</item>
-	<item>DK-Karen</item>
-	<item>DK-Kjeld</item>
-	<item>DK-Pia</item>
-	<item>EG-Nabil</item>
-	<item>EG-Nayla</item>
-	<item>ES-Alfonsina</item>
-	<item>ES-Baltasar</item>
-	<item>ES-Bertrana</item>
-	<item>ES-Dunixe</item>
-	<item>ES-Emilia</item>
-	<item>ES-Rosalia</item>
-	<item>FI-Linus</item>
-	<item>FI-Tarja</item>
-	<item>FO-Sjurdur</item>
-	<item>FR-Anastasie</item>
-	<item>FR-Archibald</item>
-	<item>FR-Gertrude</item>
-	<item>FR-Julie</item>
-	<item>FR-Maxence</item>
-	<item>FR-Philomene</item>
-	<item>GR-Antonis</item>
-	<item>GR-Dimitris</item>
-	<item>IE-Orla</item>
-	<item>IN-Nima</item>
-	<item>IN-Sangeeta</item>
-	<item>IS-Snorri</item>
-	<item>IT-Assunta</item>
-	<item>IT-Carlo</item>
-	<item>IT-Chiara</item>
-	<item>IT-Ugo</item>
-	<item>JP-Tamura</item>
-	<item>KR-Choe</item>
-	<item>MX-Guadalupe</item>
-	<item>NL-Femke</item>
-	<item>NL-Max</item>
-	<item>NL-Renate</item>
-	<item>NO-Arild</item>
-	<item>NO-Cora</item>
-	<item>NO-Kari</item>
-	<item>NO-Sigrid</item>
-	<item>PL-Hanka</item>
-	<item>PL-Ignacy</item>
-	<item>PT-Celia</item>
-	<item>RU-Bella</item>
-	<item>RU-Maia</item>
-	<item>SE-Hjalmar</item>
-	<item>SE-Liza</item>
-	<item>SE-Maj</item>
-	<item>SE-Selma</item>
-	<item>TH-Boon-mee</item>
-	<item>TR-Asli</item>
-	<item>TR-Sezen</item>
-	<item>UK-Edwin</item>
-	<item>UK-Leonard</item>
-	<item>UK-Mistermuggles</item>
-	<item>UK-Penelope</item>
-	<item>UK-Rachel</item>
-	<item>UK-Shirley</item>
-	<item>US-Bethany</item>
-	<item>US-Billye</item>
-	<item>US-Clarence</item>
-	<item>US-Darleen</item>
-	<item>US-Ernest</item>
-	<item>US-Liberty</item>
-	<item>US-Lilian</item>
-	<item>YUE-Baibo</item>
-	<item>ZA-Wilbur</item>
-      </list>
-      <description>Voice of your Nabaztag</description>
-      <default-value>FR-Julie</default-value>
-    </key>
-    <key>
+      <interface>yes</interface>
       <order-id>4</order-id>
-      <name>delay</name>
-      <type>number</type>
-      <description>TTL of your message on Mindscape's server (seconds)</description>
-      <default-value>300</default-value>
+      <name>voice</name>
+      <type>string</type>
+      <description>Nabaztag voice. Can be voice=xx or ws_kajedo=xxxx or ws_acapela=xxxx</description>
+      <default-value>voice=fr</default-value>
     </key>
   </configuration-keys>
-  <files/>
+  <files>
+    <file path="src/share/domogik/plugins/nbz_tts.xml"/>
+    <file path="src/domogik/xpl/bin/nbz_tts.py"/>
+    <file path="src/domogik/xpl/lib/nbz_tts.py"/>
+  </files>
   <dependencies/>
   <device_technology>
       <id>communication</id>
