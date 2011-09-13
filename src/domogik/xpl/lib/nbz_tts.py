@@ -48,20 +48,18 @@ class NBZNotification:
             self._log = log
 	    self._log.info("NBZNotification:__init")
 
-        def send_tts(self, serial, token, message, voice, delay):
+        def send_tts(self, serial, token, message, voice):
             """ Call NBZ HTTP API to send notification
                 @param serial : nabaztag serial
                 @param token : nabaztag token
                 @param message : notification message
                 @param voice : notification voice
-                @param delay : notification delay
             """
 	    # Parameters
             self._serial = urllib2.quote(serial)
             self._token = urllib2.quote(token)
             self._message = urllib2.quote(message)
             self._voice = urllib2.quote(voice)
-            self._delay = str(delay)
 
 
             self._log.debug("NBZNotification:run")
@@ -69,9 +67,8 @@ class NBZNotification:
             self._log.debug("NOTIF : token  " + self._token)
             self._log.debug("NOTIF : message " + self._message)
             self._log.debug("NOTIF : voice  " + self._voice)
-            self._log.debug("NOTIF : delay " + self._delay)
 
-	    myurl="http://api.nabaztag.com/vl/FR/api.jsp?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&voice=" + self._voice + "&ttlive=" + self._delay
+	    myurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&" + self._voice
 	    self._log.debug("call : " + myurl)
 	    req = urllib2.Request(myurl)
 	    try:
@@ -107,6 +104,6 @@ class Log:
 if __name__ == "__main__":
     l = Log()
     my_nbz = NBZNotification(l)
-    my_nbz.send_tts('002185ba61d4', '1293343753', 'Bonjour', 'FR-Julie', '300')
+    my_nbz.send_tts('002185ba61d4', '19644f493495351f9d427000ae070866', 'Bonjour mon coeur', 'ws_kajedo=narbe')
 
  
