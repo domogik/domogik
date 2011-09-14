@@ -24,7 +24,7 @@ Plugin purpose
 
 Nabaztag TTS support
 
-Based on an external service provide by Mindscape.
+Based on an external service provide by Wizz.cc.
 
 
 @author: Kriss1
@@ -68,20 +68,79 @@ class NBZNotification:
             self._log.debug("NOTIF : message " + self._message)
             self._log.debug("NOTIF : voice  " + self._voice)
 
-	    myurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&" + self._voice
-	    self._log.debug("call : " + myurl)
-	    req = urllib2.Request(myurl)
-	    try:
-	    	handle = urllib2.urlopen(req)
-	    except URLError, err:
-		self._log.debug("Can not connect to Mindscape\'s server.        \nReason : ", err.reason)
-		return False
-	    except HTTPError, err:
-		self._log.debug("Mindscape\'s server was unable to satify your demand.        \nError code : ",  err.code)
-		return False
-	    else:
-		self._log.debug("Mindscape\'s response :\n        " + handle.read() )
-		return True
+            ttsurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&" + self._voice
+            staturl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=7&silent&strip"
+            wakupurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=12&silent&strip"
+            sleepurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=14&silent&strip"
+            chorurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&chor=10,0,motor,1,20,0,0,0,motor,0,20,0,0,1,led,0,0,238,0"
+
+            self._log.debug("call state on nabaztag : " + staturl)
+            statreq = urllib2.Request(staturl)
+            try:
+                stathandle = urllib2.urlopen(statreq)
+            except URLError, err:
+                self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
+                return False
+            except HTTPError, err:
+                self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
+                return False
+            else:
+                statres = stathandle.read()
+                self._log.debug("Wizz.cc\'s response :\n        " + statres )
+                if statres == 'YES':
+                    self._log.debug("call wakup on nabaztag : " + wakupurl)
+                    wakupreq = urllib2.Request(wakupurl)
+                    try:
+                        wakuphandle = urllib2.urlopen(wakupreq)
+                    except URLError, err:
+                        self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
+                        return False
+                    except HTTPError, err:
+                        self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
+                        return False
+                    else:
+                        wakupres = wakuphandle.read()
+                        self._log.debug("Wizz.cc\'s response :\n        " + wakupres )
+                    self._log.debug("call TTS : " + ttsurl)
+                    ttsreq = urllib2.Request(ttsurl)
+                    try:
+                        ttshandle = urllib2.urlopen(ttsreq)
+                    except URLError, err:
+                        self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
+                        return False
+                    except HTTPError, err:
+                        self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
+                        return False
+                    else:
+                        ttsres = ttshandle.read() 
+                        self._log.debug("Wizz.cc\'s response :\n        " + ttsres )
+                    self._log.debug("call sleep on nabaztag : " + sleepurl)
+                    sleepreq = urllib2.Request(sleepurl)
+                    try:
+                        sleephandle = urllib2.urlopen(sleepreq)
+                    except URLError, err:
+                        self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
+                        return False
+                    except HTTPError, err:
+                        self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
+                        return False
+                    else:
+                        sleepres = sleephandle.read() 
+                        self._log.debug("Wizz.cc\'s response :\n        " + sleepres )
+                else:
+                    self._log.debug("call TTS : " + ttsurl)
+                    ttsreq = urllib2.Request(ttsurl)
+                    try:
+                        ttshandle = urllib2.urlopen(ttsreq)
+                    except URLError, err:
+                        self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
+                        return False
+                    except HTTPError, err:
+                        self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
+                        return False
+                    else:
+                        ttsres = ttshandle.read() 
+                        self._log.debug("Wizz.cc\'s response :\n        " + ttsres )
 
 
 class Log:
@@ -104,6 +163,6 @@ class Log:
 if __name__ == "__main__":
     l = Log()
     my_nbz = NBZNotification(l)
-    my_nbz.send_tts('002185ba61d4', '19644f493495351f9d427000ae070866', 'Bonjour mon coeur', 'ws_kajedo=narbe')
+    my_nbz.send_tts('002185ba61d4', '19644f493495351f9d427000ae070866', 'Bonjour toi', 'ws_kajedo=narbe')
 
  
