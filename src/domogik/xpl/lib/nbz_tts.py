@@ -34,6 +34,7 @@ Based on an external service provide by Wizz.cc.
 """
 
 import urllib2
+import time
 
 
 class NBZNotification:
@@ -70,7 +71,7 @@ class NBZNotification:
 
             ttsurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&" + self._voice
             staturl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=7&silent&strip"
-            wakupurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=12&silent&strip"
+            wakupurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=13&silent&strip"
             sleepurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=14&silent&strip"
             chorurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&chor=10,0,motor,1,20,0,0,0,motor,0,20,0,0,1,led,0,0,238,0"
 
@@ -101,6 +102,7 @@ class NBZNotification:
                     else:
                         wakupres = wakuphandle.read()
                         self._log.debug("Wizz.cc\'s response :\n        " + wakupres )
+                        time.sleep(2)
                     self._log.debug("call TTS : " + ttsurl)
                     ttsreq = urllib2.Request(ttsurl)
                     try:
