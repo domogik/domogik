@@ -72,14 +72,8 @@ def __drop_all_tables(engine):
     sql_schema.Trigger.__table__.drop(bind=engine, checkfirst=True)
     sql_schema.UIItemConfig.__table__.drop(bind=engine, checkfirst=True)
 
-def create_database_from_scratch(url):
-    print("Creating production database")
-    engine = create_engine(url)
-    #sql_schema.metadata.drop_all(engine)
-    __drop_all_tables(engine)
-    print("Creating all tables...")
-    sql_schema.metadata.create_all(engine)
-
+def __add_initial_data():
+    print("Adding initial data")
     # Initialize default system configuration
     __db.update_system_config()
 
@@ -121,6 +115,16 @@ def create_database_from_scratch(url):
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     __db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
+    print("Done.")
+
+def create_database_from_scratch(url):
+    print("Creating production database")
+    engine = create_engine(url)
+    #sql_schema.metadata.drop_all(engine)
+    __drop_all_tables(engine)
+    print("Creating all tables...")
+    sql_schema.metadata.create_all(engine)
+    __add_initial_data()
     print("Done.")
 
 """Initialize the databases
