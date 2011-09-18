@@ -127,13 +127,13 @@ def create_database_from_scratch(url):
     __add_initial_data()
     print("Done.")
 
-"""Initialize the databases
-
-@param create_prod_db : true if the production DB should be (re)created
-@param create_test_db : true if the test DB should be (re)created
-
-"""
 def initialize_db(create_prod_db, create_test_db):
+    """Initialize the databases
+
+    @param create_prod_db : true if the production DB should be (re)created
+    @param create_test_db : true if the test DB should be (re)created
+
+    """
     print("Using database", __db.get_db_type())
     url = __db.get_url_connection_string()
 
