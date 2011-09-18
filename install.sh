@@ -266,7 +266,7 @@ function call_db_installer {
     if [ "$upgrade_sql" = "y" -o "$upgrade_sql" = "Y" ];then
         if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
             echo "** Call DB Installer"
-            /bin/su -c "python ./db_installer.py -p" $d_user
+            /bin/su -c "python ./db_installer.py" $d_user
             if [ $? -ne 0 ];then
                 echo "ERROR : An error occured during db_installer execution, read the previous lines for detail."
                 exit 1
