@@ -188,7 +188,7 @@ function update_user_config {
     fi
     upgrade_sql="n"
     if [ $already_cfg ];then
-        read -p "Do you want to upgrade your SQL database? **WARNING** it will DROP ALL YOUR TABLES [y/N]" upgrade_sql
+        read -p "Do you want to upgrade your SQL database? [y/N]" upgrade_sql
     else
         upgrade_sql="y"
     fi
