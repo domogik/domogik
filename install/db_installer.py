@@ -135,7 +135,7 @@ def install_or_upgrade(create_test_db):
     #TODO: improve this test
     if not sql_schema.SystemConfig.__table__.exists(bind=__engine):
         print("It appears that your database doesn't contain the required tables.")
-        answer = raw_input("Should they be created (y/N)? ")
+        answer = raw_input("Should they be created? [y/N]")
         if answer != "y":
             print("Can't continue, system tables are missing")
             sys.exit(1)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
             if opt in ('-t', '--test'):
                 create_test_db = True
             if opt in ('-r', '--reset'):
-                answer = raw_input("Are you sure you want to drop all your tables(y/N)? ")
+                answer = raw_input("Are you sure you want to drop all your tables? [y/N]")
                 if answer == 'y':
                     __drop_all_tables()
                     sys.exit()
