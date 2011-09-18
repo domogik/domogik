@@ -179,6 +179,6 @@ if __name__ == "__main__":
                 answer = raw_input("Are you sure you want to drop all your tables? [y/N]")
                 if answer == 'y':
                     __drop_all_tables()
-                    sys.exit()
+                sys.exit()
 
     install_or_upgrade(create_test_db)
