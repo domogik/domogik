@@ -1,0 +1,113 @@
+<package type="plugin">
+  <name>mochad</name>
+  <technology>x10</technology>
+  <description>Manage x10 devices with mochad</description>
+  <detail>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs mochad to work</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/plugin_mochad</documentation>
+  <author>Matthieu Bollot, mattboll</author>
+  <author-email>mattboll at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>mochad-host</name>
+      <type>string</type>
+      <description>mochad host address</description>
+      <default-value>127.0.0.1</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>mochad-port</name>
+      <type>string</type>
+      <description>mochad port address</description>
+      <default-value>1099</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/mochad.xml"/>
+    <file path="src/share/domogik/stats/x10/x10.basic-mochad.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/bright.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/dim.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/on.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/off.xml"/>
+    <file path="src/domogik/xpl/bin/mochad.py"/>
+    <file path="src/domogik/xpl/lib/mochad.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>x10</id>
+      <name>X10</name>
+      <description>X10 technology</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>x10.switch</id>
+          <name>Switch</name>
+          <description>Switch</description>
+          <device_technology_id>x10</device_technology_id>
+      </device_type>
+      <device_type>
+          <id>x10.dimmer</id>
+          <name>Dimmer</name>
+          <description>Dimmer</description>
+          <device_technology_id>x10</device_technology_id>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>x10.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>x10.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>x10.dimmer.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>x10.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>x10.dimmer.reduce</id>
+          <name>Reduce</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>x10.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>x10.dimmer.increase</id>
+          <name>Increase</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>x10.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
