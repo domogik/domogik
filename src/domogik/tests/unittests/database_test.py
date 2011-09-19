@@ -1531,6 +1531,7 @@ class SystemInfoTestCase(GenericTestCase):
         assert system_info.db_version == '0.1.0'
         db.update_system_info(si_db_version=u'0.1.1')
         assert db.get_system_info().db_version == u'0.1.1'
+        assert db.get_db_version() == u'0.1.1'
 
 
 class SystemConfigTestCase(GenericTestCase):

@@ -2609,6 +2609,10 @@ class DbHelper():
 
         """
         return self.__session.query(SystemInfo).first()
+    
+    def get_db_version(self):
+        """Get the current version of the database"""
+        return self.__session.query(SystemInfo).first().db_version
 
 ###
 # SystemConfig
