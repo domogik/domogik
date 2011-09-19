@@ -2631,7 +2631,10 @@ class DbHelper():
             
     def get_db_version(self):
         """Get the current version of the database"""
-        return self.__session.query(SystemInfo).first().db_version
+        sys_info = self.__session.query(SystemInfo).first()
+        if sys_info is None:
+            return None
+        return sys_info.db_version
 
 ###
 # SystemConfig
