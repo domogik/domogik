@@ -42,46 +42,43 @@ from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
 
-
+CURRENT_DB_VERSION_NB = "0.2.0"
 __db = database.DbHelper()
+__url = __db.get_url_connection_string()
+__engine = create_engine(__url)
 
 ###
 # Installer
 ###
 
-def __drop_all_tables(engine):
+def __drop_all_tables():
     print("Droping all existing tables...")
     # Only drop the table if it exists
-    sql_schema.DeviceFeatureAssociation.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.DeviceFeature.__table__.drop(bind=engine, checkfirst=True)    
-    sql_schema.DeviceFeatureModel.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.DeviceStats.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.DeviceConfig.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.Device.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.DeviceType.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.DeviceTechnology.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.DeviceUsage.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.Room.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.Area.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.UserAccount.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.Person.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceFeatureAssociation.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.DeviceFeature.__table__.drop(bind=__engine, checkfirst=True)    
+    sql_schema.DeviceFeatureModel.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.DeviceStats.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.DeviceConfig.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.Device.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.DeviceType.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.DeviceTechnology.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.DeviceUsage.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.Room.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.Area.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.UserAccount.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.Person.__table__.drop(bind=__engine, checkfirst=True)
     # Standalone tables (no foreign keys)
-    sql_schema.PluginConfig.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.SystemConfig.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.SystemInfo.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.Trigger.__table__.drop(bind=engine, checkfirst=True)
-    sql_schema.UIItemConfig.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.PluginConfig.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.SystemConfig.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.SystemInfo.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.Trigger.__table__.drop(bind=__engine, checkfirst=True)
+    sql_schema.UIItemConfig.__table__.drop(bind=__engine, checkfirst=True)
 
-def create_database_from_scratch(url):
-    print("Creating production database")
-    engine = create_engine(url)
-    #sql_schema.metadata.drop_all(engine)
-    __drop_all_tables(engine)
-    print("Creating all tables...")
-    sql_schema.metadata.create_all(engine)
-
+def __add_initial_data():
+    print("Adding initial data...")
     # Initialize default system configuration
     __db.update_system_config()
+    __db.update_system_info(CURRENT_DB_VERSION_NB)
 
     # Create a default user account
     __db.add_default_user_account()
@@ -121,30 +118,6 @@ def create_database_from_scratch(url):
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     __db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    print("Done.")
-
-"""Initialize the databases
-
-@param create_prod_db : true if the production DB should be (re)created
-@param create_test_db : true if the test DB should be (re)created
-
-"""
-def initialize_db(create_prod_db, create_test_db):
-    print("Using database", __db.get_db_type())
-    url = __db.get_url_connection_string()
-
-    # For unit tests
-    if create_test_db:
-        print("Creating test database...")
-        test_url = '%s_test' % url
-        engine_test = create_engine(test_url)
-        __drop_all_tables(engine_test)
-        sql_schema.metadata.drop_all(engine_test)
-        sql_schema.metadata.create_all(engine_test)
-
-    if not create_prod_db:
-        return
-    create_database_from_scratch(url)
 
 """Upgrade process of the database
 
@@ -152,16 +125,46 @@ def initialize_db(create_prod_db, create_test_db):
 def upgrade_db():
     print("Upgrading the database...")
 
+def install_or_upgrade(create_test_db):
+    """Initialize the databases (install new one or upgrade it)
+
+    @param create_test_db : true if the test DB should be (re)created
+
+    """
+    print("Using database", __db.get_db_type())
+    #TODO: improve this test
+    if not sql_schema.SystemConfig.__table__.exists(bind=__engine):
+        print("It appears that your database doesn't contain the required tables.")
+        answer = raw_input("Should they be created? [y/N]")
+        if answer != "y":
+            print("Can't continue, system tables are missing")
+            sys.exit(1)
+        else:
+            __drop_all_tables() #TODO not sure this is needed
+            print("Creating all tables...")
+            sql_schema.metadata.create_all(__engine)
+            __add_initial_data()
+    else:
+        upgrade_db()
+
+    if create_test_db:
+        print("Creating test database...")
+        test_url = '%s_test' % __url
+        engine_test = create_engine(test_url)
+        __drop_all_tables(engine_test)
+        sql_schema.metadata.drop_all(engine_test)
+        sql_schema.metadata.create_all(engine_test)
+    print("Initialization complete.")
+
 def usage():
-    print("Usage : db_installer [-t, --test] [-p, --prod]")
+    print("Usage : db_installer [-t, --test]")
     print("-t or --test : database for unit tests will created (default is False)")
-    print("-p or --prod : production database will be created (default is False)")
+    print("-r or --reset : drop all tables (default is False)")
 
 if __name__ == "__main__":
-    create_prod_db = False
     create_test_db = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hpt", ["help", "prod", "test"])
+        opts, args = getopt.getopt(sys.argv[1:], "htr", ["help", "test", "reset"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -169,13 +172,13 @@ if __name__ == "__main__":
         if opt in ('-h', '--help'):
             usage()
             sys.exit()
-        elif opt in ('-p', '--prod'):
-            create_prod_db = True
-        elif opt in ('-t', '--test'):
-            create_test_db = True
-    if not create_test_db and not create_prod_db:
-        print "You must create either a production database or a test database"
-        usage()
-        sys.exit(2)
-    initialize_db(create_prod_db, create_test_db)
-    upgrade_db()
+        else:
+            if opt in ('-t', '--test'):
+                create_test_db = True
+            if opt in ('-r', '--reset'):
+                answer = raw_input("Are you sure you want to drop all your tables? [y/N]")
+                if answer == 'y':
+                    __drop_all_tables()
+                sys.exit()
+
+    install_or_upgrade(create_test_db)

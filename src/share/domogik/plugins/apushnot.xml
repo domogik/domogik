@@ -4,9 +4,9 @@
   <description>Send Android notification</description>
   <detail>Android notification system base on external service provide by notifry</detail>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org</documentation>
+  <documentation>http://wiki.domogik.org/plugin_apushnot</documentation>
   <author>Kriss</author>
-  <author-email>Kriss</author-email>
+  <author-email>Kriss@domogik.org</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
   <dependencies>
      <dep python="cjson"/>
