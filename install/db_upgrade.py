@@ -46,11 +46,12 @@ __engine = create_engine(__url)
 def process(new_db_version):
     print("=== Upgrade process")
     #while __db.get_db_version() != new_db_version:
-    __execute_upgrade(__db.get_db_version())
+    __execute_upgrade()
 
-def __execute_upgrade(current_db_version):
+def __execute_upgrade():
+    current_db_version = __db.get_db_version()
     print("Upgrading database version %s" % current_db_version)
-    if current_db_version == '0.1.0':
+    if current_db_version == '0.1.0' or current_db_version is None:
         new_version == '0.2.0'
         print("Upgrading to version : %s" % new_version)
         
