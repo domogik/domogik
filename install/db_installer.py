@@ -41,6 +41,7 @@ from sqlalchemy import create_engine
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
+import db_upgrade
 
 CURRENT_DB_VERSION_NB = "0.2.0"
 __db = database.DbHelper()
@@ -124,6 +125,7 @@ def __add_initial_data():
 """
 def __upgrade_db():
     print("Upgrading the database...")
+    db_upgrade.process(CURRENT_DB_VERSION_NB)
 
 def __install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
