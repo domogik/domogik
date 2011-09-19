@@ -4,9 +4,9 @@
   <description>Send Iphone/Ipad notification</description>
   <detail>Iphone/Ipad notification system base on external service provide by pushme.to</detail>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org</documentation>
+  <documentation>http://wiki.domogik.org/plugin_ipushnot</documentation>
   <author>Kriss</author>
-  <author-email>Kriss</author-email>
+  <author-email>Kriss@domogik.org</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
     <key>
