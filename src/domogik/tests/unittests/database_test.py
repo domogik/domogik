@@ -1559,6 +1559,8 @@ if __name__ == "__main__":
     url = db.get_url_connection_string()
     test_url = '%s_test' % url
     engine_test = create_engine(test_url)
+    sql_schema.metadata.reflect(engine_test)
+    sql_schema.metadata.drop_all(engine_test)
     sql_schema.metadata.create_all(engine_test)
     
     print("*** Using database %s ***\n" % db.get_db_type())
