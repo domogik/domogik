@@ -38,7 +38,6 @@ import getopt, sys
 
 from sqlalchemy import create_engine
 
-import db_upgrade
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
@@ -125,14 +124,10 @@ def __add_initial_data():
 """
 def __upgrade_db():
     print("Upgrading the database...")
-    db_upgrade.process()
 
-def __install_or_upgrade(create_test_db):
-    """Initialize the databases (install new one or upgrade it)
+def __install_or_upgrade():
+    """Initialize the databases (install new one or upgrade it)"""
 
-    @param create_test_db : true if the test DB should be (re)created
-
-    """
     print("Using database", __db.get_db_type())
     #TODO: improve this test
     if not sql_schema.SystemConfig.__table__.exists(bind=__engine):
@@ -149,24 +144,15 @@ def __install_or_upgrade(create_test_db):
     else:
         __upgrade_db()
 
-    if create_test_db:
-        print("Creating test database...")
-        test_url = '%s_test' % __url
-        engine_test = create_engine(test_url)
-        __drop_all_tables()
-        sql_schema.metadata.drop_all(engine_test)
-        sql_schema.metadata.create_all(engine_test)
     print("Initialization complete.")
 
 def usage():
-    print("Usage : db_installer [-t, --test]")
-    print("-t or --test : database for unit tests will created (default is False)")
+    print("Usage : db_installer [-r, --reset]")
     print("-r or --reset : drop all tables (default is False)")
 
 if __name__ == "__main__":
-    create_test_db = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "htr", ["help", "test", "reset"])
+        opts, args = getopt.getopt(sys.argv[1:], "hr", ["help", "reset"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -175,12 +161,10 @@ if __name__ == "__main__":
             usage()
             sys.exit()
         else:
-            if opt in ('-t', '--test'):
-                create_test_db = True
             if opt in ('-r', '--reset'):
                 answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
                 if answer == 'y':
                     __drop_all_tables()
                 sys.exit()
 
-    __install_or_upgrade(create_test_db)
+    __install_or_upgrade()
