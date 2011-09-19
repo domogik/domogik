@@ -122,10 +122,10 @@ def __add_initial_data():
 """Upgrade process of the database
 
 """
-def upgrade_db():
+def __upgrade_db():
     print("Upgrading the database...")
 
-def install_or_upgrade(create_test_db):
+def __install_or_upgrade(create_test_db):
     """Initialize the databases (install new one or upgrade it)
 
     @param create_test_db : true if the test DB should be (re)created
@@ -135,7 +135,7 @@ def install_or_upgrade(create_test_db):
     #TODO: improve this test
     if not sql_schema.SystemConfig.__table__.exists(bind=__engine):
         print("It appears that your database doesn't contain the required tables.")
-        answer = raw_input("Should they be created? [y/N]")
+        answer = raw_input("Should they be created? [y/N] ")
         if answer != "y":
             print("Can't continue, system tables are missing")
             sys.exit(1)
@@ -145,7 +145,7 @@ def install_or_upgrade(create_test_db):
             sql_schema.metadata.create_all(__engine)
             __add_initial_data()
     else:
-        upgrade_db()
+        __upgrade_db()
 
     if create_test_db:
         print("Creating test database...")
@@ -176,9 +176,9 @@ if __name__ == "__main__":
             if opt in ('-t', '--test'):
                 create_test_db = True
             if opt in ('-r', '--reset'):
-                answer = raw_input("Are you sure you want to drop all your tables? [y/N]")
+                answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
                 if answer == 'y':
                     __drop_all_tables()
                 sys.exit()
 
-    install_or_upgrade(create_test_db)
+    __install_or_upgrade(create_test_db)
