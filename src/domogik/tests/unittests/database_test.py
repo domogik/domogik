@@ -36,6 +36,9 @@ from unittest import TestCase
 import time
 import datetime
 
+from sqlalchemy import create_engine
+
+from domogik.common import sql_schema
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import DeviceStats
 
@@ -1551,6 +1554,12 @@ class SystemConfigTestCase(GenericTestCase):
 
 
 if __name__ == "__main__":
+    print("Creating test database...")
     db = DbHelper(use_test_db=True)
+    url = db.get_url_connection_string()
+    test_url = '%s_test' % url
+    engine_test = create_engine(test_url)
+    sql_schema.metadata.create_all(engine_test)
+    
     print("*** Using database %s ***\n" % db.get_db_type())
     unittest.main()

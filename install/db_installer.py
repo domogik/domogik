@@ -38,6 +38,7 @@ import getopt, sys
 
 from sqlalchemy import create_engine
 
+import db_upgrade
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
@@ -124,6 +125,7 @@ def __add_initial_data():
 """
 def __upgrade_db():
     print("Upgrading the database...")
+    db_upgrade.process()
 
 def __install_or_upgrade(create_test_db):
     """Initialize the databases (install new one or upgrade it)
@@ -151,7 +153,7 @@ def __install_or_upgrade(create_test_db):
         print("Creating test database...")
         test_url = '%s_test' % __url
         engine_test = create_engine(test_url)
-        __drop_all_tables(engine_test)
+        __drop_all_tables()
         sql_schema.metadata.drop_all(engine_test)
         sql_schema.metadata.create_all(engine_test)
     print("Initialization complete.")
