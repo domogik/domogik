@@ -79,7 +79,7 @@ def __add_initial_data():
     print("Adding initial data...")
     # Initialize default system configuration
     __db.update_system_config()
-    __db.update_system_info(CURRENT_DB_VERSION_NB)
+    __db.update_db_version(CURRENT_DB_VERSION_NB)
 
     # Create a default user account
     __db.add_default_user_account()
