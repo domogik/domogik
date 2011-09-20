@@ -41,14 +41,10 @@ Implements
 
 import traceback
 
-from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.mochad import *
 import os.path
 
-class mochad(XplPlugin):
+class mochad(Mochad):
     '''Manage x10 devices through mochad
     '''
 
@@ -57,17 +53,12 @@ class mochad(XplPlugin):
         Create a Mochad instance
         This class is used to connect x10 devices (through mochad) to the xPL Network
         """
-        XplPlugin.__init__(self, name = 'mochad')
+        host = "127.0.0.1"
+        port = "1099"
+        Mochad.__init__(self,host,port)
+
         self.log.debug("mochad correctly started")
-        self._host = "127.0.0.1"
-        self._port = "1099"
         self._config = Query(self.myxpl, self.log)
-        try:
-            self.__mymochad = Mochad(self._host,self._port)
-        except Exception:
-            self.log.error("Something went wrong during Mochad init, check logs")
-            self.log.error("Exception : %s" % traceback.format_exc())
-            exit(1)
         #Create listeners
         Listener(self.x10_cmnd_cb, self.myxpl, 
                  {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
@@ -80,14 +71,14 @@ class mochad(XplPlugin):
         @param message : an XplMessage object
         """
         commands = {
-            'on': lambda d, h, l: self.__mymochad.send(d,"on"),
-            'off': lambda d, h, l: self.__mymochad.send(d,"off"),
-            'all_units_on': lambda d, h, l: self.__mymochad.send(h,"all_units_on"),
-            'all_units_off': lambda d, h, l: self.__mymochad.send(h,"all_units_off"),
-            'all_lights_on': lambda d, h, l: self.__mymochad.send(h,"all_lights_on"),
-            'all_lights_off': lambda d, h, l: self.__mymochad.send(h,"all_lights_off"),
-            'bright': lambda d, h, l: self.__mymochad.send(d,"bright",l),
-            'dim': lambda d, h, l: self.__mymochad.send(d,"dim",l),
+            'on': lambda d, h, l: self.send(d,"on"),
+            'off': lambda d, h, l: self.send(d,"off"),
+            'all_units_on': lambda d, h, l: self.send(h,"all_units_on"),
+            'all_units_off': lambda d, h, l: self.send(h,"all_units_off"),
+            'all_lights_on': lambda d, h, l: self.send(h,"all_lights_on"),
+            'all_lights_off': lambda d, h, l: self.send(h,"all_lights_off"),
+            'bright': lambda d, h, l: self.send(d,"bright",l),
+            'dim': lambda d, h, l: self.send(d,"dim",l),
         }
         cmd = None
         dev = None
