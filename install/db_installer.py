@@ -54,6 +54,8 @@ __engine = create_engine(__url)
 
 def __drop_all_tables():
     print("Droping all existing tables...")
+    sql_schema.metadata.drop_all(__engine)    
+    """
     # Only drop the table if it exists
     sql_schema.DeviceFeatureAssociation.__table__.drop(bind=__engine, checkfirst=True)
     sql_schema.DeviceFeature.__table__.drop(bind=__engine, checkfirst=True)    
@@ -74,6 +76,7 @@ def __drop_all_tables():
     sql_schema.SystemInfo.__table__.drop(bind=__engine, checkfirst=True)
     sql_schema.Trigger.__table__.drop(bind=__engine, checkfirst=True)
     sql_schema.UIItemConfig.__table__.drop(bind=__engine, checkfirst=True)
+    """
 
 def __add_initial_data():
     print("Adding initial data...")
