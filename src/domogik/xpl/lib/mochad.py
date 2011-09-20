@@ -93,6 +93,7 @@ class Mochad(XplPlugin):
             self.mochad_socket = None
             while self.mochad_socket is None:
                 self.connect()
+            self.mochad_socket.send(data)
 
 
 if __name__ == '__main__':
