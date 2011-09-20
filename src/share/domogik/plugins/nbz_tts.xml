@@ -4,9 +4,9 @@
   <description>Send message to Nabaztag</description>
   <detail>Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server</detail>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org</documentation>
+  <documentation>http://wiki.domogik.org/plugin_nbz_tts</documentation>
   <author>Kriss</author>
-  <author-email>Kriss</author-email>
+  <author-email>Kriss@domogik.org</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
     <key>
