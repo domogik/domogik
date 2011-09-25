@@ -195,13 +195,13 @@ class IPX:
         except IOError:
             error = "Error while accessing to '%s' : %s" %  \
                      (self.url_status, traceback.format_exc())
-            print error
+            print(error)
             self._log.error(error)
             raise IPXException(error)
         except HTTPError:
             error = "Error while accessing to '%s' : %s" %  \
                      (self.url_status, traceback.format_exc())
-            print error
+            print(error)
             self._log.error(error)
             raise IPXException(error)
         res  = resp.read()
@@ -230,14 +230,14 @@ class IPX:
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
-            print error
+            print(error)
             self._log.error(error)
             raise IPXException(error)
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
             self._log.error("Error while changing 'led%s' to 'PULSE'" % num)
         else:
-            print("Changing 'led%s' to 'PULSE' successfully" % num)
+            print(("Changing 'led%s' to 'PULSE' successfully" % num))
             # send change of status
             self.get_status()
 
@@ -303,7 +303,7 @@ class IPX:
         if data['elt'] == "count":
             elt_type = 'count'
 
-        print "%s-%s(%s)-%s"  % (device, current, data['value'], elt_type)
+        print("%s-%s(%s)-%s"  % (device, current, data['value'], elt_type))
         self._callback(device, current, elt_type)
 
 
@@ -381,7 +381,7 @@ class IPX:
         """ count number of relay, input
             @param dom : xml data
         """
-        print dom.toxml()
+        print(dom.toxml())
         self.start_led, self.nb_led = self.get_count_of(dom, "led")
         self._log.info("Number of relay : %s (start at %s)" % 
                        (self.nb_led, self.start_led))

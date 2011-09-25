@@ -104,7 +104,7 @@ class ProcessInfo():
         self._callback(self.pid, values)
 
 def display(pid, data):
-    print("DATA (%s) = %s" % (pid, str(data)))
+    print(("DATA (%s) = %s" % (pid, str(data))))
 
 if __name__ == "__main__":
     my_process = ProcessInfo(4650, 15, display)

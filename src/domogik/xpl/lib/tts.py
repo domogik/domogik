@@ -57,7 +57,7 @@ class Tts:
 	    self.software = software
 
     def send(self,speech):
-	print self.software
+	print(self.software)
 	msg = self.software % speech
 	cmd = Popen(msg, shell=True)
 	cmd.communicate()

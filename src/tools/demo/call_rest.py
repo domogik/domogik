@@ -43,12 +43,12 @@ if __name__ == '__main__':
     file = open(data_file, "r")
 
     for request in file.read().split('\n'):
-        print "len=" + str(len(request))
-        print request[0:1]
+        print("len=" + str(len(request)))
+        print(request[0:1])
         if request[0:1] != "#" and len(request) != 0:
-            print "[ " + request + " ]"
+            print("[ " + request + " ]")
             data = urllib.urlopen("http://%s:%s%s" % (ip, port, request))
-            print data.read()
+            print(data.read())
     file.close()
 
 

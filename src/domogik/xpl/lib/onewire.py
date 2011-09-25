@@ -113,7 +113,7 @@ class ComponentDs18b20:
                     else:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
-                    print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
+                    print(("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
@@ -167,7 +167,7 @@ class ComponentDs18s20:
                     else:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
-                    print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
+                    print(("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
@@ -208,13 +208,13 @@ class ComponentDs2401:
                 if my_id in self.all_ds2401:
                     actual_ds2401[my_id] = "HIGH"
                     if self.all_ds2401[my_id] != "HIGH":
-                        print("id=%s, status=HIGH" % my_id)
+                        print(("id=%s, status=HIGH" % my_id))
                         self.all_ds2401[my_id] = "HIGH"
                         self.callback("xpl-trig", {"device" : my_id,
                                              "type" : "input",
                                              "current" : "HIGH"})
                 else:
-                    print("id=%s, status=HIGH" % my_id)
+                    print(("id=%s, status=HIGH" % my_id))
                     self.all_ds2401[my_id] = "HIGH"
                     actual_ds2401[my_id] = "HIGH"
                     self.callback("xpl-trig", {"device" : my_id,
@@ -223,7 +223,7 @@ class ComponentDs2401:
 
             for comp_id in self.all_ds2401:
                 if comp_id not in actual_ds2401 and self.all_ds2401[comp_id] == "HIGH":
-                    print("id=%s, status=LOW component disappeared)" % (comp_id))
+                    print(("id=%s, status=LOW component disappeared)" % (comp_id)))
                     self.all_ds2401[my_id] = "LOW"
                     self.callback("xpl-trig", {"device" : comp_id,
                                          "type" : "input",
@@ -265,8 +265,8 @@ class ComponentDs2438:
                 try:
                     temperature = float(comp.temperature)
                     humidity = float(comp.humidity)
-                    print "T=%s" % temperature
-                    print "H=%s" % humidity
+                    print("T=%s" % temperature)
+                    print("H=%s" % humidity)
                 except AttributeError:
                     error = "DS2438 : error while reading value"
                     self._log.error(error)
@@ -283,7 +283,7 @@ class ComponentDs2438:
                     else:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
-                    print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
+                    print(("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
@@ -297,7 +297,7 @@ class ComponentDs2438:
                     else:
                         my_type = "xpl-trig"
                     self.old_humidity[my_id] = humidity
-                    print("type=%s, id=%s, humidity=%s" % (my_type, my_id, humidity))
+                    print(("type=%s, id=%s, humidity=%s" % (my_type, my_id, humidity)))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "humidity",
                                          "current" : humidity})

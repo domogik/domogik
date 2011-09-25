@@ -290,34 +290,34 @@ class PackageXml():
         """ Display xml data in a fine way
         """
         print("---- Package informations -------------------------------")
-        print("Type                : %s" % self.type)
-        print("Name                : %s" % self.name)
-        print("Full name           : %s" % self.fullname)
-        print("Release             : %s" % self.release)
-        print("Technology          : %s" % self.techno)
+        print(("Type                : %s" % self.type))
+        print(("Name                : %s" % self.name))
+        print(("Full name           : %s" % self.fullname))
+        print(("Release             : %s" % self.release))
+        print(("Technology          : %s" % self.techno))
         if self.type == "hardware":
-            print("xPL vendor id       : %s" % self.vendor_id)
-            print("xPL device id       : %s" % self.device_id)
-        print("Link for doc        : %s" % self.doc)
-        print("Description         : %s" % self.desc)
-        print("Detail              : %s" % self.detail)
-        print("Author              : %s" % self.author)
-        print("Author's email      : %s" % self.email)
-        print("Domogik min release : %s" % self.domogik_min_release)
+            print(("xPL vendor id       : %s" % self.vendor_id))
+            print(("xPL device id       : %s" % self.device_id))
+        print(("Link for doc        : %s" % self.doc))
+        print(("Description         : %s" % self.desc))
+        print(("Detail              : %s" % self.detail))
+        print(("Author              : %s" % self.author))
+        print(("Author's email      : %s" % self.email))
+        print(("Domogik min release : %s" % self.domogik_min_release))
         print("----- Python dependencies -------------------------------")
         for dep in self.dependencies:
-            print("- %s" % dep)
+            print(("- %s" % dep))
         print("----- Package files -------------------------------------")
         for my_file in self.files:
-            print("- %s" % my_file["path"])
+            print(("- %s" % my_file["path"]))
         print("----- Package external files ----------------------------")
         for my_file in self.external_files:
-            print("- %s" % my_file["path"])
+            print(("- %s" % my_file["path"]))
         if self.package_url != None:
             print("----- Repository informations ---------------------------")
-            print("Package path        : %s" % self.package_url)
-            print("Xml path            : %s" % self.xml_url)
-            print("Priority            : %s" % self.priority)
+            print(("Package path        : %s" % self.package_url))
+            print(("Xml path            : %s" % self.xml_url))
+            print(("Priority            : %s" % self.priority))
         print("---------------------------------------------------------")
 
 if __name__ == "__main__":

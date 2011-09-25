@@ -103,8 +103,8 @@ class GAgendaListener(XplPlugin):
             my_temp_message = XplMessage()
             my_temp_message.set_type("xpl-trig")
             my_temp_message.set_schema("calendar.basic")
-            print "entry = "
-            print entry
+            print("entry = ")
+            print(entry)
             my_temp_message.add_data({"object" : entry["object"]})
             my_temp_message.add_data({"startdate" : entry["startdate"]})
             self.myxpl.send(my_temp_message)

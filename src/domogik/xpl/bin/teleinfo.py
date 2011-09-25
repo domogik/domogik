@@ -67,7 +67,7 @@ class TeleinfoManager(XplPlugin):
             teleinfo.open(device)
         except TeleinfoException as err:
             self.log.error(err.value)
-            print err.value
+            print(err.value)
             self.force_leave()
             return
             

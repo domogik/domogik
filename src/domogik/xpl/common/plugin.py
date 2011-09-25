@@ -317,12 +317,12 @@ class Watcher:
         try:
             os.wait()
         except KeyboardInterrupt:
-            print 'KeyBoardInterrupt'
+            print('KeyBoardInterrupt')
             self._plugin.log.info("Keyoard Interrupt detected, leave now.")
             self._plugin.force_leave()
             self.kill()
         except OSError:
-            print "OSError"
+            print("OSError")
         sys.exit()
 
     def kill(self):

@@ -270,9 +270,9 @@ if __name__ == "__main__":
 
     # Connect to the first Media Player found
     for name in name_list:
-        print name
+        print(name)
         if "org.mpris." in name:
-            print "Found : ", name
+            print("Found : ", name)
             playerName = name
             break
 

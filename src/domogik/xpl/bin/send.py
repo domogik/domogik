@@ -73,10 +73,10 @@ class Sender(XplPlugin):
         message = XplMessage()
         message.set_type(self.args[0])
         if self.options.source != None:
-            print("Source forced : %s" % self.options.source)
+            print(("Source forced : %s" % self.options.source))
             message.set_source(self.options.source)
         if self.options.target != None:
-            print("Target forced : %s" % self.options.target)
+            print(("Target forced : %s" % self.options.target))
             message.set_target(self.options.target)
         message.set_schema(self.args[1])
         datas = self.args[2].split(',')
@@ -92,13 +92,13 @@ class Sender(XplPlugin):
     def usage(self):
         ''' Display script usage
         '''
-        print """\
+        print("""\
 usage : sendXPL.py message_type message_contents"
 \tmessage_type: Type of the message, must correspond to one of the supported \
 schemas
 \tmessage_contents: comma separated pairs key=value that will be put in message
 \tExample (x10): ./send.py xpl-cmnd x10.basic "device=a1,command=on"
-"""
+""")
 
 def main():
     Sender()

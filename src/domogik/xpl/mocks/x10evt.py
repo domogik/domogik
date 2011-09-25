@@ -81,7 +81,7 @@ class X10EvtMock(XplPlugin):
             mess.add_data({'device' :  self.options.device})
         if self.options.level != None:
             mess.add_data({'level' :  self.options.level})
-        print "Send message : %s" % mess
+        print("Send message : %s" % mess)
         self._log.info("Send message : %s" % mess)
         self._myxpl.send(mess)
 

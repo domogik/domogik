@@ -70,7 +70,7 @@ class SamsungTV:
             @param device : serial port connected to EX Link
         """
         try:
-            print("Try to open Samsung EX Link device : %s" % device)
+            print(("Try to open Samsung EX Link device : %s" % device))
             self._samsung = serial.Serial(device, 9600, 
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
@@ -88,21 +88,21 @@ class SamsungTV:
             @param cmd_alias : alias 
             @param param : command parameter 
         """
-        print("Call command '%s' with parameter '%s'" % (cmd_alias, param))
+        print(("Call command '%s' with parameter '%s'" % (cmd_alias, param)))
         if not cmd_alias in COMMANDS:
-            print("Command not known : '%s'" % cmd_alias)
+            print(("Command not known : '%s'" % cmd_alias))
             return False
         cmd = self.generate_command(COMMANDS[cmd_alias], param)
-        print("Code for command : '%s'" % cmd)
+        print(("Code for command : '%s'" % cmd))
         data = binascii.unhexlify(cmd)
         self._samsung.write("%s" % data)
         res = binascii.hexlify(self._samsung.readline())
-        print "res=%s" % res
+        print("res=%s" % res)
         if res == "030cf100":
             print("Command is OK")
             return True
         else:
-            print("Error on command [%s]" % res)
+            print(("Error on command [%s]" % res))
             return False
 
     def generate_command(self, cmd, param = None):

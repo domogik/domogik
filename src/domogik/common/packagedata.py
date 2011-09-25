@@ -54,7 +54,7 @@ class PackageData():
         try:
             self.plg = PackageXml(path = xml_path)
         except:
-            print(str(traceback.format_exc()))
+            print((str(traceback.format_exc())))
             return
         print("Xml file OK")
 
@@ -70,7 +70,7 @@ class PackageData():
         """ Insert data for plugin
         """
         ### Technology
-        print("Technology %s" % self.plg.technology["id"])
+        print(("Technology %s" % self.plg.technology["id"]))
         if self._db.get_device_technology_by_id(self.plg.technology["id"]) == None:
             # add if not exists
             print("add...")
@@ -86,7 +86,7 @@ class PackageData():
  
         ### Device types
         for device_type in self.plg.device_types:
-            print("Device type %s" % device_type["id"])
+            print(("Device type %s" % device_type["id"]))
             if self._db.get_device_type_by_id(device_type["id"]) == None:
                 # add if not exists
                 print("add...")
@@ -104,8 +104,8 @@ class PackageData():
  
         ### Device feature model
         for device_feature_model in self.plg.device_feature_models:
-            print("Device feature model %s" % device_feature_model["id"])
-            print "M.P=%s" % device_feature_model["parameters"]
+            print(("Device feature model %s" % device_feature_model["id"]))
+            print("M.P=%s" % device_feature_model["parameters"])
             if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:
                 # add if not exists
                 print("add...")

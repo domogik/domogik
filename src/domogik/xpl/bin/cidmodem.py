@@ -66,7 +66,7 @@ class CIDManager(XplPlugin):
             cid.open(device, cid_command)
         except CallerIdModemException as e:
             self.log.error(e.value)
-            print e.value
+            print(e.value)
             self.force_leave()
             return
             
@@ -83,7 +83,7 @@ class CIDManager(XplPlugin):
         """ Send xPL message on network
             @param num : call number
         """
-        print "Input call : %s " % num
+        print("Input call : %s " % num)
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema("cid.basic")

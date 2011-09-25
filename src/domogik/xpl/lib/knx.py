@@ -63,10 +63,10 @@ class KNX:
         """ open 
             @param device :
         """
-        print "Lancement de EIBD"
+        print("Lancement de EIBD")
         # device example : "ipt:192.168.0.148"
         command = "eibd -i -d -D %s" % device
-        print "lancement de la commande: %s" %command
+        print("lancement de la commande: %s" %command)
         subp = subprocess.Popen(command, shell=True)        
         self.eibd_pid = subp.pid 
 
@@ -95,7 +95,7 @@ class KNX:
             self._callback(data) 
             #print "> %s" % data                                                                     
     def stop_listen(self):  
-        print "arret du listen"                                                 
+        print("arret du listen")                                                 
         self._read = False 
 
 if __name__ == "__main__":                                                      

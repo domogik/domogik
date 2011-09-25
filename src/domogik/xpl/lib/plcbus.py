@@ -188,7 +188,7 @@ class PLCBUSAPI:
         try:
             command = self._cmdplcbus[cmd]
         except KeyError:
-            print "PLCBUS Frame generation error, command does not exist ", cmd
+            print("PLCBUS Frame generation error, command does not exist ", cmd)
         else:
             if cmd == 'ALL_UNITS_OFF':
                 plcbus_frame = '020645000800000c03'
@@ -199,7 +199,7 @@ class PLCBUSAPI:
             try:
                 message = plcbus_frame.decode('HEX')
             except TypeError:
-                print "PLCBUS Frame generation error, does not result in a HEX string ", plcbus_frame
+                print("PLCBUS Frame generation error, does not result in a HEX string ", plcbus_frame)
             else:
                 self._ser_handler.add_to_send_queue(plcbus_frame)
 
