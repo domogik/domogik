@@ -73,10 +73,10 @@ class Sender(XplPlugin):
         message = XplMessage()
         message.set_type(self.args[0])
         if self.options.source != None:
-            print(("Source forced : %s" % self.options.source))
+            print("Source forced : %s" % self.options.source)
             message.set_source(self.options.source)
         if self.options.target != None:
-            print(("Target forced : %s" % self.options.target))
+            print("Target forced : %s" % self.options.target)
             message.set_target(self.options.target)
         message.set_schema(self.args[1])
         datas = self.args[2].split(',')

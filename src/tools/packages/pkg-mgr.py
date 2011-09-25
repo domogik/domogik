@@ -99,7 +99,7 @@ if (options.action_update == False \
 if options.action_create == True:
     # check package type
     if options.package_type not in PACKAGE_TYPES:
-        print(("Error : : type must be in this list : %s" % PACKAGE_TYPES))
+        print("Error : : type must be in this list : %s" % PACKAGE_TYPES)
         exit()
 
     # plugin

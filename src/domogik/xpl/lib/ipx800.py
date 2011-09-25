@@ -237,7 +237,7 @@ class IPX:
         if res[0:8] != IPX_SUCCESS:
             self._log.error("Error while changing 'led%s' to 'PULSE'" % num)
         else:
-            print(("Changing 'led%s' to 'PULSE' successfully" % num))
+            print("Changing 'led%s' to 'PULSE' successfully" % num)
             # send change of status
             self.get_status()
 

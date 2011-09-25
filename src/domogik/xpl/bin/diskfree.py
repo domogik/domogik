@@ -100,7 +100,7 @@ class DiskManager(XplPlugin):
                 path_listen.start()
             except:
                 self.log.error(traceback.format_exc())
-                print((traceback.format_exc()))
+                print(traceback.format_exc())
                 # we don't quit plugin if an error occured
                 # a disk can have been unmounted for a while
                 #self.force_leave()

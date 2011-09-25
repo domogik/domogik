@@ -40,7 +40,7 @@ import sys
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(("Usage : %s <plugin xml file>" % sys.argv[0])) 
+        print("Usage : %s <plugin xml file>" % sys.argv[0])
         quit()
     PD = PackageData(sys.argv[1])
     PD.insert()

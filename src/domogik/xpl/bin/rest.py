@@ -120,7 +120,7 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_default(self, event):
         """ A file is modified
         """
-        print(("File modified : %s" % event.pathname))
+        print("File modified : %s" % event.pathname)
         self.my_callback()
 
 ################################################################################
@@ -169,7 +169,7 @@ class Rest(XplPlugin):
             if conf.has_key('package_path'):
                 self._package_path = conf['package_path']
                 self.log.info("Set package path to '%s' " % self._package_path)
-                print(("Set package path to '%s' " % self._package_path))
+                print("Set package path to '%s' " % self._package_path)
                 self._xml_cmd_dir = "%s/plugins/url2xpl/" % self._package_path
                 self._xml_stat_dir = "%s/plugins/stats/" % self._package_path
             else:
