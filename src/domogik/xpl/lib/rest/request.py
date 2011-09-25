@@ -3231,7 +3231,7 @@ target=*
     def rest_helper(self):
         """ REST helpers
         """
-        print "Helper action"
+        print("Helper action")
 
         output = None
         json_data = JSonHelper("OK")
@@ -3304,7 +3304,7 @@ target=*
     def rest_repo(self):
         """ REST repository : upload and download files
         """
-        print "Repository action"
+        print("Repository action")
 
         ### put #####################################
         if self.rest_request[0] == "put":
@@ -3331,11 +3331,11 @@ target=*
         """ Put a file on rest repository
         """
         self.headers.getheader('Content-type')
-        print self.headers
+        print(self.headers)
         content_length = int(self.headers['Content-Length'])
 
         if hasattr(self, "_put_filename") == False:
-            print "No file name given!!!"
+            print("No file name given!!!")
             self.send_http_response_error(999, "You must give a file name : ?filename=foo.txt",
                                           self.jsonp, self.jsonp_cb)
             return
@@ -3356,7 +3356,7 @@ target=*
             up_file.close()
         except IOError:
             self.log.error("PUT : failed to upload '%s' : %s" % (self._put_filename, traceback.format_exc()))
-            print traceback.format_exc()
+            print(traceback.format_exc())
             self.send_http_response_error(999, "Error while writing '%s' : %s" % (file, traceback.format_exc()),
                                           self.jsonp, self.jsonp_cb)
             return
@@ -3472,7 +3472,7 @@ target=*
     def rest_scenario(self):
         """ REST scenario 
         """
-        print "Scenario action"
+        print("Scenario action")
 
         ### list-templates #####################################
         if self.rest_request[0] == "list-templates":
@@ -3841,7 +3841,7 @@ target=*
                     idx += 1
         self.myxpl.send(message)
         self.log.debug("Package : send message : %s" % str(message))
-        print str(message)
+        print(str(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -3861,7 +3861,7 @@ target=*
 
         self.log.debug("Package dependencies check : message receive : %s" % str(message))
         
-        print message
+        print(message)
         # process message
         if message.data.has_key('error'):
             self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)

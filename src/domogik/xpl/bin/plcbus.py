@@ -118,8 +118,8 @@ class PlcBusMain(XplPlugin):
         self.api.send(cmd.upper(), dev, user, level, rate)
 #       Workaround to send an OFF command when dimmer = 0
         if cmd == 'PRESET_DIM' and level == 0:
-            print "cmd : %s " % cmd
-            print "level : %s " % level     
+            print("cmd : %s " % cmd)
+            print("level : %s " % level)     
             self.api.send("OFF", dev, user)
 
     def _command_cb(self, f):
@@ -144,7 +144,7 @@ class PlcBusMain(XplPlugin):
             for i in range(0,16):
                 unit = data >> i & 1
                 code = "%s%s" % (house, i+1)
-                print  "Etat : %s " % code, unit
+                print("Etat : %s " % code, unit)
                 if code in self._probe_status and (self._probe_status[code] != str(unit)):
                     self._probe_status[code] = str(unit)
                     if unit == 1:
@@ -166,7 +166,7 @@ class PlcBusMain(XplPlugin):
             self.myxpl.send(mess)
 
     def _message_cb(self, message):
-        print "Message : %s " % message
+        print("Message : %s " % message)
 
 if __name__ == "__main__":
     PlcBusMain()

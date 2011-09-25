@@ -55,7 +55,7 @@ class Helper():
     def __init__(self):
         """ Init helper
         """
-        print "Init !"
+        print("Init !")
         self.commands =   {}
 
     def help(self):
@@ -79,7 +79,7 @@ class Helper():
         if args == None:
             args = []
         cmd = cmd.lower()
-        print "Helper : %s %s" % (cmd, str(args))
+        print("Helper : %s %s" % (cmd, str(args)))
         if cmd == "help":
             return self.help()
         if cmd == None:
@@ -88,8 +88,8 @@ class Helper():
         # unquote parameters
         for idx, val in enumerate(args):
             args[idx] = unicode(urllib.unquote(val), "UTF-8")
-            print "%s - %s - %s" % (str(idx), args[idx], 
-                                    unicode(urllib.unquote(val), "UTF-8"))
+            print("%s - %s - %s" % (str(idx), args[idx], 
+                                    unicode(urllib.unquote(val), "UTF-8")))
 
         try:
             if len(args) < self.commands[cmd]["min_args"]:

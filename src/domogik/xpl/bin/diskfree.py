@@ -100,7 +100,7 @@ class DiskManager(XplPlugin):
                 path_listen.start()
             except:
                 self.log.error(traceback.format_exc())
-                print(traceback.format_exc())
+                print(traceback.format_exc()))
                 # we don't quit plugin if an error occured
                 # a disk can have been unmounted for a while
                 #self.force_leave()
@@ -113,7 +113,7 @@ class DiskManager(XplPlugin):
     def send_xpl(self, path, du_type, du_value):
         """ Send xPL message on network
         """
-        print "path:%s, %s:%s" % (path, du_type, du_value)
+        print("path:%s, %s:%s" % (path, du_type, du_value))
         msg = XplMessage()
         msg.set_type("xpl-stat")
         msg.set_schema("sensor.basic")

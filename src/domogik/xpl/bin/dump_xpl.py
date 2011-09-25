@@ -61,20 +61,20 @@ class Sniffer(XplPlugin):
         Print received message
         '''
         if self.options.compress == False:
-            print "%s - %s" % (datetime.datetime.now(), message)
+            print("%s - %s" % (datetime.datetime.now(), message))
         else:
             ldt = localtime()
             date = "%s/%s/%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
             time = "%s:%s:%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
             display = "%s" % time
-            print "%s - %s %s hop=%s source=%s target=%s" % (display,
+            print("%s - %s %s hop=%s source=%s target=%s" % (display,
                                                           message.type,
                                                           message.schema,
                                                           message.hop_count,
                                                           message.source,
-                                                          message.target)
+                                                          message.target))
             for elt in message.data:
-                print "  %s=%s" % (elt, message.data[elt])
+                print("  %s=%s" % (elt, message.data[elt]))
 
     def _format(self, number):
         '''

@@ -131,18 +131,18 @@ class Ping:
                 # First ping, no old status for ping
                 old_status = None
             self._log.debug("Pinging %s (%s)" % (computer, self._computers[computer]["ip"]))
-            print("Pinging %s (%s)" % (computer, self._computers[computer]["ip"]))
+            print("Pinging %s (%s)" % (computer, self._computers[computer]["ip"])))
             ret = subprocess.call("ping -c 1 %s" % self._computers[computer]["ip"],
                             shell=True,
                             stdout=open('/dev/null', 'w'),
                             stderr=subprocess.STDOUT)
             if ret == 0:
                 self._log.debug("%s: is alive" % computer)
-                print("%s: is alive" % computer)
+                print("%s: is alive" % computer))
                 status = "HIGH"
             else:
                 self._log.debug("%s: did not respond" % computer)
-                print("%s: did not respond" % computer)
+                print("%s: did not respond" % computer))
                 status = "LOW"
 
             if status != old_status:

@@ -97,7 +97,7 @@ class IPXManager(XplPlugin):
                                                self.ipx_list[ipx]['password'])
             except:
                 self.log.error("Error opening board '%s' : %s " % (ipx, traceback.format_exc()))
-                print("Error opening board '%s' : check logs" % ipx)
+                print("Error opening board '%s' : check logs" % ipx))
             else:
                 num_ok += 1
 
@@ -121,7 +121,7 @@ class IPXManager(XplPlugin):
                 ipx_listen.start()
             except IPXException as err:
                 self.log.error(err.value)
-                print(err.value)
+                print(err.value))
                 # we don't quit plugin if an error occured
                 # we can loose a board for a little time
                 #self.force_leave()

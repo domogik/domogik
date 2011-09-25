@@ -76,7 +76,7 @@ class Query():
         #    self.target = "*"
 
     def __del__(self):
-        print "End query"
+        print("End query")
 
     def set(self, technology, key, value):
         '''
@@ -108,7 +108,7 @@ class Query():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
-        print "new query for t = %s, k = %s" % (technology, key)
+        print("new query for t = %s, k = %s" % (technology, key))
         l = Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config',
                                                     'xpltype': 'xpl-stat',
                                                     'technology': technology,
@@ -145,7 +145,7 @@ class Query():
         Callback to receive message after a query() call
         @param message : the message received
         '''
-        print "Answer received"
+        print("Answer received")
         result = message.data
         for r in self._keys:
             if r in result:
