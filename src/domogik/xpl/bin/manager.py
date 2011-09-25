@@ -94,7 +94,7 @@ class EventHandler(pyinotify.ProcessEvent):
         """ A file is modified
         """
         if event.pathname in self._cfg_files or event.pathname[-4:] == ".xml":
-            print("File modified : %s" % event.pathname))
+            print("File modified : %s" % event.pathname)
             self.my_callback()
 
 class SysManager(XplPlugin):
@@ -156,7 +156,7 @@ class SysManager(XplPlugin):
         if conf.has_key('package_path'):
             self._package_path = conf['package_path']
             self.log.info("Set package path to '%s' " % self._package_path)
-            print("Set package path to '%s' " % self._package_path))
+            print("Set package path to '%s' " % self._package_path)
             sys.path.append(self._package_path)
             self._xml_plugin_directory = os.path.join(self._package_path, "plugins/softwares/")
             self._xml_hardware_directory = os.path.join(self._package_path, "plugins/hardwares/")
@@ -175,7 +175,7 @@ class SysManager(XplPlugin):
             self.ping_duration = self.options.custom_ping_duration
         else:
             self.ping_duration = PING_DURATION
-        print("ping duration=%s" % self.ping_duration)
+        print "ping duration=%s" % self.ping_duration
         try:
             # Get components:
             self._list_plugins()
@@ -316,7 +316,7 @@ class SysManager(XplPlugin):
             self.wait()
         except:
             self.log.error("%s" % sys.exc_info()[1])
-            print("%s" % sys.exc_info()[1]))
+            print("%s" % sys.exc_info()[1])
 
     def _reload_configuration_file(self):
         """ reload all plugins and hardware list
@@ -602,7 +602,7 @@ class SysManager(XplPlugin):
         This method does *not* check if the component exists
         """
         self.log.info("Start the component %s" % name)
-        print("Start %s" % name))
+        print("Start %s" % name)
         if name == "dbmgr" or name == "rest" or self._package_path == None:
             plg_path = "domogik.xpl.bin." + name
         else:
@@ -665,7 +665,7 @@ class SysManager(XplPlugin):
                 hardware_list = os.listdir(self._xml_hardware_directory)
             except:
                 msg = "Error accessing hardware directory : %s. You should create it" % str(traceback.format_exc())
-                print(msg)
+                print msg
                 self.log.error(msg)
                 return 
 
@@ -692,7 +692,7 @@ class SysManager(XplPlugin):
 
                 except:
                     msg = "Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc()))
-                    print(msg)
+                    print msg
                     self.log.error(msg)
         except NoSectionError:
             pass 
@@ -824,7 +824,7 @@ class SysManager(XplPlugin):
                     state_thread[plg_xml.name].start()
 
                 except:
-                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc()))))
+                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
                     self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
 
                 # get data from xml file
@@ -975,7 +975,7 @@ class SysManager(XplPlugin):
         self.log.debug("Call _packagge_cb")
 
         command = message.data['command']
-        print("Package action : %s" % command))
+        print("Package action : %s" % command)
         try:
             host = message.data['host']
         except KeyError:
@@ -1107,7 +1107,7 @@ class SysManager(XplPlugin):
 
         # check if plugin (for a plugin) is running
         tab = message.data['package'].split("-")
-        print("T=%s" % tab)
+        print "T=%s" % tab
         if tab[0] == "plugin":
             if self._check_component_is_running(tab[1]):
                 mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % tab[1]})

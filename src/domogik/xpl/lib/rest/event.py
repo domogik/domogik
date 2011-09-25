@@ -77,7 +77,7 @@ class DmgEvents():
             clean_list = []
             for req in self.requests:
                 if time.time() - self.requests[req]["last_access_date"] > self.event_timeout:
-                    print("Ticket number '%s' expires : it will be deleted" % req)
+                    print "Ticket number '%s' expires : it will be deleted" % req
                     clean_list.append(req)
             for req in clean_list:
                 del self.requests[req]
@@ -93,7 +93,7 @@ class DmgEvents():
         """ Add a new queue and ticket id for a new event
             @return ticket_id : ticket id
         """
-        print("---- NEW ----")
+        print "---- NEW ----"
         new_queue = Queue(self.queue_size)
         ticket_id = self.generate_ticket()
         cur_date = time.time()
@@ -136,7 +136,7 @@ class DmgEvents():
         """ Add data in each queue linked to device id
             @param data : data to put in queues
         """
-        print("---- ADD ----")
+        print "---- ADD ----"
         for req in self.requests:
             ### clean queue
             idx = 0
@@ -165,7 +165,7 @@ class DmgEvents():
             @param ticket_id : id of ticket
             @return data in queue or False if ticket doesn't exists
         """
-        print("---- GET ----")
+        print "---- GET ----"
         x = 0
         empty = True
         while not self.get_stop().isSet() and x < (self.queue_timeout) and empty == True:
@@ -206,7 +206,7 @@ class DmgEvents():
             # Update access date
             self.requests[ticket_id]["last_access_date"] = time.time()
 
-            print(elt_data)
+            print elt_data
             return elt_data
 
     def stop_get(self):

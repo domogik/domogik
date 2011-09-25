@@ -252,16 +252,16 @@ class Log:
         pass
     
     def debug(self, msg):
-        print("DEBUG : %s" % msg)
+        print "DEBUG : %s" % msg
     
     def error(self, msg):
-        print("ERROR : %s" % msg)
+        print "ERROR : %s" % msg
     
     def warning(self, msg):
-        print("WARN : %s" % msg)
+        print "WARN : %s" % msg
     
     def info(self, msg):
-        print("INFO : %s" % msg)
+        print "INFO : %s" % msg
 
 
 
@@ -269,4 +269,4 @@ if __name__ == "__main__":
     l = Log()
     yw = YWeather(l, None)
     yw.open(613858, "c")
-    print(yw.read())
+    print yw.read()

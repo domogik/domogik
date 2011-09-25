@@ -89,7 +89,7 @@ class YWeatherManager(XplPlugin):
                                               self.cities[city]["device"])
             except YWeatherException as err:
                 self.log.error(err.value)
-                print(err.value)
+                print err.value
                 self.force_leave()
                 return
 
@@ -104,7 +104,7 @@ class YWeatherManager(XplPlugin):
                 self.enable_hbeat()
             except YWeatherException as err:
                 self.log.error(err.value)
-                print(err.value)
+                print err.value
                 self.force_leave()
                 return
         self.enable_hbeat()
@@ -199,7 +199,7 @@ class YWeatherManager(XplPlugin):
                                             units = units)
         except KeyError:
             # no data : pass
-            print("No data for %s>%s" % (category, key))
+            print "No data for %s>%s" % (category, key)
             pass
 
 
@@ -209,7 +209,7 @@ class YWeatherManager(XplPlugin):
             @param type : type
             @param current : current
         """
-        print("D=%s, T=%s, C=%s" % (device, type, current))
+        print "D=%s, T=%s, C=%s" % (device, type, current)
         if current == "":
             return
         msg = XplMessage()
@@ -228,7 +228,7 @@ class YWeatherManager(XplPlugin):
             @param device : device
             @param data : dictionnary of data to send
         """
-        print("D=%s, %s" % (device, data))
+        print "D=%s, %s" % (device, data)
         msg = XplMessage()
         msg.set_type("xpl-stat")
         msg.set_schema("weather.basic")

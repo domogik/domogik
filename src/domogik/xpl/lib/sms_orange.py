@@ -67,7 +67,7 @@ class Sms:
 
     def portail_login(self,browser):
       browser.open(url_sms)
-      print(browser.geturl())
+      print browser.geturl()
       if self.is_on_page(browser.geturl(),url_verif_auth):
       	post_data = {"credential" : str(self.login),
                        "pwd" : str(self.password),
@@ -148,14 +148,14 @@ class Sms:
         cj = cookielib.LWPCookieJar()
 	br.set_cookiejar(cj)
         #self.log.debug("call back5")
-        print("function Sms Send : before portail_login")
+        print "function Sms Send : before portail_login"
     	if self.portail_login(br):
-           print("function Sms Send : between portail_login and send_sms")
+           print "function Sms Send : between portail_login and send_sms"
 	   self.send_sms(to,body,br)
-	   print("function Sms Send : after send_sms")
+	   print "function Sms Send : after send_sms"
 	
 	else:
-	   print("function portail_login : error")
+	   print "function portail_login : error"
 
 
 

@@ -102,15 +102,15 @@ class serialHandler(threading.Thread):
                 self.needs_ack_for(plcbus_frame)
                 self._basic_write(plcbus_frame)
                 time.sleep(0.6)
-                print("time before wait : %s" % time.time())
+                print "time before wait : %s" % time.time()
                 for i in range(3):
                     self.receive()
                     if self._ack.isSet():
-                        print("got ack in first read")
+                        print "got ack in first read"
                         break
-                print("time after wait : %s" % time.time())
+                print "time after wait : %s" % time.time()
                 if self._ack.isSet():
-                    print(plcbus_frame + " : Ack set")
+                    print plcbus_frame + " : Ack set"
                     ACK_received = 1
                     self._ack.clear()
                     self._cb(self.explicit_message(plcbus_frame))
@@ -119,7 +119,7 @@ class serialHandler(threading.Thread):
                 if (ACK_received == 1):
                     break
                 elif(time1 + 3.1 < time.time()):
-                    print("WARN : Message %s sent, but ack never received" % plcbus_frame)
+                    print "WARN : Message %s sent, but ack never received" % plcbus_frame
                     break #2s
         elif explicit_frame["d_command"] not in ['GET_ALL_ID_PULSE', 'GET_ALL_ON_ID_PULSE']:
             #No ACK asked, we consider that the message has been correctly sent
@@ -133,11 +133,11 @@ class serialHandler(threading.Thread):
         This method should only be called as mutex.lock() parameter
         @param frame : The frame to write 
         """
-        print("SEND : %s" % frame)
+        print "SEND : %s" % frame
         self.__myser.write(frame.decode("HEX"))
 
     def add_to_send_queue(self, trame):
-        print("add_to_send_queue : %s" % trame)
+        print "add_to_send_queue : %s" % trame
         self._send_queue.put(trame)
 
     def needs_ack_for(self, frame):
@@ -237,20 +237,20 @@ class serialHandler(threading.Thread):
                 #if message is likely to be an answer, put it in the right queue
                 #First we check that the message is not from the adapter itself
                 #And simply ignore it if it's the case 
-                print("str : %s" % m_string)
+                print "str : %s" % m_string
                 if self._is_from_myself(m_string):
-                    print("from myself")
+                    print "from myself"
                     return
                 if self._is_answer(m_string):
-                    print("ANSWER : %s" % m_string)
+                    print "ANSWER : %s" % m_string
                     self._cb(self.explicit_message(m_string))
                 elif self._is_ack(m_string):
-                    print("IS ACK : %s, waited ack : %s" % (m_string, self._waited_ack))
+                    print "IS ACK : %s, waited ack : %s" % (m_string, self._waited_ack)
                     if (self._waited_ack != None) and self._is_ack_for_message(m_string, self._waited_ack):
                         self._waited_ack = None
                         self._ack.set()
                 else:
-                    print("QUEUE : %s" % m_string)
+                    print "QUEUE : %s" % m_string
                     self._cb(self.explicit_message(m_string))
 
     def stop(self):

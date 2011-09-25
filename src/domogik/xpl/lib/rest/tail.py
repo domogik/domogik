@@ -150,6 +150,6 @@ class Tail():
             return ([buf]+result)[-nlines - offset:-offset]
     
 if __name__ == "__main__":
-    print(Tail("/tmp/tail", 5).get())
-    print("----")
-    print(Tail("/tmp/tail", 5, 3).get())
+    print Tail("/tmp/tail", 5).get()
+    print "----"
+    print Tail("/tmp/tail", 5, 3).get()

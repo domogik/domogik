@@ -99,7 +99,7 @@ class Trigger(threading.Thread):
     def run(self):
         prev = None
         while not self.__die.isSet():
-            print("RUNNNNNNNNNNNNNNN")
+            print "RUNNNNNNNNNNNNNNN"
             cur = self.__mpd.status()
             if prev != cur and prev != None:
                 self.check(prev, cur)
@@ -157,7 +157,7 @@ class Trigger(threading.Thread):
         self.__res = res
         if self.__res != self.__oldres:
             self.__caps(self.__res)
-            print(self.__res)
+            print self.__res
 
 
 class Root(dbus.service.Object):
@@ -475,7 +475,7 @@ class Player(dbus.service.Object):
         """
         state = {'play': 0, 'pause': 1, 'stop': 2}
         status = self.__mpd.status()
-        print("StatusChange")
+        print "StatusChange"
         #return (state[status['state']], int(state['random']), 0,
         #        int(state['repeat']))
 
@@ -485,7 +485,7 @@ class Player(dbus.service.Object):
         Signal is emitted when the "Media Player" changes capabilities, see
         GetCaps method.
         """
-        print("CapsChange")
+        print "CapsChange"
 
     @dbus.service.signal(dbus_interface='org.freedesktop.MediaPlayer')
     def  TrackListChange(self, elementsCount):
@@ -497,7 +497,7 @@ class Player(dbus.service.Object):
         The argument is the number of elements in the TrackList after the
         change happened.
         """
-        print("TrackListChange")
+        print "TrackListChange"
 
 
 if __name__ == "__main__":
@@ -515,7 +515,7 @@ if __name__ == "__main__":
             player.CapsChange, player.TrackListChange, mpd.MPDClient(), die)
     trigger.start()
 
-    print("Running service.")
+    print "Running service."
     mainloop.run()
 #    gobject.threads_init()
 #    glib.init_threads()

@@ -46,7 +46,7 @@ import math
 from time import sleep
 
 import sys 
-print("PAAAATH : %s" % sys.path)
+print "PAAAATH : %s" % sys.path
 from domogik.common.database import *
 
 import xbmc
@@ -230,7 +230,7 @@ class DeviceSet:
         self._eff = MyEffect(window)
         self._top = top
         self._win = window
-        print("RANGE : %s" % math.ceil(len(devices) / (nb_device_per_line * 1.0)))
+        print "RANGE : %s" % math.ceil(len(devices) / (nb_device_per_line * 1.0))
         if len(devices) == 0:
             xbmcgui.unlock()
             dialog = xbmcgui.Dialog()
@@ -243,7 +243,7 @@ class DeviceSet:
                     break
                 dev_t = devices[j * nb_device_per_line + i]
                 dev = None
-                print("TYPE : %s" % dev_t[0])
+                print "TYPE : %s" % dev_t[0]
                 if dev_t[0] in self.REPRESENTATIONS:
                     dev = self.REPRESENTATIONS[dev_t[0]](window, j, dev_t[0], dev_t[1], dev_t[2],
                             dev_t[3], dev_t[4], left + i * 110, top + j * 110)
@@ -272,13 +272,13 @@ class DeviceSet:
                 self.devices[i].name.controlUp(self.devices[i - nb_device_per_line].name)
             elif ((len(devices) % nb_device_per_line) > i):
                 #Il y a un element sur la meme colonne, derniere ligne
-                print("device : %s" % (len(devices) - (len(devices)  % nb_device_per_line) + i))
+                print "device : %s" % (len(devices) - (len(devices)  % nb_device_per_line) + i)
                 self.devices[i].name.controlUp(self.devices[(len(devices) - (len(devices)  % nb_device_per_line) + i)].name)
             else:
                 #avant derniere ligne
                 self.devices[i].name.controlUp(self.devices[(len(devices) - (len(devices)  % nb_device_per_line) + i - nb_device_per_line)].name)
 
-        print("before window : %s" % self.devices)
+        print "before window : %s" % self.devices
         window.setFocus(self.devices[0].name)
         self._oldline = None
 
@@ -306,16 +306,16 @@ class DeviceSet:
         """
         put the line a device 'device' on center
         """
-        print("Device is : %s" % device)
+        print "Device is : %s" % device
         line = self.get_line_of_device(device)
-        print("line is : %s" % line)
+        print "line is : %s" % line
         wanted_position = (self._win.getHeight()) / 2 + self._top - 55
         real_position = device.getPosition()[1]
-        print("Wanted position is : %s" % wanted_position)
-        print("real position is : %s" % real_position)
+        print "Wanted position is : %s" % wanted_position
+        print "real position is : %s" % real_position
         padding = wanted_position - real_position
-        print("padding is : %s" % padding)
-        print("oldine is : %s" % self._oldline)  
+        print "padding is : %s" % padding
+        print "oldine is : %s" % self._oldline  
         if line == 0 and (self._oldline ==  len(self.devices) / self._nb_device_per_line) and self._oldline >= self._visible_lines:
             #avoid a bug if we loop from last line to first on2e
             #need to compute padding ourself since getPosition is wrong
@@ -341,7 +341,7 @@ class DeviceSet:
         """
         Delete all DeviceRepresentation
         """
-        print("DELETE DEVICES") #do *not* remove this debug
+        print "DELETE DEVICES" #do *not* remove this debug
         for device in self.devices:
             del device
 
@@ -388,14 +388,14 @@ class DMGWindow(xbmcgui.Window):
 
         
     def update_center(self, n = "default"):
-        print("%s : %s" % (n, DB.get_room_by_name(n)))
+        print "%s : %s" % (n, DB.get_room_by_name(n))
         if n != "default":
             dev = DB.search_devices(room_id = DB.get_room_by_name(n).id)
             devices = []
             for d in dev:
                 this_dev = (d.type, d.technology_id, d.id, d.name, DB.get_last_stat_of_device(d.id).value)
                 devices.append(this_dev)
-            print(devices) 
+            print devices 
         else:
             devices = [("type1","techno1", 1, "%s1" % n, "value1"),
             ("type2","techno2", 2, "%s2" % n, "value2"),

@@ -250,7 +250,7 @@ class ServerZiBase(threading.Thread):
     def stop(self):
         self.serv.sendto('FIN',(self.ip,self.port))
         while self._listen:
-            print("Wait stop")
+            print "Wait stop"
         self.log.debug("Server stopped on port=%s" % (self.port))
 
     def send_xpl(self, datas):

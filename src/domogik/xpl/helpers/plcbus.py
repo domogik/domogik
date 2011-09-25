@@ -124,11 +124,11 @@ class plcbus(Helper):
 
         
         if f["d_command"] == "STATUS_ON":
-           print("command StatusRequest : %s" % f["d_command"])
+           print "command StatusRequest : %s" % f["d_command"]
            self.liste_found.append("%s%s%s%s%s" % (self._devicecode, " | Dimmer : ", f["d_data1"], " | Fading : ", f["d_data2"]))
            self._event.set()
 
     def _message_cb(self, message):
-        print("Message : %s " % message)
+        print "Message : %s " % message
 
 MY_CLASS = {"cb" : plcbus}

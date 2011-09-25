@@ -90,8 +90,8 @@ if ('external_rest_server_prefix' in conf_django) and (conf_django['external_res
 else:
     EXTERNAL_REST_URL = "http://" + EXTERNAL_REST_IP + ":" + EXTERNAL_REST_PORT
 
-print("DJANGO REST url : " + INTERNAL_REST_URL)
-print("JQUERY REST url : " + EXTERNAL_REST_URL)
+print "DJANGO REST url : " + INTERNAL_REST_URL
+print "JQUERY REST url : " + EXTERNAL_REST_URL
 
 
 PROXY_DOMAIN = INTERNAL_REST_IP

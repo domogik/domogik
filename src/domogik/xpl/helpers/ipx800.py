@@ -84,7 +84,7 @@ class Ipx800(Helper):
                 data.append("%s : %s" % (ipx[0], ipx[1]))
         except IPXException as err:
             return [err.value]
-        print(data)
+        print data
         return data
 
     def status(self, args = None):
@@ -99,7 +99,7 @@ class Ipx800(Helper):
         else:
             return ["Bad usage of this helper"]
         data = ipx.get_status_for_helper()
-        print(data)
+        print data
         return data
 
 MY_CLASS = {"cb" : Ipx800}

@@ -642,7 +642,7 @@ def admin_packages_hardwares(request):
 
     host = None
     for h in packages:
-        print("%s %", (h.host, rest_info.rest[0].info.Host))
+        print "%s %", (h.host, rest_info.rest[0].info.Host)
         if (h.host == rest_info.rest[0].info.Host) :
             host = h
     return __go_to_page(

@@ -52,7 +52,7 @@ class Zwave(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         device = self._config.query('zwave', 'device')
         speed = self._config.query('zwave', 'speed')
-        print(device, '  ', speed)
+        print device, '  ', speed
 #        device='/dev/ttyUSB0'
         self.myzwave = ZWave(device, speed, self.zwave_cb, self.log)
         self.myzwave.start()
@@ -75,7 +75,7 @@ class Zwave(XplPlugin):
         if 'info' in read:
             self.log.error ("Error : Node %s unreponsive" % read['node'])
 	elif 'Find' in read:
-	    print("node enregistré : %s" % read['Find'])
+	    print "node enregistré : %s" % read['Find']
         elif 'event' in read:
             mess.set_type('xpl-trig')
             mess.set_schema('zwave.basic')
@@ -84,7 +84,7 @@ class Zwave(XplPlugin):
                            'level' : read['level']})
             self.myxpl.send(mess)
         elif 'command' in read and read['command'] == 'Info':
-            print("Home ID is %s" % read['Home ID'])
+            print "Home ID is %s" % read['Home ID']
 
 if __name__ == "__main__":
     Zwave()

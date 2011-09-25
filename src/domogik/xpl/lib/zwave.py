@@ -207,25 +207,25 @@ class ZWave(threading.Thread):
                                 'info': 'unresponsive'})
                     self.level = ''
                 elif data[2:4] == '00':
-                    print("Status of node %s as change, its level is : %s" % (self.nodeID,self.level))
+                    print "Status of node %s as change, its level is : %s" % (self.nodeID,self.level)
                     self.read({'event' : command,
                                 'node' : self.nodeID,
                                 'level': int(self.level)})
             elif command == 'level' and data == '01':
-                print("Node ID correct")
+                print "Node ID correct"
         elif command == 'Home ID':
             home=data[0:8]
-            print("Home ID = %s" % home)
+            print "Home ID = %s" % home
             mess={'command':command,
                        'Home ID':home}
             self.read(mess)
         elif command == 'Association':
-            print(data)
+            print data
         elif command == 'Info':
             if data == '000000030000':
-                print("Unknow device %s" % self.nodeID)            
+                print "Unknow device %s" % self.nodeID            
             data=data[6:]
-            print(data)
+            print data
             basicclass={'01':'CONTROLLER',
                         '02':'STATIC CONTROLLER',
                         '03':'SLAVE',
@@ -263,7 +263,7 @@ class ZWave(threading.Thread):
             if list!=[]:
                 self.read({'Find':list[0:]})
         if command == 'unknow':
-            print(data)
+            print data
         TOF = ''
         command = ''
         data = ''

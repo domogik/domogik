@@ -158,7 +158,7 @@ class DBConnector(XplPlugin):
         '''
         # This array is here for information only but is not used anymore
         # Values are now on the database
-        print("****** key = %s" % key)
+        print "****** key = %s" % key
         vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
                         'heyu-file-0': 'TTY /dev/ttyUSB0',
                         'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',

@@ -1566,5 +1566,5 @@ if __name__ == "__main__":
     sql_schema.metadata.drop_all(engine_test)
     sql_schema.metadata.create_all(engine_test)
     
-    print("*** Using database %s ***\n" % db.get_db_type()))
+    print("*** Using database %s ***\n" % db.get_db_type())
     unittest.main()

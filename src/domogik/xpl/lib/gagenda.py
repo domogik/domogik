@@ -172,13 +172,13 @@ class GAgenda:
 def cb_print(data):
     """ Test function
     """
-    print("DATA : ")
-    print(data)
+    print "DATA : "
+    print data
 
 
 if __name__ == "__main__":
     GA = GAgenda("fritz.smh@gmail.com", "password", "fritz.smh@gmail.com", cb_print)
-    print("Today :")
+    print "Today :"
     GA.get_today_events()
-    print("Tomorrow :")
+    print "Tomorrow :"
     GA.get_tomorrow_events()

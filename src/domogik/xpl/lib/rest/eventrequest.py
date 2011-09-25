@@ -53,7 +53,7 @@ class RequestEvents(DmgEvents):
             @param device_id : id of device to get events from
             @return ticket_id : ticket id
         """
-        print("---- NEW ----")
+        print "---- NEW ----"
         new_queue = Queue(self.queue_size)
         ticket_id = self.generate_ticket()
         cur_date = time.time()
@@ -71,7 +71,7 @@ class RequestEvents(DmgEvents):
         """ Add data in each queue linked to device id
             @param data : data to put in queues
         """
-        print("---- ADD ----")
+        print "---- ADD ----"
         for req in self.requests:
             if device_id in self.requests[req]["device_id_list"]:
                 ### clean queue

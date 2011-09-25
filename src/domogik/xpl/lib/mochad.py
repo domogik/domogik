@@ -45,7 +45,7 @@ class Mochad(XplPlugin):
                 continue
             break
         if self.mochad_socket is None:
-            print('could not open socket')
+            print 'could not open socket'
             sys.exit(1)
 
     def listener(self):
@@ -70,11 +70,11 @@ class Mochad(XplPlugin):
 
                 ## Send xpl message
                 self.myxpl.send(mess)
-                print("Received from RF : "+mochad_cmd[5]+" "+mochad_cmd[7])
+                print "Received from RF : "+mochad_cmd[5]+" "+mochad_cmd[7]
 
     def sender(self):
         while True:
-            print("Listening to stdin")
+            print "Listening to stdin"
             data = sys.stdin.readline()
             data = data.strip().split(' ')
             if data[0] == 'pl':
@@ -86,7 +86,7 @@ class Mochad(XplPlugin):
             data = "pl "+address+" "+order+" "+supp+"\n"
         else:
             data = "pl "+address+" "+order+"\n"
-        print("Send "+data+" to mochad")
+        print "Send "+data+" to mochad"
         try:
             self.mochad_socket.send(data)
         except Exception as e:

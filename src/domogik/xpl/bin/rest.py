@@ -120,7 +120,7 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_default(self, event):
         """ A file is modified
         """
-        print("File modified : %s" % event.pathname))
+        print("File modified : %s" % event.pathname)
         self.my_callback()
 
 ################################################################################
@@ -169,7 +169,7 @@ class Rest(XplPlugin):
             if conf.has_key('package_path'):
                 self._package_path = conf['package_path']
                 self.log.info("Set package path to '%s' " % self._package_path)
-                print("Set package path to '%s' " % self._package_path))
+                print("Set package path to '%s' " % self._package_path)
                 self._xml_cmd_dir = "%s/plugins/url2xpl/" % self._package_path
                 self._xml_stat_dir = "%s/plugins/stats/" % self._package_path
             else:
@@ -530,7 +530,7 @@ class Rest(XplPlugin):
         except Full:
             msg = "Queue '%s' is full : cleaning it to make some space..." % my_queue
             self.log_queue.debug(msg)
-            print(msg)
+            print msg
             # queue is full : start cleaning it
             nb_ck = 0
             while nb_ck < my_queue.qsize():
@@ -573,7 +573,7 @@ class Rest(XplPlugin):
     def start_stats(self):
         """ Start Statistics manager
         """
-        print("Start Stats")
+        print "Start Stats"
         self.log.info("Starting statistics manager. Its logs will be in a dedicated log file")
         self.stat_mgr = StatsManager(handler_params = [self], xpl = self.myxpl)
         self.stat_mgr.load()
@@ -582,7 +582,7 @@ class Rest(XplPlugin):
     def reload_stats(self):
         """ Reload Statistics manager
         """
-        print("Reload Stats")
+        print "Reload Stats"
         self.log.info("Reloading statistics manager. Its logs will be in a dedicated log file")
         self.stat_mgr.load()
 
@@ -604,7 +604,7 @@ class Rest(XplPlugin):
                         self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
                 except:
                     msg = "Error while loading url2xpl files : %s" % traceback.format_exc()
-                    print(msg)
+                    print msg
                     self.log.error(msg)
                     self.xml_ko.append("%s/%s" % (techno, command))
                     
@@ -617,9 +617,9 @@ class Rest(XplPlugin):
         """ Get exception and display it on stdout
         """
         my_exception =  str(traceback.format_exc()).replace('"', "'")
-        print("==== Error in REST ====")
-        print(my_exception)
-        print("=======================")
+        print "==== Error in REST ===="
+        print my_exception
+        print "======================="
         return my_exception
 
 
@@ -653,7 +653,7 @@ class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
         """
         self.stop = True
         # we do a last request to terminate server
-        print("Make a last request to HTTP server to stop it")
+        print "Make a last request to HTTP server to stop it"
         resp = urllib.urlopen("http://%s:%s" % (self.address[0], self.address[1]))
 
 
@@ -683,7 +683,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
                                                         self.socket_type))
         except:
             error = "SSL error : %s. Did you generate certificate ?" % self.handler_params[0].get_exception()
-            print(error)
+            print error
             self.handler_params[0].log.error(error)
             # force exiting
             self.handler_params[0].force_leave()

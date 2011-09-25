@@ -312,17 +312,17 @@ def main():
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
     liste = {}
-    print("****************  Test du parsing  *******************")
-    print("Parsing de l'expression : %s" % expr1)
-    print(eval(expr1+".parse(liste)"))
+    print "****************  Test du parsing  *******************"
+    print "Parsing de l'expression : %s" % expr1
+    print eval(expr1+".parse(liste)")
 
-    print("**************** Test des listeners *******************")
+    print "**************** Test des listeners *******************"
     expr2 = "AND(%s, %s)" % (state1, time1)
     #expr2 = "AND(%s, OR(%s, %s))" % (state1, time1, state3)
-    print("Parsing de l'expression : %s" % expr2)
+    print "Parsing de l'expression : %s" % expr2
     liste = {}
     parsing = eval(expr2+".parse(liste)")
-    print(parsing)
+    print parsing
     l = ListenerBuilder(parsing, expr2)
 
 if __name__ == "__main__":

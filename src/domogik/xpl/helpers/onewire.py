@@ -210,12 +210,12 @@ class OneWireNetwork:
         ret = []
         for comp in self._root.find(id = my_id):
             # component detail
-            print("C=%s" % comp)
+            print "C=%s" % comp
             display = " - %-20s : %s" 
             ret.append("%s attributes :" % my_id)
             for attr in comp.entryList():
                 try:
-                    print("ATTR=%s" % attr)
+                    print "ATTR=%s" % attr
                     ret.append(display % (attr, comp.__getattr__(attr)))
                 # Patch with owfs 2.8p4 : the 2 following excepts weren't needed
                 # with a previous owfs release (2.7 maybe)

@@ -65,9 +65,9 @@ class Sms:
 
     def portail_login(self,browser):
       	browser.open(url_sms)
-      	print(browser.geturl())
+      	print browser.geturl()
 	for x in browser.forms():
-        	print(x)	
+        	print x	
         browser.select_form(name='code')
         browser['j_username'] = login
         browser['j_password'] = password
@@ -77,7 +77,7 @@ class Sms:
 	
 
     def send_sms(self,to,body,browser):
-	print("sms_send : entrée")
+	print "sms_send : entrée"
 	if self.phone_regex.match(to) is None:
 		self.status_error = "Sms format to is bad"
 		return 0
@@ -86,14 +86,14 @@ class Sms:
 		return 0
 
   	browser.open(url_sms2)
-	print("sms_send : formulaire sms")
+	print "sms_send : formulaire sms"
 	for x in browser.forms():
-        	print(x)	
+        	print x	
 	browser.select_form(nr=0)
         browser['fieldMsisdn'] = to
         browser['fieldMessage'] = body.encode('utf-8')
         browser.submit()
-	print("sms_send : confirmation sms")
+	print "sms_send : confirmation sms"
 
 
 	self.status_send = 1
@@ -116,14 +116,14 @@ class Sms:
         cj = cookielib.LWPCookieJar()
 	br.set_cookiejar(cj)
         #self.log.debug("call back5")
-        print("function Sms Send : before portail_login")
+        print "function Sms Send : before portail_login"
     	if self.portail_login(br):
-           print("function Sms Send : between portail_login and send_sms")
+           print "function Sms Send : between portail_login and send_sms"
 	   self.send_sms(to,body,br)
-	   print("function Sms Send : after send_sms")
+	   print "function Sms Send : after send_sms"
 	
 	else:
-	   print("function portail_login : error")
+	   print "function portail_login : error"
 
 
 
