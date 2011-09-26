@@ -36,6 +36,9 @@ from unittest import TestCase
 import time
 import datetime
 
+from sqlalchemy import create_engine
+
+from domogik.common import sql_schema
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import DeviceStats
 
@@ -1523,12 +1526,15 @@ class SystemInfoTestCase(GenericTestCase):
         pass
 
     def test_update(self):
+        assert db.get_db_version() is None
+        db.update_db_version(si_db_version=u'0.2.0')
+        assert db.get_db_version() == u'0.2.0'
+        
         system_info = db.update_system_info(si_db_version=u'0.1.0')
         print(system_info)
         assert system_info.db_version == '0.1.0'
         db.update_system_info(si_db_version=u'0.1.1')
         assert db.get_system_info().db_version == u'0.1.1'
-
 
 class SystemConfigTestCase(GenericTestCase):
     """Test system config"""
@@ -1551,6 +1557,14 @@ class SystemConfigTestCase(GenericTestCase):
 
 
 if __name__ == "__main__":
+    print("Creating test database...")
     db = DbHelper(use_test_db=True)
+    url = db.get_url_connection_string()
+    test_url = '%s_test' % url
+    engine_test = create_engine(test_url)
+    sql_schema.metadata.reflect(engine_test)
+    sql_schema.metadata.drop_all(engine_test)
+    sql_schema.metadata.create_all(engine_test)
+    
     print("*** Using database %s ***\n" % db.get_db_type())
     unittest.main()

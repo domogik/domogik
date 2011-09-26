@@ -113,7 +113,7 @@ class DiskManager(XplPlugin):
     def send_xpl(self, path, du_type, du_value):
         """ Send xPL message on network
         """
-        print "path:%s, %s:%s" % (path, du_type, du_value)
+        print("path:%s, %s:%s" % (path, du_type, du_value))
         msg = XplMessage()
         msg.set_type("xpl-stat")
         msg.set_schema("sensor.basic")

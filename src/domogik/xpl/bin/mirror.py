@@ -64,7 +64,7 @@ class MirrorManager(XplPlugin):
             mirror.open(device)
         except MirrorException as e:
             self.log.error(e.value)
-            print e.value
+            print(e.value)
             self.force_leave()
             return
             
@@ -82,7 +82,7 @@ class MirrorManager(XplPlugin):
     def send_xpl(self, device, type, current):
         """ Send xPL message on network
         """
-        print "device:%s, type:%s, current:%s" % (device, type, current)
+        print("device:%s, type:%s, current:%s" % (device, type, current))
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema("sensor.basic")

@@ -19,28 +19,39 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Plugin purpose
+Module purpose
 ==============
 
-Insert plugin data in database
+Upgrade the database
 
 Implements
 ==========
 
-PluginData
 
-@author: Fritz <fritz.smh@gmail.com>
+@author: Marc Schneider <marc@mirelsol.org>
 @copyright: (C) 2007-2010 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
-from domogik.common.packagedata import PackageData
 import sys
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage : %s <plugin xml file>" % sys.argv[0])
-        quit()
-    PD = PackageData(sys.argv[1])
-    PD.insert()
+from sqlalchemy import create_engine
+from domogik.common import database
+
+__db = database.DbHelper()
+__url = __db.get_url_connection_string()
+__engine = create_engine(__url)
+
+def process(new_db_version):
+    print("=== Upgrade process")
+    #while __db.get_db_version() != new_db_version:
+    __execute_upgrade()
+
+def __execute_upgrade():
+    current_db_version = __db.get_db_version()
+    print("Upgrading database version %s" % current_db_version)
+    if current_db_version == '0.1.0' or current_db_version is None:
+        new_version == '0.2.0'
+        print("Upgrading to version : %s" % new_version)
+        

@@ -75,7 +75,7 @@ class SamsungTVManager(XplPlugin):
                 self.televisions[television]['obj'].open(self.televisions[television]['device'])
             except SamsungTVException as err:
                 self.log.error(err.value)
-                print err.value
+                print(err.value)
                 self.force_leave()
                 return
 
@@ -113,7 +113,7 @@ class SamsungTVManager(XplPlugin):
         status = self.televisions[name]['obj'].send(command, data1)
 
         # Send xpl-trig to say plugin receive command
-        print "S=%s" % status
+        print("S=%s" % status)
         if status == True:
             mess = XplMessage()
             mess.set_type('xpl-trig')
@@ -123,7 +123,7 @@ class SamsungTVManager(XplPlugin):
             mess.add_data({'current' :  command})
             if data1 != None:
                 mess.add_data({'data1' :  data1})
-            print mess
+            print(mess)
             self.myxpl.send(mess)
 
 

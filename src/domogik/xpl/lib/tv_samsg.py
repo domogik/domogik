@@ -97,7 +97,7 @@ class SamsungTV:
         data = binascii.unhexlify(cmd)
         self._samsung.write("%s" % data)
         res = binascii.hexlify(self._samsung.readline())
-        print "res=%s" % res
+        print("res=%s" % res)
         if res == "030cf100":
             print("Command is OK")
             return True

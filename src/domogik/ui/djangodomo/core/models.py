@@ -173,13 +173,13 @@ class DeviceTypes(pipes.DmgPipe):
     @staticmethod
     def get_dict():
         if DeviceTypes._dict is None:
-            print "device types downloading"
+            print("device types downloading")
             types = DeviceTypes.get_all()
             DeviceTypes._dict = {}
             for type in types.device_type:
                 DeviceTypes._dict[type.id] = type
         else:
-            print "device types already downloaded"
+            print("device types already downloaded")
         return DeviceTypes._dict
 
     @staticmethod
@@ -200,13 +200,13 @@ class DeviceUsages(pipes.DmgPipe):
     @staticmethod
     def get_dict():
         if DeviceUsages._dict is None:
-            print "device usages downloading"
+            print("device usages downloading")
             usages = DeviceUsages.get_all()
             DeviceUsages._dict = {}
             for usage in usages.device_usage:
                 DeviceUsages._dict[usage.id] = usage
         else:
-            print "device usages already downloaded"
+            print("device usages already downloaded")
         return DeviceUsages._dict
 
     @staticmethod

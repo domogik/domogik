@@ -68,7 +68,7 @@ class KNXManager(XplPlugin):
 
         except KNXException as err:
             self.log.error(err.value)
-            print err.value
+            print(err.value)
             self.force_leave()
             return
 
@@ -83,7 +83,7 @@ class KNXManager(XplPlugin):
             knx_listen.start()
         except KNXException as err:
             self.log.error(err.value)
-            print err.value
+            print(err.value)
             self.force_leave()
             return
 
@@ -121,12 +121,12 @@ class KNXManager(XplPlugin):
                    msg_type = "l"
            msg = XplMessage()
            if command == 'Writ':
-              print "knx Write xpl-trig"
+              print("knx Write xpl-trig")
               command = 'Write'
               msg.set_type("xpl-trig")
               msg.set_schema('knx.basic')
            if command == 'Resp':
-              print "knx Response xpl-stat"
+              print("knx Response xpl-stat")
               command = 'Response'
               if sender<>"0.0.0":
                   msg.set_type("xpl-stat")
@@ -134,7 +134,7 @@ class KNXManager(XplPlugin):
                   msg.set_type("xpl-trig")
               msg.set_schema('knx.basic')
            if command == 'Read':
-               print "knx Read xpl-cmnd"
+               print("knx Read xpl-cmnd")
                if sender<>"0.0.0":
                    msg.set_type("xpl-cmnd")
                else:
@@ -154,10 +154,10 @@ class KNXManager(XplPlugin):
         type_cmd = message.data['command']
         groups = message.data['group']
         groups = groups.replace(':','/')
-        print "%s" %type_cmd
+        print("%s" %type_cmd)
         command=""
         if type_cmd=="Write":
-            print "dmg Write"
+            print("dmg Write")
             valeur = message.data['data']
             data_type = message.data['type']
             if data_type=="s":
@@ -165,10 +165,10 @@ class KNXManager(XplPlugin):
             if data_type=="l":
                command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
         if type_cmd == "Read":
-            print "dmg Read"
+            print("dmg Read")
             command="groupread ip:127.0.0.1 %s" % groups
         if type_cmd == "Response":
-            print "dmg Response"
+            print("dmg Response")
             data_type=message.data['type']
             valeur = message.data['data']
             if data_type=="s":
@@ -178,7 +178,7 @@ class KNXManager(XplPlugin):
         if command<>"":
             subp=subprocess.Popen(command, shell=True)
         if command=="":
-           print "erreur command non définir, type cmd= %s" %type_cmd
+           print("erreur command non définir, type cmd= %s" %type_cmd)
 
 
 if __name__ == "__main__":

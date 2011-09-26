@@ -75,7 +75,7 @@ class XplBridgeManager(XplPlugin):
             br.open(device)
         except XplBridgeException as e:
             self.log.error(e.value)
-            print e.value
+            print(e.value)
             self.force_leave()
             return
             
@@ -92,7 +92,7 @@ class XplBridgeManager(XplPlugin):
         """ Send xPL message on network
             @param resp : xpl message
         """
-        print "Input xpl message : %s " % resp
+        print("Input xpl message : %s " % resp)
         msg = XplMessage(resp)
         self.myxpl.send(msg)
 

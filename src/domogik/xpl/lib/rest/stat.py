@@ -312,7 +312,7 @@ class StatsManager:
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
                 #print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
-                print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id)
+                print("Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id))
             except AttributeError:
                 if self._res["device"] != None:
                     self._log_stats_unknown.debug("Received a stat for an unreferenced device : %s - %s" \
@@ -320,7 +320,7 @@ class StatsManager:
                 else:
                     self._log_stats_unknown.debug("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, self._res["static_device"]))
-                print "=> unknown device"
+                print("=> unknown device")
                 return
             #self._log_stats.debug("Stat received for %s - %s." \
             #        % (self._technology, message.data[self._res["device"]]))
@@ -360,12 +360,12 @@ class StatsManager:
                 except KeyError:
                     # no value in message for key
                     # example : a x10 command = ON has no level value
-                    print "No param value in message for key"
+                    print("No param value in message for key")
                 except:
                     error = "Error when processing stat : %s" % traceback.format_exc()
-                    print "==== Error in Stats ===="
-                    print error
-                    print "========================"
+                    print("==== Error in Stats ====")
+                    print(error)
+                    print("========================")
                     self._log_stats.error(error)
     
             # Put data in events queues

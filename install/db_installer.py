@@ -41,6 +41,7 @@ from sqlalchemy import create_engine
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
+import db_upgrade
 
 CURRENT_DB_VERSION_NB = "0.2.0"
 __db = database.DbHelper()
@@ -53,6 +54,8 @@ __engine = create_engine(__url)
 
 def __drop_all_tables():
     print("Droping all existing tables...")
+    sql_schema.metadata.drop_all(__engine)    
+    """
     # Only drop the table if it exists
     sql_schema.DeviceFeatureAssociation.__table__.drop(bind=__engine, checkfirst=True)
     sql_schema.DeviceFeature.__table__.drop(bind=__engine, checkfirst=True)    
@@ -73,12 +76,13 @@ def __drop_all_tables():
     sql_schema.SystemInfo.__table__.drop(bind=__engine, checkfirst=True)
     sql_schema.Trigger.__table__.drop(bind=__engine, checkfirst=True)
     sql_schema.UIItemConfig.__table__.drop(bind=__engine, checkfirst=True)
+    """
 
 def __add_initial_data():
     print("Adding initial data...")
     # Initialize default system configuration
     __db.update_system_config()
-    __db.update_system_info(CURRENT_DB_VERSION_NB)
+    __db.update_db_version(CURRENT_DB_VERSION_NB)
 
     # Create a default user account
     __db.add_default_user_account()
@@ -122,20 +126,18 @@ def __add_initial_data():
 """Upgrade process of the database
 
 """
-def upgrade_db():
+def __upgrade_db():
     print("Upgrading the database...")
+    db_upgrade.process(CURRENT_DB_VERSION_NB)
 
-def install_or_upgrade(create_test_db):
-    """Initialize the databases (install new one or upgrade it)
+def __install_or_upgrade():
+    """Initialize the databases (install new one or upgrade it)"""
 
-    @param create_test_db : true if the test DB should be (re)created
-
-    """
     print("Using database", __db.get_db_type())
     #TODO: improve this test
     if not sql_schema.SystemConfig.__table__.exists(bind=__engine):
         print("It appears that your database doesn't contain the required tables.")
-        answer = raw_input("Should they be created? [y/N]")
+        answer = raw_input("Should they be created? [y/N] ")
         if answer != "y":
             print("Can't continue, system tables are missing")
             sys.exit(1)
@@ -145,26 +147,17 @@ def install_or_upgrade(create_test_db):
             sql_schema.metadata.create_all(__engine)
             __add_initial_data()
     else:
-        upgrade_db()
+        __upgrade_db()
 
-    if create_test_db:
-        print("Creating test database...")
-        test_url = '%s_test' % __url
-        engine_test = create_engine(test_url)
-        __drop_all_tables(engine_test)
-        sql_schema.metadata.drop_all(engine_test)
-        sql_schema.metadata.create_all(engine_test)
     print("Initialization complete.")
 
 def usage():
-    print("Usage : db_installer [-t, --test]")
-    print("-t or --test : database for unit tests will created (default is False)")
+    print("Usage : db_installer [-r, --reset]")
     print("-r or --reset : drop all tables (default is False)")
 
 if __name__ == "__main__":
-    create_test_db = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "htr", ["help", "test", "reset"])
+        opts, args = getopt.getopt(sys.argv[1:], "hr", ["help", "reset"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -173,12 +166,10 @@ if __name__ == "__main__":
             usage()
             sys.exit()
         else:
-            if opt in ('-t', '--test'):
-                create_test_db = True
             if opt in ('-r', '--reset'):
-                answer = raw_input("Are you sure you want to drop all your tables? [y/N]")
+                answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
                 if answer == 'y':
                     __drop_all_tables()
                 sys.exit()
 
-    install_or_upgrade(create_test_db)
+    __install_or_upgrade()

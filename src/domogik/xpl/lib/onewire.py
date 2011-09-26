@@ -265,8 +265,8 @@ class ComponentDs2438:
                 try:
                     temperature = float(comp.temperature)
                     humidity = float(comp.humidity)
-                    print "T=%s" % temperature
-                    print "H=%s" % humidity
+                    print("T=%s" % temperature)
+                    print("H=%s" % humidity)
                 except AttributeError:
                     error = "DS2438 : error while reading value"
                     self._log.error(error)
