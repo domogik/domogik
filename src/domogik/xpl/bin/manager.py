@@ -221,22 +221,23 @@ class SysManager(XplPlugin):
             self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
             comp_thread = {}
             for plugin in self._plugins:
-                name = plugin["name"]
-                self.log.debug("%s..." % name)
-                self._config = Query(self.myxpl, self.log)
-                startup = self._config.query(name, 'startup-plugin')
-                # start plugin
-                if startup == 'True':
-                    self.log.debug("Starting %s" % name)
-                    self._inc_startup_lock()
-                    comp_thread[name] = Thread(None,
-                                                   self._start_plugin,
-                                                   "start_plugin_%s" % name,
-                                                   (name,
-                                                    self.get_sanitized_hostname()),
-                                                   {"startup" : True})
-                    self.register_thread(comp_thread[name])
-                    comp_thread[name].start()
+                if plugin["check_startup_option"]:
+                    name = plugin["name"]
+                    self.log.debug("%s..." % name)
+                    self._config = Query(self.myxpl, self.log)
+                    startup = self._config.query(name, 'startup-plugin')
+                    # start plugin
+                    if startup == 'True':
+                        self.log.debug("Starting %s" % name)
+                        self._inc_startup_lock()
+                        comp_thread[name] = Thread(None,
+                                                       self._start_plugin,
+                                                       "start_plugin_%s" % name,
+                                                       (name,
+                                                        self.get_sanitized_hostname()),
+                                                       {"startup" : True})
+                        self.register_thread(comp_thread[name])
+                        comp_thread[name].start()
             
             # Define listeners
             Listener(self._sys_cb, self.myxpl, {
@@ -803,6 +804,13 @@ class SysManager(XplPlugin):
                     # get data for plugin
                     plg_xml = PackageXml(path = xml_file)
 
+                    # Rest must be started and checked before all plugins
+                    # so we don't check it with others
+                    if plugin == "rest":
+                        check_startup_option = False
+                    else:
+                        check_startup_option = True
+
                     # register plugin
                     self._plugins.append({"type" : plg_xml.type,
                                       "name" : plg_xml.name, 
@@ -812,7 +820,8 @@ class SysManager(XplPlugin):
                                       "host" : self.get_sanitized_hostname(), 
                                       "release" : plg_xml.release,
                                       "documentation" : plg_xml.doc,
-                                      "configuration" : plg_xml.configuration})
+                                      "configuration" : plg_xml.configuration,
+                                      "check_startup_option" : check_startup_option})
 
                     # check plugin state (will update component status)
                     state_thread[plg_xml.name] = Thread(None,
@@ -827,7 +836,6 @@ class SysManager(XplPlugin):
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
                     self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
 
-                # get data from xml file
         return
 
 
