@@ -67,7 +67,7 @@ import pkgutil
 
 
 KILL_TIMEOUT = 2
-PING_DURATION = 3
+PING_DURATION = 10
 WAIT_TIME_BETWEEN_PING = 15
 
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
@@ -180,7 +180,7 @@ class SysManager(XplPlugin):
             #Start dbmgr
             if self.options.start_dbmgr:
                 self._inc_startup_lock()
-                if self._check_component_is_running("dbmgr", True):
+                if self._check_component_is_running("dbmgr", startup = True):
                     self.log.warning("Manager started with -d, but a database manager is already running")
                     self._write_fifo("WARN", "Manager started with -d, but a database manager is already running\n")
                     self._dec_startup_lock()
@@ -197,7 +197,7 @@ class SysManager(XplPlugin):
             #Start rest
             if self.options.start_rest:
                 self._inc_startup_lock()
-                if self._check_component_is_running("rest", True):
+                if self._check_component_is_running("rest", startup = True):
                     self.log.warning("Manager started with -r, but a REST manager is already running")
                     self._write_fifo("WARN", "Manager started with -r, but a REST manager is already running\n")
                     self._dec_startup_lock()
@@ -309,8 +309,8 @@ class SysManager(XplPlugin):
                         ping_thread[name] = Thread(None,
                                              self._check_component_is_running,
                                              "ping_%s" % name,
-                                             (name, None),
-                                             {})
+                                             (name,), 
+                                             {"only_one_ping" : True})
                         self.register_thread(ping_thread[name])
                         ping_thread[name].start()
 
@@ -546,11 +546,12 @@ class SysManager(XplPlugin):
                 self.log.warning("Pid file contains no pid!")
 
 
-    def _check_component_is_running(self, name, startup = False):
+    def _check_component_is_running(self, name, startup = False, only_one_ping = False):
         """ This method will send a ping request to a component on localhost
         and wait for the answer (max 5 seconds).
         @param name : component name
         @param startup : set to True if the method is called during manager startup 
+        @param only_one_ping : set to True if you want to ping once only
         Notice : sort of a copy of this function is used in rest.py to check 
                  if a plugin is on before using a helper
                  Helpers will change in future, so the other function should
@@ -573,7 +574,10 @@ class SysManager(XplPlugin):
                   'xpltype':'xpl-stat', 
                   'xplsource':"xpl-%s.%s" % (name, self.get_sanitized_hostname())},
                  cb_params = {'name' : name})
-        max = self.ping_duration
+        if only_one_ping:
+            max = 1
+        else:
+            max = self.ping_duration
         while max != 0:
             self.myxpl.send(mess)
             time.sleep(1)
