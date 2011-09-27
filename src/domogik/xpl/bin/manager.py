@@ -177,11 +177,6 @@ class SysManager(XplPlugin):
             self.ping_duration = PING_DURATION
         print("ping duration=%s" % self.ping_duration)
         try:
-            # Get components:
-            self._list_plugins()
-            if self.options.check_hardware == True:
-                self._list_hardware_models()
- 
             #Start dbmgr
             if self.options.start_dbmgr:
                 self._inc_startup_lock()
@@ -216,6 +211,11 @@ class SysManager(XplPlugin):
                     self.register_thread(thr_rest)
                     thr_rest.start()
     
+            # Get components:
+            self._list_plugins()
+            if self.options.check_hardware == True:
+                self._list_hardware_models()
+ 
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
             self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
@@ -311,13 +311,13 @@ class SysManager(XplPlugin):
                                              "ping_%s" % name,
                                              (name, None),
                                              {})
-                        self.register_thread(ping_thread[n])
+                        self.register_thread(ping_thread[name])
                         ping_thread[name].start()
 
             self.wait()
         except:
-            self.log.error("%s" % sys.exc_info()[1])
-            print("%s" % sys.exc_info()[1])
+            self.log.error("%s" % traceback.format_exc())
+            print("%s" % traceback.format_exc())
 
     def _reload_configuration_file(self):
         """ reload all plugins and hardware list
@@ -823,14 +823,14 @@ class SysManager(XplPlugin):
                                       "configuration" : plg_xml.configuration,
                                       "check_startup_option" : check_startup_option})
 
-                    # check plugin state (will update component status)
-                    state_thread[plg_xml.name] = Thread(None,
-                                                   self._check_component_is_running,
-                                                   "ping_%s" % plg_xml.name,
-                                                   (plg_xml.name, None),
-                                                   {})
-                    self.register_thread(state_thread[plg_xml.name])
-                    state_thread[plg_xml.name].start()
+                    ## check plugin state (will update component status)
+                    #state_thread[plg_xml.name] = Thread(None,
+                    #                               self._check_component_is_running,
+                    #                               "ping_%s" % plg_xml.name,
+                    #                               (plg_xml.name, None),
+                    #                               {})
+                    #self.register_thread(state_thread[plg_xml.name])
+                    #state_thread[plg_xml.name].start()
 
                 except:
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
