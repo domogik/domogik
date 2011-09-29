@@ -274,7 +274,7 @@ class SysManager(XplPlugin):
                                              "ping_%s" % name,
                                              (name, None),
                                              {})
-                        self.register(ping_thread[n])
+                        self.register_thread(ping_thread[name])
                         ping_thread[name].start()
 
             self.wait()
