@@ -79,6 +79,7 @@ def __drop_all_tables():
     """
 
 def __add_initial_data():
+    """Add required data when running a brand new install"""
     print("Adding initial data...")
     # Initialize default system configuration
     __db.update_system_config()
@@ -123,10 +124,8 @@ def __add_initial_data():
     __db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
 
-"""Upgrade process of the database
-
-"""
 def __upgrade_db():
+    """Upgrade process of the database"""
     print("Upgrading the database...")
     db_upgrade.process()
 
