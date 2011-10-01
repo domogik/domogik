@@ -82,7 +82,7 @@ def __add_initial_data():
     print("Adding initial data...")
     # Initialize default system configuration
     __db.update_system_config()
-    __db.update_db_version(CURRENT_DB_VERSION_NB)
+    __db.update_db_version()
 
     # Create a default user account
     __db.add_default_user_account()
@@ -128,7 +128,7 @@ def __add_initial_data():
 """
 def __upgrade_db():
     print("Upgrading the database...")
-    db_upgrade.process(CURRENT_DB_VERSION_NB)
+    db_upgrade.process()
 
 def __install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""

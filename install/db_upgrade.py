@@ -22,7 +22,8 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-Upgrade the database
+Upgrade the database.
+Note that the application version number should *always* be superior or equal to the database one.
 
 Implements
 ==========
@@ -38,20 +39,72 @@ import sys
 
 from sqlalchemy import create_engine
 from domogik.common import database
+from domogik import __version__
 
 __db = database.DbHelper()
 __url = __db.get_url_connection_string()
 __engine = create_engine(__url)
+__prog_version = __version__
 
-def process(new_db_version):
-    print("=== Upgrade process")
-    #while __db.get_db_version() != new_db_version:
-    __execute_upgrade()
+def process():
+    """Main function that run the update process"""
+    current_db_version = __db.get_db_version()
+    if current_db_version is None or current_db_version == '':
+        __db.update_db_version('0.1.0')
+    print("=== Upgrade process (programm version : %s, database version = %s)" % (__prog_version, __db.get_db_version()))
+    upgrade_done = False
+    while __execute_upgrade():
+        pass
+    if current_db_version == __db.get_db_version():
+        print("\tNothing to do!")
+    print("=== Upgrade process terminated")
 
 def __execute_upgrade():
+    """Check the application version number and the database one. Executes an upgrade if necessary
+    
+    @return true if an upgrade was done
+    
+    """
     current_db_version = __db.get_db_version()
-    print("Upgrading database version %s" % current_db_version)
-    if current_db_version == '0.1.0' or current_db_version is None:
-        new_version == '0.2.0'
-        print("Upgrading to version : %s" % new_version)
-        
+    if current_db_version == '':
+        current_db_version = None
+    __check_for_sanity(current_db_version)
+
+    if __prog_version == '0.2.0':
+        if current_db_version == '0.1.0':
+            __upgrade_from_0_1_0_to_0_2_0()
+            return True
+
+    if __prog_version == '0.3.0':
+        if current_db_version == '0.1.0':
+            __upgrade_from_0_1_0_to_0_2_0()
+            return True
+        if current_db_version == '0.2.0':
+            __upgrade_from_0_2_0_to_0_3_0()
+            return True
+
+    return False
+
+def __check_for_sanity(db_version):
+    """Check that the upgrade process can be run"""
+
+    if db_version > __prog_version:
+        print("Something is wrong with your installation:")
+        print("Your database version number (%s) is superior to the application one (%s)" 
+              % (db_version, __prog_version))
+        print("Upgrade process aborted")    
+        sys.exit(1)
+
+def __upgrade_from_0_1_0_to_0_2_0():
+    print("\t> Upgrading database version from 0.1.0 to 0.2.0")
+    
+    # Execute update statements here
+    
+    __db.update_db_version('0.2.0')
+
+def __upgrade_from_0_2_0_to_0_3_0():
+    print("\t> Upgrading database version from 0.2.0 to 0.3.0")
+    
+    # Execute update statements here
+    
+    __db.update_db_version('0.3.0')
