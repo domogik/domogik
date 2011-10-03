@@ -66,8 +66,6 @@ def __execute_upgrade():
     
     """
     old_db_version = __db.get_db_version()
-    if old_db_version == '':
-        old_db_version = None
     __check_for_sanity(old_db_version)
 
     if __prog_version == '0.2.0':
