@@ -38,24 +38,27 @@ Implements
 import sys
 
 from sqlalchemy import create_engine
+from sqlalchemy.ext.sqlsoup import SqlSoup
+
 from domogik.common import database
 from domogik import __version__
 
-__db = database.DbHelper()
-__url = __db.get_url_connection_string()
+__dbApi = database.DbHelper()
+__url = __dbApi.get_url_connection_string()
 __engine = create_engine(__url)
 __prog_version = __version__
 
 def process():
     """Main function that run the update process"""
-    old_db_version = __db.get_db_version()
+    #__upgrade_system_info_structure()
+    old_db_version = __dbApi.get_db_version()
     if old_db_version is None or old_db_version == '':
-        __db.update_db_version('0.1.0')
-    print("=== Upgrade process (programm version : %s, database version = %s)" % (__prog_version, __db.get_db_version()))
+        __dbApi.update_db_version('0.1.0')
+    print("=== Upgrade process (programm version : %s, database version = %s)" % (__prog_version, __dbApi.get_db_version()))
     upgrade_done = False
     while __execute_upgrade():
         pass
-    if old_db_version == __db.get_db_version():
+    if old_db_version == __dbApi.get_db_version():
         print("\tNothing to do!")
     print("=== Upgrade process terminated")
 
@@ -65,7 +68,7 @@ def __execute_upgrade():
     @return true if an upgrade was done
     
     """
-    old_db_version = __db.get_db_version()
+    old_db_version = __dbApi.get_db_version()
     __check_for_sanity(old_db_version)
 
     if __prog_version == '0.2.0':
@@ -83,6 +86,14 @@ def __execute_upgrade():
 
     return False
 
+def __upgrade_system_info_structure():
+    """Operations on system_info table structure"""
+    db = SqlSoup(__engine)
+    sys_info = db.execute("SELECT db_version FROM core_system_info")
+    db_version = sys_info.fetchone()[0]
+    if db_version == '0.1.0':
+        print("Adding a new column")
+
 def __check_for_sanity(db_version):
     """Check that the upgrade process can be run"""
 
@@ -98,11 +109,11 @@ def __upgrade_from_0_1_0_to_0_2_0():
     
     # Execute update statements here
     
-    __db.update_db_version('0.2.0')
+    __dbApi.update_db_version('0.2.0')
 
 def __upgrade_from_0_2_0_to_0_3_0():
     print("\t> Upgrading database version from 0.2.0 to 0.3.0")
     
     # Execute update statements here
     
-    __db.update_db_version('0.3.0')
+    __dbApi.update_db_version('0.3.0')
