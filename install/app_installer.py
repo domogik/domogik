@@ -151,7 +151,7 @@ def __install_or_upgrade():
     print("Initialization complete.")
 
 def usage():
-    print("Usage : db_installer [-r, --reset]")
+    print("Usage : app_installer [-r, --reset]")
     print("-r or --reset : drop all tables (default is False)")
 
 if __name__ == "__main__":
