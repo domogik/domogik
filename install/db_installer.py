@@ -38,12 +38,12 @@ import getopt, sys
 
 from sqlalchemy import create_engine
 
+from domogik import DB_VERSION
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
 import db_upgrade
 
-CURRENT_DB_VERSION_NB = "0.2.0"
 __db = database.DbHelper()
 __url = __db.get_url_connection_string()
 __engine = create_engine(__url)
@@ -83,7 +83,7 @@ def __add_initial_data():
     print("Adding initial data...")
     # Initialize default system configuration
     __db.update_system_config()
-    __db.update_db_version()
+    __db.update_db_version(DB_VERSION)
 
     # Create a default user account
     __db.add_default_user_account()
