@@ -41,3 +41,5 @@ except:
     pass
 
 __version__ = "0.2.0"
+CODE_VERSION = "0.2.0"
+DB_VERSION = "0.2.0"

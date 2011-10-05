@@ -43,77 +43,94 @@ from sqlalchemy.ext.sqlsoup import SqlSoup
 from domogik.common import database
 from domogik import __version__
 
-__dbApi = database.DbHelper()
-__url = __dbApi.get_url_connection_string()
-__engine = create_engine(__url)
-__prog_version = __version__
+__url = database.DbHelper().get_url_connection_string()
+__db = SqlSoup(create_engine(__url))
+__app_version = __version__
 
 def process():
     """Main function that run the update process"""
     #__upgrade_system_info_structure()
-    old_db_version = __dbApi.get_db_version()
+    old_db_version = __get_db_version()
     if old_db_version is None or old_db_version == '':
-        __dbApi.update_db_version('0.1.0')
-    print("=== Upgrade process (programm version : %s, database version = %s)" % (__prog_version, __dbApi.get_db_version()))
+        __update_db_version('0.1.0')
+    print("=== Upgrade process (programm version : %s, database version = %s)" % (__app_version, __get_db_version()))
     upgrade_done = False
-    while __execute_upgrade():
+    while __execute_db_upgrade():
         pass
-    if old_db_version == __dbApi.get_db_version():
+    if old_db_version == __get_db_version():
         print("\tNothing to do!")
+    else:
+        __db.commit()
+    print("==== Upgrade process of the database terminated")
+    
     print("=== Upgrade process terminated")
 
-def __execute_upgrade():
+####################
+# Database upgrade #
+####################
+
+def __execute_db_upgrade():
     """Check the application version number and the database one. Executes an upgrade if necessary
     
     @return true if an upgrade was done
     
     """
-    old_db_version = __dbApi.get_db_version()
+    old_db_version = __get_db_version()
     __check_for_sanity(old_db_version)
 
-    if __prog_version == '0.2.0':
+    if __app_version == '0.2.0':
         if old_db_version == '0.1.0':
-            __upgrade_from_0_1_0_to_0_2_0()
+            __upgrade_db_from_0_1_0_to_0_2_0()
             return True
 
-    if __prog_version == '0.3.0':
+    if __app_version == '0.3.0':
         if old_db_version == '0.1.0':
-            __upgrade_from_0_1_0_to_0_2_0()
+            __upgrade_db_from_0_1_0_to_0_2_0()
             return True
         if old_db_version == '0.2.0':
-            __upgrade_from_0_2_0_to_0_3_0()
+            __upgrade_db_from_0_2_0_to_0_3_0()
             return True
 
     return False
 
-def __upgrade_system_info_structure():
-    """Operations on system_info table structure"""
-    db = SqlSoup(__engine)
-    sys_info = db.execute("SELECT db_version FROM core_system_info")
-    db_version = sys_info.fetchone()[0]
-    if db_version == '0.1.0':
-        print("Adding a new column")
-
-def __check_for_sanity(db_version):
-    """Check that the upgrade process can be run"""
-
-    if db_version > __prog_version:
-        print("Something is wrong with your installation:")
-        print("Your database version number (%s) is superior to the application one (%s)" 
-              % (db_version, __prog_version))
-        print("Upgrade process aborted")    
-        sys.exit(1)
-
-def __upgrade_from_0_1_0_to_0_2_0():
+def __upgrade_db_from_0_1_0_to_0_2_0():
     print("\t> Upgrading database version from 0.1.0 to 0.2.0")
     
     # Execute update statements here
-    
-    __dbApi.update_db_version('0.2.0')
+    sql_code = "ALTER TABLE core_system_info ADD COLUMN app_version VARCHAR(30);\n"
+    sql_code += "UPDATE core_system_info SET app_version='%s';\n" % __app_version
+    print(sql_code)
+    __db.execute(sql_code)
+    __update_db_version('0.2.0')
 
-def __upgrade_from_0_2_0_to_0_3_0():
+def __upgrade_db_from_0_2_0_to_0_3_0():
     print("\t> Upgrading database version from 0.2.0 to 0.3.0")
     
     # Execute update statements here
     
-    __dbApi.update_db_version('0.3.0')
+    __update_db_version('0.3.0')
+
+#######################
+# Application upgrade #
+#######################
+
+#####################
+# Utility functions #
+#####################
+
+def __check_for_sanity(db_version):
+    """Check that the upgrade process can be run"""
+
+    if db_version > __app_version:
+        print("Something is wrong with your installation:")
+        print("Your database version number (%s) is superior to the application one (%s)" 
+              % (db_version, __app_version))
+        print("Upgrade process aborted")    
+        sys.exit(1)
+
+def __get_db_version():
+    """Return the version of the database"""
+    return __db.execute("SELECT db_version FROM core_system_info").fetchone()[0]
+
+def __update_db_version(db_version):
+    __db.execute("UPDATE core_system_info SET db_version='%s'" % db_version)
