@@ -690,7 +690,7 @@ class SystemInfo(Base):
     __tablename__ = '%s_system_info' % _db_prefix
     id = Column(Integer, primary_key=True)
     db_version = Column(Unicode(30))
-    code_version = Column(Unicode(30))
+    app_version = Column(Unicode(30))
 
     def __init__(self, db_version):
         """Class constructor
