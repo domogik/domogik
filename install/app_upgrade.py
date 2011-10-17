@@ -54,7 +54,7 @@ def process():
     print("=== Upgrade process")
     print("\t> Current version (application : %s, database = %s)" % (_get_current_app_version(), _get_current_db_version()))
     print("\t> New version (application : %s, database = %s)" % (_get_new_app_version(), _get_new_db_version()))
-    _check_for_sanity()
+    _sanity_check()
     # Database upgrade
     while _execute_db_upgrade():
         pass
@@ -142,13 +142,25 @@ def _upgrade_app_from_0_1_0_to_0_2_0():
 # Utility functions #
 #####################
 
-def _check_for_sanity():
+def _sanity_check():
     """Check that the upgrade process can be run"""
     pass
     if _get_new_db_version() > _get_new_app_version():
         print("Internal error")
         print("The new database version number (%s) can't be superior to the application one (%s)"
               % (_get_new_db_version(), _get_new_app_version()))
+        _abort_upgrade_process()
+    
+    if _get_current_db_version() > _get_new_db_version():
+        print("Something is wrong with your installation:")
+        print("Your database version number (%s) is superior to the one you're trying to install (%s)" 
+              % (_get_current_db_version(), _get_new_db_version()))
+        _abort_upgrade_process()
+
+    if _get_current_app_version() > _get_new_app_version():
+        print("Something is wrong with your installation:")
+        print("Your application version number (%s) is superior to the one you're trying to install (%s)" 
+              % (_get_current_app_version(), _get_new_app_version()))
         _abort_upgrade_process()
 
     if _get_current_db_version() > _get_current_app_version():
