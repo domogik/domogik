@@ -132,6 +132,8 @@ def _add_initial_data():
 def _upgrade_app():
     """Upgrade process of the application"""
     print("Upgrading the application...")
+    app_upgrade = AppUpgrade(_engine)
+    app_upgrade.process()    
     app_upgrade.process()
 
 def _install_or_upgrade():
