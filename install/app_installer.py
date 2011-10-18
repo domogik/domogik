@@ -81,13 +81,9 @@ def _drop_all_tables():
 def _add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
-    # Initialize default system configuration
-    #_app_upgrade._update_db_version(_app_upgrade._get_new_db_version())
-    #_app_upgrade._update_app_version(_app_upgrade._get_new_app_version())
-    #_app_upgrade._commit()
+
     _db.update_db_version(_app_upgrade._get_new_db_version())
     _db.update_app_version(_app_upgrade._get_new_app_version())
-
 
     _db.update_system_config()
 
@@ -154,7 +150,18 @@ def _install_or_upgrade():
     else:
         _upgrade_app()
 
-    print("Initialization complete.")
+def _check_install_is_ok():
+    if (_db.get_db_version() != _app_upgrade._get_new_db_version()):
+        _abort_install_process("Something is wrong with your installation : database version is %s. It should be : %s" 
+                               % (_db.get_db_version(), _app_upgrade._get_new_db_version()))
+    if (_db.get_app_version() != _app_upgrade._get_new_app_version()):
+        _abort_install_process("Something is wrong with your installation : application version is %s. It should be : %s" 
+                               % (_db.get_app_version(), _app_upgrade._get_new_app_version()))
+    print("Installation complete.")
+
+def _abort_install_process(error_msg):
+    print(error_msg)
+    sys.exit(1)
 
 def usage():
     print("Usage : app_installer [-r, --reset]")
@@ -178,3 +185,4 @@ if __name__ == "__main__":
                 sys.exit()
 
     _install_or_upgrade()
+    _check_install_is_ok()
