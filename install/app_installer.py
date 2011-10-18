@@ -41,11 +41,12 @@ from sqlalchemy import create_engine
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
-import app_upgrade
+from app_upgrade import AppUpgrade
 
 _db = database.DbHelper()
 _url = _db.get_url_connection_string()
 _engine = create_engine(_url)
+_app_upgrade = AppUpgrade(_engine)
 
 ###
 # Installer
@@ -81,11 +82,11 @@ def _add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
     # Initialize default system configuration
-    #app_upgrade._update_db_version(app_upgrade._get_new_db_version())
-    #app_upgrade._update_app_version(app_upgrade._get_new_app_version())
-    #app_upgrade._commit()
-    _db.update_db_version(app_upgrade._get_new_db_version())
-    _db.update_app_version(app_upgrade._get_new_app_version())
+    #_app_upgrade._update_db_version(_app_upgrade._get_new_db_version())
+    #_app_upgrade._update_app_version(_app_upgrade._get_new_app_version())
+    #_app_upgrade._commit()
+    _db.update_db_version(_app_upgrade._get_new_db_version())
+    _db.update_app_version(_app_upgrade._get_new_app_version())
 
 
     _db.update_system_config()
@@ -132,9 +133,7 @@ def _add_initial_data():
 def _upgrade_app():
     """Upgrade process of the application"""
     print("Upgrading the application...")
-    app_upgrade = AppUpgrade(_engine)
-    app_upgrade.process()    
-    app_upgrade.process()
+    _app_upgrade.process()
 
 def _install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
