@@ -49,7 +49,8 @@ _url = database.DbHelper().get_url_connection_string()
 class Upgrade:
     def __init__(self, engine):
         self.__db = SqlSoup(engine)
-        
+
+    """Main"""
     def process(self):
         """Main function that run the update process"""
         #_upgrade_system_info_structure()
@@ -60,7 +61,7 @@ class Upgrade:
               % (self._get_current_app_version(), self._get_current_db_version()))
         print("\t> New version (application : %s, database = %s)" 
               % (self._get_new_app_version(), self._get_new_db_version()))
-        self._sanity_check()
+        self._sanity_check_before_upgrade()
         # Database upgrade
         while self._execute_db_upgrade():
             pass
@@ -148,7 +149,7 @@ class Upgrade:
     # Utility functions #
     #####################
 
-    def _sanity_check(self):
+    def _sanity_check_before_upgrade(self):
         """Check that the upgrade process can be run"""
         pass
         if self._get_new_db_version() > self._get_new_app_version():
