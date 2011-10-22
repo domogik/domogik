@@ -53,12 +53,10 @@ class mochad(Mochad):
         Create a Mochad instance
         This class is used to connect x10 devices (through mochad) to the xPL Network
         """
-        host = "127.0.0.1"
-        port = "1099"
-        Mochad.__init__(self,host,port)
+        Mochad.__init__(self)
 
         self.log.debug("mochad correctly started")
-        self._config = Query(self.myxpl, self.log)
+
         #Create listeners
         Listener(self.x10_cmnd_cb, self.myxpl, 
                  {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
