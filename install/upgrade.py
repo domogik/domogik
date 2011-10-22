@@ -151,7 +151,6 @@ class Upgrade:
 
     def _sanity_check_before_upgrade(self):
         """Check that the upgrade process can be run"""
-        pass
         if self._get_new_db_version() > self._get_new_app_version():
             print("Internal error")
             print("The new database version number (%s) can't be superior to the application one (%s)"
