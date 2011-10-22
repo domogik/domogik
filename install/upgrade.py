@@ -37,6 +37,8 @@ Implements
 
 import sys
 
+from distutils2.version import NormalizedVersion, suggest_normalized_version
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.sqlsoup import SqlSoup
 
@@ -44,7 +46,6 @@ from domogik.common import database
 from domogik import __version__, DB_VERSION
 
 _url = database.DbHelper().get_url_connection_string()
-#_db = SqlSoup(create_engine(_url))
 
 class Upgrade:
     def __init__(self, engine):
@@ -91,16 +92,16 @@ class Upgrade:
         old_db_version = self._get_current_db_version()
         new_db_version = self._get_new_db_version()
 
-        if new_db_version == '0.2.0':
-            if old_db_version == '0.1.0':
+        if new_db_version == NormalizedVersion('0.2.0'):
+            if old_db_version == NormalizedVersion('0.1.0'):
                 self._upgrade_db_from_0_1_0_to_0_2_0()
                 return True
 
-        if new_db_version == '0.3.0':
-            if old_db_version == '0.1.0':
+        if new_db_version == NormalizedVersion('0.3.0'):
+            if old_db_version == NormalizedVersion('0.1.0'):
                 self._upgrade_db_from_0_1_0_to_0_2_0()
                 return True
-            if old_db_version == '0.2.0':
+            if old_db_version == NormalizedVersion('0.2.0'):
                 self._upgrade_db_from_0_2_0_to_0_3_0()
                 return True
 
@@ -132,8 +133,8 @@ class Upgrade:
         """
         old_app_version = self._get_current_app_version()
         new_app_version = self._get_new_app_version()
-        if new_app_version == '0.2.0':
-            if old_app_version == '0.1.0':
+        if new_app_version == NormalizedVersion('0.2.0'):
+            if old_app_version == NormalizedVersion('0.1.0'):
                 self._upgrade_app_from_0_1_0_to_0_2_0()
                 return True
 
@@ -151,28 +152,35 @@ class Upgrade:
 
     def _sanity_check_before_upgrade(self):
         """Check that the upgrade process can be run"""
-        if self._get_new_db_version() > self._get_new_app_version():
+        
+        # We use NormalizedVersion to be able to make comparisons
+        new_db_version = self._get_new_db_version()
+        new_app_version = self._get_new_app_version()
+        current_db_version = self._get_current_db_version()
+        current_app_version = self._get_current_app_version()
+
+        if new_db_version > new_app_version:
             print("Internal error")
             print("The new database version number (%s) can't be superior to the application one (%s)"
-                  % (self._get_new_db_version(), self._get_new_app_version()))
+                  % (new_db_version, new_app_version))
             self._abort_upgrade_process()
         
-        if self._get_current_db_version() > self._get_new_db_version():
+        if current_db_version > new_db_version:
             print("Something is wrong with your installation:")
             print("Your database version number (%s) is superior to the one you're trying to install (%s)" 
-                  % (self._get_current_db_version(), self._get_new_db_version()))
+                  % (current_db_version, new_db_version))
             self._abort_upgrade_process()
 
-        if self._get_current_app_version() > self._get_new_app_version():
+        if current_app_version > new_app_version:
             print("Something is wrong with your installation:")
             print("Your application version number (%s) is superior to the one you're trying to install (%s)" 
-                  % (self._get_current_app_version(), self._get_new_app_version()))
+                  % (current_app_version, new_app_version))
             self._abort_upgrade_process()
 
-        if self._get_current_db_version() > self._get_current_app_version():
+        if current_db_version > current_app_version:
             print("Something is wrong with your installation:")
             print("Your database version number (%s) is superior to the application one (%s)" 
-                  % (self._get_current_db_version(), self._get_current_app_version()))
+                  % (current_db_version, current_app_version))
             self._abort_upgrade_process()
 
     def _get_current_db_version(self):
@@ -180,13 +188,13 @@ class Upgrade:
         db_version = self.__db.execute("SELECT db_version FROM core_system_info").fetchone()[0]
         if db_version is None or db_version == '':
             # Should only happen for the first upgrade using this script
-            return '0.1.0'
+            return NormalizedVersion('0.1.0')
         else:
-            return db_version
+            return NormalizedVersion(suggest_normalized_version(db_version))
 
     def _get_new_db_version(self):
-        """Return the version of the database we should upgrade to"""
-        return DB_VERSION
+        """Return the version of the database we should upgrade to (normalized version)"""
+        return NormalizedVersion(suggest_normalized_version(DB_VERSION))
 
     def _update_db_version(self, db_version):
         """Update the version of the database"""
@@ -199,14 +207,14 @@ class Upgrade:
             app_version = self.__db.execute("SELECT app_version FROM core_system_info").fetchone()[0]
             # Should only happen if the 'app_version' column doesn't exist (first application upgrade using this script)
             if app_version is None or app_version == '':
-                app_version = '0.1.0'
-            return app_version
+                app_version = NormalizedVersion('0.1.0')
+            return NormalizedVersion(suggest_normalized_version(app_version))
         except Exception:
-            return '0.1.0'
+            return NormalizedVersion('0.1.0')
 
     def _get_new_app_version(self):
-        """Return the version of the application we should upgrade to"""
-        return __version__
+        """Return the version of the application we should upgrade to (normalized version)"""
+        return NormalizedVersion(suggest_normalized_version(__version__))
 
     def _update_app_version(self, app_version):
         """Update the version of the application"""

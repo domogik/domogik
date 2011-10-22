@@ -151,10 +151,10 @@ def _install_or_upgrade():
         _upgrade_app()
 
 def _check_install_is_ok():
-    if (_db.get_db_version() != _upgrade._get_new_db_version()):
+    if (_upgrade._get_current_db_version() != _upgrade._get_new_db_version()):
         _abort_install_process("Something is wrong with your installation : database version is %s. It should be : %s" 
                                % (_db.get_db_version(), _upgrade._get_new_db_version()))
-    if (_db.get_app_version() != _upgrade._get_new_app_version()):
+    if (_upgrade._get_current_app_version() != _upgrade._get_new_app_version()):
         _abort_install_process("Something is wrong with your installation : application version is %s. It should be : %s" 
                                % (_db.get_app_version(), _upgrade._get_new_app_version()))
     print("Installation complete.")
