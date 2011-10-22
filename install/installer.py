@@ -41,12 +41,12 @@ from sqlalchemy import create_engine
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
-from app_upgrade import AppUpgrade
+from upgrade import Upgrade
 
 _db = database.DbHelper()
 _url = _db.get_url_connection_string()
 _engine = create_engine(_url)
-_app_upgrade = AppUpgrade(_engine)
+_upgrade = Upgrade(_engine)
 
 ###
 # Installer
@@ -82,8 +82,8 @@ def _add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
 
-    _db.update_db_version(_app_upgrade._get_new_db_version())
-    _db.update_app_version(_app_upgrade._get_new_app_version())
+    _db.update_db_version(_upgrade._get_new_db_version())
+    _db.update_app_version(_upgrade._get_new_app_version())
 
     _db.update_system_config()
 
@@ -129,7 +129,7 @@ def _add_initial_data():
 def _upgrade_app():
     """Upgrade process of the application"""
     print("Upgrading the application...")
-    _app_upgrade.process()
+    _upgrade.process()
 
 def _install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
@@ -151,12 +151,12 @@ def _install_or_upgrade():
         _upgrade_app()
 
 def _check_install_is_ok():
-    if (_db.get_db_version() != _app_upgrade._get_new_db_version()):
+    if (_db.get_db_version() != _upgrade._get_new_db_version()):
         _abort_install_process("Something is wrong with your installation : database version is %s. It should be : %s" 
-                               % (_db.get_db_version(), _app_upgrade._get_new_db_version()))
-    if (_db.get_app_version() != _app_upgrade._get_new_app_version()):
+                               % (_db.get_db_version(), _upgrade._get_new_db_version()))
+    if (_db.get_app_version() != _upgrade._get_new_app_version()):
         _abort_install_process("Something is wrong with your installation : application version is %s. It should be : %s" 
-                               % (_db.get_app_version(), _app_upgrade._get_new_app_version()))
+                               % (_db.get_app_version(), _upgrade._get_new_app_version()))
     print("Installation complete.")
 
 def _abort_install_process(error_msg):

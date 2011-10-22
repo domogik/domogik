@@ -46,32 +46,34 @@ from domogik import __version__, DB_VERSION
 _url = database.DbHelper().get_url_connection_string()
 #_db = SqlSoup(create_engine(_url))
 
-class AppUpgrade:
+class Upgrade:
     def __init__(self, engine):
         self.__db = SqlSoup(engine)
         
     def process(self):
         """Main function that run the update process"""
         #_upgrade_system_info_structure()
-        old_app_version = _get_current_app_version()
-        old_db_version = _get_current_db_version()
+        old_app_version = self._get_current_app_version()
+        old_db_version = self._get_current_db_version()
         print("=== Upgrade process")
-        print("\t> Current version (application : %s, database = %s)" % (_get_current_app_version(), _get_current_db_version()))
-        print("\t> New version (application : %s, database = %s)" % (_get_new_app_version(), _get_new_db_version()))
-        _sanity_check()
+        print("\t> Current version (application : %s, database = %s)" 
+              % (self._get_current_app_version(), self._get_current_db_version()))
+        print("\t> New version (application : %s, database = %s)" 
+              % (self._get_new_app_version(), self._get_new_db_version()))
+        self._sanity_check()
         # Database upgrade
-        while _execute_db_upgrade():
+        while self._execute_db_upgrade():
             pass
-        if old_db_version == _get_current_db_version():
+        if old_db_version == self._get_current_db_version():
             print("\tThe database was NOT upgraded: nothing to do!")
         
         # Application upgrade
-        while _execute_app_upgrade():
+        while self._execute_app_upgrade():
             pass
-        if old_app_version == _get_current_app_version():
+        if old_app_version == self._get_current_app_version():
             print("\tThe application was NOT upgraded: nothing to do!")
 
-        _commit()
+        self._commit()
         
         print("=== Upgrade process terminated")
 
@@ -85,37 +87,37 @@ class AppUpgrade:
         @return true if an upgrade was done
         
         """
-        old_db_version = _get_current_db_version()
-        new_db_version = _get_new_db_version()
+        old_db_version = self._get_current_db_version()
+        new_db_version = self._get_new_db_version()
 
         if new_db_version == '0.2.0':
             if old_db_version == '0.1.0':
-                _upgrade_db_from_0_1_0_to_0_2_0()
+                self._upgrade_db_from_0_1_0_to_0_2_0()
                 return True
 
         if new_db_version == '0.3.0':
             if old_db_version == '0.1.0':
-                _upgrade_db_from_0_1_0_to_0_2_0()
+                self._upgrade_db_from_0_1_0_to_0_2_0()
                 return True
             if old_db_version == '0.2.0':
-                _upgrade_db_from_0_2_0_to_0_3_0()
+                self._upgrade_db_from_0_2_0_to_0_3_0()
                 return True
 
         return False
 
     def _upgrade_db_from_0_1_0_to_0_2_0(self):
-        print("\t> Upgrading database version from 0.1.0 to 0.2.0")
+        print("\t+ Upgrading database version from 0.1.0 to 0.2.0")
         # Execute update statements here
         sql_code = "ALTER TABLE core_system_info ADD COLUMN app_version VARCHAR(30);\n"
         self.__db.execute(sql_code)
-        _update_db_version('0.2.0')
+        self._update_db_version('0.2.0')
 
     def _upgrade_db_from_0_2_0_to_0_3_0(self):
-        print("\t> Upgrading database version from 0.2.0 to 0.3.0")
+        print("\t+ Upgrading database version from 0.2.0 to 0.3.0")
         
         # Execute update statements here
         # ...
-        _update_db_version('0.3.0')
+        self._update_db_version('0.3.0')
 
     ##############################
     # Application (code) upgrade #
@@ -127,20 +129,20 @@ class AppUpgrade:
         @return true if an upgrade was done
         
         """
-        old_app_version = _get_current_app_version()
-        new_app_version = _get_new_app_version()
+        old_app_version = self._get_current_app_version()
+        new_app_version = self._get_new_app_version()
         if new_app_version == '0.2.0':
             if old_app_version == '0.1.0':
-                _upgrade_app_from_0_1_0_to_0_2_0()
+                self._upgrade_app_from_0_1_0_to_0_2_0()
                 return True
 
         return False
 
     def _upgrade_app_from_0_1_0_to_0_2_0(self):
-        print("\t> Upgrading application version from 0.1.0 to 0.2.0")
+        print("\t+ Upgrading application version from 0.1.0 to 0.2.0")
         # Do something here
         # ...
-        _update_app_version('0.2.0')
+        self._update_app_version('0.2.0')
         
     #####################
     # Utility functions #
@@ -149,29 +151,29 @@ class AppUpgrade:
     def _sanity_check(self):
         """Check that the upgrade process can be run"""
         pass
-        if _get_new_db_version() > _get_new_app_version():
+        if self._get_new_db_version() > self._get_new_app_version():
             print("Internal error")
             print("The new database version number (%s) can't be superior to the application one (%s)"
-                  % (_get_new_db_version(), _get_new_app_version()))
-            _abort_upgrade_process()
+                  % (self._get_new_db_version(), self._get_new_app_version()))
+            self._abort_upgrade_process()
         
-        if _get_current_db_version() > _get_new_db_version():
+        if self._get_current_db_version() > self._get_new_db_version():
             print("Something is wrong with your installation:")
             print("Your database version number (%s) is superior to the one you're trying to install (%s)" 
-                  % (_get_current_db_version(), _get_new_db_version()))
-            _abort_upgrade_process()
+                  % (self._get_current_db_version(), self._get_new_db_version()))
+            self._abort_upgrade_process()
 
-        if _get_current_app_version() > _get_new_app_version():
+        if self._get_current_app_version() > self._get_new_app_version():
             print("Something is wrong with your installation:")
             print("Your application version number (%s) is superior to the one you're trying to install (%s)" 
-                  % (_get_current_app_version(), _get_new_app_version()))
-            _abort_upgrade_process()
+                  % (self._get_current_app_version(), self._get_new_app_version()))
+            self._abort_upgrade_process()
 
-        if _get_current_db_version() > _get_current_app_version():
+        if self._get_current_db_version() > self._get_current_app_version():
             print("Something is wrong with your installation:")
             print("Your database version number (%s) is superior to the application one (%s)" 
-                  % (_get_current_db_version(), _get_current_app_version()))
-            _abort_upgrade_process()
+                  % (self._get_current_db_version(), self._get_current_app_version()))
+            self._abort_upgrade_process()
 
     def _get_current_db_version(self):
         """Return the current version of the database"""
