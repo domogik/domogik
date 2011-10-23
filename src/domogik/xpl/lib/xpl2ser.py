@@ -78,7 +78,7 @@ class XplBridge:
         """
         self._log.info("Opening serial device : %s" % device)
         try:
-            self._ser = serial.Serial(device, 115200, 8, "O",
+            self._ser = serial.Serial(device, 9600, 8, "O",
                                       timeout=1)
             self._log.info("Serial opened")
         except:

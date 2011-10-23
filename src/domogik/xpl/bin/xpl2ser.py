@@ -58,7 +58,8 @@ class XplBridgeManager(XplPlugin):
 
         # Configuration
         self._config = Query(self.myxpl, self.log)
-        device = self._config.query('xpl2ser', 'device')
+        #device = self._config.query('xpl2ser', 'device')
+        device = "/dev/ttyUSB0"
 
 
 
