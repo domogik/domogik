@@ -51,7 +51,6 @@ class Upgrade:
     def __init__(self, engine):
         self.__db = SqlSoup(engine)
 
-    """Main"""
     def process(self):
         """Main function that run the update process"""
         #_upgrade_system_info_structure()
