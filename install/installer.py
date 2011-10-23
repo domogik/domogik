@@ -41,20 +41,20 @@ from sqlalchemy import create_engine
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
-import db_upgrade
+from upgrade import Upgrade
 
-CURRENT_DB_VERSION_NB = "0.2.0"
-__db = database.DbHelper()
-__url = __db.get_url_connection_string()
-__engine = create_engine(__url)
+_db = database.DbHelper()
+_url = _db.get_url_connection_string()
+_engine = create_engine(_url)
+_upgrade = Upgrade(_engine)
 
 ###
 # Installer
 ###
 
-def __drop_all_tables():
+def _drop_all_tables():
     print("Droping all existing tables...")
-    sql_schema.metadata.drop_all(__engine)    
+    sql_schema.metadata.drop_all(_engine)    
     """
     # Only drop the table if it exists
     sql_schema.DeviceFeatureAssociation.__table__.drop(bind=__engine, checkfirst=True)
@@ -78,81 +78,93 @@ def __drop_all_tables():
     sql_schema.UIItemConfig.__table__.drop(bind=__engine, checkfirst=True)
     """
 
-def __add_initial_data():
+def _add_initial_data():
+    """Add required data when running a brand new install"""
     print("Adding initial data...")
-    # Initialize default system configuration
-    __db.update_system_config()
-    __db.update_db_version(CURRENT_DB_VERSION_NB)
+
+    _db.update_db_version(_upgrade._get_new_db_version())
+    _db.update_app_version(_upgrade._get_new_app_version())
+
+    _db.update_system_config()
 
     # Create a default user account
-    __db.add_default_user_account()
+    _db.add_default_user_account()
 
     # Create device usages
-    __db.add_device_usage(du_id='light', du_name='Light', du_description='Lamp, light usage',
+    _db.add_device_usage(du_id='light', du_name='Light', du_description='Lamp, light usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='appliance', du_name='Appliance', du_description='Appliance usage',
+    _db.add_device_usage(du_id='appliance', du_name='Appliance', du_description='Appliance usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='shutter', du_name='Shutter', du_description='Shutter usage',
+    _db.add_device_usage(du_id='shutter', du_name='Shutter', du_description='Shutter usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Down&quot;, &quot;state1&quot;:&quot;Up&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='air_conditionning', du_name='Air conditioning', du_description='Air conditioning usage',
+    _db.add_device_usage(du_id='air_conditionning', du_name='Air conditioning', du_description='Air conditioning usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&amp;deg;C&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='ventilation', du_name='Ventilation', du_description='Ventilation usage',
+    _db.add_device_usage(du_id='ventilation', du_name='Ventilation', du_description='Ventilation usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='heating', du_name='Heating', du_description='Heating',
+    _db.add_device_usage(du_id='heating', du_name='Heating', du_description='Heating',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&amp;deg;C&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='computer', du_name='Computer', du_description='Desktop computer usage',
+    _db.add_device_usage(du_id='computer', du_name='Computer', du_description='Desktop computer usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='server', du_name='Server', du_description='Server usage',
+    _db.add_device_usage(du_id='server', du_name='Server', du_description='Server usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='telephony', du_name='Telephony', du_description='Phone usage',
+    _db.add_device_usage(du_id='telephony', du_name='Telephony', du_description='Phone usage',
                         du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } } ')
-    __db.add_device_usage(du_id='tv', du_name='TV', du_description='Television usage',
+    _db.add_device_usage(du_id='tv', du_name='TV', du_description='Television usage',
                     du_default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
-    __db.add_device_usage(du_id='water', du_name='Water', du_description='Water service',
+    _db.add_device_usage(du_id='water', du_name='Water', du_description='Water service',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-#    __db.add_device_usage(du_id='gas', du_name='Gas', du_description='Gas service',
+#    _db.add_device_usage(du_id='gas', du_name='Gas', du_description='Gas service',
 #                        du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    __db.add_device_usage(du_id='electricity', du_name='Electricity', du_description='Electricity service',
+    _db.add_device_usage(du_id='electricity', du_name='Electricity', du_description='Electricity service',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    __db.add_device_usage(du_id='temperature', du_name='Temperature', du_description='Temperature',
+    _db.add_device_usage(du_id='temperature', du_name='Temperature', du_description='Temperature',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {&quot;unit&quot;:&quot;&amp;deg;C&quot;}, &quot;string&quot;: {} }}')
-    __db.add_device_usage(du_id='mirror', du_name='Mir:ror', du_description='Mir:ror device',
+    _db.add_device_usage(du_id='mirror', du_name='Mir:ror', du_description='Mir:ror device',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    __db.add_device_usage(du_id='nanoztag', du_name='Nanoztag', du_description='Nanoztag device',
+    _db.add_device_usage(du_id='nanoztag', du_name='Nanoztag', du_description='Nanoztag device',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    __db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
+    _db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
 
-"""Upgrade process of the database
+def _upgrade_app():
+    """Upgrade process of the application"""
+    print("Upgrading the application...")
+    _upgrade.process()
 
-"""
-def __upgrade_db():
-    print("Upgrading the database...")
-    db_upgrade.process(CURRENT_DB_VERSION_NB)
-
-def __install_or_upgrade():
+def _install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
 
-    print("Using database", __db.get_db_type())
+    print("Using database", _db.get_db_type())
     #TODO: improve this test
-    if not sql_schema.SystemConfig.__table__.exists(bind=__engine):
+    if not sql_schema.SystemConfig.__table__.exists(bind=_engine):
         print("It appears that your database doesn't contain the required tables.")
         answer = raw_input("Should they be created? [y/N] ")
         if answer != "y":
             print("Can't continue, system tables are missing")
             sys.exit(1)
         else:
-            __drop_all_tables() #TODO not sure this is needed
+            _drop_all_tables() #TODO not sure this is needed
             print("Creating all tables...")
-            sql_schema.metadata.create_all(__engine)
-            __add_initial_data()
+            sql_schema.metadata.create_all(_engine)
+            _add_initial_data()
     else:
-        __upgrade_db()
+        _upgrade_app()
 
-    print("Initialization complete.")
+def _check_install_is_ok():
+    if (_upgrade._get_current_db_version() != _upgrade._get_new_db_version()):
+        _abort_install_process("Something is wrong with your installation : database version is %s. It should be : %s" 
+                               % (_db.get_db_version(), _upgrade._get_new_db_version()))
+    if (_upgrade._get_current_app_version() != _upgrade._get_new_app_version()):
+        _abort_install_process("Something is wrong with your installation : application version is %s. It should be : %s" 
+                               % (_db.get_app_version(), _upgrade._get_new_app_version()))
+    print("Installation complete.")
+
+def _abort_install_process(error_msg):
+    print(error_msg)
+    sys.exit(1)
 
 def usage():
-    print("Usage : db_installer [-r, --reset]")
+    print("Usage : app_installer [-r, --reset]")
     print("-r or --reset : drop all tables (default is False)")
 
 if __name__ == "__main__":
@@ -169,7 +181,8 @@ if __name__ == "__main__":
             if opt in ('-r', '--reset'):
                 answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
                 if answer == 'y':
-                    __drop_all_tables()
+                    _drop_all_tables()
                 sys.exit()
 
-    __install_or_upgrade()
+    _install_or_upgrade()
+    _check_install_is_ok()

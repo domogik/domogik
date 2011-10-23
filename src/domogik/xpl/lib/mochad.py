@@ -11,15 +11,29 @@ from domogik.xpl.common.queryconfig import Query
 
 class Mochad(XplPlugin):
 
-    def __init__(self,host,port):
+    def __init__(self):
         # Connect to the socket
 
         XplPlugin.__init__(self, name = 'mochad')
 
         self.mochad_socket = None
 
-        self.host = host
-        self.port = port
+        self._config = Query(self.myxpl, self.log)
+        self.__host = self._config.query('mochad','mochad-host')
+        self.__port = self._config.query('mochad','mochad-port')
+        if self._config.query('mochad','cm15') == "True":
+            self.__cm15 = True
+        else:
+            self.__cm15 = False
+        if self._config.query('mochad','cm19') == "True":
+            self.__cm19 = True
+        else:
+            self.__cm19 = False
+
+        if self.__cm15:
+            self.__itf = "pl"
+        elif self.__cm19:
+            self.__itf = "rf"
 
         self.connect()
 
@@ -30,7 +44,7 @@ class Mochad(XplPlugin):
             return None
 
     def connect(self):
-        for res in socket.getaddrinfo(self.host, self.port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+        for res in socket.getaddrinfo(self.__host, self.__port, socket.AF_UNSPEC, socket.SOCK_STREAM):
             af, socktype, proto, canonname, sa = res
             try:
                 self.mochad_socket = socket.socket(af, socktype, proto)
@@ -83,9 +97,9 @@ class Mochad(XplPlugin):
 
     def send(self,address,order,supp=""):
         if order == 'bright' or order == 'dim':
-            data = "pl "+address+" "+order+" "+supp+"\n"
+            data = self.__itf+" "+address+" "+order+" "+supp+"\n"
         else:
-            data = "pl "+address+" "+order+"\n"
+            data = self.__itf+" "+address+" "+order+"\n"
         print("Send "+data+" to mochad")
         try:
             self.mochad_socket.send(data)
@@ -95,11 +109,10 @@ class Mochad(XplPlugin):
                 self.connect()
             self.mochad_socket.send(data)
 
-
 if __name__ == '__main__':
     HOST = '127.0.0.1'    # The remote host
     PORT = 50007              # The same port as used by the server
 
-    mymochad = Mochad(HOST,PORT)
+    mymochad = Mochad()
 
     mymochad.sender()

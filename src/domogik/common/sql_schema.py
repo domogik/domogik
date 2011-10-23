@@ -690,14 +690,17 @@ class SystemInfo(Base):
     __tablename__ = '%s_system_info' % _db_prefix
     id = Column(Integer, primary_key=True)
     db_version = Column(Unicode(30))
+    app_version = Column(Unicode(30))
 
-    def __init__(self, db_version):
+    def __init__(self, db_version=None, app_version=None):
         """Class constructor
 
         @param db_version : version of the database
+        @param app_version : version of the application
 
         """
         self.db_version = db_version
+        self.app_version = app_version
 
     def __repr__(self):
         """Return an internal representation of the class"""

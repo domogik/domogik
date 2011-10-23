@@ -29,6 +29,20 @@
       <description>mochad port address</description>
       <default-value>1099</default-value>
     </key>
+    <key>
+      <order-id>3</order-id>
+      <name>cm15</name>
+      <type>boolean</type>
+      <description>If you use a cm15 with communication to devices via PL</description>
+      <default-value>True</default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>cm19</name>
+      <type>boolean</type>
+      <description>if you use a cm19 with communication to devices via RF</description>
+      <default-value>False</default-value>
+    </key>
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/mochad.xml"/>

@@ -2628,13 +2628,39 @@ class DbHelper():
             self.__session.commit()
         except Exception, sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            
+
     def get_db_version(self):
         """Get the current version of the database"""
         sys_info = self.__session.query(SystemInfo).first()
         if sys_info is None:
             return None
         return sys_info.db_version
+
+    def update_app_version(self, si_app_version):
+        """Update app version
+
+        @param si_app_version : version of the application
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        sys_info = self.__session.query(SystemInfo).first()
+        if sys_info is None:
+            sys_info = SystemInfo(app_version=ucode(si_app_version))
+        else:
+            sys_info.app_version = ucode(si_app_version)
+        self.__session.add(sys_info)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+    
+    def get_app_version(self):
+        """Get the current version of the application (that is stored in the database)"""
+        sys_info = self.__session.query(SystemInfo).first()
+        if sys_info is None:
+            return None
+        return sys_info.app_version
 
 ###
 # SystemConfig

@@ -262,13 +262,13 @@ function update_user_config {
     done
 }
 
-function call_db_installer {
+function call_app_installer {
     if [ "$upgrade_sql" = "y" -o "$upgrade_sql" = "Y" ];then
         if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
-            echo "** Call DB Installer"
-            /bin/su -c "python ./install/db_installer.py" $d_user
+            echo "** Call Application Installer"
+            /bin/su -c "python ./install/installer.py" $d_user
             if [ $? -ne 0 ];then
-                echo "ERROR : An error occured during db_installer execution, read the previous lines for detail."
+                echo "ERROR : An error occured during app_installer execution, read the previous lines for detail."
                 exit 1
             fi
         fi
@@ -355,7 +355,7 @@ update_default_config
 update_user_config
 copy_tools
 create_log_dir
-call_db_installer
+call_app_installer
 install_plugins
 modify_hosts
 
