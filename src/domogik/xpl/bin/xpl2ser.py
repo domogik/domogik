@@ -64,16 +64,19 @@ class XplBridgeManager(XplPlugin):
 
 
         # Init serial device
-        br  = XplBridge(self.log, self.send_xpl)
+        self.br  = XplBridge(self.log, self.send_xpl)
         
 
         # Create listeners
-        Listener(self.xplbridge_cb, self.myxpl)
+        # Notice : this listener and callback function make this plugin send
+        # on serial port each xpl message it reads on serial port
+        # TODO : update this !
+        #Listener(self.xplbridge_cb, self.myxpl)
  
 
         # Open serial device
         try:
-            br.open(device)
+            self.br.open(device)
         except XplBridgeException as e:
             self.log.error(e.value)
             print(e.value)
@@ -82,7 +85,7 @@ class XplBridgeManager(XplPlugin):
             
         # Start reading serial device
         br_process = threading.Thread(None,
-                                   br.listen,
+                                   self.br.listen,
                                    None,
                                    (),
                                    {})                                  
@@ -105,7 +108,7 @@ class XplBridgeManager(XplPlugin):
         mesg = message.to_packet()
         # Write on serial device
         self.log.debug("Call write() ")
-        self.XplBridge.write(mesg)
+        self.br.write(mesg)
 
 if __name__ == "__main__":
     XplBridgeManager()

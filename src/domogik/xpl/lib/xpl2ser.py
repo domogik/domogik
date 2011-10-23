@@ -36,8 +36,10 @@ TODO
 @organization: Domogik
 """
 
+import re
 import serial
 import traceback
+from domogik.xpl.common.xplmessage import REGEXP_TYPE, REGEXP_GLOBAL
 
 
 START_MESSAGE = "xpl-"
@@ -60,6 +62,8 @@ class XplBridgeException(Exception):
 class XplBridge:
     """ Look for xpl message from serial device
     """
+    __regexp_type = re.compile(REGEXP_TYPE, re.UNICODE | re.VERBOSE)
+    __regexp_global = re.compile(REGEXP_GLOBAL, re.DOTALL | re.UNICODE | re.VERBOSE)
 
     def __init__(self, log, callback):
         """ Create handler
@@ -78,9 +82,10 @@ class XplBridge:
         """
         self._log.info("Opening serial device : %s" % device)
         try:
-            self._ser = serial.Serial(device, 9600, 8, "O",
-                                      timeout=1)
+            self._ser = serial.Serial(device, 9600)  #, 8, "O",
+            #                          timeout=1)
             self._log.info("Serial opened")
+            print("Serial opened")
         except:
             error = "Error while opening serial device : %s : %s" % (device, str(traceback.format_exc()))
             raise XplBridgeException(error)
@@ -100,20 +105,22 @@ class XplBridge:
         """ listen serial for xpl messages
         """
         self._log.info("Start listening serial device")
-        while True:
-            resp = self.read()
-            if resp != None:
-                self._cb(resp)
+        print("Start listening serial device")
+        current_msg = ""
 
-    def read(self):
-        """ read xpl messages from serial device
-        """
-        resp = self._ser.readline()
-        if START_MESSAGE in resp:
-            self._log.debug("Xpl Message : '%s'" % resp)
-            return resp
-        else:
-            return None
+        # TODO : use a thread issue instead of while True
+        while True:
+            resp = self._ser.readline()
+            if self.__regexp_type.match(resp):
+                self._log.debug("New start of xpl message detected")
+                print("New start of xpl message detected")
+                current_msg = resp
+            else:
+                current_msg += resp
+                if self.__regexp_global.match(current_msg):
+                    print("OK!!! %s" % current_msg)
+                    self._cb(current_msg)
+                    current_msg = ""
 
 
     def write(self,message):
@@ -122,6 +129,7 @@ class XplBridge:
         @param message : the xpl message to send to serial device
         """
         self._log.debug("Send xpl message : '%s'" % message)
+        print("Send xpl message : '%s'" % message)
         self._ser.write(message)
 
 
