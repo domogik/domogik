@@ -65,25 +65,26 @@ class XplBridge:
     __regexp_type = re.compile(REGEXP_TYPE, re.UNICODE | re.VERBOSE)
     __regexp_global = re.compile(REGEXP_GLOBAL, re.DOTALL | re.UNICODE | re.VERBOSE)
 
-    def __init__(self, log, callback):
+    def __init__(self, log, callback, stop):
         """ Create handler
 
         @param callback : method to call each time all data are collected
         """
         self._log = log
         self._cb = callback 
+        self._stop = stop
 
 
-    def open(self, device):
+    def open(self, device, baudrate):
         """ open Serial device
 
         @param device : The full path or number of the device where 
                              serial is connected
+        @param baudrate : speed of serial port (9600, ...)
         """
         self._log.info("Opening serial device : %s" % device)
         try:
-            self._ser = serial.Serial(device, 9600)  #, 8, "O",
-            #                          timeout=1)
+            self._ser = serial.Serial(device, baudrate)
             self._log.info("Serial opened")
             print("Serial opened")
         except:
@@ -109,7 +110,7 @@ class XplBridge:
         current_msg = ""
 
         # TODO : use a thread issue instead of while True
-        while True:
+        while not self._stop.isSet():
             resp = self._ser.readline()
             if self.__regexp_type.match(resp):
                 self._log.debug("New start of xpl message detected")

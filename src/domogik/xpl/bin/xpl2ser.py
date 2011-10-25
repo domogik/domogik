@@ -44,6 +44,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.xpl2ser import XplBridge
 from domogik.xpl.lib.xpl2ser import XplBridgeException
 import threading
+import traceback
 
 
 class XplBridgeManager(XplPlugin):
@@ -58,14 +59,59 @@ class XplBridgeManager(XplPlugin):
 
         # Configuration
         self._config = Query(self.myxpl, self.log)
-        #device = self._config.query('xpl2ser', 'device')
-        device = "/dev/ttyUSB0"
 
+        # Configuration : list of devices to check
+        self.dev_list = {}
+        num = 1
+        loop = True
+        while loop == True:
+            dev = self._config.query('xpl2ser', 'device-%s' % str(num))
+            if dev != None:
+                self.log.info("Configuration : device=%s" % dev)
+                # init object 
+                baudrate = self._config.query('xpl2ser', 'baudrate-%s' % str(num))
+                self.dev_list[dev] = { "baudrate" : baudrate }
+                num += 1
+            else:
+                loop = False
 
+        # no device configured
+        if num == 1:
+            msg = "No device configured. Exiting plugin"
+            self.log.info(msg)
+            print(msg)
+            self.force_leave()
+            return
 
-        # Init serial device
-        self.br  = XplBridge(self.log, self.send_xpl)
-        
+        ### Start listening each device
+        for dev in self.dev_list:
+            try:
+                self.dev_list[dev]["obj"] = XplBridge(self.log, self.send_xpl, self.get_stop())
+                # Open serial device
+                self.log.info("Open '%s'" % dev)
+                try:
+                    self.dev_list[dev]["obj"].open(dev, 
+                                              self.dev_list[dev]["baudrate"])
+                except XplBridgeException as e:
+                    self.log.error(e.value)
+                    print(e.value)
+                    self.force_leave()
+                    return
+                self.log.info("Start listening for '%s'" % dev)
+                dev_listen = threading.Thread(None,
+                                              self.dev_list[dev]["obj"].listen,
+                                              None,
+                                              (),
+                                              {})
+                dev_listen.start()
+            except:
+                self.log.error(traceback.format_exc())
+                print(traceback.format_exc())
+                # We don't quit plugin if an error occured
+                # a device may have disappeared
+                # Notice that it won't be read if device come back
+                #self.force_leave()
+                #return
 
         # Create listeners
         # Notice : this listener and callback function make this plugin send
@@ -73,24 +119,8 @@ class XplBridgeManager(XplPlugin):
         # TODO : update this !
         #Listener(self.xplbridge_cb, self.myxpl)
  
-
-        # Open serial device
-        try:
-            self.br.open(device)
-        except XplBridgeException as e:
-            self.log.error(e.value)
-            print(e.value)
-            self.force_leave()
-            return
-            
-        # Start reading serial device
-        br_process = threading.Thread(None,
-                                   self.br.listen,
-                                   None,
-                                   (),
-                                   {})                                  
-        br_process.start()                              
         self.enable_hbeat()
+        self.log.info("Plugin ready :)")
 
     def send_xpl(self, resp):
         """ Send xPL message on network

@@ -18,11 +18,20 @@
       <default-value>False</default-value>
     </key>
     <key>
+      <interface>yes</interface>
       <order-id>1</order-id>
       <name>device</name>
       <type>string</type>
       <description>Serial device (ex: /dev/ttyUSB0)</description>
-      <default-value>/dev/xpl2ser</default-value>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
+      <name>baudrate</name>
+      <type>string</type>
+      <description>Serial speed (ex: 9600 bauds)</description>
+      <default-value>9600</default-value>
     </key>
   </configuration-keys>
   <files>
