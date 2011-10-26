@@ -1461,13 +1461,18 @@ class DbHelper():
         @return a device object
 
         """
+        print("1")
+        #device_list = []
         device_list = self.__session.query(
                                 Device
                             ).filter_by(address=ucode(device_address)
                             ).all()
+        print("2")
         if len(device_list) == 0:
+            print("2bis")
             return None
         device = []
+        print("3")
         for device in device_list:
             device_type = self.__session.query(
                                     DeviceType
@@ -1479,6 +1484,7 @@ class DbHelper():
                                 ).first()
             if device_tech.id.lower() == ucode(techno_id.lower()):
                 return device
+        print("4")
         return None
 
     def get_all_devices_of_room(self, d_room_id):
