@@ -295,36 +295,26 @@ class StatsManager:
             self._log_stats.debug("message catcher : %s" % message)
             try:
                 if self._res["device"] != None:
-                    print "A"
                     device = message.data[self._res["device"]]
-                    print "B"
                     my_device = my_db.get_device_by_technology_and_address(self._technology, \
                         message.data[self._res["device"]])
                     if my_device != None:
-                        print "B1"
                         d_id = my_device.id
-                        print "B2"
                     else:
-                        print "B3"
                         raise AttributeError
                     #d_id = my_db.get_device_by_technology_and_address(self._technology, \
                     #    message.data[self._res["device"]]).id
-                    print "C"
                     device = message.data[self._res["device"]]
-                    print "D"
                 elif self._res["static_device"] != None:
-                    print "BB"
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         self._res["static_device"]).id
                     device = self._res["static_device"]
                 elif self._res["device_type"] != None:
-                    print "CC"
                     # device id equals 0 for a notification
                     if self._res["device_type"] == "notification":
                         d_id = 0
                         device = "notification"
                 else:  # oups... something wrong in xml file ?
-                    print "DD"
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
                 #print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
