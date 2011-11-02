@@ -50,6 +50,7 @@ Implements
 
 import binascii
 import serial
+import traceback
 
 HUMIDITY_STATUS = {
   "0x00" : "dry",
@@ -405,12 +406,10 @@ class RfxcomUsb:
         if type.lower() == "ninja":
             self._command_28(device = msg_device,
                              current = msg_current)
-
-                              
-        
         
         # TODO : finish
         pass
+
 
     def listen(self, stop):
         """ Start listening to Rfxcom
@@ -421,8 +420,15 @@ class RfxcomUsb:
         # First, ask for hardware informations
         #TODO : call _command_00 with appropriate parameter to request status
         # infinite
-        while not stop.isSet():
-            self.read()
+        try:
+            while not stop.isSet():
+                self.read()
+        except serial.SerialException:
+            error = "Error while reading rfxcom device (disconnected ?) : %s" % traceback.format_exc()
+            print(error)
+            self._log.error(error)
+            # TODO : raise for using self.force_leave() in bin ?
+            return
 
     def read(self):
         """ Read Rfxcom device once

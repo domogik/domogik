@@ -56,7 +56,7 @@ class RfxcomUsbManager(XplPlugin):
         #   - device
         #self._config = Query(self.myxpl, self.log)
         #device = self._config.query('rfxcom', 'device')
-        device = "/dev/ttyACM0"
+        device = "/dev/rfxcom"
 
         # Init RFXCOM
         self.rfxcom  = RfxcomUsb(self.log, self.send_xpl)
