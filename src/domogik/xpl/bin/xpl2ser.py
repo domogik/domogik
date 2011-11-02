@@ -37,6 +37,7 @@ TODO
 """
 
 
+from domogik.common.dmg_exceptions import XplMessageError
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
@@ -127,8 +128,13 @@ class XplBridgeManager(XplPlugin):
             @param resp : xpl message
         """
         print("Input xpl message : %s " % resp)
-        msg = XplMessage(resp)
-        self.myxpl.send(msg)
+        try:
+            msg = XplMessage(resp)
+            self.myxpl.send(msg)
+        except XplMessageError:
+            error = "Bad data : %s" % traceback.format_exc()
+            print(error)
+            self.log.error(error)
 
     def xplbridge_cb(self, message):
         """ Call xplbridge lib for sending xpl message to serial
