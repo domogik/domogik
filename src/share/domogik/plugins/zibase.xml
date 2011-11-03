@@ -107,6 +107,12 @@
           <name>Digimax</name>
           <description>Digimax</description>
       </device_type>
+      <device_type>
+          <id>zibase.sensor</id>
+          <device_technology_id>zibase</device_technology_id>
+          <name>ON/OFF Sensor</name>
+          <description>motion sensors, door sensors ... </description>
+      </device_type>
   </device_types>
   <device_feature_models>
       <device_feature_model>
@@ -354,6 +360,18 @@
           <name>Status</name>
           <feature_type>sensor</feature_type>
           <device_type_id>zibase.digimax</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>status</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>zibase.sensor.status</id>
+          <name>Status</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>zibase.sensor</device_type_id>
           <parameters>
               {}
           </parameters>
