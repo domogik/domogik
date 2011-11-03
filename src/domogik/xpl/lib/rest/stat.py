@@ -290,14 +290,20 @@ class StatsManager:
             @param message : the Xpl message received 
             """
 
-            #print "MSG=%s" % message
             ### we put data in database
             my_db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
             try:
                 if self._res["device"] != None:
-                    d_id = my_db.get_device_by_technology_and_address(self._technology, \
-                        message.data[self._res["device"]]).id
+                    device = message.data[self._res["device"]]
+                    my_device = my_db.get_device_by_technology_and_address(self._technology, \
+                        message.data[self._res["device"]])
+                    if my_device != None:
+                        d_id = my_device.id
+                    else:
+                        raise AttributeError
+                    #d_id = my_db.get_device_by_technology_and_address(self._technology, \
+                    #    message.data[self._res["device"]]).id
                     device = message.data[self._res["device"]]
                 elif self._res["static_device"] != None:
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
@@ -312,7 +318,7 @@ class StatsManager:
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
                 #print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
-                print("Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id))
+                #print("Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id))
             except AttributeError:
                 if self._res["device"] != None:
                     self._log_stats_unknown.debug("Received a stat for an unreferenced device : %s - %s" \
@@ -321,6 +327,7 @@ class StatsManager:
                     self._log_stats_unknown.debug("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, self._res["static_device"]))
                 print("=> unknown device")
+                del(my_db)
                 return
             #self._log_stats.debug("Stat received for %s - %s." \
             #        % (self._technology, message.data[self._res["device"]]))
@@ -371,7 +378,7 @@ class StatsManager:
             # Put data in events queues
             self._event_requests.add_in_queues(d_id, 
                     {"timestamp" : current_date, "device_id" : d_id, "data" : device_data})
-
+            del(my_db)
 
 
 

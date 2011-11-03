@@ -68,7 +68,6 @@ class DiskManager(XplPlugin):
         self.path_list = {}
         num = 1
         loop = True
-        self._config = Query(self.myxpl, self.log)
         while loop == True:
             path = self._config.query('diskfree', 'path-%s' % str(num))
             if path != None:

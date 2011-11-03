@@ -324,8 +324,9 @@ class PackageManager():
         __import__("domogik")
         dmg = sys.modules["domogik"]
         self.log("Domogik release = %s" % dmg.__version__)
-        self.log("Package compatibility = %s" % pkg_xml.domogik_min_release)
-        if pkg_xml.domogik_min_release < dmg.__version__:
+        self.log("Minimum Domogik release required for package = %s" % pkg_xml.domogik_min_release)
+        print("%s < %s" % ( pkg_xml.domogik_min_release , dmg.__version__))
+        if pkg_xml.domogik_min_release > dmg.__version__:
             msg = "This package needs a Domogik release >= %s. Actual is %s. Installation ABORTED!" % (pkg_xml.domogik_min_release, dmg.__version__)
             self.log(msg)
             raise PackageException(msg)

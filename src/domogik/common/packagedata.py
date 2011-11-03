@@ -50,7 +50,7 @@ class PackageData():
             @param custom_path : full path to domogik.cfg file
         """
 
-        self._db = DbHelper(custom_path)
+        self._db = DbHelper(custom_path = custom_path)
         try:
             self.plg = PackageXml(path = xml_path)
         except:
