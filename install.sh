@@ -306,19 +306,21 @@ function create_log_dir {
 }
 
 function install_plugins {
-    chmod +x src/tools/packages/insert_data.py 
-    for file in src/share/domogik/plugins/*.xml;do
-        echo "** Parse $file"
-        su -c "src/tools/packages/insert_data.py $file" $d_user
-        echo "** File $file parsed"
-    done
-    for file in src/share/domogik/hardwares/*.xml;do
-        if [[ $file != "src/share/domogik/hardwares/*.xml" ]] ; then
+    if [ "$MODE" = "develop" ];then
+        chmod +x src/tools/packages/insert_data.py 
+        for file in src/share/domogik/plugins/*.xml;do
             echo "** Parse $file"
             su -c "src/tools/packages/insert_data.py $file" $d_user
             echo "** File $file parsed"
-        fi
-    done
+        done
+        for file in src/share/domogik/hardwares/*.xml;do
+            if [[ $file != "src/share/domogik/hardwares/*.xml" ]] ; then
+                echo "** Parse $file"
+                su -c "src/tools/packages/insert_data.py $file" $d_user
+                echo "** File $file parsed"
+            fi
+        done
+    fi
 }
 
 #Main part
