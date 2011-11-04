@@ -131,7 +131,12 @@ class SysManager(XplPlugin):
                           action="store", 
                           type="int",
                           dest="custom_ping_duration", 
-                          help="Time for ping duration (default : %s)" % PING_DURATION)
+                          help="Time for xpl ping duration (default : %s)" % PING_DURATION)
+        parser.add_option("-w", 
+                          action="store", 
+                          type="int",
+                          dest="wait_time_between_ping", 
+                          help="Time between 2 xpl ping (default : %s)" % WAIT_TIME_BETWEEN_PING)
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
@@ -171,11 +176,29 @@ class SysManager(XplPlugin):
         self._hardwares = []
         self._hardware_models = []
 
+        if self.options.allow_ping:
+            msg = "xpl ping activated"
+        else:
+            msg = "xpl ping not activated"
+        print(msg)
+        self.log.info(msg)
+
         if self.options.custom_ping_duration != None:
             self.ping_duration = self.options.custom_ping_duration
         else:
             self.ping_duration = PING_DURATION
-        print("ping duration=%s" % self.ping_duration)
+        msg = "xpl ping duration=%s" % self.ping_duration
+        print(msg)
+        self.log.info(msg)
+
+        if self.options.wait_time_between_ping != None:
+            self.wait_time_between_ping = self.options.wait_time_between_ping
+        else:
+            self.wait_time_between_ping = WAIT_TIME_BETWEEN_PING
+        msg = "Delay between 2 xpl ping=%s" % self.wait_time_between_ping
+        print(msg)
+        self.log.info(msg)
+
         try:
             #Start dbmgr
             if self.options.start_dbmgr:
@@ -302,7 +325,7 @@ class SysManager(XplPlugin):
             # the goal is to detect manually launched plugins
             if self.options.allow_ping:
                 while True:
-                    time.sleep(WAIT_TIME_BETWEEN_PING)
+                    time.sleep(self.wait_time_between_ping)
                     ping_thread = {}
                     for plugin in self._plugins:
                         name = plugin["name"]

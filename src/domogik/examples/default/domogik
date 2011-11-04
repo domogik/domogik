@@ -3,12 +3,13 @@
 #Start domogik daemon under this user
 DOMOGIK_USER=domogik
 
-# This variable can take 4 parameters :
-# -p to regulary ping plugins 
+# This variable can take 6 parameters :
 # -d to start the database manager (launch only on master host)
 # -r to start the rest component (launch only on master host)
 # -H to manage hardware (launch only on master host)
+# -p to regulary ping plugins 
 # -t <ping duration> to customize ping duration
+# -w <wait time between 2 ping> to customize ping delay
 # Remember : Your domogik installation must have *one* and *only one*
 # instance of each manager running.
 # Your domogik installation won't start on this computer if :
