@@ -82,8 +82,8 @@ def _add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
 
-    _db.update_db_version(_upgrade._get_new_db_version())
-    _db.update_app_version(_upgrade._get_new_app_version())
+    #_db.update_db_version(_upgrade._get_new_db_version())
+    #_db.update_app_version(_upgrade._get_new_app_version())
 
     _db.update_system_config()
 
@@ -125,7 +125,8 @@ def _add_initial_data():
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     _db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-
+    _upgrade.set_version(_upgrade._get_new_app_version(), _upgrade._get_new_db_version())
+    
 def _upgrade_app():
     """Upgrade process of the application"""
     print("Upgrading the application...")
@@ -153,14 +154,15 @@ def _install_or_upgrade():
 def _check_install_is_ok():
     if (_upgrade._get_current_db_version() != _upgrade._get_new_db_version()):
         _abort_install_process("Something is wrong with your installation : database version is %s. It should be : %s" 
-                               % (_db.get_db_version(), _upgrade._get_new_db_version()))
+                               % (_upgrade._get_current_db_version(), _upgrade._get_new_db_version()))
     if (_upgrade._get_current_app_version() != _upgrade._get_new_app_version()):
         _abort_install_process("Something is wrong with your installation : application version is %s. It should be : %s" 
-                               % (_db.get_app_version(), _upgrade._get_new_app_version()))
+                               % (_upgrade._get_current_app_version(), _upgrade._get_new_app_version()))
+    _upgrade.commit()
     print("Installation complete.")
 
-def _abort_install_process(error_msg):
-    print(error_msg)
+def _abort_install_process(error_msg=""):
+    print("Install process aborted : %s " % error_msg)
     sys.exit(1)
 
 def usage():

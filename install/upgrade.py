@@ -74,10 +74,17 @@ class Upgrade:
         if old_app_version == self._get_current_app_version():
             print("\tThe application was NOT upgraded: nothing to do!")
 
-        self._commit()
-        
         print("=== Upgrade process terminated")
-
+    
+    def set_version(self, app_version, db_version):
+        """Set the version of the application and the database"""
+        self._update_app_version(app_version)
+        self._update_db_version(db_version)
+        self.commit()
+    
+    def commit(self):
+        self.__db.commit()
+        
     ####################
     # Database upgrade #
     ####################
@@ -197,7 +204,11 @@ class Upgrade:
 
     def _update_db_version(self, db_version):
         """Update the version of the database"""
-        self.__db.execute("UPDATE core_system_info SET db_version='%s'" % db_version)
+        if self.__db.execute("SELECT db_version FROM core_system_info").fetchone() is None:
+            sql = "INSERT INTO core_system_info (db_version) VALUES('%s')" % db_version
+        else:
+            sql = "UPDATE core_system_info SET db_version='%s'" % db_version
+        self.__db.execute(sql)
 
     def _get_current_app_version(self):
         """Return the current version of the application"""
@@ -217,11 +228,21 @@ class Upgrade:
 
     def _update_app_version(self, app_version):
         """Update the version of the application"""
-        self.__db.execute("UPDATE core_system_info SET app_version='%s'" % app_version)
+        if self.__db.execute("SELECT app_version FROM core_system_info").fetchone() is None:
+            sql = "INSERT INTO core_system_info (app_version) VALUES('%s')" % app_version
+        else:
+            sql = "UPDATE core_system_info SET app_version='%s'" % app_version
+        self.__db.execute(sql)
 
-    def _commit(self):
-        self.__db.commit()
+    def _suggest_normalized_version(version):
+        n_version = suggest_normalized_version(version)
+        if n_version is None:
+            print("Error : invalid version number : %s" % version)
+            print("See : http://wiki.domogik.org/Release_numbering")
+            self._abort_install_process()
+        else:
+            return n_version
 
-    def _abort_upgrade_process(self):
-        print("Upgrade process aborted")
+    def _abort_upgrade_process(self, message=""):
+        print("Upgrade process aborted : %s" % message)
         sys.exit(1)
