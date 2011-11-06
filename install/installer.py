@@ -82,9 +82,6 @@ def _add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
 
-    #_db.update_db_version(_upgrade._get_new_db_version())
-    #_db.update_app_version(_upgrade._get_new_app_version())
-
     _db.update_system_config()
 
     # Create a default user account
