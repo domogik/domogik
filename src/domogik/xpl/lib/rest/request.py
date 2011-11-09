@@ -422,7 +422,7 @@ class ProcessRequest():
             return "%s" % (stdout)
         # else, we send dmg release
         else:
-            return self.rest_status_dmg_release
+            return self.rest_status_dmg_release()
 
     def rest_status_dmg_release(self):
         """ Return Domogik release
