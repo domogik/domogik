@@ -132,6 +132,7 @@ setup(
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
             dmg_django = domogik.ui.djangodomo.manage:run_manager
+            dmg_version = domogik.xpl.bin.version:main
             """
         ],
     },
