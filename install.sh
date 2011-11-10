@@ -161,7 +161,7 @@ function update_user_config {
             sed -i "s;^#package_path.*$;package_path = $dmg_home;" $dmg_home/domogik.cfg
         else
             prefix=$PWD/src
-            sed -i "s;^#package_path.*$;package_path = $dmg_home;" $dmg_home/domogik.cfg
+            sed -i "s;^#package_path.*$;#package_path = $dmg_home;" $dmg_home/domogik.cfg
         fi
         sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $dmg_home/domogik.cfg
 
