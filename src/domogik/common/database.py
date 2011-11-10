@@ -44,7 +44,7 @@ from types import DictType
 
 import sqlalchemy
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker,scoped_session
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.utils import ucode
@@ -108,7 +108,7 @@ class DbHelper():
 
     """
     __engine = None
-    __session = None
+    __session_object = None
 
     def __init__(self, echo_output=False, use_test_db=False, engine=None, custom_path = None):
         """Class constructor
@@ -131,23 +131,24 @@ class DbHelper():
         if use_test_db:
             url = '%s_test' % url
         # Connecting to the database
-        if engine != None:
-            self.__engine = engine
-        else:
-            self.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8')
-        Session = sessionmaker(bind=self.__engine, autoflush=True)
-        self.__session = Session()
+        if DbHelper.__engine == None:
+            if engine != None:
+                DbHelper.__engine = engine
+            else:
+                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8')
+        if DbHelper.__session_object == None:
+            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
+        self.__session = DbHelper.__session_object()
 
     def get_engine(self):
         """Return the existing engine or None if not set
         @return self.__engine
 
         """
-        return self.__engine
+        return DbHelper.__engine
 
     def __del__(self):
         self.__session.close()
-        self.__engine.dispose()
 
     def __rollback(self):
         """Issue a rollback to a SQL transaction (for dev purposes only)
@@ -179,7 +180,8 @@ class DbHelper():
         @return a list of Area objects
 
         """
-        return self.__session.query(Area).all()
+        ret = self.__session.query(Area).all()
+        return ret
 
     def search_areas(self, filters):
         """Look for area(s) with filter on their attributes
