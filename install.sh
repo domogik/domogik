@@ -251,15 +251,6 @@ function update_user_config {
                     return
             fi
         fi
-        nb_tables=$(echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -vc ^Tables)
-        if [ $nb_tables -ne 0 ];then
-            read -p "Your database already contains some tables, do you want to drop them. If you choose No, new items will *NOT* be installed ? [Y/n]" drop_db
-            if [ "$drop_db" = "" -o "$drop_db" = "y" -o "$drop_db" = "Y" ];then
-                echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -v ^Tables|while read table;do
-                    echo "DROP TABLE $table;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
-                done
-            fi
-        fi
     done
 }
 
