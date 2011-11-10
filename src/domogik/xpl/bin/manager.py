@@ -211,8 +211,7 @@ class SysManager(XplPlugin):
                     thr_dbmgr = Thread(None,
                                        self._start_plugin,
                                        "start_plugin_dbmgr",
-                                       ("dbmgr",
-                                        self.get_sanitized_hostname()),
+                                       ("dbmgr",),
                                        {"ping" : False, "startup" : True})
                     self.register_thread(thr_dbmgr)
                     thr_dbmgr.start()
@@ -228,8 +227,7 @@ class SysManager(XplPlugin):
                     thr_rest = Thread(None,
                                        self._start_plugin,
                                        "start_plugin_rest",
-                                       ("rest",
-                                        self.get_sanitized_hostname()),
+                                       ("rest",),
                                        {"ping" : False, "startup" : True})
                     self.register_thread(thr_rest)
                     thr_rest.start()
@@ -256,14 +254,13 @@ class SysManager(XplPlugin):
                         comp_thread[name] = Thread(None,
                                                        self._start_plugin,
                                                        "start_plugin_%s" % name,
-                                                       (name,
-                                                        self.get_sanitized_hostname()),
+                                                       (name,),
                                                        {"startup" : True})
                         self.register_thread(comp_thread[name])
                         comp_thread[name].start()
             
             # Define listeners
-            Listener(self._sys_cb, self.myxpl, {
+            Listener(self._system_action_cb, self.myxpl, {
                 'schema': 'domogik.system',
                 'xpltype': 'xpl-cmnd',
             })
@@ -397,11 +394,11 @@ class SysManager(XplPlugin):
         self._startup_count_lock.release()
         self.log.info("lock-- released: %s" % self._startup_count)
 
-    def _sys_cb(self, message):
+    def _system_action_cb(self, message):
         """ Internal callback for receiving system messages
         @param message : xpl message received
         """
-        self.log.debug("Call _sys_cb")
+        self.log.debug("Call _system_action_cb")
 
         cmd = message.data['command']
         try:
@@ -417,9 +414,10 @@ class SysManager(XplPlugin):
         error = ""
         if plg != "*":
             if self.get_sanitized_hostname() == host and \
-               (cmd != "enable" and cmd != "disable") and \
+               cmd != "enable" and \
+               cmd != "disable" and \
                self._is_plugin(plg) == False:
-                self._invalid_plugin(cmd, plg, host)
+                self._invalid_plugin(cmd, plg)
                 return
 
         # if no error at this point, process
@@ -428,11 +426,11 @@ class SysManager(XplPlugin):
 
             # start plugin
             if cmd == "start" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
-                self._start_plugin(plg, host) 
+                self._start_plugin(plg)
 
             # stop plugin
             if cmd == "stop" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
-                self._stop_plugin(plg, host)
+                self._stop_plugin(plg)
 
             # enable plugin
             if cmd == "enable" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
@@ -455,42 +453,40 @@ class SysManager(XplPlugin):
         else:
             self.log.error("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
-    def _invalid_plugin(self, cmd, plg, host):
+    def _invalid_plugin(self, cmd, plg):
         """ send an invalid plugin message
              @param cmd : command
              @param plg : plugin name
-             @param host : computer on which action was tried
         """
-        error = "Component %s doesn't exists on %s" % (plg, host)
+        error = "Component %s doesn't exists on %s" % (plg, self.get_sanitized_hostname())
         self.log.debug(error)
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
-        mess.add_data({'host' : host})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
         mess.add_data({'command' :  cmd})
         mess.add_data({'plugin' :  plg})
         mess.add_data({'error' :  error})
         self.myxpl.send(mess)
 
-    def _start_plugin(self, plg, host, ping = True, startup = False):
+    def _start_plugin(self, plg, ping = True, startup = False):
         """ Start a plugin
             @param plg : plugin name
-            @param host : computer on which plugin should be started
             @param startup : set it to True if you call _start_plugin during manager start
         """
         error = ""
-        self.log.debug("Ask to start %s on %s" % (plg, host))
+        self.log.debug("Ask to start %s on %s" % (plg, self.get_sanitized_hostname()))
         if startup:
-            self._write_fifo("INFO", "Start %s on %s\n" % (plg, host))
+            self._write_fifo("INFO", "Start %s on %s\n" % (plg, self.get_sanitized_hostname()))
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
-        mess.add_data({'host' : host})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
         mess.add_data({'command' :  'start'})
         mess.add_data({'plugin' :  plg})
         if ping == True:
             if self._check_component_is_running(plg):
-                error = "Component %s is already running on %s" % (plg, host)
+                error = "Component %s is already running on %s" % (plg, self.get_sanitized_hostname())
                 self.log.warning(error)
                 if startup:
                     self._write_fifo("ERROR", "Component %s is already running\n" % plg)
@@ -522,20 +518,19 @@ class SysManager(XplPlugin):
             self._dec_startup_lock()
         self.myxpl.send(mess)
 
-    def _stop_plugin(self, plg, host):
+    def _stop_plugin(self, plg):
         """ stop a plugin
             @param plg : plugin name
-            @param host : computer on which we want to stop plugin
         """
-        self.log.debug("Check plugin stops : %s on %s" % (plg, host))
+        self.log.debug("Check plugin stops : %s on %s" % (plg, self.get_sanitized_hostname()))
         if self._check_component_is_running(plg) == False:
-            error = "Component %s is not running on %s" % (plg, host)
+            error = "Component %s is not running on %s" % (plg, self.get_sanitized_hostname())
             self.log.warning(error)
             mess = XplMessage()
             mess.set_type('xpl-trig')
             mess.set_schema('domogik.system')
             mess.add_data({'command' : 'stop'})
-            mess.add_data({'host' : host})
+            mess.add_data({'host' : self.get_sanitized_hostname()})
             mess.add_data({'plugin' : plg})
             mess.add_data({'error' : error})
             self.myxpl.send(mess)
