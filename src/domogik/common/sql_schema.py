@@ -287,7 +287,7 @@ class Device(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
-    address = Column(Unicode(30), nullable=False)
+    address = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(30))
     device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
