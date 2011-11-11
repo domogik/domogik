@@ -43,7 +43,8 @@ from distutils2.version import NormalizedVersion
 
 def db_upgrade(upgrade_instance):
     """Eventually upgrade the database (depending on the current version number)
-    
+
+    @param upgrade_instance : instance of the Upgrade object
     @return true if an upgrade was done
     
     """
@@ -85,7 +86,8 @@ def _upgrade_db_from_0_2_0_to_0_3_0(upgrade_instance):
 
 def app_upgrade(upgrade_instance):
     """Eventually upgrade the application (depending on the current version number)
-    
+
+    @param upgrade_instance : instance of the Upgrade object    
     @return true if an upgrade was done
     
     """
