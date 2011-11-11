@@ -2583,27 +2583,6 @@ class DbHelper():
 # SystemInfo
 ###
 
-    def update_system_info(self, si_db_version):
-        """Update system information
-
-        @param si_db_version : version of the database
-        @return a SystemInfo object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        sys_info = self.__session.query(SystemInfo).first()
-        if sys_info is None:
-            sys_info = SystemInfo(db_version=ucode(si_db_version))
-        else:
-            sys_info.db_version = ucode(si_db_version)
-        self.__session.add(sys_info)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return sys_info
-
     def get_system_info(self):
         """Get current system information
 
