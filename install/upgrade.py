@@ -132,11 +132,11 @@ class Upgrade:
             # Should only happen for the first upgrade using this script
             return NormalizedVersion('0.1.0')
         else:
-            return NormalizedVersion(suggest_normalized_version(db_version))
+            return NormalizedVersion(self._suggest_normalized_version(db_version))
 
     def get_new_db_version(self):
         """Return the version of the database we should upgrade to (normalized version)"""
-        return NormalizedVersion(suggest_normalized_version(DB_VERSION))
+        return NormalizedVersion(self._suggest_normalized_version(DB_VERSION))
 
     def update_db_version(self, db_version):
         """Update the version of the database"""
@@ -154,13 +154,13 @@ class Upgrade:
             # Should only happen if the 'app_version' column doesn't exist (first application upgrade using this script)
             if app_version is None or app_version == '':
                 app_version = NormalizedVersion('0.1.0')
-            return NormalizedVersion(suggest_normalized_version(app_version))
+            return NormalizedVersion(self._suggest_normalized_version(app_version))
         except Exception:
             return NormalizedVersion('0.1.0')
 
     def get_new_app_version(self):
         """Return the version of the application we should upgrade to (normalized version)"""
-        return NormalizedVersion(suggest_normalized_version(__version__))
+        return NormalizedVersion(self._suggest_normalized_version(__version__))
 
     def update_app_version(self, app_version):
         """Update the version of the application"""
@@ -170,7 +170,7 @@ class Upgrade:
             sql = "UPDATE core_system_info SET app_version='%s'" % app_version
         self._sql_execute(sql)
 
-    def _suggest_normalized_version(version):
+    def _suggest_normalized_version(self, version):
         n_version = suggest_normalized_version(version)
         if n_version is None:
             print("Error : invalid version number : %s" % version)
