@@ -122,7 +122,7 @@ def _add_initial_data():
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     _db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
-    _upgrade.set_version(_upgrade._get_new_app_version(), _upgrade._get_new_db_version())
+    _upgrade.set_version(_upgrade.get_new_app_version(), _upgrade.get_new_db_version())
     
 def _upgrade_app():
     """Upgrade process of the application"""
@@ -149,12 +149,12 @@ def _install_or_upgrade():
         _upgrade_app()
 
 def _check_install_is_ok():
-    if (_upgrade._get_current_db_version() != _upgrade._get_new_db_version()):
+    if (_upgrade.get_current_db_version() != _upgrade.get_new_db_version()):
         _abort_install_process("Something is wrong with your installation : database version is %s. It should be : %s" 
-                               % (_upgrade._get_current_db_version(), _upgrade._get_new_db_version()))
-    if (_upgrade._get_current_app_version() != _upgrade._get_new_app_version()):
+                               % (_upgrade.get_current_db_version(), _upgrade.get_new_db_version()))
+    if (_upgrade.get_current_app_version() != _upgrade.get_new_app_version()):
         _abort_install_process("Something is wrong with your installation : application version is %s. It should be : %s" 
-                               % (_upgrade._get_current_app_version(), _upgrade._get_new_app_version()))
+                               % (_upgrade.get_current_app_version(), _upgrade.get_new_app_version()))
     _upgrade.commit()
     print("Installation complete.")
 

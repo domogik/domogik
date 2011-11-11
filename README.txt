@@ -19,9 +19,7 @@ along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 @license: GPL(v3)
 @organization: Domogik
 
-See : http://wiki.domogik.org/EndUserDocumentation
+======================================================================
 
-*** IMPORTANT NOTE TO beta users ***
-If you are upgrading from a previous beta version to the current rc1, 
-then you have to run the upgrade_to_rc1.sql script before starting Domogik
-It will ensure to keep your stats values.
+To add scripts to upgrade from a version to another one, please put them
+in the 'upgrade_scripts.py' module.
