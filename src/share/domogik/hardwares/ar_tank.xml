@@ -1,0 +1,82 @@
+<package type="hardware">
+  <name>ar_tank</name>
+  <technology>arduino</technology>
+  <description>Get water level from a tank with an arduino</description>
+  <detail>
+This hardware plugin is a xPL program for arduino which get water level of a tank
+
+It requires : 
+- Arduino Uno or similar
+- Xbee shield and xbee serie 1
+
+Open the following files as a sketchbook with the Arduino Java IDE :
+- ar_tank.pde
+- time.pde
+- xpl.pde
+- float.pde
+
+Configure parameters in ar_tank.pde
+- xPL part
+- tank parameters
+
+Upload project to Arduino with the IDE
+  </detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/hardware_ar_tank</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <vendor-id>arduino</vendor-id>
+  <device-id>tank</device-id>
+  <domogik-min-version>0.2.0</domogik-min-version>
+  <configuration-keys/>
+  <files>
+    <file path="src/share/domogik/hardwares/ar_tank.xml"/>
+    <file path="src/share/domogik/stats/arduino/arduino.tank-ar_tank.xml"/>
+  </files>
+  <external_files>
+    <file path="src/external/hardwares/ar_tank/ar_tank.pde"/>
+    <file path="src/external/hardwares/ar_tank/float.pde"/>
+    <file path="src/external/hardwares/ar_tank/time.pde"/>
+    <file path="src/external/hardwares/ar_tank/xpl.pde"/>
+  </external_files>
+  <dependencies/>
+  <device_technology>
+      <id>arduino</id>
+      <name>Arduino</name>
+      <description>Arduino</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>arduino.tank</id>
+          <device_technology_id>arduino</device_technology_id>
+          <name>Tank</name>
+          <description>Tank</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>arduino.tank.distance</id>
+          <name>Distance</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>arduino.tank</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;cm&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>distance</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>arduino.tank.level</id>
+          <name>Level</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>arduino.tank</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;%&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
