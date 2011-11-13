@@ -31,7 +31,7 @@ Upload project to Arduino with the IDE
   <configuration-keys/>
   <files>
     <file path="src/share/domogik/hardwares/ar_tank.xml"/>
-    <file path="src/share/domogik/stats/arduino/arduino.tank-ar_tank.xml"/>
+    <file path="src/share/domogik/stats/arduino/sensor.basic-ar_tank.xml"/>
   </files>
   <external_files>
     <file path="src/external/hardwares/ar_tank/ar_tank.pde"/>
