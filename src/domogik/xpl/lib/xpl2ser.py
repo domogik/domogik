@@ -119,7 +119,6 @@ class XplBridge:
             else:
                 current_msg += resp
                 if self.__regexp_global.match(current_msg):
-                    print("OK!!! %s" % current_msg)
                     self._cb(current_msg)
                     current_msg = ""
 
