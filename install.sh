@@ -217,7 +217,9 @@ function update_user_config {
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
         read -p "Username : " db_user
+        stty -echo echonl
         read -p "Password : " db_password
+        stty echo
         read -p "Port [3306] : " db_port
         if [ "$db_port" = "" ];then 
             db_port=3306 
