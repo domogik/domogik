@@ -8,11 +8,11 @@ List of supported devices :
 - DS18S20
 - DS2401
 - DS2438</detail>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_onewire</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

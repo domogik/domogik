@@ -3,11 +3,11 @@
   <technology>service</technology>
   <description>Get power consumption with teleinfo</description>
   <detail>Teleinfo is a french method to get power related informations.</detail>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_teleinfo</documentation>
   <author>Maxence Dunnewind</author>
   <author-email>maxence at dunnewind.net</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

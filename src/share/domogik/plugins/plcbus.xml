@@ -3,11 +3,11 @@
   <technology>plcbus</technology>
   <description>Manage Plcbus devices</description>
   <detail>Plcbus is a CPL based protocol to control lights, appliances and others things in your house</detail>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 <documentation>http://wiki.domogik.org/plugin_plcbus</documentation>
   <author>Francois Pinet, Maxence Dunnewind</author>
   <author-email>domopyx at gmail.com ; maxence at dunnewind.net</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
