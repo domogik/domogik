@@ -5,8 +5,8 @@
   <detail>This plugin sends date and time over xPL network each minute</detail>
   <version>0.1</version>
   <documentation>https://wiki.domogik.org/plugin_xpl_time</documentation>
-  <author>Fritz</author>
-  <author-email>fritz.smh at gmail.com</author-email>
+  <author>Maxence Dunnewind</author>
+  <author-email>maxence at dunnewind.net</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
     <key>
