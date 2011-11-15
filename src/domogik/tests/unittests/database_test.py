@@ -1525,16 +1525,9 @@ class SystemInfoTestCase(GenericTestCase):
     def tearDown(self):
         pass
 
-    def test_update(self):
+    def test_get(self):
+        assert db.get_app_version() is None
         assert db.get_db_version() is None
-        db.update_db_version(si_db_version=u'0.2.0')
-        assert db.get_db_version() == u'0.2.0'
-        
-        system_info = db.update_system_info(si_db_version=u'0.1.0')
-        print(system_info)
-        assert system_info.db_version == '0.1.0'
-        db.update_system_info(si_db_version=u'0.1.1')
-        assert db.get_system_info().db_version == u'0.1.1'
 
 class SystemConfigTestCase(GenericTestCase):
     """Test system config"""

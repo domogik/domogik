@@ -44,7 +44,7 @@ from types import DictType
 
 import sqlalchemy
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker,scoped_session
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.utils import ucode
@@ -108,7 +108,7 @@ class DbHelper():
 
     """
     __engine = None
-    __session = None
+    __session_object = None
 
     def __init__(self, echo_output=False, use_test_db=False, engine=None, custom_path = None):
         """Class constructor
@@ -131,23 +131,24 @@ class DbHelper():
         if use_test_db:
             url = '%s_test' % url
         # Connecting to the database
-        if engine != None:
-            self.__engine = engine
-        else:
-            self.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8')
-        Session = sessionmaker(bind=self.__engine, autoflush=True)
-        self.__session = Session()
+        if DbHelper.__engine == None:
+            if engine != None:
+                DbHelper.__engine = engine
+            else:
+                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8')
+        if DbHelper.__session_object == None:
+            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
+        self.__session = DbHelper.__session_object()
 
     def get_engine(self):
         """Return the existing engine or None if not set
         @return self.__engine
 
         """
-        return self.__engine
+        return DbHelper.__engine
 
     def __del__(self):
         self.__session.close()
-        self.__engine.dispose()
 
     def __rollback(self):
         """Issue a rollback to a SQL transaction (for dev purposes only)
@@ -179,7 +180,8 @@ class DbHelper():
         @return a list of Area objects
 
         """
-        return self.__session.query(Area).all()
+        ret = self.__session.query(Area).all()
+        return ret
 
     def search_areas(self, filters):
         """Look for area(s) with filter on their attributes
@@ -2581,27 +2583,6 @@ class DbHelper():
 # SystemInfo
 ###
 
-    def update_system_info(self, si_db_version):
-        """Update system information
-
-        @param si_db_version : version of the database
-        @return a SystemInfo object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        sys_info = self.__session.query(SystemInfo).first()
-        if sys_info is None:
-            sys_info = SystemInfo(db_version=ucode(si_db_version))
-        else:
-            sys_info.db_version = ucode(si_db_version)
-        self.__session.add(sys_info)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return sys_info
-
     def get_system_info(self):
         """Get current system information
 
@@ -2610,25 +2591,6 @@ class DbHelper():
         """
         return self.__session.query(SystemInfo).first()
 
-    def update_db_version(self, si_db_version):
-        """Update database version
-
-        @param si_db_version : version of the database
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        sys_info = self.__session.query(SystemInfo).first()
-        if sys_info is None:
-            sys_info = SystemInfo(db_version=ucode(si_db_version))
-        else:
-            sys_info.db_version = ucode(si_db_version)
-        self.__session.add(sys_info)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-
     def get_db_version(self):
         """Get the current version of the database"""
         sys_info = self.__session.query(SystemInfo).first()
@@ -2636,25 +2598,6 @@ class DbHelper():
             return None
         return sys_info.db_version
 
-    def update_app_version(self, si_app_version):
-        """Update app version
-
-        @param si_app_version : version of the application
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        sys_info = self.__session.query(SystemInfo).first()
-        if sys_info is None:
-            sys_info = SystemInfo(app_version=ucode(si_app_version))
-        else:
-            sys_info.app_version = ucode(si_app_version)
-        self.__session.add(sys_info)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-    
     def get_app_version(self):
         """Get the current version of the application (that is stored in the database)"""
         sys_info = self.__session.query(SystemInfo).first()

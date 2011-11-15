@@ -76,11 +76,11 @@ def test_imports():
         warning("OpenSSL can't be imported, please exec ./setup.py develop or ./setup.py install and check it \
                 downloads and install pyOpenSSL correctly.")
         good = False
-    try:
-        import django
-    except ImportError:
-        warning("Can't import django, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
-        good = False
+#TODO : DEL#    try:
+#TODO : DEL#        import django
+#TODO : DEL#    except ImportError:
+#TODO : DEL#        warning("Can't import django, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
+#TODO : DEL#        good = False
     try:
         import MySQLdb
     except ImportError:
@@ -198,7 +198,7 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     rest = dict(config.items('rest'))
-    django = dict(config.items('django'))
+#TODO : DEL#    django = dict(config.items('django'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")
@@ -242,8 +242,8 @@ def test_user_config_file(user_home, user_entry):
     info("Parse [rest] section")
     _check_port_availability(rest['rest_server_ip'], rest['rest_server_port'])
     ok("Rest server IP/port is not bound by anything else")
-    _check_port_availability(django['django_server_ip'], django['django_server_port'])
-    ok("Django server IP/port is not bound by anything else")
+#TODO : DEL#    _check_port_availability(django['django_server_ip'], django['django_server_port'])
+#TODO : DEL#    ok("Django server IP/port is not bound by anything else")
 
 def test_init():
     info("Check init.d / rc.d")
@@ -264,14 +264,14 @@ def test_hostname_length():
             Please change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again."
     ok("Hostname length is < 16.")
 
-def get_django_url():
-    user_entry = pwd.getpwnam(user)
-    user_home = user_entry.pw_dir
-    import ConfigParser
-    config = ConfigParser.ConfigParser()
-    config.read("%s/.domogik/domogik.cfg" % user_home)
-    django = dict(config.items('django'))
-    return "http://%s:%s/domogik" % (django['django_server_ip'], django['django_server_port'])
+#TODO : DEL#def get_django_url():
+#TODO : DEL#    user_entry = pwd.getpwnam(user)
+#TODO : DEL#    user_home = user_entry.pw_dir
+#TODO : DEL#    import ConfigParser
+#TODO : DEL#    config = ConfigParser.ConfigParser()
+#TODO : DEL#    config.read("%s/.domogik/domogik.cfg" % user_home)
+#TODO : DEL#    django = dict(config.items('django'))
+#TODO : DEL#    return "http://%s:%s/domogik" % (django['django_server_ip'], django['django_server_port'])
      
 try:
     am_i_root()
@@ -280,15 +280,16 @@ try:
     test_config_files()
     test_init()
     test_version()
-    django_url = get_django_url()
+#TODO : DEL#    django_url = get_django_url()
     print "\n\n"
     ok("================================================== <==")
     ok(" Everything seems ok, you should be able to start  <==")
     ok("      Domogik with /etc/init.d/domogik start       <==")
     ok("            or /etc/rc.d/domogik start             <==")
-    ok(" Domogik UI is available on                        <==")
-    ok(" %49s <==" % django_url)
-    ok(" Default login is 'admin', password is '123'       <==") 
+    ok(" You can now install Domoweb User Interface        <==")
+#TODO : DEL#    ok(" Domogik UI is available on                        <==")
+#TODO : DEL#    ok(" %49s <==" % django_url)
+#TODO : DEL#    ok(" Default login is 'admin', password is '123'       <==") 
     ok("================================================== <==")
 except:
     fail(sys.exc_info()[1])

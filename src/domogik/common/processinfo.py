@@ -45,7 +45,7 @@ class ProcessInfo():
         cpu usage, memory usage, etc.
     """
 
-    def __init__(self, pid, interval, callback, log, myxpl):
+    def __init__(self, pid, interval = 0, callback = None, log = None, myxpl = None):
         """ Init object
             @param pid : process identifier
             @param interval : time between looking for values
@@ -77,8 +77,9 @@ class ProcessInfo():
         timer = XplTimer(self._interval, self._get_values, stop, self.myxpl)
         timer.start()
 
-    def _get_values(self):
+    def _get_values(self, raw = False):
         """ Get usefull values and put them in a dictionnary
+            @param raw : True : return raw values. False : return values in Mo
         """
         # check process status
         if not psutil.pid_exists(self.pid):
@@ -90,8 +91,12 @@ class ProcessInfo():
         # get memory info and set them in Mbyte
         memory_total_phymem = round(psutil.TOTAL_PHYMEM / (1024 * 1024), 0)
         memory_info = self.p.get_memory_info()
-        memory_rss = round(memory_info[0] / (1024 * 1024), 1)
-        memory_vsz = round(memory_info[1] / (1024 * 1024), 1)
+        if raw == False:
+            divisor = 1024 * 1024
+        else:
+            divisor = 1
+        memory_rss = round(memory_info[0] / divisor, 1)
+        memory_vsz = round(memory_info[1] / divisor, 1)
         memory_percent = round(self.p.get_memory_percent(),1)
         values = {"pid" : self.pid,
                   "cpu_percent" : cpu_percent,
@@ -101,11 +106,14 @@ class ProcessInfo():
                   "memory_percent" : memory_percent,
 	 }
         # TODO : add threads number
-        self._callback(self.pid, values)
+        if self._callback != None:
+            self._callback(self.pid, values)
+        else:
+            print("%s > %s" % (self.pid, values))
 
 def display(pid, data):
     print("DATA (%s) = %s" % (pid, str(data)))
 
 if __name__ == "__main__":
-    my_process = ProcessInfo(4650, 15, display)
-    my_process.start()
+    my_process = ProcessInfo(3529)
+    #my_process.start()

@@ -161,7 +161,7 @@ function update_user_config {
             sed -i "s;^#package_path.*$;package_path = $dmg_home;" $dmg_home/domogik.cfg
         else
             prefix=$PWD/src
-            sed -i "s;^#package_path.*$;package_path = $dmg_home;" $dmg_home/domogik.cfg
+            sed -i "s;^#package_path.*$;#package_path = $dmg_home;" $dmg_home/domogik.cfg
         fi
         sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $dmg_home/domogik.cfg
 
@@ -175,10 +175,10 @@ function update_user_config {
         sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $dmg_home/domogik.cfg
         sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
         sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
-        sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $dmg_home/domogik.cfg
-        sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
-        read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
-        sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $dmg_home/domogik.cfg
+        #TODO : DEL#sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $dmg_home/domogik.cfg
+        #TODO : DEL#sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
+        #TODO : DEL#read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
+        #TODO : DEL#sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $dmg_home/domogik.cfg
         
         #Mysql config 
         echo "You need to have a working Mysql server with a domogik user and database."
@@ -217,7 +217,9 @@ function update_user_config {
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
         read -p "Username : " db_user
+        stty -echo echonl
         read -p "Password : " db_password
+        stty echo
         read -p "Port [3306] : " db_port
         if [ "$db_port" = "" ];then 
             db_port=3306 
@@ -249,15 +251,6 @@ function update_user_config {
             sed -i "s;^db_host.*$;db_host = $db_host;" $dmg_home/domogik.cfg
             if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
                     return
-            fi
-        fi
-        nb_tables=$(echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -vc ^Tables)
-        if [ $nb_tables -ne 0 ];then
-            read -p "Your database already contains some tables, do you want to drop them. If you choose No, new items will *NOT* be installed ? [Y/n]" drop_db
-            if [ "$drop_db" = "" -o "$drop_db" = "y" -o "$drop_db" = "Y" ];then
-                echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -v ^Tables|while read table;do
-                    echo "DROP TABLE $table;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
-                done
             fi
         fi
     done
