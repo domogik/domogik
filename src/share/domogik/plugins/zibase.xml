@@ -36,6 +36,13 @@
       <description>Listening Port</description>
       <default-value>17100</default-value>
     </key>
+    <key>
+      <order-id>4</order-id>
+      <name>interv</name>
+      <type>int</type>
+      <description>Interval between each read internal variables</description>
+      <default-value>1000</default-value>
+    </key>
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/zibase.xml"/>
@@ -112,6 +119,12 @@
           <device_technology_id>zibase</device_technology_id>
           <name>ON/OFF Sensor</name>
           <description>motion sensors, door sensors ... </description>
+      </device_type>
+      <device_type>
+          <id>zibase.intvar</id>
+          <device_technology_id>zibase</device_technology_id>
+          <name>Internal VARs</name>
+          <description>ZiBase Internal variables </description>
       </device_type>
   </device_types>
   <device_feature_models>
@@ -376,6 +389,18 @@
               {}
           </parameters>
           <value_type>string</value_type>
+          <stat_key>status</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>zibase.intvar.status</id>
+          <name>Status</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>zibase.intvar</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
           <stat_key>status</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
