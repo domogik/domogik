@@ -108,7 +108,7 @@ class Manager:
         if ip == None:
             ip = self.get_sanitized_hostname()
         self.p = plugin
-        source = "xpl-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
+        source = "domogik-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
