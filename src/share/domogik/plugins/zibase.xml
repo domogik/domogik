@@ -41,7 +41,7 @@
       <name>interv</name>
       <type>int</type>
       <description>Interval between each read internal variables</description>
-      <default-value>1000</default-value>
+      <default-value>10</default-value>
     </key>
   </configuration-keys>
   <files>
