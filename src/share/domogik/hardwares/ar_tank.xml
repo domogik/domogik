@@ -75,7 +75,7 @@ Upload project to Arduino with the IDE
               {&quot;unit&quot;:&quot;%&quot;}
           </parameters>
           <value_type>number</value_type>
-          <stat_key>level</stat_key>
+          <stat_key>percent</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
   </device_feature_models>

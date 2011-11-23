@@ -4,14 +4,14 @@
         <xpltype type="*">
             <listener>
                 <filter>
-                    <key name="type" value="level"/>
+                    <key name="type" value="percent"/>
                     <key name="type" value="distance"/>
                 </filter>
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="current" new_name="level" 
-                       filter_key="type" filter_value="level" />
+                <value field="current" new_name="percent" 
+                       filter_key="type" filter_value="percent" />
                 <value field="current" new_name="distance" 
                        filter_key="type" filter_value="distance" />
             </mapping>
