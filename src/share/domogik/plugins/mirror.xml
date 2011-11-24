@@ -1,8 +1,14 @@
 <package type="plugin">
-  <name>mirror</name>
+  <id>mirror</id>
   <technology>rfid</technology>
-  <description>Use Mir:ror device</description>
-  <detail>Mir:ror device allow to detect RFID devices</detail>
+  <description>Mir:ror device allow to detect RFID devices</description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_mirror</documentation>
   <author>Fritz</author>

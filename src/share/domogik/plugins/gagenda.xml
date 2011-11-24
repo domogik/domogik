@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>gagenda</name>
+  <id>gagenda</id>
   <technology>communication</technology>
-  <description>Get events from a Google agenda</description>
-  <detail>Connect to a google agenda to get events</detail>
+  <description>Connect to a google agenda to get events agenda</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/plugin_gagenda</documentation>
   <author>Fritz</author>

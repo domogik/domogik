@@ -1,10 +1,15 @@
 <package type="plugin">
-  <name>cidmodem</name>
+  <id>cidmodem</id>
   <technology>communication</technology>
-  <description>Get caller id with a modem</description>
+  <description>Get caller id with a modem : when receiving an incoming call on a classic telephonic line, this plugin gets the incoming call number and send it on xPL.</description>
   <version>0.2.0</version>
-  <detail>When receiving an incoming call on a classic telephonic line, this plugin gets the incoming call number and send it on xPL.
-  </detail>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <documentation>http://wiki.domogik.org/plugin_cidmodem</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>

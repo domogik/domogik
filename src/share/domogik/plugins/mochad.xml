@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>mochad</name>
+  <id>mochad</id>
   <technology>x10</technology>
-  <description>Manage x10 devices with mochad</description>
-  <detail>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs mochad to work</detail>
+  <description>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs mochad to work</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_mochad</documentation>
   <author>Julien Garet, jgaret</author>

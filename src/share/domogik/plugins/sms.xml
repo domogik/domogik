@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>sms</name>
+  <id>sms</id>
   <technology>communication</technology>
-  <description>SMS Send</description>
-  <detail>test</detail>
+  <description>Send SMS with french telephony providers : Orange, SFR, Bouygues</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_sms</documentation>
   <author>Gizmo - Guillaume MORLET</author>

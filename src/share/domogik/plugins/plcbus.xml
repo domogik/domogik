@@ -1,8 +1,14 @@
 <package type="plugin">
-  <name>plcbus</name>
+  <id>plcbus</id>
   <technology>plcbus</technology>
-  <description>Manage Plcbus devices</description>
-  <detail>Plcbus is a CPL based protocol to control lights, appliances and others things in your house</detail>
+  <description>Plcbus is a CPL based protocol to control lights, appliances and others things in your house</description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
 <documentation>http://wiki.domogik.org/plugin_plcbus</documentation>
   <author>Francois Pinet, Maxence Dunnewind</author>

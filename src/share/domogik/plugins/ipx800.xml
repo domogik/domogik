@@ -1,8 +1,7 @@
 <package type="plugin">
-  <name>ipx800</name>
+  <id>ipx800</id>
   <technology>relayboard</technology>
-  <description>IPX800 support</description>
-  <detail>IPX800 relayboard support.
+  <description>IPX800 relayboard support.
 Supported  models :
 - IPX 800
 - IPX 800 pro
@@ -10,7 +9,14 @@ Supported  models :
 Supported features :
 - Relay : set and get state
 - Digital input 
-- Analog input </detail>
+- Analog input </description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_ipx800</documentation>
   <author>Fritz</author>

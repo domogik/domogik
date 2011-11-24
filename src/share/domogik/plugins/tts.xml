@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>tts</name>
+  <id>tts</id>
   <technology>communication</technology>
-  <description>TTS</description>
-  <detail>Text To Speech</detail>
+  <description>Text to speech</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_tts</documentation>
   <author>Gizmo - Guillaume MORLET</author>

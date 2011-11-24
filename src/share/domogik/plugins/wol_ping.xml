@@ -1,8 +1,14 @@
 <package type="plugin">
-  <name>wol_ping</name>
+  <id>wol_ping</id>
   <technology>computer</technology>
-  <description>Wake on lan and ping computers</description>
-  <detail>This plugin allows to wake up computers on a LAN and to ping them to check if they are alive</detail>
+  <description>This plugin allows to wake up computers on a LAN and to ping them to check if they are alive</description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_wol_ping</documentation>
   <author>Fritz</author>

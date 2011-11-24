@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>  
-<package type="hardware">
-  <name>webcam</name>
+<package type="external">
+  <id>webcam</id>
   <technology>camera</technology>
   <description>Generic Webcam support</description>
-  <detail>Generic Webcam support</detail>
+  <changelog>
+0.1.0
+- create 
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/</documentation>
   <author>Ferllings</author>

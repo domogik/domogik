@@ -1,8 +1,13 @@
 <package type="plugin">
-  <name>xbmc_not</name>
+  <id>xbmc_not</id>
   <technology>multimedia</technology>
   <description>Send notifications to XBMC</description>
-  <detail>XBMC notifications management</detail>
+  <changelog>
+Obsolete plugin - will be suppressed
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/plugin_xbmc_not</documentation>
   <author>Fritz</author>

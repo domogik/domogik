@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>xpl_time</name>
+  <id>xpl_time</id>
   <technology>service</technology>
-  <description>Send date and time on the xPL network every minute</description>
-  <detail>This plugin sends date and time over xPL network each minute</detail>
+  <description>This plugin sends date and time on the xPL network every minute</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1</version>
   <documentation>https://wiki.domogik.org/plugin_xpl_time</documentation>
   <author>Maxence Dunnewind</author>

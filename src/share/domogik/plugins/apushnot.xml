@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>apushnot</name>
+  <id>apushnot</id>
   <technology>notification</technology>
-  <description>Send Android notification</description>
-  <detail>Android notification system base on external service provide by notifry</detail>
+  <description>Android notification system base on external service provide by notifry</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/plugin_apushnot</documentation>
   <author>Kriss</author>

@@ -1,9 +1,8 @@
-<package type="hardware">
-  <name>ar_rgb</name>
+<package type="external">
+  <id>ar_rgb</id>
   <technology>arduino</technology>
-  <description>Control RGB leds with an arduino and an ethernet shield</description>
-  <detail>
-This hardware plugin is a xPL program for arduino which manage RGB led strips.
+  <description>Control RGB leds with an arduino and an ethernet shield
+This external plugin is a xPL program for arduino which manage RGB led strips.
 
 It requires : 
 - Arduino Uno or similar
@@ -24,7 +23,11 @@ Configure parameters in ar_rgb.pde
 Upload project to Arduino with the IDE
 
 Test it with the manual controllers (push button and potentiometer) and then create a device and test it with Domogik
-  </detail>
+  </description>
+  <changelog>
+0.1.0
+- create 
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/hardware_ar_rgb</documentation>
   <author>Fritz</author>

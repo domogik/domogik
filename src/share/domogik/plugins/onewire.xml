@@ -1,13 +1,19 @@
 <package type="plugin">
-  <name>onewire</name>
+  <id>onewire</id>
   <technology>1wire</technology>
-  <description>Manage 1-wire devices</description>
-  <detail>Manage 1-wire devices.
-List of supported devices : 
+  <description>Manage 1-wire devices.
+List of supported devices :
 - DS18B20
 - DS18S20
 - DS2401
-- DS2438</detail>
+- DS2438</description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_onewire</documentation>
   <author>Fritz</author>

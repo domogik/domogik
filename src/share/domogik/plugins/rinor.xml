@@ -1,12 +1,15 @@
 <package type="plugin">
-  <name>rinor</name>
+  <id>rinor</id>
   <technology>domogik</technology>
-  <description>RINOR server</description>
-  <detail>RINOR is the entry point for :
-- UIs
-- Stats
-- Scenaries</detail>
-  <version>0.1.0</version>
+  <description>Domogik RINOR server</description>
+  <changelog>
+0.2.0
+- See tracker
+
+0.1.0
+- plugin creation
+  </changelog>
+  <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/RINOR</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>

@@ -1,9 +1,12 @@
 <package type="plugin">
-  <name>ipushnot</name>
+  <id>ipushnot</id>
   <technology>notification</technology>
-  <description>Send Iphone/Ipad notification</description>
-  <detail>Iphone/Ipad notification system base on external service provide by pushme.to</detail>
-  <version>0.1</version>
+  <description>Iphone/Ipad notification system base on external service provide by pushme.to</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
+  <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_ipushnot</documentation>
   <author>Kriss</author>
   <author-email>Kriss@domogik.org</author-email>

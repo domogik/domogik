@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>knx</name>
+  <id>knx</id>
   <technology>knx</technology>
   <description>KNX management with Eibd</description>
-  <detail>KNS is...</detail>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
 <documentation>http://wiki.domogik.org/plugin_knx</documentation>
   <author>Basilic</author>

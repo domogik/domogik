@@ -1,8 +1,7 @@
-<package type="hardware">
-  <name>ar_tank</name>
+<package type="external">
+  <id>ar_tank</id>
   <technology>arduino</technology>
-  <description>Get water level from a tank with an arduino</description>
-  <detail>
+  <description>Get water level from a tank with an arduino
 This hardware plugin is a xPL program for arduino which get water level of a tank
 
 It requires : 
@@ -20,7 +19,11 @@ Configure parameters in ar_tank.pde
 - tank parameters
 
 Upload project to Arduino with the IDE
-  </detail>
+  </description>
+  <changelog>
+0.1.0
+- create 
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/hardware_ar_tank</documentation>
   <author>Fritz</author>

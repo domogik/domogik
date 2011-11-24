@@ -1,13 +1,16 @@
 <package type="plugin">
-  <name>tv_samsg</name>
+  <id>tv_samsg</id>
   <technology>multimedia</technology>
-  <description>Samsung televisions control</description>
-  <detail>Control Samsung televisions :
+  <description>Control Samsung televisions :
 - Channel up/down
 - Volume up/down
 - 16/9, 4/3
-- input
-- ... </detail>
+- Select input
+- ... </description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_tv_samsg</documentation>
   <author>Fritz</author>

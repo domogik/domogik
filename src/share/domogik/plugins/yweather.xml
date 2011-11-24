@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>yweather</name>
+  <id>yweather</id>
   <technology>online_service</technology>
-  <description>Get weather informations from Yahoo! Weather</description>
-  <detail>Get current weather informations about your town and give predictions about tomorrow</detail>
+  <description>Get weather informations from Yahoo! Weather  about your town</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_yweather</documentation>
   <author>Fritz</author>

@@ -1,8 +1,14 @@
 <package type="plugin">
-  <name>x10_heyu</name>
+  <id>x10_heyu</id>
   <technology>x10</technology>
-  <description>Manage x10 devices with Heyu</description>
-  <detail>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work</detail>
+  <description>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work</description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_x10_heyu</documentation>
   <author>Maxence Dunnewind, Mirelsol</author>

@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>nbz_tts</name>
+  <id>nbz_tts</id>
   <technology>communication</technology>
-  <description>Send message to Nabaztag</description>
-  <detail>Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server</detail>
+  <description>Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/plugin_nbz_tts</documentation>
   <author>Kriss</author>

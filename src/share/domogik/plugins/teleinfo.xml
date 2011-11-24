@@ -1,8 +1,14 @@
 <package type="plugin">
-  <name>teleinfo</name>
+  <id>teleinfo</id>
   <technology>service</technology>
-  <description>Get power consumption with teleinfo</description>
-  <detail>Teleinfo is a french method to get power related informations.</detail>
+  <description>Teleinfo is a french method to get power related informations.</description>
+  <changelog>
+0.2.0
+- adapt plugin for release 0.2.0
+
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/plugin_teleinfo</documentation>
   <author>Maxence Dunnewind</author>

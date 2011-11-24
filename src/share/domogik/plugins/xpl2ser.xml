@@ -1,10 +1,12 @@
 <package type="plugin">
-  <name>xpl2ser</name>
+  <id>xpl2ser</id>
   <technology>bridge</technology>
-  <description>forward xpl message from hub to serial device and vice versa</description>
+  <description>When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
-  <detail>When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.
-  </detail>
   <documentation>#</documentation>
   <author>Kriss</author>
   <author-email>#</author-email>

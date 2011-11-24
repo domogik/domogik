@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>bts_gen</name>
+  <id>bts_gen</id>
   <technology>bts</technology>
   <description>bts_gen</description>
-  <detail>bts_gen</detail>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/#</documentation>
   <author>BTS, Fritz</author>

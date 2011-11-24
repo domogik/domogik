@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>diskfree</name>
+  <id>diskfree</id>
   <technology>computer</technology>
-  <description>Disk usage</description>
-  <detail>Send over xPL disk usage</detail>
+  <description>Send over xPL disk usage</description>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/plugin_diskfree</documentation>
   <author>Fritz</author>

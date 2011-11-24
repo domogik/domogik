@@ -1,8 +1,11 @@
 <package type="plugin">
-  <name>tschacon</name>
+  <id>tschacon</id>
   <technology>tschacon</technology>
   <description>Manage Chacon / Di-O devices through TellStick</description>
-  <detail>Chacon are RF devices</detail>
+  <changelog>
+0.1.0
+- plugin creation
+  </changelog>
   <version>0.1.0</version>
   <documentation>to do</documentation>
   <author>Julien Garet</author>
