@@ -75,7 +75,7 @@ PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
 TMP_DIR = tempfile.gettempdir()
 
-DESCRIPTION_LEN_IN_DETAIL = 10
+DESCRIPTION_LEN_IN_DETAIL = 500
 
 class EventHandler(pyinotify.ProcessEvent):
     """ Check a file for any event (creation, modification, etc)
