@@ -64,6 +64,7 @@ import re
 import tempfile
 import domogik.xpl.bin
 import pkgutil
+import math
 
 
 KILL_TIMEOUT = 2
@@ -73,6 +74,8 @@ WAIT_TIME_BETWEEN_PING = 15
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
 TMP_DIR = tempfile.gettempdir()
+
+DESCRIPTION_LEN_IN_DETAIL = 10
 
 class EventHandler(pyinotify.ProcessEvent):
     """ Check a file for any event (creation, modification, etc)
@@ -122,9 +125,9 @@ class SysManager(XplPlugin):
                           dest="allow_ping", 
                           default=False, \
                           help="Activate background ping for all plugins.")
-        parser.add_option("-H", 
+        parser.add_option("-E", 
                           action="store_true", 
-                          dest="check_hardware", 
+                          dest="check_external", 
                           default=False, \
                           help="This manager is the one who looks for harware.")
         parser.add_option("-t", 
@@ -164,17 +167,17 @@ class SysManager(XplPlugin):
             print("Set package path to '%s' " % self._package_path)
             sys.path.append(self._package_path)
             self._xml_plugin_directory = os.path.join(self._package_path, "plugins/softwares/")
-            self._xml_hardware_directory = os.path.join(self._package_path, "plugins/hardwares/")
+            self._xml_external_directory = os.path.join(self._package_path, "plugins/externals/")
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
             self._xml_plugin_directory = os.path.join(conf['custom_prefix'], "share/domogik/plugins/")
-            self._xml_hardware_directory = os.path.join(conf['custom_prefix'], "share/domogik/hardwares/")
+            self._xml_external_directory = os.path.join(conf['custom_prefix'], "share/domogik/externals/")
 
         self._pinglist = {}
         self._plugins = []
-        self._hardwares = []
-        self._hardware_models = []
+        self._externals = []
+        self._external_models = []
 
         if self.options.allow_ping:
             msg = "xpl ping activated"
@@ -234,8 +237,8 @@ class SysManager(XplPlugin):
     
             # Get components:
             self._list_plugins()
-            if self.options.check_hardware == True:
-                self._list_hardware_models()
+            if self.options.check_external == True:
+                self._list_external_models()
  
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
@@ -274,22 +277,22 @@ class SysManager(XplPlugin):
             # PackageManager instance
             self.pkg_mgr = PackageManager()
     
-            if self.options.check_hardware:
-                Listener(self._refresh_hardware_list, self.myxpl, {
+            if self.options.check_external:
+                Listener(self._refresh_external_list, self.myxpl, {
                     'schema': 'hbeat.app',
                     'xpltype': 'xpl-stat',
                 })
-                Listener(self._refresh_hardware_list, self.myxpl, {
+                Listener(self._refresh_external_list, self.myxpl, {
                     'schema': 'hbeat.basic',
                     'xpltype': 'xpl-stat',
                 })
 
             # define timers
-            if self.options.check_hardware:
-                hardware_timer = XplTimer(15, 
-                                          self._check_hardware_status, 
+            if self.options.check_external:
+                external_timer = XplTimer(15, 
+                                          self._check_external_status, 
                                           self.myxpl)
-                hardware_timer.start()
+                external_timer.start()
 
             # inotify 
             wm = pyinotify.WatchManager() # Watch manager
@@ -300,7 +303,7 @@ class SysManager(XplPlugin):
             notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
             notifier.start()
             config_files_dir = [self._xml_plugin_directory,
-                                self._xml_hardware_directory]
+                                self._xml_external_directory]
             for fic in  self.get_config_files():
                 config_files_dir.append(os.path.dirname(fic))
             for direc in set(config_files_dir):
@@ -340,13 +343,13 @@ class SysManager(XplPlugin):
             print("%s" % traceback.format_exc())
 
     def _reload_configuration_file(self):
-        """ reload all plugins and hardware list
+        """ reload all plugins and external list
         """
-        print("Reloading plugin and hardware model lists")
-        self.log.info("Reloading plugin and hardware model lists")
+        print("Reloading plugin and external members model lists")
+        self.log.info("Reloading plugin and external members model lists")
         self._list_plugins()
-        self._list_hardware_models()  # still usefull ? TODO :check
-                                      # hardwares are automatically loaded by
+        self._list_external_models()  # still usefull ? TODO :check
+                                      # externals are automatically loaded by
                                       # manager now...
 
     def _write_fifo(self, level, message):
@@ -446,7 +449,7 @@ class SysManager(XplPlugin):
 
             # detail plugin
             elif cmd == "detail": # and host == self.get_sanitized_hostname():
-                                  # no check on host for hardware
+                                  # no check on host for external
                 self._send_plugin_detail(plg)
 
         # if error
@@ -671,41 +674,38 @@ class SysManager(XplPlugin):
                     plugin["status"] = state
                     self._send_plugin_list()
 
-    def _list_hardware_models(self):
-        """ List domogik hardware models
+    def _list_external_models(self):
+        """ List domogik external models
         """
-        self.log.debug("Start listing available hardware models")
+        self.log.debug("Start listing available external members models")
 
-        self._hardware_models = []
+        self._external_models = []
 
-        # Get hardware list
+        # Get external list
         try:
-            #hardwares = Loader('hardwares')
-            #hardware_list = dict(hardwares.load()[1])
-
             # list xml files
             try:
-                hardware_list = os.listdir(self._xml_hardware_directory)
+                external_list = os.listdir(self._xml_external_directory)
             except:
-                msg = "Error accessing hardware directory : %s. You should create it" % str(traceback.format_exc())
+                msg = "Error accessing external directory : %s. You should create it" % str(traceback.format_exc())
                 print(msg)
                 self.log.error(msg)
                 return 
 
             state_thread = {}
-            for hardware in hardware_list:
-                hardware = hardware[0:-4]
-                print(hardware)
-                self.log.info("==> %s" % (hardware))
+            for external in external_list:
+                external = external[0:-4]
+                print(external)
+                self.log.info("==> %s" % (external))
                 # try open xml file
-                xml_file = "%s/%s.xml" % (self._xml_hardware_directory, hardware)
+                xml_file = "%s/%s.xml" % (self._xml_external_directory, external)
                 try:
-                    # get data for hardware
+                    # get data for external
                     plg_xml = PackageXml(path = xml_file)
    
                     # register plugin
-                    self._hardware_models.append({"type" : plg_xml.type,
-                                      "name" : plg_xml.name, 
+                    self._external_models.append({"type" : plg_xml.type,
+                                      "name" : plg_xml.id, 
                                       "description" : plg_xml.desc, 
                                       "technology" : plg_xml.techno,
                                       "release" : plg_xml.release,
@@ -723,53 +723,53 @@ class SysManager(XplPlugin):
         return
 
 
-    def _refresh_hardware_list(self, message):
-        """ Refresh hardware list
+    def _refresh_external_list(self, message):
+        """ Refresh external list
             @param message : xpl message
         """
-        self.log.debug("Refresh hardware list with : %s" % str(message))
+        self.log.debug("Refresh external members list with : %s" % str(message))
         vendor_device = message.source.split(".")[0]
         instance = message.source.split(".")[1]
-        for hardware_model in self._hardware_models:
-            msg_vendor_device = "%s-%s" % (hardware_model["vendor_id"], 
-                                           hardware_model["device_id"])
+        for external_model in self._external_models:
+            msg_vendor_device = "%s-%s" % (external_model["vendor_id"], 
+                                           external_model["device_id"])
             if vendor_device == msg_vendor_device:
                 found = False
-                for hardware in self._hardwares:
-                    if hardware["host"] == instance:
-                        hardware["status"] = "ON"
-                        hardware["last_seen"] = time.time()
+                for external in self._externals:
+                    if external["host"] == instance:
+                        external["status"] = "ON"
+                        external["last_seen"] = time.time()
                         # interval converted from minutes to seconds : *60
-                        hardware["interval"] = int(message.data["interval"])*60
+                        external["interval"] = int(message.data["interval"])*60
                         found = True
-                        self.log.info("Set hardware status ON : %s on %s" % \
-                                                   (hardware["name"], instance))
-                        # hardware config part
-                        # - hardware configuration is given in hbeat.app body
-                        hardware["configuration"] = self._get_hardware_configuration(message)
+                        self.log.info("Set external member status ON : %s on %s" % \
+                                                   (external["name"], instance))
+                        # external config part
+                        # - external configuration is given in hbeat.app body
+                        external["configuration"] = self._get_external_configuration(message)
                      
                 if found == False:
-                    # hardware config part
-                    # - hardware configuration is given in hbeat.app body
-                    configuration = self._get_hardware_configuration(message)
-                    self._hardwares.append({"type" : hardware_model["type"],
-                              "name" : hardware_model["name"], 
-                              "description" : hardware_model["description"], 
-                              "technology" : hardware_model["technology"],
+                    # external config part
+                    # - external configuration is given in hbeat.app body
+                    configuration = self._get_external_configuration(message)
+                    self._externals.append({"type" : external_model["type"],
+                              "name" : external_model["name"], 
+                              "description" : external_model["description"], 
+                              "technology" : external_model["technology"],
                               "status" : "ON",
                               "host" : instance,
-                              "release" : hardware_model["release"],
-                              "documentation" : hardware_model["documentation"],
-                              "vendor_id" : hardware_model["vendor_id"],
-                              "device_id" : hardware_model["device_id"],
+                              "release" : external_model["release"],
+                              "documentation" : external_model["documentation"],
+                              "vendor_id" : external_model["vendor_id"],
+                              "device_id" : external_model["device_id"],
                               "configuration" : configuration,
                               "interval" : int(message.data["interval"]) * 60,
                               "last_seen" : time.time()})
-                    self.log.info("Add hardware : %s on %s" % \
-                                             (hardware_model["name"], instance))
+                    self.log.info("Add external : %s on %s" % \
+                                             (external_model["name"], instance))
 
-    def _get_hardware_configuration(self, message):
-        """ Get hardware configuration from hbeat message
+    def _get_external_configuration(self, message):
+        """ Get external configuration from hbeat message
         @param message : hbeat message
         """
         config = []
@@ -785,8 +785,8 @@ class SysManager(XplPlugin):
                 idx += 1
         return config
 
-    def _check_hardware_status(self):
-        """ Check if hardwares are always present
+    def _check_external_status(self):
+        """ Check if externals are always present
         """
         # send a hbeat request
         self._send_broadcast_hbeat()
@@ -795,13 +795,13 @@ class SysManager(XplPlugin):
         time.sleep(1)
  
         # process
-        for hardware in self._hardwares:
-            # if hardware was not seen in the interval its tells, 
+        for external in self._externals:
+            # if external was not seen in the interval its tells, 
             # we consider it as OFF
-            if time.time() - hardware["last_seen"] > hardware["interval"]:
-                hardware["status"] = "OFF"
-                self.log.info("Set hardware status OFF : %s on %s" % \
-                                       (hardware["name"], hardware["host"]))
+            if time.time() - external["last_seen"] > external["interval"]:
+                external["status"] = "OFF"
+                self.log.info("Set external member status OFF : %s on %s" % \
+                                       (external["name"], external["host"]))
 
 
     def _list_plugins(self):
@@ -835,7 +835,7 @@ class SysManager(XplPlugin):
 
                     # register plugin
                     self._plugins.append({"type" : plg_xml.type,
-                                      "name" : plg_xml.name, 
+                                      "name" : plg_xml.id, 
                                       "description" : plg_xml.desc, 
                                       "technology" : plg_xml.techno,
                                       "status" : "OFF",
@@ -845,15 +845,6 @@ class SysManager(XplPlugin):
                                       "configuration" : plg_xml.configuration,
                                       "check_startup_option" : check_startup_option})
 
-                    ## check plugin state (will update component status)
-                    #state_thread[plg_xml.name] = Thread(None,
-                    #                               self._check_component_is_running,
-                    #                               "ping_%s" % plg_xml.name,
-                    #                               (plg_xml.name, None),
-                    #                               {})
-                    #self.register_thread(state_thread[plg_xml.name])
-                    #state_thread[plg_xml.name].start()
-
                 except:
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
                     self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
@@ -862,14 +853,14 @@ class SysManager(XplPlugin):
 
 
     def _is_plugin(self, name):
-        """ Is a component a plugin or hardware?
+        """ Is a component a plugin or external?
         @param name : component name to check
         """
         for plugin in self._plugins:
             if plugin["name"] == name:
                 return True
-        for hardware in self._hardwares:
-            if hardware["name"] == name:
+        for external in self._externals:
+            if external["name"] == name:
                 return True
         return False
 
@@ -889,18 +880,18 @@ class SysManager(XplPlugin):
             mess.add_data({'plugin'+str(idx)+'-name' : plugin["name"]})
             mess.add_data({'plugin'+str(idx)+'-type' : plugin["type"]})
             mess.add_data({'plugin'+str(idx)+'-techno' : plugin["technology"]})
-            mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
+            #mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
             mess.add_data({'plugin'+str(idx)+'-status' : plugin["status"]})
             mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
             idx += 1
-        # hardwares
-        for hardware in self._hardwares:
-            mess.add_data({'plugin'+str(idx)+'-name' : hardware["name"]})
-            mess.add_data({'plugin'+str(idx)+'-type' : hardware["type"]})
-            mess.add_data({'plugin'+str(idx)+'-techno' : hardware["technology"]})
-            mess.add_data({'plugin'+str(idx)+'-desc' : hardware["description"]})
-            mess.add_data({'plugin'+str(idx)+'-status' : hardware["status"]})
-            mess.add_data({'plugin'+str(idx)+'-host' : hardware["host"]})
+        # externals
+        for external in self._externals:
+            mess.add_data({'plugin'+str(idx)+'-name' : external["name"]})
+            mess.add_data({'plugin'+str(idx)+'-type' : external["type"]})
+            mess.add_data({'plugin'+str(idx)+'-techno' : external["technology"]})
+            mess.add_data({'plugin'+str(idx)+'-desc' : external["description"]})
+            mess.add_data({'plugin'+str(idx)+'-status' : external["status"]})
+            mess.add_data({'plugin'+str(idx)+'-host' : external["host"]})
             idx += 1
         # mess.add_data({'host' : self.get_sanitized_hostname()})
         self.myxpl.send(mess)
@@ -926,27 +917,41 @@ class SysManager(XplPlugin):
                         mess.add_data({'cfg'+str(conf["id"])+'-opt' : conf["optionnal"]})
                 mess.add_data({'type' :  plugin["type"]})
                 mess.add_data({'plugin' :  plugin["name"]})
-                mess.add_data({'description' :  plugin["description"]})
+
+                # Cut description in multiple parts
+                the_desc = plugin["description"].replace('\n', "\\n")
+                cut_desc = [the_desc[n*DESCRIPTION_LEN_IN_DETAIL:(n+1)*DESCRIPTION_LEN_IN_DETAIL ] for n in range(int(math.ceil((len(the_desc) / float(DESCRIPTION_LEN_IN_DETAIL))))) ]
+                idx = 0
+                for elt_desc in cut_desc:
+                    mess.add_data({'description%s' % idx :  elt_desc})
+                    idx += 1
                 mess.add_data({'technology' :  plugin["technology"]})
                 mess.add_data({'status' :  plugin["status"]})
                 mess.add_data({'release' :  plugin["release"]})
                 mess.add_data({'documentation' :  plugin["documentation"]})
                 mess.add_data({'host' : self.get_sanitized_hostname()})
                 host_in_msg = True
-        for hardware in self._hardwares:
-            if hardware["name"] == plg:
-                for conf in hardware["configuration"]:
+        for external in self._externals:
+            if external["name"] == plg:
+                for conf in external["configuration"]:
                     mess.add_data({'cfg'+str(conf["id"])+'-id' : conf["id"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-key' : conf["key"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-value' : conf["value"]})
-                mess.add_data({'type' :  hardware["type"]})
-                mess.add_data({'plugin' :  hardware["name"]})
-                mess.add_data({'description' :  hardware["description"]})
-                mess.add_data({'technology' :  hardware["technology"]})
-                mess.add_data({'status' :  hardware["status"]})
-                mess.add_data({'release' :  hardware["release"]})
-                mess.add_data({'documentation' :  hardware["documentation"]})
-                mess.add_data({'host' : hardware["host"]})
+                mess.add_data({'type' :  external["type"]})
+                mess.add_data({'plugin' :  external["name"]})
+ 
+                # Cut description in multiple parts
+                the_desc = external["description"].replace('\n', "\\n")
+                cut_desc = [the_desc[n*DESCRIPTION_LEN_IN_DETAIL:(n+1)*DESCRIPTION_LEN_IN_DETAIL ] for n in range(int(math.ceil((len(the_desc) / float(DESCRIPTION_LEN_IN_DETAIL))))) ]
+                idx = 0
+                for elt_desc in cut_desc:
+                    mess.add_data({'description%s' % idx :  elt_desc})
+                    idx += 1
+                mess.add_data({'technology' :  external["technology"]})
+                mess.add_data({'status' :  external["status"]})
+                mess.add_data({'release' :  external["release"]})
+                mess.add_data({'documentation' :  external["documentation"]})
+                mess.add_data({'host' : external["host"]})
                 host_in_msg = True
         if host_in_msg == False:
             mess.add_data({'host' : self.get_sanitized_hostname()})
@@ -1144,9 +1149,9 @@ class SysManager(XplPlugin):
                 self.myxpl.send(mess)
                 return
 
-        # check if it is a hardware if current manager handle hardware
-        if tab[0] == "hardware" and self.options.check_hardware == False:
-            mess.add_data({'error' : "This host doesn't handle hardware packages. Please install it on main host"})
+        # check if it is a external if current manager handle external
+        if tab[0] == "external" and self.options.check_external == False:
+            mess.add_data({'error' : "This host doesn't handle external member packages. Please install it on main host"})
             self.myxpl.send(mess)
             return
 

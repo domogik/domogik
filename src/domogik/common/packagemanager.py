@@ -147,7 +147,7 @@ class PackageManager():
 
         # Copy xml file in a temporary location in order to complete it
         xml_tmp_file = "%s/plugin-%s-%s.xml" % (tempfile.gettempdir(),
-                                                plg_xml.name,
+                                                plg_xml.id,
                                                 plg_xml.release)
         shutil.copyfile(plg_xml.info_file, xml_tmp_file)
         
@@ -155,23 +155,23 @@ class PackageManager():
         plg_xml.set_generated(xml_tmp_file)
 
         # Create .tgz
-        self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.release), 
+        self._create_tar_gz("plugin-%s-%s" % (plg_xml.id, plg_xml.release), 
                             output_dir,
                             plg_xml.all_files, 
                             xml_tmp_file)
 
-    def _create_package_for_hardware(self, name, output_dir, force):
-        """ Create package for a hardware
+    def _create_package_for_external(self, name, output_dir, force):
+        """ Create package for a external
             1. read xml file to get informations and list of files
             2. generate package
-            @param name : name of hardware
+            @param name : name of external
             @param output_dir : target directory for package
             @param force : False : ask for confirmation
         """
         self.log("Hardware name : %s" % name)
 
         try:
-            plg_xml = PackageXml(name, type = "hardware")
+            plg_xml = PackageXml(name, type = "external")
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -190,11 +190,11 @@ class PackageManager():
 
         self.log("Xml file OK")
 
-        if plg_xml.type != "hardware":
-            self.log("Error : this package is not a hardware")
+        if plg_xml.type != "external":
+            self.log("Error : this package is not an external member")
             return
 
-        # display hardware informations
+        # display external informations
         plg_xml.display()
 
         # check file existence
@@ -210,8 +210,8 @@ class PackageManager():
                 return
 
         # Copy xml file in a temporary location in order to complete it
-        xml_tmp_file = "%s/hardware-%s-%s.xml" % (tempfile.gettempdir(),
-                                                plg_xml.name,
+        xml_tmp_file = "%s/external-%s-%s.xml" % (tempfile.gettempdir(),
+                                                plg_xml.id,
                                                 plg_xml.release)
         shutil.copyfile(plg_xml.info_file, xml_tmp_file)
         
@@ -219,7 +219,7 @@ class PackageManager():
         plg_xml.set_generated(xml_tmp_file)
 
         # Create .tgz
-        self._create_tar_gz("hardware-%s-%s" % (plg_xml.name, plg_xml.release), 
+        self._create_tar_gz("external-%s-%s" % (plg_xml.id, plg_xml.release), 
                             output_dir,
                             plg_xml.all_files, 
                             xml_tmp_file)
@@ -344,8 +344,8 @@ class PackageManager():
         # install plugin in $HOME
         self.log("Installing package (plugin)...")
         try:
-            if pkg_xml.type in ('plugin', 'hardware'):
-                self._install_plugin_or_hardware(my_tmp_dir, INSTALL_PATH, pkg_xml.type, package_part)
+            if pkg_xml.type in ('plugin', 'external'):
+                self._install_plugin_or_external(my_tmp_dir, INSTALL_PATH, pkg_xml.type, package_part)
             else:
                 raise "Package type '%s' not installable" % pkg_xml.type
         except:
@@ -355,7 +355,7 @@ class PackageManager():
         self.log("Package successfully extracted.")
 
         # insert data in database
-        if pkg_xml.type in ('plugin', 'hardware'):
+        if pkg_xml.type in ('plugin', 'external'):
             if package_part == PKG_PART_RINOR:
                 self.log("Insert data in database...")
                 pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
@@ -381,11 +381,11 @@ class PackageManager():
         tar.close()
 
 
-    def _install_plugin_or_hardware(self, pkg_dir, install_path, type, package_part):
+    def _install_plugin_or_external(self, pkg_dir, install_path, type, package_part):
         """ Install plugin
             @param pkg_dir : directory where package is extracted
             @param install_path : path where we install packages
-            @param type : plugin, hardware
+            @param type : plugin, external
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
 
@@ -414,9 +414,10 @@ class PackageManager():
                 self._create_init_py("%s/xpl/lib/" % plg_path)
                 if type == "plugin":
                     type_path = "softwares"
-                if type == "hardware":
-                    type_path = "hardwares"
+                if type == "external":
+                    type_path = "externals"
                 copytree("%s/src/share/domogik/%ss" % (pkg_dir, type), "%s/%s" % (plg_path, type_path), self.log)
+            # stats/* and url2xpl/* and exernal/* are insatlled on rinor host
             if package_part == PKG_PART_RINOR:
                 copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
                 copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
@@ -620,7 +621,7 @@ class PackageManager():
                                      "techno" : pkg_xml.techno,
                                      "doc" : pkg_xml.doc,
                                      "desc" : pkg_xml.desc,
-                                     "detail" : pkg_xml.detail,
+                                     "changelog" : pkg_xml.changelog,
                                      "author" : pkg_xml.author,
                                      "email" : pkg_xml.email,
                                      "domogik_min_release" : pkg_xml.domogik_min_release,

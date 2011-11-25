@@ -2468,13 +2468,13 @@ target=*
                 try:
                     plg_name = message.data["plugin"+str(idx)+"-name"]
                     plg_type = message.data["plugin"+str(idx)+"-type"]
-                    plg_description = message.data["plugin"+str(idx)+"-desc"]
+                    #plg_description = message.data["plugin"+str(idx)+"-desc"]
                     plg_technology = message.data["plugin"+str(idx)+"-techno"]
                     plg_status = message.data["plugin"+str(idx)+"-status"]
                     plg_host = message.data["plugin"+str(idx)+"-host"]
-                    plugin_data = ({"name" : plg_name, 
+                    plugin_data = ({"id" : plg_name, 
                                         "technology" : plg_technology, 
-                                        "description" : plg_description, 
+                                        #"description" : plg_description, 
                                         "status" : plg_status, 
                                         "type" : plg_type, 
                                         "host" : plg_host})
@@ -2530,7 +2530,6 @@ target=*
         cmd = message.data['command']
         host = message.data["host"]
         name = message.data["plugin"]
-        my_type = message.data["type"]
         try:
             error = message.data["error"]
             self.send_http_response_error(999, "Error on detail request : %s" % error,
@@ -2539,7 +2538,16 @@ target=*
         except:
             # no error, everything is alright
             pass 
-        description = message.data["description"]
+        my_type = message.data["type"]
+        do_loop = True
+        description = ""
+        idx = 0
+        while do_loop:
+            try:
+                description += message.data["description%s" % idx]
+            except KeyError:
+                do_loop = False
+            idx += 1
         technology = message.data["technology"]
         status = message.data["status"]
         release = message.data["release"]
@@ -2617,7 +2625,7 @@ target=*
                 except:
                     loop_again = False
 
-        json_data.add_data({"name" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : release, "documentation" : documentation, "configuration" : config_data})
+        json_data.add_data({"id" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : release, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 

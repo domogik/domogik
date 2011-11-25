@@ -59,7 +59,7 @@ class PackageData():
         print("Xml file OK")
 
         # check type == plugin
-        if self.plg.type not in ["plugin", "hardware"]:
+        if self.plg.type not in ["plugin", "external"]:
             print("Error : this package is not recognized")
             exit()
 

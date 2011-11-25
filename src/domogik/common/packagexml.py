@@ -46,7 +46,7 @@ import time #for debug : remove after dev
 
 
 PLUGIN_XML_PATH = "share/domogik/plugins/"
-HARDWARE_XML_PATH = "share/domogik/hardwares/"
+HARDWARE_XML_PATH = "share/domogik/externals/"
 
 class PackageException(Exception):
     """
@@ -80,7 +80,7 @@ class PackageXml():
 
                 if type == "plugin":
                     xml_directory = "%s/%s" % (conf['custom_prefix'], PLUGIN_XML_PATH)
-                elif type == "hardware":
+                elif type == "external":
                     xml_directory = "%s/%s" % (conf['custom_prefix'], HARDWARE_XML_PATH)
                 else:
                     raise PackageException("Type '%s' doesn't exists" % type)
@@ -102,9 +102,9 @@ class PackageXml():
 
             # read xml file
             self.type = self.xml_content.getElementsByTagName("package")[0].attributes.get("type").value.strip()
-            self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue.strip()
+            self.id = self.xml_content.getElementsByTagName("id")[0].firstChild.nodeValue.strip()
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
-            self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue.strip()
+            self.changelog = self.xml_content.getElementsByTagName("changelog")[0].firstChild.nodeValue.strip()
             self.release = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
             try:
                 self.generated = self.xml_content.getElementsByTagName("generated")[0].firstChild.nodeValue.strip()
@@ -119,8 +119,8 @@ class PackageXml():
                 # if no restriction, compatible since 0.1.0 (first release)
                 self.domogik_min_release = "0.1.0"
 
-            # hardware specific
-            if self.type == "hardware":
+            # external specific
+            if self.type == "external":
                 self.vendor_id = self.xml_content.getElementsByTagName("vendor-id")[0].firstChild.nodeValue.strip()
                 self.device_id = self.xml_content.getElementsByTagName("device-id")[0].firstChild.nodeValue.strip()
             else:
@@ -192,9 +192,9 @@ class PackageXml():
                    self.dependencies.append(data)
 
             # construct filenames
-            self.fullname = "%s-%s" % (self.type, self.name)
-            self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.release)
-            self.pkg_filename = "%s-%s-%s.tgz" % (self.type, self.name, self.release)
+            self.fullname = "%s-%s" % (self.type, self.id)
+            self.xml_filename = "%s-%s-%s.xml" % (self.type, self.id, self.release)
+            self.pkg_filename = "%s-%s-%s.tgz" % (self.type, self.id, self.release)
 
             # repository specifics
             rep = self.xml_content.getElementsByTagName("repository")
@@ -291,16 +291,16 @@ class PackageXml():
         """
         print("---- Package informations -------------------------------")
         print("Type                : %s" % self.type)
-        print("Name                : %s" % self.name)
+        print("Id                  : %s" % self.id)
         print("Full name           : %s" % self.fullname)
         print("Release             : %s" % self.release)
         print("Technology          : %s" % self.techno)
-        if self.type == "hardware":
+        if self.type == "external":
             print("xPL vendor id       : %s" % self.vendor_id)
             print("xPL device id       : %s" % self.device_id)
         print("Link for doc        : %s" % self.doc)
         print("Description         : %s" % self.desc)
-        print("Detail              : %s" % self.detail)
+        print("Changelog           : %s" % self.changelog)
         print("Author              : %s" % self.author)
         print("Author's email      : %s" % self.email)
         print("Domogik min release : %s" % self.domogik_min_release)
