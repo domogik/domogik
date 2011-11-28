@@ -46,6 +46,8 @@ import fcntl
 import sys
 import re
 import threading
+import urllib
+import xml.dom.minidom
     
 class ZbAction:
     """ ZiBase action """
@@ -152,6 +154,23 @@ class APIZiBase(object):
             req.param3 = int(address[1:]) - 1
             req.param4 = ord(address[0]) - 0x41                        
             self.sendRequest(req)
+    
+    def getVariables(self):
+        """ Listen internal variables """
+
+        info=[]
+        url = "http://" + self.ip + "/sensors.xml"
+        handle = urllib.urlopen(url)
+        xmlContent = handle.read()
+        handle.close()
+        xmlDoc = xml.dom.minidom.parseString(xmlContent)
+        nodes = xmlDoc.getElementsByTagName("var")
+        for node in nodes:
+            num = int(node.getAttribute("num"))
+            val = int(node.getAttribute("val"))
+            info += ["VAR" + str(num) + ":" + str(val)]
+                    
+        return info
 
     def Connect(self,ip_host,port_host):
         req = ZbRequest()
@@ -230,11 +249,11 @@ class ServerZiBase(threading.Thread):
                 datas=[]
                 for elmt in self.data:
                     if elmt[0]=='id':
-                        self.id=elmt[1]
+                        id=elmt[1]
                     else:
                         datas+=[elmt[0] + ':' + elmt[1]]
 
-                self.send_xpl(datas)
+                self.send_xpl_sensor(datas,id,'xpl-trig')
 
 
             if "linked to host" in self.req:
@@ -253,7 +272,7 @@ class ServerZiBase(threading.Thread):
             print("Wait stop")
         self.log.debug("Server stopped on port=%s" % (self.port))
 
-    def send_xpl(self, datas):
+    def send_xpl_sensor(self, datas, id, xpltype):
         """ Send xpl-trig to give status change
         """
         type={
@@ -275,13 +294,26 @@ class ServerZiBase(threading.Thread):
             elmt=data.split(':')
             if elmt[0] in type.keys():
                 msg = XplMessage()
-                msg.set_type("xpl-trig")
+                msg.set_type(xpltype)
                 msg.set_schema('sensor.basic')
-                msg.add_data({'device' :  self.id})
+                msg.add_data({'device' :  id})
                 msg.add_data({'type' :  type[elmt[0]]})
                 msg.add_data({'current' :  elmt[1]})
                 self.hxpl.send(msg)
 
+    def send_xpl_cmd(self, msg_device, msg_command, msg_preset):
+        """ Send xpl-trig to give status change
+            @param msg_device : device
+            @param msg_command : device's value
+            @param msg_preset : device's preset
+        """
+        msg = XplMessage()
+        msg.set_type("xpl-trig")
+        msg.set_schema('zibase.basic')
+        msg.add_data({'device' :  msg_device})
+        msg.add_data({'command' :  msg_command})
+        msg.add_data({'preset-dim' :  msg_preset})
+        self.hxpl.send(msg)
 
 
 

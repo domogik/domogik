@@ -34,11 +34,12 @@ Implements
 @license: GPL(v3)
 """
 
-from domogik.xpl.common.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener, XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.zibase import APIZiBase, get_ip_address, ServerZiBase
+import threading
 import traceback
 
 
@@ -49,16 +50,18 @@ class ZiBaseMain(XplPlugin):
         """ Create lister and launch bg listening
         """
         XplPlugin.__init__(self, name = 'zibase')
-        self.log.info("Creating listener for ZiBase")
-        Listener(self.zibase_command, self.myxpl, {'schema': 'zibase.basic',
-                'xpltype': 'xpl-cmnd'})
 
         self._config = Query(self.myxpl, self.log)
 
         self.address = self._config.query('zibase', 'ip')
         self.inter = self._config.query('zibase', 'interface')
         self.port = int(self._config.query('zibase', 'port'))
+        self.interv=int(self._config.query('zibase', 'interv'))
 
+        self.log.info("Creating listener for ZiBase")
+        Listener(self.zibase_command, self.myxpl, {'schema': 'zibase.basic',
+                'xpltype': 'xpl-cmnd'})
+        
         try:
             self.ip_host=get_ip_address(self.inter)
             self.log.debug("Adress IP Host=%s" % (self.ip_host))
@@ -84,6 +87,15 @@ class ZiBaseMain(XplPlugin):
         except:
             self.log.error("Connection ZiBase error=%s" % (traceback.format_exc()))
             self.stop()
+
+        self.log.info("Start reading internal variables")
+        try:
+            #var_read=threading.Thread(None, self.zibase_read_var, None, (), {})
+            var_read=XplTimer(self.interv,self.zibase_read_var,self.myxpl)
+            var_read.start()
+        except:
+            self.log.error("reading internal variables error")
+            return
 
         self.add_stop_cb(self.stop)
         self.enable_hbeat()
@@ -144,27 +156,27 @@ class ZiBaseMain(XplPlugin):
                 self.log.error("Sendcommand error")
                 return
 
-            self.send_xpl(message.data['device'], cmd, preset_dim)
+            self.th.send_xpl_cmd(message.data['device'], cmd, preset_dim)
 
-    def send_xpl(self, msg_device, msg_command, msg_preset):
-        """ Send xpl-trig to give status change
-            @param msg_device : device
-            @param msg_command : device's value
-            @param msg_preset : device's preset
-        """
-        msg = XplMessage()
-        msg.set_type("xpl-trig")
-        msg.set_schema('zibase.basic')
-        msg.add_data({'device' :  msg_device})
-        msg.add_data({'command' :  msg_command})
-        msg.add_data({'preset-dim' :  msg_preset})
-        self.myxpl.send(msg)
+
 
     def stop(self):
         self.log.debug("Stop plugin in progress...")
+        self.var_read.stop()
         self.api.Disconnect(self.ip_host,self.port)
         self.th.stop()
         return
+    
+    def zibase_read_var(self):
+        try:
+            datas=self.api.getVariables()
+            for data in datas:
+                elmt=data.split(':')
+                stats=['sta:' + elmt[1]]
+                self.th.send_xpl_sensor(stats,elmt[0],'xpl-stat')
+        except:
+            self.log.error("Read var error=%s" % (traceback.format_exc()))
+                        
 
 
 
