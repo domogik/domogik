@@ -71,6 +71,7 @@ def _upgrade_db_from_0_1_0_to_0_2_0(upgrade_instance):
     # Execute update statements here
     sql_code = "ALTER TABLE core_system_info ADD COLUMN app_version VARCHAR(30);\n"
     sql_code += "ALTER TABLE core_device modify address VARCHAR(255);\n"
+    sql_code += "ALTER TABLE core_plugin_config CHANGE COLUMN name id VARCHAR(30) NOT NULL;\n"
     upgrade_instance._sql_execute(sql_code)
     upgrade_instance.update_db_version('0.2.0')
 

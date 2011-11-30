@@ -216,28 +216,28 @@ class PluginConfig(Base):
     """Configuration for a plugin (x10, plcbus, ...)"""
 
     __tablename__ = '%s_plugin_config' % _db_prefix
-    name = Column(Unicode(30), primary_key=True)
+    id = Column(Unicode(30), primary_key=True)
     hostname = Column(Unicode(40), primary_key=True)
     key = Column(Unicode(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
 
-    def __init__(self, name, hostname, key, value):
+    def __init__(self, id, hostname, key, value):
         """Class constructor
 
-        @param name : plugin name
+        @param id : plugin id
         @param hostname : hostname the plugin is installed on
         @param key : key
         @param value : value
 
         """
-        self.name = ucode(name)
+        self.id = ucode(id)
         self.hostname = ucode(hostname)
         self.key = ucode(key)
         self.value = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<PluginConfig(name=%s, hostname=%s, (%s, %s))>" % (self.name, self.hostname, self.key, self.value)
+        return "<PluginConfig(id=%s, hostname=%s, (%s, %s))>" % (self.id, self.hostname, self.key, self.value)
 
     @staticmethod
     def get_tablename():
