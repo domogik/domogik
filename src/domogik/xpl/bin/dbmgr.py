@@ -75,6 +75,7 @@ class DBConnector(XplPlugin):
         Callback to receive a request for some config stuff
         @param message : the xPL message
         '''
+        print("request")
         #try:
         self._db = DbHelper(engine=self._engine)
         techno = message.data['technology']
