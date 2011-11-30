@@ -2518,7 +2518,7 @@ target=*
             # in filter, "%" means, that we check for something starting with name
             message = self._get_from_queue(self._queue_system_detail, "xpl-trig", "domogik.system", filter_data = {"host" : host, "command" : "detail", "plugin" : id + "%"})
         except Empty:
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin detail for %s" % name)
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin detail for %s" % id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("plugin")
             self.send_http_response_ok(json_data.get())
