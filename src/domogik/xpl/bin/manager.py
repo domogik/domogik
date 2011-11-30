@@ -69,6 +69,7 @@ import math
 
 KILL_TIMEOUT = 2
 PING_DURATION = 10
+# time between 2 pings of a plugin
 WAIT_TIME_BETWEEN_PING = 15
 
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
@@ -488,7 +489,7 @@ class SysManager(XplPlugin):
         mess.add_data({'command' :  'start'})
         mess.add_data({'plugin' :  plg})
         if ping == True:
-            if self._check_component_is_running(plg):
+            if self._check_component_is_running(plg, only_one_ping = True):
                 error = "Component %s is already running on %s" % (plg, self.get_sanitized_hostname())
                 self.log.warning(error)
                 if startup:
@@ -586,14 +587,14 @@ class SysManager(XplPlugin):
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         if name != "*":
-            mess.set_target("xpl-%s.%s" % (name, self.get_sanitized_hostname()))
+            mess.set_target("domogik-%s.%s" % (name, self.get_sanitized_hostname()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
         my_listener = Listener(self._cb_check_component_is_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
-                  'xplsource':"xpl-%s.%s" % (name, self.get_sanitized_hostname())},
+                  'xplsource':"domogik-%s.%s" % (name, self.get_sanitized_hostname())},
                  cb_params = {'name' : name})
         if only_one_ping:
             max = 1
@@ -601,7 +602,7 @@ class SysManager(XplPlugin):
             max = self.ping_duration
         while max != 0:
             self.myxpl.send(mess)
-            time.sleep(1)
+            time.sleep(2)
             max = max - 1
             if self._pinglist[name].isSet():
                 break
@@ -727,13 +728,13 @@ class SysManager(XplPlugin):
         """ Refresh external list
             @param message : xpl message
         """
-        self.log.debug("Refresh external members list with : %s" % str(message))
         vendor_device = message.source.split(".")[0]
         instance = message.source.split(".")[1]
         for external_model in self._external_models:
             msg_vendor_device = "%s-%s" % (external_model["vendor_id"], 
                                            external_model["device_id"])
             if vendor_device == msg_vendor_device:
+                self.log.debug("Refresh external members list with : %s" % str(message))
                 found = False
                 for external in self._externals:
                     if external["host"] == instance:
