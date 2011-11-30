@@ -73,8 +73,13 @@ class Sniffer(XplPlugin):
                                                           message.hop_count,
                                                           message.source,
                                                           message.target))
+            idx = 0
             for elt in message.data:
                 print("  %s=%s" % (elt, message.data[elt]))
+                idx += 1
+                if idx == 4:
+                    print "  ..."
+                    return
 
     def _format(self, number):
         '''
