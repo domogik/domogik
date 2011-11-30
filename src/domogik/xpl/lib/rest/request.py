@@ -2360,10 +2360,10 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 elif len(self.rest_request) == 5:
                     if self.rest_request[2] == "by-name":
-                        self._rest_plugin_config_list(name=self.rest_request[4], hostname=self.rest_request[3])
+                        self._rest_plugin_config_list(id=self.rest_request[4], hostname=self.rest_request[3])
                 elif len(self.rest_request) == 7:
                     if self.rest_request[2] == "by-name" and self.rest_request[5] == "by-key":
-                        self._rest_plugin_config_list(name = self.rest_request[4], hostname=self.rest_request[3], key = self.rest_request[6])
+                        self._rest_plugin_config_list(id = self.rest_request[4], hostname=self.rest_request[3], key = self.rest_request[6])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2383,10 +2383,10 @@ target=*
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 4:
-                    self._rest_plugin_config_del(name=self.rest_request[3], hostname=self.rest_request[2])
+                    self._rest_plugin_config_del(id=self.rest_request[3], hostname=self.rest_request[2])
                 elif len(self.rest_request) == 6:
                     if self.rest_request[4] == "by-key":
-                        self._rest_plugin_config_del_key(name=self.rest_request[3], hostname=self.rest_request[2], key=self.rest_request[5])
+                        self._rest_plugin_config_del_key(id=self.rest_request[3], hostname=self.rest_request[2], key=self.rest_request[5])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2492,21 +2492,21 @@ target=*
 
 
 
-    def _rest_plugin_detail(self, name, host = None):
+    def _rest_plugin_detail(self, id, host = None):
         """ Send a xpl message to manager to get plugin list
             Display this list as json
-            @param name : name of plugin
+            @param id : name of plugin
         """
         if host == None:
             host = self.get_sanitized_hostname()
-        self.log.debug("Plugin : ask for plugin detail : %s on %s." % (name, host))
+        self.log.debug("Plugin : ask for plugin detail : %s on %s." % (id, host))
 
         ### Send xpl message to get detail
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.system")
         message.add_data({"command" : "detail"})
-        message.add_data({"plugin" : name})
+        message.add_data({"plugin" : id})
         message.add_data({"host" : host})
         self.myxpl.send(message)
         self.log.debug("Plugin : send message : %s" % str(message))
@@ -2516,7 +2516,7 @@ target=*
         try:
             self.log.debug("Plugin : wait for answer...")
             # in filter, "%" means, that we check for something starting with name
-            message = self._get_from_queue(self._queue_system_detail, "xpl-trig", "domogik.system", filter_data = {"host" : host, "command" : "detail", "plugin" : name + "%"})
+            message = self._get_from_queue(self._queue_system_detail, "xpl-trig", "domogik.system", filter_data = {"host" : host, "command" : "detail", "plugin" : id + "%"})
         except Empty:
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin detail for %s" % name)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2529,7 +2529,7 @@ target=*
         # process message
         cmd = message.data['command']
         host = message.data["host"]
-        name = message.data["plugin"]
+        id = message.data["plugin"]
         try:
             error = message.data["error"]
             self.send_http_response_error(999, "Error on detail request : %s" % error,
@@ -2625,7 +2625,7 @@ target=*
                 except:
                     loop_again = False
 
-        json_data.add_data({"id" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : release, "documentation" : documentation, "configuration" : config_data})
+        json_data.add_data({"id" : id, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : release, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 
@@ -2735,22 +2735,22 @@ target=*
 # /plugin/config/ processing
 ######
 
-    def _rest_plugin_config_list(self, name = None, hostname = None, key = None):
+    def _rest_plugin_config_list(self, id = None, hostname = None, key = None):
         """ list device technology config
-            @param name : name of module
+            @param id : name of module
             @param key : key of config
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
-        if name == None:
+        if id == None:
             for plugin in self._db.list_all_plugin_config():
                 json_data.add_data(plugin)
         elif key == None:
-            for plugin in self._db.list_plugin_config(name, hostname):
+            for plugin in self._db.list_plugin_config(id, hostname):
                 json_data.add_data(plugin)
         else:
-            plugin = self._db.get_plugin_config(name, hostname, key)
+            plugin = self._db.get_plugin_config(id, hostname, key)
             if plugin is not None:
                 json_data.add_data(plugin)
         self.send_http_response_ok(json_data.get())
@@ -2764,7 +2764,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
-            plugin = self._db.set_plugin_config(self.get_parameters("name"), \
+            plugin = self._db.set_plugin_config(self.get_parameters("id"), \
                                                 self.get_parameters("hostname"), \
                                                 self.get_parameters("key"), \
                                                 self.get_parameters("value"))
@@ -2774,25 +2774,25 @@ target=*
         self.send_http_response_ok(json_data.get())
 
 
-    def _rest_plugin_config_del(self, name, hostname):
+    def _rest_plugin_config_del(self, id, hostname):
         """ delete device technology config
-            @param name : module name
+            @param id : module name
             @param hostname : host
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
-            for plugin in self._db.del_plugin_config(name, hostname):
+            for plugin in self._db.del_plugin_config(id, hostname):
                 json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
-    def _rest_plugin_config_del_key(self, name, hostname, key):
+    def _rest_plugin_config_del_key(self, id, hostname, key):
         """ delete device technology config
-            @param name : module name
+            @param id : module name
             @param hostname : host
             @param key : key to delete
         """
@@ -2800,7 +2800,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
-            plugin = self._db.del_plugin_config_key(name, hostname, key)
+            plugin = self._db.del_plugin_config_key(id, hostname, key)
             if plugin is not None:
                 json_data.add_data(plugin)
         except:
