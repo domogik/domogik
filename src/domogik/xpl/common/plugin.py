@@ -169,8 +169,11 @@ class XplPlugin(BasePlugin):
         try:
             cmd = message.data["command"]
             plugin = message.data["plugin"]
+            host = message.data["host"]
+            if host != self.get_sanitized_hostname():
+                return
         except KeyError, e:
-            self.log.error("command or plugin key does not exist : %s", e)
+            self.log.error("command, plugin or host key does not exist : %s", e)
             return
         if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
             self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
