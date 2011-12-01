@@ -2420,7 +2420,6 @@ target=*
         message.add_data({"command" : "list"})
         message.add_data({"host" : "*"})
         self.myxpl.send(message)
-        self.log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -2509,7 +2508,6 @@ target=*
         message.add_data({"plugin" : id})
         message.add_data({"host" : host})
         self.myxpl.send(message)
-        self.log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -2650,7 +2648,6 @@ target=*
         cmd_message.add_data({"host" : host})
         cmd_message.add_data({"plugin" : plugin})
         self.myxpl.send(cmd_message)
-        self.log.debug("Plugin : send message : %s" % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
@@ -2699,7 +2696,6 @@ target=*
         cmd_message.add_data({"host" : host})
         cmd_message.add_data({"plugin" : plugin})
         self.myxpl.send(cmd_message)
-        self.log.debug("Plugin : send message : %s" % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
@@ -3750,7 +3746,6 @@ target=*
         message.add_data({"command" : "installed-packages-list"})
         message.add_data({"host" : "*"})
         self.myxpl.send(message)
-        self.log.debug("Package : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -3849,7 +3844,6 @@ target=*
                     message.add_data({"dep%s" % idx : dep[dep_type]})
                     idx += 1
         self.myxpl.send(message)
-        self.log.debug("Package : send message : %s" % str(message))
         print(str(message))
 
         ### Wait for answer
@@ -3932,7 +3926,6 @@ target=*
         message.add_data({"release" : release})
         message.add_data({"part" : PKG_PART_XPL})
         self.myxpl.send(message)
-        self.log.debug("Package : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -3971,7 +3964,6 @@ target=*
         message.add_data({"release" : release})
         message.add_data({"part" : PKG_PART_RINOR})
         self.myxpl.send(message)
-        self.log.debug("Package : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
