@@ -31,6 +31,41 @@
 #@license: GPL(v3)
 #@organization: Domogik
 
+# Manage options
+
+function display_usage {
+    echo "Usage : "
+    echo "  Full installation : ./install.sh"
+    echo "  Installation on secondary host : ./install.sh --secondary"
+    echo "  Help : ./install.sh -h"
+    echo "         ./install.sh --help"
+}
+
+MAIN_INSTALL=y
+while [ "$1" ] ; do 
+    arg=$1
+    case $arg in
+        --secondary) 
+            MAIN_INSTALL="n"
+            echo "This installation will be done as a secondary host installation : only manager (and plugins) will be launched on this host."
+            ;;
+        -h) 
+            display_usage
+            exit 0
+            ;;
+        --help) 
+            display_usage
+            exit 0
+            ;;
+        *) 
+            display_usage
+            exit 1
+            ;;
+    esac	
+    shift
+done
+
+
 DMG_HOME=
 
 function run_setup_py {
@@ -153,6 +188,14 @@ function update_default_config {
     fi
 }
 
+function update_default_config_other_hosts {
+    if [ ! -f /etc/default/domogik ];then
+        echo "Can't find /etc/default/domogik!"
+        exit 8
+    fi
+    [ -f /etc/default/domogik ] &&  sed -i "s;^MANAGER_PARAMS.*$;MANAGER_PARAMS=\"-p\";" /etc/default/domogik
+}
+
 function update_user_config {
             
     if [ "$keep" = "n" -o "$keep" = "N" ];then
@@ -179,7 +222,13 @@ function update_user_config {
         #TODO : DEL#sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
         #TODO : DEL#read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
         #TODO : DEL#sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $dmg_home/domogik.cfg
-        
+    fi
+}    
+
+
+function update_user_config_db {
+            
+    if [ "$keep" = "n" -o "$keep" = "N" ];then
         #Mysql config 
         echo "You need to have a working Mysql server with a domogik user and database."
         echo "You can create it using these commands (as mysql admin user) :"
@@ -348,12 +397,20 @@ fi
 run_setup_py $MODE
 copy_sample_files
 update_default_config
+if [ $MAIN_INSTALL = "n" ] ; then
+    update_default_config_other_hosts
+fi
 update_user_config
+if [ $MAIN_INSTALL = "y" ] ; then
+    update_user_config_db
+fi
 copy_tools
 create_log_dir
-call_app_installer
-install_plugins
-modify_hosts
+if [ $MAIN_INSTALL = "y" ] ; then
+    call_app_installer
+    install_plugins
+fi
+modify_hosts   
 
 
 echo "Everything seems to be good, Domogik should be installed correctly."
