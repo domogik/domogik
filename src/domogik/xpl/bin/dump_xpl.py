@@ -52,7 +52,7 @@ class Sniffer(XplPlugin):
         parser = OptionParser()
         parser.add_option("-c", action="store_true", dest="compress", default=False, \
                 help="Diaply data in a compress way")
-        XplPlugin.__init__(self, name='sniffer', daemonize=False, parser=parser)
+        XplPlugin.__init__(self, name='dump_xpl', daemonize=False, parser=parser)
         Listener(self._sniffer_cb, self.myxpl)
         self.enable_hbeat()
 
@@ -62,11 +62,13 @@ class Sniffer(XplPlugin):
         '''
         if self.options.compress == False:
             print("%s - %s" % (datetime.datetime.now(), message))
+            self.log.info("%s - %s" % (datetime.datetime.now(), message))
         else:
             ldt = localtime()
             date = "%s/%s/%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
             time = "%s:%s:%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
             display = "%s" % time
+            self.log.info("%s - %s" % (datetime.datetime.now(), message))
             print("%s - %s %s hop=%s source=%s target=%s" % (display,
                                                           message.type,
                                                           message.schema,
