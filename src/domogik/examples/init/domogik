@@ -40,26 +40,6 @@ if [ $UID != 0 ];then
     exit 1;
 fi
 
-#TODO : DEL#function start_django {
-#TODO : DEL#    echo -n " * Starting Django..."
-#TODO : DEL#    USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-#TODO : DEL#    DJANGO_SERVER_IP=$(grep "^django_server_ip" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
-#TODO : DEL#    if [ -z ${DJANGO_SERVER_IP} ] ; then
-#TODO : DEL#        DJANGO_SERVER_IP=127.0.0.1
-#TODO : DEL#    fi
-#TODO : DEL#    DJANGO_SERVER_PORT=$(grep "^django_server_port" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
-#TODO : DEL#    if [ -z ${DJANGO_SERVER_PORT} ] ; then
-#TODO : DEL#        DJANGO_SERVER_PORT=8000
-#TODO : DEL#    fi
-#TODO : DEL#    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/var/log/domogik/django.log 2>&1 &"
-#TODO : DEL#    if [ $? -gt 0 ]; then
-#TODO : DEL#        echo " An error occured during Django startup."
-#TODO : DEL#        exit 1
-#TODO : DEL#    else
-#TODO : DEL#        echo " Done."
-#TODO : DEL#    fi
-#TODO : DEL#}
-
 function start_xpl {
     if [ -z "$(which xPL_Hub)" ];then
         echo "ERROR : xPL_Hub not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
@@ -89,14 +69,6 @@ function start_manager {
     cat < /tmp/dmg-manager-state
     rm -f /tmp/dmg-manager-state
 }
-
-#TODO : DEL#function stop_django {
-#TODO : DEL#    echo -n " * Stopping Django..."
-#TODO : DEL#    for pid in `ps ax | grep "dmg_django runserver" | grep -v grep | awk '{print $1}'`; do
-#TODO : DEL#        kill -15 $pid 2>/dev/null 1>&2
-#TODO : DEL#    done
-#TODO : DEL#    echo " Done."
-#TODO : DEL#}
 
 function stop_xpl {
     echo -n " * Stopping XPL..."
@@ -145,12 +117,8 @@ case "$1" in
     if [ $# -eq 1 ];then
         start_xpl
         start_manager
-        #TODO : DEL#start_django
     else
         case "$2" in
-            #TODO : DEL#django)
-            #TODO : DEL#start_django
-            #TODO : DEL#;;
             xpl)
             start_xpl
             ;;
@@ -163,15 +131,11 @@ case "$1" in
     ;;
     stop)
     if [ $# -eq 1 ];then
-        #TODO : DEL#stop_django
         stop_plugins
         stop_xpl
         stop_manager
     else
         case "$2" in
-            #TODO : DEL#django)
-            #TODO : DEL#stop_django
-            #TODO : DEL#;;
             xpl)
             stop_xpl
             ;;
@@ -191,7 +155,6 @@ case "$1" in
     $0 start $2
     ;;
     *)
-    #TODO : DEL#echo "usage: $0 {start|stop|restart} [(django|xpl|manager|plugins)]"
     echo "usage: $0 {start|stop|restart} [(xpl|manager|plugins)]"
 esac
 exit 0
