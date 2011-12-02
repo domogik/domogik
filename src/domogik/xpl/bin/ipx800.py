@@ -115,7 +115,7 @@ class IPXManager(XplPlugin):
                 self.log.info("Start listening to IPX800 named '%s'" % ipx)
                 ipx_listen = threading.Thread(None,
                                               self.ipx_list[ipx]['obj'].listen,
-                                              None,
+                                              "listen_ipx",
                                               (self.ipx_list[ipx]['interval'],),
                                               {})
                 ipx_listen.start()

@@ -101,7 +101,7 @@ class XplBridgeManager(XplPlugin):
                 self.log.info("Start listening for '%s'" % dev)
                 dev_listen = threading.Thread(None,
                                               self.dev_list[dev]["obj"].listen,
-                                              None,
+                                              "listen_serial",
                                               (),
                                               {})
                 dev_listen.start()

@@ -93,7 +93,7 @@ class DiskManager(XplPlugin):
                 self.log.info("Start listening for '%s'" % path)
                 path_listen = threading.Thread(None,
                                               self.path_list[path].listen,
-                                              None,
+                                              "listen_diskfree",
                                               (path, interval,),
                                               {})
                 path_listen.start()

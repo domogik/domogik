@@ -73,7 +73,7 @@ class CIDManager(XplPlugin):
         # Start reading Modem
         cid_process = threading.Thread(None,
                                    cid.listen,
-                                   None,
+                                   "listen_cid",
                                    (),
                                    {})                                  
         cid_process.start()                              

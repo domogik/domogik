@@ -104,7 +104,7 @@ class OneWireManager(XplPlugin):
                 self.log.info("DS18B20 support enabled")
                 ds18b20 = threading.Thread(None, 
                                            ComponentDs18b20, 
-                                           None,
+                                           "ds18b20",
                                            (self.log,
                                             ow, 
                                             float(ds18b20_interval), 
@@ -119,7 +119,7 @@ class OneWireManager(XplPlugin):
                 self.log.info("DS18S20 support enabled")
                 ds18s20 = threading.Thread(None, 
                                            ComponentDs18s20, 
-                                           None,
+                                           "ds18s20",
                                            (self.log,
                                             ow, 
                                             float(ds18s20_interval), 
@@ -133,7 +133,7 @@ class OneWireManager(XplPlugin):
                 self.log.info("DS2401 support enabled")
                 ds2401 = threading.Thread(None, 
                                            ComponentDs2401, 
-                                           None,
+                                           "ds2401",
                                            (self.log,
                                             ow, 
                                             float(ds2401_interval), 
@@ -147,7 +147,7 @@ class OneWireManager(XplPlugin):
                 self.log.info("DS2438 support enabled")
                 ds2438 = threading.Thread(None, 
                                            ComponentDs2438, 
-                                           None,
+                                           "ds2438",
                                            (self.log,
                                             ow, 
                                             float(ds2438_interval), 

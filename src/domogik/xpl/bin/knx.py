@@ -77,7 +77,7 @@ class KNXManager(XplPlugin):
             self.log.info("Start listening to KNX")
             knx_listen = threading.Thread(None,
                                           self.knx.listen,
-                                          None,
+                                          "listen_knx",
                                           (),
                                           {})
             knx_listen.start()
