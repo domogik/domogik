@@ -49,13 +49,13 @@ ENDC = '\033[0m'
 user = ''
 
 def info(msg):
-    print "%s [ %s ] %s" % (BLUE,msg,ENDC)
+    print("%s [ %s ] %s" % (BLUE,msg,ENDC))
 def ok(msg):
-    print "%s ==> %s  %s" % (OK,msg,ENDC)
+    print("%s ==> %s  %s" % (OK,msg,ENDC))
 def warning(msg):
-    print "%s ==> %s  %s" % (WARNING,msg,ENDC)
+    print("%s ==> %s  %s" % (WARNING,msg,ENDC))
 def fail(msg):
-    print "%s ==> %s  %s" % (FAIL,msg,ENDC)
+    print("%s ==> %s  %s" % (FAIL,msg,ENDC))
 
 def am_i_root():
     info("Check this script is started as root")
@@ -147,7 +147,7 @@ def test_config_files():
     l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
     assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
     ok("xPL_Hub found in the path")
-    
+
     info("Test user / config file")
 
     #Check user config file
@@ -167,12 +167,15 @@ def _test_user_can_write(conn, path, user_entry):
     conn.send(os.access(path, os.W_OK))
     conn.close()
 
-def _check_port_availability(s_ip, s_port):
+def _check_port_availability(s_ip, s_port, udp = False):
     """ Parse /proc/net/tcp to check if something listen on the port"""
     ip = gethostbyname(s_ip).split('.')
     port = "%04X" % int(s_port)
     ip = "%02X%02X%02X%02X" % (int(ip[3]),int(ip[2]),int(ip[1]),int(ip[0]))
-    f = open("/proc/net/tcp")
+    if udp == False:
+        f = open("/proc/net/tcp")
+    else:
+        f = open("/proc/net/udp")
     lines = f.readlines()
     f.close()
     lines.pop(0)
@@ -197,6 +200,10 @@ def test_user_config_file(user_home, user_entry):
 
     info("Parse [domogik] section")
     import domogik
+
+    #Check ix xpl port is not used
+    _check_port_availability("0.0.0.0", 3865, udp = True)
+    ok("xPL hub IP/port is not bound by anything else")
 
     parent_conn, child_conn = Pipe()
     p = Process(target=_test_user_can_write, args=(child_conn, dmg['log_dir_path'],user_entry,))
@@ -264,7 +271,7 @@ try:
     test_config_files()
     test_init()
     test_version()
-    print "\n\n"
+    print("\n\n")
     ok("================================================== <==")
     ok(" Everything seems ok, you should be able to start  <==")
     ok("      Domogik with /etc/init.d/domogik start       <==")
