@@ -68,6 +68,19 @@ done
 
 DMG_HOME=
 
+function stop_domogik {
+    if [ -d "/etc/init.d/" ];then
+        if [ -f "/etc/init.d/domogik" ];then
+            echo "There is already a Domogik on this system. Try to stop it before installation..."
+            /etc/init.d/domogik stop
+        fi
+    elif [ -d "/etc/rc.d/" ];then
+        echo "TODO"
+    else
+        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
+        exit 16
+    fi
+}
 function run_setup_py {
     MODE=$1
     case $MODE in
@@ -371,6 +384,7 @@ if [ "$(dirname $0)" != "." ];then
     exit 15
 fi
 
+stop_domogik
 check_python
 test_sources $0
 read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE
