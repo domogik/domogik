@@ -59,7 +59,7 @@ class RfxcomUsbManager(XplPlugin):
         device = "/dev/rfxcom"
 
         # Init RFXCOM
-        self.rfxcom  = RfxcomUsb(self.log, self.send_xpl)
+        self.rfxcom  = RfxcomUsb(self.log, self.send_xpl, self.get_stop())
         
         # Create a listener for all messages used by RFXCOM
         # TODO !!!!!
@@ -117,8 +117,20 @@ class RfxcomUsbManager(XplPlugin):
         """ Process command xpl message and call the librairy for processing command
             @param message : xpl message
         """
-        # TODO
-        pass
+        # TODO : finish
+        address = message.data["address"].lower()
+        unit = message.data["unit"]
+        command = message.data["command"].lower()
+        if command = "preset":
+            level = message.data["level"]
+        else:
+            level = None
+        if message.data.has_key("eu"):
+            eu = message.data["eu"]
+        else:
+            eu = None
+        self.rfxcom.comand_11(address, unit, command, level, eu)
+   
         
     def process_remote_basic(self, message):
         """ Process command xpl message and call the librairy for processing command
