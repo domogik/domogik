@@ -39,6 +39,8 @@ Implements
 """
 
 
+# TODO : put all global tables in concerned functions
+
 # TODO : hbeat (app and request) implementation
 #        log.basic implementation
 #        x10.basic
@@ -52,6 +54,7 @@ import binascii
 import serial
 import traceback
 import threading
+from Queue import Queue, Empty, Full
 
 
 HUMIDITY_STATUS = {
@@ -337,7 +340,7 @@ class RfxcomUsb:
 
         # Thread to process queue
         write_process = threading.Thread(None,
-                                         self.write_rfx,
+                                         self.write_daemon,
                                          "write_packets_process",
                                          (),
                                          {})
@@ -374,8 +377,6 @@ class RfxcomUsb:
         """
         length = len(data)/2
         packet = "%02X%s" % (length, data.upper())
-        # TODO : check it works
-        #self.rfxcom.write(packet)
 
         # Put message in write queue
         seqnbr = gh(packet, 2)
@@ -428,20 +429,24 @@ class RfxcomUsb:
             seqnbr = data["seqnbr"]
             packet = data["packet"]
             print("Get from Queue : %s > %s" % (seqnbr, packet))
+            self._rfxcom.write(binascii.unhexlify(packet))
             
     def get_seqnbr(self):
         """ Return seqnbr and then increase it
         """
         ret = self.seqnbr
-        self.seqnbr += 1
-        return ret
+        if ret == 255:
+            ret = 0
+        else:
+            self.seqnbr += 1
+        return "%02x" % ret
             
     def xplcmd_control_basic(msg_device, msg_type, msg_current):
         """ Handle control.basic xpl commande messages
         """
         # Type 0x28 : X10 Ninja/Robocam
         if type.lower() == "ninja":
-            self._command_28(device = msg_device,
+            self.command_28(device = msg_device,
                              current = msg_current)
         
         # TODO : finish
@@ -455,7 +460,7 @@ class RfxcomUsb:
         # listen 
         self._log.info("Start listening RFXCOM")
         # First, ask for hardware informations
-        #TODO : call _command_00 with appropriate parameter to request status
+        #TODO : call command_00 with appropriate parameter to request status
         # infinite
         try:
             while not stop.isSet():
@@ -501,7 +506,7 @@ class RfxcomUsb:
             self._log.warning("No function for type '%s' with data : '%s'" % (type, data))
 
         
-    def _command_00(self, data):
+    def command_00(self, data):
         """ Interface Control
         
             !!! TODO !!!
@@ -534,28 +539,50 @@ class RfxcomUsb:
     #TODO
     
 
-    def _command_11(self, address, unit, command, level, eu):
+    def command_11(self, address, unit, command, level, eu, group):
         """ Type 0x11, Lighting2
 
             Type : command
             SDK version : 2.07
-            Tested : No
+            Tested : yes
+
+            Remarks :
+            - eu != true : Chacon, KlikAanKlikUit, HomeEasy UK, NEXA 
+            - eu = true : HomeEasy EU
+            - ANSLUT is the same as Chacon. But the address must have a special
+              address, not all addresses are accepted in fact. The user has to 
+              try addresses and change the lowest address digit until the ANSLUT              responds.
         """
+        COMMAND = {"off"    : "00",
+                   "on"     : "01",
+                   "preset" : "02",
+                   "group_off"    : "03",
+                   "group_on"     : "04",
+                   "group_preset" : "05"}
         # type
         cmd = "11" 
         # subtype
-        cmd += "00"
+        if eu != True:
+            cmd += "00"
+        else:
+            cmd += "01"
+        # Note : ANSLUT not implemented (view remark in function header
         # seqnbr
         cmd += self.get_seqnbr()
-        # housecode
-        cmd += #euh??????? TODO
-        # <============================================== j'en susi ici!!!!!!!
+        # address
+        cmd += "%08x" % int(bin(int(address, 16))+'00', 2)
+        # unit code
+        cmd += "%02x" % unit
         # cmnd
-        cmd += X10_NINJA_CAM[current.lower()]
+        if group == True:
+            command = "group_" + command
+        cmd += COMMAND[command.lower()]
+        # level
+        cmd += "%02x" % level
         # filler + rssi : 0x00
         cmd += "00"
         
-        self._log.debug("Type x28 : write '%s'" % cmd)
+        self._log.debug("Type x11 : write '%s'" % cmd)
         self.write_packet(cmd)
 
 
@@ -619,7 +646,7 @@ class RfxcomUsb:
     #TODO
     
 
-    def _command_28(self, device, current):
+    def command_28(self, device, current):
         """ X10 Ninja/Robocam
 
             Type : command

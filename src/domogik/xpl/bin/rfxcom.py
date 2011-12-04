@@ -120,16 +120,22 @@ class RfxcomUsbManager(XplPlugin):
         # TODO : finish
         address = message.data["address"].lower()
         unit = message.data["unit"]
-        command = message.data["command"].lower()
-        if command = "preset":
-            level = message.data["level"]
+        if unit.lower() == "group":
+            unit = 0
+            group = True
         else:
-            level = None
+            unit = int(unit)
+            group = False
+        command = message.data["command"].lower()
+        if command == "preset":
+            level = int(message.data["level"])
+        else:
+            level = 0
         if message.data.has_key("eu"):
             eu = message.data["eu"]
         else:
-            eu = None
-        self.rfxcom.comand_11(address, unit, command, level, eu)
+            eu = False
+        self.rfxcom.command_11(address, unit, command, level, eu, group)
    
         
     def process_remote_basic(self, message):
