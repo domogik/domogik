@@ -1,0 +1,17 @@
+<technology id="telldus">
+  <command name="stop">
+    <schema>telldus.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>stop</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>telldus.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="stop" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

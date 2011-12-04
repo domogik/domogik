@@ -1,0 +1,180 @@
+<package type="plugin">
+  <id>telldus</id>
+  <technology>telldus</technology>
+  <description>
+Manage many devices through TellStick and TellStick Duo.
+Add your devices with telldus tools (tdtool or telldusCenter) and
+they will appear automatically in Domogik
+</description>
+  <changelog>Update XML description</changelog>
+  <version>0.2.0</version>
+  <documentation>to do</documentation>
+  <author>Sebastien GALLET</author>
+  <author-email>sgallet at gmail dot com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>delayrf</name>
+      <type>string</type>
+      <description>Delay between 2 RF orders (default 400ms)</description>
+      <default-value>400</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
+      <name>name</name>
+      <type>string</type>
+      <description>Address of the device (TSxx)</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>3</order-id>
+      <name>param1</name>
+      <type>string</type>
+      <description>Parameter 1</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>4</order-id>
+      <name>param2</name>
+      <type>string</type>
+      <description>Parameter 2</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/telldus.xml"/>
+    <file path="src/share/domogik/stats/telldus/telldus.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/dim.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/down.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/off.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/on.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/shut.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/stop.xml"/>
+    <file path="src/share/domogik/url2xpl/telldus/up.xml"/>
+    <file path="src/domogik/xpl/bin/telldus.py"/>
+    <file path="src/domogik/xpl/helpers/telldus.py"/>
+    <file path="src/domogik/xpl/lib/telldus.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>telldus</id>
+      <name>telldus tech.</name>
+      <description>Manage many devices through TellStick (Chacon, Ikea, ...)</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>telldus.switch</id>
+          <name>Switch</name>
+          <description>Switch</description>
+          <device_technology_id>telldus</device_technology_id>
+      </device_type>
+      <device_type>
+          <id>telldus.dimmer</id>
+          <name>Dimmer</name>
+          <description>Dimmer</description>
+          <device_technology_id>telldus</device_technology_id>
+      </device_type>
+      <device_type>
+          <id>telldus.shutter</id>
+          <name>Shutter</name>
+          <description>Shutter</description>
+          <device_technology_id>telldus</device_technology_id>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>telldus.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>telldus.shutter.switch</id>
+          <name>Shutter</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.shutter</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>telldus.shutter.stop</id>
+          <name>Stop</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.shutter</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;stop&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;stop&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>telldus.shutter.shut</id>
+          <name>Shut</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.shutter</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;shut&quot;,&quot;valueMin&quot;:&quot;0&quot;, &quot;valueMax&quot;:&quot;4&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>telldus.dimmer.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>telldus.dimmer.change</id>
+          <name>Change</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:&quot;0&quot;, &quot;valueMax&quot;:&quot;100&quot;, &quot;step&quot;:&quot;10&quot;}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>telldus.dimmer.bright</id>
+          <name>Bright</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>telldus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:&quot;0&quot;, &quot;valueMax&quot;:&quot;100&quot;, &quot;step&quot;:&quot;10&quot;}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
