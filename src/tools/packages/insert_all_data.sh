@@ -33,7 +33,7 @@
 
 SRC_PATH="../../../"
 PLG_XML_PATH="src/share/domogik/plugins/"
-HARD_XML_PATH="src/share/domogik/hardwares/"
+HARD_XML_PATH="src/share/domogik/externals/"
 CUR_DIR=`pwd`
 FULL_PATH=$0
 PROG_NAME=${FULL_PATH##*/}
