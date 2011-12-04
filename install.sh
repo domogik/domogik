@@ -133,7 +133,7 @@ function copy_sample_files {
         chown $d_user $dmg_home
     fi
     # create folders for packages management
-    for pkg_rep in cache plugins plugins/softwares plugins/hardwares plugins/stats plugins/url2xpl
+    for pkg_rep in cache plugins plugins/softwares plugins/externals plugins/stats plugins/url2xpl
       do
         if [ ! -d $dmg_home/$pkg_rep ];then
             mkdir $dmg_home/$pkg_rep
@@ -364,8 +364,8 @@ function install_plugins {
             su -c "src/tools/packages/insert_data.py $file" $d_user
             echo "** File $file parsed"
         done
-        for file in src/share/domogik/hardwares/*.xml;do
-            if [[ $file != "src/share/domogik/hardwares/*.xml" ]] ; then
+        for file in src/share/domogik/externals/*.xml;do
+            if [[ $file != "src/share/domogik/externals/*.xml" ]] ; then
                 echo "** Parse $file"
                 su -c "src/tools/packages/insert_data.py $file" $d_user
                 echo "** File $file parsed"
