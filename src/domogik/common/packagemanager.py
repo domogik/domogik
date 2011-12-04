@@ -58,8 +58,7 @@ PLG_XML_PATH = "src/share/domogik/plugins/"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with temp folder
 CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
 REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
-REPO_LST_FILE = "packages.lst"
-REPO_LST_FILE_HEADER = "Domogik repository"
+REPO_LST_FILE_HEADER = "Domogik Repository"
 REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
 
 cfg = Loader('domogik')
@@ -549,15 +548,15 @@ class PackageManager():
             @param prioriry : repo priority
         """
         try:
-            resp = urllib.urlopen("%s/%s" % (url, REPO_LST_FILE))
+            resp = urllib.urlopen("%s" % (url))
             my_list = []
             first_line = True
             for data in resp.readlines():
                 if first_line == True:
                     first_line = False
                     if data.strip() != REPO_LST_FILE_HEADER:
-                        self.log("This is not a Domogik repository : '%s/%s'" %
-                                   (url, REPO_LST_FILE))
+                        self.log("This is not a Domogik repository : '%s'" %
+                                   (url))
                         break
                 else:
                     my_list.append({"file" : "%s/%s" % (url, data.strip()),
@@ -565,7 +564,7 @@ class PackageManager():
                                     "repo_url" : url})
             return my_list
         except IOError:
-            self.log("Bad url :'%s/%s'" % (url, REPO_LST_FILE))
+            self.log("Bad url :'%s'" % (url))
             return []
 
 

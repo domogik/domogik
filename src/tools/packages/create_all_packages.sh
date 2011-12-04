@@ -33,7 +33,7 @@
 
 SRC_PATH="../../../"
 PLG_XML_PATH="src/share/domogik/plugins/"
-HDW_XML_PATH="src/share/domogik/hardwares/"
+HDW_XML_PATH="src/share/domogik/externals/"
 
 if [[ $# -ne 1 ]] ; then
     echo "Usage : $0 <directory>"
@@ -55,10 +55,10 @@ done
 
 for fic in $(find $SRC_PATH/$HDW_XML_PATH -name "*.xml")
   do
-    hardware=$(basename $fic | sed "s/\.xml//")
+    external=$(basename $fic | sed "s/\.xml//")
     echo "********************************************************"
-    echo "*    Generating package for $hardware"
+    echo "*    Generating package for $external"
     echo "********************************************************"
   
-    ./pkg-mgr.py -f -c -t hardware -o $FOLDER $hardware
+    ./pkg-mgr.py -f -c -t external -o $FOLDER $external
 done

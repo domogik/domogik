@@ -90,7 +90,7 @@ class ZiBaseMain(XplPlugin):
 
         self.log.info("Start reading internal variables")
         try:
-            #var_read=threading.Thread(None, self.zibase_read_var, None, (), {})
+            #var_read=threading.Thread(None, self.zibase_read_var, "listen_zibase", (), {})
             var_read=XplTimer(self.interv,self.zibase_read_var,self.myxpl)
             var_read.start()
         except:

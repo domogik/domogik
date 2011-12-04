@@ -40,7 +40,7 @@ from domogik.common.packagemanager import PackageManager
 from optparse import OptionParser
 
 
-PACKAGE_TYPES = ['plugin', 'hardware']
+PACKAGE_TYPES = ['plugin', 'external']
 
 mgr = PackageManager()
 
@@ -105,9 +105,9 @@ if options.action_create == True:
     # plugin
     if options.package_type == "plugin":
         mgr._create_package_for_plugin(args[0], options.output_dir, options.force)
-    # hardware
-    if options.package_type == "hardware":
-        mgr._create_package_for_hardware(args[0], options.output_dir, options.force)
+    # external
+    if options.package_type == "external":
+        mgr._create_package_for_external(args[0], options.output_dir, options.force)
 
 # package installation
 if options.action_install == True:

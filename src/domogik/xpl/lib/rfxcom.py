@@ -39,6 +39,8 @@ Implements
 """
 
 
+# TODO : put all global tables in concerned functions
+
 # TODO : hbeat (app and request) implementation
 #        log.basic implementation
 #        x10.basic
@@ -51,6 +53,9 @@ Implements
 import binascii
 import serial
 import traceback
+import threading
+from Queue import Queue, Empty, Full
+
 
 HUMIDITY_STATUS = {
   "0x00" : "dry",
@@ -317,16 +322,30 @@ class RfxcomUsb:
     """ Rfxcom Usb librairy
     """
 
-    def __init__(self, log, callback):
+    def __init__(self, log, callback, stop):
         """ Init object
             @param log : log instance
             @param callback : callback
+            @param stop : 
         """
         self._log = log
         self._callback = callback
+        self._stop = stop
         self._rfxcom = None
         # TODO : how to get proper value ?
         self.seqnbr = 0
+
+        # Queue for writing packets to Rfxcom
+        self.write_rfx = Queue()
+
+        # Thread to process queue
+        write_process = threading.Thread(None,
+                                         self.write_daemon,
+                                         "write_packets_process",
+                                         (),
+                                         {})
+        write_process.start()
+
 
     def open(self, device):
         """ Open RFXCOM device
@@ -358,53 +377,76 @@ class RfxcomUsb:
         """
         length = len(data)/2
         packet = "%02X%s" % (length, data.upper())
-        # TODO : check it works
-        self.rfxcom.write(packet)
-        
-        # TODO : do it in the good way....
-        
-        # The sequence number is not used by the transceiver so you can leave it zero if you want. But it can be used in your program to which ACK/NAK message belongs to which transmit message.
-        # You need to keep the messages in a buffer until they are acknowledged by an ACK. If you got a NAK you have to resend a message.
-        # For example:
-        # Transmit message 1
-        # Transmit message 2
-        # Transmit message 3
 
-        # Received ACK 1
-        # Received NAK 2
-        # Received ACK 3
+        # Put message in write queue
+        seqnbr = gh(packet, 2)
+        self.write_rfx.put_nowait({"seqnbr" : seqnbr, 
+                                   "packet" : packet})
 
-        # Now you know that message number 2 is not correct processed and you send again:
-        # Transmit message 2
-        # Received ACK 2
+    def write_daemon(self):
+        """ Write packets in queue to RFXCOM and manager errors to resend them
+            This function must be launched as a thread in backgroun
+ 
+            How it works (actually solution 2) :
 
-        # An easier way is to transmit a message and wait for the acknowledge before you transmit the next command:
-        # Transmit message 1
-        # Receive ACK 1
-        # Transmit message 2
-        # Receive NAK 2
-        # Transmit message 2
-        # Receive ACK 2
-        # Transmit message 3
-        # Receive ACK 3
+            Solution 1 : 
         
+            The sequence number is not used by the transceiver so you can leave it zero if you want. But it can be used in your program to which ACK/NAK message belongs to which transmit message.
+            You need to keep the messages in a buffer until they are acknowledged by an ACK. If you got a NAK you have to resend a message.
+            For example:
+            Transmit message 1
+            Transmit message 2
+            Transmit message 3
+    
+            Received ACK 1
+            Received NAK 2
+            Received ACK 3
+    
+            Now you know that message number 2 is not correct processed and you send again:
+            Transmit message 2
+            Received ACK 2
+
+            Solution 2 : 
+    
+            An easier way is to transmit a message and wait for the acknowledge before you transmit the next command:
+            Transmit message 1
+            Receive ACK 1
+            Transmit message 2
+            Receive NAK 2
+            Transmit message 2
+            Receive ACK 2
+            Transmit message 3
+            Receive ACK 3
+        """
+        print("Start write_rfx thread")
         # To test, see RFXCOM email from 17/10/2011 at 20:22 
         
-        pass
+        # infinite
+        while not self._stop.isSet():
+
+            # Wait for a packet in the queue
+            data = self.write_rfx.get(block = True)
+            seqnbr = data["seqnbr"]
+            packet = data["packet"]
+            print("Get from Queue : %s > %s" % (seqnbr, packet))
+            self._rfxcom.write(binascii.unhexlify(packet))
             
     def get_seqnbr(self):
-        """ Return seqnbr and hen increase it
+        """ Return seqnbr and then increase it
         """
         ret = self.seqnbr
-        self.seqnbr += 1
-        return ret
+        if ret == 255:
+            ret = 0
+        else:
+            self.seqnbr += 1
+        return "%02x" % ret
             
     def xplcmd_control_basic(msg_device, msg_type, msg_current):
         """ Handle control.basic xpl commande messages
         """
         # Type 0x28 : X10 Ninja/Robocam
         if type.lower() == "ninja":
-            self._command_28(device = msg_device,
+            self.command_28(device = msg_device,
                              current = msg_current)
         
         # TODO : finish
@@ -418,7 +460,7 @@ class RfxcomUsb:
         # listen 
         self._log.info("Start listening RFXCOM")
         # First, ask for hardware informations
-        #TODO : call _command_00 with appropriate parameter to request status
+        #TODO : call command_00 with appropriate parameter to request status
         # infinite
         try:
             while not stop.isSet():
@@ -464,7 +506,7 @@ class RfxcomUsb:
             self._log.warning("No function for type '%s' with data : '%s'" % (type, data))
 
         
-    def _command_00(self, data):
+    def command_00(self, data):
         """ Interface Control
         
             !!! TODO !!!
@@ -497,8 +539,52 @@ class RfxcomUsb:
     #TODO
     
 
-    ### 0x11 : Lighting2
-    #TODO : command
+    def command_11(self, address, unit, command, level, eu, group):
+        """ Type 0x11, Lighting2
+
+            Type : command
+            SDK version : 2.07
+            Tested : yes
+
+            Remarks :
+            - eu != true : Chacon, KlikAanKlikUit, HomeEasy UK, NEXA 
+            - eu = true : HomeEasy EU
+            - ANSLUT is the same as Chacon. But the address must have a special
+              address, not all addresses are accepted in fact. The user has to 
+              try addresses and change the lowest address digit until the ANSLUT              responds.
+        """
+        COMMAND = {"off"    : "00",
+                   "on"     : "01",
+                   "preset" : "02",
+                   "group_off"    : "03",
+                   "group_on"     : "04",
+                   "group_preset" : "05"}
+        # type
+        cmd = "11" 
+        # subtype
+        if eu != True:
+            cmd += "00"
+        else:
+            cmd += "01"
+        # Note : ANSLUT not implemented (view remark in function header
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address
+        cmd += "%08x" % int(bin(int(address, 16))+'00', 2)
+        # unit code
+        cmd += "%02x" % unit
+        # cmnd
+        if group == True:
+            command = "group_" + command
+        cmd += COMMAND[command.lower()]
+        # level
+        cmd += "%02x" % level
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x11 : write '%s'" % cmd)
+        self.write_packet(cmd)
+
 
     def _process_11(self, data):
         """ Type 0x11, Lighting2
@@ -560,7 +646,7 @@ class RfxcomUsb:
     #TODO
     
 
-    def _command_28(self, device, current):
+    def command_28(self, device, current):
         """ X10 Ninja/Robocam
 
             Type : command
