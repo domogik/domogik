@@ -59,7 +59,7 @@ class RfxcomUsbManager(XplPlugin):
         device = "/dev/rfxcom"
 
         # Init RFXCOM
-        self.rfxcom  = RfxcomUsb(self.log, self.send_xpl, self.get_stop())
+        self.rfxcom  = RfxcomUsb(self.log, self.send_xpl, self.send_trig, self.get_stop())
         
         # Create a listener for all messages used by RFXCOM
         # TODO !!!!!
@@ -169,6 +169,12 @@ class RfxcomUsbManager(XplPlugin):
         for key in data:
             msg.add_data({key : data[key]})
         self.myxpl.send(msg)
+
+    def send_trig(self, message):
+        """ Send xpl-trig given message
+            @param message : xpl-trig message
+        """
+        self.myxpl.send(message)
 
 
 if __name__ == "__main__":

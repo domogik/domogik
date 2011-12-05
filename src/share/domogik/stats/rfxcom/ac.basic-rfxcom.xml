@@ -1,0 +1,17 @@
+<xml version="1.0" encoding="UTF-8"?>
+<statistic technology="rfxcom">
+    <schema name="ac.basic">
+        <xpltype type="*">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="address"/>
+                <value field="command"/>
+                <value field="level"/>
+                <value field="unit"/>
+                <value field="eu"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

@@ -54,6 +54,7 @@ import binascii
 import serial
 import traceback
 import threading
+import time
 from Queue import Queue, Empty, Full
 
 WAIT_BETWEEN_TRIES = 1
@@ -318,14 +319,16 @@ class RfxcomUsb:
     """ Rfxcom Usb librairy
     """
 
-    def __init__(self, log, callback, stop):
+    def __init__(self, log, cb_send_xpl, cb_send_trig, stop):
         """ Init object
             @param log : log instance
-            @param callback : callback
+            @param cb_send_xpl : callback
+            @param cb_send_trig : callback
             @param stop : 
         """
         self._log = log
-        self._callback = callback
+        self._callback = cb_send_xpl
+        self._cb_send_trig = cb_send_trig
         self._stop = stop
         self._rfxcom = None
         # TODO : how to get proper value ?
@@ -437,10 +440,11 @@ class RfxcomUsb:
                 res = self.rfx_response.get(block = True)
                 if res["status"] == "NACK":
                     self.debug.warning("Failed to write. Retry in %s : %s > %s" % (WAIT_BETWEEN_TRIES, seqnbr, packet))
-                    sleep(WAIT_BETWEEN_TRIES)
+                    time.sleep(WAIT_BETWEEN_TRIES)
                     self._rfxcom.write(binascii.unhexlify(packet))
                 else:
                     print("Command succesfully sent")
+                    self._cb_send_trig(trig_msg)
                     loop = False
             
     def get_seqnbr(self):
