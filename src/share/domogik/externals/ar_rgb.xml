@@ -37,17 +37,17 @@ Test it with the manual controllers (push button and potentiometer) and then cre
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys/>
   <files>
-    <file path="src/share/domogik/hardwares/ar_rgb.xml"/>
+    <file path="src/share/domogik/externals/ar_rgb.xml"/>
     <file path="src/share/domogik/url2xpl/arduino/setcolor.xml"/>
     <file path="src/share/domogik/stats/arduino/arduino.rgb-ar_rgb.xml"/>
   </files>
   <external_files>
-    <file path="src/external/hardwares/ar_rgb/ar_rgb.pde"/>
-    <file path="src/external/hardwares/ar_rgb/memoryfree.cpp"/>
-    <file path="src/external/hardwares/ar_rgb/memoryfree.h"/>
-    <file path="src/external/hardwares/ar_rgb/rgb.pde"/>
-    <file path="src/external/hardwares/ar_rgb/time.pde"/>
-    <file path="src/external/hardwares/ar_rgb/xpl.pde"/>
+    <file path="src/external/externals/ar_rgb/ar_rgb.pde"/>
+    <file path="src/external/externals/ar_rgb/memoryfree.cpp"/>
+    <file path="src/external/externals/ar_rgb/memoryfree.h"/>
+    <file path="src/external/externals/ar_rgb/rgb.pde"/>
+    <file path="src/external/externals/ar_rgb/time.pde"/>
+    <file path="src/external/externals/ar_rgb/xpl.pde"/>
   </external_files>
   <dependencies/>
   <device_technology>

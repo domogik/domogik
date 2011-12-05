@@ -17,7 +17,7 @@ LAN 433.92MHz receiver + transmitter</description>
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys/>
   <files>
-    <file path="src/share/domogik/hardwares/rfxcom.xml"/>
+    <file path="src/share/domogik/externals/rfxcom.xml"/>
     <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"/>
   </files>
   <dependencies/>
