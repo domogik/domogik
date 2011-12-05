@@ -103,7 +103,6 @@ setup(
                       'simplejson >= 1.9.2',
                       'pyOpenSSL >= 0.10', 
                       'httplib2 >= 0.6.0', 
-                      'django-pipes >= 0.2', 
                       'psutil >= 0.1.3', 
                       'MySQL-python >= 1.2.3c', 
                       'pyinotify >= 0.8.9', 
