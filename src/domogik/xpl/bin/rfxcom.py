@@ -135,8 +135,10 @@ class RfxcomUsbManager(XplPlugin):
             eu = message.data["eu"]
         else:
             eu = False
-        self.rfxcom.command_11(address, unit, command, level, eu, group)
-   
+        # Prepare xpl-trig to send if success
+        trig_msg = message
+        trig_msg.set_type("xpl-trig")
+        self.rfxcom.command_11(address, unit, command, level, eu, group, trig_msg)
         
     def process_remote_basic(self, message):
         """ Process command xpl message and call the librairy for processing command

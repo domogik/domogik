@@ -56,6 +56,7 @@ import traceback
 import threading
 from Queue import Queue, Empty, Full
 
+WAIT_BETWEEN_TRIES = 1
 
 HUMIDITY_STATUS = {
   "0x00" : "dry",
@@ -289,11 +290,6 @@ AC_CMND = {
   "05" : "Set group level",
 }
 
-# TODO : check it is used in command_11
-AC_GROUP_CMND_LIST = ["03", "04"]
-
-
-
 #TODO : X10 RF Remote
 #       ATI Remote Wonder
 #       ATI Remote Wonder Plus
@@ -337,6 +333,7 @@ class RfxcomUsb:
 
         # Queue for writing packets to Rfxcom
         self.write_rfx = Queue()
+        self.rfx_response = Queue()
 
         # Thread to process queue
         write_process = threading.Thread(None,
@@ -371,9 +368,10 @@ class RfxcomUsb:
             error = "Error while closing device"
             raise RfxcomException(error)
             
-    def write_packet(self, data):
+    def write_packet(self, data, trig_msg):
         """ Write command to rfxcom
             @param data : command without length
+            @param trig_msg : xpl-trig msg to send if success
         """
         length = len(data)/2
         packet = "%02X%s" % (length, data.upper())
@@ -381,7 +379,8 @@ class RfxcomUsb:
         # Put message in write queue
         seqnbr = gh(packet, 2)
         self.write_rfx.put_nowait({"seqnbr" : seqnbr, 
-                                   "packet" : packet})
+                                   "packet" : packet,
+                                   "trig_msg" : trig_msg})
 
     def write_daemon(self):
         """ Write packets in queue to RFXCOM and manager errors to resend them
@@ -428,8 +427,21 @@ class RfxcomUsb:
             data = self.write_rfx.get(block = True)
             seqnbr = data["seqnbr"]
             packet = data["packet"]
+            trig_msg = data["trig_msg"]
             print("Get from Queue : %s > %s" % (seqnbr, packet))
             self._rfxcom.write(binascii.unhexlify(packet))
+
+            # TODO : read in queue in which has been stored data readen from rfx
+            loop = True
+            while loop == True:
+                res = self.rfx_response.get(block = True)
+                if res["status"] == "NACK":
+                    self.debug.warning("Failed to write. Retry in %s : %s > %s" % (WAIT_BETWEEN_TRIES, seqnbr, packet))
+                    sleep(WAIT_BETWEEN_TRIES)
+                    self._rfxcom.write(binascii.unhexlify(packet))
+                else:
+                    print("Command succesfully sent")
+                    loop = False
             
     def get_seqnbr(self):
         """ Return seqnbr and then increase it
@@ -539,7 +551,41 @@ class RfxcomUsb:
     #TODO
     
 
-    def command_11(self, address, unit, command, level, eu, group):
+    def _process_02(self, data):
+        """ Receiver/Transmitter Message
+        
+            !!! TODO !!!
+            
+            Type : rfxcom responses
+            SDK version : 2.07
+            Tested : No
+        """
+        subtype = gh(data, 1)
+        if subtype == "00":
+            type = "error"
+            message = "Message not used"
+        elif subtype == "01":
+            type = "response"
+        seqnbr = gh(data, 2)
+        msg = gh(data, 3)
+        if msg == "00":
+            message = "ACK, transmit OK"
+            status = "ACK"
+        elif msg == "01":
+            message = "ACK, but transmit started after 3 seconds delay anyway with RF receive data"
+            status = "ACK"
+        elif msg == "02":
+            message = "NAK, transmitter did not lock on the requested transmit frequency"
+            status = "NACK"
+        else:
+            print("Bad response from RFXCOM : %s" % data)
+        print("%s : %s" % (status, message))
+        self.rfx_response.put_nowait({"seqnbr" : seqnbr, 
+                                      "status" : status})
+        
+
+
+    def command_11(self, address, unit, command, level, eu, group, trig_msg):
         """ Type 0x11, Lighting2
 
             Type : command
@@ -583,7 +629,7 @@ class RfxcomUsb:
         cmd += "00"
         
         self._log.debug("Type x11 : write '%s'" % cmd)
-        self.write_packet(cmd)
+        self.write_packet(cmd, trig_msg)
 
 
     def _process_11(self, data):
@@ -667,7 +713,8 @@ class RfxcomUsb:
         cmd += "00"
         
         self._log.debug("Type x28 : write '%s'" % cmd)
-        self.write_packet(cmd)
+        # TODO : set trig_msg !!!!!
+        self.write_packet(cmd, None)
 
     ### 0x30 : Remote control and IR
     #TODO
