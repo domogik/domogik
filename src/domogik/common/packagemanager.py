@@ -535,15 +535,15 @@ class PackageManager():
 
         # for each package, put it in cache if it corresponds to priority
         for file_info in file_list:
-            pkg_xml = PackageXml(url = "%s.xml" % file_info["file"])
+            pkg_xml = PackageXml(url = "%s" % file_info["file"])
             priority = self._get_package_priority_in_cache(pkg_xml.fullname, pkg_xml.release)
             # our package has a prioriry >= to other packages with same name/rel
             if priority == None or priority < file_info["priority"]:
                 self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
-                pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
+                pkg_xml.cache_package(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["priority"])
 
     def _get_files_list_from_repository(self, url, priority):
-        """ Read packages.xml on repository
+        """ Read packages.lst on repository
             @param url : repo url
             @param prioriry : repo priority
         """
@@ -559,7 +559,9 @@ class PackageManager():
                                    (url))
                         break
                 else:
-                    my_list.append({"file" : "%s/%s" % (url, data.strip()),
+                    # TODO : temporary fix
+                    #my_list.append({"file" : "%s/xml/%s" % (url, data.strip()),
+                    my_list.append({"file" : "%sxml/%s" % (url.replace("/repository", ""), data.strip()),
                                     "priority" : priority,
                                     "repo_url" : url})
             return my_list
