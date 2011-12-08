@@ -200,12 +200,10 @@ class PackageXml():
             rep = self.xml_content.getElementsByTagName("repository")
             if len(rep) == 0:
                 self.package_url = None
-                self.xml_url = None
                 self.priority = None
             else:
                 url_prefix = rep[0].attributes.get("url_prefix").value.strip()
-                self.package_url = "%s.tgz" % url_prefix
-                self.xml_url = "%s.xml" % url_prefix
+                self.package_url = "%s" % url_prefix
                 self.priority = rep[0].attributes.get("priority").value.strip()
 
             # data for database
@@ -316,7 +314,6 @@ class PackageXml():
         if self.package_url != None:
             print("----- Repository informations ---------------------------")
             print("Package path        : %s" % self.package_url)
-            print("Xml path            : %s" % self.xml_url)
             print("Priority            : %s" % self.priority)
         print("---------------------------------------------------------")
 

@@ -292,8 +292,8 @@ remote-ip=%s
                                     for l in self._listeners:
                                         l.new_message(mess)
                                 #Enabling this debug will really polute your logs
-                                #self.log.debug("New message received : %s" % \
-                                #        mess.get_type())
+                                self.p.log.debug("New message received : %s" % \
+                                        mess.type)
                         except XPLException:
                             self.p.log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
                         except XplMessageError as exc:

@@ -895,6 +895,7 @@ class SysManager(XplPlugin):
             mess.add_data({'plugin'+str(idx)+'-host' : external["host"]})
             idx += 1
         # mess.add_data({'host' : self.get_sanitized_hostname()})
+        self.log.debug("Send xPL in function send_plugin_list")
         self.myxpl.send(mess)
 
     def _send_plugin_detail(self, plg):
@@ -1041,7 +1042,7 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : self.get_sanitized_hostname()})
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
-            mess.add_data({'name%s' % idx : package['name'],
+            mess.add_data({'id%s' % idx : package['id'],
                            'fullname%s' % idx : package['fullname'],
                            'release%s' % idx : package['release'],
                            'type%s' % idx : package['type']})

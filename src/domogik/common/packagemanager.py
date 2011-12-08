@@ -268,10 +268,7 @@ class PackageManager():
             @param release : release to install (default : highest)
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
-        #if self.is_root() == False:
-        #    self.log("-i option must be used as root")
-        #    return
-        # package from repository
+        self.log("Start install for part '%s' of '%s'" % (package_part, path))
         if path[0:5] == "repo:":
             pkg, status = self._find_package(path[5:], release)
             if status != True:
@@ -284,7 +281,7 @@ class PackageManager():
         # twice to remove first .gz and then .tar
         id =  os.path.splitext(full_name)[0]
         id =  os.path.splitext(id)[0] 
-        self.log("package id : %s" % id)
+        self.log("Ask for installing package id : %s" % id)
 
         # get temp dir to extract data
         my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
@@ -559,9 +556,7 @@ class PackageManager():
                                    (url))
                         break
                 else:
-                    # TODO : temporary fix
-                    #my_list.append({"file" : "%s/xml/%s" % (url, data.strip()),
-                    my_list.append({"file" : "%sxml/%s" % (url.replace("/repository", ""), data.strip()),
+                    my_list.append({"file" : "%sxml/%s" % (url, data.strip()),
                                     "priority" : priority,
                                     "repo_url" : url})
             return my_list
