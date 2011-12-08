@@ -94,18 +94,18 @@ class PackageManager():
         print(message)
 
 
-    def _create_package_for_plugin(self, name, output_dir, force):
+    def _create_package_for_plugin(self, id, output_dir, force):
         """ Create package for a plugin
             1. read xml file to get informations and list of files
             2. generate package
-            @param name : name of plugin
+            @param id : name of plugin
             @param output_dir : target directory for package
             @param force : False : ask for confirmation
         """
-        self.log("Plugin name : %s" % name)
+        self.log("Plugin id : %s" % id)
 
         try:
-            plg_xml = PackageXml(name)
+            plg_xml = PackageXml(id)
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -159,18 +159,18 @@ class PackageManager():
                             plg_xml.all_files, 
                             xml_tmp_file)
 
-    def _create_package_for_external(self, name, output_dir, force):
+    def _create_package_for_external(self, id, output_dir, force):
         """ Create package for a external
             1. read xml file to get informations and list of files
             2. generate package
-            @param name : name of external
+            @param id : name of external
             @param output_dir : target directory for package
             @param force : False : ask for confirmation
         """
-        self.log("Hardware name : %s" % name)
+        self.log("Hardware id : %s" % id)
 
         try:
-            plg_xml = PackageXml(name, type = "external")
+            plg_xml = PackageXml(id, type = "external")
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -282,13 +282,13 @@ class PackageManager():
         full_name = os.path.basename(path)
 
         # twice to remove first .gz and then .tar
-        name =  os.path.splitext(full_name)[0]
-        name =  os.path.splitext(name)[0] 
-        self.log("package name : %s" % name)
+        id =  os.path.splitext(full_name)[0]
+        id =  os.path.splitext(id)[0] 
+        self.log("package id : %s" % id)
 
         # get temp dir to extract data
         my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
-        my_tmp_dir = "%s/%s" % (my_tmp_dir_dl, name)
+        my_tmp_dir = "%s/%s" % (my_tmp_dir_dl, id)
         self.log("Creating temporary directory : %s" % my_tmp_dir)
         try:
             if os.path.isdir(my_tmp_dir) == False:
@@ -614,7 +614,7 @@ class PackageManager():
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                 if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
-                    pkg_list.append({"name" : pkg_xml.name,
+                    pkg_list.append({"id" : pkg_xml.id,
                                      "type" : pkg_xml.type,
                                      "fullname" : pkg_xml.fullname,
                                      "release" : pkg_xml.release,
@@ -629,7 +629,7 @@ class PackageManager():
                                      "priority" : pkg_xml.priority,
                                      "dependencies" : pkg_xml.dependencies,
                                      "package_url" : pkg_xml.package_url})
-        return sorted(pkg_list, key = lambda k: (k['name']))
+        return sorted(pkg_list, key = lambda k: (k['id']))
 
     def get_installed_packages_list(self):
         """ List all packages in install folder 
@@ -641,7 +641,7 @@ class PackageManager():
                 for f in files:
                     pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                     pkg_list.append({"fullname" : pkg_xml.fullname,
-                                     "name" : pkg_xml.name,
+                                     "id" : pkg_xml.id,
                                      "release" : pkg_xml.release,
                                      "type" : pkg_xml.type,
                                      "package-url" : pkg_xml.package_url})

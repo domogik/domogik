@@ -62,17 +62,17 @@ class PackageException(Exception):
 
 
 class PackageXml():
-    def __init__(self, name = None, url = None, path = None, type = "plugin"):
+    def __init__(self, id = None, url = None, path = None, type = "plugin"):
         """ Read xml file of a plugin and make an object from it
-            @param name : name of plugin
+            @param id : name of package
             @param url : url of xml file
             @param path : path of xml file
             @param type : package type (default : 'plugin')
-                          To use only with name != None
+                          To use only with id != None
         """
         xml_file = None
         try:
-            if name != None:
+            if id != None:
                 # get config
                 cfg = Loader('domogik')
                 config = cfg.load()
@@ -84,7 +84,7 @@ class PackageXml():
                     xml_directory = "%s/%s" % (conf['custom_prefix'], HARDWARE_XML_PATH)
                 else:
                     raise PackageException("Type '%s' doesn't exists" % type)
-                xml_file = "%s/%s.xml" % (xml_directory, name)
+                xml_file = "%s/%s.xml" % (xml_directory, id)
 
                 self.info_file = xml_file
                 self.xml_content = minidom.parse(xml_file)
