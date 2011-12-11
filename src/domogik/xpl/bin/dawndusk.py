@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -26,91 +26,175 @@ xPL Dawndusk client
 
 Implements
 ==========
-
+Class dawndusk
 - dateFromTuple(tuple)
 - get_dawn(message)
 - get_dusk(message)
 
+@author: Sébastien Gallet <sgallet@gmail.com>
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
-from domogik.xpl.lib.dawndusk import DawnDusk
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.common.queryconfig import Query
+from domogik.xpl.common.plugin import XplPlugin
 import datetime
-from domogik.common.configloader import Loader
+#from datetime import timedelta
+#from datetime import datetime
+from domogik.xpl.lib.dawndusk import dawnduskAPI
+from domogik.xpl.lib.dawndusk import dawnduskScheduler
+from domogik.xpl.lib.dawndusk import dawnduskException
+import traceback
+import logging
 
-#TODO : rewrite this plugin to use database query
-cfgloader = Loader('dawndusk')
-config = cfgloader.load()
+#logging.basicConfig()
 
-myxpl = Manager(source = config["source"], plugin_name = 'dawndusk')
-mydawndusk = DawnDusk()
+class dawndusk(XplPlugin):
+    '''
+    Send Dawn and Dusk messages over XPL
+    '''
+    def __init__(self):
+        """
+        Create the dawndusk class
+        """
+        XplPlugin.__init__(self, name = 'dawndusk')
+        self.log.info("dawndusk.__init__ : Start ...")
+        self._config = Query(self.myxpl, self.log)
 
-#Parameters definitions
-longi = -1.59
-lat = 48.07
-fh = 1
-#Waiting for the reception of a message of the type DAWNDUSK.REQUEST
-#CAUTION : This script does not respect  DAWNDUSK.REQUEST scheme
-#This script is waiting for a messgage wich contains query=day or query=night
-#And return a message of the type DATETIME.BASIC with sunrise or sunset hour
+        self.log.debug("dawndusk.__init__ : Try to start the dawndusk librairy")
+        try:
+            self._mydawndusk = dawnduskAPI()
+        except:
+            error = "Something went wrong during dawnduskAPI init : %s" %  \
+                     (traceback.format_exc())
+            self.log.exception("dawndusk.__init__ : "+error)
+            raise dawnduskException(error)
 
-def dateFromTuple(tuple):
-    """
-    Tranforme the result from get_dawn_dusk to string with "yyyymmddhhmmss"
-    form
-    """
-    h = "%.2i" % (tuple[0] + 1) #1h more because summer time TO FIX
-    m = "%.2i" % (int(tuple[1]))
-    s = "%.2i" % ((tuple[1] - int(tuple[1])) * 60) #Passage in second
-    today = datetime.date.today()
-    y = today.year
-    mo = "%.2i" % today.month
-    d = "%.2i" % today.day
-    date = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
-    return date
+        self.log.debug("dawndusk.__init__ : Try to get configuration from XPL")
+        try:
+            self._longitude = float(self._config.query('dawndusk', 'longitude'))
+            self._latitude = float(self._config.query('dawndusk', 'latitude'))
+        except:
+            error = "Can't get configuration from XPL : %s" %  \
+                     (traceback.format_exc())
+            self.log.exception("dawndusk.__init__ : "+error)
+            self._longitude = 5.043
+            self._latitude = 47.352
+            raise dawnduskException(error)
 
+        self.log.debug("dawndusk.__init__ : Try to add the next event to the scheduler")
+        try:
+            self.addNextEvent()
+        except:
+            error = "Something went wrong during dawnduskScheduler init : %s" %  \
+                     (traceback.format_exc())
+            self.log.exception("dawndusk.__init__ : "+error)
+            raise dawnduskException(error)
 
-def get_dawn(message):
-    """
-    Send a xPL message of the type DATETIME.BASIC with sunrise hour
-    """
-    dawn, dusk = mydawndusk.get_dawn_dusk(longi, lat, fh)
-    date = dateFromTuple(dawn)
-    mess = XplMessage()
-    mess.set_type("xpl-stat")
-    mess.set_schema("datetime.basic")
-    mess.add_data({"status" :  date})
-    myxpl.send(mess)
+        self.log.debug("dawndusk.__init__ : Try to create listeners")
+        Listener(self.dawndusk_cmnd_cb, self.myxpl,
+                 {'schema': 'dawndusk.request', 'xpltype': 'xpl-cmnd'})
+        self.enable_hbeat()
+        self.log.info("dawndusk plugin correctly started")
 
+    def dawndusk_cmnd_cb(self, message):
+        """
+        General callback for all command messages
+        @param message : an XplMessage object
+        """
+        self.log.debug("dawndusk.dawndusk_cmnd_cb() : Start ...")
+        cmd = None
+        if 'command' in message.data:
+            cmd = message.data['command']
+        query = None
+        if 'query' in message.data:
+            query = message.data['query']
+        self.log.debug("dawndusk.dawndusk_cmnd_cb :  command %s received with query %s" %
+                       (cmd,query))
+        mess = XplMessage()
+        mess.set_type("xpl-stat")
+        sendit=False
+        if cmd=='status':
+            if query=="dawn":
+                mess.set_schema("datetime.basic")
+                dawn = self._mydawndusk.getNextDawn(self._longitude, self._latitude)
+                mess.add_data({"status": dawn.strftime("%Y%m%d%H%M%S"), "type": "dawn" })
+                sendit=True
+                self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, status= %s" % (query,dawn))
+            elif query=="dusk":
+                mess.set_schema("datetime.basic")
+                dusk = self._mydawndusk.getNextDusk(self._longitude, self._latitude)
+                mess.add_data({"status" :  dusk.strftime("%Y%m%d%H%M%S"), "type": "dusk" })
+                sendit=True
+                self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, satus= %s" % (query,dusk))
+            elif query=="daynight":
+                dawn = self._mydawndusk.getNextDawn(self._longitude, self._latitude)
+                dusk = self._mydawndusk.getNextDusk(self._longitude, self._latitude)
+                mess.set_schema("dawndusk.basic")
+                mess.add_data({"type" : "daynight"})
+                if dusk < dawn:
+                    mess.add_data({"status" :  "day"})
+                    self.log.debug("dawndusk.dawndusk_cmnd_cb() : status= day")
+                else :
+                    mess.add_data({"status" :  "night"})
+                    self.log.debug("dawndusk.dawndusk_cmnd_cb() : status= night")
+                sendit=True
+        if sendit:
+            self.myxpl.send(mess)
+        self.log.debug("dawndusk.dawndusk_cmnd_cb() : Done :)")
 
-def get_dusk(message):
-    """
-    Send a xPL message of the type DATETIME.BASIC with sunset hour
-    """
-    dawn, dusk = mydawndusk.get_dawn_dusk(longi, lat, fh)
-    date = dateFromTuple(dusk)
-    mess = XplMessage()
-    mess.set_type("xpl-stat")
-    mess.set_schema("datetime.basic")
-    mess.add_data({"status" :  date})
-    myxpl.send(mess)
+    def addNextEvent(self):
+        """
+        Get the next event date : dawn or dusk
+        """
+        self.log.debug("dawndusk.addNextEvent() : Start ...")
+        ddate, dstate = self.getNextEvent()
+        #for test only
+        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"DAWN")
+        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"DUSK")
+        self.log.debug("dawndusk.addNextEvent() : Add %s at %s to the scheduler" % (dstate,ddate))
+        self._mydawndusk.schedAdd(ddate,self.sendDawnDusk,dstate)
+        self.log.debug("dawndusk.addNextEvent() : Done :-)")
 
-#Listener for the dawn
-dawnL = Listener(get_dawn, myxpl, {
-    'schema': 'dawndusk.request',
-    'xpltype': 'xpl-cmnd',
-    'command': 'status',
-    'query': 'day',
-})
-#Listener for the dusk
-duskL = Listener(get_dusk, myxpl, {
-    'schema': 'dawndusk.request',
-    'xpltype': 'xpl-cmnd',
-    'command': 'status',
-    'query': 'night',
-})
+    def getNextEvent(self):
+        """
+        Get the next event date : dawn or dusk
+        @return rdate : the next event date
+        @return rstate : the event type : DAWN or DUSK
+        """
+        self.log.debug("dawndusk.getNextEvent() : Start ...")
+        dawn = self._mydawndusk.getNextDawn(self._longitude, self._latitude)
+        dusk = self._mydawndusk.getNextDusk(self._longitude, self._latitude)
+        if dusk < dawn :
+            rdate = dusk
+            rstate = "dusk"
+        else :
+            rdate = dawn
+            rstate = "dawn"
+        self.log.debug("dawndusk.getNextEvent() : Done :-)")
+        return rdate,rstate
+
+    def sendDawnDusk(self,state):
+        """
+        Send a xPL message of the type DAWNDUSK.BASIC when the sun goes down or up
+        @param state : DAWN or DUSK
+        """
+        self.log.debug("dawndusk.sendDawnDusk() : Start ...")
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("dawndusk.basic")
+        mess.add_data({"type" : "dawndusk"})
+        if state=="DAWN":
+            mess.add_data({"status" :  "dawn"})
+        elif state=="DUSK":
+            mess.add_data({"status" :  "dusk"})
+        self.myxpl.send(mess)
+        self.addNextEvent()
+        self.log.debug("dawndusk.sendDawnDusk() : Done :-)")
+
+if __name__ == "__main__":
+    dawndusk()

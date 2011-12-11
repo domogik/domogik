@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -24,8 +24,8 @@ Plugin purpose
 xPL client through the TellStick and Tellstick Duo
 
 Support Chacon/DIO, Nexa, Proove, Intertechno, HomeEasy, KlikAanKlikUit,
-Byebye Standby, Rusta ... and many others 
-For a list of supported protocols/models, please see the telldus-core 
+Byebye Standby, Rusta ... and many others
+For a list of supported protocols/models, please see the telldus-core
 documentation here : http://developer.telldus.se/wiki/TellStick_conf
 
 Implements
@@ -42,15 +42,15 @@ from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.telldus import telldusException
 from domogik.xpl.lib.telldus import telldusAPI
 from domogik.common import logger
-
+from domogik.xpl.common.queryconfig import Query
 
 class telldus(Helper):
-    """ 
+    """
     telldusTool helpers
     """
 
     def __init__(self):
-        """ 
+        """
         telldusTool helper
         """
 
@@ -58,7 +58,9 @@ class telldus(Helper):
                { "list" :
                   {
                     "cb" : self.list,
-                    "desc" : "List all devices referenced by the telldus"
+                    "desc" : "List devices referenced by the telldus",
+                    "min_args" : 1,
+                    "usage" : "list all|devicetype"
                   },
                  "info" :
                   {
@@ -71,39 +73,51 @@ class telldus(Helper):
 
         log = logger.Logger('telldus-helper')
         self._log = log.get_logger('telldus-helper')
+       # self._config = Query(self.myxpl, self._log)
+        self.tdapi  = telldusAPI(None,self._log,None,None)
 
     def list(self, args = None):
-        """ 
+        """
         List all devices
         """
-        self._log.info("telldusHelper.list : Start ...")                
+        self._log.info("telldusHelper.list : Start ...")
         data = []
-        data.append("List of all devices :")
-        data.append("id : XPL id : Name")
+        if  args[0]=="all":
+            data.append("List all devices :")
+            data.append("id : XPL id : Name")
 
-        tdapi  = telldusAPI(None,self._log,None)
+            # List devices
+            for key in self.tdapi.getDevices().iterkeys():
+                add=self.tdapi.getDeviceAddress(key)
+                name=self.tdapi.getDeviceName(key)
+                data.append("%s  :  %s  : %s" % (str(key),add,name.encode("ascii", "ignore")))
+        else:
+            data.append("List all devices of type %s :" % args[0])
+            data.append("id : XPL id : Name")
+            self._log.debug("telldusHelper.list devicetype=%s" % args[0])
 
-        # List devices
-        for key in tdapi._devices._data.iterkeys():
-            add=tdapi.getDeviceAddress(key)
-            name=tdapi.getDeviceName(key)
-            data.append("%s  :  %s  : %s" % (str(key),add,name.encode("ascii", "ignore")))
-        self._log.debug("telldusHelper.list : Done")                
+            # List devices
+            for key in self.tdapi.getDevices().iterkeys():
+                add=self.tdapi.getDeviceAddress(key)
+                name=self.tdapi.getDeviceName(key)
+                self._log.debug("telldusHelper.list for device= %s if devicetype==%s : '%s'" % (key,args[0],self.tdapi.isDevicetype(key,str(args[0]))))
+                if self.tdapi.isDevicetype(key,str(args[0])):
+                    data.append("%s  :  %s  : %s" % (str(key),add,name.encode("ascii", "ignore")))
+        self._log.debug("telldusHelper.list : Done")
         return data
 
     def info(self, args = None):
-        """ 
+        """
         Get information for device
         """
-        self._log.info("telldusHelper.info : Start ...")                            
+        self._log.info("telldusHelper.info : Start ...")
         data = []
         data.append("Information for device %s" % args[0])
-        tdapi  = telldusAPI(None,self._log,None)
         if len(args) == 1:
-            data.extend(tdapi.getInfo(int(args[0])))
+            data.extend(self.tdapi.getInfo(int(args[0])))
         else:
             return ["Bad usage of this helper. "]
-        self._log.debug("telldusHelper.info : Done")                
+        self._log.debug("telldusHelper.info : Done")
         return data
 
 MY_CLASS = {"cb" : telldus}

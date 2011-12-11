@@ -47,6 +47,9 @@ import threading
 from datetime import datetime
 from datetime import timedelta
 from collections import deque
+from domogik.xpl.lib.telldus_dawndusk import *
+from domogik.xpl.lib.telldus_windoor import *
+from domogik.xpl.lib.telldus_move import *
 
 #platform specific imports:
 if (platform.system() == 'Windows'):
@@ -109,22 +112,22 @@ def deviceEventCallbackFunction(deviceId, method, value, callbackId, context):
         if deviceId==0 or method==0 :
             return
         obj = cast(context, py_object).value
-        obj._log.debug("deviceEventCallback: id=%s, method=%s and value=%s" % (deviceId,method,value))
+        obj.log.debug("deviceEventCallback: id=%s, method=%s and value=%s" % (deviceId,method,value))
         eventDate=datetime.now()
         deviceEventLock.acquire()
         obj._send_xpl(deviceId, method,c_char_p(value).value,callbackId,eventDate)
         deviceEventLock.release()
- 
+
 def deviceChangeEventCallbackFunction(deviceId, changeEvent, changeType, callbackId, context):
         obj = cast(context, py_object).value
-        obj._log.debug("deviceChangeEventCallback: id=%s, changeEvent=%s and changeType=%s" % (deviceId,changeEvent,changeType))
+        obj.log.debug("deviceChangeEventCallback: id=%s, changeEvent=%s and changeType=%s" % (deviceId,changeEvent,changeType))
         obj._loadDevices()
-    
+
 class deviceEventQueue:
     def __init__(self, delayRF):
         self._delayRF = delayRF
         self._data = dict()
-    
+
     def addDevice(self, deviceId, method, value, callbackId, eventDate):
         '''
         Add Device to the dictionnary
@@ -142,12 +145,12 @@ class deviceEventQueue:
         '''
         if (deviceId in self._data and self._data[deviceId]['method'] == method and self._data[deviceId]['value'] == value and self._data[deviceId]['callbackId'] == callbackId and (eventDate-self._data[deviceId]['eventDate'] < timedelta(milliseconds=self._delayRF))):
             #print "EQUAL !!!!!!"
-            return True         
+            return True
         else:
             #print "NOT EQUAL !!!!!!"
             self.addDevice(deviceId, method, value, callbackId, eventDate)
             return False
-        
+
 class telldusException(Exception):
     """
     telldus exception
@@ -158,13 +161,13 @@ class telldusException(Exception):
 
     def __str__(self):
         return repr(self.value)
-        
+
 class telldusDevices:
-    
+
     def __init__(self):
         self._data = dict()
-    
-    def addDevice(self, deviceId, name, protocol, model, house, unit, param1, param2):
+
+    def addDevice(self, deviceId, name, protocol, model, house, unit, devicetype, param1, param2):
         '''
         Add Device to the dictionnary
         '''
@@ -173,11 +176,12 @@ class telldusDevices:
                             'model' : model,
                             'house' : house,
                             'unit' : unit,
+                            'devicetype' : devicetype,
                             'param1' : param1,
                             'param2' : param2,
                             }
-        #print deviceId,self._data[deviceId]                
-        
+        #print deviceId,self._data[deviceId]
+
     def getId(self, add):
         '''
         Retrieve an id from HU address
@@ -196,24 +200,30 @@ class telldusDevices:
         '''
         return str(self._data[deviceId]['name'])
 
+    def getDevicetype(self,deviceId):
+        '''
+        Retrieve a device type deviceId
+        '''
+        return str(self._data[deviceId]['devicetype'])
+
     def getDevice(self,deviceId):
         '''
         Retrieve an Device from from deviceId
         @param deviceId : deviceId of the module (given by telldus-core)
         '''
         return self._data[deviceId]
-    
+
 class telldusXPL:
     '''
     Manage the extended XPL language
     ie : shutter -> on, shutter close during 8s(t/2)
     We will scan the incoming messages from the tellstick
     and reassemble them in a complex XPL command
-    '''    
+    '''
     def __init__(self,callback):
         self._data = dict()
         self._callback = callback
-    
+
     def append(self, deviceId, method):
         '''
         Append Device to the dictionnary/list
@@ -227,7 +237,7 @@ class telldusXPL:
                             'method' : method,
                             })
         self._data[deviceId]=queue
-        #print deviceId,self._data[deviceId]                
+        #print deviceId,self._data[deviceId]
         queueLock.release()
 
     def clear(self, deviceId):
@@ -251,7 +261,7 @@ class telldusXPL:
                 del self._data[deviceId]
                 ttrue=False
         queueLock.release()
-        
+
     def leftCommand(self, deviceId):
         '''
         Return the left command in the queue
@@ -264,7 +274,7 @@ class telldusXPL:
         queue = self._data[deviceId]
         elt = queue.popleft()
         queue.appendleft(elt)
-        print "leftCommand : %s" % elt['method']
+        #print "leftCommand : %s" % elt['method']
         queueLock.release()
         return elt['method']
 
@@ -272,7 +282,7 @@ class telldusXPL:
         '''
         Validate that the message is a part of a complex XPL message
         '''
-        #print deviceId,self._data[deviceId]                
+        #print deviceId,self._data[deviceId]
         queueLock.acquire()
         if deviceId not in self._data :
             #print False
@@ -309,7 +319,7 @@ class telldusXPL:
         if deviceId not in self._data :
             #print True
             return True
-        #print deviceId,self._data[deviceId]                
+        #print deviceId,self._data[deviceId]
         queue = self._data[deviceId]
         elt = queue.popleft()
         if (elt['deviceId']==deviceId) and (elt['method']==method):
@@ -341,12 +351,12 @@ class telldusXPL:
             return 0
         else :
             return len(self._data[deviceId])
-        
+
 class telldusAPI:
     '''
     Telldus python binding library
     '''
-    def __init__(self, xplCallback, log, config):
+    def __init__(self, xplCallback, log, config, XPLSender):
         '''
         Constructor : Find telldus-core library and try to open it
         If success : initialize telldus API
@@ -355,11 +365,13 @@ class telldusAPI:
         @param config : the plugin configurator to use. None to disable
         the receiver.
         '''
-        self._log = log
-        self._config = config
+        self.log = log
+        self.log.info("telldusAPI.__init__ : Start ...")
+        self.config = config
         self._xplCallback=xplCallback
         self._tdlib = None
-        self._log.info("telldusAPI.__init__ : Look for telldus-core ...")        
+        self.myxpl=XPLSender
+        self.log.info("telldusAPI.__init__ : Look for telldus-core")
         ret = ctypes.util.find_library("telldus-core")
         if ret != None:
             try:
@@ -370,32 +382,33 @@ class telldusAPI:
                     #Linux
                     self._tdlib = cdll.LoadLibrary(ret)
             except:
-                self._log.exception("telldusAPI.__init__ : Could not load the telldus-core library.")        
+                self.log.exception("telldusAPI.__init__ : Could not load the telldus-core library.")
                 raise telldusException("Could not load the telldus-core library.")
                 return
         else:
-            self._log.error("telldusAPI.__init__ : Could not find the telldus-core library. Check if it is installed properly.")        
+            self.log.error("telldusAPI.__init__ : Could not find the telldus-core library. Check if it is installed properly.")
             raise telldusException("Could not find the telldus-core library. Check if it is installed properly.")
         # Initialize tellDus API
         try:
             self._tdlib.tdInit()
         except:
-            self._log.exception("telldusAPI.__init__ : Could not init telldus-core library.")        
+            self.log.exception("telldusAPI.__init__ : Could not init telldus-core library.")
             raise telldusException("Could not init telldus-core library.")
             return
         self._loadDevices()
         self._loadCommands()
+        self._load_telldus_extensions()
         self._lastSentCommand = {}
-        if config==None:
-            self._log.warning("telldusAPI.__init__ : Receiver is disabled.")        
+        if self.config==None:
+            self.log.warning("telldusAPI.__init__ : Receiver is disabled.")
         else:
             try:
-                self._delayRF = int(self._config.query('telldus', 'delayrf'))
+                self._delayRF = int(self.config.query('telldus', 'delayrf'))
             except:
                 self.log.exception("telldusAPI.__init__ : Can't get configuration from XPL")
                 self._delayRF = 400
                 #print "self=%s" % param
-            self._log.debug("telldusAPI.__init__ : Registering the callback functions ...")        
+            self.log.debug("telldusAPI.__init__ : Registering the callback functions ...")
             if (platform.system() == 'Windows'):
                 CMPFUNC = WINFUNCTYPE(c_void_p, c_int, c_int, c_char_p, c_int, c_void_p)
             else:
@@ -410,36 +423,46 @@ class telldusAPI:
             self._deviceChangeEventCallback = CMPFUNC(deviceChangeEventCallbackFunction)
             self._deviceChangeEventCallbackId =self._tdlib.tdRegisterDeviceChangeEvent(self._deviceChangeEventCallback, py_object(self))
             self._telldusXPL = telldusXPL(self._call_xplCallback)
-        self._log.debug("telldusAPI.__init__ : Done :-)")        
+        self.log.debug("telldusAPI.__init__ : Done :-)")
 
     def reloadConfig(self):
-        self._log.debug("telldusAPI.reloadConfig : Start")        
+        self.log.debug("telldusAPI.reloadConfig : Start")
+        if self.config!=None:
+            try:
+                self._delayRF = int(self.config.query('telldus', 'delayrf'))
+            except:
+                self.log.exception("telldusAPI.__init__ : Can't get configuration from XPL")
+                self._delayRF = 400
         self._loadDevices()
-        self._log.debug("telldusAPI.reloadConfig : Done :-)")        
-    
+        self.load_tellsdus_extensions()
+        self.log.debug("telldusAPI.reloadConfig : Done :-)")
+
     def _loadDevices(self):
         '''
         Load devices into the _devices dictionnary
         '''
-        self._log.debug("telldusAPI._loadDevices : Start ...")        
+        self.log.debug("telldusAPI._loadDevices : Start ...")
         self._devices = telldusDevices()
         #Read the plugin configurations
         confs= {}
-        if self._config!=None :
+        if self.config!=None :
             num = 1
             loop = True
             while loop == True:
-                name = self._config.query('telldus', 'name-%s' % str(num))
-                param1 = self._config.query('telldus', 'param1-%s' % str(num))
-                param2 = self._config.query('telldus', 'param2-%s' % str(num))
+                name = self.config.query('telldus', 'name-%s' % str(num))
+                devicetype = self.config.query('telldus', 'devicetype-%s' % str(num))
+                param1 = self.config.query('telldus', 'param1-%s' % str(num))
+                param2 = self.config.query('telldus', 'param2-%s' % str(num))
                 if name != None:
-                    self._log.debug("telldusAPI._loadDevices : Configuration from xpl : name=%s, param1=%s, param2=%s" % (name, param1, param2))
-                    confs[name] = {"param1" : param1, "param2" : param2}
+                    self.log.debug("telldusAPI._loadDevices : Configuration from xpl : name=%s, param1=%s, param2=%s" % (name, param1, param2))
+                    confs[name] = {"devicetype" : devicetype, "param1" : param1, "param2" : param2}
                 else:
                     loop = False
-                num += 1        
+                num += 1
         #Read the devices from telldus-core
+        j=0
         for i in range(self._tdlib.tdGetNumberOfDevices()):
+            j=j+1
             iid = self._tdlib.tdGetDeviceId(c_int(i))
             #print iid
             id_name = c_char_p(self._tdlib.tdGetName(c_int(iid))).value
@@ -447,23 +470,81 @@ class telldusAPI:
             id_unit=c_char_p(self._tdlib.tdGetDeviceParameter(c_int(iid), c_char_p("unit"), "")).value
             id_model = c_char_p(self._tdlib.tdGetModel(c_int(iid))).value.partition(':')[0]
             id_protocol = c_char_p(self._tdlib.tdGetProtocol(c_int(iid))).value
+            id_devicetype = None
             id_param1 = None
             id_param2 = None
-            if self._devices.getAddress(iid) in confs.iterkeys(): 
-                self._log.debug("telldusAPI._loadDevices : Get configuration from plugin : device=%s" % (self._devices.getAddress(iid)))
+            if self._devices.getAddress(iid) in confs.iterkeys():
+                self.log.debug("telldusAPI._loadDevices : Get configuration from plugin : device=%s" % (self._devices.getAddress(iid)))
+                id_devicetype = confs[self._devices.getAddress(iid)]['devicetype']
                 id_param1 = confs[self._devices.getAddress(iid)]['param1']
                 id_param2 = confs[self._devices.getAddress(iid)]['param2']
-            self._devices.addDevice(iid,id_name,id_protocol,id_model,id_house,id_unit,id_param1,id_param2)
-        self._log.debug("telldusAPI._loadDevices : Done :-)")        
+            self._devices.addDevice(iid,id_name,id_protocol,id_model,id_house,id_unit,id_devicetype,id_param1,id_param2)
+        self.log.debug("telldusAPI._loadDevices : Loading %s devices from telldus-core." % j)
+        self.log.debug("telldusAPI._loadDevices : Done :-)")
+
+    def _load_telldus_extensions(self):
+        """
+        Load the extensions
+        """
+        if self.config!=None :
+            self._load_telldus_windoor()
+            self._load_telldus_dawndusk()
+            self._load_telldus_move()
+
+    def _load_telldus_windoor(self):
+        """
+        Load the WINDOOR extension
+        """
+        self._windoor=None
+        self._ext_windoor = eval(self.config.query('telldus', 'windoor'))
+        self.log.debug("telldus.load_telldus_windoor : Load =" + str(type(self._ext_windoor)))
+        if self._ext_windoor==True:
+            self.log.debug("telldus.load_telldus_windoor : Load windoor extension")
+            try:
+                self._windoor = telldusWindoorAPI(self)
+            except Exception:
+                self.log.exception("Something went wrong during windoor extension init, check logs")
+        else:
+            self.log.debug("telldus.load_telldus_windoor : Don't load windoor extension")
+
+    def _load_telldus_dawndusk(self):
+        """
+        Load the DAWNDUSK extension
+        """
+        self._dawndusk=None
+        self._ext_dawndusk = eval(self.config.query('telldus', 'dawndusk'))
+        if self._ext_dawndusk==True:
+            self.log.debug("telldus.load_telldus_dawndusk : Load dawndusk extension")
+            try:
+                self._dawndusk = telldusDawnduskAPI(self)
+            except Exception:
+                self.log.exception("Something went wrong during dawndusk extension init, check logs")
+        else:
+            self.log.debug("telldus.load_telldus_dawndusk : Don't load dawndusk extension")
+
+    def _load_telldus_move(self):
+        """
+        Load the MOVE extension
+        """
+        self._move=None
+        self._ext_move = eval(self.config.query('telldus', 'move'))
+        if self._ext_move==True:
+            self.log.debug("telldus.load_telldus_move : Load move extension")
+            try:
+                self._move = telldusMoveAPI(self)
+            except Exception:
+                self.log.exception("Something went wrong during move extension init, check logs")
+        else:
+            self.log.debug("telldus.load_telldus_move : Don't load move extension")
 
     def _loadCommands(self):
         """
         Load commands into a dictionnary
         """
-        self._log.debug("telldusAPI._loadCommands : Start ...")        
+        self.log.debug("telldusAPI._loadCommands : Start ...")
         self._commands = dict()
         if self._tdlib == None:
-            self._log.error("Library telldus-core not loaded.")        
+            self.log.error("Library telldus-core not loaded.")
             raise telldusException("Library telldus-core not loaded.")
         self._commands[TELLSTICK_TURNON] = {'cmd': "on"}
         self._commands[TELLSTICK_TURNOFF] = {'cmd': "off"}
@@ -477,7 +558,7 @@ class telldusAPI:
         self._commands[TELLDUS_SHUT] = {'cmd': "shut"}
         self._commands[TELLSTICK_DOWN] = {'cmd': "down"}
         self._commands[TELLSTICK_STOP] = {'cmd': "stop"}
-        self._log.debug("telldusAPI._loadCommands : Done :-)")        
+        self.log.debug("telldusAPI._loadCommands : Done :-)")
 
     def _send_xpl(self,deviceId,method,value,callbackId,eventDate):
         """
@@ -488,14 +569,37 @@ class telldusAPI:
         @param callbackId : the id of the callback
         @param eventDate : the date of the event. Use to filter redondant events.
         """
-        self._log.debug("telldusAPI._send_xpl : Start ...")
+        self.log.debug("telldusAPI._send_xpl : Start ...")
         #Try to test the message is not repeated
-        if not self._deviceEventQueue.equal(deviceId, method, value, callbackId, eventDate):
+        if self._deviceEventQueue.equal(deviceId, method, value, callbackId, eventDate)==False:
             #It is not
             #Test if the message is not a part of the complex message
-            if not self._telldusXPL.inQueue(deviceId, method):
+            if self._telldusXPL.inQueue(deviceId, method)==False:
+                #print self.isDevicetype(deviceId,self._dawndusk.devicetype)
+                self._send_xpl_extensions(deviceId,method,value,callbackId,eventDate)
                 self._call_xplCallback(deviceId,method)
-        self._log.debug("telldusAPI._send_xpl : Done")
+        self.log.debug("telldusAPI._send_xpl : Done")
+
+    def _send_xpl_extensions(self,deviceId,method,value,callbackId,eventDate):
+        """
+        Send messages extensions
+        @param deviceId : the id of the transceiver
+        @param method : the command sent
+        @param value : the value sent
+        @param callbackId : the id of the callback
+        @param eventDate : the date of the event. Use to filter redondant events.
+        """
+        self.log.debug("telldusAPI._send_xpl_extensions : Start ...")
+        if self._ext_dawndusk==True and self.isDevicetype(deviceId,self._dawndusk.devicetype)==True:
+           self.log.debug("telldusAPI._send_xpl : Use the danwdusk extension")
+           self._dawndusk.sendDawnDusk(deviceId,method)
+        elif self._ext_windoor==True and self.isDevicetype(deviceId,self._windoor.devicetype)==True:
+           self.log.debug("telldusAPI._send_xpl : Use the windoor extension")
+           self._windoor.sendWindoor(deviceId,method)
+        elif self._ext_move==True and self.isDevicetype(deviceId,self._move.devicetype)==True:
+           self.log.debug("telldusAPI._send_xpl : Use the move extension")
+           self._move.sendMove(deviceId,method)
+        self.log.debug("telldusAPI._send_xpl_extensions : Done")
 
     def _call_xplCallback(self,deviceId,method):
         """
@@ -503,20 +607,45 @@ class telldusAPI:
         @param deviceId : the id of the transceiver
         @param method : the command sent
         """
-        self._log.debug("telldusAPI._call_xplCallback : Start ...")
+        self.log.debug("telldusAPI._call_xplCallback : Start ...")
         self._xplCallback(self._devices.getAddress(deviceId), self._commands[method]['cmd'])
-        self._log.debug("telldusAPI._call_xplCallback : Done")
+        self.log.debug("telldusAPI._call_xplCallback : Done")
 
     def __del__(self):
         '''
         Destructor : Cleanup Telldus Lib
         '''
-        self._log.debug("telldusAPI.__del__")        
+        self.log.debug("telldusAPI.__del__")
+
+    def getDevices(self):
+        '''
+        Return the collection of the devices
+        @return : a the collection of devices
+        '''
+        return self._devices._data
+
+    def getDevicesFromType(self,devicetype):
+        '''
+        Return a collection of devices of type devicetype
+        @param devicetype : the device type looking for
+        @return : a the collection of devices
+        '''
+        return None
+
+    def isDevicetype(self,deviceId,devicetype):
+        '''
+        Test if a device is of device type devicetype
+        @param deviceid : the id of the device
+        @param devicetype : the device type
+        @return : True or False
+        '''
+        return self._devices.getDevicetype(deviceId)==devicetype
 
     def getDeviceId(self, add):
         '''
         Retrieve an id from HU address
         @param add : address of the module (ie TS14)
+        @return : Id of the device
         '''
         return self._devices.getId(add)
 
@@ -546,7 +675,7 @@ class telldusAPI:
         Test only method
         '''
         print " telldusAPI print is Ok"
-        
+
     def sendOn(self, add):
         '''
         Turns the specified device On
@@ -622,10 +751,10 @@ class telldusAPI:
             time.sleep(1.2*int(dtime))
             if self._telldusXPL.count(deviceId)!=0:
                 self._turnOnDevice(deviceId)
-                self._log.debug("telldusAPI.sendUp continue")        
+                self.log.debug("telldusAPI.sendUp continue")
             else:
-                self._log.debug("telldusAPI.sendUp cancelled")        
-            
+                self.log.debug("telldusAPI.sendUp cancelled")
+
     def sendDown(self, add):
         '''
         Move the shutter down.
@@ -647,9 +776,9 @@ class telldusAPI:
             time.sleep(1.2*int(dtime))
             if self._telldusXPL.count(deviceId)!=0:
                 self._turnOffDevice(deviceId)
-                self._log.debug("telldusAPI.sendUp continue")        
+                self.log.debug("telldusAPI.sendUp continue")
             else:
-                self._log.debug("telldusAPI.sendDown cancelled")        
+                self.log.debug("telldusAPI.sendDown cancelled")
 
     def sendShut(self, add, level):
         '''
@@ -701,7 +830,7 @@ class telldusAPI:
             self._telldusXPL.append(deviceId,TELLSTICK_TURNON)
             self._telldusXPL.append(deviceId,TELLDUS_SHUT)
             self._turnOnDevice(deviceId)
-            
+
 #    def sendStop(self, add):
 #        '''
 #        Stop the shutter.
@@ -710,7 +839,7 @@ class telldusAPI:
 #        #print " stop : address: %s" % (add)
 #        deviceId=self.getDeviceId(add)
 #        if self._deviceMethods(deviceId,TELLSTICK_DOWN)==TELLSTICK_DOWN:
-#            #If the device support the stop method, use it 
+#            #If the device support the stop method, use it
 #            self._stopDevice(deviceId)
 #        elif self._deviceMethods(deviceId,TELLSTICK_TURNOFF)==TELLSTICK_TURNOFF \
 #           and self._telldusXPL.validate(deviceId, TELLSTICK_TURNOFF):
@@ -745,7 +874,7 @@ class telldusAPI:
 #        #print " stop : address: %s" % (add)
 #        deviceId=self.getDeviceId(add)
 #        if self._deviceMethods(deviceId,TELLSTICK_STOP)==TELLSTICK_STOP:
-#              #If the device support the stop method, use it 
+#              #If the device support the stop method, use it
 #              print "Last sent = STOP"
 #              self._stopDevice(deviceId)
 #              return
@@ -783,7 +912,7 @@ class telldusAPI:
         #print " stop : address: %s" % (add)
         deviceId=self.getDeviceId(add)
         if self._deviceMethods(deviceId,TELLSTICK_STOP)==TELLSTICK_STOP:
-              #If the device support the stop method, use it 
+              #If the device support the stop method, use it
               print "Last sent = STOP"
               self._stopDevice(deviceId)
               return
@@ -823,7 +952,7 @@ class telldusAPI:
         @param deviceId : id of the module
         '''
         if self._tdlib == None:
-            self._log.error("Library telldus-core not loaded.")        
+            self.log.error("Library telldus-core not loaded.")
             raise telldusException("Library telldus-core not loaded.")
         st = []
         st.append("%s : %s" % (deviceId,self._devices.getDevice(deviceId)['name']))
@@ -858,7 +987,7 @@ class telldusAPI:
             s3="Yes"
         st.append("UP : %s / DOWN: %s / STOP: %s" % (s1,s2,s3))
         return st
-        
+
     def _turnOnDevice(self,deviceId):
         '''
         Turns the internal device On
