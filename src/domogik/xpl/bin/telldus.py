@@ -24,8 +24,8 @@ Plugin purpose
 xPL client through the TellStick and Tellstick Duo
 
 Support Chacon/DIO, Nexa, Proove, Intertechno, HomeEasy, KlikAanKlikUit,
-Byebye Standby, Rusta ... and many others 
-For a list of supported protocols/models, please see the telldus-core 
+Byebye Standby, Rusta ... and many others
+For a list of supported protocols/models, please see the telldus-core
 documentation here : http://developer.telldus.se/wiki/TellStick_conf
 
 Implements
@@ -73,12 +73,13 @@ class telldus(XplPlugin):
             self.log.debug("Device present as "+self._device)
         self._config = Query(self.myxpl, self.log)
         try:
-            self._mytelldus = telldusAPI(self.send_xpl,self.log,self._config)
+            self._mytelldus = telldusAPI(self.send_xpl,self.log,self._config,self.myxpl)
         except Exception:
             self.log.exception("Something went wrong during telldus init, check logs")
             exit(1)
         #Create listeners
-        Listener(self.telldus_cmnd_cb, self.myxpl, 
+        self.log.debug("telldus.__init__ : Create listeners")
+        Listener(self.telldus_cmnd_cb, self.myxpl,
                  {'schema': 'telldus.basic', 'xpltype': 'xpl-cmnd'})
         Listener(self.telldus_reload_config_cb, self.myxpl,
                  {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
@@ -105,12 +106,12 @@ class telldus(XplPlugin):
         if 'command' in message.data:
             cmd = message.data['command']
         device = None
-        if 'device' in message.data:        
+        if 'device' in message.data:
             device = message.data['device']
         level = None
         if 'level' in message.data:
             level = message.data['level']
-            
+
         self.log.debug("%s received : device= %s, level=%s" %
                        (cmd, device,level))
         commands[cmd](device, level)
@@ -129,8 +130,9 @@ class telldus(XplPlugin):
         mess.add_data({"device" :  add})
         mess.add_data({"command" :  order})
         if args:
-            mess.add_data({"level" : args}) 
+            mess.add_data({"level" : args})
         self.myxpl.send(mess)
+
 
     def telldus_reload_config_cb(self):
         """
@@ -153,8 +155,8 @@ class telldus(XplPlugin):
         mess.add_data({"device" :  add})
         mess.add_data({"command" :  order})
         if args:
-            mess.add_data({"level" : args}) 
+            mess.add_data({"level" : args})
         self.myxpl.send(mess)
-        
+
 if __name__ == "__main__":
     telldus()
