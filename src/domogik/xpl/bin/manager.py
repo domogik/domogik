@@ -1042,6 +1042,7 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : self.get_sanitized_hostname()})
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
+            print package
             mess.add_data({'id%s' % idx : package['id'],
                            'fullname%s' % idx : package['fullname'],
                            'release%s' % idx : package['release'],

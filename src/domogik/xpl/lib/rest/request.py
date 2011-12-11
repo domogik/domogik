@@ -3754,21 +3754,22 @@ target=*
         try:
             # Get first answer for command
             self.log.debug("Package repository list : wait for first answer...")
-            messages.append(self._get_from_queue(self._queue_package, 
+            msg = self._get_from_queue(self._queue_package, 
                                                  "xpl-trig", 
                                                  "domogik.package",
-                                                 filter_data = {"command" : "list-packages-installed"}))
+                                                 filter_data = {"command" : "list-packages-installed"})
+            messages.append(msg)
             # after first message, we start to listen for other messages 
             self.log.debug("Installed package list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
             max_time = time.time() + WAIT_FOR_LIST_ANSWERS
             while time.time() < max_time:
                 try:
-                    message = self._get_from_queue(self._queue_package, 
+                    msg = self._get_from_queue(self._queue_package, 
                                                    "xpl-trig", 
                                                    "domogik.package", 
                                                    filter_data = {"command" : "list-packages-installed"},
                                                    timeout = WAIT_FOR_LIST_ANSWERS)
-                    messages.append(message)
+                    messages.append(msg)
                     self.log.debug("Installed packages list : get one answer from '%s'" % message.data["host"])
                 except Empty:
                     self.log.debug("Installed packages list : empty queue")
@@ -3797,7 +3798,7 @@ target=*
             while loop_again:
                 try:
                     data = {"fullname" : message.data["fullname"+str(idx)],
-                            "name" : message.data["name"+str(idx)],
+                            "id" : message.data["id"+str(idx)],
                             "release" : message.data["release"+str(idx)],
                             "type" : message.data["type"+str(idx)],
                             "host" : host}

@@ -70,7 +70,7 @@ else:
     INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
 
 PLUGIN_XML_PATH = "%s/plugins/softwares" % INSTALL_PATH
-HARDWARE_XML_PATH = "%s/plugins/softwares" % INSTALL_PATH
+EXTERNAL_XML_PATH = "%s/plugins/externals" % INSTALL_PATH
 
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
@@ -276,11 +276,15 @@ class PackageManager():
             path = pkg.package_url
 
         # get package name
-        full_name = os.path.basename(path)
+        if path[0:4] == "http": # special process for a http path
+            id = full_name = '-'.join(path.split("/")[-3:])
+            print "id=%s" % full_name
+        else:
+            full_name = os.path.basename(path)
+            # twice to remove first .gz and then .tar
+            id =  os.path.splitext(full_name)[0]
+            id =  os.path.splitext(id)[0] 
 
-        # twice to remove first .gz and then .tar
-        id =  os.path.splitext(full_name)[0]
-        id =  os.path.splitext(id)[0] 
         self.log("Ask for installing package id : %s" % id)
 
         # get temp dir to extract data
@@ -297,8 +301,8 @@ class PackageManager():
 
         # Check if we need to download package
         if path[0:4] == "http":
-            self.log("Downloading package : %s" % path)
-            dl_path = "%s/%s" % (my_tmp_dir_dl, full_name)
+            dl_path = "%s/%s.tar.gz" % (my_tmp_dir_dl, full_name)
+            self.log("Downloading package : '%s' to '%s'" % (path, dl_path))
             urllib.urlretrieve(path, dl_path)
             path = dl_path
             self.log("Package downloaded : %s" % path)
@@ -631,15 +635,17 @@ class PackageManager():
             and return a detailed list
         """
         pkg_list = []
-        for rep in [PLUGIN_XML_PATH, HARDWARE_XML_PATH]:
+        for rep in [PLUGIN_XML_PATH, EXTERNAL_XML_PATH]:
             for root, dirs, files in os.walk(rep):
                 for f in files:
                     pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                    pkg_list.append({"fullname" : pkg_xml.fullname,
-                                     "id" : pkg_xml.id,
-                                     "release" : pkg_xml.release,
-                                     "type" : pkg_xml.type,
-                                     "package-url" : pkg_xml.package_url})
+                    # filter on rest
+                    if pkg_xml.id != "rest":
+                        pkg_list.append({"fullname" : pkg_xml.fullname,
+                                         "id" : pkg_xml.id,
+                                         "release" : pkg_xml.release,
+                                         "type" : pkg_xml.type,
+                                         "package-url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                  k['release']))
 
