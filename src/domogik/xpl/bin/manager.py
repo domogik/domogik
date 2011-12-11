@@ -1146,7 +1146,7 @@ class SysManager(XplPlugin):
         tab = message.data['package'].split("-")
         print("T=%s" % tab)
         if tab[0] == "plugin":
-            if self._check_component_is_running(tab[1]):
+            if self._check_component_is_running(tab[1], only_one_ping = True):
                 mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % tab[1]})
                 self.myxpl.send(mess)
                 return
