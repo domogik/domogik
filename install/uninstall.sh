@@ -64,6 +64,13 @@ echo "Domogik installation found for user : $DOMOGIK_USER"
 #RM="ls -l "  # for simulation
 RM="rm -Rf "
 
+echo "Delete /etc/default/domogik"
+$RM /etc/default/domogik
+
+echo "Delete rc.d script"
+[ -f /etc/init.d/domogik ] && $RM /etc/init.d/domogik
+[ -f /etc/rc.d/domogik ] && $RM /etc/rc.d/domogik
+
 echo "Delete /usr/local/share/domogik"
 $RM /usr/local/share/domogik
 

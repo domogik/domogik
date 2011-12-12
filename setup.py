@@ -92,7 +92,7 @@ d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/do
 
 setup(
     name = 'Domogik',
-    version = '0.1.0',
+    version = '0.2.0',
     url = 'http://www.domogik.org/',
     description = 'OpenSource home automation software',
     author = 'Domogik team',

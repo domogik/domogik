@@ -150,6 +150,8 @@ function copy_sample_files {
     if [ ! -f $dmg_home/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
         chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
+        cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
+        chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
     else
         keep="y"
         already_cfg=1
