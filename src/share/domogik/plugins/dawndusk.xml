@@ -1,0 +1,75 @@
+<package type="plugin">
+  <id>dawndusk</id>
+  <technology>dawndusk</technology>
+  <description>
+  Get the dawn and dusk time using the geocoordinates
+  </description>
+  <changelog>Update the plugin to domogik 0.2.0</changelog>
+  <version>0.1.0</version>
+  <documentation>to do</documentation>
+  <author>Sebastien GALLET, Maxence Dunnewind</author>
+  <author-email>sgallet at gmail dot com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>longitude</name>
+      <type>string</type>
+      <description>The longitude of the house</description>
+      <default-value>-1.59</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>latitude</name>
+      <type>string</type>
+      <description>The latitude of the house</description>
+      <default-value>48.07</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/dawndusk.xml"/>
+    <file path="src/share/domogik/stats/dawndusk/dawndusk.basic.xml"/>
+    <file path="src/share/domogik/stats/dawndusk/dawndusk.request.xml"/>
+    <file path="src/share/domogik/url2xpl/dawndusk/daynight.xml"/>
+    <file path="src/domogik/xpl/bin/dawndusk.py"/>
+    <file path="src/domogik/xpl/lib/dawndusk.py"/>
+  </files>
+  <dependencies>
+    <dep name="apscheduler (>=2.0.2)"/>
+    <dep name="pyephem (>=3.7.5)"/>
+  </dependencies>
+  <device_technology>
+      <id>dawndusk</id>
+      <name>Dawndusk</name>
+      <description>Get the dawn and dusk time using the geocoordinates</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>dawndusk.daynight</id>
+          <name>DayNight</name>
+          <description>Tell if is the day or the night</description>
+          <device_technology_id>dawndusk</device_technology_id>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>dawndusk.daynight.switch</id>
+          <name>DayNight</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>dawndusk.daynight</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;status&quot;,&quot;query&quot;:&quot;daynight&quot;,&quot;value0&quot;:&quot;night&quot;, &quot;value1&quot;:&quot;day&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+
+</package>

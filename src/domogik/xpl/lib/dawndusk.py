@@ -82,11 +82,16 @@ class dawnduskAPI:
     dawndusk API
     """
 
-    def __init__(self):
+    def __init__(self,lgt,lat):
         """
         Init the dawndusk API
+        @param lgt : longitude of the observer
+        @param lat : latitude of the observer
         """
         self._scheduler = dawnduskScheduler()
+        self.mycity = ephem.Observer()
+        self.mycity.lat, self.mycity.lon = str(lat), str(lgt)
+        self.mycity.horizon = '-6'
 
     def schedAdd(self,sdate,cb_function,label):
         """
@@ -108,33 +113,61 @@ class dawnduskAPI:
             data.append(str(i))
         return data
 
-    def getNextDawn(self, lgt, lat):
+    def getNextDawn(self):
         """
         Return the date and time of the next dawn
-        @param lgt : longitude of the observer
-        @param lat : latitude of the observer
         @return : the next dawn daytime
         """
-        mycity = ephem.Observer()
-        mycity.lat, mycity.lon = str(lat), str(lgt)
-        mycity.date = datetime.datetime.today()
-        mycity.horizon = '-6'
-        dawn = ephem.localtime(mycity.next_rising(ephem.Sun(), use_center=True))
+        self.mycity.date = datetime.datetime.today()
+        dawn = ephem.localtime(self.mycity.next_rising(ephem.Sun(), use_center=True))
         return dawn
 
-    def getNextDusk(self, lgt, lat):
+    def getNextDusk(self):
         """
-        Return the date and time of the dawn
-        @param lgt : longitude of the observer
-        @param lat : latitude of the observer
+        Return the date and time of the dusk
         @return : the next dusk daytime
         """
-        mycity = ephem.Observer()
-        mycity.lat, mycity.lon = str(lat), str(lgt)
-        mycity.date = datetime.datetime.today()
-        mycity.horizon = '-6'
-        dusk = ephem.localtime(mycity.next_setting(ephem.Sun(), use_center=True))
+        self.mycity.date = datetime.datetime.today()
+        dusk = ephem.localtime(self.mycity.next_setting(ephem.Sun(), use_center=True))
         return dusk
+
+    def getNextFullMoonDawn(self):
+        """
+        Return the date and time of the next dawn and dusk of the next fullmoon
+        @return : the next dawn daytime
+        """
+        self.mycity.date = self._getNextFullMoon()
+        dawn = ephem.localtime(self.mycity.next_rising(ephem.Moon(), use_center=True))
+        dusk = ephem.localtime(self.mycity.next_setting(ephem.Moon(), use_center=True))
+        if dawn>dusk:
+            dawn=ephem.localtime(self.mycity.previous_rising(ephem.Moon(), use_center=True))
+        return dawn
+
+    def getNextFullMoonDusk(self):
+        """
+        Return the date and time of the dusk of the next fullmoon
+        @return : the next dusk daytime
+        """
+        self.mycity.date = self._getNextFullMoon()
+        dusk = ephem.localtime(self.mycity.next_setting(ephem.Moon(), use_center=True))
+        return dusk
+
+    def getNextFullMoon(self):
+        """
+        Return the date and time of the next fullmoon
+        @return : the next full moon daytime
+        """
+        dusk = ephem.localtime(self._getNextFullMoon())
+        return dusk
+
+    def _getNextFullMoon(self):
+        """
+        Return the date and time of the next full moon
+        @return : the next full moon daytime
+        """
+        now=datetime.datetime.today()
+        nextfullmoon=ephem.next_full_moon(now)
+        return nextfullmoon
 
 if __name__ == "__main__":
     dd = dawnduskAPI()
