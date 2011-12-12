@@ -65,25 +65,29 @@ class dawndusk(XplPlugin):
         self.log.info("dawndusk.__init__ : Start ...")
         self._config = Query(self.myxpl, self.log)
 
-        self.log.debug("dawndusk.__init__ : Try to start the dawndusk librairy")
-        try:
-            self._mydawndusk = dawnduskAPI()
-        except:
-            error = "Something went wrong during dawnduskAPI init : %s" %  \
-                     (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
-            raise dawnduskException(error)
-
         self.log.debug("dawndusk.__init__ : Try to get configuration from XPL")
         try:
-            self._longitude = float(self._config.query('dawndusk', 'longitude'))
-            self._latitude = float(self._config.query('dawndusk', 'latitude'))
+            longitude = str(self._config.query('dawndusk', 'longitude'))
+            latitude = str(self._config.query('dawndusk', 'latitude'))
+            if latitude==None:
+                latitude="47.352"
+            if longitude==None:
+                longitude="5.043"
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.exception("dawndusk.__init__ : "+error)
-            self._longitude = 5.043
-            self._latitude = 47.352
+            longitude = "5.043"
+            latitude = "47.352"
+            raise dawnduskException(error)
+
+        self.log.debug("dawndusk.__init__ : Try to start the dawndusk librairy")
+        try:
+            self._mydawndusk = dawnduskAPI(longitude,latitude)
+        except:
+            error = "Something went wrong during dawnduskAPI init : %s" %  \
+                     (traceback.format_exc())
+            self.log.exception("dawndusk.__init__ : "+error)
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to add the next event to the scheduler")
@@ -121,19 +125,37 @@ class dawndusk(XplPlugin):
         if cmd=='status':
             if query=="dawn":
                 mess.set_schema("datetime.basic")
-                dawn = self._mydawndusk.getNextDawn(self._longitude, self._latitude)
+                dawn = self._mydawndusk.getNextDawn()
                 mess.add_data({"status": dawn.strftime("%Y%m%d%H%M%S"), "type": "dawn" })
                 sendit=True
                 self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, status= %s" % (query,dawn))
             elif query=="dusk":
                 mess.set_schema("datetime.basic")
-                dusk = self._mydawndusk.getNextDusk(self._longitude, self._latitude)
+                dusk = self._mydawndusk.getNextDusk()
                 mess.add_data({"status" :  dusk.strftime("%Y%m%d%H%M%S"), "type": "dusk" })
                 sendit=True
                 self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, satus= %s" % (query,dusk))
+            elif query=="fullmoon":
+                mess.set_schema("datetime.basic")
+                dusk = self._mydawndusk.getNextFullMoon()
+                mess.add_data({"status" :  dusk.strftime("%Y%m%d%H%M%S"), "type": "fullmoon" })
+                sendit=True
+                self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, satus= %s" % (query,dusk))
+            if query=="fullmoondawn":
+                mess.set_schema("datetime.basic")
+                fullmoondawn = self._mydawndusk.getNextFullMoonDawn()
+                mess.add_data({"status": fullmoondawn.strftime("%Y%m%d%H%M%S"), "type": "fullmoondawn" })
+                sendit=True
+                self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, status= %s" % (query,fullmoondawn))
+            elif query=="fullmoondusk":
+                mess.set_schema("datetime.basic")
+                fullmoondusk = self._mydawndusk.getNextFullMoonDusk()
+                mess.add_data({"status" :  fullmoondusk.strftime("%Y%m%d%H%M%S"), "type": "fullmoondusk" })
+                sendit=True
+                self.log.debug("dawndusk.dawndusk_cmnd_cb :  query= %s, satus= %s" % (query,fullmoondusk))
             elif query=="daynight":
-                dawn = self._mydawndusk.getNextDawn(self._longitude, self._latitude)
-                dusk = self._mydawndusk.getNextDusk(self._longitude, self._latitude)
+                dawn = self._mydawndusk.getNextDawn()
+                dusk = self._mydawndusk.getNextDusk()
                 mess.set_schema("dawndusk.basic")
                 mess.add_data({"type" : "daynight"})
                 if dusk < dawn:
@@ -167,8 +189,8 @@ class dawndusk(XplPlugin):
         @return rstate : the event type : DAWN or DUSK
         """
         self.log.debug("dawndusk.getNextEvent() : Start ...")
-        dawn = self._mydawndusk.getNextDawn(self._longitude, self._latitude)
-        dusk = self._mydawndusk.getNextDusk(self._longitude, self._latitude)
+        dawn = self._mydawndusk.getNextDawn()
+        dusk = self._mydawndusk.getNextDusk()
         if dusk < dawn :
             rdate = dusk
             rstate = "dusk"
