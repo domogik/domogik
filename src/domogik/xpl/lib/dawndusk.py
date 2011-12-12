@@ -90,7 +90,7 @@ class dawnduskAPI:
         """
         self._scheduler = dawnduskScheduler()
         self.mycity = ephem.Observer()
-        self.mycity.lat, self.mycity.lon = str(lat), str(lgt)
+        self.mycity.lat, self.mycity.lon = lat, lgt
         self.mycity.horizon = '-6'
 
     def schedAdd(self,sdate,cb_function,label):

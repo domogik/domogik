@@ -22,14 +22,14 @@
       <name>longitude</name>
       <type>string</type>
       <description>The longitude of the house</description>
-      <default-value>-1.59</default-value>
+      <default-value>5.043</default-value>
     </key>
     <key>
       <order-id>2</order-id>
       <name>latitude</name>
       <type>string</type>
       <description>The latitude of the house</description>
-      <default-value>48.07</default-value>
+      <default-value>47.352</default-value>
     </key>
   </configuration-keys>
   <files>

@@ -67,14 +67,18 @@ class dawndusk(XplPlugin):
 
         self.log.debug("dawndusk.__init__ : Try to get configuration from XPL")
         try:
-            longitude = float(self._config.query('dawndusk', 'longitude'))
-            latitude = float(self._config.query('dawndusk', 'latitude'))
+            longitude = str(self._config.query('dawndusk', 'longitude'))
+            latitude = str(self._config.query('dawndusk', 'latitude'))
+            if latitude==None:
+                latitude="47.352"
+            if longitude==None:
+                longitude="5.043"
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.exception("dawndusk.__init__ : "+error)
-            longitude = 5.043
-            latitude = 47.352
+            longitude = "5.043"
+            latitude = "47.352"
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to start the dawndusk librairy")
