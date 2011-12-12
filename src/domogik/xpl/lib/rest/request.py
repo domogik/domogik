@@ -3647,6 +3647,16 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
+        ### uninstall ##################################
+        elif self.rest_request[0] == "uninstall":
+            if len(self.rest_request) == 3:
+                self._rest_package_uninstall(self.rest_request[1],
+                                             self.rest_request[2])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
@@ -3994,6 +4004,56 @@ target=*
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("install")
+            self.send_http_response_ok(json_data.get())
+
+    def _rest_package_uninstall(self, host, package):
+        """ Send xpl messages to install a package :
+            - one to manager on target host for "bin" files
+            - one to manager on rinor's host for rest's xml files
+            @param host : host targetted
+            @param package : fullname of package (type-name)
+            Return ok/ko as json
+        """
+        self.log.debug("Package : ask for uninstalling a package")
+
+        ### Send xpl message to uninstall package
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "uninstall"})
+        message.add_data({"host" : host})
+        message.add_data({"package" : package})
+        self.myxpl.send(message)
+
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "uninstall",
+                                                          "package" : package,
+                                                          "host" : host},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
+        except Empty:
+            self.log.debug("Package uninstall : no answer")
+            self.send_http_response_error(999, "No data or timeout on uninstalling package",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package uninstall : message received : %s" % (str(message)))
+        
+
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error : %s" % (message.data['error']), self.jsonp, self.jsonp_cb)
+            return
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("uninstall")
             self.send_http_response_ok(json_data.get())
 
 

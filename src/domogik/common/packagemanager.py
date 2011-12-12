@@ -365,6 +365,32 @@ class PackageManager():
         return True
 
 
+    def uninstall_package(self, package):
+        """ Uninstall a package
+            For the moment, we will only delete the package xml file for 
+            plugins and external
+            @param package : package name
+        """
+        self.log("Start uninstall for package '%s'" % package)
+        self.log("Only xml description file will be deleted in this Domogik version")
+        (type, id) = package.split("-")
+
+        try:
+            if type in ('plugin'):
+                os.unlink("%s/plugins/softwares/%s.xml" %(INSTALL_PATH, id))
+            elif type in ('external'):
+                os.unlink("%s/plugins/externals/%s.xml" %(INSTALL_PATH, id))
+            else:
+                raise "Package type '%s' not uninstallable" % type
+        except:
+            msg = "Error while installing package : %s" % (traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
+        self.log("Package successfully uninstalled.")
+
+        return True
+
+
     def _extract_package(self, pkg_path, extract_path):
         """ Extract package <pkg_path> in <extract_path>
             @param pkg_path : path to package

@@ -1031,6 +1031,9 @@ class SysManager(XplPlugin):
         if command == "install" and host != "*":
             self._pkg_install(message)
 
+        if command == "uninstall" and host != "*":
+            self._pkg_uninstall(message)
+
 
     def _pkg_list_installed(self):
         """ List packages installed on host
@@ -1131,8 +1134,7 @@ class SysManager(XplPlugin):
             release = message.data['release']
             package_part = message.data['part']
         except KeyError:
-            mess.add_data({'error' : 'incomplete xpl message'})
-            self.myxpl.send(mess)
+            self.log.error("Missing part of xPL message for installing a package : %s" % traceback.format_exc())
             return
 
         mess = XplMessage()
@@ -1145,7 +1147,6 @@ class SysManager(XplPlugin):
 
         # check if plugin (for a plugin) is running
         tab = message.data['package'].split("-")
-        print("T=%s" % tab)
         if tab[0] == "plugin":
             if self._check_component_is_running(tab[1], only_one_ping = True):
                 mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % tab[1]})
@@ -1165,6 +1166,47 @@ class SysManager(XplPlugin):
         except:
             mess.add_data({'error' : 'Error while installing package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while installing package '%s (%s)' : %s" % (package, release, traceback.format_exc()))
+        self.myxpl.send(mess)          
+
+
+    def _pkg_uninstall(self, message):
+        """ Uninstall a package
+            @param message : xpl message received
+        """
+        try:
+            package = message.data['package']
+        except KeyError:
+            self.log.error("Missing part of xPL message for installing a package : %s" % traceback.format_exc())
+            return
+
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' : 'uninstall'})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+        mess.add_data({'package' : package})
+
+        # check if plugin (for a plugin) is running
+        tab = message.data['package'].split("-")
+        if tab[0] == "plugin":
+            if self._check_component_is_running(tab[1], only_one_ping = True):
+                mess.add_data({'error' : "Plugin '%s' is running. Stop it before uninstalling plugin." % tab[1]})
+                self.myxpl.send(mess)
+                return
+
+        # check if it is a external if current manager handle external
+        if tab[0] == "external" and self.options.check_external == False:
+            mess.add_data({'error' : "This host doesn't handle external member packages. Please install it on main host"})
+            self.myxpl.send(mess)
+            return
+
+        try:
+            status = self.pkg_mgr.uninstall_package(package)
+            if status != True:
+                mess.add_data({'error' : status})
+        except:
+            mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
+            self.log.error("Error while uninstalling package '%s' : %s" % (package, traceback.format_exc()))
         self.myxpl.send(mess)          
 
 
