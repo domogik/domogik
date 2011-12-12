@@ -496,7 +496,10 @@ class telldusAPI:
         Load the WINDOOR extension
         """
         self._windoor=None
-        self._ext_windoor = eval(self.config.query('telldus', 'windoor'))
+        boo=self.config.query('telldus', 'windoor')
+        if boo==None:
+            boo="False"
+        self._ext_windoor = eval(boo)
         self.log.debug("telldus.load_telldus_windoor : Load =" + str(type(self._ext_windoor)))
         if self._ext_windoor==True:
             self.log.debug("telldus.load_telldus_windoor : Load windoor extension")
@@ -512,7 +515,10 @@ class telldusAPI:
         Load the DAWNDUSK extension
         """
         self._dawndusk=None
-        self._ext_dawndusk = eval(self.config.query('telldus', 'dawndusk'))
+        boo=self.config.query('telldus', 'dawndusk')
+        if boo==None:
+            boo="False"
+        self._ext_dawndusk = eval(boo)
         if self._ext_dawndusk==True:
             self.log.debug("telldus.load_telldus_dawndusk : Load dawndusk extension")
             try:
@@ -527,7 +533,10 @@ class telldusAPI:
         Load the MOVE extension
         """
         self._move=None
-        self._ext_move = eval(self.config.query('telldus', 'move'))
+        boo=self.config.query('telldus', 'move')
+        if boo==None:
+            boo="False"
+        self._ext_move = eval(boo)
         if self._ext_move==True:
             self.log.debug("telldus.load_telldus_move : Load move extension")
             try:
