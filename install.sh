@@ -152,8 +152,10 @@ function copy_sample_files {
     if [ ! -f $dmg_home/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
         chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
-        cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
-        chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
+        if [ $MAIN_INSTALL = "y" ] ; then
+            cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
+            chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
+        fi
     else
         keep="y"
         already_cfg=1
@@ -164,8 +166,10 @@ function copy_sample_files {
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
             chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
-            cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
-            chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
+            if [ $MAIN_INSTALL = "y" ] ; then
+                cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
+                chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
+            fi
         fi
     fi
     if [ -d "/etc/default/" ];then
