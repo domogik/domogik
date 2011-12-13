@@ -3767,7 +3767,7 @@ target=*
             msg = self._get_from_queue(self._queue_package, 
                                                  "xpl-trig", 
                                                  "domogik.package",
-                                                 filter_data = {"command" : "list-packages-installed"})
+                                                 filter_data = {"command" : "installed-packages-list"})
             messages.append(msg)
             # after first message, we start to listen for other messages 
             self.log.debug("Installed package list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
@@ -3777,7 +3777,7 @@ target=*
                     msg = self._get_from_queue(self._queue_package, 
                                                    "xpl-trig", 
                                                    "domogik.package", 
-                                                   filter_data = {"command" : "list-packages-installed"},
+                                                   filter_data = {"command" : "installed-packages-list"},
                                                    timeout = WAIT_FOR_LIST_ANSWERS)
                     messages.append(msg)
                     self.log.debug("Installed packages list : get one answer from '%s'" % message.data["host"])
