@@ -1,0 +1,35 @@
+<package type="plugin">
+  <id>cron</id>
+  <technology>cronr</technology>
+  <description>
+  Add a cron like to the XPL network.
+  Alpha release. Use with caution.
+  </description>
+  <changelog>Initial release</changelog>
+  <version>0.2.0</version>
+  <documentation>to do</documentation>
+  <author>Sebastien GALLET</author>
+  <author-email>sgallet at gmail dot com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/cron.xml"/>
+    <file path="src/domogik/xpl/bin/cron.py"/>
+    <file path="src/domogik/xpl/lib/cron.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>cron</id>
+      <name>Cron</name>
+      <description>Add a cron like to the XPL network</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
+</package>
