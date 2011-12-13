@@ -1041,7 +1041,7 @@ class SysManager(XplPlugin):
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.package')
-        mess.add_data({'command' : 'list-packages-installed'})
+        mess.add_data({'command' : 'installed-packages-list'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
