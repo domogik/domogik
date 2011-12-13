@@ -141,7 +141,9 @@ function copy_sample_files {
         fi
     done
     # copy rest xml file
-    cp src/share/domogik/plugins/rest.xml $dmg_home/plugins/softwares/
+    if [ $MAIN_INSTALL = "y" ] ; then
+        cp src/share/domogik/plugins/rest.xml $dmg_home/plugins/softwares/
+    fi
     # Check for old version when .domogik.cfg was in $HOME
     if [ -f $d_home/.domogik.cfg ];then
         mv $d_home/.domogik.cfg $dmg_home/domogik.cfg
