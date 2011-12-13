@@ -1,6 +1,6 @@
 <package type="plugin">
   <id>cron</id>
-  <technology>cronr</technology>
+  <technology>Cron</technology>
   <description>
   Add a cron like to the XPL network.
   Alpha release. Use with caution.
@@ -24,7 +24,9 @@
     <file path="src/domogik/xpl/bin/cron.py"/>
     <file path="src/domogik/xpl/lib/cron.py"/>
   </files>
-  <dependencies/>
+  <dependencies>
+    <dep name="apscheduler (>=2.0.2)"/>
+  </dependencies>
   <device_technology>
       <id>cron</id>
       <name>Cron</name>
