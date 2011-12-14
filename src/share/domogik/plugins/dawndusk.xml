@@ -5,7 +5,7 @@
   Get the dawn and dusk time using the geocoordinates
   </description>
   <changelog>Update the plugin to domogik 0.2.0</changelog>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <documentation>to do</documentation>
   <author>Sebastien GALLET, Maxence Dunnewind</author>
   <author-email>sgallet at gmail dot com</author-email>
@@ -30,6 +30,13 @@
       <type>string</type>
       <description>The latitude of the house</description>
       <default-value>47.352</default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>cron</name>
+      <type>boolean</type>
+      <description>Use esternal cron like the cron plugin to schedule events</description>
+      <default-value>False</default-value>
     </key>
   </configuration-keys>
   <files>

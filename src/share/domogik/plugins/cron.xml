@@ -4,6 +4,8 @@
   <description>
   Add a cron like to the XPL network.
   Alpha release. Use with caution.
+  Actually this plugin stores jobs in RAM.
+  If you stop this plugin, you must resend all the jobs.
   </description>
   <changelog>Initial release</changelog>
   <version>0.2.0</version>
@@ -21,8 +23,10 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/cron.xml"/>
+    <file path="src/share/domogik/stats/cron/cron.xml"/>
     <file path="src/domogik/xpl/bin/cron.py"/>
     <file path="src/domogik/xpl/lib/cron.py"/>
+    <file path="src/domogik/xpl/lib/cron_query.py"/>
   </files>
   <dependencies>
     <dep name="apscheduler (>=2.0.2)"/>

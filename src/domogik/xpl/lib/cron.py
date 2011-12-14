@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-XPL Timer
+XPL Cron
 
 Implements
 ==========
@@ -42,6 +42,18 @@ from apscheduler.jobstores.shelve_store import ShelveJobStore
 import logging
 logging.basicConfig()
 
+ERROR_NO=0
+ERROR_PARAMETER=1
+ERROR_DEVICE_EXIST=10
+ERROR_DEVICE_NOT_EXIST=11
+ERROR_SCHEDULER=20
+
+cronErrors = { ERROR_NO: 'No error',
+               ERROR_PARAMETER: 'Missing or wrong parameter',
+               ERROR_DEVICE_EXIST: 'Device already exist',
+               ERROR_DEVICE_NOT_EXIST: 'Device does not exist',
+               ERROR_SCHEDULER: 'Error with the scheduler',
+               }
 
 class cronJobs:
 
@@ -76,9 +88,9 @@ class cronJobs:
                 del (self.data[device]['apjobs'])
             self.data[device]['current']="stopped"
             self.data[device]['apjob']=None
-            return True
+            return ERROR_NO
         else:
-            return False
+            return ERROR_DEVICE_NOT_EXIST
 
     def removeJob(self, device):
         """
@@ -88,9 +100,9 @@ class cronJobs:
         if device in self.data.iterkeys():
             self.stopJob(device)
             del(self.data[device])
-            return True
+            return ERROR_NO
         else:
-            return False
+            return ERROR_DEVICE_NOT_EXIST
 
     def resumeJob(self, device):
         """
@@ -103,7 +115,7 @@ class cronJobs:
             self.data[device]['apjob']=None
             return self.startJob(device)
         else:
-            return False
+            return ERROR_DEVICE_NOT_EXIST
 
     def startJob(self, device):
         """
@@ -120,7 +132,7 @@ class cronJobs:
             devicetype=self.data[device]['devicetype']
             return devicetypes[devicetype](device)
         else:
-            return False
+            return ERROR_DEVICE_NOT_EXIST
 
     def _startJobDate(self, device):
         """
@@ -136,15 +148,16 @@ class cronJobs:
                 job = self._scheduler.add_date_job(self._api.sendXplJob, sdate, args=[device])
                 self.data[device]['current']="started"
                 self.data[device]['apjob']=job
+                self._api.log.debug("cronJobs._startJobDate : add job at date %s"%xpldate)
             except:
                 self._api.log.exception("cronJobs._startJobDate :")
                 del(self.data[device])
-                return False
-            return True
+                return ERROR_SCHEDULER
+            return ERROR_NO
         else:
             self._api.log.exception("cronJobs._startJobDate : Don't add cron job : no parameters given")
             del(self.data[device])
-            return False
+            return ERROR_PARAMETER
 
     def _startJobTimer(self, device):
         """
@@ -157,7 +170,7 @@ class cronJobs:
         else:
             self._api.log.exception("cronJobs._startJobTimer : Don't add cron job : no parameters given")
             del(self.data[device])
-            return False
+            return ERROR_PARAMETER
         duration = 0
         if 'duration' in self.data[device]:
             duration = int(self.data[device]['duration'])
@@ -167,10 +180,11 @@ class cronJobs:
                 job = self._scheduler.add_interval_job(self._api.sendXplJob,seconds=frequence, args=[device])
                 self.data[device]['current']="started"
                 self.data[device]['apjob']=job
+                self._api.log.debug("cronJobs._startJobDate : add an infinite timer every %s seconds"%frequence)
             except:
                 self._api.log.exception("cronJobs._startJobTimer :")
                 del(self.data[device])
-                return False
+                return ERROR_SCHEDULER
         else:
             try :
                 now=datetime.datetime.today()
@@ -181,11 +195,12 @@ class cronJobs:
                     jobs.append(self._scheduler.add_date_job(self._api.sendXplJob, now+i*delta, args=[device]))
                     i=i-1
                 self.data[device]['apjobs']=jobs
+                self._api.log.debug("cronJobs._startJobDate : add a %s beats timer every %s seconds"%(duration,frequence))
             except:
                 self._api.log.exception("cronJobs._startJobTimer :")
                 del(self.data[device])
-                return False
-        return True
+                return ERROR_SCHEDULER
+        return ERROR_NO
 
     def _startJobInterval(self, device):
         """
@@ -193,7 +208,7 @@ class cronJobs:
         @param device : the name of the job (=device in xpl)
         """
         ok=False
-        weeks = None
+        weeks = 0
         if 'weeks' in self.data[device]:
             weeks = int(self.data[device]['weeks'])
             ok=True
@@ -216,7 +231,7 @@ class cronJobs:
         if ok==False:
             self._api.log.exception("cronJobs._startJobInterval : Don't add cron job : no parameters given")
             del(self.data[device])
-            return False
+            return ERROR_PARAMETER
         start_date = None
         if 'startdate' in self.data[device]:
             startdate = self.dateFromXPL(self.data[device]['startdate'])
@@ -226,15 +241,16 @@ class cronJobs:
                   start_date=startdate, args=[device])
             self.data[device]['current']="started"
             self.data[device]['apjob']=job
+            self._api.log.debug("cronJobs._startJobDate : add an interval job")
         except:
             self._api.log.exception("cronJobs._startJobInterval :")
             del(self.data[device])
-            return False
-        return True
+            return ERROR_SCHEDULER
+        return ERROR_NO
 
     def _startJobCron(self, device):
         """
-        Start a job of type interval
+        Start a job of type cron
         @param device : the name of the job (=device in xpl)
         """
         ok=False
@@ -273,7 +289,7 @@ class cronJobs:
         if ok==False:
             self._api.log.exception("cronJobs._startJobCron : Don't add cron job : no parameters given")
             del(self.data[device])
-            return False
+            return ERROR_PARAMETER
         startdate = None
         if 'startdate' in self.data[device]:
             startdate = self.dateFromXPL(self.data[device]['startdate'])
@@ -284,11 +300,12 @@ class cronJobs:
             self._api.log.debug("cronJobs._startJobCron : %s" % str(job))
             self.data[device]['current']="started"
             self.data[device]['apjob']=job
+            self._api.log.debug("cronJobs._startJobDate : add a cron job")
         except:
             self._api.log.exception("cronJobs._startJobCron :")
             del(self.data[device])
-            return False
-        return True
+            return ERROR_SCHEDULER
+        return ERROR_NO
 
     def addJob(self, device, devicetype, message):
         """
@@ -298,12 +315,12 @@ class cronJobs:
         @param message : the inxoming xpl message
         """
         if device in self.data.iterkeys():
-            return False
+            return ERROR_DEVICE_EXIST
         current = None
         if 'current' in message.data:
             current = message.data['current']
         if 'current'==None:
-            current = "startes"
+            current = "started"
         self.data[device] = {'devicetype' : devicetype,
                             'current' : current,
                             'apjob' : None
@@ -322,7 +339,7 @@ class cronJobs:
         if device in self.data.iterkeys():
             return self.data[device]['current']
         else:
-            return None
+            return ERROR_DEVICE_NOT_EXIST
 
     def getList(self):
         """
@@ -360,6 +377,20 @@ class cronJobs:
         s = int(xpldate[12:14])
         return datetime.datetime(y,mo,d,h,m,s)
 
+    def dateToXPL(self,sdate):
+        """
+        Tranform an datetime date to an xpl one "yyyymmddhhmmss"
+        form
+        """
+        h = "%.2i" % sdate.hour
+        m = "%.2i" % sdate.minute
+        s = "%.2i" % sdate.second
+        y = sdate.year
+        mo = "%.2i" % sdate.month
+        d = "%.2i" % sdate.day
+        xpldate = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
+        return xpldate
+
     def getXplTrig(self,device):
         """
         Return the xpl message to send
@@ -367,13 +398,15 @@ class cronJobs:
         if device not in self.data.iterkeys():
             return None
         mess = XplMessage()
-        mess.set_type("xpl-trig")
         mess.add_data({'device' : device})
+        mess.set_type("xpl-trig")
         for key in self.data[device]:
             if key[0:4].startswith("nst-"):
                 k=key[4:]
                 if k.startswith("schema"):
                    mess.set_schema(self.data[device][key])
+                elif k.startswith("xpltype"):
+                   mess.set_type(self.data[device][key])
                 else:
                    mess.add_data({k : self.data[device][key]})
         return mess
@@ -498,8 +531,7 @@ class cronAPI:
         @param device : The timer to stop
         """
         self.log.debug("cronAPI._actionStop : Start ...")
-        if self.jobs.stopJob(device)==True:
-            self._sendXplTrig(myxpl,device,"stopped",0)
+        self._sendXplTrig(myxpl,device,"stopped",self.jobs.stopJob(device),0)
         self.log.debug("cronAPI._actionStop : Done :)")
 
     def _actionResume(self,myxpl,device):
@@ -508,8 +540,7 @@ class cronAPI:
         @param device : The timer to resume
         """
         self.log.debug("cronAPI._actionResume : Start ...")
-        if self.jobs.resumeJob(device)==True:
-            self._sendXplTrig(myxpl,device,"resumed",0)
+        self._sendXplTrig(myxpl,device,"resumed",self.jobs.resumeJob(device),0)
         self.log.debug("cronAPI._actionResume : Done :)")
 
     def _actionHalt(self,myxpl,device):
@@ -518,8 +549,7 @@ class cronAPI:
         @param device : The timer to halt
         """
         self.log.debug("cronAPI._actionHalt : Start ...")
-        if self.jobs.removeJob(device)==True:
-            self._sendXplTrig(myxpl,device,"halted",0)
+        self._sendXplTrig(myxpl,device,"halted",self.jobs.removeJob(device),0)
         self.log.debug("cronAPI._actionHalt : Done :)")
 
     def _actionStart(self,myxpl,device,message):
@@ -539,11 +569,10 @@ class cronAPI:
         devicetype = "timer"
         if 'devicetype' in message.data:
             devicetype = message.data['devicetype']
-        if self.jobs.addJob(device, devicetype, message)==True:
-            self._sendXplTrig(myxpl,device,"started",0)
+        self._sendXplTrig(myxpl,device,"started",self.jobs.addJob(device, devicetype, message),0)
         self.log.debug("cronAPI._actionAdd : Done :)")
 
-    def _sendXplTrig(self,myxpl,device,current,elapsed):
+    def _sendXplTrig(self,myxpl,device,current,error,elapsed):
         """
         Send the XPL Trigger
         @param myxpl : The XPL sender
@@ -563,10 +592,21 @@ class cronAPI:
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
         mess.add_data({"device" : device})
-        mess.add_data({"current" :  current})
-#        mess.add_data({"elasped" :  elapsed})
+        if error==ERROR_NO:
+            mess.add_data({"current" :  current})
+            self.log.info("cronAPI._sendXPLTrig : Send ok xpl-trig :)")
+#            mess.add_data({"elasped" :  elapsed})
+        else:
+            mess.add_data(self.error(error))
+            self.log.info("cronAPI._sendXPLTrig : Send error xpl-trig :(")
         myxpl.send(mess)
         self.log.debug("cronAPI._sendXPLTrig : Done :)")
+
+    def error(self,code):
+        errorcode=code
+        error=cronErrors[code]
+        res= {'errorcode':errorcode,  'error':error}
+        return res
 
 if __name__ == "__main__":
     dd = cronAPI()

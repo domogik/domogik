@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="cron">
+    <schema name="timer.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+            </mapping>
+        </xpltype>
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
