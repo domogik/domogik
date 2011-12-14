@@ -43,7 +43,7 @@ from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
-from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR
+from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR
 from domogik.common.packagexml import PackageXml, PackageException
 import time
 import urllib
@@ -70,9 +70,6 @@ from subprocess import Popen, PIPE
 # Time we wait for answers after a multi host list command
 WAIT_FOR_LIST_ANSWERS = 1
 WAIT_FOR_PACKAGE_INSTALLATION = 20
-
-#TODO : change it
-PKG_CACHE_DIR = "/tmp/"
 
 #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
 PING_DURATION = 2

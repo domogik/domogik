@@ -60,6 +60,7 @@ CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
 REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
 REPO_LST_FILE_HEADER = "Domogik Repository"
 REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
+PKG_CACHE_DIR = "%s/.domogik/pkg-cache" % os.getenv("HOME")
 
 cfg = Loader('domogik')
 config = cfg.load()
