@@ -258,6 +258,28 @@ class PackageManager():
         self.log("OK")
     
 
+    def cache_package(self, cache_folder, package, release):
+        """ Download package to put it in cache
+            @param cache_folder : folder in which we want to cache the file
+            @param package : package id
+            @param release : package release
+        """
+        if package[0:5] == "repo:":
+            pkg, status = self._find_package(package[5:], release)
+            if status != True:
+                return status
+            path = pkg.package_url
+        else:
+            self.log("Only 'repo:....' path can be refreshed")
+        package = package[5:]
+        dl_path = "%s/%s-%s.tar.gz" % (cache_folder, package, release)
+        self.log("Caching package : '%s' to '%s'" % (path, dl_path))
+        urllib.urlretrieve(path, dl_path)
+        path = dl_path
+        self.log("Package in cache : %s" % path)
+
+
+
     def install_package(self, path, release = None, package_part = PKG_PART_XPL):
         """ Install a package
             0. Eventually download package

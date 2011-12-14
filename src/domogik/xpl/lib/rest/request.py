@@ -71,6 +71,8 @@ from subprocess import Popen, PIPE
 WAIT_FOR_LIST_ANSWERS = 1
 WAIT_FOR_PACKAGE_INSTALLATION = 20
 
+#TODO : change it
+PKG_CACHE_DIR = "/tmp/"
 
 #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
 PING_DURATION = 2
@@ -3927,6 +3929,46 @@ target=*
         """
         self.log.debug("Package : ask for installing a package")
 
+        pkg_mgr = PackageManager()
+        pkg_mgr.cache_package(PKG_CACHE_DIR, "repo:%s" % package, release)
+
+        #### Send xpl message to install package's rinor part
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : self.get_sanitized_hostname()})
+        message.add_data({"package" : package})
+        message.add_data({"release" : release})
+        message.add_data({"part" : PKG_PART_RINOR})
+        self.myxpl.send(message)
+        
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install",
+                                                          "package" : package,
+                                                          "release" : release,
+                                                         "host" : self.get_sanitized_hostname()},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
+        except Empty:
+           self.log.debug("Package install : no answer")
+           self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
+           return
+        
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
+        
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_RINOR, message.data['error']), self.jsonp, self.jsonp_cb)
+
+
         ### Send xpl message to install package bin part
         message = XplMessage()
         message.set_type("xpl-cmnd")
@@ -3965,41 +4007,7 @@ target=*
             self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_XPL, message.data['error']), self.jsonp, self.jsonp_cb)
             return
 
-        ### Send xpl message to install package's rinor part
-        message = XplMessage()
-        message.set_type("xpl-cmnd")
-        message.set_schema("domogik.package")
-        message.add_data({"command" : "install"})
-        message.add_data({"host" : self.get_sanitized_hostname()})
-        message.add_data({"package" : package})
-        message.add_data({"release" : release})
-        message.add_data({"part" : PKG_PART_RINOR})
-        self.myxpl.send(message)
 
-        ### Wait for answer
-        # get xpl message from queue
-        messages = []
-        try:
-            self.log.debug("Package install : wait for answer...")
-            message = self._get_from_queue(self._queue_package, 
-                                           "xpl-trig", 
-                                           "domogik.package", 
-                                           filter_data = {"command" : "install",
-                                                          "package" : package,
-                                                          "release" : release,
-                                                          "host" : self.get_sanitized_hostname()},
-                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
-        except Empty:
-            self.log.debug("Package install : no answer")
-            self.send_http_response_error(999, "No data or timeout on installing package",
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
-
-        # process message
-        if message.data.has_key('error'):
-            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_RINOR, message.data['error']), self.jsonp, self.jsonp_cb)
         else:
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
