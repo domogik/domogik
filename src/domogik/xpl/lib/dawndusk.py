@@ -41,6 +41,7 @@ Class dawnduskException
 @organization: Domogik
 """
 
+from domogik.xpl.common.xplmessage import XplMessage
 import datetime
 import math
 from apscheduler.scheduler import Scheduler
@@ -48,6 +49,7 @@ import ephem
 from ephem import CircumpolarError
 from ephem import NeverUpError
 from ephem import AlwaysUpError
+from domogik.xpl.lib.cron_query import cronQuery
 
 class dawnduskScheduler:
     """
@@ -61,9 +63,9 @@ class dawnduskScheduler:
     def __del__(self):
         self._sched.shutdown()
 
-    def add(self,sdate,cb_function,label):
+    def add(self,cb_function, sdate,label):
         # Start the scheduler
-        self.job = self._sched.add_date_job(cb_function, sdate, [label])
+        self.job = self._sched.add_date_job(cb_function, sdate, label)
 
 class dawnduskException(Exception):
     """
@@ -82,13 +84,19 @@ class dawnduskAPI:
     dawndusk API
     """
 
-    def __init__(self,lgt,lat):
+    def __init__(self,lgt,lat,use_cron,myxpl,log):
         """
         Init the dawndusk API
         @param lgt : longitude of the observer
         @param lat : latitude of the observer
         """
-        self._scheduler = dawnduskScheduler()
+        self.use_cron = use_cron
+        self.log = log
+        self.myxpl = myxpl
+        if self.use_cron == False:
+            self._scheduler = dawnduskScheduler()
+        else:
+            self._cronQuery = cronQuery(self.myxpl,self.log)
         self.mycity = ephem.Observer()
         self.mycity.lat, self.mycity.lon = lat, lgt
         self.mycity.horizon = '-6'
@@ -100,18 +108,31 @@ class dawnduskAPI:
         @param cb_function : the callback function to call
         @param : the label of the event
         """
-        self.job = self._scheduler._sched.add_date_job(cb_function, sdate, [label])
+        self.log.debug("dawndusk.schedAdd : Start ...")
+        if self.use_cron == False:
+            self.job = self._scheduler.add(cb_function, sdate, label)
+            self.log.debug("dawndusk.schedAdd : Use internal cron ...")
+            return True
+        else :
+            self.log.debug("dawndusk.schedAdd : Use external cron ...")
+            device="dawndusk"
 
-    def schedList(self):
-        """
-        Return the list of schedulered events
-        @return : the list of the schedulered events
-        """
-        data = []
-        jobs = self._scheduler._sched.get_jobs()
-        for i in jobs:
-            data.append(str(i))
-        return data
+            nstMess = XplMessage()
+            nstMess.set_type("xpl-trig")
+            nstMess.set_schema("dawndusk.basic")
+            nstMess.add_data({"type" : "dawndusk"})
+            if label=="DAWN":
+                nstMess.add_data({"status" :  "dawn"})
+            elif label=="DUSK":
+                nstMess.add_data({"status" :  "dusk"})
+            if self._cronQuery.startDateJob(device,nstMess,sdate):
+                self.log.debug("dawndusk.schedAdd : External cron activated")
+                self.log.debug("dawndusk.schedAdd : Done :)")
+                return True
+            else:
+                self.log.error("dawndusk.schedAdd : Can't activate external cron")
+                self.log.debug("dawndusk.schedAdd : Done :(")
+                return False
 
     def getNextDawn(self):
         """
