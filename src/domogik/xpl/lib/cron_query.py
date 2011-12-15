@@ -138,8 +138,8 @@ class cronQuery():
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
-        @param configMess : the XPL configuration message to send to the plugin
         @param nstMess : the XPL message which will be sent by the cron job
+        @param frequence : the frequence of the signal (in seconds).
         '''
         if frequence==0:
             return false
@@ -158,8 +158,8 @@ class cronQuery():
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
-        @param configMess : the XPL configuration message to send to the plugin
         @param nstMess : the XPL message which will be sent by the cron job
+        @param sdate : the date/time to run the job at
         '''
         if sdate==None:
             return false
@@ -178,7 +178,13 @@ class cronQuery():
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
-        @param ... weeks=0,days=0,hours=0,minutes=0,seconds=0,startdate=None
+        @param weeks: number of weeks to wait
+        @param days: number of days to wait
+        @param hours: number of hours to wait
+        @param minutes: number of minutes to wait
+        @param seconds: number of seconds to wait
+        @param start_date: when to first execute the job and start the
+               counter (default is after the given interval)
         '''
         if sdate==None:
             return false
@@ -211,16 +217,22 @@ class cronQuery():
         return self.startJob(device, configMess, nstMess)
 
     def startCronJob( self, device, nstMess, year=None,month=None,day=None,
-                      week=None,day_of_week=None,hour=None,
+                      week=None,dayofweek=None,hour=None,
                       minute=None,second=None,startdate=None):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
-        @param ... year=None,month=None,day=None,week=None,
-                   day_of_week=None,hour=None,minute=None,second=None,
-                   startdate=None
-        '''
+        @param year: year to run on
+        @param month: month to run on
+        @param day: day of month to run on
+        @param week: week of the year to run on
+        @param day_of_week: weekday to run on (0 = Monday)
+        @param hour: hour to run on
+        @param second: second to run on
+        @param start_date: when to first execute the job and start the
+               counter (default is after the given interval)
+       '''
         configMess = XplMessage()
         configMess.set_type("xpl-cmnd")
         configMess.set_schema("timer.basic")
@@ -240,8 +252,8 @@ class cronQuery():
         if week != None:
             configMess.add_data({"week" : week})
             ok=True
-        if day_of_week != None:
-            configMess.add_data({"day_of_week" : day_of_week})
+        if dayofweek != None:
+            configMess.add_data({"dayofweek" : dayofweek})
             ok=True
         if hour != None:
             configMess.add_data({"hour" : hour})
