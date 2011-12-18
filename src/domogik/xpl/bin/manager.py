@@ -1130,7 +1130,9 @@ class SysManager(XplPlugin):
             @param message : xpl message received
         """
         try:
-            package = message.data['package']
+            source = message.data['source']
+            type = message.data['type']
+            id = message.data['id']
             release = message.data['release']
             package_part = message.data['part']
         except KeyError:
@@ -1142,30 +1144,38 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'install'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
-        mess.add_data({'package' : package})
+        mess.add_data({'source' : source})
+        mess.add_data({'type' : type})
+        mess.add_data({'id' : id})
         mess.add_data({'release' : release})
 
+        if source == "cache":
+            package = "cache:%s/%s/%s" % (type, id, release)
+        else:
+            mess.add_data({'error' : "source '%s' not allowed" % source})
+            self.myxpl.send(mess)
+            return
+
         # check if plugin (for a plugin) is running
-        tab = message.data['package'].split("-")
-        if tab[0] == "plugin":
-            if self._check_component_is_running(tab[1], only_one_ping = True):
-                mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % tab[1]})
+        if type == "plugin":
+            if self._check_component_is_running(id, only_one_ping = True):
+                mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % id})
                 self.myxpl.send(mess)
                 return
 
         # check if it is a external if current manager handle external
-        if tab[0] == "external" and self.options.check_external == False:
+        if type == "external" and self.options.check_external == False:
             mess.add_data({'error' : "This host doesn't handle external member packages. Please install it on main host"})
             self.myxpl.send(mess)
             return
 
         try:
-            status = self.pkg_mgr.install_package("repo:%s" % package, release, package_part)
+            status = self.pkg_mgr.install_package(package, package_part = package_part)
             if status != True:
                 mess.add_data({'error' : status})
         except:
             mess.add_data({'error' : 'Error while installing package. Check log file : packagemanager.log and manager.log'})
-            self.log.error("Error while installing package '%s (%s)' : %s" % (package, release, traceback.format_exc()))
+            self.log.error("Error while installing package '%s' : %s" % (package, traceback.format_exc()))
         self.myxpl.send(mess)          
 
 
@@ -1174,7 +1184,8 @@ class SysManager(XplPlugin):
             @param message : xpl message received
         """
         try:
-            package = message.data['package']
+            type = message.data['type']
+            id = message.data['id']
         except KeyError:
             self.log.error("Missing part of xPL message for installing a package : %s" % traceback.format_exc())
             return
@@ -1184,24 +1195,24 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'uninstall'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
-        mess.add_data({'package' : package})
+        mess.add_data({'type' : type})
+        mess.add_data({'id' : id})
 
         # check if plugin (for a plugin) is running
-        tab = message.data['package'].split("-")
-        if tab[0] == "plugin":
-            if self._check_component_is_running(tab[1], only_one_ping = True):
-                mess.add_data({'error' : "Plugin '%s' is running. Stop it before uninstalling plugin." % tab[1]})
+        if type == "plugin":
+            if self._check_component_is_running(id, only_one_ping = True):
+                mess.add_data({'error' : "Plugin '%s' is running. Stop it before uninstalling plugin." % id})
                 self.myxpl.send(mess)
                 return
 
         # check if it is a external if current manager handle external
-        if tab[0] == "external" and self.options.check_external == False:
+        if type == "external" and self.options.check_external == False:
             mess.add_data({'error' : "This host doesn't handle external member packages. Please install it on main host"})
             self.myxpl.send(mess)
             return
 
         try:
-            status = self.pkg_mgr.uninstall_package(package)
+            status = self.pkg_mgr.uninstall_package(type, id)
             if status != True:
                 mess.add_data({'error' : status})
         except:

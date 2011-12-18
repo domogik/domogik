@@ -59,6 +59,7 @@ import domogik.xpl.helpers
 import pkgutil
 import uuid
 import stat
+#from stat import * 
 import shutil
 import mimetypes
 from threading import Event
@@ -3626,10 +3627,11 @@ target=*
 
         ### check-dependencies #######################
         elif self.rest_request[0] == "check-dependencies":
-            if len(self.rest_request) == 4:
+            if len(self.rest_request) == 5:
                 self._rest_package_check_dependencies(self.rest_request[1],
                                            self.rest_request[2],
-                                           self.rest_request[3])
+                                           self.rest_request[3],
+                                           self.rest_request[4])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -3637,10 +3639,11 @@ target=*
 
         ### install ##################################
         elif self.rest_request[0] == "install":
-            if len(self.rest_request) == 4:
+            if len(self.rest_request) == 5:
                 self._rest_package_install(self.rest_request[1],
                                            self.rest_request[2],
-                                           self.rest_request[3])
+                                           self.rest_request[3],
+                                           self.rest_request[4])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -3648,9 +3651,21 @@ target=*
 
         ### uninstall ##################################
         elif self.rest_request[0] == "uninstall":
-            if len(self.rest_request) == 3:
+            if len(self.rest_request) == 4:
                 self._rest_package_uninstall(self.rest_request[1],
-                                             self.rest_request[2])
+                                             self.rest_request[2],
+                                             self.rest_request[3])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### download #################################
+        elif self.rest_request[0] == "download":
+            if len(self.rest_request) == 4:
+                self._rest_package_download(self.rest_request[1],
+                                           self.rest_request[2],
+                                           self.rest_request[3])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -3823,14 +3838,16 @@ target=*
     
         self.send_http_response_ok(json_data.get())
 
-    def _rest_package_check_dependencies(self, host, package, release):
+    def _rest_package_check_dependencies(self, host, type, id, release):
         """ Send a xpl message to check python dependencies
             @param host : host targetted
-            @param package : fullname of package (type-name)
+            @param type : type of package
+            @param id ; id of package
             @param release : package release
             Return status of each dependency as json
         """
         self.log.debug("Package : ask for checking dependencies for a package")
+        package = "%s-%s" % (type, id)
 
         ### Send xpl message to check dependencies
         message = XplMessage()
@@ -3915,19 +3932,21 @@ target=*
                     loop_again = False
             self.send_http_response_ok(json_data.get())
 
-    def _rest_package_install(self, host, package, release):
+    def _rest_package_install(self, host, type, id, release):
         """ Send xpl messages to install a package :
             - one to manager on target host for "bin" files
             - one to manager on rinor's host for rest's xml files
             @param host : host targetted
-            @param package : fullname of package (type-name)
+            @param type : type of package
+            @param id : id of package
             @param release : package release
             Return ok/ko as json
         """
         self.log.debug("Package : ask for installing a package")
+        package = "%s/%s/%s" % (type, id, release)
 
         pkg_mgr = PackageManager()
-        pkg_mgr.cache_package(PKG_CACHE_DIR, "repo:%s" % package, release)
+        pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, release)
 
         #### Send xpl message to install package's rinor part
         message = XplMessage()
@@ -3935,7 +3954,9 @@ target=*
         message.set_schema("domogik.package")
         message.add_data({"command" : "install"})
         message.add_data({"host" : self.get_sanitized_hostname()})
-        message.add_data({"package" : package})
+        message.add_data({"source" : "cache"})
+        message.add_data({"type" : type})
+        message.add_data({"id" : id})
         message.add_data({"release" : release})
         message.add_data({"part" : PKG_PART_RINOR})
         self.myxpl.send(message)
@@ -3949,7 +3970,9 @@ target=*
                                            "xpl-trig", 
                                            "domogik.package", 
                                            filter_data = {"command" : "install",
-                                                          "package" : package,
+                                                          "source" : "cache",
+                                                          "type" : type,
+                                                          "id" : id,
                                                           "release" : release,
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
@@ -3972,7 +3995,9 @@ target=*
         message.set_schema("domogik.package")
         message.add_data({"command" : "install"})
         message.add_data({"host" : host})
-        message.add_data({"package" : package})
+        message.add_data({"source" : "cache"})
+        message.add_data({"type" : type})
+        message.add_data({"id" : id})
         message.add_data({"release" : release})
         message.add_data({"part" : PKG_PART_XPL})
         self.myxpl.send(message)
@@ -3986,7 +4011,9 @@ target=*
                                            "xpl-trig", 
                                            "domogik.package", 
                                            filter_data = {"command" : "install",
-                                                          "package" : package,
+                                                          "source" : "cache",
+                                                          "type" : type,
+                                                          "id" : id,
                                                           "release" : release,
                                                           "host" : host},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
@@ -4011,15 +4038,17 @@ target=*
             json_data.set_data_type("install")
             self.send_http_response_ok(json_data.get())
 
-    def _rest_package_uninstall(self, host, package):
+    def _rest_package_uninstall(self, host, type, id):
         """ Send xpl messages to install a package :
             - one to manager on target host for "bin" files
             - one to manager on rinor's host for rest's xml files
             @param host : host targetted
-            @param package : fullname of package (type-name)
+            @param type : package type
+            @param id : package id
             Return ok/ko as json
         """
         self.log.debug("Package : ask for uninstalling a package")
+        package = "%s-%s" % (type, id)
 
         ### Send xpl message to uninstall package
         message = XplMessage()
@@ -4027,7 +4056,8 @@ target=*
         message.set_schema("domogik.package")
         message.add_data({"command" : "uninstall"})
         message.add_data({"host" : host})
-        message.add_data({"package" : package})
+        message.add_data({"type" : type})
+        message.add_data({"id" : id})
         self.myxpl.send(message)
 
         ### Wait for answer
@@ -4039,7 +4069,8 @@ target=*
                                            "xpl-trig", 
                                            "domogik.package", 
                                            filter_data = {"command" : "uninstall",
-                                                          "package" : package,
+                                                          "type" : type,
+                                                          "id" : id,
                                                           "host" : host},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
@@ -4060,6 +4091,56 @@ target=*
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("uninstall")
             self.send_http_response_ok(json_data.get())
+
+
+    def _rest_package_download(self, type, id, release):
+        """ Download a package storen in cache
+        """
+        pkg_path = "%s-%s-%s.tgz" % (type, id, release)
+        # Check file opening
+        try:
+            file_name = "%s/%s" % (PKG_CACHE_DIR, pkg_path)
+            my_file = open("%s" % (file_name), "rb")
+        except IOError:
+            self.send_http_response_error(999, "No file '%s' available" % file_name,
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        # Get informations on file
+        ctype = None
+        file_stat = os.fstat(my_file.fileno())
+        print file_name
+        #last_modified = os.stat("%s" % (file_name))[stat.ST_MTIME]
+        last_modified = os.path.getmtime(file_name)
+
+        # Get mimetype information
+        if not mimetypes.inited:
+            mimetypes.init()
+        extension_map = mimetypes.types_map.copy()
+        extension_map.update({
+                '' : 'application/octet-stream', # default
+                '.py' : 'text/plain'})
+        basename, extension = os.path.splitext(file_name)
+        if extension in extension_map:
+            ctype = extension_map[extension] 
+        else:
+            extension = extension.lower()
+            if extension in extension_map:
+                ctype = extension_map[extension] 
+            else:
+                ctype = extension_map[''] 
+
+        # Send file
+        self.send_response(200)
+        self.send_header("Content-type", ctype)
+        self.send_header("Content-Length", str(file_stat[6]))
+        self.send_header("Last-Modified", last_modified)
+        self.end_headers()
+        shutil.copyfileobj(my_file, self.wfile)
+        my_file.close(
+
+    )
+
 
 
 

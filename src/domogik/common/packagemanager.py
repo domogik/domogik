@@ -70,6 +70,11 @@ if conf.has_key('package_path'):
 else:
     INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
 
+cfg = Loader('rest')
+config = cfg.load()
+conf = dict(config[1])
+REST_URL = "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
+
 PLUGIN_XML_PATH = "%s/plugins/softwares" % INSTALL_PATH
 EXTERNAL_XML_PATH = "%s/plugins/externals" % INSTALL_PATH
 
@@ -259,21 +264,19 @@ class PackageManager():
         self.log("OK")
     
 
-    def cache_package(self, cache_folder, package, release):
+    def cache_package(self, cache_folder, type, id, release):
         """ Download package to put it in cache
             @param cache_folder : folder in which we want to cache the file
-            @param package : package id
+            @param type : package type
+            @param id : package id
             @param release : package release
         """
-        if package[0:5] == "repo:":
-            pkg, status = self._find_package(package[5:], release)
-            if status != True:
-                return status
-            path = pkg.package_url
-        else:
-            self.log("Only 'repo:....' path can be refreshed")
-        package = package[5:]
-        dl_path = "%s/%s-%s.tar.gz" % (cache_folder, package, release)
+        package = "%s-%s" % (type, id)
+        pkg, status = self._find_package(package, release)
+        if status != True:
+            return status
+        path = pkg.package_url
+        dl_path = "%s/%s-%s-%s.tgz" % (cache_folder, type, id, release)
         self.log("Caching package : '%s' to '%s'" % (path, dl_path))
         urllib.urlretrieve(path, dl_path)
         path = dl_path
@@ -292,6 +295,9 @@ class PackageManager():
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
         self.log("Start install for part '%s' of '%s'" % (package_part, path))
+        if path[0:6] == "cache:":
+            path = "%s/package/download/%s" % (REST_URL, path[6:])
+
         if path[0:5] == "repo:":
             pkg, status = self._find_package(path[5:], release)
             if status != True:
@@ -324,7 +330,7 @@ class PackageManager():
 
         # Check if we need to download package
         if path[0:4] == "http":
-            dl_path = "%s/%s.tar.gz" % (my_tmp_dir_dl, full_name)
+            dl_path = "%s/%s.tgz" % (my_tmp_dir_dl, full_name)
             self.log("Downloading package : '%s' to '%s'" % (path, dl_path))
             urllib.urlretrieve(path, dl_path)
             path = dl_path
@@ -388,15 +394,15 @@ class PackageManager():
         return True
 
 
-    def uninstall_package(self, package):
+    def uninstall_package(self, type, id):
         """ Uninstall a package
             For the moment, we will only delete the package xml file for 
             plugins and external
-            @param package : package name
+            @param type : package type
+            @param id : package id
         """
-        self.log("Start uninstall for package '%s'" % package)
+        self.log("Start uninstall for package '%s-%s'" % (type, id))
         self.log("Only xml description file will be deleted in this Domogik version")
-        (type, id) = package.split("-")
 
         try:
             if type in ('plugin'):
