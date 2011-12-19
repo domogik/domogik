@@ -73,17 +73,22 @@ class dawndusk(XplPlugin):
                 latitude="47.352"
             if longitude==None:
                 longitude="5.043"
+            boo=self._config.query('dawndusk', 'cron')
+            if boo==None:
+                boo="False"
+            use_cron = eval(boo)
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.exception("dawndusk.__init__ : "+error)
             longitude = "5.043"
             latitude = "47.352"
+            use_cron = False
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to start the dawndusk librairy")
         try:
-            self._mydawndusk = dawnduskAPI(longitude,latitude)
+            self._mydawndusk = dawnduskAPI(longitude,latitude,use_cron,self.myxpl,self.log)
         except:
             error = "Something went wrong during dawnduskAPI init : %s" %  \
                      (traceback.format_exc())
@@ -102,8 +107,32 @@ class dawndusk(XplPlugin):
         self.log.debug("dawndusk.__init__ : Try to create listeners")
         Listener(self.dawndusk_cmnd_cb, self.myxpl,
                  {'schema': 'dawndusk.request', 'xpltype': 'xpl-cmnd'})
+        if use_cron==True:
+            #We need to catch the dawndusk trig message to schedule the next one
+            Listener(self.dawndusk_trig_cb, self.myxpl,
+                 {'schema': 'dawndusk.basic', 'xpltype': 'xpl-trig'})
         self.enable_hbeat()
         self.log.info("dawndusk plugin correctly started")
+
+    def dawndusk_trig_cb(self, message):
+        """
+        General callback for all command messages
+        @param message : an XplMessage object
+        """
+        self.log.debug("dawndusk.dawndusk_trig_cb() : Start ...")
+        mtype = None
+        if 'type' in message.data:
+            mtype = message.data['type']
+        status = None
+        if 'status' in message.data:
+            status = message.data['status']
+        self.log.debug("dawndusk.dawndusk_trig_cb :  type %s received with status %s" %
+                       (mtype,status))
+        if mtype=="dawndusk" and status!=None:
+            #We receive a trig indicating that the dawn or dus has occured.
+            #We need to schedule the next one
+            self.addNextEvent()
+        self.log.debug("dawndusk.dawndusk_trig_cb() : Done :)")
 
     def dawndusk_cmnd_cb(self, message):
         """
