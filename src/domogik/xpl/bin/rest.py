@@ -44,6 +44,8 @@ class RestHandler(BaseHTTPRequestHandler):
 @license: GPL(v3)
 @organization: Domogik
 """
+from domogik.xpl.common.xplconnector import XplTimer
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
@@ -155,6 +157,14 @@ class Rest(XplPlugin):
 
         # API version
         self._rest_api_version = REST_API_VERSION
+
+        # Hosts list
+        self._hosts_list = {self.get_sanitized_hostname() : 
+                                {"status" : "on",
+                                 "type" : "main",
+                                 "last_seen" : time.time(),
+                                 "ip" : "",
+                                 "interval" : "1"}}
 
         try:
     
@@ -345,7 +355,20 @@ class Rest(XplPlugin):
                       'command' : 'stop'})
             Listener(self._add_to_queue_command, self.myxpl, \
                      {'xpltype': 'xpl-trig'})
+
+            # Listener for hosts list
+            Listener(self._list_hosts, self.myxpl, \
+                     {'schema': 'hbeat.app',
+                      'xpltype': 'xpl-stat'})
  
+            # Background process to check if hosts has disappeared
+            thr_hbeat = XplTimer(10, \
+                                 self._refresh_status_for_list_hosts, \
+                                 self.myxpl)
+            thr_hbeat.start()
+   
+            self._discover_hosts()
+            
             # Load xml files for /command
             self.xml = {}
             self.xml_date = None
@@ -542,8 +565,42 @@ class Rest(XplPlugin):
             my_queue.put((time.time(), message), True, self._queue_timeout) 
             self.log_queue.debug("Cleaning finished")
               
+    def _discover_hosts(self):
+        """ Send a hbeat.request to discover managers
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-cmnd')
+        mess.set_target("*")
+        mess.set_schema('hbeat.request')
+        mess.add_data({'command' : 'request'})
+        self.myxpl.send(mess)
+
+    def _list_hosts(self, message):
+        """ Maintain list of Domogik hosts
+            @param message : hbeat.app xpl message
+        """
+        tmp1 = message.source.split(".")
+        tmp2 = tmp1[0].split("-")
+        vendor = tmp2[0]
+        device = tmp2[1]
+        instance = tmp1[1]
+        if vendor == "domogik" and device == "manager":
+             # host not in the list
+             if self._hosts_list.has_key(instance) == False:
+                 self._hosts_list[instance] = {"type" : "secondary"}
+             self._hosts_list[instance]["status"] = "on"
+             self._hosts_list[instance]["last_seen"] = time.time()
+             self._hosts_list[instance]["interval"] = 60 * int(message.data["interval"])
+             self._hosts_list[instance]["ip"] = message.data["remote-ip"]
                 
 
+    def _refresh_status_for_list_hosts(self):
+        """ Check if hosts has disappeared
+        """
+        now = time.time()
+        for instance in self._hosts_list:
+            if (now - self._hosts_list[instance]["last_seen"] > self._hosts_list[instance]["interval"]):
+                self._hosts_list[instance]["status"] = "off"
 
 
     def start_http(self):

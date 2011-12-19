@@ -171,6 +171,8 @@ class ProcessRequest():
 
         self.stat_mgr =  self.handler_params[0].stat_mgr
 
+        self._hosts_list = self.handler_params[0]._hosts_list
+
         # global init
         self.jsonp = False
         self.jsonp_cb = ""
@@ -287,6 +289,8 @@ class ProcessRequest():
             self.rest_package()
         elif self.rest_type == "log":
             self.rest_log()
+        elif self.rest_type == "host":
+            self.rest_host()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -4239,4 +4243,48 @@ target=*
         except IOError:
             result = "Unable to read '%s' file" % path
         self.send_http_response_text_html(result)
+
+######
+# /host processing
+######
+
+    def rest_host(self):
+        """ /host processing
+        """
+        self.log.debug("Host action")
+
+        # parameters initialisation
+        self.parameters = {}
+
+        if len(self.rest_request) < 1:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        ### list ##################################
+        if self.rest_request[0] == "list":
+
+            if len(self.rest_request) == 1:
+                self._rest_host_list()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ####################################
+        else:
+            self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
+            return
+
+    def _rest_host_list(self):
+        """ Get hosts list
+            Display this list as json
+        """
+        self.log.debug("Host : ask for list")
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("host")
+
+        json_data.add_data(self._hosts_list)
+        self.send_http_response_ok(json_data.get())
 
