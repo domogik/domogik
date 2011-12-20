@@ -161,7 +161,7 @@ class Rest(XplPlugin):
         # Hosts list
         self._hosts_list = {self.get_sanitized_hostname() : 
                                 {"status" : "on",
-                                 "type" : "main",
+                                 "primary" : "True",
                                  "last_seen" : time.time(),
                                  "ip" : "",
                                  "interval" : "1"}}
@@ -587,7 +587,7 @@ class Rest(XplPlugin):
         if vendor == "domogik" and device == "manager":
              # host not in the list
              if self._hosts_list.has_key(instance) == False:
-                 self._hosts_list[instance] = {"type" : "secondary"}
+                 self._hosts_list[instance] = {"primary" : "False"}
              self._hosts_list[instance]["status"] = "on"
              self._hosts_list[instance]["last_seen"] = time.time()
              self._hosts_list[instance]["interval"] = 60 * int(message.data["interval"])
