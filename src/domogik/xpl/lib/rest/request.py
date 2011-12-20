@@ -3622,8 +3622,9 @@ target=*
 
         ### list-installed ###########################
         elif self.rest_request[0] == "list-installed":
-            if len(self.rest_request) == 1:
-                self._rest_package_list_installed()
+            if len(self.rest_request) == 3:
+                self._rest_package_list_installed(self.rest_request[1],
+                                                  self.rest_request[2])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -3761,9 +3762,11 @@ target=*
         self.send_http_response_ok(json_data.get())
 
 
-    def _rest_package_list_installed(self):
+    def _rest_package_list_installed(self, host, pkg_type):
         """ Send a xpl message to manager to get installed packages list
             Display this list as json
+            @param host : host
+            @param pkg_type : type of package
         """
         self.log.debug("Package : ask for installed packages list")
 
@@ -3772,7 +3775,7 @@ target=*
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.package")
         message.add_data({"command" : "installed-packages-list"})
-        message.add_data({"host" : "*"})
+        message.add_data({"host" : host})
         self.myxpl.send(message)
 
         ### Wait for answer
@@ -3780,65 +3783,43 @@ target=*
         # make a time loop of one second after first xpl-trig reception
         messages = []
         try:
-            # Get first answer for command
+            # Get answer for command
             self.log.debug("Package repository list : wait for first answer...")
-            msg = self._get_from_queue(self._queue_package, 
+            message = self._get_from_queue(self._queue_package, 
                                                  "xpl-trig", 
                                                  "domogik.package",
                                                  filter_data = {"command" : "installed-packages-list"})
-            messages.append(msg)
-            # after first message, we start to listen for other messages 
-            self.log.debug("Installed package list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
-            max_time = time.time() + WAIT_FOR_LIST_ANSWERS
-            while time.time() < max_time:
-                try:
-                    msg = self._get_from_queue(self._queue_package, 
-                                                   "xpl-trig", 
-                                                   "domogik.package", 
-                                                   filter_data = {"command" : "installed-packages-list"},
-                                                   timeout = WAIT_FOR_LIST_ANSWERS)
-                    messages.append(msg)
-                    self.log.debug("Installed packages list : get one answer from '%s'" % message.data["host"])
-                except Empty:
-                    self.log.debug("Installed packages list : empty queue")
-                    pass
-            self.log.debug("Installed packages list : end waiting for answers")
         except Empty:
             self.log.debug("Installed packages list : no answer")
             self.send_http_response_error(999, "No data or timeout on getting installed packages list",
                                           self.jsonp, self.jsonp_cb)
             return
 
-        self.log.debug("Installed packages list : messages received : %s" % str(messages))
-        
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
 
-        # process messages
-        for message in messages:
-            pkg_list = {}
-            cmd = message.data['command']
-            host = message.data["host"]
-    
-            idx = 0
-            loop_again = True
-            while loop_again:
-                try:
+        # process message
+        pkg_list = []
+        cmd = message.data['command']
+        host = message.data["host"]
+
+        idx = 0
+        loop_again = True
+        while loop_again:
+            try:
+                if pkg_type == message.data["type"+str(idx)]:
                     data = {"fullname" : message.data["fullname"+str(idx)],
                             "id" : message.data["id"+str(idx)],
                             "release" : message.data["release"+str(idx)],
                             "type" : message.data["type"+str(idx)],
                             "host" : host}
-                    my_type = data['type']
-                    if pkg_list.has_key(my_type):
-                        pkg_list[my_type].append(data)
-                    else:
-                        pkg_list[my_type] = [data]
-                    idx += 1
-                except:
-                    loop_again = False
-            json_data.add_data({"host" : host, "installed" : pkg_list})
+                    # TODO : check for available updates!!!! 
+                    pkg_list.append(data)
+                idx += 1
+            except:
+                loop_again = False
+        json_data.add_data({"host" : host, "installed" : pkg_list})
     
         self.send_http_response_ok(json_data.get())
 
