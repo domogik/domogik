@@ -4256,26 +4256,20 @@ target=*
         # parameters initialisation
         self.parameters = {}
 
-        if len(self.rest_request) < 1:
-            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
-            return
+        ### list hosts ############################
+        if len(self.rest_request) == 0:
+            self._rest_host_list()
 
-        ### list ##################################
-        if self.rest_request[0] == "list":
-
-            if len(self.rest_request) == 1:
-                self._rest_host_list()
-            else:
-                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
-                                              self.jsonp, self.jsonp_cb)
-                return
+        ### detail for a host #####################
+        elif len(self.rest_request) == 1:
+            self._rest_host_list(self.rest_request[0])
 
         ### others ####################################
         else:
-            self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, "Bad operation for /host", self.jsonp, self.jsonp_cb)
             return
 
-    def _rest_host_list(self):
+    def _rest_host_list(self, host = None):
         """ Get hosts list
             Display this list as json
         """
@@ -4285,6 +4279,12 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("host")
 
-        json_data.add_data(self._hosts_list)
+        if host == None:
+            json_data.add_data(self._hosts_list)
+        else:
+            try:
+                json_data.add_data(self._hosts_list[host])
+            except KeyError:
+                json_data.add_data({})
         self.send_http_response_ok(json_data.get())
 
