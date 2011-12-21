@@ -3607,23 +3607,20 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
-        ### list #####################################
-        elif self.rest_request[0] == "list":
-            if len(self.rest_request) == 1:
-                self._rest_package_list()
+        ### available ################################
+        elif self.rest_request[0] == "available":
+            if len(self.rest_request) == 3:
+                self._rest_package_available(self.rest_request[1],
+                                             self.rest_request[2])
             else:
-                offset = 1
-                if self.set_parameters(offset):
-                    self._rest_package_list()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
                 return
 
         ### list-installed ###########################
-        elif self.rest_request[0] == "list-installed":
+        elif self.rest_request[0] == "installed":
             if len(self.rest_request) == 3:
-                self._rest_package_list_installed(self.rest_request[1],
+                self._rest_package_installed(self.rest_request[1],
                                                   self.rest_request[2])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
@@ -3733,36 +3730,49 @@ target=*
             json_data.set_data_type("cache")
             self.send_http_response_ok(json_data.get())
 
-    def _rest_package_list(self):
-        """ Get packages list
+    def _rest_package_available(self, host, pkg_type):
+        """ Get packages list not already installed
             Display this list as json
+            @param host : filter on host
+            @param pkg_type : filter on package type
         """
-        self.log.debug("Package : ask for packages list")
+        self.log.debug("Package : ask for available packages list")
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("package")
+        json_data.set_data_type("package-available")
 
-        #by_type = self.get_parameters("by-type")
-        #by_repo = self.get_parameters("by-repo")
-        pkg_mgr = PackageManager()
-        pkg_list = {}
-        for data in pkg_mgr.get_packages_list():
-            #if (by_type == None or by_type == data['type']) \
-            #    and (by_repo == None or by_repo == data['package-url'][0:len(by_repo)]):
-            #    json_data.add_data(data)
-            my_type = data['type']
-            if pkg_list.has_key(my_type):
-                pkg_list[my_type].append(data)
-            else:
-                pkg_list[my_type] = [data]
-        if pkg_list != {}:
-            json_data.add_data(pkg_list)
+        # for the host, get the packages already installed
+        (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, pkg_type)
+        list_installed = []
+        if res == True:
+            message = data
+            # process message
+            cmd = message.data['command']
+            host = message.data["host"]
     
+            idx = 0
+            loop_again = True
+            while loop_again:
+                try:
+                    if pkg_type == message.data["type"+str(idx)]:
+                        list_installed.append(message.data["id"+str(idx)])
+                    idx += 1
+                except:
+                    loop_again = False
+
+        pkg_mgr = PackageManager()
+        pkg_list = []
+        # get package list for the type
+        for data in pkg_mgr.get_packages_list(type = None):
+            if data["id"] not in list_installed:
+                print "!"
+                json_data.add_data(data)
+
         self.send_http_response_ok(json_data.get())
 
 
-    def _rest_package_list_installed(self, host, pkg_type):
+    def _rest_package_installed(self, host, pkg_type):
         """ Send a xpl message to manager to get installed packages list
             Display this list as json
             @param host : host
@@ -3770,34 +3780,16 @@ target=*
         """
         self.log.debug("Package : ask for installed packages list")
 
-        ### Send xpl message to get list
-        message = XplMessage()
-        message.set_type("xpl-cmnd")
-        message.set_schema("domogik.package")
-        message.add_data({"command" : "installed-packages-list"})
-        message.add_data({"host" : host})
-        self.myxpl.send(message)
-
-        ### Wait for answer
-        # get xpl message from queue
-        # make a time loop of one second after first xpl-trig reception
-        messages = []
-        try:
-            # Get answer for command
-            self.log.debug("Package repository list : wait for first answer...")
-            message = self._get_from_queue(self._queue_package, 
-                                                 "xpl-trig", 
-                                                 "domogik.package",
-                                                 filter_data = {"command" : "installed-packages-list"})
-        except Empty:
-            self.log.debug("Installed packages list : no answer")
-            self.send_http_response_error(999, "No data or timeout on getting installed packages list",
+        (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, pkg_type)
+        if res == True: # ok
+            message = data
+        else:
+            self.send_http_response_error(999, data,
                                           self.jsonp, self.jsonp_cb)
-            return
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("package")
+        json_data.set_data_type("package-installed")
 
         # process message
         pkg_list = []
@@ -3822,6 +3814,37 @@ target=*
         json_data.add_data({"host" : host, "installed" : pkg_list})
     
         self.send_http_response_ok(json_data.get())
+
+    def _rest_package_send_xpl_to_get_installed_list(self, host, pkg_type):
+        """ Send a xpl message to manager to get installed packages list
+            @param host : host
+            @param pkg_type : type of package
+        """
+
+        ### Send xpl message to get list
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "installed-packages-list"})
+        message.add_data({"host" : host})
+        self.myxpl.send(message)
+
+        ### Wait for answer
+        # get xpl message from queue
+        # make a time loop of one second after first xpl-trig reception
+        messages = []
+        try:
+            # Get answer for command
+            self.log.debug("Package repository list : wait for first answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                                 "xpl-trig", 
+                                                 "domogik.package",
+                                                 filter_data = {"command" : "installed-packages-list"})
+        except Empty:
+            self.log.debug("Installed packages list : no answer")
+            return False, "No data or timeout on getting installed packages list"
+        return True, message
+
 
     def _rest_package_check_dependencies(self, host, type, id, release):
         """ Send a xpl message to check python dependencies
@@ -4261,7 +4284,8 @@ target=*
         json_data.set_data_type("host")
 
         if host == None:
-            json_data.add_data(self._hosts_list)
+            for my_host in self._hosts_list:
+                json_data.add_data(my_host)
         else:
             try:
                 json_data.add_data(self._hosts_list[host])

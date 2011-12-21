@@ -656,11 +656,12 @@ class PackageManager():
                     return pkg_xml.priority
         return None
 
-    def get_packages_list(self, fullname = None, release = None):
+    def get_packages_list(self, fullname = None, release = None, type = None):
         """ List all packages in cache folder 
             and return a detailed list
             @param fullname (optionnal) : fullname of a package
             @param release (optionnal) : release of a package (to use with name)
+            @param type (optionnal) : package type
             Used by Rest
         """
         pkg_list = []
@@ -668,7 +669,8 @@ class PackageManager():
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                 if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
-                    pkg_list.append({"id" : pkg_xml.id,
+                    if type == None or type == pkg_xml.type:
+                        pkg_list.append({"id" : pkg_xml.id,
                                      "type" : pkg_xml.type,
                                      "fullname" : pkg_xml.fullname,
                                      "release" : pkg_xml.release,
