@@ -21,11 +21,13 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 Plugin purpose
 ==============
-
-XPL Cron
+XPL Cron server.
 
 Implements
 ==========
+class cronJobs
+class cronException
+class cronAPI
 
 @author: Sébastien Gallet <sgallet@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -48,6 +50,7 @@ ERROR_PARAMETER=1
 ERROR_DEVICE_EXIST=10
 ERROR_DEVICE_NOT_EXIST=11
 ERROR_SCHEDULER=20
+ERROR_NOT_IMPLEMENTED=30
 
 cronErrors = { ERROR_NO: 'No error',
                ERROR_PARAMETER: 'Missing or wrong parameter',
@@ -128,6 +131,7 @@ class cronJobs:
             'timer': lambda d: self._startJobTimer(d),
             'interval': lambda d: self._startJobInterval(d),
             'cron': lambda d: self._startJobCron(d),
+            'hvac': lambda d: self._startJobHvac(d),
         }
         if device in self.data.iterkeys():
             devicetype=self.data[device]['devicetype']
@@ -372,6 +376,184 @@ class cronJobs:
             return ERROR_SCHEDULER
         return ERROR_NO
 
+    def isValidHour(self,hour):
+        #print hour[0:2]
+        #print hour[3:5]
+        try:
+            t=datetime.time(int(hour[0:2]),int(hour[3:5]))
+        except :
+            #print "error in %s"%hour
+            return False
+        return True
+
+    def _extractParameters(self,device):
+        res={}
+        ok=True
+        if 'parameter0' in self.data[device]:
+            parameter0 = self.data[device]['parameter0']
+            ok=False
+            if 'valueon0' in self.data[device] and 'valueoff0' in self.data[device]:
+                valueon0 = self.data[device]['valueon0']
+                valueoff0 = self.data[device]['valueoff0']
+                res[parameter0]={'valueon':valueon0,'valueoff':valueoff0}
+                ok=True
+            else:
+                ok=False
+        if ok and 'parameter1' in self.data[device]:
+            parameter1 = self.data[device]['parameter1']
+            ok=False
+            if 'valueon1' in self.data[device] and 'valueoff1' in self.data[device]:
+                valueon1 = self.data[device]['valueon1']
+                valueoff1 = self.data[device]['valueoff1']
+                res[parameter1]={'valueon':valueon1,'valueoff':valueoff1}
+                ok=True
+            else:
+                ok=False
+        return res
+
+    def _startJobHvac(self, device):
+        """
+        Start a job of type hvac
+        This schema reports the current timer settings. It is sent as
+        an xPL status message if requested by an hvac.request
+        with request=timer, or as a trigger message when a timer
+        value is changed.
+
+        The timer elements define the days and times on which the
+        hvac system will be active. There can be more than one
+        timer= element in the message. This allows different time
+        periods to be set for different days of the week (for example,
+        additional heating at weekends, when the house may be occupied
+        for a greater portion of the day).The timer values provided in
+        this message replace any previous timer settings, so the message
+        contains all the timer information for the zone.
+
+        The format of the timer value consists of a list of
+        two-character codes for the days of the week (each code is
+        simply the first two letters of the day) on which the timer
+        will be active (with no delimiters), followed by a comma
+        separated list of time periods. Each time period is formed
+        from a start time and end time separated by a hyphen,
+        with each time in the form hh:mm using the 24 hour clock.
+
+        For example, for timers defining a morning and evening period
+        during the week, and a daytime period at weekends,
+        the message could look something like this:
+
+        hvac.timer
+         {
+            zone=lounge
+            timer=MoTuWeThFr,06:30-09:00,17:00-22:30
+            timer=SaSu,08:00-23:00
+         }
+
+        If no timers have been set, then the message will contain
+        the zone and a single timer= entry with nothing to the right
+        of the equals sign.
+        @param device : the name of the job (=device in xpl)
+        timer.basic
+           {
+            action=start
+            device=<name of the timer>, normally the zone id
+            devicetype=hvac
+            timer1=MoTuWeThFr|06:30-09:00|17:00-22:30
+            [timer2=SaSu|08:00-23:00]
+            [timer3=...]
+            [onstate=comfort]
+            [offstate=economy]
+           }
+        hvac.timer
+           {
+            zone=id
+            timer=[SuMoTuWeThFrSa,hh:mm-hh:mm,hh:mm-hh:mm,...etc]
+            [timer=]
+           }
+        """
+        ok=True
+        try:
+            timer = None
+            if 'timer0' in self.data[device]:
+                timer = self.data[device]['timer0']
+                #print "timer=%s"%timer
+            else:
+                ok=False
+            parameters = self._extractParameters(device)
+            if ok==False:
+                self._api.log.exception("cronJobs._startJobHvac : Don't add hvac job : missing parameters")
+                del(self.data[device])
+                return ERROR_PARAMETER
+        except:
+            self._api.log.exception("cronJobs._startJobHvac : "+traceback.format_exc())
+            del(self.data[device])
+            return ERROR_PARAMETER
+        try :
+            ok=True
+            events={}
+            days={"Mo":0,"Tu":1,"We":2,"Th":3,"Fr":4,"Sa":5,"Su":6}
+            for key in self.data[device]:
+                if key.startswith("timer"):
+                    timer=self.data[device][key]
+                    idx=timer.find("|")
+                    if idx<=0:
+                        ok=False
+                    ds=timer[0:idx]
+                    hrs=timer[idx+1:]
+                    #print ("ds=%s")%ds
+                    #print ("hrs=%s")%hrs
+                    cont=True
+                    while cont:
+                        d=ds[0:2]
+                        #print "d=%s"%d
+                        if len(ds)<2:
+                            cont=False
+                        elif d not in days:
+                            cont=False
+                            ok=False
+                        else:
+                            events[d]={}
+                            for hs in hrs.split("|"):
+                                #print "hs=%s"%hs
+                                i=hs.find("-")
+                                deb=hs[0:i]
+                                end=hs[i+1:]
+                                #print "deb=%s"%deb
+                                #print "end=%s"%end
+                                if self.isValidHour(deb):
+                                    events[d][deb]="valueon"
+                                else:
+                                    cont=False
+                                    ok=False
+                                if self.isValidHour(end):
+                                    events[d][end]="valueoff"
+                                else:
+                                    cont=False
+                                    ok=False
+                        ds=ds[2:]
+                        if len(ds)<2:
+                            cont=False
+                        #print "ok=%s"%ok
+            if ok:
+                #print "events=%s"%events
+                jobs=[]
+                for d in events:
+                    for h in events[d]:
+                        dayofweek=days[d]
+                        hour=int(h[0:2])
+                        minute=int(h[3:5])
+                        jobs.append(self._scheduler.add_cron_job(self._api.sendXplJob, day_of_week=dayofweek,hour=hour,minute=minute,args=[device,parameters,events[d][h]]))
+                self.data[device]['current']="started"
+                self.data[device]['apjobs']=jobs
+                self.data[device]['starttime']=datetime.datetime.today()
+                self._api.log.info("cronJobs._startJobHvac : add a hvac job %s" % str(jobs))
+        except:
+            self._api.log.exception("cronJobs._startJobHvac : "+traceback.format_exc())
+            del(self.data[device])
+            return ERROR_SCHEDULER
+        if ok:
+            return ERROR_NO
+        else:
+            return ERROR_SCHEDULER
+
     def addJob(self, device, devicetype, message):
         """
         add a job
@@ -496,7 +678,7 @@ class cronJobs:
         xpldate = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
         return xpldate
 
-    def getXplTrig(self,device):
+    def getXplTrig(self,device,parameters,value):
         """
         Return the xpl message to send and increase the counter
         """
@@ -507,6 +689,12 @@ class cronJobs:
         mess.add_data({'device' : device})
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
+        if parameters!=None:
+            for key in parameters:
+                if value in parameters[key]:
+                    mess.add_data({key:parameters[key][value]})
+                else :
+                    mess.add_data({"error":key})
         for key in self.data[device]:
             if key[0:4].startswith("nst-"):
                 k=key[4:]
@@ -544,7 +732,7 @@ class cronAPI:
         self.config=config
         self.jobs = cronJobs(self)
 
-    def sendXplJob(self,device):
+    def sendXplJob(self,device,parameters=None,value=None):
         """
         Send the XPL Trigger
         @param myxpl : The XPL sender
@@ -553,7 +741,7 @@ class cronAPI:
         @param elapsed : elapsed time
         """
         self.log.debug("cronAPI._sendXPLJob : Start ...")
-        mess = self.jobs.getXplTrig(device)
+        mess = self.jobs.getXplTrig(device,parameters,value)
         if mess!=None:
             self.myxpl.send(mess)
             self.log.debug("cronAPI._sendXPLJob : xplmessage = %s"%mess)
@@ -653,9 +841,12 @@ class cronAPI:
             mess.add_data({"uptime" : self.jobs.getUpTime(device)})
             mess.add_data({"runtime" : self.jobs.getRunTime(device)})
             mess.add_data({"runtimes" : self.jobs.getRunTimes(device)})
-        else:
+        elif device==None:
             mess.add_data({"devices" : self.jobs.getList()})
             mess.add_data({"apjobs" : self.jobs.getAPList()})
+        else:
+            mess.add_data({"device" : device})
+            mess.add_data({"error" : "Device %s not found"%device})
         myxpl.send(mess)
         self.log.debug("cronAPI._actionStatus : Done :)")
 

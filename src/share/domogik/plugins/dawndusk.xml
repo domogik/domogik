@@ -35,7 +35,7 @@
       <order-id>3</order-id>
       <name>cron</name>
       <type>boolean</type>
-      <description>Use esternal cron like the cron plugin to schedule events</description>
+      <description>Use external cron like the cron plugin to schedule events</description>
       <default-value>False</default-value>
     </key>
   </configuration-keys>
@@ -63,6 +63,12 @@
           <description>Tell if is the day or the night</description>
           <device_technology_id>dawndusk</device_technology_id>
       </device_type>
+      <device_type>
+          <id>dawndusk.sensor</id>
+          <device_technology_id>dawndusk</device_technology_id>
+          <name>DawnDusk</name>
+          <description>View the day/night status using dawn/dusk signals</description>
+      </device_type>
   </device_types>
   <device_feature_models>
       <device_feature_model>
@@ -75,6 +81,18 @@
           </parameters>
           <value_type>binary</value_type>
           <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+     <device_feature_model>
+          <id>dawndusk.sensor.status</id>
+          <name>DawnDuskStatus</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>dawndusk.sensor</device_type_id>
+          <parameters>
+              {&quot;status&quot;:&quot;&quot;,&quot;value0&quot;:&quot;dusk&quot;, &quot;value1&quot;:&quot;dawn&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>status</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
   </device_feature_models>
