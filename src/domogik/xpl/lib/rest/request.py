@@ -3792,7 +3792,6 @@ target=*
         json_data.set_data_type("package-installed")
 
         # process message
-        pkg_list = []
         cmd = message.data['command']
         host = message.data["host"]
 
@@ -3807,11 +3806,10 @@ target=*
                             "type" : message.data["type"+str(idx)],
                             "host" : host}
                     # TODO : check for available updates!!!! 
-                    pkg_list.append(data)
+                    json_data.add_data(data)
                 idx += 1
             except:
                 loop_again = False
-        json_data.add_data({"host" : host, "installed" : pkg_list})
     
         self.send_http_response_ok(json_data.get())
 
@@ -4285,7 +4283,8 @@ target=*
 
         if host == None:
             for my_host in self._hosts_list:
-                json_data.add_data(my_host)
+                json_data.add_data({"id" : my_host,
+                                    "primary" : self._hosts_list[my_host]["primary"]})
         else:
             try:
                 json_data.add_data(self._hosts_list[host])
