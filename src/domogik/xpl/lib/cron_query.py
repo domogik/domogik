@@ -284,15 +284,13 @@ class cronQuery():
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
-        @param year: year to run on
-        @param month: month to run on
-        @param day: day of month to run on
-        @param week: week of the year to run on
-        @param dayofweek: weekday to run on (0 = Monday)
-        @param hour: hour to run on
-        @param second: second to run on
-        @param startdate: when to first execute the job and start the
-               counter (default is after the given interval)
+        @param parameter0 : the first parameter to include as key in return message
+        @param valueon0 : the value of parameter0 in case of on
+        @param valueoff0 : the value of parameter0 in case of on
+        @param parameter1 : the second parameter to include as key in return message
+        @param valueon1 : the value of parameter0 in case of on
+        @param valueoff1 : the value of parameter0 in case of on
+        @param timers: the list of timers to use
        '''
         configMess = XplMessage()
         configMess.set_type("xpl-cmnd")
@@ -318,6 +316,52 @@ class cronQuery():
         if ok and len(timers)>0 :
             for key in timers:
                 configMess.add_data({key : timers[key]})
+        else:
+            ok=False
+        if ok==False:
+            return ERROR_PARAMETER
+        return self.startJob(device, configMess, nstMess)
+
+    def startAlarmJob( self, device, nstMess,
+                      parameter0=None, valueon0=None,valueoff0=None,
+                      parameter1=None, valueon1=None,valueoff1=None,
+                      alarms={}):
+        '''
+        Add and start a job to the cron plugin
+        @param device : the name of the timer
+        @param nstMess : the XPL message which will be sent by the cron job
+        @param parameter0 : the first parameter to include as key in return message
+        @param valueon0 : the value of parameter0 in case of on
+        @param valueoff0 : the value of parameter0 in case of on
+        @param parameter1 : the second parameter to include as key in return message
+        @param valueon1 : the value of parameter0 in case of on
+        @param valueoff1 : the value of parameter0 in case of on
+        @param alarms : the list of alarms to use
+       '''
+        configMess = XplMessage()
+        configMess.set_type("xpl-cmnd")
+        configMess.set_schema("timer.basic")
+        configMess.add_data({"devicetype" : "alarm"})
+        configMess.add_data({"device" : device})
+        configMess.add_data({"action" : "start"})
+        ok=True
+        if parameter0 != None:
+            configMess.add_data({"parameter0" : parameter0})
+            ok=False
+            if valueon0 != None and valueoff0 != None:
+                configMess.add_data({"valueon0" : valueon0})
+                configMess.add_data({"valueoff0" : valueoff0})
+                ok=True
+        if ok and parameter1 != None:
+            configMess.add_data({"parameter1" : parameter1})
+            ok=False
+            if valueon1 != None and valueoff1 != None:
+                configMess.add_data({"valueon1" : valueon1})
+                configMess.add_data({"valueoff1" : valueoff1})
+                ok=True
+        if ok and len(alarms)>0 :
+            for key in timers:
+                configMess.add_data({key : alarms[key]})
         else:
             ok=False
         if ok==False:

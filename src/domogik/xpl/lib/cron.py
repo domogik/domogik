@@ -59,7 +59,7 @@ cronErrors = { ERROR_NO: 'No error',
                ERROR_SCHEDULER: 'Error with the scheduler',
                }
 
-class cronJobs:
+class cronJobs():
 
     def __init__(self,api):
         self.data = dict()
@@ -83,7 +83,7 @@ class cronJobs:
         @param device : the name of the job (=device in xpl)
         """
         if device in self.data.iterkeys():
-            if self.data[device]['apjob']!=None:
+            if 'apjob' in self.data[device]:
                 self._scheduler.unschedule_job(self.data[device]['apjob'])
             if 'apjobs' in self.data[device]:
                 while len(self.data[device]['apjobs'])>0:
@@ -91,7 +91,7 @@ class cronJobs:
                     self._scheduler.unschedule_job(i)
                 del (self.data[device]['apjobs'])
             self.data[device]['current']="stopped"
-            self.data[device]['apjob']=None
+            del(self.data[device]['apjob'])
             return ERROR_NO
         else:
             return ERROR_DEVICE_NOT_EXIST
@@ -114,9 +114,9 @@ class cronJobs:
         @param device : the name of the job (=device in xpl)
         """
         if device in self.data.iterkeys():
-            if self.data[device]['apjob']!=None:
+            if 'apjob' in self.data[device]:
                 self._scheduler.unschedule_job(self.data[device]['apjob'])
-            self.data[device]['apjob']=None
+            del(self.data[device]['apjob'])
             return self.startJob(device)
         else:
             return ERROR_DEVICE_NOT_EXIST
@@ -132,6 +132,7 @@ class cronJobs:
             'interval': lambda d: self._startJobInterval(d),
             'cron': lambda d: self._startJobCron(d),
             'hvac': lambda d: self._startJobHvac(d),
+            'alarm': lambda d: self._startJobAlarm(d),
         }
         if device in self.data.iterkeys():
             devicetype=self.data[device]['devicetype']
@@ -278,6 +279,7 @@ class cronJobs:
             startdate = None
             if 'startdate' in self.data[device]:
                 startdate = self.dateFromXPL(self.data[device]['startdate'])
+            #parameters = self._extractParameters(device)
         except:
             self._api.log.exception("cronJobs._startJobInterval : "+traceback.format_exc())
             del(self.data[device])
@@ -358,6 +360,7 @@ class cronJobs:
             startdate = None
             if 'startdate' in self.data[device]:
                 startdate = self.dateFromXPL(self.data[device]['startdate'])
+            #parameters = self._extractParameters(device)
         except:
             self._api.log.exception("cronJobs._startJobCron : "+traceback.format_exc())
             del(self.data[device])
@@ -456,11 +459,11 @@ class cronJobs:
             action=start
             device=<name of the timer>, normally the zone id
             devicetype=hvac
-            timer1=MoTuWeThFr|06:30-09:00|17:00-22:30
-            [timer2=SaSu|08:00-23:00]
+            timer1=MoTuWeThFr,06:30-09:00,17:00-22:30
+            [timer2=SaSu,08:00-23:00]
             [timer3=...]
-            [onstate=comfort]
-            [offstate=economy]
+            [valueon1=comfort]
+            [valueoff1=economy]
            }
         hvac.timer
            {
@@ -468,6 +471,252 @@ class cronJobs:
             timer=[SuMoTuWeThFrSa,hh:mm-hh:mm,hh:mm-hh:mm,...etc]
             [timer=]
            }
+        """
+        ok=True
+        try:
+            timer = None
+            if not 'timer' in self.data[device]:
+                ok=False
+            parameters = self._extractParameters(device)
+            if ok==False:
+                self._api.log.exception("cronJobs._startJobHvac : Don't add hvac job : missing parameters")
+                del(self.data[device])
+                return ERROR_PARAMETER
+        except:
+            self._api.log.exception("cronJobs._startJobHvac : "+traceback.format_exc())
+            del(self.data[device])
+            return ERROR_PARAMETER
+        try :
+            ok=True
+            events={}
+            days={"Mo":0,"Tu":1,"We":2,"Th":3,"Fr":4,"Sa":5,"Su":6}
+            for key in self.data[device]:
+                if key.startswith("timer"):
+                    timersss=set()
+                    if type(self.data[device][key])==type(""):
+                        timersss.add(self.data[device][key])
+                    else :
+                        timersss=self.data[device][key]
+                    for timer in timersss:
+                        timer=self.data[device][key]
+                        idx=timer.find(",")
+                        if idx<=0:
+                            ok=False
+                        ds=timer[0:idx]
+                        hrs=timer[idx+1:]
+                        #print ("ds=%s")%ds
+                        #print ("hrs=%s")%hrs
+                        cont=True
+                        while cont:
+                            d=ds[0:2]
+                            #print "d=%s"%d
+                            if len(ds)<2:
+                                cont=False
+                            elif d not in days:
+                                cont=False
+                                ok=False
+                            else:
+                                events[d]={}
+                                for hs in hrs.split(","):
+                                    #print "hs=%s"%hs
+                                    i=hs.find("-")
+                                    deb=hs[0:i]
+                                    end=hs[i+1:]
+                                    #print "deb=%s"%deb
+                                    #print "end=%s"%end
+                                    if self.isValidHour(deb):
+                                        events[d][deb]="valueon"
+                                    else:
+                                        cont=False
+                                        ok=False
+                                    if self.isValidHour(end):
+                                        events[d][end]="valueoff"
+                                    else:
+                                        cont=False
+                                        ok=False
+                            ds=ds[2:]
+                            if len(ds)<2:
+                                cont=False
+                            #print "ok=%s"%ok
+            if ok:
+                #print "events=%s"%events
+                jobs=[]
+                for d in events:
+                    for h in events[d]:
+                        dayofweek=days[d]
+                        hour=int(h[0:2])
+                        minute=int(h[3:5])
+                        jobs.append(self._scheduler.add_cron_job(self._api.sendXplJob,hour=hour,minute=minute,args=[device,parameters,events[d][h]]))
+                self.data[device]['current']="started"
+                self.data[device]['apjobs']=jobs
+                self.data[device]['starttime']=datetime.datetime.today()
+                self._api.log.info("cronJobs._startJobHvac : add a hvac job %s" % str(jobs))
+        except:
+            self._api.log.exception("cronJobs._startJobHvac : "+traceback.format_exc())
+            del(self.data[device])
+            return ERROR_SCHEDULER
+        if ok:
+            return ERROR_NO
+        else:
+            return ERROR_SCHEDULER
+
+    def _startJobAlarm(self, device):
+        """
+        Start a job of type alarm
+        This schema reports the current timer settings. It is sent as
+        an xPL status message if requested by an hvac.request
+        with request=timer, or as a trigger message when a timer
+        value is changed.
+
+        The format of the timer value consists of a list of
+        two-character codes for the days of the week (each code is
+        simply the first two letters of the day) on which the timer
+        will be active (with no delimiters)
+        The second parameter is a simple time or an interval time.
+        If the period is an interval, a valueOn message is sent first and
+        a valueOff is send at the end of te period
+        The time in the form hh:mm using the 24 hour clock.
+
+        For example, for defining one alarm during the week at 6:30 and another
+        for the weekend at 8:00 :
+        You can also create an alarm to turn on your christmas tree twice a day.
+        timer.basic
+           {
+            action=start
+            device=<name of the timer>
+            devicetype=alarm
+            alarm=MoTuWeThFr,09:30|alarm=SaSu,08:00|alarm=SaSu,08:00,18:00|alarm=MoTuWeThFrSaSu,07:00-08:00,17:00-21:00
+         }
+
+        """
+        ok=True
+        try:
+            alarm = None
+            if 'alarm' in self.data[device]:
+                alarm = self.data[device]['alarm']
+                #print "timer=%s"%timer
+            else:
+                ok=False
+            parameters = self._extractParameters(device)
+            if ok==False:
+                self._api.log.exception("cronJobs._startJobAlarm : Don't add alarm job : missing parameters")
+                del(self.data[device])
+                return ERROR_PARAMETER
+            ok=True
+            events={}
+            days={"Mo":0,"Tu":1,"We":2,"Th":3,"Fr":4,"Sa":5,"Su":6}
+            for key in self.data[device]:
+                if key.startswith("alarm"):
+                    timersss=set()
+                    if type(self.data[device][key])==type(""):
+                        timersss.add(self.data[device][key])
+                    else :
+                        timersss=self.data[device][key]
+                    #Alarm is a list of alarm
+                    for timer in timersss:
+                        idx=timer.find(",")
+                        if idx<=0:
+                            ok=False
+                        ds=timer[0:idx]
+                        hrs=timer[idx+1:]
+                        #print ("ds=%s")%ds
+                        #print ("hrs=%s")%hrs
+                        cont=True
+                        while cont:
+                            d=ds[0:2]
+                            #print "d=%s"%d
+                            if len(ds)<2:
+                                cont=False
+                            elif d not in days:
+                                cont=False
+                                ok=False
+                            else:
+                                events[d]={}
+                                for hs in hrs.split(","):
+                                    #print "hs=%s"%hs
+                                    i=hs.find("-")
+                                    if i<0:
+                                        #This is a single date
+                                        deb=hs
+                                        if self.isValidHour(deb):
+                                            events[d][deb]="single"
+                                    else:
+                                        #this is an interval period
+                                        deb=hs[0:i]
+                                        end=hs[i+1:]
+                                        #print "deb=%s"%deb
+                                        #print "end=%s"%end
+                                        if self.isValidHour(deb):
+                                            events[d][deb]="valueon"
+                                        else:
+                                            cont=False
+                                            ok=False
+                                        if self.isValidHour(end):
+                                            events[d][end]="valueoff"
+                                        else:
+                                            cont=False
+                                            ok=False
+                            ds=ds[2:]
+                            if len(ds)<2:
+                                cont=False
+                                #print "ok=%s"%ok
+            if ok:
+                #print "events=%s"%events
+                jobs=[]
+                for d in events:
+                    for h in events[d]:
+                        dayofweek=days[d]
+                        hour=int(h[0:2])
+                        minute=int(h[3:5])
+                        if "single" in events[d][h]:
+                            jobs.append(self._scheduler.add_cron_job(self._api.sendXplJob,hour=hour,minute=minute,args=[device]))
+                        else:
+                            jobs.append(self._scheduler.add_cron_job(self._api.sendXplJob,hour=hour,minute=minute,args=[device,parameters,events[d][h]]))
+                self.data[device]['current']="started"
+                self.data[device]['apjobs']=jobs
+                self.data[device]['starttime']=datetime.datetime.today()
+                self._api.log.info("cronJobs._startJobAlarm : add a hvac job %s" % str(jobs))
+        except:
+            self._api.log.exception("cronJobs._startJobAlarm : "+traceback.format_exc())
+            del(self.data[device])
+            return ERROR_SCHEDULER
+
+        if ok:
+            return ERROR_NO
+        else:
+            return ERROR_SCHEDULER
+
+    def _startDawnAlarm(self, device):
+        """
+        Start a job of type alarm
+        This schema reports the current timer settings. It is sent as
+        an xPL status message if requested by an hvac.request
+        with request=timer, or as a trigger message when a timer
+        value is changed.
+
+        The format of the timer value consists of a list of
+        two-character codes for the days of the week (each code is
+        simply the first two letters of the day) on which the timer
+        will be active (with no delimiters), followed by the hours of the
+        alarm, the duration of the dawn simulation, and the dim parameter
+        to send. You can specify up to 10 levels.
+        The dawnsequence will finish a the time specified in parameter.
+        The time in the form hh:mm using the 24 hour clock.
+
+        For example, for defining one alarm during the week using the dawn
+        simulation during a period of 30 minutes with 10 phases, and another
+        for the weekend at 8:00 not using the dawdusk simulation,
+        the message could look something like this:
+
+        timer.basic
+           {
+            action=start
+            device=<name of the timer>
+            devicetype=dawnalarm
+            alarm=MoTuWeThFr,09:30,00,00
+            alarm=SaSu,08:00,00,00
+         }
+
         """
         ok=True
         try:
@@ -491,9 +740,9 @@ class cronJobs:
             events={}
             days={"Mo":0,"Tu":1,"We":2,"Th":3,"Fr":4,"Sa":5,"Su":6}
             for key in self.data[device]:
-                if key.startswith("timer"):
+                if key.startswith("alarm"):
                     timer=self.data[device][key]
-                    idx=timer.find("|")
+                    idx=timer.find(",")
                     if idx<=0:
                         ok=False
                     ds=timer[0:idx]
@@ -504,28 +753,23 @@ class cronJobs:
                     while cont:
                         d=ds[0:2]
                         #print "d=%s"%d
-                        if len(ds)<2:
+                        if len(d)<2:
                             cont=False
                         elif d not in days:
                             cont=False
                             ok=False
                         else:
                             events[d]={}
-                            for hs in hrs.split("|"):
-                                #print "hs=%s"%hs
-                                i=hs.find("-")
-                                deb=hs[0:i]
-                                end=hs[i+1:]
-                                #print "deb=%s"%deb
-                                #print "end=%s"%end
-                                if self.isValidHour(deb):
-                                    events[d][deb]="valueon"
-                                else:
-                                    cont=False
-                                    ok=False
-                                if self.isValidHour(end):
-                                    events[d][end]="valueoff"
-                                else:
+                            try:
+                                hr=hrs[0:4]
+                                if self.isValidHour(hr):
+                                    events[d][hr]={"dawn":0,"step":0}
+                                dawn=hrs[4:6]
+                                events[d][hr]["dawn"]=int(dawn)
+                                step=hrs[6:8]
+                                events[d][hr]["step"]=int(step)
+                            except:
+                                    del(events[d])
                                     cont=False
                                     ok=False
                         ds=ds[2:]
@@ -540,7 +784,11 @@ class cronJobs:
                         dayofweek=days[d]
                         hour=int(h[0:2])
                         minute=int(h[3:5])
-                        jobs.append(self._scheduler.add_cron_job(self._api.sendXplJob, day_of_week=dayofweek,hour=hour,minute=minute,args=[device,parameters,events[d][h]]))
+                        if events[d][h]["dawn"]==0:
+                            jobs.append(self._scheduler.add_cron_job(self._api.sendXplJob,hour=hour,minute=minute,args=[device,parameters]))
+                        else:
+                            #we will add the cron jobs here
+                            ok=ok
                 self.data[device]['current']="started"
                 self.data[device]['apjobs']=jobs
                 self.data[device]['starttime']=datetime.datetime.today()
@@ -648,8 +896,20 @@ class cronJobs:
         lines = []
         lines.append("%s | %s" % ("name","runs"))
         for i in self._scheduler.get_jobs():
-            lines.append("%s | %s" % (str(i.name), i.runs))
+            lines.append("%s | %s" % (str(i.trigger), i.runs))
         return lines
+
+    def getAPCount(self,device):
+        """
+        Get the numbers of jobs
+        @return : The numbers of jobs in APScheduler
+        """
+        if "apjobs" in self.data[device]:
+            return len(self.data[device]['apjobs'])
+        elif "apjob" in self.data[device]:
+            return 1
+        else :
+            return 0
 
     def dateFromXPL(self,xpldate):
         """
@@ -689,22 +949,27 @@ class cronJobs:
         mess.add_data({'device' : device})
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
-        if parameters!=None:
-            for key in parameters:
-                if value in parameters[key]:
-                    mess.add_data({key:parameters[key][value]})
-                else :
-                    mess.add_data({"error":key})
-        for key in self.data[device]:
-            if key[0:4].startswith("nst-"):
-                k=key[4:]
-                if k.startswith("schema"):
-                   mess.set_schema(self.data[device][key])
-                elif k.startswith("xpltype"):
-                   mess.set_type(self.data[device][key])
-                else:
-                   mess.add_data({k : self.data[device][key]})
-        return mess
+        try:
+            if parameters!=None:
+                for key in parameters:
+                    if value in parameters[key]:
+                        mess.add_data({key:parameters[key][value]})
+                    else :
+                        mess.add_data({"error":key})
+            for key in self.data[device]:
+                if key[0:4].startswith("nst-"):
+                    k=key[4:]
+                    if k.startswith("schema"):
+                       mess.set_schema(self.data[device][key])
+                    elif k.startswith("xpltype"):
+                       mess.set_type(self.data[device][key])
+                    else:
+                       mess.add_data({k : self.data[device][key]})
+            return mess
+        except:
+            return mess
+            #send an xpl error message ...
+
 
 class cronException(Exception):
     """
@@ -767,26 +1032,32 @@ class cronAPI:
              runtimes=<number of messages sent>
             }
         """
-        self.log.debug("cronAPI.requestListener : Start ...")
-        device = None
-        if 'device' in message.data:
-            device = message.data['device']
-        mess = XplMessage()
-        mess.set_type("xpl-stat")
-        mess.set_schema("timer.basic")
-        mess.add_data({"device" : device})
-        if device in self.jobs.data.iterkeys():
-            mess.add_data({"type" : self.jobs.data[device]['devicetype']})
-            mess.add_data({"current" : self.jobs.data[device]['current']})
-            mess.add_data({"elapsed" : self.jobs.getUpTime(device)})
-            mess.add_data({"runtime" : self.jobs.getRunTime(device)})
-#            mess.add_data({"uptime" : self.jobs.getUpTime(device)})
-            mess.add_data({"runtimes" : self.jobs.getRunTimes(device)})
-        else:
-            mess.add_data({"elasped" :  0})
-            mess.add_data({"current" : "halted"})
-        self.myxpl.send(mess)
-        self.log.debug("cronAPI.requestListener : Done :)")
+        try:
+            self.log.debug("cronAPI.requestListener : Start ...")
+            device = None
+            if 'device' in message.data:
+                device = message.data['device']
+            mess = XplMessage()
+            mess.set_type("xpl-stat")
+            mess.set_schema("timer.basic")
+            mess.add_data({"device" : device})
+            if device in self.jobs.data.iterkeys():
+                mess.add_data({"type" : self.jobs.data[device]['devicetype']})
+                mess.add_data({"current" : self.jobs.data[device]['current']})
+                mess.add_data({"elapsed" : self.jobs.getUpTime(device)})
+                mess.add_data({"runtime" : self.jobs.getRunTime(device)})
+#                mess.add_data({"uptime" : self.jobs.getUpTime(device)})
+                mess.add_data({"runtimes" : self.jobs.getRunTimes(device)})
+            else:
+                mess.add_data({"elasped" :  0})
+                mess.add_data({"current" : "halted"})
+            self.myxpl.send(mess)
+            self.log.debug("cronAPI.requestListener : Done :)")
+        except:
+            self.log.error("action _ %s _ unknown."%(request))
+            error = "Exception : %s" %  \
+                     (traceback.format_exc())
+            self.log.debug("cronAPI.requestListener : "+error)
 
     def basicListener(self,message):
         """
@@ -808,18 +1079,42 @@ class cronAPI:
             'stop': lambda x,d,m: self._actionStop(x,d),
             'start': lambda x,d,m: self._actionStart(x,d,m),
             'status': lambda x,d,m: self._actionStatus(x,d),
+            'list': lambda x,d,m: self._actionList(x,d),
         }
-        action = None
-        if 'action' in message.data:
-            action = message.data['action']
+        try:
+            action = None
+            if 'action' in message.data:
+                action = message.data['action']
+            device = None
+            if 'device' in message.data:
+                device = message.data['device']
+            self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action,device))
 
-        device = None
-        if 'device' in message.data:
-            device = message.data['device']
+            actions[action](self.myxpl,device,message)
+        except:
+            self.log.error("action _ %s _ unknown."%(request))
+            error = "Exception : %s" %  \
+                     (traceback.format_exc())
+            self.log.debug("cronAPI.basicCmndListener : "+error)
 
-        self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action,device))
+    def _actionList(self,myxpl,device):
+        """
+        Lists the timers
+        timer.basic
+           {
+            action=status
+            ...
+           }
+        """
+        self.log.debug("cronAPI._listStatus : Start ...")
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("timer.basic")
+        mess.add_data({"devices" : self.jobs.getList()})
+        mess.add_data({"apjobs" : self.jobs.getAPList()})
+        myxpl.send(mess)
+        self.log.debug("cronAPI._listStatus : Done :)")
 
-        actions[action](self.myxpl,device,message)
 
     def _actionStatus(self,myxpl,device):
         """
@@ -841,12 +1136,10 @@ class cronAPI:
             mess.add_data({"uptime" : self.jobs.getUpTime(device)})
             mess.add_data({"runtime" : self.jobs.getRunTime(device)})
             mess.add_data({"runtimes" : self.jobs.getRunTimes(device)})
-        elif device==None:
-            mess.add_data({"devices" : self.jobs.getList()})
-            mess.add_data({"apjobs" : self.jobs.getAPList()})
+            mess.add_data({"apjobs" : self.jobs.getAPCount(device)})
         else:
             mess.add_data({"device" : device})
-            mess.add_data({"error" : "Device %s not found"%device})
+            mess.add_data({"current" : "halted"})
         myxpl.send(mess)
         self.log.debug("cronAPI._actionStatus : Done :)")
 
