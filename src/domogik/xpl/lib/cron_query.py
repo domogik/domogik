@@ -61,7 +61,7 @@ class cronQuery():
     def __del__(self):
         print("End query")
 
-    def query(self, device, configMess, extkey=None):
+    def query(self, device, configMess,extkey=None):
         '''
         Ask the config system for the value. Calling this function will make
         your program wait until it got an answer
@@ -91,10 +91,13 @@ class cronQuery():
                 pass
         if 'error' not in self._result:
             if extkey!=None:
-                if extkey in self._keys:
-                    return self._keys[extkey]
+                #print "extkey=%s"%extkey
+                #print "result=%s"%self._result
+                if extkey in self._result:
+                    #print "extkey=%s"%self._result[extkey]
+                    return self._result[extkey]
                 else:
-                    return false
+                    return False
             return True
         else:
             self.log.error("Error %s when communicating device=%s" % (self._result['errorcode'],device))
@@ -110,6 +113,7 @@ class cronQuery():
         device = None
         if 'device' in message.data:
             device = message.data['device']
+        #print "result=%s"%result
         for r in self._keys:
             if r in result:
                 self.log.debug("Timer value received : device=%s" % (device))
@@ -359,16 +363,16 @@ class cronQuery():
                 configMess.add_data({"valueon1" : valueon1})
                 configMess.add_data({"valueoff1" : valueoff1})
                 ok=True
-        if ok and len(alarms)>0 :
-            for key in timers:
-                configMess.add_data({key : alarms[key]})
+        if alarms!=None:
+            for key in alarms:
+                configMess.add_data({"alarm" : key})
         else:
             ok=False
         if ok==False:
             return ERROR_PARAMETER
         return self.startJob(device, configMess, nstMess)
 
-    def stopJob(self, device):
+    def stopJob(self, device,extkey=None):
         """
         Stop a job to the cron plugin. The cron job could be restarted via a
         resume command.
@@ -379,10 +383,10 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "stop"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess)
+        res=self.query(device, configMess,extkey=extkey)
         return res
 
-    def resumeJob(self, device):
+    def resumeJob(self, device,extkey=None):
         """
         Resume a previous stopped job to the cron plugin.*
         @param device : the name of the timer
@@ -392,10 +396,10 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "resume"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess)
+        res=self.query(device, configMess,extkey=extkey)
         return res
 
-    def haltJob(self, device):
+    def haltJob(self, device,extkey=None):
         """
         Stop a job and delete the device.
         @param device : the name of the timer
@@ -405,11 +409,11 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "halt"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess)
+        res=self.query(device, configMess,extkey=extkey)
         #print res
         return res
 
-    def statusJob(self, device):
+    def statusJob(self, device,extkey=None):
         """
         Get the status of a job to the cron plugin.
         @param device : the name of the timer
@@ -419,7 +423,7 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "status"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess,extkey="current")
+        res=self.query(device, configMess,extkey=extkey)
         return res
 
     def dateFromXPL(self,xpldate):
