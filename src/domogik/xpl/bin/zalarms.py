@@ -44,19 +44,19 @@ import logging
 
 class zalarms(XplPlugin):
     '''
-    Send Dawn and Dusk messages over XPL
-    '''
+    Program alarms to the cron plugin    '''
     def __init__(self):
         """
-        Create the hvac class
+        Create the zalarms class
         """
         XplPlugin.__init__(self, name = 'zalarms')
         self._config = Query(self.myxpl, self.log)
 
         try:
             self._myapi = zalarmsAPI(self._config,self.myxpl,self.log)
-            Listener(self.request_cmnd_cb, self.myxpl,
-                 {'schema': 'timer.request', 'xpltype': 'xpl-cmnd'})
+            #Listener(self.request_cmnd_cb, self.myxpl,
+            #     {'schema': 'timer.request', 'xpltype': 'xpl-cmnd'})
+            self.enable_hbeat()
         except:
             error = "Something went wrong during API init : %s" %  \
                      (traceback.format_exc())
