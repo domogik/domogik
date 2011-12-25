@@ -166,6 +166,12 @@ class DbHelper():
             url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
                                      self.__db_config['db_host'], self.__db_config['db_name'])
         return url
+    
+    def get_db_user(self):
+        return self.__db_config['db_user']
+    
+    def get_db_name(self):
+        return self.__db_config['db_name']
 
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
