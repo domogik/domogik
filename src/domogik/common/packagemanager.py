@@ -624,6 +624,26 @@ class PackageManager():
             return []
 
 
+    def get_available_updates(self, pkg_type, id, release):
+        """ List all available updates for a package
+            @param pkg_type : package type
+            @param id : package id
+            @param release : package release
+        """
+        upd_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                if f[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                    if pkg_xml.type == pkg_type and pkg_xml.id == id \
+                       and pkg_xml.release > release:
+                        upd_list.append({"type" : pkg_xml.type,
+                                         "id" : pkg_xml.id,
+                                         "release" : pkg_xml.release,
+                                         "priority" : pkg_xml.priority,
+                                         "changelog" : pkg_xml.changelog})
+        return upd_list
+
     def list_packages(self):
         """ List all packages in cache folder 
             Used for printing on command line
@@ -631,11 +651,12 @@ class PackageManager():
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
-                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                pkg_list.append({"fullname" : pkg_xml.fullname,
-                                 "release" : pkg_xml.release,
-                                 "priority" : pkg_xml.priority,
-                                 "desc" : pkg_xml.desc})
+                if f[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                    pkg_list.append({"fullname" : pkg_xml.fullname,
+                                     "release" : pkg_xml.release,
+                                     "priority" : pkg_xml.priority,
+                                     "desc" : pkg_xml.desc})
         pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                       k['release']))
         for pkg in pkg_list:

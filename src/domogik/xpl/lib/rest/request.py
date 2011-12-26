@@ -3764,9 +3764,8 @@ target=*
         pkg_mgr = PackageManager()
         pkg_list = []
         # get package list for the type
-        for data in pkg_mgr.get_packages_list(type = None):
+        for data in pkg_mgr.get_packages_list(type = pkg_type):
             if data["id"] not in list_installed:
-                print "!"
                 json_data.add_data(data)
 
         self.send_http_response_ok(json_data.get())
@@ -3795,6 +3794,7 @@ target=*
         cmd = message.data['command']
         host = message.data["host"]
 
+        pkg_mgr = PackageManager()
         idx = 0
         loop_again = True
         while loop_again:
@@ -3806,9 +3806,11 @@ target=*
                             "type" : message.data["type"+str(idx)],
                             "host" : host}
                     # TODO : check for available updates!!!! 
+                    updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
+                    data["updates"] = updates
                     json_data.add_data(data)
                 idx += 1
-            except:
+            except KeyError:
                 loop_again = False
     
         self.send_http_response_ok(json_data.get())
