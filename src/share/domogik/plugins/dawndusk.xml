@@ -42,7 +42,7 @@
   <files>
     <file path="src/share/domogik/plugins/dawndusk.xml"/>
     <file path="src/share/domogik/stats/dawndusk/dawndusk.basic.xml"/>
-    <file path="src/share/domogik/stats/dawndusk/dawndusk.request.xml"/>
+<!--    <file path="src/share/domogik/stats/dawndusk/dawndusk.request.xml"/>-->
     <file path="src/share/domogik/url2xpl/dawndusk/daynight.xml"/>
     <file path="src/domogik/xpl/bin/dawndusk.py"/>
     <file path="src/domogik/xpl/lib/dawndusk.py"/>
@@ -58,40 +58,22 @@
   </device_technology>
   <device_types>
       <device_type>
-          <id>dawndusk.daynight</id>
-          <name>DayNight</name>
-          <description>Tell if is the day or the night</description>
+          <id>dawndusk.status</id>
           <device_technology_id>dawndusk</device_technology_id>
-      </device_type>
-      <device_type>
-          <id>dawndusk.sensor</id>
-          <device_technology_id>dawndusk</device_technology_id>
-          <name>DawnDusk</name>
-          <description>View the day/night status using dawn/dusk signals</description>
+          <name>Status</name>
+          <description>View the day/night status using dawn/dusk triggers</description>
       </device_type>
   </device_types>
   <device_feature_models>
-      <device_feature_model>
-          <id>dawndusk.daynight.switch</id>
-          <name>DayNight</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>dawndusk.daynight</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;status&quot;,&quot;query&quot;:&quot;daynight&quot;,&quot;value0&quot;:&quot;night&quot;, &quot;value1&quot;:&quot;day&quot;}
-          </parameters>
-          <value_type>binary</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
      <device_feature_model>
-          <id>dawndusk.sensor.status</id>
-          <name>DawnDuskStatus</name>
+          <id>dawndusk.status.status</id>
+          <name>Status</name>
           <feature_type>sensor</feature_type>
-          <device_type_id>dawndusk.sensor</device_type_id>
+          <device_type_id>dawndusk.status</device_type_id>
           <parameters>
               {&quot;status&quot;:&quot;&quot;,&quot;value0&quot;:&quot;dusk&quot;, &quot;value1&quot;:&quot;dawn&quot;}
           </parameters>
-          <value_type>binary</value_type>
+          <value_type>string</value_type>
           <stat_key>status</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>

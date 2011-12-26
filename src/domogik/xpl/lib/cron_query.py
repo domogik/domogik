@@ -372,6 +372,36 @@ class cronQuery():
             return ERROR_PARAMETER
         return self.startJob(device, configMess, nstMess)
 
+    def startDawnAlarmJob( self, device, nstMess,
+                          alarms={}):
+        '''
+        Add and start a job to the cron plugin
+        @param device : the name of the timer
+        @param nstMess : the XPL message which will be sent by the cron job
+        @param parameter0 : the first parameter to include as key in return message
+        @param valueon0 : the value of parameter0 in case of on
+        @param valueoff0 : the value of parameter0 in case of on
+        @param parameter1 : the second parameter to include as key in return message
+        @param valueon1 : the value of parameter0 in case of on
+        @param valueoff1 : the value of parameter0 in case of on
+        @param alarms : the list of alarms to use
+       '''
+        configMess = XplMessage()
+        configMess.set_type("xpl-cmnd")
+        configMess.set_schema("timer.basic")
+        configMess.add_data({"devicetype" : "dawnalarm"})
+        configMess.add_data({"device" : device})
+        configMess.add_data({"action" : "start"})
+        ok=True
+        if alarms!=None:
+            for key in alarms:
+                configMess.add_data({"alarm" : key})
+        else:
+            ok=False
+        if ok==False:
+            return ERROR_PARAMETER
+        return self.startJob(device, configMess, nstMess)
+
     def stopJob(self, device,extkey=None):
         """
         Stop a job to the cron plugin. The cron job could be restarted via a

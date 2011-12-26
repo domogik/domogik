@@ -52,13 +52,17 @@ class zalarmsAPI:
         self.myxpl=myxpl
         self.config=config
         self._cronQuery = cronQuery(self.myxpl,self.log)
+        self._devices=set()
+
         if self.config!=None :
             num = 1
             loop = True
             while loop == True:
                 device = self.config.query('zalarms', 'device-%s' % str(num))
                 if device!=None:
+                    self._devices.add(device)
                     #print "status=%s"%self._cronQuery.statusJob(device,extkey="current")
+                    alarmtype = self.config.query('zalarms', 'alarmtype-%s' % str(num))
                     if self._cronQuery.statusJob(device,extkey="current")!="halted":
                         self._cronQuery.haltJob(device)
                     alarms=list()
@@ -102,13 +106,24 @@ class zalarmsAPI:
                         nstMess.add_data({nstfield2 : nstvalue2})
                     if nstfield3!=None:
                         nstMess.add_data({nstfield3 : nstvalue3})
-                    self._cronQuery.startAlarmJob(device,nstMess,
-                        parameter0=parameter0, valueon0=valueon0,valueoff0=valueoff0,
-                        parameter1=parameter1, valueon1=valueon1,valueoff1=valueoff1,
-                        alarms=alarms)
+                    if alarmtype=="alarm":
+                        self._cronQuery.startAlarmJob(device,nstMess,
+                            parameter0=parameter0, valueon0=valueon0,valueoff0=valueoff0,
+                            parameter1=parameter1, valueon1=valueon1,valueoff1=valueoff1,
+                            alarms=alarms)
+                    else :
+                        self._cronQuery.startDawnAlarmJob(device,nstMess,
+                            alarms=alarms)
                 else:
                     loop = False
                 num += 1
+
+    def __del__(self):
+        """
+
+        """
+        for dev in self._devices:
+            self._cronQuery.haltJob(dev)
 
     def requestListener(self,message):
         """

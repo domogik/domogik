@@ -7,14 +7,7 @@
             </listener>
             <mapping>
                 <device field="device"/>
-            </mapping>
-        </xpltype>
-        <xpltype type="xpl-stat">
-            <listener>
-                <filter/>
-            </listener>
-            <mapping>
-                <device field="device"/>
+                <value field="current"/>
             </mapping>
         </xpltype>
     </schema>
