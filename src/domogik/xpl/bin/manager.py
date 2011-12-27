@@ -1043,13 +1043,26 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'installed-packages-list'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
+        cfg_plugins = Loader('plugins')
+        cfg_plugin_list = dict(cfg_plugins.load(refresh = True)[1])
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
             print package
+            # I guess all plugins are naturally activated except for plugins
+            if package['type'] == "plugin":
+                if cfg_plugin_list.has_key(package['id']) and cfg_plugin_list[package['id']] == "enabled":
+                    enabled = "yes"
+                else:
+                    enabled = "no"
+            else:
+                enabled = "yes"
+            # Add data to xpl
             mess.add_data({'id%s' % idx : package['id'],
                            'fullname%s' % idx : package['fullname'],
                            'release%s' % idx : package['release'],
-                           'type%s' % idx : package['type']})
+                           'type%s' % idx : package['type'],
+                           'source%s' % idx : package['source'],
+                           'enabled%s' % idx : enabled})
             idx += 1
         self.myxpl.send(mess)
 
@@ -1184,7 +1197,7 @@ class SysManager(XplPlugin):
             @param message : xpl message received
         """
         try:
-            type = message.data['type']
+            pkg_type = message.data['type']
             id = message.data['id']
         except KeyError:
             self.log.error("Missing part of xPL message for installing a package : %s" % traceback.format_exc())
@@ -1195,29 +1208,29 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'uninstall'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
-        mess.add_data({'type' : type})
+        mess.add_data({'type' : pkg_type})
         mess.add_data({'id' : id})
 
         # check if plugin (for a plugin) is running
-        if type == "plugin":
+        if pkg_type == "plugin":
             if self._check_component_is_running(id, only_one_ping = True):
                 mess.add_data({'error' : "Plugin '%s' is running. Stop it before uninstalling plugin." % id})
                 self.myxpl.send(mess)
                 return
 
         # check if it is a external if current manager handle external
-        if type == "external" and self.options.check_external == False:
+        if pkg_type == "external" and self.options.check_external == False:
             mess.add_data({'error' : "This host doesn't handle external member packages. Please install it on main host"})
             self.myxpl.send(mess)
             return
 
         try:
-            status = self.pkg_mgr.uninstall_package(type, id)
+            status = self.pkg_mgr.uninstall_package(pkg_type, id)
             if status != True:
                 mess.add_data({'error' : status})
         except:
             mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
-            self.log.error("Error while uninstalling package '%s' : %s" % (package, traceback.format_exc()))
+            self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, id, traceback.format_exc()))
         self.myxpl.send(mess)          
 
 

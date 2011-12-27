@@ -55,7 +55,7 @@ from distutils2.version import NormalizedVersion, IrrationalVersionError
 
 SRC_PATH = "../../../"
 PLG_XML_PATH = "src/share/domogik/plugins/"
-TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with temp folder
+TMP_EXTRACT_DIR = "%s/%s" % (tempfile.gettempdir(), "domogik-pkg-mgr")
 CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
 REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
 REPO_LST_FILE_HEADER = "Domogik Repository"
@@ -176,7 +176,7 @@ class PackageManager():
         self.log("Hardware id : %s" % id)
 
         try:
-            plg_xml = PackageXml(id, type = "external")
+            plg_xml = PackageXml(id, pkg_type = "external")
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -254,35 +254,83 @@ class PackageManager():
             tar.close()
 
             # delete temporary xml file
-            os.unlink(info_file) 
+            if info_file != None:
+                os.unlink(info_file) 
         except: 
             msg = "Error generating package : %s : %s" % (my_tar, traceback.format_exc())
             self.log(msg)
             # delete temporary xml file
-            os.unlink(info_file) 
+            if info_file != None:
+                os.unlink(info_file) 
             raise PackageException(msg)
         self.log("OK")
     
 
-    def cache_package(self, cache_folder, type, id, release):
+    def cache_package(self, cache_folder, pkg_type, id, release):
         """ Download package to put it in cache
             @param cache_folder : folder in which we want to cache the file
-            @param type : package type
+            @param pkg_type : package type
             @param id : package id
             @param release : package release
         """
-        package = "%s-%s" % (type, id)
+        package = "%s-%s" % (pkg_type, id)
         pkg, status = self._find_package(package, release)
         if status != True:
             return status
+        # download package
         path = pkg.package_url
-        dl_path = "%s/%s-%s-%s.tgz" % (cache_folder, type, id, release)
+        dl_path = "%s/%s-%s-%s.tgz" % (cache_folder, pkg_type, id, release)
         self.log("Caching package : '%s' to '%s'" % (path, dl_path))
         urllib.urlretrieve(path, dl_path)
         path = dl_path
+ 
+        # extract package to update xml with source repo
+        my_tmp_dir = "%s/%s/" % (TMP_EXTRACT_DIR, id)
+        self._create_folder(my_tmp_dir)
+        self._extract_package(path, my_tmp_dir)
+
+        # update xml
+        xml_path = "%s/src/share/domogik/%ss/%s.xml" % (my_tmp_dir, pkg_type, id)
+        pkg_xml = PackageXml(path = xml_path)
+        pkg_xml.set_repo_source(pkg.source)
+
+        # recreate tgz
+        # TODO :)
+        my_tar = path
+        self.log("Generating package : '%s'" % my_tar)
+        try:
+            tar = tarfile.open(my_tar, "w:gz")
+
+            for root, dirnames, filenames in os.walk(my_tmp_dir):
+                for filename in filenames:
+                    src_file = os.path.join(root, filename)
+                    dst_file = src_file.replace(my_tmp_dir, "")
+                    tar.add(name = src_file, arcname = dst_file)
+            tar.close()
+        except: 
+            msg = "Error generating package : %s : %s" % (my_tar, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
+        self.log("OK")
+
+
+
+
+        #self._clean_folder(my_tmp_dir)
         self.log("Package in cache : %s" % path)
 
-
+    def _create_folder(self, folder):
+        """ Try to create a folder (does nothing if it already exists)
+            @param folder : folder path
+        """
+        self.log("Creating directory : %s" % folder)
+        try:
+            if os.path.isdir(folder) == False:
+                os.makedirs(folder)
+        except:
+            msg = "Error while creating temporary folder '%s' : %s" % (folder, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
     def install_package(self, path, release = None, package_part = PKG_PART_XPL):
         """ Install a package
@@ -294,6 +342,7 @@ class PackageManager():
             @param release : release to install (default : highest)
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
+        source = path
         self.log("Start install for part '%s' of '%s'" % (package_part, path))
         if path[0:6] == "cache:":
             path = "%s/package/download/%s" % (REST_URL, path[6:])
@@ -307,7 +356,7 @@ class PackageManager():
         # get package name
         if path[0:4] == "http": # special process for a http path
             id = full_name = '-'.join(path.split("/")[-3:])
-            print "id=%s" % full_name
+            print("id=%s" % full_name)
         else:
             full_name = os.path.basename(path)
             # twice to remove first .gz and then .tar
@@ -317,16 +366,9 @@ class PackageManager():
         self.log("Ask for installing package id : %s" % id)
 
         # get temp dir to extract data
-        my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
+        my_tmp_dir_dl = TMP_EXTRACT_DIR
         my_tmp_dir = "%s/%s" % (my_tmp_dir_dl, id)
-        self.log("Creating temporary directory : %s" % my_tmp_dir)
-        try:
-            if os.path.isdir(my_tmp_dir) == False:
-                os.makedirs(my_tmp_dir)
-        except:
-            msg = "Error while creating temporary folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc())
-            self.log(msg)
-            raise PackageException(msg)
+        self._create_folder(my_tmp_dir)
 
         # Check if we need to download package
         if path[0:4] == "http":
@@ -361,14 +403,7 @@ class PackageManager():
             raise PackageException(msg)
 
         # create install directory
-        self.log("Creating install directory : %s" % INSTALL_PATH)
-        try:
-            if os.path.isdir(INSTALL_PATH) == False:
-                os.makedirs(INSTALL_PATH)
-        except:
-            msg = "Error while creating installation folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc())
-            self.log(msg)
-            raise PackageException(msg)
+        self._create_folder(INSTALL_PATH)
 
         # install plugin in $HOME
         self.log("Installing package (plugin)...")
@@ -394,25 +429,25 @@ class PackageManager():
         return True
 
 
-    def uninstall_package(self, type, id):
+    def uninstall_package(self, pkg_type, id):
         """ Uninstall a package
             For the moment, we will only delete the package xml file for 
             plugins and external
-            @param type : package type
+            @param pkg_type : package type
             @param id : package id
         """
         self.log("Start uninstall for package '%s-%s'" % (type, id))
         self.log("Only xml description file will be deleted in this Domogik version")
 
         try:
-            if type in ('plugin'):
+            if pkg_type in ('plugin'):
                 os.unlink("%s/plugins/softwares/%s.xml" %(INSTALL_PATH, id))
-            elif type in ('external'):
+            elif pkg_type in ('external'):
                 os.unlink("%s/plugins/externals/%s.xml" %(INSTALL_PATH, id))
             else:
-                raise "Package type '%s' not uninstallable" % type
+                raise "Package type '%s' not uninstallable" % pkg_type
         except:
-            msg = "Error while installing package : %s" % (traceback.format_exc())
+            msg = "Error while unstalling package : %s" % (traceback.format_exc())
             self.log(msg)
             raise PackageException(msg)
         self.log("Package successfully uninstalled.")
@@ -429,36 +464,32 @@ class PackageManager():
         # check if there is no .. or / in files path
         for fic in tar.getnames():
             if fic[0:1] == "/" or fic[0:2] == "..":
-                msg = "Error while extracting package '%s' : filename '%s' not allowed" % (pkg_path, fic)
+                msg = "Error while extracting package '%s' : filename '%s' in tgz not allowed" % (pkg_path, fic)
                 self.log(msg)
                 raise PackageException(msg)
         tar.extractall(path = extract_path)
         tar.close()
 
 
-    def _install_plugin_or_external(self, pkg_dir, install_path, type, package_part):
+    def _install_plugin_or_external(self, pkg_dir, install_path, pkg_type, package_part):
         """ Install plugin
             @param pkg_dir : directory where package is extracted
             @param install_path : path where we install packages
-            @param type : plugin, external
+            @param pkg_type : plugin, external
+            @param pkg_id : package id
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
+            @param repo_source : path from which the package comes
         """
 
         ### create needed directories
         # create install directory
-        self.log("Creating directories for %s..." % type)
+        self.log("Creating directories for %s..." % pkg_type)
         # notice : the %ss is not a bug
-        plg_path = "%s/%ss/" % (install_path, type)
-        try:
-            if os.path.isdir(plg_path) == False:
-                os.makedirs(plg_path)
-        except:
-            msg = "Error while creating %s folder '%s' : %s" % (type, plg_path, traceback.format_exc())
-            self.log(msg)
-            raise PackageException(msg)
+        plg_path = "%s/%ss/" % (install_path, pkg_type)
+        self._create_folder(plg_path)
 
         ### copy files
-        self.log("Copying files for %s..." % type)
+        self.log("Copying files for %s..." % pkg_type)
         try:
             # xpl/* and plugins/*.xml are installed on target host 
             if package_part == PKG_PART_XPL:
@@ -467,18 +498,18 @@ class PackageManager():
                 self._create_init_py("%s/xpl/" % plg_path)
                 self._create_init_py("%s/xpl/bin/" % plg_path)
                 self._create_init_py("%s/xpl/lib/" % plg_path)
-                if type == "plugin":
+                if pkg_type == "plugin":
                     type_path = "softwares"
-                if type == "external":
+                if pkg_type == "external":
                     type_path = "externals"
-                copytree("%s/src/share/domogik/%ss" % (pkg_dir, type), "%s/%s" % (plg_path, type_path), self.log)
+                copytree("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path), self.log)
             # stats/* and url2xpl/* and exernal/* are insatlled on rinor host
             if package_part == PKG_PART_RINOR:
                 copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
                 copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
                 copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
         except:
-            msg = "Error while copying %s files : %s" % (type, traceback.format_exc())
+            msg = "Error while copying %s files : %s" % (pkg_type, traceback.format_exc())
             self.log(msg)
             raise PackageException(msg)
 
@@ -550,19 +581,21 @@ class PackageManager():
 
 
     def _clean_cache(self, folder):
-        """ If not exists, create <folfer>
+        """ If not exists, create <folder>
             Then, clean this folder
             @param folder : cache folder to empty
         """
         # Create folder
-        try:
-            if os.path.isdir(folder) == False:
-                os.makedirs(folder)
-        except:
-            msg = "Error while creating cache folder '%s' : %s" % (folder, traceback.format_exc())
-            self.log(msg)
-            raise PackageException(msg)
+        self._create_folder(folder)
 
+        # clean folder
+        self._clean_folder(folder)
+
+
+    def _clean_folder(self, folder):
+        """ Delete the content of a folder
+            @param folder: folder to clean
+        """
         # Clean folder
         try:
             for root, dirs, files in os.walk(folder):
@@ -596,7 +629,7 @@ class PackageManager():
             # our package has a prioriry >= to other packages with same name/rel
             if priority == None or priority < file_info["priority"]:
                 self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
-                pkg_xml.cache_package(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["priority"])
+                pkg_xml.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
 
     def _get_files_list_from_repository(self, url, priority):
         """ Read packages.lst on repository
@@ -677,12 +710,12 @@ class PackageManager():
                     return pkg_xml.priority
         return None
 
-    def get_packages_list(self, fullname = None, release = None, type = None):
+    def get_packages_list(self, fullname = None, release = None, pkg_type = None):
         """ List all packages in cache folder 
             and return a detailed list
             @param fullname (optionnal) : fullname of a package
             @param release (optionnal) : release of a package (to use with name)
-            @param type (optionnal) : package type
+            @param pkg_type (optionnal) : package type
             Used by Rest
         """
         pkg_list = []
@@ -690,7 +723,7 @@ class PackageManager():
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                 if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
-                    if type == None or type == pkg_xml.type:
+                    if pkg_type == None or pkg_type == pkg_xml.type:
                         pkg_list.append({"id" : pkg_xml.id,
                                      "type" : pkg_xml.type,
                                      "fullname" : pkg_xml.fullname,
@@ -723,7 +756,8 @@ class PackageManager():
                                          "id" : pkg_xml.id,
                                          "release" : pkg_xml.release,
                                          "type" : pkg_xml.type,
-                                         "package-url" : pkg_xml.package_url})
+                                         "package-url" : pkg_xml.package_url,
+                                         "source" : pkg_xml.source})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                  k['release']))
 
@@ -753,6 +787,7 @@ class PackageManager():
                         pkg_list.append({"fullname" : pkg_xml.fullname,
                                          "release" : pkg_xml.release,
                                          "priority" : pkg_xml.priority,
+                                         "source" : pkg_xml.source,
                                          "xml" : pkg_xml})
                 else:
                     if fullname == pkg_xml.fullname and release == pkg_xml.release:

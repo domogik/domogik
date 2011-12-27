@@ -62,12 +62,12 @@ class PackageException(Exception):
 
 
 class PackageXml():
-    def __init__(self, id = None, url = None, path = None, type = "plugin"):
+    def __init__(self, id = None, url = None, path = None, pkg_type = "plugin"):
         """ Read xml file of a plugin and make an object from it
             @param id : name of package
             @param url : url of xml file
             @param path : path of xml file
-            @param type : package type (default : 'plugin')
+            @param pkg_type : package type (default : 'plugin')
                           To use only with id != None
         """
         xml_file = None
@@ -78,12 +78,12 @@ class PackageXml():
                 config = cfg.load()
                 conf = dict(config[1])
 
-                if type == "plugin":
+                if pkg_type == "plugin":
                     xml_directory = "%s/%s" % (conf['custom_prefix'], PLUGIN_XML_PATH)
-                elif type == "external":
+                elif pkg_type == "external":
                     xml_directory = "%s/%s" % (conf['custom_prefix'], HARDWARE_XML_PATH)
                 else:
-                    raise PackageException("Type '%s' doesn't exists" % type)
+                    raise PackageException("Type '%s' doesn't exists" % pkg_type)
                 xml_file = "%s/%s.xml" % (xml_directory, id)
 
                 self.info_file = xml_file
@@ -201,10 +201,20 @@ class PackageXml():
             if len(rep) == 0:
                 self.package_url = None
                 self.priority = None
+                self.source = None
             else:
-                url_prefix = rep[0].attributes.get("url_prefix").value.strip()
-                self.package_url = "%s" % url_prefix
-                self.priority = rep[0].attributes.get("priority").value.strip()
+                try:
+                    self.package_url = rep[0].attributes.get("url_prefix").value.strip()
+                except AttributeError:
+                    self.package_url = None
+                try:
+                    self.priority = rep[0].attributes.get("priority").value.strip()
+                except AttributeError:
+                    self.priority = None
+                try:
+                    self.source = rep[0].attributes.get("source").value.strip()
+                except AttributeError:
+                    self.source = None
 
             # data for database
             dtec = self.xml_content.getElementsByTagName("device_technology")[0]
@@ -255,21 +265,36 @@ class PackageXml():
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 
 
-    def cache_package(self, cache_folder, url_prefix, priority):
+    def cache_xml(self, cache_folder, url_prefix, repo_url, priority):
         """ Add url_prefix info in xml data
             Store xml in a file in cache_folder
             @param cache_folder : folder to put xml file
             @param url_prefix : http://.../pluginname-release
+            @param repo_url : repository url
             @param priority : repository priority
         """
         top_elt = self.xml_content.documentElement
         new_elt = self.xml_content.createElementNS(None, 'repository')
         new_elt.setAttribute("url_prefix", url_prefix)
         new_elt.setAttribute("priority", priority)
+        new_elt.setAttribute("source", repo_url)
         top_elt.appendChild(new_elt)
         cache_file = open("%s/%s" % (cache_folder, self.xml_filename), "w") 
         cache_file.write(self.xml_content.toxml().encode("utf-8"))
         cache_file.close()
+
+    def set_repo_source(self, source):
+        """ Add url_prefix info in xml data
+            Store in xml the repository from which it comes
+            @param source : repository url
+        """
+        top_elt = self.xml_content.documentElement
+        new_elt = self.xml_content.createElementNS(None, 'repository')
+        new_elt.setAttribute("source", source)
+        top_elt.appendChild(new_elt)
+        my_file = open("%s" % (self.info_file), "w") 
+        my_file.write(self.xml_content.toxml().encode("utf-8"))
+        my_file.close()
 
     def set_generated(self, xml_path):
         """ Add generation date info in xml data

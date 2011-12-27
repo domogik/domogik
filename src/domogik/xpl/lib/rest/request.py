@@ -3617,7 +3617,7 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
-        ### list-installed ###########################
+        ### installed ################################
         elif self.rest_request[0] == "installed":
             if len(self.rest_request) == 3:
                 self._rest_package_installed(self.rest_request[1],
@@ -3764,7 +3764,7 @@ target=*
         pkg_mgr = PackageManager()
         pkg_list = []
         # get package list for the type
-        for data in pkg_mgr.get_packages_list(type = pkg_type):
+        for data in pkg_mgr.get_packages_list(pkg_type = pkg_type):
             if data["id"] not in list_installed:
                 json_data.add_data(data)
 
@@ -3800,11 +3800,16 @@ target=*
         while loop_again:
             try:
                 if pkg_type == message.data["type"+str(idx)]:
+                    if  message.data["fullname"+str(idx)].lower() == "yes":
+                        enabled = True
+                    else:
+                        enabled = False
                     data = {"fullname" : message.data["fullname"+str(idx)],
                             "id" : message.data["id"+str(idx)],
                             "release" : message.data["release"+str(idx)],
                             "type" : message.data["type"+str(idx)],
-                            "host" : host}
+                            "source" : message.data["source"+str(idx)],
+                            "enabled" : enabled}
                     # TODO : check for available updates!!!! 
                     updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
                     data["updates"] = updates
