@@ -148,6 +148,7 @@ class dawnduskAPI:
                 self.log.error("dawndusk.schedAdd : Can't activate external cron")
                 self.log.debug("dawndusk.schedAdd : Done :(")
                 return False
+            self.log.info("Add a new event of type %s at %s"%(label,sdate))
         return True
 
     def getNextDawn(self):

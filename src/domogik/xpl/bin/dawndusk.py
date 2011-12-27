@@ -80,7 +80,7 @@ class dawndusk(XplPlugin):
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
+            self.log.error("dawndusk.__init__ : "+error)
             longitude = "5.043"
             latitude = "47.352"
             use_cron = False
@@ -92,7 +92,7 @@ class dawndusk(XplPlugin):
         except:
             error = "Something went wrong during dawnduskAPI init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
+            self.log.error("dawndusk.__init__ : "+error)
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to add the next event to the scheduler")
@@ -101,7 +101,7 @@ class dawndusk(XplPlugin):
         except:
             error = "Something went wrong during dawnduskScheduler init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
+            self.log.error("dawndusk.__init__ : "+error)
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to create listeners")
@@ -245,6 +245,7 @@ class dawndusk(XplPlugin):
             mess.add_data({"status" :  "dusk"})
         self.myxpl.send(mess)
         self.addNextEvent()
+        self.log.info("dawndusk : send signal for %"%state)
         self.log.debug("dawndusk.sendDawnDusk() : Done :-)")
 
 if __name__ == "__main__":
