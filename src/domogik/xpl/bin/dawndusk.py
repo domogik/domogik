@@ -207,7 +207,7 @@ class dawndusk(XplPlugin):
         #for test only
         #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"dawn")
         #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"dawn")
-        self.log.debug("dawndusk.addNextEvent() : Add %s at %s to the scheduler" % (dstate,ddate))
+        self.log.info("Add a new event %s at %s to the scheduler" % (dstate,ddate))
         self._mydawndusk.schedAdd(ddate,self.sendDawnDusk,dstate)
         self.log.debug("dawndusk.addNextEvent() : Done :-)")
 
