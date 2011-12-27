@@ -4,7 +4,7 @@ from domogik.common.sql_schema import DeviceUsage
 def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     #1078
-    core_device_usage = Table('core_device_usage', meta, autoload=True)
+    core_device_usage = Table(DeviceUsage.__tablename__, meta, autoload=True)
     insert = core_device_usage.insert()
     insert.execute(id='water_tank', name='Water Tank', description='Water tank usage', 
                    default_options='{ "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"}, "trigger": {}, "number": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }')
@@ -18,7 +18,7 @@ def upgrade(migrate_engine):
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     #1078
-    core_device_usage = Table('core_device_usage', meta, autoload=True)
+    core_device_usage = Table(DeviceUsage.__tablename__, meta, autoload=True)
     core_device_usage.delete(whereclause="id='water_tank'").execute()
     core_device_usage.delete(whereclause="id='christmas_tree'").execute()
     core_device_usage.delete(whereclause="id='portal'").execute()
