@@ -49,7 +49,6 @@ from domogik.common.configloader import Loader
 
 DB_BACKUP_FILE = tempfile.gettempdir() + "/domogik.sql"
 UPGRADE_REPOSITORY = os.path.dirname(os.path.abspath(__file__)) + "/upgrade_repository"
-MANAGE_SCRIPT = "manage.py"
 MIGRATE_VERSION_TABLE = "migrate_version"
 
 _db = database.DbHelper()
