@@ -1,4 +1,4 @@
-from sqlalchemy import Table, MetaData, String, Column
+from sqlalchemy import Table, MetaData, String, Column, Index
 
 def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
@@ -15,6 +15,9 @@ def upgrade(migrate_engine):
     core_device_type = Table('core_device_type', meta, autoload=True)
     core_device_type.c.name.alter(type=String(80))
     
+    #1061
+    core_device_stats = Table('core_device_stats', meta, autoload=True)
+    Index('ix_core_device_stats_skey', core_device_stats.c.skey).create()
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
@@ -30,3 +33,7 @@ def downgrade(migrate_engine):
     #1110
     core_device_type = Table('core_device_type', meta, autoload=True)
     core_device_type.c.name.alter(type=String(30))
+
+    #1061
+    core_device_stats = Table('core_device_stats', meta, autoload=True)
+    Index('ix_core_device_stats_skey', core_device_stats.c.skey).drop()

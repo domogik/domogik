@@ -498,7 +498,7 @@ class DeviceStats(Base):
     date = Column(DateTime, nullable=False)
     # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
     timestamp = Column(Integer, nullable=False)
-    skey = Column(Unicode(30), nullable=False)
+    skey = Column(Unicode(30), nullable=False, index=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
