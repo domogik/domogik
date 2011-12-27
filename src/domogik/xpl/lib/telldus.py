@@ -708,7 +708,12 @@ class telldusAPI:
         @param add : address of the module (ie TS14)
         @param level : level of light (0..255max)
         '''
-        self._dimDevice(self.getDeviceId(add),int(level))
+        if level==0:
+            self._turnOffDevice(self.getDeviceId(add))
+        elif level==100:
+            self._turnOnDevice(self.getDeviceId(add))
+        else :
+            self._dimDevice(self.getDeviceId(add),int(level))
 
     def sendBright(self, add, level):
         '''

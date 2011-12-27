@@ -205,8 +205,8 @@ class dawndusk(XplPlugin):
         self.log.debug("dawndusk.addNextEvent() : Start ...")
         ddate, dstate = self.getNextEvent()
         #for test only
-        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"DAWN")
-        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"DUSK")
+        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"dawn")
+        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"dawn")
         self.log.debug("dawndusk.addNextEvent() : Add %s at %s to the scheduler" % (dstate,ddate))
         self._mydawndusk.schedAdd(ddate,self.sendDawnDusk,dstate)
         self.log.debug("dawndusk.addNextEvent() : Done :-)")
@@ -239,9 +239,9 @@ class dawndusk(XplPlugin):
         mess.set_type("xpl-trig")
         mess.set_schema("dawndusk.basic")
         mess.add_data({"type" : "dawndusk"})
-        if state=="DAWN":
+        if state=="dawn":
             mess.add_data({"status" :  "dawn"})
-        elif state=="DUSK":
+        elif state=="dawn":
             mess.add_data({"status" :  "dusk"})
         self.myxpl.send(mess)
         self.addNextEvent()

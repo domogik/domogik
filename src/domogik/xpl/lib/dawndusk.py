@@ -136,9 +136,9 @@ class dawnduskAPI:
             nstMess.set_type("xpl-trig")
             nstMess.set_schema("dawndusk.basic")
             nstMess.add_data({"type" : "dawndusk"})
-            if label=="DAWN":
+            if label=="dawn":
                 nstMess.add_data({"status" :  "dawn"})
-            elif label=="DUSK":
+            elif label=="dusk":
                 nstMess.add_data({"status" :  "dusk"})
             if self._cronQuery.startDateJob(device,nstMess,sdate):
                 self.log.debug("dawndusk.schedAdd : External cron activated")
@@ -148,6 +148,7 @@ class dawnduskAPI:
                 self.log.error("dawndusk.schedAdd : Can't activate external cron")
                 self.log.debug("dawndusk.schedAdd : Done :(")
                 return False
+        return True
 
     def getNextDawn(self):
         """

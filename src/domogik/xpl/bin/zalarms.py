@@ -62,6 +62,13 @@ class zalarms(XplPlugin):
                      (traceback.format_exc())
             self.log.exception(error)
 
+    def __del__(self):
+        """
+        Remove the zalarms class
+        """
+        del(self._myapy)
+        XplPlugin.__del__(self)
+
     def request_cmnd_cb(self, message):
         """
         General callback for timer.request messages

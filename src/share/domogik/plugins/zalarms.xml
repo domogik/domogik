@@ -30,6 +30,14 @@
     <key>
       <interface>yes</interface>
       <order-id>2</order-id>
+      <name>alarmtype</name>
+      <type>string</type>
+      <description>alarm or dawnalarm</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>3</order-id>
       <name>alarm1</name>
       <type>string</type>
       <description>A string like MoTuWeThFr,09:30</description>
@@ -37,7 +45,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>3</order-id>
+      <order-id>4</order-id>
       <name>alarm2</name>
       <type>string</type>
       <description>Or like MoTuWeThFrSaSu,07:00-08:00,17:00-21:00</description>
@@ -45,15 +53,15 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>4</order-id>
+      <order-id>5</order-id>
       <name>alarm3</name>
       <type>string</type>
-      <description>Or like SaSu,08:00,18:00</description>
+      <description>Or for a dawnalarm like SaSu,08:00-09:00</description>
       <default-value></default-value>
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>5</order-id>
+      <order-id>6</order-id>
       <name>nstschema</name>
       <type>string</type>
       <description>The schema of the message to send</description>
@@ -61,7 +69,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>6</order-id>
+      <order-id>7</order-id>
       <name>nsttype</name>
       <type>string</type>
       <description>The type of the message to send</description>
@@ -69,7 +77,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>7</order-id>
+      <order-id>8</order-id>
       <name>parameter0</name>
       <type>string</type>
       <description>The name of the parameter 0 to send (ie command)</description>
@@ -77,7 +85,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>8</order-id>
+      <order-id>9</order-id>
       <name>valueon0</name>
       <type>string</type>
       <description>The on value of the parameter 0 to send (ie on)</description>
@@ -85,7 +93,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>9</order-id>
+      <order-id>10</order-id>
       <name>valueoff0</name>
       <type>string</type>
       <description>The off value of the parameter 0 to send (ie off)</description>
@@ -93,7 +101,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>10</order-id>
+      <order-id>11</order-id>
       <name>parameter1</name>
       <type>string</type>
       <description>The name of the parameter 1 to send</description>
@@ -101,7 +109,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>11</order-id>
+      <order-id>12</order-id>
       <name>valueon1</name>
       <type>string</type>
       <description>The on value of the parameter 1 to send</description>
@@ -109,7 +117,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>12</order-id>
+      <order-id>13</order-id>
       <name>valueoff1</name>
       <type>string</type>
       <description>The off value of the parameter 1 to send</description>
@@ -117,7 +125,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>13</order-id>
+      <order-id>14</order-id>
       <name>nstfield1</name>
       <type>string</type>
       <description>The nested field 1 to send</description>
@@ -125,7 +133,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>14</order-id>
+      <order-id>15</order-id>
       <name>nstvalue1</name>
       <type>string</type>
       <description>The value of the nested field to send</description>
@@ -133,7 +141,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>15</order-id>
+      <order-id>16</order-id>
       <name>nstfield2</name>
       <type>string</type>
       <description>The nested the field 2 to send</description>
@@ -141,7 +149,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>16</order-id>
+      <order-id>17</order-id>
       <name>nstvalue2</name>
       <type>string</type>
       <description>The value of the nested field to send</description>
@@ -149,7 +157,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>17</order-id>
+      <order-id>18</order-id>
       <name>nstfield3</name>
       <type>string</type>
       <description>The nested the field 3 to send</description>
@@ -157,7 +165,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>18</order-id>
+      <order-id>19</order-id>
       <name>nstvalue3</name>
       <type>string</type>
       <description>The value of the nested field to send</description>
