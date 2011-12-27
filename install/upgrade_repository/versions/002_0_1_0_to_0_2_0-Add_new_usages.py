@@ -7,13 +7,13 @@ def upgrade(migrate_engine):
     core_device_usage = Table(DeviceUsage.__tablename__, meta, autoload=True)
     insert = core_device_usage.insert()
     insert.execute(id='water_tank', name='Water Tank', description='Water tank usage', 
-                   default_options='{ "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"}, "trigger": {}, "number": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }')
+                   default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
     insert.execute(id='christmas_tree', name='Christmas Tree', description='Happy Christmas!!',
-                   default_options='{"actuator": { "binary": {}, "range": {}, "trigger": {}, "number": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} }}')
+                   default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     insert.execute(id='portal', name='Portal', description='Portal',
-                   default_options='{ "actuator": { "binary": {"state0":"Closed", "state1":"Open"}, "range": {"step":10, "unit":"%"}, "trigger": {}, "number": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }')
+                   default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Closed&quot;, &quot;state1&quot;:&quot;Open&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
     insert.execute(id='security_camera', name='Security camera', description='Security camera',
-                   default_options='{"actuator": { "binary": {}, "range": {}, "trigger": {}, "number": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} }}')
+                   default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
