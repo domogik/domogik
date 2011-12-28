@@ -166,21 +166,27 @@ def add_initial_data():
     
 def upgrade_app():
     """Upgrade process of the application"""
-    backup_existing_database()
-    set_repository_under_version_control()    
-    print("Upgrading the application...")
-    # Upgrade to the current version of the repository
-    rep_v = get_repository_version()
-    db_v = get_db_version()
-    if (int(db_v) > int(rep_v)):
-        abort_install_process("Database version (%s) is greater than the repository one (%s)" % (db_v, rep_v))
-    print("Current repository version is : %s" % get_repository_version())
-    print("Current database version is : %s" % get_db_version())
-    if (int(rep_v) > int(db_v)):
-        print("Upgrading database to version %s" % rep_v)
+    if not is_repository_under_version_control():
+        backup_existing_database()
+        set_repository_under_version_control()
+        print("Upgrading the application...")
+        # Upgrade to the current version of the repository
         db_upgrade(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
     else:
-        print("Nothing to do!")
+        print("Upgrading the application...")
+        # Upgrade to the current version of the repository
+        rep_v = get_repository_version()
+        db_v = get_db_version()
+        if (int(db_v) > int(rep_v)):
+            abort_install_process("Database version (%s) is greater than the repository one (%s)" % (db_v, rep_v))
+        print("Current repository version is : %s" % get_repository_version())
+        print("Current database version is : %s" % get_db_version())
+        if (int(rep_v) > int(db_v)):
+            print("Upgrading database to version %s" % rep_v)
+            backup_existing_database()
+            db_upgrade(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
+        else:
+            print("Nothing to do, database is up to date.")
 
 def install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
