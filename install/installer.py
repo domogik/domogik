@@ -99,7 +99,8 @@ def get_db_version():
 
 def drop_all_tables():
     print("Droping all existing tables...")
-    sql_schema.metadata.drop_all(_engine)    
+    sql_schema.metadata.drop_all(_engine)
+    drop_version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
 
 def add_initial_data():
     """Add required data when running a brand new install"""
@@ -225,7 +226,6 @@ if __name__ == "__main__":
                 answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
                 if answer == 'y':
                     drop_all_tables()
-                    drop_version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
                 sys.exit()
 
     install_or_upgrade()
