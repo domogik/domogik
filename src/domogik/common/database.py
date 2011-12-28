@@ -173,6 +173,9 @@ class DbHelper():
     def get_db_name(self):
         return self.__db_config['db_name']
 
+    def is_db_type_mysql(self):
+        return self.__db_config['db_type'].lower() == 'mysql'
+
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()

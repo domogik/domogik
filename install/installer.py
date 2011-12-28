@@ -73,7 +73,7 @@ def abort_install_process(error_msg=""):
     sys.exit(1)
 
 def backup_existing_database(confirm=True):
-    if _db.get_db_type() != 'mysql':
+    if not _db.is_db_type_mysql():
         print("Can't backup your database, only mysql is supported (you have : %s)" % _db.get_db_type())
         return
     if confirm:
