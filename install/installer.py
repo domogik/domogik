@@ -208,8 +208,7 @@ def install_or_upgrade():
         print("It appears that your database doesn't contain the required tables.")
         answer = raw_input("Should they be created? [Y/n] ")
         if answer == "n":
-            print("Can't continue, system tables are missing")
-            sys.exit(1)
+            abort_install_process("Can't continue, system tables are missing")
         else:
             drop_all_tables() # Make sure we don't have any existing table in the database
             print("Creating all tables...")
