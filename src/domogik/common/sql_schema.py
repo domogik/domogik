@@ -498,7 +498,7 @@ class DeviceStats(Base):
     date = Column(DateTime, nullable=False)
     # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
     timestamp = Column(Integer, nullable=False)
-    skey = Column(Unicode(30), nullable=False)
+    skey = Column(Unicode(30), nullable=False, index=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
@@ -689,22 +689,19 @@ class SystemInfo(Base):
 
     __tablename__ = '%s_system_info' % _db_prefix
     id = Column(Integer, primary_key=True)
-    db_version = Column(Unicode(30))
     app_version = Column(Unicode(30))
 
-    def __init__(self, db_version=None, app_version=None):
+    def __init__(self, app_version=None):
         """Class constructor
 
-        @param db_version : version of the database
         @param app_version : version of the application
 
         """
-        self.db_version = db_version
         self.app_version = app_version
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<SystemInfo(db_version='%s')>" % (self.db_version)
+        return "<SystemInfo(db_version='%s')>" % (self.app_version)
 
     @staticmethod
     def get_tablename():
