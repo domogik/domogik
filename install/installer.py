@@ -90,10 +90,6 @@ def set_repository_under_version_control():
     if not migrate_version_t.exists(_engine):
         print("Creating versioning table '%s' ..." % MIGRATE_VERSION_TABLE)
         version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
-        """
-        execute_system_command(["python", UPGRADE_REPOSITORY +"/manage.py", "version_control", 
-                                _db.get_url_connection_string(), UPGRADE_REPOSITORY])
-        """
 
 def get_repository_version():
     return rep_version(UPGRADE_REPOSITORY)
