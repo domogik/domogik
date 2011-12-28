@@ -77,6 +77,24 @@ class dawndusk(XplPlugin):
             if boo==None:
                 boo="False"
             use_cron = eval(boo)
+            self.devices={}
+            num = 1
+            loop = True
+            while loop == True:
+                schema = self._config.query('dawndusk', 'schema-%s' % str(num))
+                addname = self._config.query('dawndusk', 'addname-%s' % str(num))
+                add = self._config.query('dawndusk', 'add-%s' % str(num))
+                command = self._config.query('dawndusk', 'command-%s' % str(num))
+                dawn = self._config.query('dawndusk', 'dawn-%s' % str(num))
+                dusk = self._config.query('dawndusk', 'dusk-%s' % str(num))
+                if schema != None:
+                    self.log.debug("dawndusk.__init__ : Device from xpl : device=%s," % (add))
+                    self.devices[add]={"schema":schema,"command":command,
+                                "dawn":dawn,"dusk":dusk,"addname":addname}
+                else:
+                    loop = False
+                num += 1
+
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
@@ -132,6 +150,13 @@ class dawndusk(XplPlugin):
             #We receive a trig indicating that the dawn or dus has occured.
             #We need to schedule the next one
             self.addNextEvent()
+            for dev in self.devices:
+                mess = XplMessage()
+                mess.set_type("xpl-cmnd")
+                mess.set_schema(self.devices[dev]["schema"])
+                mess.add_data({self.devices[dev]["command"] : self.devices[dev][status]})
+                mess.add_data({self.devices[dev]["addname"] : dev})
+                self.myxpl.send(mess)
         self.log.debug("dawndusk.dawndusk_trig_cb() : Done :)")
 
     def dawndusk_cmnd_cb(self, message):

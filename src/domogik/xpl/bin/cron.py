@@ -91,10 +91,11 @@ from datetime import timedelta
 from domogik.xpl.lib.cron import cronAPI
 from domogik.xpl.lib.cron import cronJobs
 from domogik.xpl.lib.cron import cronException
+from domogik.xpl.lib.helperplugin import XplHlpPlugin
 import traceback
 import logging
 
-class cron(XplPlugin):
+class cron(XplHlpPlugin):
     '''
     Manage
     '''
@@ -102,7 +103,7 @@ class cron(XplPlugin):
         """
         Create the cron class
         """
-        XplPlugin.__init__(self, name = 'cron')
+        XplHlpPlugin.__init__(self, name = 'cron')
         self.log.info("cron.__init__ : Start ...")
         self.config = Query(self.myxpl, self.log)
 
@@ -121,6 +122,50 @@ class cron(XplPlugin):
         Listener(self.basic_cmnd_cb, self.myxpl,
                  {'schema': 'timer.basic', 'xpltype': 'xpl-cmnd'})
 
+        self.helpers =   \
+           { "list" :
+              {
+                "cb" : self._cron.jobs.helperList,
+                "desc" : "List devices (cron jobs)",
+                "usage" : "list all (all the devices)|aps(jobs in APScheduler)",
+                "param-list" : "which",
+                "which" : "all|aps",
+              },
+             "info" :
+              {
+                "cb" : self._cron.jobs.helperInfo,
+                "desc" : "Display device information",
+                "usage" : "info <device>",
+                "param-list" : "device",
+                "device" : "<device>",
+              },
+             "stop" :
+              {
+                "cb" : self._cron.jobs.helperStop,
+                "desc" : "Stop a device",
+                "usage" : "stop <device>",
+                "param-list" : "device",
+                "device" : "<device>",
+              },
+             "halt" :
+              {
+                "cb" : self._cron.jobs.helperHalt,
+                "desc" : "Halt a device",
+                "usage" : "halt <device>",
+                "param-list" : "device",
+                "device" : "<device>",
+              },
+             "resume" :
+              {
+                "cb" : self._cron.jobs.helperResume,
+                "desc" : "Resume a device",
+                "usage" : "resume <device>",
+                "param-list" : "device",
+                "device" : "<device>",
+              },
+            }
+
+        self.enable_helper()
         self.enable_hbeat()
         self.log.info("cron plugin correctly started")
 

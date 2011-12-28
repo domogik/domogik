@@ -92,7 +92,7 @@ class cronJobs():
                     self._scheduler.unschedule_job(self.data[device]['apjob'])
                 except:
                     print "Can't unschedule AP job %s"%self.data[device]['apjob']
-                    del(self.data[device]['apjob'])
+                del(self.data[device]['apjob'])
             if 'apjobs' in self.data[device]:
                 while len(self.data[device]['apjobs'])>0:
                     i=self.data[device]['apjobs'].pop()
@@ -975,27 +975,33 @@ class cronJobs():
         else:
             return 0
 
-    def getList(self):
+    def getList(self,head):
         """
         Get the list of jobs
         @return : The list of jobs
         """
+        fmtret="%-10s | %-8s | %8s | %8s | %12s"
         lines = []
-        lines.append("%s | %s | %s" % ("device","type","state"))
+        if head==True:
+            lines.append(fmtret % ("device","status","#runs", "#aps","uptime(in s)"))
+            lines.append(fmtret % ("----------","--------","--------", "--------","------------"))
         for i in self.data.iterkeys():
             #print i
-            lines.append("%s | %s | %s" % (i,self.data[i]['devicetype'],self.data[i]['current']))
+            lines.append(fmtret % (i,self.data[i]['current'],self.getRunTimes(i),self.getAPCount(i),self.getUpTime(i)))
         return lines
 
-    def getAPList(self):
+    def getAPList(self,head):
         """
         Get the list of jobs
         @return : The list of jobs in APScheduler
         """
+        fmtret="%-10s | %8s"
         lines = []
-        lines.append("%s | %s" % ("name","runs"))
+        if head==True:
+            lines.append(fmtret % ("name","runs"))
+            lines.append(fmtret % ("----------","--------"))
         for i in self._scheduler.get_jobs():
-            lines.append("%s | %s" % (str(i.trigger), i.runs))
+            lines.append(fmtret % (str(i.trigger), i.runs))
         return lines
 
     def getAPCount(self,device):
@@ -1074,6 +1080,113 @@ class cronJobs():
             return mess
             #send an xpl error message ...
 
+    def helperList(self, params={}):
+        """
+        List all devices
+        """
+        self._api.log.error("cronJobs.helperList : Start ...")
+        data = []
+        if "which" in params:
+            if params["which"]=="all":
+                data.append("List all devices :")
+                data.extend(self.getList(True))
+            elif params["which"]=="aps":
+                data.extend(self.getAPList(True))
+            else:
+                data.append("Bad parameter")
+        else:
+            data.append("No ""which"" parameter found")
+        self._api.log.error("cronJobs.helperList : Done")
+        return data
+
+    def helperInfo(self, params={}):
+        """
+        Return informations on a device
+        """
+        self._api.log.error("cronJobs.helperList : Start ...")
+        data = []
+        if "device" in params:
+            device=params["device"]
+            data.append("Informations on device %s :"%device)
+            if device in self.data:
+                data.append(" Current state : %s"%(self.data[device]['current']))
+                data.append(" Device type : %s"%(self.data[device]['devicetype']))
+                data.append(" Uptime : %s"%(self.getUpTime(device)))
+                data.append(" Runtime : %s"%(self.getRunTime(device)))
+                data.append(" #Runtimes : %s"%(self.getRunTimes(device)))
+                data.append(" #APScheduler jobs : %s"%(self.getAPCount(device)))
+            else:
+                data.append(" Device not found")
+        else:
+            data.append("No ""device"" parameter found")
+        self._api.log.error("cronJobs.helperList : Done")
+        return data
+
+    def helperStop(self, params={}):
+        """
+        Stop a device
+        """
+        self._api.log.error("cronJobs.helperStop : Start ...")
+        data = []
+        if "device" in params:
+            device=params["device"]
+            data.append("Stop device %s :"%device)
+            if device in self.data:
+                data.append(" Current state : %s"%(self.data[device]['current']))
+                ret=self.stopJob(device)
+                data.append(" Return of the command : %s"%(cronErrors[ret]))
+                data.append(" Current state : %s"%(self.data[device]['current']))
+                data.append(" #APScheduler jobs : %s"%(self.getAPCount(device)))
+            else:
+                data.append(" Device not found")
+        else:
+            data.append("No ""device"" parameter found")
+        self._api.log.error("cronJobs.helperStop : Done")
+        return data
+
+    def helperResume(self, params={}):
+        """
+        Resume a device
+        """
+        self._api.log.error("cronJobs.helperResume : Start ...")
+        data = []
+        if "device" in params:
+            device=params["device"]
+            data.append("Resume device %s :"%device)
+            if device in self.data:
+                data.append(" Current state : %s"%(self.data[device]['current']))
+                ret=self.resumeJob(device)
+                data.append(" Return of the command : %s"%(cronErrors[ret]))
+                data.append(" Current state : %s"%(self.data[device]['current']))
+                data.append(" #APScheduler jobs : %s"%(self.getAPCount(device)))
+            else:
+                data.append(" Device not found")
+        else:
+            data.append("No ""device"" parameter found")
+        self._api.log.error("cronJobs.helperResume : Done")
+        return data
+
+    def helperHalt(self, params={}):
+        """
+        Halt a device
+        """
+        self._api.log.error("cronJobs.helperHalt : Start ...")
+        data = []
+        if "device" in params:
+            device=params["device"]
+            data.append("Halt device %s :"%device)
+            if params["device"] in self.data:
+                data.append(" Current state : %s"%(self.data[device]['current']))
+                ret=self.haltJob(device)
+                data.append(" Return of the command : %s"%(cronErrors[ret]))
+                data.append(" Current state : %s"%("halted"))
+            else:
+                data.append(" Device not found")
+                data.append(" Current state : %s"%("halted"))
+        else:
+            data.append("No ""device"" parameter found")
+        self._api.log.error("cronJobs.helperHalt : Done")
+        return data
 
 class cronException(Exception):
     """
@@ -1214,8 +1327,8 @@ class cronAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
-        mess.add_data({"devices" : self.jobs.getList()})
-        mess.add_data({"apjobs" : self.jobs.getAPList()})
+        mess.add_data({"devices" : self.jobs.getList(False)})
+        mess.add_data({"apjobs" : self.jobs.getAPList(False)})
         myxpl.send(mess)
         self.log.debug("cronAPI._listStatus : Done :)")
 

@@ -2,7 +2,8 @@
   <id>dawndusk</id>
   <technology>dawndusk</technology>
   <description>
-  Get the dawn and dusk time using the geocoordinates
+  Get the dawn and dusk events using the geocoordinates.
+  Can also send command to devices using this events.
   </description>
   <changelog>Update the plugin to domogik 0.2.0</changelog>
   <version>0.2.0</version>
@@ -38,11 +39,58 @@
       <description>Use external cron like the cron plugin to schedule events</description>
       <default-value>False</default-value>
     </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>4</order-id>
+      <name>schema</name>
+      <type>string</type>
+      <description>Schema to use to send command</description>
+      <default-value>telldus.basic</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>5</order-id>
+      <name>addname</name>
+      <type>string</type>
+      <description>address name</description>
+      <default-value>device</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>6</order-id>
+      <name>add</name>
+      <type>string</type>
+      <description>address</description>
+      <default-value>TS3</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>7</order-id>
+      <name>command</name>
+      <type>string</type>
+      <description>Command to send to the device</description>
+      <default-value>command</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>8</order-id>
+      <name>dawn</name>
+      <type>string</type>
+      <description>Value of command when dawn event</description>
+      <default-value>on</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>9</order-id>
+      <name>dusk</name>
+      <type>string</type>
+      <description>Value of command when dusk event</description>
+      <default-value>off</default-value>
+    </key>
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/dawndusk.xml"/>
     <file path="src/share/domogik/stats/dawndusk/dawndusk.basic.xml"/>
-<!--    <file path="src/share/domogik/stats/dawndusk/dawndusk.request.xml"/>-->
     <file path="src/share/domogik/url2xpl/dawndusk/daynight.xml"/>
     <file path="src/domogik/xpl/bin/dawndusk.py"/>
     <file path="src/domogik/xpl/lib/dawndusk.py"/>
