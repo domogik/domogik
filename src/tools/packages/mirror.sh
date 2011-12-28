@@ -20,7 +20,7 @@
 #Module purpose
 #==============
 #
-# Generate all packages from sources
+# Mirror an existing repository
 #
 #Implements
 #==========
@@ -30,6 +30,10 @@
 #@copyright: (C) 2007-2009 Domogik project
 #@license: GPL(v3)
 #@organization: Domogik
+
+
+echo "This script is obsolete actually. It will be upgrader in a following release"
+exit 0
 
 TMP_PKG_LIST=/tmp/dmg-mirror-tool.lst
 
