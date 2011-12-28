@@ -3810,7 +3810,6 @@ target=*
                             "type" : message.data["type"+str(idx)],
                             "source" : message.data["source"+str(idx)],
                             "enabled" : enabled}
-                    # TODO : check for available updates!!!! 
                     updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
                     data["updates"] = updates
                     json_data.add_data(data)
