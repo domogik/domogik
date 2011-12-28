@@ -86,10 +86,13 @@ def backup_existing_database():
         execute_system_command(['mysqldump', '-u', _db.get_db_user(), '-p', _db.get_db_name()], p_stdout=f)
 
 def set_repository_under_version_control():
-    migrate_version_t = Table(MIGRATE_VERSION_TABLE, sql_schema.metadata)
-    if not migrate_version_t.exists(_engine):
+    if not is_repository_under_version_control():
         print("Creating versioning table '%s' ..." % MIGRATE_VERSION_TABLE)
         version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
+
+def is_repository_under_version_control():
+    migrate_version_t = Table(MIGRATE_VERSION_TABLE, sql_schema.metadata)
+    return migrate_version_t.exists(_engine)
 
 def get_repository_version():
     return rep_version(UPGRADE_REPOSITORY)
@@ -163,6 +166,8 @@ def add_initial_data():
     
 def upgrade_app():
     """Upgrade process of the application"""
+    backup_existing_database()
+    set_repository_under_version_control()    
     print("Upgrading the application...")
     # Upgrade to the current version of the repository
     rep_v = get_repository_version()
@@ -195,8 +200,6 @@ def install_or_upgrade():
             add_initial_data()
     else:
         # Upgrade
-        backup_existing_database()
-        set_repository_under_version_control()
         upgrade_app()
 
 def check_install_is_ok():
