@@ -187,7 +187,7 @@ def install_or_upgrade():
             print("Can't continue, system tables are missing")
             sys.exit(1)
         else:
-            drop_all_tables() #TODO not sure this is needed
+            drop_all_tables() # Make sure we don't have any existing table in the database
             print("Creating all tables...")
             sql_schema.metadata.create_all(_engine)
             set_repository_under_version_control()
