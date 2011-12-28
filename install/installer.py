@@ -193,8 +193,8 @@ def upgrade_app():
         if (int(rep_v) > int(db_v)):
             if not user_want_database_upgrade():
                 return False
-            print("Upgrading database to version %s" % rep_v)
             backup_existing_database()
+            print("Upgrading database to version %s" % rep_v)
             db_upgrade(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
         else:
             print("Nothing to do, database is up to date.")
