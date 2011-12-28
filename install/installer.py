@@ -169,11 +169,10 @@ def upgrade_app():
     if not is_repository_under_version_control():
         backup_existing_database()
         set_repository_under_version_control()
-        print("Upgrading the application...")
+        print("Upgrading database to version %s" % get_repository_version())
         # Upgrade to the current version of the repository
         db_upgrade(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
     else:
-        print("Upgrading the application...")
         # Upgrade to the current version of the repository
         rep_v = get_repository_version()
         db_v = get_db_version()
