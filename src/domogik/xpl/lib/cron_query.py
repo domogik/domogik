@@ -33,18 +33,34 @@ A client librairy to speak with the cron plugin, via xpl language
 """
 
 from threading import Event
-
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
+import traceback
 
+ERROR_NO=0
+ERROR_PARAMETER=1
+ERROR_DEVICE_EXIST=10
+ERROR_DEVICE_NOT_EXIST=11
+ERROR_DEVICE_NOT_STARTED=12
+ERROR_DEVICE_NOT_STOPPED=13
+ERROR_SCHEDULER=20
+ERROR_NOT_IMPLEMENTED=30
+
+cronErrors = { ERROR_NO: 'No error',
+               ERROR_PARAMETER: 'Missing or wrong parameter',
+               ERROR_DEVICE_EXIST: 'Device already exist',
+               ERROR_DEVICE_NOT_EXIST: 'Device does not exist',
+               ERROR_DEVICE_NOT_STARTED: "Device is not started",
+               ERROR_DEVICE_NOT_STOPPED: "Device is not stopped",
+               ERROR_SCHEDULER: 'Error with the scheduler',
+               }
 
 class cronQuery():
     '''
     Query throw xPL network to get a config item
     '''
-
     def __init__(self, xpl, log):
         '''
         Init the query system and connect it to xPL network
@@ -57,9 +73,8 @@ class cronQuery():
         self._keys = {}
         self._l = {}
         self._result = None
-
-    def __del__(self):
-        print("End query")
+        self.parameters =["parameter0","parameter1"]
+        self.values =["valueon","valueoff"]
 
     def query(self, device, configMess,extkey=None):
         '''
@@ -140,8 +155,12 @@ class cronQuery():
         configMess.add_data({self.nestedKey("xpltype"):nstMess.type})
         for key in nstMess.data:
                 configMess.add_data({self.nestedKey(key):nstMess.data[key]})
-        res=self.query(device, configMess)
-        return res
+        try:
+            res=self.query(device, configMess)
+            return res
+        except:
+            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            return False
 
     def startTimerJob(self, device, nstMess, frequence, duration=0):
         '''
@@ -280,20 +299,12 @@ class cronQuery():
             return ERROR_PARAMETER
         return self.startJob(device, configMess, nstMess)
 
-    def startHvacJob( self, device, nstMess,
-                      parameter0=None, valueon0=None,valueoff0=None,
-                      parameter1=None, valueon1=None,valueoff1=None,
-                      timers={}):
+    def startHvacJob( self, device, nstMess, params={}, timers={}):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
-        @param parameter0 : the first parameter to include as key in return message
-        @param valueon0 : the value of parameter0 in case of on
-        @param valueoff0 : the value of parameter0 in case of on
-        @param parameter1 : the second parameter to include as key in return message
-        @param valueon1 : the value of parameter0 in case of on
-        @param valueoff1 : the value of parameter0 in case of on
+        @param params : parameters in a dict with valueon and valueoff fields
         @param timers: the list of timers to use
        '''
         configMess = XplMessage()
@@ -303,20 +314,16 @@ class cronQuery():
         configMess.add_data({"device" : device})
         configMess.add_data({"action" : "start"})
         ok=True
-        if parameter0 != None:
-            configMess.add_data({"parameter0" : parameter0})
-            ok=False
-            if valueon0 != None and valueoff0 != None:
-                configMess.add_data({"valueon0" : valueon0})
-                configMess.add_data({"valueoff0" : valueoff0})
-                ok=True
-        if ok and parameter1 != None:
-            configMess.add_data({"parameter1" : parameter1})
-            ok=False
-            if valueon1 != None and valueoff1 != None:
-                configMess.add_data({"valueon1" : valueon1})
-                configMess.add_data({"valueoff1" : valueoff1})
-                ok=True
+        i=0
+        if params !=None:
+            for param in params:
+                #try:
+                    configMess.add_data({"parameter"+str(i) : param})
+                    for value in params[param]:
+                        configMess.add_data({value+str(i) : params[param][value]})
+                    i=i+1
+                #except:
+                #    ok=False
         if ok and len(timers)>0 :
             for key in timers:
                 configMess.add_data({key : timers[key]})
@@ -326,20 +333,12 @@ class cronQuery():
             return ERROR_PARAMETER
         return self.startJob(device, configMess, nstMess)
 
-    def startAlarmJob( self, device, nstMess,
-                      parameter0=None, valueon0=None,valueoff0=None,
-                      parameter1=None, valueon1=None,valueoff1=None,
-                      alarms={}):
+    def startAlarmJob( self, device, nstMess, params={}, alarms=list()):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
-        @param parameter0 : the first parameter to include as key in return message
-        @param valueon0 : the value of parameter0 in case of on
-        @param valueoff0 : the value of parameter0 in case of on
-        @param parameter1 : the second parameter to include as key in return message
-        @param valueon1 : the value of parameter0 in case of on
-        @param valueoff1 : the value of parameter0 in case of on
+        @param params : parameters in a dict with valueon and valueoff fields
         @param alarms : the list of alarms to use
        '''
         configMess = XplMessage()
@@ -349,20 +348,50 @@ class cronQuery():
         configMess.add_data({"device" : device})
         configMess.add_data({"action" : "start"})
         ok=True
-        if parameter0 != None:
-            configMess.add_data({"parameter0" : parameter0})
+        i=0
+        if params !=None:
+            for param in params:
+                #try:
+                    configMess.add_data({"parameter"+str(i) : param})
+                    for value in params[param]:
+                        configMess.add_data({value+str(i) : params[param][value]})
+                    i=i+1
+                #except:
+                #    ok=False
+        if alarms!=None:
+            for key in alarms:
+                configMess.add_data({"alarm" : key})
+        else:
             ok=False
-            if valueon0 != None and valueoff0 != None:
-                configMess.add_data({"valueon0" : valueon0})
-                configMess.add_data({"valueoff0" : valueoff0})
-                ok=True
-        if ok and parameter1 != None:
-            configMess.add_data({"parameter1" : parameter1})
-            ok=False
-            if valueon1 != None and valueoff1 != None:
-                configMess.add_data({"valueon1" : valueon1})
-                configMess.add_data({"valueoff1" : valueoff1})
-                ok=True
+        if ok==False:
+            return ERROR_PARAMETER
+        return self.startJob(device, configMess, nstMess)
+
+    def startDawnAlarmJob( self, device, nstMess, params={}, alarms=list()):
+        '''
+        Add and start a job to the cron plugin
+        @param device : the name of the timer
+        @param nstMess : the XPL message which will be sent by the cron job
+        @param params : parameters in a dict with valueon and valueoff fields
+        @param alarms : the list of alarms to use
+       '''
+        configMess = XplMessage()
+        configMess.set_type("xpl-cmnd")
+        configMess.set_schema("timer.basic")
+        configMess.add_data({"devicetype" : "dawnalarm"})
+        configMess.add_data({"device" : device})
+        configMess.add_data({"action" : "start"})
+        ok=True
+        i=0
+        if params !=None:
+            for param in params:
+                #try:
+                    configMess.add_data({"parameter"+str(i) : param})
+                    for value in params[param]:
+                        configMess.add_data({value+str(i) : params[param][value]})
+                    i=i+1
+                #except:
+                #    ok=False
         if alarms!=None:
             for key in alarms:
                 configMess.add_data({"alarm" : key})
@@ -383,8 +412,12 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "stop"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess,extkey=extkey)
-        return res
+        try :
+            res=self.query(device, configMess,extkey=extkey)
+            return res
+        except:
+            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            return False
 
     def resumeJob(self, device,extkey=None):
         """
@@ -396,8 +429,12 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "resume"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess,extkey=extkey)
-        return res
+        try:
+            res=self.query(device, configMess,extkey=extkey)
+            return res
+        except:
+            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            return False
 
     def haltJob(self, device,extkey=None):
         """
@@ -409,9 +446,13 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "halt"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess,extkey=extkey)
-        #print res
-        return res
+        try:
+            res=self.query(device, configMess,extkey=extkey)
+            #print res
+            return res
+        except:
+            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            return False
 
     def statusJob(self, device,extkey=None):
         """
@@ -423,8 +464,12 @@ class cronQuery():
         configMess.set_schema("timer.basic")
         configMess.add_data({"action" : "status"})
         configMess.add_data({"device" : device})
-        res=self.query(device, configMess,extkey=extkey)
-        return res
+        try:
+            res=self.query(device, configMess,extkey=extkey)
+            return res
+        except:
+            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            return False
 
     def dateFromXPL(self,xpldate):
         """

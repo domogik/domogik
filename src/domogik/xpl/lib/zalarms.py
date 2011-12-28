@@ -52,13 +52,17 @@ class zalarmsAPI:
         self.myxpl=myxpl
         self.config=config
         self._cronQuery = cronQuery(self.myxpl,self.log)
+        self._devices=set()
+
         if self.config!=None :
             num = 1
             loop = True
             while loop == True:
                 device = self.config.query('zalarms', 'device-%s' % str(num))
                 if device!=None:
+                    self._devices.add(device)
                     #print "status=%s"%self._cronQuery.statusJob(device,extkey="current")
+                    alarmtype = self.config.query('zalarms', 'alarmtype-%s' % str(num))
                     if self._cronQuery.statusJob(device,extkey="current")!="halted":
                         self._cronQuery.haltJob(device)
                     alarms=list()
@@ -88,27 +92,32 @@ class zalarmsAPI:
                     nstMess = XplMessage()
                     nstMess.set_type(nsttype)
                     nstMess.set_schema(nstschema)
+                    params={}
                     if parameter0!=None:
-                        nstMess.add_data({"parameter0": parameter0})
-                        nstMess.add_data({"valueon0": valueon0})
-                        nstMess.add_data({"valueoff0": valueoff0})
+                        params[parameter0]={"valueon":valueon0,"valueoff":valueoff0}
                     if parameter1!=None:
-                        nstMess.add_data({"parameter1": parameter1})
-                        nstMess.add_data({"valueon1": valueon1})
-                        nstMess.add_data({"valueoff1": valueoff1})
+                        params[parameter1]={"valueon":valueon1,"valueoff":valueoff1}
                     if nstfield1!=None:
                         nstMess.add_data({nstfield1 : nstvalue1})
                     if nstfield2!=None:
                         nstMess.add_data({nstfield2 : nstvalue2})
                     if nstfield3!=None:
                         nstMess.add_data({nstfield3 : nstvalue3})
-                    self._cronQuery.startAlarmJob(device,nstMess,
-                        parameter0=parameter0, valueon0=valueon0,valueoff0=valueoff0,
-                        parameter1=parameter1, valueon1=valueon1,valueoff1=valueoff1,
-                        alarms=alarms)
+                    if alarmtype=="alarm":
+                        self._cronQuery.startAlarmJob(device, nstMess,
+                            params=params, alarms=alarms)
+                    else :
+                        self._cronQuery.startDawnAlarmJob(device,nstMess,params=params,alarms=alarms)
                 else:
                     loop = False
                 num += 1
+
+    def __del__(self):
+        """
+
+        """
+        for dev in self._devices:
+            self._cronQuery.haltJob(dev)
 
     def requestListener(self,message):
         """

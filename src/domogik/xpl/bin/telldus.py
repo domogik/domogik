@@ -51,7 +51,10 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.telldus import *
 import os.path
-import sys, traceback
+import sys
+import traceback
+import logging
+logging.basicConfig()
 
 class telldus(XplPlugin):
     '''
@@ -102,20 +105,26 @@ class telldus(XplPlugin):
             'stop': lambda hu, l: self._mytelldus.sendStop(hu),
             'shut': lambda hu, l: self._mytelldus.sendShut(hu,l),
         }
-        cmd = None
-        if 'command' in message.data:
-            cmd = message.data['command']
-        device = None
-        if 'device' in message.data:
-            device = message.data['device']
-        level = None
-        if 'level' in message.data:
-            level = message.data['level']
+        try :
+            cmd = None
+            if 'command' in message.data:
+                cmd = message.data['command']
+            device = None
+            if 'device' in message.data:
+                device = message.data['device']
+            level = None
+            if 'level' in message.data:
+                level = message.data['level']
 
-        self.log.debug("%s received : device= %s, level=%s" %
-                       (cmd, device,level))
-        commands[cmd](device, level)
-        self.telldus_monitor_cb(device, cmd)
+            self.log.debug("%s received : device= %s, level=%s" %
+                           (cmd, device,level))
+            commands[cmd](device, level)
+            self.telldus_monitor_cb(device, cmd)
+        except:
+            self.log.error("action _ %s _ unknown."%(request))
+            error = "Exception : %s" %  \
+                     (traceback.format_exc())
+            self.log.info("TelldusException : "+error)
 
     def telldus_monitor_cb(self, add, order, args = None):
         """

@@ -80,7 +80,7 @@ class dawndusk(XplPlugin):
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
+            self.log.error("dawndusk.__init__ : "+error)
             longitude = "5.043"
             latitude = "47.352"
             use_cron = False
@@ -92,7 +92,7 @@ class dawndusk(XplPlugin):
         except:
             error = "Something went wrong during dawnduskAPI init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
+            self.log.error("dawndusk.__init__ : "+error)
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to add the next event to the scheduler")
@@ -101,7 +101,7 @@ class dawndusk(XplPlugin):
         except:
             error = "Something went wrong during dawnduskScheduler init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("dawndusk.__init__ : "+error)
+            self.log.error("dawndusk.__init__ : "+error)
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to create listeners")
@@ -205,9 +205,9 @@ class dawndusk(XplPlugin):
         self.log.debug("dawndusk.addNextEvent() : Start ...")
         ddate, dstate = self.getNextEvent()
         #for test only
-        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"DAWN")
-        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"DUSK")
-        self.log.debug("dawndusk.addNextEvent() : Add %s at %s to the scheduler" % (dstate,ddate))
+        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"dawn")
+        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"dawn")
+        self.log.info("Add a new event %s at %s to the scheduler" % (dstate,ddate))
         self._mydawndusk.schedAdd(ddate,self.sendDawnDusk,dstate)
         self.log.debug("dawndusk.addNextEvent() : Done :-)")
 
@@ -239,12 +239,13 @@ class dawndusk(XplPlugin):
         mess.set_type("xpl-trig")
         mess.set_schema("dawndusk.basic")
         mess.add_data({"type" : "dawndusk"})
-        if state=="DAWN":
+        if state=="dawn":
             mess.add_data({"status" :  "dawn"})
-        elif state=="DUSK":
+        elif state=="dawn":
             mess.add_data({"status" :  "dusk"})
         self.myxpl.send(mess)
         self.addNextEvent()
+        self.log.info("dawndusk : send signal for %"%state)
         self.log.debug("dawndusk.sendDawnDusk() : Done :-)")
 
 if __name__ == "__main__":
