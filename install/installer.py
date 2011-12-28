@@ -86,12 +86,12 @@ def backup_existing_database():
     with open(DB_BACKUP_FILE, 'w') as f:
         execute_system_command(['mysqldump', '-u', _db.get_db_user(), '-p', _db.get_db_name()], p_stdout=f)
 
-def set_repository_under_version_control():
-    if not is_repository_under_version_control():
+def set_db_under_version_control():
+    if not is_db_under_version_control():
         print("Creating versioning table '%s' ..." % MIGRATE_VERSION_TABLE)
         version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
 
-def is_repository_under_version_control():
+def is_db_under_version_control():
     migrate_version_t = Table(MIGRATE_VERSION_TABLE, sql_schema.metadata)
     return migrate_version_t.exists(_engine)
 
@@ -104,7 +104,7 @@ def get_db_version():
 def drop_all_tables():
     print("Droping all existing tables...")
     sql_schema.metadata.drop_all(_engine)
-    if is_repository_under_version_control():
+    if is_db_under_version_control():
         drop_version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
 
 def add_initial_data():
@@ -174,11 +174,11 @@ def user_want_database_upgrade():
 
 def upgrade_app():
     """Upgrade process of the application"""
-    if not is_repository_under_version_control():
+    if not is_db_under_version_control():
         if not user_want_database_upgrade():
             return False
         backup_existing_database()
-        set_repository_under_version_control()
+        set_db_under_version_control()
         print("Upgrading database to version %s" % get_repository_version())
         # Upgrade to the current version of the repository
         db_upgrade(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
@@ -213,16 +213,16 @@ def install_or_upgrade():
             drop_all_tables() # Make sure we don't have any existing table in the database
             print("Creating all tables...")
             print(sql_schema.metadata)
-            set_repository_under_version_control()
+            set_db_under_version_control()
             sql_schema.metadata.create_all(_engine)
-            set_repository_under_version_control()
+            set_db_under_version_control()
             add_initial_data()
     else:
         # Upgrade
         upgrade_app()
 
 def check_install_is_ok():
-    if not is_repository_under_version_control():
+    if not is_db_under_version_control():
         abort_install_process("Your database is NOT under version control. Can't continue!")
     db_v = get_db_version()
     rep_v = get_repository_version()
