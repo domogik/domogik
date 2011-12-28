@@ -72,13 +72,14 @@ def abort_install_process(error_msg=""):
     print("Install process aborted : %s " % error_msg)
     sys.exit(1)
 
-def backup_existing_database():
+def backup_existing_database(confirm=True):
     if _db.get_db_type() != 'mysql':
         print("Can't backup your database, only mysql is supported (you have : %s)" % _db.get_db_type())
         return
-    answer = raw_input("Do you want to backup your database? [Y/n] ")
-    if answer == 'n':
-        return
+    if confirm:
+        answer = raw_input("Do you want to backup your database? [Y/n] ")
+        if answer == 'n':
+            return
     answer = raw_input("Backup file? [%s] " % DB_BACKUP_FILE)
     if answer != '':
         backup_directory = answer
@@ -232,12 +233,13 @@ def check_install_is_ok():
     print("Installation complete.")
 
 def usage():
-    print("Usage : app_installer [-r, --reset]")
-    print("-r or --reset : drop all tables (default is False)")
+    print("Usage : app_installer [-r, --reset] [-d, --dump]")
+    print("-r or --reset : drop all tables")
+    print("-d or --dump : make a dump of the database")
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hr", ["help", "reset"])
+        opts, args = getopt.getopt(sys.argv[1:], "hrd", ["help", "reset", "dump"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -250,6 +252,9 @@ if __name__ == "__main__":
                 answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
                 if answer == 'y':
                     drop_all_tables()
+                sys.exit()
+            elif opt in ('-d', '--dump'):
+                backup_existing_database(confirm=False)
                 sys.exit()
 
     install_or_upgrade()
