@@ -101,6 +101,17 @@ class dawnduskAPI:
         self.mycity.lat, self.mycity.lon = lat, lgt
         self.mycity.horizon = '-6'
 
+    def __del__(self):
+        """
+        Kill the dawndusk API
+        @param lgt : longitude of the observer
+        @param lat : latitude of the observer
+        """
+        if self.use_cron == True:
+            self._cronQuery.haltJob(device)
+        else :
+            self._scheduler.__del__(self)
+
     def schedAdd(self,sdate,cb_function,label):
         """
         Add an event in the schedulered tasks
@@ -114,9 +125,13 @@ class dawnduskAPI:
             self.log.debug("dawndusk.schedAdd : Use internal cron ...")
             return True
         else :
+
             self.log.debug("dawndusk.schedAdd : Use external cron ...")
             device="dawndusk"
-
+            #print "status=%s"%self._cronQuery.statusJob(device,extkey="current")
+            if self._cronQuery.statusJob(device,extkey="current")!="halted":
+                self._cronQuery.haltJob(device)
+                self.log.debug("dawndusk.schedAdd : Halt old device")
             nstMess = XplMessage()
             nstMess.set_type("xpl-trig")
             nstMess.set_schema("dawndusk.basic")

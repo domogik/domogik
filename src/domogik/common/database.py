@@ -166,6 +166,12 @@ class DbHelper():
             url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
                                      self.__db_config['db_host'], self.__db_config['db_name'])
         return url
+    
+    def get_db_user(self):
+        return self.__db_config['db_user']
+    
+    def get_db_name(self):
+        return self.__db_config['db_name']
 
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
@@ -2590,13 +2596,6 @@ class DbHelper():
 
         """
         return self.__session.query(SystemInfo).first()
-
-    def get_db_version(self):
-        """Get the current version of the database"""
-        sys_info = self.__session.query(SystemInfo).first()
-        if sys_info is None:
-            return None
-        return sys_info.db_version
 
     def get_app_version(self):
         """Get the current version of the application (that is stored in the database)"""

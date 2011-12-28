@@ -1,6 +1,6 @@
 <package type="plugin">
   <id>cron</id>
-  <technology>Cron</technology>
+  <technology>cron</technology>
   <description>
   Add a cron like to the XPL network.
   Alpha release. Use with caution.

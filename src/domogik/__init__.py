@@ -42,4 +42,3 @@ except:
 
 # For the format of version numbers please see : http://wiki.domogik.org/Release_numbering
 __version__ = "0.2.0"
-DB_VERSION = "0.2.0"
