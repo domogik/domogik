@@ -1527,7 +1527,6 @@ class SystemInfoTestCase(GenericTestCase):
 
     def test_get(self):
         assert db.get_app_version() is None
-        assert db.get_db_version() is None
 
 class SystemConfigTestCase(GenericTestCase):
     """Test system config"""
