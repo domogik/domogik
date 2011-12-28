@@ -37,6 +37,7 @@ Implements
 import getopt, subprocess, os, sys, tempfile
 
 from sqlalchemy import create_engine, MetaData, Table
+
 from migrate.versioning.api import db_version
 from migrate.versioning.api import version as rep_version
 from migrate.versioning.api import drop_version_control
@@ -103,7 +104,8 @@ def get_db_version():
 def drop_all_tables():
     print("Droping all existing tables...")
     sql_schema.metadata.drop_all(_engine)
-    drop_version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
+    if is_repository_under_version_control():
+        drop_version_control(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
 
 def add_initial_data():
     """Add required data when running a brand new install"""
@@ -163,10 +165,18 @@ def add_initial_data():
     migrate_table = Table(MIGRATE_VERSION_TABLE, meta, autoload=True)
     update = migrate_table.update(migrate_table.c.repository_path == UPGRADE_REPOSITORY)
     update.execute(version=int(rep_v))
-    
+
+def user_want_database_upgrade():
+    answer = raw_input("Do you want to upgrade your database? [Y/n] ")
+    if answer == 'n':
+        return False
+    return True
+
 def upgrade_app():
     """Upgrade process of the application"""
     if not is_repository_under_version_control():
+        if not user_want_database_upgrade():
+            return False
         backup_existing_database()
         set_repository_under_version_control()
         print("Upgrading database to version %s" % get_repository_version())
@@ -181,11 +191,14 @@ def upgrade_app():
         print("Current repository version is : %s" % get_repository_version())
         print("Current database version is : %s" % get_db_version())
         if (int(rep_v) > int(db_v)):
+            if not user_want_database_upgrade():
+                return False
             print("Upgrading database to version %s" % rep_v)
             backup_existing_database()
             db_upgrade(_db.get_url_connection_string(), UPGRADE_REPOSITORY)
         else:
             print("Nothing to do, database is up to date.")
+    return True
 
 def install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
@@ -200,6 +213,8 @@ def install_or_upgrade():
         else:
             drop_all_tables() # Make sure we don't have any existing table in the database
             print("Creating all tables...")
+            print(sql_schema.metadata)
+            set_repository_under_version_control()
             sql_schema.metadata.create_all(_engine)
             set_repository_under_version_control()
             add_initial_data()
@@ -208,6 +223,8 @@ def install_or_upgrade():
         upgrade_app()
 
 def check_install_is_ok():
+    if not is_repository_under_version_control():
+        abort_install_process("Your database is NOT under version control. Can't continue!")
     db_v = get_db_version()
     rep_v = get_repository_version()
     if int(db_v) != int(rep_v):

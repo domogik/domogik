@@ -253,12 +253,6 @@ function update_user_config_db {
         echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@127.0.0.1 IDENTIFIED BY 'randompassword';"
         read -p "Press Enter to continue the installation when your setup is ok. "
     fi
-    upgrade_sql="n"
-    if [ $already_cfg ];then
-        read -p "Do you want to upgrade your SQL database? [y/N]" upgrade_sql
-    else
-        upgrade_sql="y"
-    fi
     mysql_ok=
 
     if [ "$keep" = "y" -o "$keep" = "Y" ];then
@@ -315,23 +309,16 @@ function update_user_config_db {
             sed -i "s;^db_port.*$;db_port = $db_port;" $dmg_home/domogik.cfg
             sed -i "s;^db_name.*$;db_name = $db_name;" $dmg_home/domogik.cfg
             sed -i "s;^db_host.*$;db_host = $db_host;" $dmg_home/domogik.cfg
-            if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
-                    return
-            fi
         fi
     done
 }
 
 function call_app_installer {
-    if [ "$upgrade_sql" = "y" -o "$upgrade_sql" = "Y" ];then
-        if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
-            echo "** Call Application Installer"
-            /bin/su -c "python ./install/installer.py" $d_user
-            if [ $? -ne 0 ];then
-                echo "ERROR : An error occured during app_installer execution, read the previous lines for detail."
-                exit 1
-            fi
-        fi
+    echo "** Calling Application Installer"
+    /bin/su -c "python ./install/installer.py" $d_user
+    if [ $? -ne 0 ];then
+        echo "ERROR : An error occured during app_installer execution, read the previous lines for detail."
+        exit 1
     fi
 }
 
