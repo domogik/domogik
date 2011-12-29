@@ -42,6 +42,7 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 FOLDER=$1
+mkdir -p $FOLDER
 
 for fic in $(find $SRC_PATH/$PLG_XML_PATH -name "*.xml")
   do

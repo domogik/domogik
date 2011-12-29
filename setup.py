@@ -86,9 +86,6 @@ else:
 d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/stats/'))
 d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
 d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
-#TODO : DEL#d_files.extend(list_all_files('src/domogik/ui/djangodomo/core/templates/', '/usr/local/share/domogik/ui/djangodomo/core/templates/')),
-#TODO : DEL#d_files.extend(list_all_files('src/domogik/ui/djangodomo/locale/', '/usr/local/share/domogik/ui/djangodomo/locale/')),
-#TODO : DEL#d_files.extend(list_all_files('src/domogik/ui/djangodomo/apache/', '/usr/local/share/doc/domogik/examples/apache/')),
 
 setup(
     name = 'Domogik',
@@ -98,7 +95,6 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 
-                      #TODO : DEL#'django < 1.3',
                       'sqlalchemy == 0.7.2',
                       'sqlalchemy-migrate >= 0.7.2',
                       'simplejson >= 1.9.2',
@@ -117,21 +113,16 @@ setup(
     packages = find_packages('src', exclude=["mpris"]),
     package_dir = {'': 'src'},
     test_suite = 'domogik.tests',
-    # Include all files of the ui/djangodomo directory
-    # in data files.
     package_data = {
-        #TODO : DEL#'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/','.')[0][1],
-        #TODO : DEL#'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
-#       #TODO : DEL# 'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
     },
     data_files = d_files,
 
     entry_points = {
         'console_scripts': [
             """
+            dmg_pkgmgr = domogik.xpl.bin.pkgmgr:main
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
-            #TODO : DEL#dmg_django = domogik.ui.djangodomo.manage:run_manager
             dmg_version = domogik.xpl.bin.version:main
             """
         ],
