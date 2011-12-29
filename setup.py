@@ -120,7 +120,7 @@ setup(
     entry_points = {
         'console_scripts': [
             """
-            dmg_pkg_mgr = domogik.xpl.bin.pkg-mgr:main
+            dmg_pkg_mgr = domogik.xpl.bin.pkgmgr:main
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
             dmg_version = domogik.xpl.bin.version:main

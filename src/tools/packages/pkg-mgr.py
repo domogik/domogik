@@ -37,4 +37,4 @@ Implements
 
 if __name__ == "__main__":
     print("WARNING !")
-    print("This file has been moved to src/domogik/xpl/bin/pkg-mgr.py")
+    print("This file has been moved to src/domogik/xpl/bin/pkgmgr.py")
