@@ -70,6 +70,17 @@ function start_manager {
     rm -f /tmp/dmg-manager-state
 }
 
+function update_cache {
+    echo -n "* Updating packages cache..."
+    /bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during packages cache update."
+        exit 1
+    else
+        echo " Done"
+    fi
+}
+
 function stop_xpl {
     echo -n " * Stopping XPL..."
     for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
@@ -117,6 +128,7 @@ case "$1" in
     if [ $# -eq 1 ];then
         start_xpl
         start_manager
+        update_cache
     else
         case "$2" in
             xpl)
