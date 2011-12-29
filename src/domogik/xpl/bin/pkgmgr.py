@@ -92,7 +92,7 @@ def main():
     if (options.action_update == False \
             and options.action_list == False )\
             and len(args) < 1:
-        print("Error : missing argument : plugin name")
+        parser.print_help()
         exit()
       
     # package creation
