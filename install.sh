@@ -242,9 +242,20 @@ function update_user_config {
         fi
         sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $dmg_home/domogik.cfg
         sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
+        # will be overide on secondary host
         sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
     fi
 }    
+
+
+function update_rest_config_for_secondary_host {
+    if [ "$keep" = "n" -o "$keep" = "N" ];then
+        read -p "Ip of the main Domogik installation (ip of Rest server) : " rest_server_ip
+        read -p "Port of the main Domogik installation (port of Rest server) : " rest_server_ip
+        sed -i "s/^rest_server_ip.*$/rest_server_ip = $rest_server_ip/" $dmg_home/domogik.cfg
+        sed -i "s/^rest_server_port.*$/rest_server_port = $rest_server_port/" $dmg_home/domogik.cfg
+    fi
+}
 
 
 function update_user_config_db {
@@ -412,6 +423,8 @@ fi
 update_user_config
 if [ $MAIN_INSTALL = "y" ] ; then
     update_user_config_db
+else
+    update_rest_config_for_secondary_host
 fi
 copy_tools
 create_log_dir
