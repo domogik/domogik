@@ -3740,7 +3740,7 @@ target=*
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("package-available")
+        json_data.set_data_type("package")
 
         # for the host, get the packages already installed
         (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, pkg_type)
@@ -3788,7 +3788,7 @@ target=*
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("package-installed")
+        json_data.set_data_type("package")
 
         # process message
         cmd = message.data['command']
