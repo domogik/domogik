@@ -71,11 +71,13 @@ DMG_HOME=
 function stop_domogik {
     if [ -d "/etc/init.d/" ];then
         if [ -f "/etc/init.d/domogik" ];then
-            [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-            [ -f /etc/default/domogik ] && . /etc/default/domogik
-            if [ -f "/home/${DOMOGIK_USER}/.domogik/domogik.cfg" ];then
-                echo "There is already a Domogik on this system. Try to stop it before installation..."
-                /etc/init.d/domogik stop
+            if [ -d "/var/run/domogik" ];then
+                [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+                [ -f /etc/default/domogik ] && . /etc/default/domogik
+                if [ -f "/home/${DOMOGIK_USER}/.domogik/domogik.cfg" ];then
+                    echo "There is already a Domogik on this system. Try to stop it before installation..."
+                    /etc/init.d/domogik stop
+                fi
             fi
         fi
     elif [ -d "/etc/rc.d/" ];then
