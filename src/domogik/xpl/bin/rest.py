@@ -160,7 +160,8 @@ class Rest(XplPlugin):
 
         # Hosts list
         self._hosts_list = {self.get_sanitized_hostname() : 
-                                {"status" : "on",
+                                {"id" : self.get_sanitized_hostname(),
+                                 "status" : "on",
                                  "primary" : True,
                                  "last_seen" : time.time(),
                                  "ip" : "",
