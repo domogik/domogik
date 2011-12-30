@@ -29,7 +29,7 @@
     <key>
       <order-id>2</order-id>
       <name>password</name>
-      <type>string</type>
+      <type>password</type>
       <description>Password</description>
       <default-value></default-value>
     </key>
