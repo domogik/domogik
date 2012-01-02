@@ -4,16 +4,16 @@
   <technology>camera</technology>
   <description>Generic Webcam support</description>
   <changelog>
-0.1.0
+0.1
 - create 
   </changelog>
-  <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/</documentation>
+  <version>0.1a0</version>
+  <documentation>#TODO</documentation>
   <author>Ferllings</author>
   <author-email>ferllings at gmail.com</author-email>
   <vendor-id>none</vendor-id>
   <device-id>none</device-id>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys/>
   <files/>
   <dependencies/>

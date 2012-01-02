@@ -5,16 +5,16 @@
   <description>RFXCOM with xPL support
 LAN 433.92MHz receiver + transmitter</description>
   <changelog>
-0.1.0
+0.1
 - create 
   </changelog>
-  <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/</documentation>
+  <version>0.1a0</version>
+  <documentation>#TODO</documentation>
   <author>Ferllings</author>
   <author-email>ferllings at gmail.com</author-email>
   <vendor-id>rfxcom</vendor-id>
   <device-id>lan</device-id>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys/>
   <files>
     <file path="src/share/domogik/externals/rfxcom.xml"/>

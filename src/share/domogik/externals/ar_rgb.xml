@@ -25,16 +25,16 @@ Upload project to Arduino with the IDE
 Test it with the manual controllers (push button and potentiometer) and then create a device and test it with Domogik
   </description>
   <changelog>
-0.1.0
+0.1
 - create 
   </changelog>
-  <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/hardware_ar_rgb</documentation>
+  <version>0.1a0</version>
+  <documentation>http://wiki.domogik.org/external_ar_rgb</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <vendor-id>arduino</vendor-id>
   <device-id>rgb</device-id>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys/>
   <files>
     <file path="src/share/domogik/externals/ar_rgb.xml"/>

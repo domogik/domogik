@@ -21,11 +21,11 @@ Configure parameters in ar_tank.pde
 Upload project to Arduino with the IDE
   </description>
   <changelog>
-0.1.0
+0.1
 - create 
   </changelog>
-  <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/hardware_ar_tank</documentation>
+  <version>0.1a0</version>
+  <documentation>http://wiki.domogik.org/external_ar_tank</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <vendor-id>arduino</vendor-id>
