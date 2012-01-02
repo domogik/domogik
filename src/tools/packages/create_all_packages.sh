@@ -32,6 +32,7 @@
 #@organization: Domogik
 
 SRC_PATH="../../../"
+PKGMGR="../../domogik/xpl/bin/pkgmgr.py"
 PLG_XML_PATH="src/share/domogik/plugins/"
 HDW_XML_PATH="src/share/domogik/externals/"
 
@@ -51,7 +52,7 @@ for fic in $(find $SRC_PATH/$PLG_XML_PATH -name "*.xml")
     echo "*    Generating package for $plugin"
     echo "********************************************************"
   
-    ./pkg-mgr.py -f -c -t plugin -o $FOLDER $plugin
+    $PKGMGR -f -c -t plugin -o $FOLDER $plugin
 done
 
 for fic in $(find $SRC_PATH/$HDW_XML_PATH -name "*.xml")
@@ -61,5 +62,5 @@ for fic in $(find $SRC_PATH/$HDW_XML_PATH -name "*.xml")
     echo "*    Generating package for $external"
     echo "********************************************************"
   
-    ./pkg-mgr.py -f -c -t external -o $FOLDER $external
+    $PKGMGR -f -c -t external -o $FOLDER $external
 done
