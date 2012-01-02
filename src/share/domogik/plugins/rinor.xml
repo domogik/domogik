@@ -3,17 +3,13 @@
   <technology>domogik</technology>
   <description>Domogik RINOR server</description>
   <changelog>
-0.2.0
-- See tracker
-
-0.1.0
-- plugin creation
+See http://wiki.domogik.org/Developers_rinor_rest
   </changelog>
   <version>0.2.0</version>
   <documentation>http://wiki.domogik.org/RINOR</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

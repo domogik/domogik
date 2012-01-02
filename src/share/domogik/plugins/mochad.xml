@@ -3,13 +3,14 @@
   <technology>x10</technology>
   <description>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs mochad to work</description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1.0</version>
+  <version>0.1a0</version>
   <documentation>http://wiki.domogik.org/plugin_mochad</documentation>
   <author>Julien Garet, jgaret</author>
   <author-email>julien at garet dot info</author-email>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

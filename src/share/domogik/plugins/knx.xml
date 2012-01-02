@@ -3,14 +3,14 @@
   <technology>knx</technology>
   <description>KNX management with Eibd</description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1.0</version>
+  <version>0.1a0</version>
 <documentation>http://wiki.domogik.org/plugin_knx</documentation>
   <author>Basilic</author>
   <author-email>foof@fuu.bar</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

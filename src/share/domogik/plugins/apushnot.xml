@@ -3,10 +3,10 @@
   <technology>notification</technology>
   <description>Android notification system base on external service provide by notifry</description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1</version>
+  <version>0.1a0</version>
   <documentation>http://wiki.domogik.org/plugin_apushnot</documentation>
   <author>Kriss</author>
   <author-email>Kriss@domogik.org</author-email>

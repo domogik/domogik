@@ -3,13 +3,14 @@
   <technology>foscam</technology>
   <description>Allows to open an close foscam relay, your device must be plug on pin 1 and 2 </description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1.0</version>
+  <version>0.1a0</version>
   <documentation>http://wiki.domogik.org/plugin_foscam_relay</documentation>
   <author>Capof</author>
   <author-email>capof1000 at gmail.com</author-email>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

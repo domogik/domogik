@@ -11,13 +11,13 @@ Supported features :
 - Digital input 
 - Analog input </description>
   <changelog>
-0.2.0
+0.2
 - adapt plugin for release 0.2.0
 
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.2.0</version>
+  <version>0.2a0</version>
   <documentation>http://wiki.domogik.org/plugin_ipx800</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>

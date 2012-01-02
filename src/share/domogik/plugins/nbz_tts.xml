@@ -3,14 +3,14 @@
   <technology>communication</technology>
   <description>Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server</description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1</version>
+  <version>0.1a0</version>
   <documentation>http://wiki.domogik.org/plugin_nbz_tts</documentation>
   <author>Kriss</author>
   <author-email>Kriss@domogik.org</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

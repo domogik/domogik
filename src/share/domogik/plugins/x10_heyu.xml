@@ -3,13 +3,13 @@
   <technology>x10</technology>
   <description>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work</description>
   <changelog>
-0.2.0
+0.2
 - adapt plugin for release 0.2.0
 
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.2.0</version>
+  <version>0.2a0</version>
   <documentation>http://wiki.domogik.org/plugin_x10_heyu</documentation>
   <author>Maxence Dunnewind, Mirelsol</author>
   <author-email>maxence at dunnewind.net; marc at mirelsol.org</author-email>

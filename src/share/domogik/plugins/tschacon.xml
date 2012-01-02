@@ -3,13 +3,14 @@
   <technology>tschacon</technology>
   <description>Manage Chacon / Di-O devices through TellStick</description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1.0</version>
-  <documentation>to do</documentation>
+  <version>0.1a0</version>
+  <documentation>#TODO</documentation>
   <author>Julien Garet</author>
   <author-email>julien at garet dot info</author-email>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

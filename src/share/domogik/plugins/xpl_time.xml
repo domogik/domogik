@@ -3,14 +3,14 @@
   <technology>service</technology>
   <description>This plugin sends date and time on the xPL network every minute</description>
   <changelog>
-0.1.0
+0.1
 - plugin creation
   </changelog>
-  <version>0.1</version>
+  <version>0.1a0</version>
   <documentation>https://wiki.domogik.org/plugin_xpl_time</documentation>
   <author>Maxence Dunnewind</author>
   <author-email>maxence at dunnewind.net</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
