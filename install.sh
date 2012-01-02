@@ -253,7 +253,7 @@ function update_user_config {
 function update_rest_config_for_secondary_host {
     if [ "$keep" = "n" -o "$keep" = "N" ];then
         read -p "Ip of the main Domogik installation (ip of Rest server) : " rest_server_ip
-        read -p "Port of the main Domogik installation (port of Rest server) : " rest_server_ip
+        read -p "Port of the main Domogik installation (port of Rest server) : " rest_server_port
         sed -i "s/^rest_server_ip.*$/rest_server_ip = $rest_server_ip/" $dmg_home/domogik.cfg
         sed -i "s/^rest_server_port.*$/rest_server_port = $rest_server_port/" $dmg_home/domogik.cfg
     fi
