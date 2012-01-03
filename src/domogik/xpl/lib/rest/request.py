@@ -2463,7 +2463,7 @@ target=*
         host_list = {}
         for message in messages:
             cmd = message.data['command']
-            #host = message.data["host"]
+            host = message.data["host"]
     
             idx = 0
             loop_again = True
@@ -2488,9 +2488,9 @@ target=*
                     idx += 1
                 except:
                     loop_again = False
-            for host_name in host_list:
-                json_data.add_data({"host" : host_name, 
-                                    "list" : host_list[host_name]})   
+        for host_name in host_list:
+            json_data.add_data({"host" : host_name, 
+                                "list" : host_list[host_name]})   
         self.send_http_response_ok(json_data.get())
 
 
