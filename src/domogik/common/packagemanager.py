@@ -276,7 +276,7 @@ class PackageManager():
         package = "%s-%s" % (pkg_type, id)
         pkg, status = self._find_package(package, release)
         if status != True:
-            return status
+            return False
         # download package
         path = pkg.package_url
         dl_path = "%s/%s-%s-%s.tgz" % (cache_folder, pkg_type, id, release)
@@ -312,6 +312,8 @@ class PackageManager():
             self.log(msg)
             raise PackageException(msg)
         self.log("OK")
+        return True
+        
 
 
 

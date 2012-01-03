@@ -3958,7 +3958,10 @@ target=*
         package = "%s/%s/%s" % (type, id, release)
 
         pkg_mgr = PackageManager()
-        pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, release)
+        res = pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, release)
+        # if package not cachable (doesn't exists, ...)
+        if res == False:
+            self.send_http_response_error(999, "Error on putting package in cache", self.jsonp, self.jsonp_cb)
 
         #### Send xpl message to install package's rinor part
         message = XplMessage()
