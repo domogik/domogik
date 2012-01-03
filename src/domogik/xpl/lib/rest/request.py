@@ -3800,7 +3800,7 @@ target=*
         while loop_again:
             try:
                 if pkg_type == message.data["type"+str(idx)]:
-                    if  message.data["fullname"+str(idx)].lower() == "yes":
+                    if  message.data["enabled"+str(idx)].lower() == "yes":
                         enabled = True
                     else:
                         enabled = False
