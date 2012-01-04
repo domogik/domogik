@@ -1228,6 +1228,9 @@ class SysManager(XplPlugin):
             status = self.pkg_mgr.uninstall_package(pkg_type, id)
             if status != True:
                 mess.add_data({'error' : status})
+            # if this is a plugin, disable it
+            if pkg_type == "plugin":
+                self._disable_plugin(id)
         except:
             mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, id, traceback.format_exc()))
