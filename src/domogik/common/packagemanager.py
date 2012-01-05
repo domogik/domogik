@@ -408,7 +408,7 @@ class PackageManager():
         self._create_folder(INSTALL_PATH)
 
         # install plugin in $HOME
-        self.log("Installing package (plugin)...")
+        self.log("Installing package (%s)..." % pkg_xml.type)
         try:
             if pkg_xml.type in ('plugin', 'external'):
                 self._install_plugin_or_external(my_tmp_dir, INSTALL_PATH, pkg_xml.type, package_part)
@@ -486,8 +486,7 @@ class PackageManager():
         ### create needed directories
         # create install directory
         self.log("Creating directories for %s..." % pkg_type)
-        # notice : the %ss is not a bug
-        plg_path = "%s/%ss/" % (install_path, pkg_type)
+        plg_path = "%s/plugins/" % (install_path)
         self._create_folder(plg_path)
 
         ### copy files
@@ -495,15 +494,16 @@ class PackageManager():
         try:
             # xpl/* and plugins/*.xml are installed on target host 
             if package_part == PKG_PART_XPL:
-                copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
-                self._create_init_py("%s/" % plg_path)
-                self._create_init_py("%s/xpl/" % plg_path)
-                self._create_init_py("%s/xpl/bin/" % plg_path)
-                self._create_init_py("%s/xpl/lib/" % plg_path)
                 if pkg_type == "plugin":
+                    copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
+                    self._create_init_py("%s/" % plg_path)
+                    self._create_init_py("%s/xpl/" % plg_path)
+                    self._create_init_py("%s/xpl/bin/" % plg_path)
+                    self._create_init_py("%s/xpl/lib/" % plg_path)
                     type_path = "softwares"
                 if pkg_type == "external":
                     type_path = "externals"
+                print("%s => %s" % ("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path)))
                 copytree("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path), self.log)
             # stats/* and url2xpl/* and exernal/* are insatlled on rinor host
             if package_part == PKG_PART_RINOR:
