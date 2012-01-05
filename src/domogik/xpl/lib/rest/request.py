@@ -3785,6 +3785,7 @@ target=*
         else:
             self.send_http_response_error(999, data,
                                           self.jsonp, self.jsonp_cb)
+            return
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
