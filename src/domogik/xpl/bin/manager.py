@@ -167,8 +167,8 @@ class SysManager(XplPlugin):
             self.log.info("Set package path to '%s' " % self._package_path)
             print("Set package path to '%s' " % self._package_path)
             sys.path.append(self._package_path)
-            self._xml_plugin_directory = os.path.join(self._package_path, "plugins/softwares/")
-            self._xml_external_directory = os.path.join(self._package_path, "plugins/externals/")
+            self._xml_plugin_directory = os.path.join(self._package_path, "packages/softwares/")
+            self._xml_external_directory = os.path.join(self._package_path, "packages/externals/")
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
@@ -633,7 +633,7 @@ class SysManager(XplPlugin):
         if name == "dbmgr" or name == "rest" or self._package_path == None:
             plg_path = "domogik.xpl.bin." + name
         else:
-            plg_path = "plugins.xpl.bin." + name
+            plg_path = "packages.xpl.bin." + name
         __import__(plg_path)
         plugin = sys.modules[plg_path]
         self.log.debug("Component path : %s" % plugin.__file__)

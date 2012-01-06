@@ -139,7 +139,7 @@ function copy_sample_files {
         chown $d_user $dmg_home
     fi
     # create folders for packages management
-    for pkg_rep in pkg-cache cache plugins plugins/softwares plugins/externals plugins/stats plugins/url2xpl
+    for pkg_rep in pkg-cache cache packages packages/softwares packages/externals packages/stats packages/url2xpl
       do
         if [ ! -d $dmg_home/$pkg_rep ];then
             mkdir $dmg_home/$pkg_rep
@@ -148,7 +148,7 @@ function copy_sample_files {
     done
     # copy rest xml file
     if [ $MAIN_INSTALL = "y" ] ; then
-        cp src/share/domogik/plugins/rest.xml $dmg_home/plugins/softwares/
+        cp src/share/domogik/plugins/rest.xml $dmg_home/packages/softwares/
     fi
     # Check for old version when .domogik.cfg was in $HOME
     if [ -f $d_home/.domogik.cfg ];then

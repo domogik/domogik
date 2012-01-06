@@ -181,8 +181,8 @@ class Rest(XplPlugin):
                 self._package_path = conf['package_path']
                 self.log.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
-                self._xml_cmd_dir = "%s/plugins/url2xpl/" % self._package_path
-                self._xml_stat_dir = "%s/plugins/stats/" % self._package_path
+                self._xml_cmd_dir = "%s/packages/url2xpl/" % self._package_path
+                self._xml_stat_dir = "%s/packages/stats/" % self._package_path
             else:
                 self.log.info("No package path defined in config file")
                 self._package_path = None

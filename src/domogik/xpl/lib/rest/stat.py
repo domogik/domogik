@@ -79,7 +79,7 @@ class StatsManager:
                 self._package_path = cfg_db['package_path']
                 self._log_stats.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
-                self.directory = "%s/plugins/stats/" % self._package_path
+                self.directory = "%s/packages/stats/" % self._package_path
             else:
                 self._log_stats.info("No package path defined in config file")
                 self._package_path = None

@@ -75,8 +75,8 @@ config = cfg.load()
 conf = dict(config[1])
 REST_URL = "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
 
-PLUGIN_XML_PATH = "%s/plugins/softwares" % INSTALL_PATH
-EXTERNAL_XML_PATH = "%s/plugins/externals" % INSTALL_PATH
+PLUGIN_XML_PATH = "%s/packages/softwares" % INSTALL_PATH
+EXTERNAL_XML_PATH = "%s/packages/externals" % INSTALL_PATH
 
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
@@ -295,7 +295,6 @@ class PackageManager():
         pkg_xml.set_repo_source(pkg.source)
 
         # recreate tgz
-        # TODO :)
         my_tar = path
         self.log("Generating package : '%s'" % my_tar)
         try:
@@ -443,9 +442,9 @@ class PackageManager():
 
         try:
             if pkg_type in ('plugin'):
-                os.unlink("%s/plugins/softwares/%s.xml" %(INSTALL_PATH, id))
+                os.unlink("%s/packages/softwares/%s.xml" %(INSTALL_PATH, id))
             elif pkg_type in ('external'):
-                os.unlink("%s/plugins/externals/%s.xml" %(INSTALL_PATH, id))
+                os.unlink("%s/packages/externals/%s.xml" %(INSTALL_PATH, id))
             else:
                 raise "Package type '%s' not uninstallable" % pkg_type
         except:
@@ -486,7 +485,7 @@ class PackageManager():
         ### create needed directories
         # create install directory
         self.log("Creating directories for %s..." % pkg_type)
-        plg_path = "%s/plugins/" % (install_path)
+        plg_path = "%s/packages/" % (install_path)
         self._create_folder(plg_path)
 
         ### copy files
