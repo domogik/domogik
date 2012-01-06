@@ -1196,6 +1196,7 @@ class SysManager(XplPlugin):
         """ Uninstall a package
             @param message : xpl message received
         """
+        print "call uninstall"
         try:
             pkg_type = message.data['type']
             id = message.data['id']

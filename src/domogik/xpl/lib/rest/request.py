@@ -4080,7 +4080,7 @@ target=*
         # get xpl message from queue
         messages = []
         try:
-            self.log.debug("Package install : wait for answer...")
+            self.log.debug("Package uninstall : wait for answer...")
             message = self._get_from_queue(self._queue_package, 
                                            "xpl-trig", 
                                            "domogik.package", 
