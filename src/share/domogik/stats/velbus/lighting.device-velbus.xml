@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="velbus">
+    <schema name="lighting.device">
+        <xpltype type="xpl-trig">
+            <listener>	
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="level" filter_key="event" filter_value="level"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
