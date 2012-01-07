@@ -704,15 +704,18 @@ class telldusAPI:
     def sendDim(self, add, level):
         '''
         Sets the specified dim level on device
-        Level should be between 0 and 255
+        Level should be between 0 and 100
         @param add : address of the module (ie TS14)
-        @param level : level of light (0..255max)
+        @param level : level of light (0..100)
         '''
-        if level==0:
+        #print "dim level=%s"%type(level)
+        level=int(level)
+        #print "dim level=%s"%type(level)
+        if level<=0:
             self._turnOffDevice(self.getDeviceId(add))
-        elif level==100:
+        elif level>=100:
             self._turnOnDevice(self.getDeviceId(add))
-        else :
+        elif level>0 and level<100 :
             self._dimDevice(self.getDeviceId(add),int(level))
 
     def sendBright(self, add, level):
@@ -1042,9 +1045,8 @@ class telldusAPI:
         @param level : level of light (0..100)
         '''
         #print " DIM : device: %s, level: %s / %s" % (deviceId,level,type(level))
-        if level >= 0 and level <= 100:
-            self._lastSentCommand[deviceId]=TELLSTICK_DIM
-            self._tdlib.tdDim(c_int(deviceId), c_ubyte(int(level*2.55)))
+        self._lastSentCommand[deviceId]=TELLSTICK_DIM
+        self._tdlib.tdDim(c_int(deviceId), c_ubyte(int(level*2.55)))
 
     def _upDevice(self,deviceId):
         '''

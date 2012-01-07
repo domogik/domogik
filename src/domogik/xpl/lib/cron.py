@@ -492,9 +492,9 @@ class cronJobs():
             action=start
             device=<name of the timer>, normally the zone id
             devicetype=hvac
-            timer1=MoTuWeThFr,06:30-09:00,17:00-22:30
-            [timer2=SaSu,08:00-23:00]
-            [timer3=...]
+            timer=MoTuWeThFr,06:30-09:00,17:00-22:30
+            [timer=SaSu,08:00-23:00]
+            [timer=...]
             [valueon1=comfort]
             [valueoff1=economy]
            }

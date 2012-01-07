@@ -64,7 +64,7 @@
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
      <device_feature_model>
-          <id>cron.totgle.status</id>
+          <id>cron.toggle.status</id>
           <name>Status</name>
           <feature_type>sensor</feature_type>
           <device_type_id>cron.toggle</device_type_id>

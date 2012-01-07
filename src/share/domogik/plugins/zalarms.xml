@@ -1,6 +1,6 @@
 <package type="plugin">
   <id>zalarms</id>
-  <technology>zalarms</technology>
+  <technology>cron</technology>
   <description>
   A poor interface to the cron plugin.
   You can only create an alarm message.
@@ -184,9 +184,9 @@
   </files>
   <dependencies/>
   <device_technology>
-      <id>zalarms</id>
-      <name>Zalarms</name>
-      <description>Alarms</description>
+      <id>cron</id>
+      <name>Cron</name>
+      <description>Cron</description>
   </device_technology>
   <device_types/>
   <device_feature_models/>

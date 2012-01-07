@@ -131,6 +131,24 @@ class cron(XplHlpPlugin):
                 "param-list" : "which",
                 "which" : "all|aps",
               },
+             "ls" :
+              {
+                "cb" : self._cron.jobs.helperList,
+                "desc" : "List devices (cron jobs)",
+                "usage" : "list all the devices",
+                "return-list" : "array1",
+                "array1" : "multi",
+              },
+             "test" :
+              {
+                "cb" : self._cron.jobs.helperList,
+                "desc" : "Test return transfert",
+                "usage" : "test",
+                "param-list" : "device",
+                "device" : "<device>",
+                "return-list" : "array1,single",
+                "array1" : "multi",
+              },
              "info" :
               {
                 "cb" : self._cron.jobs.helperInfo,
