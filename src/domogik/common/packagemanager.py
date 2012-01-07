@@ -729,6 +729,7 @@ class PackageManager():
                                      "type" : pkg_xml.type,
                                      "fullname" : pkg_xml.fullname,
                                      "release" : pkg_xml.release,
+                                     "source" : pkg_xml.source,
                                      "genrated" : pkg_xml.generated,
                                      "techno" : pkg_xml.techno,
                                      "doc" : pkg_xml.doc,
