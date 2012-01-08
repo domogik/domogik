@@ -640,6 +640,7 @@ class Rest(XplPlugin):
     def reload_stats(self):
         """ Reload Statistics manager
         """
+        time.sleep(1)
         print("Reload Stats")
         self.log.info("Reloading statistics manager. Its logs will be in a dedicated log file")
         self.stat_mgr.load()
