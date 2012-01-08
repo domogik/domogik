@@ -30,6 +30,7 @@
 # source application-specific settings
 CUSTOM_PATH=""
 HUB_IFACE="lo"
+LAUNCH_DOMOGIK_XPL_HUB="true"
 
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
