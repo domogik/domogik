@@ -126,7 +126,11 @@ case "$1" in
     start)
     check_lock_dir
     if [ $# -eq 1 ];then
-        start_xpl
+        if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
+            start_xpl
+        else
+            echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
+        fi
         start_manager
         update_cache
     else
@@ -144,7 +148,11 @@ case "$1" in
     stop)
     if [ $# -eq 1 ];then
         stop_plugins
-        stop_xpl
+        if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
+            stop_xpl
+        else
+            echo "Domogik xPL hub disabled : no need to stop Domogik xPL hub"
+        fi
         stop_manager
     else
         case "$2" in
