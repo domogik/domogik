@@ -1023,7 +1023,8 @@ class SysManager(XplPlugin):
             return
 
         if command == "installed-packages-list":
-            self._pkg_list_installed()
+            my_uuid = message.data["uuid"]
+            self._pkg_list_installed(my_uuid)
 
         if command == "check-dependencies" and host != "*":
             self._pkg_check_dependencies(message)
@@ -1035,7 +1036,7 @@ class SysManager(XplPlugin):
             self._pkg_uninstall(message)
 
 
-    def _pkg_list_installed(self):
+    def _pkg_list_installed(self, my_uuid):
         """ List packages installed on host
         """
         mess = XplMessage()
@@ -1043,6 +1044,7 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'installed-packages-list'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
+        mess.add_data({'uuid' : my_uuid})
         cfg_plugins = Loader('plugins')
         cfg_plugin_list = dict(cfg_plugins.load(refresh = True)[1])
         idx = 0

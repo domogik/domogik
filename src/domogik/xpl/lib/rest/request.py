@@ -3832,6 +3832,8 @@ target=*
         message.set_schema("domogik.package")
         message.add_data({"command" : "installed-packages-list"})
         message.add_data({"host" : host})
+        my_uuid = str(uuid.uuid4())
+        message.add_data({"uuid" : my_uuid})
         self.myxpl.send(message)
 
         ### Wait for answer
@@ -3844,7 +3846,7 @@ target=*
             message = self._get_from_queue(self._queue_package, 
                                                  "xpl-trig", 
                                                  "domogik.package",
-                                                 filter_data = {"command" : "installed-packages-list"})
+                                                 filter_data = {"command" : "installed-packages-list", "uuid" : my_uuid})
         except Empty:
             self.log.debug("Installed packages list : no answer")
             return False, "No data or timeout on getting installed packages list"
