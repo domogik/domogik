@@ -2,10 +2,10 @@
   <id>telldus</id>
   <technology>telldus</technology>
   <description>
-Manage many devices through TellStick and TellStick Duo.
-Add your devices with telldus tools (tdtool or telldusCenter) and
-they will appear automatically in Domogik
-</description>
+  Manage many devices through TellStick and TellStick Duo.
+  Add your devices with telldus tools (tdtool or telldusCenter) and
+  they will appear automatically in Domogik
+  </description>
   <changelog>
 0.2
 - Update XML description</changelog>
@@ -110,7 +110,7 @@ they will appear automatically in Domogik
   <dependencies/>
   <device_technology>
       <id>telldus</id>
-      <name>telldus tech.</name>
+      <name>Telldus</name>
       <description>Manage many devices through TellStick (Chacon, Ikea, ...)</description>
   </device_technology>
   <device_types>

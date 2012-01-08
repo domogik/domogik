@@ -110,7 +110,7 @@ class dawnduskAPI:
         if self.use_cron == True:
             self._cronQuery.haltJob(device)
         else :
-            self._scheduler.__del__(self)
+            del(self._scheduler)
 
     def schedAdd(self,sdate,cb_function,label):
         """

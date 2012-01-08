@@ -492,9 +492,9 @@ class cronJobs():
             action=start
             device=<name of the timer>, normally the zone id
             devicetype=hvac
-            timer1=MoTuWeThFr,06:30-09:00,17:00-22:30
-            [timer2=SaSu,08:00-23:00]
-            [timer3=...]
+            timer=MoTuWeThFr,06:30-09:00,17:00-22:30
+            [timer=SaSu,08:00-23:00]
+            [timer=...]
             [valueon1=comfort]
             [valueoff1=economy]
            }
@@ -1051,9 +1051,9 @@ class cronJobs():
             return None
         self.data[device]['runs']=self.data[device]['runs']+1
         mess = XplMessage()
-        #mess.add_data({'device' : device})
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
+        empty=True
         try:
             #print "value=%s"%value
             if parameters!=None:
@@ -1063,6 +1063,7 @@ class cronJobs():
                     if value in parameters[key]:
                         #print "key=%s"%parameters[key][value]
                         mess.add_data({key:parameters[key][value]})
+                        empty=False
                     else :
                         mess.add_data({"error":key})
             for key in self.data[device]:
@@ -1071,10 +1072,15 @@ class cronJobs():
                     #print "k=%s"%k
                     if k.startswith("schema"):
                        mess.set_schema(self.data[device][key])
+                       empty=False
                     elif k.startswith("xpltype"):
                        mess.set_type(self.data[device][key])
+                       empty=False
                     elif not k.startswith("parameter") and not k.startswith("valueon") and not k.startswith("valueoff"):
                        mess.add_data({k : self.data[device][key]})
+                       empty=False
+            if empty:
+                mess.add_data({'device' : device})
             return mess
         except:
             return mess

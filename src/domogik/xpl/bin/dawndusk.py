@@ -132,6 +132,12 @@ class dawndusk(XplPlugin):
         self.enable_hbeat()
         self.log.info("dawndusk plugin correctly started")
 
+    def __del__(self):
+        """
+        Kill the dawndusk plugin
+        """
+        del(self._mydawndusk)
+
     def dawndusk_trig_cb(self, message):
         """
         General callback for all command messages
