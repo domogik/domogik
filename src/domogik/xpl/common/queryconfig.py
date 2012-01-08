@@ -64,16 +64,16 @@ class Query():
         self._result = None
 
         # Check in config file is target is forced
-        #cfg = Loader('domogik')
-        #config = cfg.load()
-        #conf = dict(config[1])
-        #if conf.has_key('config_provider'):
-        #    self.target = "xpl-dbmgr.%s" % conf["config_provider"]
-        #    msg = "Force config provider to '%s'" % self.target
-        #    print msg
-        #    self.log.debug(msg)
-        #else:
-        #    self.target = "*"
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+        if conf.has_key('config_provider'):
+            self.target = "xpl-dbmgr.%s" % conf["config_provider"]
+            msg = "Force config provider to '%s'" % self.target
+            print msg
+            self.log.debug(msg)
+        else:
+            self.target = "*"
 
     def __del__(self):
         print("End query")
