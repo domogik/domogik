@@ -39,6 +39,7 @@ ez_setup.use_setuptools()
 
 import os
 from setuptools import setup, find_packages
+from install.get_arch import *
 import platform
 
 def list_all_files(path, dst):
@@ -58,13 +59,7 @@ def list_all_files(path, dst):
     d.append((dst, files))
     return d
 
-arch = platform.machine()
-hub = {
-    'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
-    'i686' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
-    'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub',
-    'armv5tel' : 'src/domogik/xpl/tools/arm/xPL_Hub'
-}
+arch = get_path()
 
 d_files = [
         ('/usr/local/bin/', ['src/tools/dmgenplug']),
@@ -73,8 +68,8 @@ d_files = [
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
 
-if arch in hub.keys():
-    d_files.append(('/usr/local/bin/', [hub[arch]]))
+if arch != None:
+    d_files.append(('/usr/local/bin/', [arch]))
 else:
     print "*************** WARNING ***************"
     print "* Can't find an xPL Hub for your arch *"
