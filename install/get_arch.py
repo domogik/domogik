@@ -32,18 +32,21 @@ Little script to get correct architecture name
 
 import platform
 
-def get_path():
+def get_path(dir_only=False):
     arch = platform.machine()
     hub = {
-        'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
-        'i686' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
-        'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub',
-        'armv5tel' : 'src/domogik/xpl/tools/arm/xPL_Hub'
+        'x86_64' : 'src/domogik/xpl/tools/64bit/',
+        'i686' : 'src/domogik/xpl/tools/32bit/',
+        'arm' : 'src/domogik/xpl/tools/arm/',
+        'armv5tel' : 'src/domogik/xpl/tools/arm/'
     }
     if arch not in hub.keys():
         return None
     else:
-        return hub[arch]
+        if not dir_only:
+            return hub[arch] + "xPL_Hub"
+        else:
+            return hub[arch] 
 
 if __name__ == "__main__":
-    print get_path()
+    print get_path(True)
