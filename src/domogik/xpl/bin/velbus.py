@@ -84,7 +84,6 @@ class VelbusUsbManager(XplPlugin):
         msg.set_schema(schema)
         for key in data:
             msg.add_data({key : data[key]})
-	print msg
         self.myxpl.send(msg)
 
     def send_trig(self, message):
@@ -96,7 +95,6 @@ class VelbusUsbManager(XplPlugin):
     def process_lighting_basic(self, message):
         """ Process xpl chema lightning.basic
         """
-        print message
         self.send_xpl("lighting.device", message.data)
 	add = message.data['device'].split('-');
 	chan = []
