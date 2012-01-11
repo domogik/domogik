@@ -515,7 +515,7 @@ class Rest(XplPlugin):
                     for key in filter_data:
                         # take care of final "%" in order to search data starting by filter_data[key]
                         if filter_data[key][-1] == "%":
-                            self.log_queue.debug("- MODE : % search : %s / %s" % (filter_data[key], message.data[key]))
+                            self.log_queue.debug("- MODE : * search : %s / %s" % (filter_data[key], message.data[key]))
                             msg_data = str(message.data[key])
                             my_filter_data = str(filter_data[key])
                             len_data = len(my_filter_data) - 1
