@@ -815,7 +815,6 @@ class SysManager(XplPlugin):
         # Getplugin list
         plugins = Loader('plugins')
         plugin_list = dict(plugins.load(refresh = True)[1])
-        plugin_list["rest"] = "enabled"
         state_thread = {}
         for plugin in plugin_list:
             print(plugin)
@@ -827,13 +826,6 @@ class SysManager(XplPlugin):
                     # get data for plugin
                     plg_xml = PackageXml(path = xml_file)
 
-                    # Rest must be started and checked before all plugins
-                    # so we don't check it with others
-                    if plugin == "rest":
-                        check_startup_option = False
-                    else:
-                        check_startup_option = True
-
                     # register plugin
                     self._plugins.append({"type" : plg_xml.type,
                                       "name" : plg_xml.id, 
@@ -844,7 +836,7 @@ class SysManager(XplPlugin):
                                       "release" : plg_xml.release,
                                       "documentation" : plg_xml.doc,
                                       "configuration" : plg_xml.configuration,
-                                      "check_startup_option" : check_startup_option})
+                                      "check_startup_option" : True})
 
                 except:
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
