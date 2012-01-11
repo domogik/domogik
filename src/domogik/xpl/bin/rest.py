@@ -73,7 +73,7 @@ import pyinotify
 import calendar
 import tempfile
 
-REST_API_VERSION = "0.3"
+REST_API_VERSION = "0.4"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
 ### parameters that can be overidden by Domogik config file
