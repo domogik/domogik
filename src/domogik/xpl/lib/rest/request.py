@@ -3997,7 +3997,7 @@ target=*
                                            "domogik.package", 
                                            filter_data = {"command" : "check-dependencies"})
         except Empty:
-            self.log.debug("Package install : no answer")
+            self.log.debug("Package dependencies check : no answer")
             self.send_http_response_error(999, "No data or timeout on checking dependencies",
                                           self.jsonp, self.jsonp_cb)
             return
