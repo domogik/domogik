@@ -407,10 +407,108 @@ class ProcessRequest():
         events["Domogik_requests"] = self._event_dmg.list()
         events["Devices_requests"] = self._event_requests.list()
 
-        data = {"info" : info, "command" : command,
+        # Configuration
+        conf = [
+                {
+                    "id" : 0,
+                    "key" : "q-timeout",
+                    "description" : "Maximum wait time for getting data froma queue",
+                    "type" : "Number",
+                    "default" : 15,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 1,
+                    "key" : "q-size",
+                    "description" : "Size for 'classic' queues. You should not have to change this value",
+                    "type" : "Number",
+                    "default" : 10,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 2,
+                    "key" : "q-pkg-size",
+                    "description" : "Size for packages management queues. You should not have to change this value",
+                    "type" : "Number",
+                    "default" : 10,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 3,
+                    "key" : "q-cmd-size",
+                    "description" : "Size for /command queue",
+                    "type" : "Number",
+                    "default" : 1000,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 4,
+                    "key" : "q-life-exp",
+                    "description" : "Life expectancy for a xpl message in queues. You sould not have to change this value",
+                    "type" : "Number",
+                    "default" : 3,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 5,
+                    "key" : "q-sleep",
+                    "description" : "Time between each unsuccessfull look for a xpl data in a queue",
+                    "type" : "Number",
+                    "default" : 0.1,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 6,
+                    "key" : "evt-timeout",
+                    "description" : "Maximum wait time for a GET request (after event will be closed)",
+                    "type" : "Number",
+                    "default" : 300,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 7,
+                    "key" : "q-evt-timeout",
+                    "description" : ">Maximum wait time for getting event from queue",
+                    "type" : "Number",
+                    "default" : 120,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 8,
+                    "key" : "q-evt-size",
+                    "description" : "Size for /event queue",
+                    "type" : "Number",
+                    "default" : 50,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                },
+                {
+                    "id" : 9,
+                    "key" : "q-evt-life-exp",
+                    "description" : "Life expectancy for an event in event queues",
+                    "type" : "Number",
+                    "default" : 5,
+                    "element_type" : "item",
+                    "optionnal" : "no",
+                }
+            ] 
+
+        data = {"info" : info, 
+                "command" : command,
                 "stats" : stats,
-                "queue" : queues, "event" : events}
+                "queue" : queues, 
+                "event" : events,
+                "configuration" : conf}
         json_data.add_data(data)
+
         self.send_http_response_ok(json_data.get())
 
 
