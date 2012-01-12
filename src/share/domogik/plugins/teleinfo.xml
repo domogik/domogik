@@ -45,7 +45,7 @@
     <file path="src/domogik/xpl/lib/teleinfo.py"/>
   </files>
   <dependencies>
-    <dep name="pyserial (>=2.5)"/>
+    <dep python="pyserial (>=2.5)"/>
   </dependencies>
   <device_technology>
       <id>service</id>

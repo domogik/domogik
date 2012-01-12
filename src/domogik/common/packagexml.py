@@ -187,6 +187,9 @@ class PackageXml():
                if "python" in dep.attributes.keys():
                    data = {"python" :  dep.attributes.get("python").value.strip()}
                    self.dependencies.append(data)
+               if "domogik" in dep.attributes.keys():
+                   data = {"domogik" :  dep.attributes.get("domogik").value.strip()}
+                   self.dependencies.append(data)
                if "other" in dep.attributes.keys():
                    data = {"other" :  dep.attributes.get("other").value.strip()}
                    self.dependencies.append(data)

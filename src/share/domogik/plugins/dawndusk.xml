@@ -103,8 +103,9 @@
     <file path="src/domogik/xpl/lib/dawndusk.py"/>
   </files>
   <dependencies>
-    <dep name="apscheduler (>=2.0.2)"/>
-    <dep name="pyephem (>=3.7.5)"/>
+    <dep python="apscheduler (>=2.0.2)"/>
+    <dep python="pyephem (>=3.7.5)"/>
+    <dep domogik="plugin-xpl_time (>=0.1)"/>
   </dependencies>
   <device_technology>
       <id>dawndusk</id>
