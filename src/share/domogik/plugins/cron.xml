@@ -28,8 +28,6 @@
   <files>
     <file path="src/share/domogik/plugins/cron.xml"/>
     <file path="src/share/domogik/stats/cron/cron.xml"/>
-    <file path="src/share/domogik/url2xpl/cron/stop.xml"/>
-    <file path="src/share/domogik/url2xpl/cron/resume.xml"/>
     <file path="src/domogik/xpl/bin/cron.py"/>
     <file path="src/domogik/xpl/lib/cron.py"/>
     <file path="src/domogik/xpl/lib/cron_query.py"/>
