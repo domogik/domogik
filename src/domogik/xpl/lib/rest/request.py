@@ -3962,12 +3962,11 @@ target=*
         self.log.debug("Package : ask for checking dependencies for a package")
         package = "%s-%s" % (type, id)
 
-        ### Send xpl message to check dependencies
-        message = XplMessage()
-        message.set_type("xpl-cmnd")
-        message.set_schema("domogik.package")
-        message.add_data({"command" : "check-dependencies"})
-        message.add_data({"host" : host})
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("dependencies")
+
+        ### check package exists in cache
         pkg_mgr = PackageManager()
         data = pkg_mgr.get_packages_list(fullname = package, release = release)
         # if there is no package corresponding
@@ -3977,73 +3976,97 @@ target=*
                                           self.jsonp, self.jsonp_cb)
             return
 
-        idx = 0
+        ### list dependencies
+        idx_python = 0
+        idx_domogik = 0
+        python_dep = []
         for dep in data[0]["dependencies"]:
             for dep_type in dep:
                 if dep_type == "python":
-                    message.add_data({"dep%s" % idx : dep[dep_type]})
-                    idx += 1
-        self.myxpl.send(message)
-        print(str(message))
-
-        ### Wait for answer
-        # get xpl message from queue
-        # make a time loop of one second after first xpl-trig reception
-        messages = []
-        try:
-            self.log.debug("Package check dependencies : wait for answer...")
-            message = self._get_from_queue(self._queue_package, 
-                                           "xpl-trig", 
-                                           "domogik.package", 
-                                           filter_data = {"command" : "check-dependencies"})
-        except Empty:
-            self.log.debug("Package dependencies check : no answer")
-            self.send_http_response_error(999, "No data or timeout on checking dependencies",
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        self.log.debug("Package dependencies check : message receive : %s" % str(message))
-        
-        print(message)
-        # process message
-        if message.data.has_key('error'):
-            self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
-        else:
-            json_data = JSonHelper("OK")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("dependencies")
-            idx = 0
-            loop_again = True
-            dep_list = []
-            while loop_again:
-                try:
-                    my_key = message.data["dep%s" % idx]
-                    installed = message.data["dep%s-installed" % idx]
-                    if message.data.has_key("dep%s-release" % idx):
-                        release = message.data["dep%s-release" % idx]
-                    else:
-                        release = "";
-                    if message.data.has_key("dep%s-cmd-line" % idx):
-                        cmd_line = message.data["dep%s-cmd-line" % idx]
-                    else:
-                        cmd_line = "";
-                    if message.data.has_key("dep%s-candidate" % idx):
-                        candidate = message.data["dep%s-candidate" % idx]
-                    else:
-                        candidate = "";
-    
+                    python_dep.append({"dep%s" % idx_python : dep[dep_type]})
+                    idx_python += 1
+                if dep_type == "domogik":
+                    idx_domogik += 1
                     data = {
-                               "name" : my_key,
-                               "installed" : installed,
-                               "release" : release,
-                               "cmd-line" : cmd_line,
-                               "candidate" : candidate,
-                           }
+                               "type" : "domogik",
+                               "name" : "foo",
+                               "installed" : "installed",
+                               "release" : "999",
+                               "cmd-line" : "ls",
+                               "candidate" : "999",
+                               }
                     json_data.add_data(data)
-                    idx += 1
-                except:
-                    loop_again = False
-            self.send_http_response_ok(json_data.get())
+
+        ### check python dependencies
+        # if there are python dependencies, ask on xpl
+        if idx_python != 0:
+            ### Send xpl message to check python dependencies on host
+            message = XplMessage()
+            message.set_type("xpl-cmnd")
+            message.set_schema("domogik.package")
+            message.add_data({"command" : "check-dependencies"})
+            message.add_data({"host" : host})
+            for the_dep in python_dep:
+                message.add_data(the_dep)
+            self.myxpl.send(message)
+            print(str(message))
+
+            ### Wait for answer
+            # get xpl message from queue
+            # make a time loop of one second after first xpl-trig reception
+            messages = []
+            try:
+                self.log.debug("Package check dependencies : wait for answer...")
+                message = self._get_from_queue(self._queue_package, 
+                                               "xpl-trig", 
+                                               "domogik.package", 
+                                               filter_data = {"command" : "check-dependencies"})
+            except Empty:
+                self.log.debug("Package dependencies check : no answer")
+                self.send_http_response_error(999, "No data or timeout on checking dependencies",
+                                              self.jsonp, self.jsonp_cb)
+                return
+    
+            self.log.debug("Package dependencies check : message receive : %s" % str(message))
+            
+            print(message)
+            # process message
+            if message.data.has_key('error'):
+                self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+            else:
+                idx = 0
+                loop_again = True
+                dep_list = []
+                while loop_again:
+                    try:
+                        my_key = message.data["dep%s" % idx]
+                        installed = message.data["dep%s-installed" % idx]
+                        if message.data.has_key("dep%s-release" % idx):
+                            release = message.data["dep%s-release" % idx]
+                        else:
+                            release = "";
+                        if message.data.has_key("dep%s-cmd-line" % idx):
+                            cmd_line = message.data["dep%s-cmd-line" % idx]
+                        else:
+                            cmd_line = "";
+                        if message.data.has_key("dep%s-candidate" % idx):
+                            candidate = message.data["dep%s-candidate" % idx]
+                        else:
+                            candidate = "";
+        
+                        data = {
+                                   "type" : "python",
+                                   "name" : my_key,
+                                   "installed" : installed,
+                                   "release" : release,
+                                   "cmd-line" : cmd_line,
+                                   "candidate" : candidate,
+                               }
+                        json_data.add_data(data)
+                        idx += 1
+                    except:
+                        loop_again = False
+        self.send_http_response_ok(json_data.get())
 
     def _rest_package_install(self, host, type, id, release):
         """ Send xpl messages to install a package :
