@@ -165,6 +165,17 @@ class PlcBusMain(XplPlugin):
                            "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
             self.myxpl.send(mess)
 
+#           Workaround to for switch widget go ON when dimmer is send
+        if f["d_command"] == 'PRESET_DIM' and f["d_data1"] != 0 : 
+            print('WORKAROUD : on fait suivre le DIM d un ON pour garder les widgets switch allumes')
+            #print("data1 : %s " % f["d_data1"])
+            mess = XplMessage()
+            mess.set_type('xpl-trig')
+            mess.set_schema('plcbus.basic')
+            mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"],
+                       "command": 'ON'})
+            self.myxpl.send(mess)
+
     def _message_cb(self, message):
         print("Message : %s " % message)
 
