@@ -116,11 +116,18 @@ class PlcBusMain(XplPlugin):
 #            self.api.get_all_on_id(user, dev)
 #        else:
         self.api.send(cmd.upper(), dev, user, level, rate)
-#       Workaround to send an OFF command when dimmer = 0
+#       Workaround to send an ON command when dimmer = 0
         if cmd == 'PRESET_DIM' and level == 0:
             print("cmd : %s " % cmd)
             print("level : %s " % level)     
             self.api.send("OFF", dev, user)
+
+        if cmd == 'PRESET_DIM' and level != 0:
+            print('WORKAROUD : on fait suivre le DIM d un ON pour garder les widgets switch allumes')
+            print("DEBUG cmd : %s " % cmd)
+            print("DEBUG level : %s " % level)
+            self.api.send("ON", dev, user)
+
 
     def _command_cb(self, f):
         ''' Called by the plcbus library when a command has been sent.
@@ -146,6 +153,7 @@ class PlcBusMain(XplPlugin):
                 code = "%s%s" % (house, i+1)
                 print("Etat : %s " % code, unit)
                 if code in self._probe_status and (self._probe_status[code] != str(unit)):
+                    print('DEBUG in rentre dans le IF detection GET_ALL_ON')
                     self._probe_status[code] = str(unit)
                     if unit == 1:
                         command = "ON"
@@ -166,15 +174,14 @@ class PlcBusMain(XplPlugin):
             self.myxpl.send(mess)
 
 #           Workaround to for switch widget go ON when dimmer is send
-        if f["d_command"] == 'PRESET_DIM' and f["d_data1"] != 0 : 
-            print('WORKAROUD : on fait suivre le DIM d un ON pour garder les widgets switch allumes')
+#        if f["d_command"] == 'PRESET_DIM' and f["d_data1"] != 0 : 
+#            print('WORKAROUD : on fait suivre le DIM d un ON pour garder les widgets switch allumes')
             #print("data1 : %s " % f["d_data1"])
-            mess = XplMessage()
-            mess.set_type('xpl-trig')
-            mess.set_schema('plcbus.basic')
-            mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"],
-                       "command": 'ON'})
-            self.myxpl.send(mess)
+#            mess = XplMessage()
+#            mess.set_type('xpl-stat')
+#            mess.set_schema('plcbus.basic')
+#            mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"], "command": 'ON'})
+#            self.myxpl.send(mess)
 
     def _message_cb(self, message):
         print("Message : %s " % message)
