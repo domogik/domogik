@@ -57,7 +57,7 @@
     <file path="src/domogik/xpl/lib/sms_bouygues.py"/>
   </files>
   <dependencies>                                                                
-     <dep python="mechanize"/>
+     <dep type="python" id="mechanize"/>
   </dependencies> 
   <device_technology>
       <id>communication</id>

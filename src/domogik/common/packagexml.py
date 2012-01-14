@@ -184,15 +184,11 @@ class PackageXml():
             self.dependencies = []
             xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
-               if "python" in dep.attributes.keys():
-                   data = {"python" :  dep.attributes.get("python").value.strip()}
-                   self.dependencies.append(data)
-               if "domogik" in dep.attributes.keys():
-                   data = {"domogik" :  dep.attributes.get("domogik").value.strip()}
-                   self.dependencies.append(data)
-               if "other" in dep.attributes.keys():
-                   data = {"other" :  dep.attributes.get("other").value.strip()}
-                   self.dependencies.append(data)
+               dep_type = dep.attributes.get("type").value.strip()
+               dep_id = dep.attributes.get("id").value.strip()
+               data = {"type" : dep_type,
+                       "id" : dep_id}
+               self.dependencies.append(data)
 
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.id)
@@ -332,7 +328,7 @@ class PackageXml():
         print("Domogik min release : %s" % self.domogik_min_release)
         print("----- Python dependencies -------------------------------")
         for dep in self.dependencies:
-            print("- %s" % dep)
+            print("- %s %s" % (dep["type"], dep["id"]))
         print("----- Package files -------------------------------------")
         for my_file in self.files:
             print("- %s" % my_file["path"])

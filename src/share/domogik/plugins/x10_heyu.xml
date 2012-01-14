@@ -41,7 +41,7 @@
     <file path="src/domogik/xpl/lib/x10_heyu.py"/>
   </files>
   <dependencies>
-    <dep other="heyu"/>
+    <dep type="other" id="heyu"/>
   </dependencies>
   <device_technology>
       <id>x10</id>

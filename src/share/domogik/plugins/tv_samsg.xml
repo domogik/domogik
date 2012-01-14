@@ -49,7 +49,7 @@
     <file path="src/domogik/xpl/lib/tv_samsg_led.py"/>
   </files>
   <dependencies>
-    <dep python="pyserial (>=2.5)"/>
+    <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
   <device_technology>
       <id>multimedia</id>

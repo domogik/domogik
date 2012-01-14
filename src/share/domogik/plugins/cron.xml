@@ -33,9 +33,9 @@
     <file path="src/domogik/xpl/lib/cron_query.py"/>
   </files>
   <dependencies>
-    <dep python="apscheduler (>=2.0.2)"/>
-    <dep python="pyserial (>=2.5)"/>
-    <dep domogik="plugin-xpl_time (>=0.1)"/>
+    <dep type="python" id="apscheduler (>=2.0.2)"/>
+    <dep type="python" id="pyserial (>=2.5)"/>
+    <dep type="plugin" id="xpl_time (>=0.1)"/>
   </dependencies>
   <device_technology>
       <id>cron</id>

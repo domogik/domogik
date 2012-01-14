@@ -42,7 +42,7 @@
     <file path="src/domogik/xpl/lib/xpl2ser.py"/>
   </files>
   <dependencies>
-    <dep python="pySerial > 2.4"/>
+    <dep type="python" id="pySerial > 2.4"/>
   </dependencies>
   <device_technology>
       <id>bridge</id>

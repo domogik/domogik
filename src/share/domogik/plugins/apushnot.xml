@@ -12,7 +12,7 @@
   <author-email>Kriss@domogik.org</author-email>
   <domogik-min-version>0.1.0</domogik-min-version>
   <dependencies>
-     <dep python="cjson"/>
+     <dep type="python" id="cjson"/>
   </dependencies>
   <configuration-keys>
     <key>

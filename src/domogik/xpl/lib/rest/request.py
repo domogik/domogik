@@ -3726,9 +3726,9 @@ target=*
                 return
 
         ### check-dependencies #######################
-        elif self.rest_request[0] == "check-dependencies":
+        elif self.rest_request[0] == "dependency":
             if len(self.rest_request) == 5:
-                self._rest_package_check_dependencies(self.rest_request[1],
+                self._rest_package_dependency(self.rest_request[1],
                                            self.rest_request[2],
                                            self.rest_request[3],
                                            self.rest_request[4])
@@ -3951,7 +3951,7 @@ target=*
         return True, message
 
 
-    def _rest_package_check_dependencies(self, host, type, id, release):
+    def _rest_package_dependency(self, host, type, id, release):
         """ Send a xpl message to check python dependencies
             @param host : host targetted
             @param type : type of package
@@ -3964,7 +3964,7 @@ target=*
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("dependencies")
+        json_data.set_data_type("dependency")
 
         ### check package exists in cache
         pkg_mgr = PackageManager()
@@ -3978,24 +3978,24 @@ target=*
 
         ### list dependencies
         idx_python = 0
-        idx_domogik = 0
+        idx_plugin = 0
         python_dep = []
+        print "D=%s" %  data[0]["dependencies"]
         for dep in data[0]["dependencies"]:
-            for dep_type in dep:
-                if dep_type == "python":
-                    python_dep.append({"dep%s" % idx_python : dep[dep_type]})
-                    idx_python += 1
-                if dep_type == "domogik":
-                    idx_domogik += 1
-                    data = {
-                               "type" : "domogik",
-                               "name" : "foo",
-                               "installed" : "installed",
-                               "release" : "999",
-                               "cmd-line" : "ls",
-                               "candidate" : "999",
-                               }
-                    json_data.add_data(data)
+            if dep["type"] == "python":
+                python_dep.append({"dep%s" % idx_python : dep["id"]})
+                idx_python += 1
+            if dep["type"] == "plugin":
+                idx_plugin += 1
+                data = {
+                           "type" : "domogik",
+                           "name" : "foo",
+                           "installed" : "installed",
+                           "release" : "999",
+                           "cmd-line" : "ls",
+                           "candidate" : "999",
+                           }
+                json_data.add_data(data)
 
         ### check python dependencies
         # if there are python dependencies, ask on xpl
