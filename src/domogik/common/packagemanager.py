@@ -75,7 +75,7 @@ config = cfg.load()
 conf = dict(config[1])
 REST_URL = "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
 
-PLUGIN_XML_PATH = "%s/packages/softwares" % INSTALL_PATH
+PLUGIN_XML_PATH = "%s/packages/plugins" % INSTALL_PATH
 EXTERNAL_XML_PATH = "%s/packages/externals" % INSTALL_PATH
 
 # type of part for a plugin
@@ -442,7 +442,7 @@ class PackageManager():
 
         try:
             if pkg_type in ('plugin'):
-                os.unlink("%s/packages/softwares/%s.xml" %(INSTALL_PATH, id))
+                os.unlink("%s/packages/plugins/%s.xml" %(INSTALL_PATH, id))
             elif pkg_type in ('external'):
                 os.unlink("%s/packages/externals/%s.xml" %(INSTALL_PATH, id))
             else:
@@ -499,7 +499,7 @@ class PackageManager():
                     self._create_init_py("%s/xpl/" % plg_path)
                     self._create_init_py("%s/xpl/bin/" % plg_path)
                     self._create_init_py("%s/xpl/lib/" % plg_path)
-                    type_path = "softwares"
+                    type_path = "plugins"
                 if pkg_type == "external":
                     type_path = "externals"
                 print("%s => %s" % ("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path)))
