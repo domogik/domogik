@@ -53,7 +53,8 @@ from domogik.common import logger
 from distutils2.version import NormalizedVersion, IrrationalVersionError
 
 
-SRC_PATH = "../../../"
+from domogik import __path__ as domopath
+SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
 PLG_XML_PATH = "src/share/domogik/plugins/"
 TMP_EXTRACT_DIR = "%s/%s" % (tempfile.gettempdir(), "domogik-pkg-mgr")
 CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
