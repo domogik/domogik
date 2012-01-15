@@ -105,7 +105,7 @@
   <dependencies>
     <dep type="python" id="apscheduler (>=2.0.2)"/>
     <dep type="python" id="pyephem (>=3.7.5)"/>
-    <dep type="plugin" id="xpl_time (>=0.1)"/>
+    <dep type="plugin" id="xpl_time"/>
   </dependencies>
   <device_technology>
       <id>dawndusk</id>

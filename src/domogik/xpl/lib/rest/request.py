@@ -3989,6 +3989,7 @@ target=*
                 idx_python += 1
 
             if dep["type"] == "plugin":
+                id = dep["id"].split(" ")[0]
                 installed = False
                 release = ""
                 (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, "plugin")
@@ -4001,7 +4002,7 @@ target=*
                 while loop_again:
                     try:
                         if "plugin" == message.data["type"+str(idx)] and \
-                           dep["id"] == message.data["id"+str(idx)]:
+                           id == message.data["id"+str(idx)]:
                             release = message.data["release"+str(idx)]
                             installed = True
                             loop_again = False
