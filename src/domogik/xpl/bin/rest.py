@@ -654,6 +654,7 @@ class Rest(XplPlugin):
         """ Load XML files for /command
         """
         # list technologies folders
+        time.sleep(1)
         self.xml = {}
         self.xml_ko = [] ## to list bad xml files
         for techno in os.listdir(self._xml_cmd_dir):
