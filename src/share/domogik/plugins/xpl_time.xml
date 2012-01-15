@@ -20,7 +20,9 @@
       <default-value>False</default-value>
     </key>
   </configuration-keys>
-  <files/>
+  <files>
+    <file path="src/domogik/xpl/bin/xpl_time.py"/>
+  </files>
   <dependencies/>
   <device_technology>
       <id>domogik</id>
