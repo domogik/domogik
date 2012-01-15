@@ -625,12 +625,15 @@ class PackageManager():
 
         # for each package, put it in cache if it corresponds to priority
         for file_info in file_list:
-            pkg_xml = PackageXml(url = "%s" % file_info["file"])
-            priority = self._get_package_priority_in_cache(pkg_xml.fullname, pkg_xml.release)
-            # our package has a prioriry >= to other packages with same name/rel
-            if priority == None or priority < file_info["priority"]:
-                self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
-                pkg_xml.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
+            try:
+                pkg_xml = PackageXml(url = "%s" % file_info["file"])
+                priority = self._get_package_priority_in_cache(pkg_xml.fullname, pkg_xml.release)
+                # our package has a prioriry >= to other packages with same name/rel
+                if priority == None or priority < file_info["priority"]:
+                    self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
+                    pkg_xml.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
+            except:
+                self.log("Error while caching file from '%s' : %s" % (file_info["file"], traceback.format_exc()))
 
     def _get_files_list_from_repository(self, url, priority):
         """ Read packages.lst on repository
