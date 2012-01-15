@@ -82,6 +82,7 @@ SSL_CERTIFICATE = "/dev/null"
 
 # packages queues config
 QUEUE_PACKAGE_SIZE = 10
+QUEUE_PACKAGE_TIMEOUT = 30
 
 # global queues config (plugins, etc)
 QUEUE_TIMEOUT = 15

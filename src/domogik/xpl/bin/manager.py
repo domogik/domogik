@@ -1099,16 +1099,21 @@ class SysManager(XplPlugin):
                     mess.add_data({"dep%s-release" % idx : installed_release})
                 crawler = Crawler()
                 found = False
-                for rel in crawler.get_releases(dep):
-                    if  ver.match(rel._version):
-                        found = True
-                        mess.add_data({"dep%s-candidate" % idx : rel._version})
-                        mess.add_data({"dep%s-cmd-line" % idx : "sudo easy_install %s==%s" % (ver.name, rel._version)})
-                        break
+                try:
+                    for rel in crawler.get_releases(dep):
+                        print rel
+                        if  ver.match(rel._version):
+                            found = True
+                            mess.add_data({"dep%s-candidate" % idx : rel._version})
+                            mess.add_data({"dep%s-cmd-line" % idx : "sudo easy_install %s==%s" % (ver.name, rel._version)})
+                            break
+                except:
+                    self.log.error("Error while looking for candidates : %s" % traceback.format_exc())
+
                 if found == False:
                     msg = "No candidate to dependency '%s' installation found" % ver.name
                     self.log.warning(msg)
-                    mess.add_data({'error' : msg})
+                    mess.add_data({"dep%s-error" % idx : msg})
 
             mess.add_data({"dep%s-installed" % idx : installed})
             idx += 1

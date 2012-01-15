@@ -71,6 +71,7 @@ from subprocess import Popen, PIPE
 # Time we wait for answers after a multi host list command
 WAIT_FOR_LIST_ANSWERS = 1
 WAIT_FOR_PACKAGE_INSTALLATION = 20
+WAIT_FOR_DEPENDENCY_CHECK = 30
 
 #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
 PING_DURATION = 2
@@ -3981,19 +3982,42 @@ target=*
         idx_plugin = 0
         python_dep = []
         print "D=%s" %  data[0]["dependencies"]
+        pkg_mgr = PackageManager()
         for dep in data[0]["dependencies"]:
             if dep["type"] == "python":
                 python_dep.append({"dep%s" % idx_python : dep["id"]})
                 idx_python += 1
+
             if dep["type"] == "plugin":
+                installed = False
+                release = ""
+                (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, "plugin")
+                if res == True: # ok
+                    message = data
+        
+                # process message
+                idx = 0
+                loop_again = True
+                while loop_again:
+                    try:
+                        if "plugin" == message.data["type"+str(idx)] and \
+                           dep["id"] == message.data["id"+str(idx)]:
+                            release = message.data["release"+str(idx)]
+                            installed = True
+                            loop_again = False
+                        idx += 1
+                    except KeyError:
+                        loop_again = False
+
                 idx_plugin += 1
                 data = {
-                           "type" : "domogik",
-                           "name" : "foo",
-                           "installed" : "installed",
-                           "release" : "999",
-                           "cmd-line" : "ls",
-                           "candidate" : "999",
+                           "type" : "plugin",
+                           "name" : dep["id"],
+                           "installed" : installed,
+                           "release" : release,
+                           "cmd-line" : "Install from Domogik Administration",
+                           "candidate" : "",
+                           "error" : "",
                            }
                 json_data.add_data(data)
 
@@ -4020,7 +4044,8 @@ target=*
                 message = self._get_from_queue(self._queue_package, 
                                                "xpl-trig", 
                                                "domogik.package", 
-                                               filter_data = {"command" : "check-dependencies"})
+                                               filter_data = {"command" : "check-dependencies"},
+                                               timeout = WAIT_FOR_DEPENDENCY_CHECK)
             except Empty:
                 self.log.debug("Package dependencies check : no answer")
                 self.send_http_response_error(999, "No data or timeout on checking dependencies",
@@ -4040,7 +4065,10 @@ target=*
                 while loop_again:
                     try:
                         my_key = message.data["dep%s" % idx]
-                        installed = message.data["dep%s-installed" % idx]
+                        if message.data["dep%s-installed" % idx].lower() == "yes":
+                            installed = True
+                        else:
+                            installed = False
                         if message.data.has_key("dep%s-release" % idx):
                             release = message.data["dep%s-release" % idx]
                         else:
@@ -4053,6 +4081,10 @@ target=*
                             candidate = message.data["dep%s-candidate" % idx]
                         else:
                             candidate = "";
+                        if message.data.has_key("dep%s-error" % idx):
+                            error = message.data["dep%s-error" % idx]
+                        else:
+                            error = "";
         
                         data = {
                                    "type" : "python",
@@ -4061,6 +4093,7 @@ target=*
                                    "release" : release,
                                    "cmd-line" : cmd_line,
                                    "candidate" : candidate,
+                                   "error" : error,
                                }
                         json_data.add_data(data)
                         idx += 1
