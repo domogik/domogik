@@ -87,6 +87,7 @@ function stop_domogik {
         exit 16
     fi
 }
+
 function run_setup_py {
     MODE=$1
     case $MODE in
@@ -139,7 +140,7 @@ function copy_sample_files {
         chown $d_user $dmg_home
     fi
     # create folders for packages management
-    for pkg_rep in pkg-cache cache packages packages/plugins packages/externals packages/stats packages/url2xpl
+    for pkg_rep in pkg-cache cache packages packages/plugins packages/externals packages/stats packages/url2xpl packages/design
       do
         if [ ! -d $dmg_home/$pkg_rep ];then
             mkdir $dmg_home/$pkg_rep

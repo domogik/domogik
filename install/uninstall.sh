@@ -32,6 +32,28 @@
 #@organization: Domogik
 
 
+
+function stop_domogik {
+    if [ -d "/etc/init.d/" ];then
+        if [ -f "/etc/init.d/domogik" ];then
+            if [ -d "/var/run/domogik" ];then
+                [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+                [ -f /etc/default/domogik ] && . /etc/default/domogik
+                if [ -f "/home/${DOMOGIK_USER}/.domogik/domogik.cfg" ];then
+                    echo "There is already a Domogik on this system. Try to stop it before uninstall..."
+                    /etc/init.d/domogik stop
+                fi
+            fi
+        fi
+    elif [ -d "/etc/rc.d/" ];then
+        echo "TODO"
+    else
+        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
+        exit 16
+    fi
+}
+
+
 # IS root user ?
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
@@ -53,6 +75,8 @@ if [ $choice != "y" -a $choice != "Y" ] ; then
     echo "Aborting..."
     exit 0
 fi
+
+stop_domogik
 
 [ ! -f /etc/default/domogik ] && [ ! -f /etc/conf.d/domogik ] && echo "File /etc/default/domogik or /etc/conf.d/domogik doesn't exists : exiting" && exit 1
 
@@ -100,3 +124,8 @@ fi
 echo "Notice : database was not suppressed : you must do it manually"
 
 echo "Uninstall complete!"
+
+
+
+
+

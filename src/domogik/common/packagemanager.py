@@ -511,8 +511,13 @@ class PackageManager():
                     type_path = "externals"
                 print("%s => %s" % ("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path)))
                 copytree("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path), self.log)
-            # stats/* and url2xpl/* and exernal/* are insatlled on rinor host
+
+            # design/*
+            # stats/* 
+            # url2xpl/* 
+            # exernal/* are installed on rinor host
             if package_part == PKG_PART_RINOR:
+                copytree("%s/src/share/domogik/design/" % pkg_dir, "%s/design/" % plg_path, self.log)
                 copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
                 copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
                 copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
