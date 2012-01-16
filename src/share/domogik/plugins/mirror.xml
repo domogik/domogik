@@ -31,6 +31,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/mirror/icon.png"/>
     <file path="src/share/domogik/plugins/mirror.xml"/>
     <file path="src/share/domogik/stats/rfid/sensor.basic-mirror.xml"/>
     <file path="src/domogik/xpl/bin/mirror.py"/>

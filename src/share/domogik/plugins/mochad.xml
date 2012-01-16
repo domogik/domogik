@@ -49,6 +49,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/mochad/icon.png"/>
     <file path="src/share/domogik/plugins/mochad.xml"/>
     <file path="src/share/domogik/stats/x10/x10.basic-mochad.xml"/>
     <file path="src/share/domogik/url2xpl/x10/bright.xml"/>

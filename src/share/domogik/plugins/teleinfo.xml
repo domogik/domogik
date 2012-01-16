@@ -38,6 +38,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/teleinfo/icon.png"/>
     <file path="src/share/domogik/plugins/teleinfo.xml"/>
     <file path="src/share/domogik/stats/teleinfo/teleinfo.basic-teleinfo.xml"/>
     <file path="src/share/domogik/stats/teleinfo/teleinfo.short-teleinfo.xml"/>

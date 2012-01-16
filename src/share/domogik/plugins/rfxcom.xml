@@ -29,6 +29,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/rfxcom/icon.png"/>
     <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"/>
   </files>
   <dependencies/>

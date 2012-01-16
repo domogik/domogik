@@ -21,6 +21,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/xpl_time/icon.png"/>
     <file path="src/share/domogik/plugins/xpl_time.xml"/>
     <file path="src/domogik/xpl/bin/xpl_time.py"/>
   </files>

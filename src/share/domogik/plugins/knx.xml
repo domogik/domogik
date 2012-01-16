@@ -28,6 +28,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/knx/icon.png"/>
     <file path="src/share/domogik/plugins/knx.xml"/>
     <file path="src/share/domogik/stats/knx/knx.basic.xml"/>
     <file path="src/domogik/xpl/bin/knx.py"/>

@@ -21,6 +21,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/tschacon/icon.png"/>
     <file path="src/share/domogik/plugins/tschacon.xml"/>
     <file path="src/share/domogik/stats/tschacon/arctech.tschacon.xml"/>
     <file path="src/share/domogik/url2xpl/tschacon/on.xml"/>

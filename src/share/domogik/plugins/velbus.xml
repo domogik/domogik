@@ -29,11 +29,12 @@
     </key>
   </configuration-keys>
   <files>
-	<file path="src/share/domogik/stats/velbus/lighting.basic-velbus.xml"/>
-	<file path="src/share/domogik/url2xpl/velbus/100.xml"/>
-	<file path="src/share/domogik/url2xpl/velbus/0.xml"/>
-	<file path="src/domogik/xpl/bin/velbus.py"/>
-	<file path="src/domogik/xpl/lib/velbus.py"/>
+    <file path="src/share/domogik/design/plugin/velbus/icon.png"/>
+    <file path="src/share/domogik/stats/velbus/lighting.basic-velbus.xml"/>
+    <file path="src/share/domogik/url2xpl/velbus/100.xml"/>
+    <file path="src/share/domogik/url2xpl/velbus/0.xml"/>
+    <file path="src/domogik/xpl/bin/velbus.py"/>
+    <file path="src/domogik/xpl/lib/velbus.py"/>
   </files>
   <dependencies/>
   <device_technology>

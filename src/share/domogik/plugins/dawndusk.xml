@@ -96,6 +96,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/dawndusk/icon.png"/>
     <file path="src/share/domogik/plugins/dawndusk.xml"/>
     <file path="src/share/domogik/stats/dawndusk/dawndusk.basic.xml"/>
     <file path="src/share/domogik/url2xpl/dawndusk/daynight.xml"/>

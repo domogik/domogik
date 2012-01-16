@@ -69,6 +69,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/foscam/icon.png"/>
     <file path="src/share/domogik/plugins/foscam.xml"/>
     <file path="src/share/domogik/stats/foscam/sensor.basic-foscam_relay.xml"/>
     <file path="src/share/domogik/url2xpl/foscam/high.xml"/>

@@ -36,6 +36,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/diskfree/icon.png"/>
     <file path="src/share/domogik/plugins/diskfree.xml"/>
     <file path="src/share/domogik/stats/computer/sensor.basic-diskfree.xml"/>
     <file path="src/domogik/xpl/bin/diskfree.py"/>

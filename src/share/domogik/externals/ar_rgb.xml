@@ -37,6 +37,7 @@ Test it with the manual controllers (push button and potentiometer) and then cre
   <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys/>
   <files>
+    <file path="src/share/domogik/design/external/ar_rgb/icon.png"/>
     <file path="src/share/domogik/externals/ar_rgb.xml"/>
     <file path="src/share/domogik/url2xpl/arduino/setcolor.xml"/>
     <file path="src/share/domogik/stats/arduino/arduino.rgb-ar_rgb.xml"/>

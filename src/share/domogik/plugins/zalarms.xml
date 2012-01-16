@@ -178,6 +178,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/zalarms/icon.png"/>
     <file path="src/share/domogik/plugins/zalarms.xml"/>
     <file path="src/domogik/xpl/bin/zalarms.py"/>
     <file path="src/domogik/xpl/lib/zalarms.py"/>

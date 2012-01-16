@@ -38,6 +38,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/cimodem/icon.png"/>
     <file path="src/share/domogik/plugins/cidmodem.xml"/>
     <file path="src/share/domogik/stats/communication/cid.basic-cidmodem.xml"/>
     <file path="src/domogik/xpl/bin/cidmodem.py"/>

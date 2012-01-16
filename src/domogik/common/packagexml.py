@@ -47,6 +47,7 @@ import time #for debug : remove after dev
 
 PLUGIN_XML_PATH = "share/domogik/plugins/"
 HARDWARE_XML_PATH = "share/domogik/externals/"
+DESIGN_PATH = "share/domogik/design/"
 
 class PackageException(Exception):
     """
@@ -72,6 +73,7 @@ class PackageXml():
         """
         xml_file = None
         try:
+            # load xml from repository
             if id != None:
                 # get config
                 cfg = Loader('domogik')
@@ -88,17 +90,22 @@ class PackageXml():
 
                 self.info_file = xml_file
                 self.xml_content = minidom.parse(xml_file)
+
+                # icon file
+                self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['custom_prefix'], DESIGN_PATH, pkg_type, id)
     
             elif path != None:
                 xml_file = path
                 self.info_file = xml_file
                 self.xml_content = minidom.parse(xml_file)
+                self.icon_file = None
 
             elif url != None:
                 xml_file = url
                 self.info_file = xml_file
                 xml_data = urllib2.urlopen(xml_file)
                 self.xml_content = minidom.parseString(xml_data.read())
+                self.icon_file = None
 
             # read xml file
             self.type = self.xml_content.getElementsByTagName("package")[0].attributes.get("type").value.strip()
