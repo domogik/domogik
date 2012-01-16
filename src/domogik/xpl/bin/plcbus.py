@@ -139,11 +139,13 @@ class PlcBusMain(XplPlugin):
                 elif (not unit) and code in self._probe_status:
                     del self._probe_status[code]
         elif f["d_command"] == "GET_ALL_ON_ID_PULSE":
-            data = int("%s%s" % (f["d_data1"], f["d_data2"]))
+            data = int("%s%s" % (bin(f["d_data1"])[2:].zfill(8), bin(f["d_data2"])[2:].zfill(8)))
+            print "data : %s" % data
             house = f["d_home_unit"][0]
-            for i in range(0,16):
-                unit = data >> i & 1
-                code = "%s%s" % (house, i+1)
+            item = 16
+            for c in data:
+                unit=int(c)
+                code = "%s%s" % (house, item)
                 print("Etat : %s " % code, unit)
                 if code in self._probe_status and (self._probe_status[code] != str(unit)):
                     self._probe_status[code] = str(unit)
@@ -157,6 +159,7 @@ class PlcBusMain(XplPlugin):
                     mess.add_data({"usercode" : f["d_user_code"], "device": code,
                                    "command": command})
                     self.myxpl.send(mess)
+                item = item - 1
         else:
             mess = XplMessage()
             mess.set_type('xpl-trig')

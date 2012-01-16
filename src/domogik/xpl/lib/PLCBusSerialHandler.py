@@ -208,7 +208,7 @@ class serialHandler(threading.Thread):
         r["start_bit"] = message[0:2]
         r["data_length"] = int(message[2:4])
         int_length = int(message[2:4])*2
-        r["data"] = message[4:5+int_length]
+        r["data"] = message[4:4+int_length]
         r["d_user_code"] = r["data"][0:2]
         r["d_home_unit"] = "%s%s" % (home[int(r["data"][2:3], 16)],int(r["data"][3:4], 16)+1)
         r["d_command"] = cmdplcbus[r["data"][4:6]]
