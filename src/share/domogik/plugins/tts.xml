@@ -28,6 +28,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/tts/icon.png"/>
     <file path="src/share/domogik/plugins/tts.xml"/>
     <file path="src/share/domogik/url2xpl/communication/tts.xml"/>
     <file path="src/domogik/xpl/bin/tts.py"/>

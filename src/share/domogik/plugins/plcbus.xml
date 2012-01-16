@@ -52,6 +52,7 @@
      </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/plcbus/icon.png"/>
     <file path="src/share/domogik/plugins/plcbus.xml"/>
     <file path="src/share/domogik/stats/plcbus/plcbus.basic-plcbus.xml"/>
     <file path="src/share/domogik/url2xpl/plcbus/all_lights_off.xml"/>

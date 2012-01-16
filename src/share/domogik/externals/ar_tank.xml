@@ -33,6 +33,7 @@ Upload project to Arduino with the IDE
   <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys/>
   <files>
+    <file path="src/share/domogik/design/external/ar_tank/icon.png"/>
     <file path="src/share/domogik/externals/ar_tank.xml"/>
     <file path="src/share/domogik/stats/arduino/sensor.basic-ar_tank.xml"/>
   </files>

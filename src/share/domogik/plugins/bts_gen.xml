@@ -44,6 +44,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/bts_gen/icon.png"/>
     <file path="src/share/domogik/plugins/bts_gen.xml"/>
   </files>
   <dependencies/>

@@ -35,6 +35,7 @@
       </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/zwave/icon.png"/>
     <file path="src/share/domogik/plugins/zwave.xml"/>
     <file path="src/share/domogik/stats/zwave/zwave.basic-zwave.xml"/>
     <file path="src/share/domogik/url2xpl/zwave/level.xml"/>

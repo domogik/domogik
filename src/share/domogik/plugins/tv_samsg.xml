@@ -40,6 +40,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/tv_samsg/icon.png"/>
     <file path="src/share/domogik/plugins/tv_samsg.xml"/>
     <file path="src/share/domogik/url2xpl/multimedia/power_on.xml"/>
     <file path="src/share/domogik/url2xpl/multimedia/power_standby.xml"/>

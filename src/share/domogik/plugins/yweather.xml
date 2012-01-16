@@ -58,6 +58,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/yweather/icon.png"/>
     <file path="src/share/domogik/plugins/yweather.xml"/>
     <file path="src/domogik/xpl/bin/yweather.py"/>
     <file path="src/domogik/xpl/lib/yweather.py"/>

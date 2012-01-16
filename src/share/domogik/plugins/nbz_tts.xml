@@ -53,6 +53,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/nbz_tts/icon.png"/>
     <file path="src/share/domogik/plugins/nbz_tts.xml"/>
     <file path="src/domogik/xpl/bin/nbz_tts.py"/>
     <file path="src/domogik/xpl/lib/nbz_tts.py"/>

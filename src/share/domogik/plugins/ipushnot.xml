@@ -21,6 +21,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/ipushnot/icon.png"/>
     <file path="src/share/domogik/plugins/ipushnot.xml"/>
     <file path="src/domogik/xpl/bin/ipushnot.py"/>
     <file path="src/domogik/xpl/lib/ipushnot.py"/>

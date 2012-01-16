@@ -164,7 +164,8 @@ class PackageManager():
         self._create_tar_gz("plugin-%s-%s" % (plg_xml.id, plg_xml.release), 
                             output_dir,
                             plg_xml.all_files, 
-                            xml_tmp_file)
+                            xml_tmp_file,
+                            plg_xml.icon_file)
 
     def _create_package_for_external(self, id, output_dir, force):
         """ Create package for a external
@@ -228,15 +229,17 @@ class PackageManager():
         self._create_tar_gz("external-%s-%s" % (plg_xml.id, plg_xml.release), 
                             output_dir,
                             plg_xml.all_files, 
-                            xml_tmp_file)
+                            xml_tmp_file,
+                            plg_xml.icon_file)
 
 
-    def _create_tar_gz(self, name, output_dir, files, info_file = None):
+    def _create_tar_gz(self, name, output_dir, files, info_file = None, icon_file = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
             @param name : file name
             @param output_dir : if != None, the path to put .tar.gz
             @param files : table of file names to add in tar.gz
             @param info_file : path for info.xml file
+            @param icon_file : path for icon.png file
         """
         if output_dir == None:
             my_tar = "%s/%s.tgz" % (tempfile.gettempdir(), name)
@@ -252,6 +255,9 @@ class PackageManager():
             if info_file != None:
                 self.log("- info.xml")
                 tar.add(info_file, arcname="info.xml")
+            if icon_file != None:
+                self.log("- icon.png")
+                tar.add(icon_file, arcname="icon.png")
             tar.close()
 
             # delete temporary xml file

@@ -87,6 +87,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/telldus/icon.png"/>
     <file path="src/share/domogik/plugins/telldus.xml"/>
     <file path="src/share/domogik/stats/telldus/telldus.xml"/>
     <file path="src/share/domogik/stats/telldus/dawndusk.request.xml"/>

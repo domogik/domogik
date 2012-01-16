@@ -64,6 +64,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/wol_ping/icon.png"/>
     <file path="src/share/domogik/plugins/wol_ping.xml"/>
     <file path="src/share/domogik/stats/computer/sensor.basic-wol_ping.xml"/>
     <file path="src/share/domogik/url2xpl/computer/wol.xml"/>

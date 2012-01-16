@@ -37,6 +37,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/xpl2ser/icon.png"/>
     <file path="src/share/domogik/plugins/xpl2ser.xml"/>
     <file path="src/domogik/xpl/bin/xpl2ser.py"/>
     <file path="src/domogik/xpl/lib/xpl2ser.py"/>

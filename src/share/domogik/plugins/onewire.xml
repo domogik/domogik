@@ -112,6 +112,7 @@ List of supported devices :
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/onewire/icon.png"/>
     <file path="src/share/domogik/plugins/onewire.xml"/>
     <file path="src/share/domogik/stats/1wire/sensor.basic-onewire.xml"/>
     <file path="src/domogik/xpl/bin/onewire.py"/>

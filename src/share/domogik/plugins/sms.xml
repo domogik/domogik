@@ -49,6 +49,7 @@
     </key>
   </configuration-keys>
   <files>
+    <file path="src/share/domogik/design/plugin/sms/icon.png"/>
     <file path="src/share/domogik/plugins/sms.xml"/>
     <file path="src/share/domogik/url2xpl/communication/send_sms.xml"/>
     <file path="src/domogik/xpl/bin/sms.py"/>
