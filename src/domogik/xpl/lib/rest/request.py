@@ -43,7 +43,7 @@ from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
-from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR
+from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, REPO_CACHE_DIR
 from domogik.common.packagexml import PackageXml, PackageException
 import time
 import urllib
@@ -137,6 +137,7 @@ class ProcessRequest():
         self.log = self.handler_params[0].log
         self.log_dm = self.handler_params[0].log_dm
         self._package_path = self.handler_params[0]._package_path
+        self._design_dir = self.handler_params[0]._design_dir
         self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
         self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
         self.repo_dir = self.handler_params[0].repo_dir
@@ -3706,6 +3707,30 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
+        ### icon #####################################
+        elif self.rest_request[0] == "icon":
+            if self.rest_request[1] == "available":
+                if len(self.rest_request) == 5:
+                    self._rest_package_icon_available(self.rest_request[2],
+                                                      self.rest_request[3],
+                                                      self.rest_request[4])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                    return
+            elif self.rest_request[1] == "installed":
+                if len(self.rest_request) == 4:
+                    self._rest_package_icon_installed(self.rest_request[2],
+                                                      self.rest_request[3])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                    return
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### available ################################
         elif self.rest_request[0] == "available":
             if len(self.rest_request) == 3:
@@ -4266,6 +4291,32 @@ target=*
             self.send_http_response_ok(json_data.get())
 
 
+    def _rest_package_icon_available(self, type, id, release):
+        """ Download a package icon storen in cache
+        """
+        icon_name = "%s-%s-%s.png" % (type, id, release)
+        try:
+            file_name = "%s/%s" % (REPO_CACHE_DIR, icon_name)
+            self._download_file(file_name)
+        except IOError:
+            self.send_http_response_error(999, "No icon '%s' available" % file_name,
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+
+    def _rest_package_icon_installed(self, type, id):
+        """ Download a package icon storen in cache
+        """
+        try:
+            file_name = "%s/%s/%s/icon.png" % (self._design_dir, type, id)
+
+            self._download_file(file_name)
+        except IOError:
+            self.send_http_response_error(999, "No icon '%s' available" % file_name,
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+
     def _rest_package_download(self, type, id, release):
         """ Download a package storen in cache
         """
@@ -4273,47 +4324,11 @@ target=*
         # Check file opening
         try:
             file_name = "%s/%s" % (PKG_CACHE_DIR, pkg_path)
-            my_file = open("%s" % (file_name), "rb")
+            self._download_file(file_name)
         except IOError:
             self.send_http_response_error(999, "No file '%s' available" % file_name,
                                           self.jsonp, self.jsonp_cb)
             return
-
-        # Get informations on file
-        ctype = None
-        file_stat = os.fstat(my_file.fileno())
-        print file_name
-        #last_modified = os.stat("%s" % (file_name))[stat.ST_MTIME]
-        last_modified = os.path.getmtime(file_name)
-
-        # Get mimetype information
-        if not mimetypes.inited:
-            mimetypes.init()
-        extension_map = mimetypes.types_map.copy()
-        extension_map.update({
-                '' : 'application/octet-stream', # default
-                '.py' : 'text/plain'})
-        basename, extension = os.path.splitext(file_name)
-        if extension in extension_map:
-            ctype = extension_map[extension] 
-        else:
-            extension = extension.lower()
-            if extension in extension_map:
-                ctype = extension_map[extension] 
-            else:
-                ctype = extension_map[''] 
-
-        # Send file
-        self.send_response(200)
-        self.send_header("Content-type", ctype)
-        self.send_header("Content-Length", str(file_stat[6]))
-        self.send_header("Last-Modified", last_modified)
-        self.end_headers()
-        shutil.copyfileobj(my_file, self.wfile)
-        my_file.close(
-
-    )
-
 
 
 
@@ -4458,4 +4473,48 @@ target=*
             except KeyError:
                 json_data.add_data({})
         self.send_http_response_ok(json_data.get())
+
+
+##########
+# Tools
+##########
+
+    def _download_file(self, file_name):
+        """ Download a file
+        """
+        # Check file opening
+        my_file = open("%s" % (file_name), "rb")
+
+        # Get informations on file
+        ctype = None
+        file_stat = os.fstat(my_file.fileno())
+        print file_name
+        #last_modified = os.stat("%s" % (file_name))[stat.ST_MTIME]
+        last_modified = os.path.getmtime(file_name)
+
+        # Get mimetype information
+        if not mimetypes.inited:
+            mimetypes.init()
+        extension_map = mimetypes.types_map.copy()
+        extension_map.update({
+                '' : 'application/octet-stream', # default
+                '.py' : 'text/plain'})
+        basename, extension = os.path.splitext(file_name)
+        if extension in extension_map:
+            ctype = extension_map[extension] 
+        else:
+            extension = extension.lower()
+            if extension in extension_map:
+                ctype = extension_map[extension] 
+            else:
+                ctype = extension_map[''] 
+
+        # Send file
+        self.send_response(200)
+        self.send_header("Content-type", ctype)
+        self.send_header("Content-Length", str(file_stat[6]))
+        self.send_header("Last-Modified", last_modified)
+        self.end_headers()
+        shutil.copyfileobj(my_file, self.wfile)
+        my_file.close()
 

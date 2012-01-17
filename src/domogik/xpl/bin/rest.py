@@ -182,11 +182,13 @@ class Rest(XplPlugin):
                 self._package_path = conf['package_path']
                 self.log.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
+                self._design_dir = "%s/packages/design/" % self._package_path
                 self._xml_cmd_dir = "%s/packages/url2xpl/" % self._package_path
                 self._xml_stat_dir = "%s/packages/stats/" % self._package_path
             else:
                 self.log.info("No package path defined in config file")
                 self._package_path = None
+                self._design_dir = "%s/share/domogik/design/" % conf['custom_prefix']
                 self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
                 self._xml_stat_dir = "%s/share/domogik/stats/" % conf['custom_prefix']
     

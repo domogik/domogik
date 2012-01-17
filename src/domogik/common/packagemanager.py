@@ -644,6 +644,13 @@ class PackageManager():
                 if priority == None or priority < file_info["priority"]:
                     self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
                     pkg_xml.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
+
+                    # try to cache the icon (if it exists)
+                    try:
+                        urllib.urlretrieve(file_info["icon"],  \
+                             "%s/%s.png" % (cache_folder, file_info["suffixe"]))
+                    except:
+                        self.log("Warning : no icon found : '%s'" % file_info["icon"])
             except:
                 self.log("Error while caching file from '%s' : %s" % (file_info["file"], traceback.format_exc()))
 
@@ -665,6 +672,8 @@ class PackageManager():
                         break
                 else:
                     my_list.append({"file" : "%sxml/%s" % (url, data.strip()),
+                                    "icon" : "%sicon/%s" % (url, data.strip()),
+                                    "suffixe" :  data.strip().replace("/", "-"),
                                     "priority" : priority,
                                     "repo_url" : url})
             return my_list
@@ -721,9 +730,10 @@ class PackageManager():
         """
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
-                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                if fullname == pkg_xml.fullname and release == pkg_xml.release:
-                    return pkg_xml.priority
+                if f[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                    if fullname == pkg_xml.fullname and release == pkg_xml.release:
+                        return pkg_xml.priority
         return None
 
     def get_packages_list(self, fullname = None, release = None, pkg_type = None):
@@ -737,25 +747,26 @@ class PackageManager():
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
-                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
-                    if pkg_type == None or pkg_type == pkg_xml.type:
-                        pkg_list.append({"id" : pkg_xml.id,
-                                     "type" : pkg_xml.type,
-                                     "fullname" : pkg_xml.fullname,
-                                     "release" : pkg_xml.release,
-                                     "source" : pkg_xml.source,
-                                     "genrated" : pkg_xml.generated,
-                                     "techno" : pkg_xml.techno,
-                                     "doc" : pkg_xml.doc,
-                                     "desc" : pkg_xml.desc,
-                                     "changelog" : pkg_xml.changelog,
-                                     "author" : pkg_xml.author,
-                                     "email" : pkg_xml.email,
-                                     "domogik_min_release" : pkg_xml.domogik_min_release,
-                                     "priority" : pkg_xml.priority,
-                                     "dependencies" : pkg_xml.dependencies,
-                                     "package_url" : pkg_xml.package_url})
+                if f[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                    if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
+                        if pkg_type == None or pkg_type == pkg_xml.type:
+                            pkg_list.append({"id" : pkg_xml.id,
+                                         "type" : pkg_xml.type,
+                                         "fullname" : pkg_xml.fullname,
+                                         "release" : pkg_xml.release,
+                                         "source" : pkg_xml.source,
+                                         "generated" : pkg_xml.generated,
+                                         "techno" : pkg_xml.techno,
+                                         "doc" : pkg_xml.doc,
+                                         "desc" : pkg_xml.desc,
+                                         "changelog" : pkg_xml.changelog,
+                                         "author" : pkg_xml.author,
+                                         "email" : pkg_xml.email,
+                                         "domogik_min_release" : pkg_xml.domogik_min_release,
+                                         "priority" : pkg_xml.priority,
+                                         "dependencies" : pkg_xml.dependencies,
+                                         "package_url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['id']))
 
     def get_installed_packages_list(self):
@@ -798,20 +809,21 @@ class PackageManager():
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
-                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                if release == None:
-                    if fullname == pkg_xml.fullname:
-                        pkg_list.append({"fullname" : pkg_xml.fullname,
-                                         "release" : pkg_xml.release,
-                                         "priority" : pkg_xml.priority,
-                                         "source" : pkg_xml.source,
-                                         "xml" : pkg_xml})
-                else:
-                    if fullname == pkg_xml.fullname and release == pkg_xml.release:
-                        pkg_list.append({"fullname" : pkg_xml.fullname,
-                                         "release" : pkg_xml.release,
-                                         "priority" : pkg_xml.priority,
-                                         "xml" : pkg_xml})
+                if f[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                    if release == None:
+                        if fullname == pkg_xml.fullname:
+                            pkg_list.append({"fullname" : pkg_xml.fullname,
+                                             "release" : pkg_xml.release,
+                                             "priority" : pkg_xml.priority,
+                                             "source" : pkg_xml.source,
+                                             "xml" : pkg_xml})
+                    else:
+                        if fullname == pkg_xml.fullname and release == pkg_xml.release:
+                            pkg_list.append({"fullname" : pkg_xml.fullname,
+                                             "release" : pkg_xml.release,
+                                             "priority" : pkg_xml.priority,
+                                             "xml" : pkg_xml})
         if len(pkg_list) == 0:
             if release == None:
                 release = "*"
