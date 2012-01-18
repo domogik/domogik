@@ -870,6 +870,7 @@ class RestHandler(BaseHTTPRequestHandler):
                                  self.wfile, \
                                  self.rfile, \
                                  self.send_http_response_ok, \
+                                 self.send_http_response_404, \
                                  self.send_http_response_error, \
                                  self.send_http_response_text_plain, \
                                  self.send_http_response_text_html)
@@ -908,6 +909,25 @@ class RestHandler(BaseHTTPRequestHandler):
                     self.server.handler_params[0].log.debug("Send HTTP data : %s" % data.encode("utf-8"))
                 self.wfile.write(data.encode("utf-8"))
         except IOError as err: 
+            if err.errno == errno.EPIPE:
+                # [Errno 32] Broken pipe : client closed connexion
+                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
+                return
+            else:
+                raise err
+
+
+
+    def send_http_response_404(self):
+        """ Send a 404 error
+        """
+        self.server.handler_params[0].log.warning("Send HTTP header for 404")
+        try:
+            self.send_response(404)
+            self.send_header("Content-Type","text/html")
+            self.end_headers()       
+            self.wfile.write("404 - Not found") 
+        except IOError as err:
             if err.errno == errno.EPIPE:
                 # [Errno 32] Broken pipe : client closed connexion
                 self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")

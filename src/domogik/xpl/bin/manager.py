@@ -402,9 +402,9 @@ class SysManager(XplPlugin):
         """ Internal callback for receiving system messages
         @param message : xpl message received
         """
-        self.log.debug("Call _system_action_cb")
-
         cmd = message.data['command']
+        self.log.debug("Call _system_action_cb for cmd='%s'" % cmd)
+
         try:
            plg = message.data['plugin']
         except KeyError:
@@ -860,6 +860,7 @@ class SysManager(XplPlugin):
     def _send_plugin_list(self):
         """ send compoennt list
         """
+        self.log.debug("Call _send_plugin_list")
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')

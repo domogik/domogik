@@ -94,6 +94,7 @@ class ProcessRequest():
                  wfile, \
                  rfile, \
                  cb_send_http_response_ok, \
+                 cb_send_http_response_404, \
                  cb_send_http_response_error, \
                  cb_send_http_response_text_plain, \
                  cb_send_http_response_text_html):
@@ -104,6 +105,8 @@ class ProcessRequest():
             @param command : GET, POST, PUT, OPTIONS, etc
             @param cb_send_http_response_ok : callback for function
                                               REST.send_http_response_ok 
+            @param cb_send_http_response_404 : callback for function
+                                              REST.send_http_response_404 
             @param cb_send_http_response_error : callback for function
                                               REST.send_http_response_error 
             @param cb_send_http_response_text_plain : callback for function
@@ -124,6 +127,7 @@ class ProcessRequest():
         self.wfile = wfile
         self.rfile = rfile
         self.send_http_response_ok = cb_send_http_response_ok
+        self.send_http_response_404 = cb_send_http_response_404
         self.send_http_response_error = cb_send_http_response_error
         self.send_http_response_text_plain = cb_send_http_response_text_plain
         self.send_http_response_text_html = cb_send_http_response_text_html
@@ -3505,45 +3509,7 @@ target=*
         """ Get a file from rest repository
         """
         # Check file opening
-        try:
-            my_file = open("%s/%s" % (self.repo_dir, file_name), "rb")
-        except IOError:
-            self.send_http_response_error(999, "No file '%s' available" % file_name,
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        # Get informations on file
-        ctype = None
-        file_stat = os.fstat(my_file.fileno())
-        last_modified = os.stat("%s%s" % (self.repo_dir, file_name))[stat.ST_MTIME]
-
-        # Get mimetype information
-        if not mimetypes.inited:
-            mimetypes.init()
-        extension_map = mimetypes.types_map.copy()
-        extension_map.update({
-                '' : 'application/octet-stream', # default
-                '.py' : 'text/plain'})
-        basename, extension = os.path.splitext(file)
-        if extension in extension_map:
-            ctype = extension_map[extension] 
-        else:
-            extension = extension.lower()
-            if extension in extension_map:
-                ctype = extension_map[extension] 
-            else:
-                ctype = extension_map[''] 
-
-        # Send file
-        self.send_response(200)
-        self.send_header("Content-type", ctype)
-        self.send_header("Content-Length", str(file_stat[6]))
-        self.send_header("Last-Modified", last_modified)
-        self.end_headers()
-        shutil.copyfileobj(my_file, self.wfile)
-        my_file.close(
-
-    )
+        self._download_file("%s/%s" % (self.repo_dir, file_name))
 
 
     ##### TEMPORARY FUNCTION THAT WILL NOT BE USED (AND DELETED)
@@ -4317,40 +4283,23 @@ target=*
         """ Download a package icon storen in cache
         """
         icon_name = "%s-%s-%s.png" % (type, id, release)
-        try:
-            file_name = "%s/%s" % (REPO_CACHE_DIR, icon_name)
-            self._download_file(file_name)
-        except IOError:
-            self.send_http_response_error(999, "No icon '%s' available" % file_name,
-                                          self.jsonp, self.jsonp_cb)
-            return
+        file_name = "%s/%s" % (REPO_CACHE_DIR, icon_name)
+        self._download_file(file_name)
 
 
     def _rest_package_icon_installed(self, type, id):
         """ Download a package icon storen in cache
         """
-        try:
-            file_name = "%s/%s/%s/icon.png" % (self._design_dir, type, id)
-
-            self._download_file(file_name)
-        except IOError:
-            self.send_http_response_error(999, "No icon '%s' available" % file_name,
-                                          self.jsonp, self.jsonp_cb)
-            return
+        file_name = "%s/%s/%s/icon.png" % (self._design_dir, type, id)
+        self._download_file(file_name)
 
 
     def _rest_package_download(self, type, id, release):
         """ Download a package storen in cache
         """
         pkg_path = "%s-%s-%s.tgz" % (type, id, release)
-        # Check file opening
-        try:
-            file_name = "%s/%s" % (PKG_CACHE_DIR, pkg_path)
-            self._download_file(file_name)
-        except IOError:
-            self.send_http_response_error(999, "No file '%s' available" % file_name,
-                                          self.jsonp, self.jsonp_cb)
-            return
+        file_name = "%s/%s" % (PKG_CACHE_DIR, pkg_path)
+        self._download_file(file_name)
 
 
 
@@ -4505,7 +4454,10 @@ target=*
         """ Download a file
         """
         # Check file opening
-        my_file = open("%s" % (file_name), "rb")
+        try:
+            my_file = open("%s" % (file_name), "rb")
+        except IOError:
+            self.send_http_response_404()
 
         # Get informations on file
         ctype = None
