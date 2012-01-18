@@ -178,7 +178,7 @@ class ProcessRequest():
         self.stat_mgr =  self.handler_params[0].stat_mgr
 
         self._hosts_list = self.handler_params[0]._hosts_list
-        self.installed_packages = self.handler_params[0].installed_packages
+        self.get_installed_packages = self.handler_params[0].get_installed_packages
 
         # global init
         self.jsonp = False
@@ -3856,9 +3856,10 @@ target=*
         json_data.set_data_type("package")
 
         list_installed = []
-        if self.installed_packages.has_key(host):
-            if self.installed_packages[host].has_key(pkg_type):
-                for elt in self.installed_packages[host][pkg_type]:
+        pkg_list = self.get_installed_packages()
+        if pkg_list.has_key(host):
+            if pkg_list[host].has_key(pkg_type):
+                for elt in pkg_list[host][pkg_type]:
                     list_installed.append(elt["id"])
 
         pkg_mgr = PackageManager()
@@ -3882,9 +3883,10 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
-        if self.installed_packages.has_key(host):
-            if self.installed_packages[host].has_key(pkg_type):
-                for elt in self.installed_packages[host][pkg_type]:
+        pkg_list = self.get_installed_packages()
+        if pkg_list.has_key(host):
+            if pkg_list[host].has_key(pkg_type):
+                for elt in pkg_list[host][pkg_type]:
                     json_data.add_data(elt)
         self.send_http_response_ok(json_data.get())
 

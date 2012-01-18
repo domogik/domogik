@@ -73,6 +73,7 @@ import errno
 import pyinotify
 import calendar
 import tempfile
+from threading import Semaphore
 
 REST_API_VERSION = "0.5"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
@@ -409,8 +410,10 @@ class Rest(XplPlugin):
             self.enable_hbeat()
 
             # Ask for installed packages on all hosts
-            self.installed_packages = {}
-            self._get_installed_packages()
+            # Semaphore init for installed package list update
+            self.sema_installed = Semaphore(value=1)
+            self._installed_packages = {}
+            self._get_installed_packages_from_manager()
 
             # Launch server, stats
             self.log.info("REST Initialisation OK")
@@ -618,7 +621,7 @@ class Rest(XplPlugin):
                 self._hosts_list[instance]["status"] = "off"
 
 
-    def _get_installed_packages(self):
+    def _get_installed_packages_from_manager(self):
         """ Send a xpl message to all managers to get installed packages list
         """
 
@@ -631,15 +634,25 @@ class Rest(XplPlugin):
         self.myxpl.send(message)
 
 
+    def get_installed_packages(self):
+        """ return list of installed packages
+            There is a semaphore in order not to return the list when it is
+            updated (may be incomplete)
+        """
+        self.sema_installed.acquire()
+        self.sema_installed.release()
+        return self._installed_packages
+
     def _list_installed_packages(self, message):
         """ Send a xpl message to manager to get installed packages list
             @param host : host
             @param pkg_type : type of package
         """
-
+        
+        self.sema_installed.acquire()
         # process message
         host = message.data["host"]
-        self.installed_packages[host] = {}
+        self._installed_packages[host] = {}
 
         pkg_mgr = PackageManager()
         idx = 0
@@ -659,12 +672,13 @@ class Rest(XplPlugin):
                         "enabled" : enabled}
                 updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
                 data["updates"] = updates
-                if self.installed_packages[host].has_key(pkg_type) == False:
-                    self.installed_packages[host][pkg_type] = []
-                self.installed_packages[host][pkg_type].append(data)
+                if self._installed_packages[host].has_key(pkg_type) == False:
+                    self._installed_packages[host][pkg_type] = []
+                self._installed_packages[host][pkg_type].append(data)
                 idx += 1
             except KeyError:
                 loop_again = False
+        self.sema_installed.release()
     
 
 
