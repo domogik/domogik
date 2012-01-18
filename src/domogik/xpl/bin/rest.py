@@ -639,6 +639,7 @@ class Rest(XplPlugin):
 
         # process message
         host = message.data["host"]
+        self.installed_packages[host] = {}
 
         pkg_mgr = PackageManager()
         idx = 0
@@ -658,8 +659,6 @@ class Rest(XplPlugin):
                         "enabled" : enabled}
                 updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
                 data["updates"] = updates
-                if self.installed_packages.has_key(host) == False:
-                    self.installed_packages[host] = {}
                 if self.installed_packages[host].has_key(pkg_type) == False:
                     self.installed_packages[host][pkg_type] = []
                 self.installed_packages[host][pkg_type].append(data)

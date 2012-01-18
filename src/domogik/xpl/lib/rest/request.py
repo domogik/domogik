@@ -3856,8 +3856,10 @@ target=*
         json_data.set_data_type("package")
 
         list_installed = []
-        for elt in self.installed_packages[host][pkg_type]:
-            list_installed.append(elt["id"])
+        if self.installed_packages.has_key(host):
+            if self.installed_packages[host].has_key(pkg_type):
+                for elt in self.installed_packages[host][pkg_type]:
+                    list_installed.append(elt["id"])
 
         pkg_mgr = PackageManager()
         pkg_list = []
@@ -3880,8 +3882,10 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
-        for elt in self.installed_packages[host][pkg_type]:
-            json_data.add_data(elt)
+        if self.installed_packages.has_key(host):
+            if self.installed_packages[host].has_key(pkg_type):
+                for elt in self.installed_packages[host][pkg_type]:
+                    json_data.add_data(elt)
         self.send_http_response_ok(json_data.get())
 
     #def _rest_package_send_xpl_to_get_installed_list(self, host, pkg_type):
