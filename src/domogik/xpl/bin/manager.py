@@ -41,7 +41,7 @@ import os
 import sys
 import time
 import stat
-from threading import Event, currentThread, Thread, enumerate, Lock
+from threading import Event, currentThread, Thread, enumerate, Lock, Semaphore
 from optparse import OptionParser
 import traceback
 from subprocess import Popen, PIPE
@@ -108,6 +108,8 @@ class SysManager(XplPlugin):
     def __init__(self):
         """ Init manager and start listeners
         """
+        # Semaphore init
+        self.sema_installed = Semaphore(value=1)
 
         # Check parameters 
         parser = OptionParser()
@@ -321,6 +323,9 @@ class SysManager(XplPlugin):
             self._write_fifo("OK", "System manager initialized.\n")
             if self._state_fifo != None:
                 self._state_fifo.close()
+
+            ### Send installed packages list
+            self._pkg_list_installed()
 
             ### make an eternal loop to ping plugins
             # the goal is to detect manually launched plugins
@@ -1016,8 +1021,7 @@ class SysManager(XplPlugin):
             return
 
         if command == "installed-packages-list":
-            my_uuid = message.data["uuid"]
-            self._pkg_list_installed(my_uuid)
+            self._pkg_list_installed()
 
         if command == "check-dependencies" and host != "*":
             self._pkg_check_dependencies(message)
@@ -1029,15 +1033,16 @@ class SysManager(XplPlugin):
             self._pkg_uninstall(message)
 
 
-    def _pkg_list_installed(self, my_uuid):
+    def _pkg_list_installed(self):
         """ List packages installed on host
+            This function use a semaphore to be used only by 1 command at a time
         """
+        self.sema_installed.acquire()
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'installed-packages-list'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
-        mess.add_data({'uuid' : my_uuid})
         cfg_plugins = Loader('plugins')
         cfg_plugin_list = dict(cfg_plugins.load(refresh = True)[1])
         idx = 0
@@ -1060,6 +1065,8 @@ class SysManager(XplPlugin):
                            'enabled%s' % idx : enabled})
             idx += 1
         self.myxpl.send(mess)
+        time.sleep(0.3) # make sure to make a pause between 2 messages
+        self.sema_installed.release()
 
     def _pkg_check_dependencies(self, message):
         """ Check if python dependencies for a package are installed
@@ -1190,6 +1197,8 @@ class SysManager(XplPlugin):
             mess.add_data({'error' : 'Error while installing package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while installing package '%s' : %s" % (package, traceback.format_exc()))
         self.myxpl.send(mess)          
+        if package_part == PKG_PART_XPL:
+            self._pkg_list_installed()
 
 
     def _pkg_uninstall(self, message):
@@ -1236,6 +1245,9 @@ class SysManager(XplPlugin):
             mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, id, traceback.format_exc()))
         self.myxpl.send(mess)          
+
+        # send updated list of installed packages
+        self._pkg_list_installed()
 
 
 

@@ -178,6 +178,7 @@ class ProcessRequest():
         self.stat_mgr =  self.handler_params[0].stat_mgr
 
         self._hosts_list = self.handler_params[0]._hosts_list
+        self.installed_packages = self.handler_params[0].installed_packages
 
         # global init
         self.jsonp = False
@@ -3854,24 +3855,9 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
 
-        # for the host, get the packages already installed
-        (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, pkg_type)
         list_installed = []
-        if res == True:
-            message = data
-            # process message
-            cmd = message.data['command']
-            host = message.data["host"]
-    
-            idx = 0
-            loop_again = True
-            while loop_again:
-                try:
-                    if pkg_type == message.data["type"+str(idx)]:
-                        list_installed.append(message.data["id"+str(idx)])
-                    idx += 1
-                except:
-                    loop_again = False
+        for elt in self.installed_packages[host][pkg_type]:
+            list_installed.append(elt["id"])
 
         pkg_mgr = PackageManager()
         pkg_list = []
@@ -3890,79 +3876,43 @@ target=*
             @param pkg_type : type of package
         """
         self.log.debug("Package : ask for installed packages list")
-
-        (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, pkg_type)
-        if res == True: # ok
-            message = data
-        else:
-            self.send_http_response_error(999, data,
-                                          self.jsonp, self.jsonp_cb)
-            return
-
+       
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
-
-        # process message
-        cmd = message.data['command']
-        host = message.data["host"]
-
-        pkg_mgr = PackageManager()
-        idx = 0
-        loop_again = True
-        while loop_again:
-            try:
-                if pkg_type == message.data["type"+str(idx)]:
-                    if  message.data["enabled"+str(idx)].lower() == "yes":
-                        enabled = True
-                    else:
-                        enabled = False
-                    data = {"fullname" : message.data["fullname"+str(idx)],
-                            "id" : message.data["id"+str(idx)],
-                            "release" : message.data["release"+str(idx)],
-                            "type" : message.data["type"+str(idx)],
-                            "source" : message.data["source"+str(idx)],
-                            "enabled" : enabled}
-                    updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
-                    data["updates"] = updates
-                    json_data.add_data(data)
-                idx += 1
-            except KeyError:
-                loop_again = False
-    
+        for elt in self.installed_packages[host][pkg_type]:
+            json_data.add_data(elt)
         self.send_http_response_ok(json_data.get())
 
-    def _rest_package_send_xpl_to_get_installed_list(self, host, pkg_type):
-        """ Send a xpl message to manager to get installed packages list
-            @param host : host
-            @param pkg_type : type of package
-        """
+    #def _rest_package_send_xpl_to_get_installed_list(self, host, pkg_type):
+    #    """ Send a xpl message to manager to get installed packages list
+    #        @param host : host
+    #        @param pkg_type : type of package
+    #    """
 
-        ### Send xpl message to get list
-        message = XplMessage()
-        message.set_type("xpl-cmnd")
-        message.set_schema("domogik.package")
-        message.add_data({"command" : "installed-packages-list"})
-        message.add_data({"host" : host})
-        my_uuid = str(uuid.uuid4())
-        message.add_data({"uuid" : my_uuid})
-        self.myxpl.send(message)
+    #    ### Send xpl message to get list
+    #    message = XplMessage()
+    #    message.set_type("xpl-cmnd")
+    #    message.set_schema("domogik.package")
+    #    message.add_data({"command" : "installed-packages-list"})
+    #    message.add_data({"host" : host})
+    #    self.myxpl.send(message)
 
-        ### Wait for answer
-        # get xpl message from queue
-        # make a time loop of one second after first xpl-trig reception
-        messages = []
-        try:
-            # Get answer for command
-            self.log.debug("Package repository list : wait for first answer...")
-            message = self._get_from_queue(self._queue_package, 
-                                                 "xpl-trig", 
-                                                 "domogik.package",
-                                                 filter_data = {"command" : "installed-packages-list", "uuid" : my_uuid})
-        except Empty:
-            self.log.debug("Installed packages list : no answer")
-            return False, "No data or timeout on getting installed packages list"
-        return True, message
+    #    ### Wait for answer
+    #    # get xpl message from queue
+    #    # make a time loop of one second after first xpl-trig reception
+    #    messages = []
+    #    try:
+    #        # Get answer for command
+    #        self.log.debug("Package repository list : wait for first answer...")
+    #        message = self._get_from_queue(self._queue_package, 
+    #                                             "xpl-trig", 
+    #                                             "domogik.package",
+    #                                             filter_data = {"command" : "installed-packages-list"})
+    #    except Empty:
+    #        self.log.debug("Installed packages list : no answer")
+    #        return False, "No data or timeout on getting installed packages list"
+    #    return True, message
 
 
     def _rest_package_dependency(self, host, type, id, release):

@@ -56,6 +56,7 @@ from domogik.xpl.lib.rest.eventrequest import RequestEvents
 from domogik.xpl.lib.rest.stat import StatsManager
 from domogik.xpl.lib.rest.request import ProcessRequest
 from domogik.common.configloader import Loader
+from domogik.common.packagemanager import PackageManager
 from xml.dom import minidom
 import time
 import urllib
@@ -330,6 +331,10 @@ class Rest(XplPlugin):
     
             # define listeners for queues
             self.log.debug("Create listeners")
+            Listener(self._list_installed_packages, self.myxpl, \
+                     {'schema': 'domogik.package',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'installed-packages-list'})
             Listener(self._add_to_queue_package, self.myxpl, \
                      {'schema': 'domogik.package',
                       'xpltype': 'xpl-trig'})
@@ -402,6 +407,10 @@ class Rest(XplPlugin):
 
             # Enable hbeat
             self.enable_hbeat()
+
+            # Ask for installed packages on all hosts
+            self.installed_packages = {}
+            self._get_installed_packages()
 
             # Launch server, stats
             self.log.info("REST Initialisation OK")
@@ -607,6 +616,58 @@ class Rest(XplPlugin):
         for instance in self._hosts_list:
             if (now - self._hosts_list[instance]["last_seen"] > self._hosts_list[instance]["interval"]):
                 self._hosts_list[instance]["status"] = "off"
+
+
+    def _get_installed_packages(self):
+        """ Send a xpl message to all managers to get installed packages list
+        """
+
+        ### Send xpl message to get list
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "installed-packages-list"})
+        message.add_data({"host" : "*"})
+        self.myxpl.send(message)
+
+
+    def _list_installed_packages(self, message):
+        """ Send a xpl message to manager to get installed packages list
+            @param host : host
+            @param pkg_type : type of package
+        """
+
+        # process message
+        host = message.data["host"]
+
+        pkg_mgr = PackageManager()
+        idx = 0
+        loop_again = True
+        while loop_again:
+            try:
+                pkg_type = message.data["type"+str(idx)]
+                if  message.data["enabled"+str(idx)].lower() == "yes":
+                    enabled = True
+                else:
+                    enabled = False
+                data = {"fullname" : message.data["fullname"+str(idx)],
+                        "id" : message.data["id"+str(idx)],
+                        "release" : message.data["release"+str(idx)],
+                        "type" : message.data["type"+str(idx)],
+                        "source" : message.data["source"+str(idx)],
+                        "enabled" : enabled}
+                updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
+                data["updates"] = updates
+                if self.installed_packages.has_key(host) == False:
+                    self.installed_packages[host] = {}
+                if self.installed_packages[host].has_key(pkg_type) == False:
+                    self.installed_packages[host][pkg_type] = []
+                self.installed_packages[host][pkg_type].append(data)
+                idx += 1
+            except KeyError:
+                loop_again = False
+    
+
 
 
     def start_http(self):
