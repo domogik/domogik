@@ -530,7 +530,6 @@ class Rest(XplPlugin):
                     for key in filter_data:
                         # take care of final "%" in order to search data starting by filter_data[key]
                         if filter_data[key][-1] == "%":
-                            self.log_queue.debug("- MODE : * search : %s / %s" % (filter_data[key], message.data[key]))
                             msg_data = str(message.data[key])
                             my_filter_data = str(filter_data[key])
                             len_data = len(my_filter_data) - 1
@@ -538,8 +537,10 @@ class Rest(XplPlugin):
                                 keep_data = False
                         # normal search
                         else:
-                            self.log_queue.debug("- MODE : normal search : %s / %s" % (filter_data[key], message.data[key]))
-                            if message.data[key].lower() != filter_data[key].lower():
+                            if message.data.has_key(key):
+                                if message.data[key].lower() != filter_data[key].lower():
+                                    keep_data = False
+                            else:
                                 keep_data = False
     
                 # if message is ok for us, return it

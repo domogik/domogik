@@ -1196,9 +1196,10 @@ class SysManager(XplPlugin):
         except:
             mess.add_data({'error' : 'Error while installing package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while installing package '%s' : %s" % (package, traceback.format_exc()))
-        self.myxpl.send(mess)          
         if package_part == PKG_PART_XPL:
             self._pkg_list_installed()
+            time.sleep(1) # make sure rest receive the updated list before the ack of install
+        self.myxpl.send(mess)          
 
 
     def _pkg_uninstall(self, message):
@@ -1244,10 +1245,12 @@ class SysManager(XplPlugin):
         except:
             mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, id, traceback.format_exc()))
-        self.myxpl.send(mess)          
 
         # send updated list of installed packages
         self._pkg_list_installed()
+        time.sleep(0.5) # make sure rest receive the updated list before the ack of install
+
+        self.myxpl.send(mess)          
 
 
 
