@@ -866,36 +866,39 @@ class SysManager(XplPlugin):
     def _send_plugin_list(self):
         """ send compoennt list
         """
-        self.log.debug("Call _send_plugin_list")
-        mess = XplMessage()
-        mess.set_type('xpl-trig')
-        mess.set_schema('domogik.system')
-        mess.add_data({'command' :  'list'})
-        # notice : this entry seems to be duplicate because of pluginX-host
-        # entries. But this is need by rest in /plugin/list for multi hosts
-        mess.add_data({'host' :  self.get_sanitized_hostname()})
-        # plugins
-        idx = 0
-        for plugin in self._plugins:
-            mess.add_data({'plugin'+str(idx)+'-name' : plugin["name"]})
-            mess.add_data({'plugin'+str(idx)+'-type' : plugin["type"]})
-            mess.add_data({'plugin'+str(idx)+'-techno' : plugin["technology"]})
-            #mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
-            mess.add_data({'plugin'+str(idx)+'-status' : plugin["status"]})
-            mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
-            idx += 1
-        # externals
-        for external in self._externals:
-            mess.add_data({'plugin'+str(idx)+'-name' : external["name"]})
-            mess.add_data({'plugin'+str(idx)+'-type' : external["type"]})
-            mess.add_data({'plugin'+str(idx)+'-techno' : external["technology"]})
-            mess.add_data({'plugin'+str(idx)+'-desc' : external["description"]})
-            mess.add_data({'plugin'+str(idx)+'-status' : external["status"]})
-            mess.add_data({'plugin'+str(idx)+'-host' : external["host"]})
-            idx += 1
-        # mess.add_data({'host' : self.get_sanitized_hostname()})
-        self.log.debug("Send xPL in function send_plugin_list")
-        self.myxpl.send(mess)
+        try:
+            self.log.debug("Call _send_plugin_list")
+            mess = XplMessage()
+            mess.set_type('xpl-trig')
+            mess.set_schema('domogik.system')
+            mess.add_data({'command' :  'list'})
+            # notice : this entry seems to be duplicate because of pluginX-host
+            # entries. But this is need by rest in /plugin/list for multi hosts
+            mess.add_data({'host' :  self.get_sanitized_hostname()})
+            # plugins
+            idx = 0
+            for plugin in self._plugins:
+                mess.add_data({'plugin'+str(idx)+'-name' : plugin["name"]})
+                mess.add_data({'plugin'+str(idx)+'-type' : plugin["type"]})
+                mess.add_data({'plugin'+str(idx)+'-techno' : plugin["technology"]})
+                #mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
+                mess.add_data({'plugin'+str(idx)+'-status' : plugin["status"]})
+                mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
+                idx += 1
+            # externals
+            for external in self._externals:
+                mess.add_data({'plugin'+str(idx)+'-name' : external["name"]})
+                mess.add_data({'plugin'+str(idx)+'-type' : external["type"]})
+                mess.add_data({'plugin'+str(idx)+'-techno' : external["technology"]})
+                mess.add_data({'plugin'+str(idx)+'-desc' : external["description"]})
+                mess.add_data({'plugin'+str(idx)+'-status' : external["status"]})
+                mess.add_data({'plugin'+str(idx)+'-host' : external["host"]})
+                idx += 1
+            # mess.add_data({'host' : self.get_sanitized_hostname()})
+            self.log.debug("Send xPL in function send_plugin_list")
+            self.myxpl.send(mess)
+        except:
+            self.log.error("Error while sending plugin list : %s" % traceback.format_exc())
 
     def _send_plugin_detail(self, plg):
         """ send details about a component 
