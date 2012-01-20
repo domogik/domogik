@@ -2608,10 +2608,9 @@ target=*
                                         "status" : plg_status, 
                                         "type" : plg_type, 
                                         "host" : plg_host})
-                    if host_list.has_key(plg_host):
-                        host_list[plg_host].append(plugin_data)
-                    else:
-                        host_list[plg_host] = [plugin_data]
+                    # this erase any previous data for a given host to avoid
+                    # duplicate entries
+                    host_list[plg_host] = [plugin_data]
                     idx += 1
                 except:
                     loop_again = False
