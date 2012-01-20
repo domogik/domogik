@@ -2,8 +2,7 @@
 <package type="external">
   <id>rfxcom</id>
   <technology>rfxcom</technology>
-  <description>RFXCOM with xPL support
-LAN 433.92MHz receiver + transmitter</description>
+  <description>RFXCOM with xPL support LAN 433.92MHz receiver transmitter</description>
   <changelog>
 0.1
 - create 
