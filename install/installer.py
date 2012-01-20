@@ -240,6 +240,10 @@ def usage():
 if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hrd", ["help", "reset", "dump"])
+        if len(args) != 0:
+            usage()
+            sys.exit(2)
+        
     except getopt.GetoptError:
         usage()
         sys.exit(2)
