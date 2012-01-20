@@ -823,9 +823,9 @@ class SysManager(XplPlugin):
         plugin_list = dict(cfg_plugins)
         state_thread = {}
         for plugin in plugin_list:
-            print(plugin)
             self.log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
             if plugin_list[plugin] == "enabled":
+                print(plugin)
                 # try open xml file
                 xml_file = "%s/%s.xml" % (self._xml_plugin_directory, plugin)
                 try:
@@ -975,6 +975,8 @@ class SysManager(XplPlugin):
         subp = Popen("dmgenplug -f %s" % name, shell=True)
         pid = subp.pid
         subp.communicate()
+        self._pkg_list_installed()
+        time.sleep(1) # make sure rest receive the updated list before the ack of enable
         self.myxpl.send(mess)          
 
     def _disable_plugin(self, name):
@@ -991,6 +993,8 @@ class SysManager(XplPlugin):
         subp = Popen("dmgdisplug %s" % name, shell=True)
         pid = subp.pid
         subp.communicate()
+        self._pkg_list_installed()
+        time.sleep(1) # make sure rest receive the updated list before the ack of disable
         self.myxpl.send(mess)          
 
     def _send_broadcast_hbeat(self):
@@ -1048,7 +1052,6 @@ class SysManager(XplPlugin):
         cfg_plugin_list = dict(cfg_plugins.load(refresh = True)[1])
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
-            print package
             # I guess all plugins are naturally activated except for plugins
             if package['type'] == "plugin":
                 if cfg_plugin_list.has_key(package['id']) and cfg_plugin_list[package['id']] == "enabled":
@@ -1110,7 +1113,6 @@ class SysManager(XplPlugin):
                 found = False
                 try:
                     for rel in crawler.get_releases(dep):
-                        print rel
                         if  ver.match(rel._version):
                             found = True
                             mess.add_data({"dep%s-candidate" % idx : rel._version})
@@ -1249,7 +1251,7 @@ class SysManager(XplPlugin):
 
         # send updated list of installed packages
         self._pkg_list_installed()
-        time.sleep(0.5) # make sure rest receive the updated list before the ack of install
+        time.sleep(1) # make sure rest receive the updated list before the ack of install
 
         self.myxpl.send(mess)          
 

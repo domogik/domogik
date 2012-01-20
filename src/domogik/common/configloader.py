@@ -44,6 +44,8 @@ import os
 import pwd 
 import ConfigParser
 import threading
+import time
+from threading import Semaphore
 
 
 class Loader():
@@ -58,6 +60,9 @@ class Loader():
         Load the configuration for a part of the Domogik system
         @param plugin_name name of the plugin to load config from
         '''
+        # Semaphore init
+        self.sema_load = Semaphore(value=1)
+
         self.main_conf_name = "domogik.cfg"
         self.valid_files = None
         self.plugin_name = plugin_name
@@ -90,17 +95,8 @@ class Loader():
         @param refresh : force refreshing config
         @return pair (main_config, plugin_config)
         '''
+        self.sema_load.acquire()
         sys_file = ''
-        #if os.path.isfile('/etc/default/domogik'):
-        #    sys_file = '/etc/default/domogik'
-        #elif os.path.isfile('/etc/conf.d/domogik'):
-        #    sys_file = '/etc/conf.d/domogik'
-        #homedir = os.getenv('HOME')
-        #if sys_file != '':
-        #    f = open(sys_file)
-        #    data = f.readlines()
-        #    data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
-        #    homedir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
         main_result = {}
         if self.__class__.config == None or refresh == True:
             self.__class__.config = ConfigParser.ConfigParser()
@@ -113,13 +109,16 @@ class Loader():
             main_result[k] = v
         #Check the plugin conf file if defined
         if self.plugin_name == None:
+            self.sema_load.release()
             return (main_result, None)
 
         if self.plugin_name:
+            self.sema_load.release()
             return (main_result, self.__class__.config.items(self.plugin_name))
         else:
             #If we're here, there is no plugin config
             return (main_result, None)
+            self.sema_load.release()
 
     def set(self, section, key, value):
         """ Set a key value for a section in config file and write it
