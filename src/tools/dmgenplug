@@ -54,24 +54,10 @@ function enable {
 }
 
 #check params
-[ $# -eq 0 ] && syntax
-[ $# -gt 2 ] && syntax
+[ $# -ne 1 ] && syntax
 [ $# -eq 1 ] && PLUGIN=$1
-if [ $# -gt 1 -a "$1" != "-f" ];then  
-    syntax
-elif [ $# -gt 1 -a "$1" == "-f" ];then  
-    FORCE=1
-    PLUGIN=$2
-fi
 
 #check if plugin exists
 get_user
 plugin_exists
-if [ $EXISTS -eq 0 ];then
-    enable
-elif [ $FORCE ];then
-    enable
-else
-    echo "WARNING : The plugin does not exists and '-f' not used, do nothing."
-    exit 2
-fi
+enable
