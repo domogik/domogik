@@ -43,10 +43,13 @@
       <default-value>HIGH</default-value>
     </key>
   </configuration-keys>
+  <files/>
+<!--
   <files>
     <file path="src/share/domogik/design/plugin/bts_gen/icon.png"/>
     <file path="src/share/domogik/plugins/bts_gen.xml"/>
   </files>
+-->
   <dependencies/>
   <device_technology>
       <id>bts</id>

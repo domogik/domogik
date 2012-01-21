@@ -113,12 +113,13 @@ class Loader():
             return (main_result, None)
 
         if self.plugin_name:
+            ret =  (main_result, self.__class__.config.items(self.plugin_name))
             self.sema_load.release()
-            return (main_result, self.__class__.config.items(self.plugin_name))
+            return ret
         else:
             #If we're here, there is no plugin config
-            return (main_result, None)
             self.sema_load.release()
+            return (main_result, None)
 
     def set(self, section, key, value):
         """ Set a key value for a section in config file and write it
