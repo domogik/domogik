@@ -252,7 +252,7 @@ class DeviceType(Base):
     id = Column(Unicode(80), primary_key=True)
     device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     device_technology = relation(DeviceTechnology)
-    name = Column(Unicode(30), nullable=False)
+    name = Column(Unicode(80), nullable=False)
     description = Column(UnicodeText())
 
     def __init__(self, id, name, device_technology_id, description=None):
