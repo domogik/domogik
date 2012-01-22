@@ -1,0 +1,59 @@
+<package type="plugin">
+  <id>karotz</id>
+  <technology>karotz</technology>
+  <description>Karotz support</description>
+  <changelog>
+0.1
+- plugin creation
+  </changelog>
+  <version>0.1a0</version>
+  <documentation>http://wiki.domogik.org/plugin_karotz</documentation>
+  <author>Cedric BOLLINI</author>
+  <author-email>cb.dev@sfr.fr</author-email>
+  <domogik-min-version>0.2.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>Name</name>
+      <type>string</type>
+      <description>Karotz Name</description>
+      <default-value></default-value>
+    </key>      
+    <key>
+      <order-id>2</order-id>
+      <name>installid</name>
+      <type>string</type>
+      <description>Domogik installID into Kartoz</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>language</name>
+      <type>string</type>
+      <description>Language spoken by the Karotz (EN, FR, DE, ES)</description>
+      <default-value>EN</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/design/plugin/karotz/icon.png"/>
+    <file path="src/share/domogik/plugins/karotz.xml"/>
+    <file path="src/share/domogik/url2xpl/karotz/tts.xml"/>
+    <file path="src/domogik/xpl/bin/karotz.py"/>
+    <file path="src/domogik/xpl/lib/karotz.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>karotz</id>
+      <name>Karotz</name>
+      <description>Karotz controlling : tts, led, ears</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
+</package>

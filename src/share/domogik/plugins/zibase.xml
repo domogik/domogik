@@ -1,7 +1,7 @@
 <package type="plugin">
   <id>zibase</id>
   <technology>zibase</technology>
-  <description>ZiBase support</description>
+  <description>ZiBase support (zodianet)</description>
   <changelog>
 0.1
 - plugin creation

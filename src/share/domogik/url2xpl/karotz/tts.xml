@@ -1,0 +1,19 @@
+<technology id="karotz">
+  <command name="tts">
+    <schema>karotz.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>tts</command-xpl-value>
+    <parameters>
+      <parameter key="value" location="1"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>karotz.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="tts" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
