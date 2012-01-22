@@ -110,6 +110,7 @@ class SysManager(XplPlugin):
         """
         # Semaphore init
         self.sema_installed = Semaphore(value=1)
+        self.loader_plugins = Loader('plugins')
 
         # Check parameters 
         parser = OptionParser()
@@ -818,8 +819,7 @@ class SysManager(XplPlugin):
         self._plugins = []
 
         # Getplugin list
-        plugins = Loader('plugins')
-        cfg_plugins = plugins.load(refresh = True)[1]
+        cfg_plugins = self.loader_plugins.load(refresh = True)[1]
         plugin_list = dict(cfg_plugins)
         state_thread = {}
         for plugin in plugin_list:
@@ -975,7 +975,7 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : self.get_sanitized_hostname()})
         mess.add_data({'plugin' : name})
 
-        subp = Popen("dmgenplug -f %s" % name, shell=True)
+        subp = Popen("dmgenplug %s" % name, shell=True)
         pid = subp.pid
         subp.communicate()
         self._pkg_list_installed()
@@ -1051,8 +1051,7 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'installed-packages-list'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
-        cfg_plugins = Loader('plugins')
-        cfg_plugin_list = dict(cfg_plugins.load(refresh = True)[1])
+        cfg_plugin_list = dict(self.loader_plugins.load(refresh = True)[1])
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
             # I guess all plugins are naturally activated except for plugins

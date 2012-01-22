@@ -2610,9 +2610,11 @@ target=*
                                         "host" : plg_host})
                     # this erase any previous data for a given host to avoid
                     # duplicate entries
-                    host_list[plg_host] = [plugin_data]
+                    if host_list.has_key(plg_host) == False:
+                        host_list[plg_host] = []
+                    host_list[plg_host].append(plugin_data)
                     idx += 1
-                except:
+                except KeyError:
                     loop_again = False
         for host_name in host_list:
             json_data.add_data({"host" : host_name, 
@@ -4413,6 +4415,7 @@ target=*
             my_file = open("%s" % (file_name), "rb")
         except IOError:
             self.send_http_response_404()
+            return
 
         # Get informations on file
         ctype = None
