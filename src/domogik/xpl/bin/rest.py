@@ -530,10 +530,13 @@ class Rest(XplPlugin):
                     for key in filter_data:
                         # take care of final "%" in order to search data starting by filter_data[key]
                         if filter_data[key][-1] == "%":
-                            msg_data = str(message.data[key])
-                            my_filter_data = str(filter_data[key])
-                            len_data = len(my_filter_data) - 1
-                            if msg_data[0:len_data] != my_filter_data[0:-1]:
+                            if message.data.has_key(key):
+                                msg_data = str(message.data[key])
+                                my_filter_data = str(filter_data[key])
+                                len_data = len(my_filter_data) - 1
+                                if msg_data[0:len_data] != my_filter_data[0:-1]:
+                                    keep_data = False
+                            else:
                                 keep_data = False
                         # normal search
                         else:
@@ -653,6 +656,7 @@ class Rest(XplPlugin):
         self.sema_installed.acquire()
         # process message
         host = message.data["host"]
+        print "H=%s" % host
         self._installed_packages[host] = {}
 
         pkg_mgr = PackageManager()
