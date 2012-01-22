@@ -40,8 +40,7 @@ function plugin_exists {
 
 function syntax {
     echo -e "$0 [-f] <plugin>\n
-Enables a plugin.\n
-    -f : add the plugin if it not exists in config file"
+Enables a plugin."
     exit 1
 }
 
