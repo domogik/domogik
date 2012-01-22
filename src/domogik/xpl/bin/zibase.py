@@ -56,6 +56,7 @@ class ZiBaseMain(XplPlugin):
         self.address = self._config.query('zibase', 'ip')
         self.inter = self._config.query('zibase', 'interface')
         self.port = int(self._config.query('zibase', 'port'))
+        self.valvar=self._config.query('zibase', 'envar')
         self.interv=int(self._config.query('zibase', 'interv'))
 
         self.log.info("Creating listener for ZiBase")
@@ -88,14 +89,14 @@ class ZiBaseMain(XplPlugin):
             self.log.error("Connection ZiBase error=%s" % (traceback.format_exc()))
             self.stop()
 
-        self.log.info("Start reading internal variables")
-        try:
-            #var_read=threading.Thread(None, self.zibase_read_var, "listen_zibase", (), {})
-            var_read=XplTimer(self.interv,self.zibase_read_var,self.myxpl)
-            var_read.start()
-        except:
-            self.log.error("reading internal variables error")
-            return
+        if self.valvar=="True" :
+            try:
+                self.log.info("Start reading internal variables")
+                var_read=XplTimer(self.interv,self.zibase_read_var,self.myxpl)
+                var_read.start()
+            except:
+                self.log.error("reading internal variables error")
+                return
 
         self.add_stop_cb(self.stop)
         self.enable_hbeat()

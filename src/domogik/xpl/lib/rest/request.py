@@ -1364,6 +1364,7 @@ target=*
 
         ### device #####################################
         elif self.rest_request[0] == "device":
+	    self.log.debug("DEVICE")
             ### list
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
