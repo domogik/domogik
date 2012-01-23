@@ -210,7 +210,7 @@ class PackageXml():
                 self.source = None
             else:
                 try:
-                    self.package_url = rep[0].attributes.get("url_prefix").value.strip()
+                    self.package_url = rep[0].attributes.get("package").value.strip()
                 except AttributeError:
                     self.package_url = None
                 try:
@@ -271,17 +271,17 @@ class PackageXml():
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 
 
-    def cache_xml(self, cache_folder, url_prefix, repo_url, priority):
+    def cache_xml(self, cache_folder, url, repo_url, priority):
         """ Add url_prefix info in xml data
             Store xml in a file in cache_folder
             @param cache_folder : folder to put xml file
-            @param url_prefix : http://.../pluginname-release
+            @param url : package url
             @param repo_url : repository url
             @param priority : repository priority
         """
         top_elt = self.xml_content.documentElement
         new_elt = self.xml_content.createElementNS(None, 'repository')
-        new_elt.setAttribute("url_prefix", url_prefix)
+        new_elt.setAttribute("package", url_prefix)
         new_elt.setAttribute("priority", priority)
         new_elt.setAttribute("source", repo_url)
         top_elt.appendChild(new_elt)
@@ -290,7 +290,7 @@ class PackageXml():
         cache_file.close()
 
     def set_repo_source(self, source):
-        """ Add url_prefix info in xml data
+        """ Add source info in xml data
             Store in xml the repository from which it comes
             @param source : repository url
         """
