@@ -85,7 +85,12 @@ def backup_existing_database(confirm=True):
         backup_directory = answer
     print("Backing up your database to %s" % DB_BACKUP_FILE)
     with open(DB_BACKUP_FILE, 'w') as f:
-        execute_system_command(['mysqldump', '-u', _db.get_db_user(), '-p', _db.get_db_name()], p_stdout=f)
+        mysqldump_cmd = ['mysqldump', '-u', _db.get_db_user()]
+        if _db.get_db_password():
+            mysqldump_cmd.extend(('-p%s' %_db.get_db_password(), _db.get_db_name()))
+        else:
+            mysqldump_cmd.append(_db.get_db_name())
+        execute_system_command(mysqldump_cmd, p_stdout=f)
 
 def set_db_under_version_control():
     if not is_db_under_version_control():

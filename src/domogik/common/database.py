@@ -169,6 +169,9 @@ class DbHelper():
     
     def get_db_user(self):
         return self.__db_config['db_user']
+
+    def get_db_password(self):
+        return self.__db_config['db_password']
     
     def get_db_name(self):
         return self.__db_config['db_name']
