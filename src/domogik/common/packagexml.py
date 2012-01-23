@@ -272,7 +272,7 @@ class PackageXml():
 
 
     def cache_xml(self, cache_folder, url, repo_url, priority):
-        """ Add url_prefix info in xml data
+        """ Add package url info in xml data
             Store xml in a file in cache_folder
             @param cache_folder : folder to put xml file
             @param url : package url
@@ -281,7 +281,7 @@ class PackageXml():
         """
         top_elt = self.xml_content.documentElement
         new_elt = self.xml_content.createElementNS(None, 'repository')
-        new_elt.setAttribute("package", url_prefix)
+        new_elt.setAttribute("package", url)
         new_elt.setAttribute("priority", priority)
         new_elt.setAttribute("source", repo_url)
         top_elt.appendChild(new_elt)
