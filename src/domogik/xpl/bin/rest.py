@@ -614,6 +614,7 @@ class Rest(XplPlugin):
              self._hosts_list[instance]["last_seen"] = time.time()
              self._hosts_list[instance]["interval"] = 60 * int(message.data["interval"])
              self._hosts_list[instance]["ip"] = message.data["remote-ip"]
+             self._hosts_list[instance]["id"] = instance
                 
 
     def _refresh_status_for_list_hosts(self):
