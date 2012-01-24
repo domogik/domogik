@@ -2,7 +2,7 @@
 <package type="plugin">
   <id>rfxcom</id>
   <technology>rfxcom</technology>
-  <description>RFXCOM Usb 433.92MHz receiver + transmitter</description>
+  <description>RFXCOM Usb 433.92MHz receiver and transmitter</description>
   <changelog>
 0.1
 - create 
