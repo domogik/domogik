@@ -51,6 +51,7 @@ Test it with the manual controllers (push button and potentiometer) and then cre
     <file path="src/external/externals/ar_rgb/xpl.pde"/>
   </external_files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>arduino</id>
       <name>Arduino</name>
