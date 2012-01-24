@@ -35,6 +35,7 @@
     <file path="src/domogik/xpl/lib/tts.py"/>
   </files>
   <dependencies/>                                                         
+  <udev-rules/>
   <device_technology>
       <id>communication</id>
       <name>communication</name>

@@ -52,6 +52,7 @@
   <dependencies>
     <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
+  <udev-rules/>
   <device_technology>
       <id>multimedia</id>
       <name>Multimedia</name>

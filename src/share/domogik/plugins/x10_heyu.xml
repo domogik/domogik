@@ -44,6 +44,7 @@
   <dependencies>
     <dep type="other" id="heyu"/>
   </dependencies>
+  <udev-rules/>
   <device_technology>
       <id>x10</id>
       <name>X10</name>

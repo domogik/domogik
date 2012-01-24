@@ -109,6 +109,7 @@
     <file path="src/domogik/xpl/lib/telldus_move.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>telldus</id>
       <name>Telldus</name>

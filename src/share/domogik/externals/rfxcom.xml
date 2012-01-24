@@ -21,6 +21,7 @@
     <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>rfxcom</id>
       <name>RFXCom</name>

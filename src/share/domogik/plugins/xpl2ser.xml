@@ -45,6 +45,7 @@
   <dependencies>
     <dep type="python" id="pySerial > 2.4"/>
   </dependencies>
+  <udev-rules/>
   <device_technology>
       <id>bridge</id>
       <name>Bridge</name>

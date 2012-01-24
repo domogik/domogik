@@ -72,6 +72,7 @@
     <file path="src/domogik/xpl/lib/wol_ping.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>computer</id>
       <name>Computer</name>

@@ -44,6 +44,7 @@ Upload project to Arduino with the IDE
     <file path="src/external/externals/ar_tank/xpl.pde"/>
   </external_files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>arduino</id>
       <name>Arduino</name>

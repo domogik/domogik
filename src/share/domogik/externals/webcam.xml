@@ -19,6 +19,7 @@
     <file path="src/share/domogik/design/external/webcam/icon.png"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>camera</id>
       <name>Camera</name>

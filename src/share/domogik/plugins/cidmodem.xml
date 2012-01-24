@@ -47,6 +47,11 @@
   <dependencies>
     <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
+  <udev-rules>
+    <rule model="modem" description="Example for a common modem" filename="modem.rules">
+UBSYSTEMS=="usb", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="modem", MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>communication</id>
       <name>Communication</name>

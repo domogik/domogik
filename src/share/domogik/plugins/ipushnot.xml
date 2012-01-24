@@ -27,6 +27,7 @@
     <file path="src/domogik/xpl/lib/ipushnot.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>notification</id>
       <name>Notification</name>

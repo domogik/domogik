@@ -39,6 +39,11 @@
     <file path="src/domogik/xpl/lib/x10cm15a.py"/>
   </files>
   <dependencies/>
+  <udev-rules>
+    <rule model="CM15A" description="X10 CM15A interface" filename="cm15a.rules">
+KERNEL=="cm15a0", BUS=="usb", SYSFS{idVendor}=="0bc7", SYSFS{idProduct}=="0001", NAME="cm15a0", MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>x10</id>
       <name>X10</name>

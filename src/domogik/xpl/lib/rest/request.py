@@ -2591,6 +2591,10 @@ target=*
         for message in messages:
             cmd = message.data['command']
             host = message.data["host"]
+
+            # this erase any previous data for a given host to avoid
+            # duplicate entries
+            host_list[host] = []
     
             idx = 0
             loop_again = True
@@ -2608,10 +2612,6 @@ target=*
                                         "status" : plg_status, 
                                         "type" : plg_type, 
                                         "host" : plg_host})
-                    # this erase any previous data for a given host to avoid
-                    # duplicate entries
-                    if host_list.has_key(plg_host) == False:
-                        host_list[plg_host] = []
                     host_list[plg_host].append(plugin_data)
                     idx += 1
                 except KeyError:

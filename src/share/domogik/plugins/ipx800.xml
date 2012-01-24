@@ -85,6 +85,7 @@ Supported features :
     <file path="src/domogik/xpl/lib/ipx800.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>relayboard</id>
       <name>Relay board</name>

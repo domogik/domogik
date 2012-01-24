@@ -45,6 +45,7 @@
   <dependencies>
     <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
+  <udev-rules/>
   <device_technology>
       <id>zwave</id>
       <name>Z-wave</name>

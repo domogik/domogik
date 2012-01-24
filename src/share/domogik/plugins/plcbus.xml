@@ -69,6 +69,11 @@
   <dependencies>
     <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
+  <udev-rules>
+    <rule model="Plcbus 1141U" description="Plcbus 1141U Usb adaptator" filename="plcbus.rules">
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="plcbus", MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>plcbus</id>
       <name>PLCBus</name>

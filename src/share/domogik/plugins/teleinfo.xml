@@ -48,6 +48,14 @@
   <dependencies>
     <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
+  <udev-rules>
+    <rule model="Dauguet Usb" description="Dauguet Usb assembly" filename="teleinfo.rules">
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="teleinfo", MODE="0666"
+    </rule>
+    <rule model="Modchip usb to serial adapter" description="Dauguet serial assembly with a modchip usb to serial adapter" filename="teleinfo.rules">
+KERNEL=="ttyUSB*", ATTRS{port_number}=="0", DRIVERS=="moschip7720", SYMLINK+="teleinfo", MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>service</id>
       <name>Service</name>

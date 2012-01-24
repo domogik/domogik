@@ -51,6 +51,7 @@
   </files>
 -->
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>bts</id>
       <name>BTS Project</name>

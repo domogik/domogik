@@ -1227,6 +1227,15 @@ class SysManager(XplPlugin):
         mess.add_data({'type' : pkg_type})
         mess.add_data({'id' : id})
 
+        # check if plugin (for a plugin) is enabled
+        if pkg_type == "plugin":
+            cfg_plugins = self.loader_plugins.load(refresh = True)[1]
+            plugin_list = dict(cfg_plugins)
+            if plugin_list[id] == "enabled":
+                mess.add_data({'error' : "Plugin '%s' is enabled. Disable it before uninstalling plugin." % id})
+                self.myxpl.send(mess)
+                return
+
         # check if plugin (for a plugin) is running
         if pkg_type == "plugin":
             if self._check_component_is_running(id, only_one_ping = True):

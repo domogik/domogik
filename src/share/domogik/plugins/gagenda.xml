@@ -43,6 +43,7 @@
   </configuration-keys>
   <files/>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>communication</id>
       <name>Communication</name>

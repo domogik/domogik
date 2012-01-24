@@ -26,6 +26,7 @@
     <file path="src/domogik/xpl/bin/xpl_time.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>domogik</id>
       <name>Domogik</name>

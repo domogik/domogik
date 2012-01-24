@@ -79,6 +79,7 @@
     <file path="src/domogik/xpl/lib/foscam.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
  <device_technology>
       <id>foscam</id>
       <name>Foscam Camera</name>

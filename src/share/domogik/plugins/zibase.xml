@@ -66,6 +66,7 @@
     <file path="src/domogik/xpl/lib/zibase.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>zibase</id>
       <name>ZiBase</name>
