@@ -60,6 +60,7 @@
     <file path="src/domogik/xpl/lib/mochad.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>x10</id>
       <name>X10</name>

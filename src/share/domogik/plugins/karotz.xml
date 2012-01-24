@@ -49,6 +49,7 @@
     <file path="src/domogik/xpl/lib/karotz.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>karotz</id>
       <name>Karotz</name>

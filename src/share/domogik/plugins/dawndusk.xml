@@ -108,6 +108,7 @@
     <dep type="python" id="pyephem (>=3.7.5)"/>
     <dep type="plugin" id="xpl_time"/>
   </dependencies>
+  <udev-rules/>
   <device_technology>
       <id>dawndusk</id>
       <name>Dawndusk</name>

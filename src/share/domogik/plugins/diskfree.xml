@@ -43,6 +43,7 @@
     <file path="src/domogik/xpl/lib/diskfree.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>computer</id>
       <name>Computer</name>

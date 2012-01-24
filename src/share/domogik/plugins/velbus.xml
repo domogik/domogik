@@ -37,6 +37,7 @@
     <file path="src/domogik/xpl/lib/velbus.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>velbus</id>
       <name>Velbus</name>

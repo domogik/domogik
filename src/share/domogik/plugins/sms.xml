@@ -60,6 +60,7 @@
   <dependencies>                                                                
      <dep type="python" id="mechanize"/>
   </dependencies> 
+  <udev-rules/>
   <device_technology>
       <id>communication</id>
       <name>communication</name>

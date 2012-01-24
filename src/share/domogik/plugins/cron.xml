@@ -38,6 +38,7 @@
     <dep type="python" id="pyserial (>=2.5)"/>
     <dep type="plugin" id="xpl_time"/>
   </dependencies>
+  <udev-rules/>
   <device_technology>
       <id>cron</id>
       <name>Cron</name>

@@ -30,6 +30,7 @@
     <file path="src/domogik/xpl/lib/TellStick.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>tschacon</id>
       <name>tsChacon</name>

@@ -59,6 +59,7 @@
     <file path="src/domogik/xpl/lib/nbz_tts.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>communication</id>
       <name>Communication</name>

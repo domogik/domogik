@@ -33,6 +33,11 @@
     <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"/>
   </files>
   <dependencies/>
+  <udev-rules>
+    <rule model="RFXCOM Usb" description="RFXCOM Usb transceiver and receiver" filename="rfxcom.rules">
+SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rfxcom" MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>rfxcom</id>
       <name>RFXCom</name>

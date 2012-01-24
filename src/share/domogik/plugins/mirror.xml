@@ -40,6 +40,11 @@
   <dependencies>
     <dep type="python" id="pyserial (>=2.5)"/>
   </dependencies>
+  <udev-rules>
+    <rule model="Mir:ror" description="Mir:ror usb device" filename="mirror.rules">
+KERNEL=="hidraw*", ATTRS{idVendor}=="1da8", ATTRS{idProduct}=="1301", SYMLINK+="mirror", MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>rfid</id>
       <name>RFID</name>

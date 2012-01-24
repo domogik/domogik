@@ -121,6 +121,11 @@ List of supported devices :
   <dependencies>
     <dep type="other" id="owfs (>=2.8.4)"/>
   </dependencies>
+  <udev-rules>
+    <rule model="DS9490R" description="Usb DS9490R adaptator" filename="onewire.rules">
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", SYMLINK+="onewire", MODE="0666"
+    </rule>
+  </udev-rules>
   <device_technology>
       <id>onewire</id>
       <name>1-wire</name>

@@ -184,6 +184,7 @@
     <file path="src/domogik/xpl/lib/zalarms.py"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>cron</id>
       <name>Cron</name>

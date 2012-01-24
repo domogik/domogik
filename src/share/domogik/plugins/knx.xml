@@ -38,6 +38,7 @@
     <file path="src/share/domogik/url2xpl/knx/response.xml"/>
   </files>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>knx</id>
       <name>KNX</name>

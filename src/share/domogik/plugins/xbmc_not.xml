@@ -45,6 +45,7 @@ Obsolete plugin - will be suppressed
   </configuration-keys>
   <files/>
   <dependencies/>
+  <udev-rules/>
   <device_technology>
       <id>multimedia</id>
       <name>Multimedia</name>
