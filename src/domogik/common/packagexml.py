@@ -197,6 +197,20 @@ class PackageXml():
                        "id" : dep_id}
                self.dependencies.append(data)
 
+            # list of udev rules
+            self.udev_rules = []
+            xml_data = self.xml_content.getElementsByTagName("udev-rules")[0]
+            for dep in xml_data.getElementsByTagName("rule"):
+               rule_model = dep.attributes.get("model").value.strip()
+               rule_desc = dep.attributes.get("description").value.strip()
+               rule_filename = dep.attributes.get("filename").value.strip()
+               rule_content = dep.firstChild.nodeValue.strip()
+               data = {"model" : rule_model,
+                       "desc" : rule_desc,
+                       "filename" : rule_filename,
+                       "rule" : rule_content}
+               self.udev_rules.append(data)
+
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.id)
             self.xml_filename = "%s-%s-%s.xml" % (self.type, self.id, self.release)
@@ -336,6 +350,10 @@ class PackageXml():
         print("----- Python dependencies -------------------------------")
         for dep in self.dependencies:
             print("- %s %s" % (dep["type"], dep["id"]))
+        print("----- UDev rules ----------------------------------------")
+        for rule in self.udev_rules:
+            print("- %s (%s) in '%s'" % (rule["model"], rule["desc"], rule["filename"]))
+            print("  Rule : %s" % rule["rule"])
         print("----- Package files -------------------------------------")
         for my_file in self.files:
             print("- %s" % my_file["path"])
