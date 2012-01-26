@@ -3922,16 +3922,16 @@ target=*
     #    return True, message
 
 
-    def _rest_package_dependency(self, host, type, id, release):
+    def _rest_package_dependency(self, host, pkg_type, id, release):
         """ Send a xpl message to check python dependencies
             @param host : host targetted
-            @param type : type of package
+            @param pkg_type : type of package
             @param id ; id of package
             @param release : package release
             Return status of each dependency as json
         """
         self.log.debug("Package : ask for checking dependencies for a package")
-        package = "%s-%s" % (type, id)
+        package = "%s-%s" % (pkg_type, id)
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -3953,6 +3953,7 @@ target=*
         python_dep = []
         print "D=%s" %  data[0]["dependencies"]
         pkg_mgr = PackageManager()
+        pkg_list = self.get_installed_packages()
         for dep in data[0]["dependencies"]:
             if dep["type"] == "python":
                 python_dep.append({"dep%s" % idx_python : dep["id"]})
@@ -3961,26 +3962,13 @@ target=*
             if dep["type"] == "plugin":
                 id = dep["id"].split(" ")[0]
                 installed = False
-                release = ""
-                (res, data) = self._rest_package_send_xpl_to_get_installed_list(host, "plugin")
-                if res == True: # ok
-                    message = data
-        
-                # process message
-                idx = 0
-                loop_again = True
-                while loop_again:
-                    try:
-                        if "plugin" == message.data["type"+str(idx)] and \
-                           id == message.data["id"+str(idx)]:
-                            release = message.data["release"+str(idx)]
-                            installed = True
-                            loop_again = False
-                        idx += 1
-                    except KeyError:
-                        loop_again = False
 
-                idx_plugin += 1
+                if pkg_list.has_key(host):
+                    if pkg_list[host].has_key(pkg_type):
+                        for elt in pkg_list[host][pkg_type]:
+                            if elt["id"] == id:
+                                installed = True
+
                 data = {
                            "type" : "plugin",
                            "name" : dep["id"],
@@ -3991,6 +3979,7 @@ target=*
                            "error" : "",
                            }
                 json_data.add_data(data)
+                idx_plugin += 1
 
         ### check python dependencies
         # if there are python dependencies, ask on xpl
