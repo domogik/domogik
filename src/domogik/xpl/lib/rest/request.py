@@ -3971,7 +3971,7 @@ target=*
 
                 data = {
                            "type" : "plugin",
-                           "name" : dep["id"],
+                           "id" : dep["id"],
                            "installed" : installed,
                            "release" : release,
                            "cmd-line" : "Install from Domogik Administration",
@@ -4048,7 +4048,7 @@ target=*
         
                         data = {
                                    "type" : "python",
-                                   "name" : my_key,
+                                   "id" : my_key,
                                    "installed" : installed,
                                    "release" : release,
                                    "cmd-line" : cmd_line,
