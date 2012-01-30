@@ -251,13 +251,17 @@ class PackageManager():
             for my_file in files:
                 path =  str(my_file["path"])
                 self.log("- %s" % path)
-                tar.add(SRC_PATH + path, arcname = path)
+                if os.path.isfile(SRC_PATH + path):
+                    tar.add(SRC_PATH + path, arcname = path)
+                else:
+                    self.log("  WARNING : file doesn't exists")
             if info_file != None:
                 self.log("- info.xml")
                 tar.add(info_file, arcname="info.xml")
             if icon_file != None:
-                self.log("- icon.png")
-                tar.add(icon_file, arcname="icon.png")
+                if os.path.isfile(icon_file):
+                    self.log("- icon.png")
+                    tar.add(icon_file, arcname="icon.png")
             tar.close()
 
             # delete temporary xml file
