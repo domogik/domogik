@@ -1162,7 +1162,7 @@ class SysManager(XplPlugin):
         """ Check if dependency is installed
             @param dep : dependency as VersionPredicate. Example : pyserial >= 2.4
         """
-        subp = Popen("pip freeze | grep %s" % version.name, stdout=PIPE, shell=True)
+        subp = Popen("pip freeze | grep -i %s" % version.name, stdout=PIPE, shell=True)
         pid = subp.pid
         res = subp.stdout.read()
         subp.communicate()
