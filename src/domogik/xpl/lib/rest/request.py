@@ -2457,6 +2457,16 @@ target=*
                 return
             self._rest_plugin_detail(self.rest_request[2], self.rest_request[1])
 
+        ### dependency ###############################
+        elif self.rest_request[0] == "dependency":
+            if len(self.rest_request) == 3:
+                self._rest_plugin_dependency(self.rest_request[1],
+                                           self.rest_request[2])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
 
         ### enable ####################################
         elif self.rest_request[0] == "enable" \
@@ -2759,6 +2769,61 @@ target=*
         self.send_http_response_ok(json_data.get())
 
 
+    def _rest_plugin_dependency(self, host, id):
+        """ Send a xpl message to check python dependencies
+            @param host : host targetted
+            @param id : id of package
+            Return status of each dependency as json
+        """
+        self.log.debug("Plugin : ask for getting and checking dependencies")
+
+        ### Send xpl message to check python dependencies on host
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "get-dependencies"})
+        message.add_data({"host" : host})
+        message.add_data({"id" : id})
+        message.add_data({"type" : "plugin"})
+        self.myxpl.send(message)
+
+
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Plugin get dependencies : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "get-dependencies", "host" : host, "id" : id, "type" : "plugin"},
+                                           timeout = WAIT_FOR_DEPENDENCY_CHECK)
+        except Empty:
+            self.log.debug("Plugin get dependencies : no answer")
+            self.send_http_response_error(999, "No data or timeout on getting dependencies",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package get dependencies : message receive : %s" % str(message))
+        
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+            return
+        else:
+            idx = 0
+            loop_again = True
+            dep_list = []
+            while loop_again:
+                try:
+                    my_id = message.data["dep%s-id" % idx]
+                    my_type = message.data["dep%s-type" % idx]
+                    dep_list.append({"id" : my_id, "type" : my_type})
+                    idx += 1
+                except:
+                    loop_again = False
+
+        self._rest_get_dependency(host, dep_list)
 
 
     def _rest_plugin_start_stop(self, command, host = None, plugin = None):
@@ -3741,7 +3806,7 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
-        ### check-dependencies #######################
+        ### dependency ###############################
         elif self.rest_request[0] == "dependency":
             if len(self.rest_request) == 5:
                 self._rest_package_dependency(self.rest_request[1],
@@ -3933,10 +3998,6 @@ target=*
         self.log.debug("Package : ask for checking dependencies for a package")
         package = "%s-%s" % (pkg_type, id)
 
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("dependency")
-
         ### check package exists in cache
         pkg_mgr = PackageManager()
         data = pkg_mgr.get_packages_list(fullname = package, release = release)
@@ -3946,15 +4007,26 @@ target=*
             self.send_http_response_error(999, "No package corresponding to request",
                                           self.jsonp, self.jsonp_cb)
             return
+        self._rest_get_dependency(host, data[0]["dependencies"])
+
+    def _rest_get_dependency(self, host, dep_list):
+        """ Send a xpl message to check the package dependencies
+            return a json
+            @param host : host
+            @param dep_list : list of dependencies [{"type": , "id": }, {}...]
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("dependency")
 
         ### list dependencies
         idx_python = 0
         idx_plugin = 0
         python_dep = []
-        print "D=%s" %  data[0]["dependencies"]
+        print "D=%s" %  dep_list
         pkg_mgr = PackageManager()
         pkg_list = self.get_installed_packages()
-        for dep in data[0]["dependencies"]:
+        for dep in dep_list:
             if dep["type"] == "python":
                 python_dep.append({"dep%s" % idx_python : dep["id"]})
                 idx_python += 1
@@ -3993,7 +4065,6 @@ target=*
             for the_dep in python_dep:
                 message.add_data(the_dep)
             self.myxpl.send(message)
-            print(str(message))
 
             ### Wait for answer
             # get xpl message from queue
@@ -4004,7 +4075,7 @@ target=*
                 message = self._get_from_queue(self._queue_package, 
                                                "xpl-trig", 
                                                "domogik.package", 
-                                               filter_data = {"command" : "check-dependencies"},
+                                               filter_data = {"command" : "check-dependencies", "host" : host},
                                                timeout = WAIT_FOR_DEPENDENCY_CHECK)
             except Empty:
                 self.log.debug("Package dependencies check : no answer")
@@ -4014,10 +4085,10 @@ target=*
     
             self.log.debug("Package dependencies check : message receive : %s" % str(message))
             
-            print(message)
             # process message
             if message.data.has_key('error'):
                 self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+                return
             else:
                 idx = 0
                 loop_again = True

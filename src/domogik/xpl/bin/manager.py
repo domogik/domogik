@@ -1031,6 +1031,9 @@ class SysManager(XplPlugin):
         if command == "installed-packages-list":
             self._pkg_list_installed()
 
+        if command == "get-dependencies" and host != "*":
+            self._pkg_get_dependencies(message)
+
         if command == "check-dependencies" and host != "*":
             self._pkg_check_dependencies(message)
 
@@ -1073,6 +1076,29 @@ class SysManager(XplPlugin):
         self.myxpl.send(mess)
         time.sleep(0.3) # make sure to make a pause between 2 messages
         self.sema_installed.release()
+
+    def _pkg_get_dependencies(self, message):
+        """ Return the list of dependencies for a package
+            @param message : xpl message received
+        """
+        pkg_id = message.data["id"]
+        pkg_type = message.data["type"]
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' : 'get-dependencies'})
+        mess.add_data({'id' : pkg_id})
+        mess.add_data({'type' : pkg_type})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+
+        pkg_xml = PackageXml(pkg_id, pkg_type = pkg_type)
+        idx = 0
+        for dep in pkg_xml.dependencies:
+            mess.add_data({"dep%s-id" % idx : dep["id"]})
+            mess.add_data({"dep%s-type" % idx : dep["type"]})
+            idx += 1
+        self.myxpl.send(mess)
+
 
     def _pkg_check_dependencies(self, message):
         """ Check if python dependencies for a package are installed
