@@ -2823,7 +2823,7 @@ target=*
                 except:
                     loop_again = False
 
-        self._rest_get_dependency(host, dep_list)
+        self._rest_get_dependency(host, "plugin", dep_list)
 
 
     def _rest_plugin_start_stop(self, command, host = None, plugin = None):
@@ -4007,12 +4007,13 @@ target=*
             self.send_http_response_error(999, "No package corresponding to request",
                                           self.jsonp, self.jsonp_cb)
             return
-        self._rest_get_dependency(host, data[0]["dependencies"])
+        self._rest_get_dependency(host, pkg_type, data[0]["dependencies"])
 
-    def _rest_get_dependency(self, host, dep_list):
+    def _rest_get_dependency(self, host, pkg_type, dep_list):
         """ Send a xpl message to check the package dependencies
             return a json
             @param host : host
+            @param pkg_type : package type
             @param dep_list : list of dependencies [{"type": , "id": }, {}...]
         """
         json_data = JSonHelper("OK")
@@ -4045,7 +4046,7 @@ target=*
                            "type" : "plugin",
                            "id" : dep["id"],
                            "installed" : installed,
-                           "release" : release,
+                           "release" : "",
                            "cmd-line" : "Install from Domogik Administration",
                            "candidate" : "",
                            "error" : "",
