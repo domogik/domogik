@@ -644,9 +644,14 @@ class Rest(XplPlugin):
             There is a semaphore in order not to return the list when it is
             updated (may be incomplete)
         """
+        # TODO : remove log lines after tests
+        self.log.debug("*** get_installed_packages")
         self.sema_installed.acquire()
+        self.log.debug("*** sema acquired")
+        ret = self._installed_packages
         self.sema_installed.release()
-        return self._installed_packages
+        self.log.debug("*** sema released")
+        return ret
 
     def _list_installed_packages(self, message):
         """ Send a xpl message to manager to get installed packages list
