@@ -39,7 +39,7 @@ function plugin_exists {
 }
 
 function syntax {
-    echo -e "$0 [-f] <plugin>\n
+    echo -e "$0 <plugin>\n
 Enables a plugin."
     exit 1
 }
