@@ -659,7 +659,9 @@ class Rest(XplPlugin):
             @param pkg_type : type of package
         """
         
+        self.log.debug("*** list_installed_packages")
         self.sema_installed.acquire()
+        self.log.debug("*** sema acquired")
         # process message
         host = message.data["host"]
         print "H=%s" % host
@@ -690,6 +692,7 @@ class Rest(XplPlugin):
             except KeyError:
                 loop_again = False
         self.sema_installed.release()
+        self.log.debug("*** sema released")
     
 
 
