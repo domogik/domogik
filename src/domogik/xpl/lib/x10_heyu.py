@@ -145,7 +145,7 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Error during send of command : %s " % output)
+            self._log.error("Error when sending the command : %s " % output)
 
     def _send_lvl(self, cmd, item, lvl):
         """
@@ -160,7 +160,7 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Error during send of command : %s " % output)
+            self._log.error("Error when sending the command : %s " % output)
 
     def on(self, item):
         """
