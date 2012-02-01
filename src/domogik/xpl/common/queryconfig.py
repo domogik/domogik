@@ -70,13 +70,13 @@ class Query():
         if conf.has_key('config_provider'):
             self.target = "xpl-dbmgr.%s" % conf["config_provider"]
             msg = "Force config provider to '%s'" % self.target
-            print msg
+            print("Query config : %s" % msg)
             self.log.debug(msg)
         else:
             self.target = "*"
 
     def __del__(self):
-        print("End query")
+        print("Query config : end query")
 
     def set(self, technology, key, value):
         '''
@@ -88,7 +88,7 @@ class Query():
         '''
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        #mess.set_target(self.target)
+        mess.set_target(self.target)
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
         mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
@@ -108,7 +108,9 @@ class Query():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
-        print("new query for t = %s, k = %s" % (technology, key))
+        msg = "QC : ask > h=%s, t=%s, k=%s" % (self.__myxpl.p.get_sanitized_hostname(), technology, key)
+        print(msg)
+        self.log.debug(msg)
         l = Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config',
                                                     'xpltype': 'xpl-stat',
                                                     'technology': technology,
@@ -117,7 +119,7 @@ class Query():
         self._l[key] = l
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        #mess.set_target(self.target)
+        mess.set_target(self.target)
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
         mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
@@ -145,9 +147,11 @@ class Query():
         Callback to receive message after a query() call
         @param message : the message received
         '''
-        print("Answer received")
         result = message.data
         for r in self._keys:
+            msg = "QC : res > h=%s, t=%s, k=%s, v=%s" % (result["hostname"], result["technology"], r, result[r])
+            print(msg)
+            self.log.debug(msg)
             if r in result:
                 self.log.debug("Config value received : %s : %s" % (r, result[r]))
                 res = self._keys.pop(r)

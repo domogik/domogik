@@ -80,7 +80,9 @@ class DBConnector(XplPlugin):
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
-        print("request for host '%s' - techno '%s' - key '%s'" % (hostname, techno, key))
+        msg = "Request  h=%s, t=%s, k=%s" % (hostname, techno, key)
+        print(msg)
+        self.log.debug(msg)
         if "value" in message.data:
             new_value = message.data['value']
         else:
@@ -92,22 +94,21 @@ class DBConnector(XplPlugin):
 
         # Set configuration
         if new_value:
-            self.log.debug("New set config received for %s : %s : %s" % (techno, key, new_value))
+            msg = "Set config h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, new_value)
+            print msg
+            self.log.debug(msg)
             self._set_config(techno, hostname, key, new_value)
 
         # Send configuration
         else:
             if element:
-                self.log.debug("New request config received for %s : %s : %s" % (techno, key, element))
                 self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
             else:
                 if not key:
-                    self.log.debug("New request config received for %s : asked for all config items" % (techno))
                     keys = self._fetch_techno_config(techno, hostname, key).keys()
                     values = self._fetch_techno_config(techno, hostname, key).values()
                     self._send_config(techno, hostname, keys, values)
                 else:
-                    self.log.debug("New request config received for %s : %s" % (techno, key))
                     self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
 
     def _send_config(self, technology, hostname, key, value, element = None):
@@ -119,8 +120,9 @@ class DBConnector(XplPlugin):
         @param key : the key or list of keys of the config tuple(s) to fetch
         @param value : the value or list of values corresponding to the key(s)
         '''
-        self.log.debug("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
-        print("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
+        msg = "Response h=%s, t=%s, k=%s, v=%s" % (hostname, technology, key, value)
+        print(msg)
+        self.log.debug(msg)
         mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
@@ -203,7 +205,9 @@ class DBConnector(XplPlugin):
                         res[val.key] = val.value
                 return res
         except:
-            self.log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
+            msg = "No config found h=%s, t=%s, k=%s" % (hostname, techno, key)
+            prin(msg)
+            self.log.warn(msg)
             return "None"
 
     def _set_config(self, technology, hostname, key, value):
@@ -214,7 +218,6 @@ class DBConnector(XplPlugin):
         @param key : the key to set
         @param value : the value to set
         '''
-        self.log.debug("Set config response for %s on %s : %s = %s" % (technology, hostname, key, value))
 
         try:
             self._db.set_plugin_config(techno, hostname, key, value)
@@ -229,7 +232,9 @@ class DBConnector(XplPlugin):
             self.myxpl.send(mess)
         except:
             traceback.print_exc()
-            self.log.warn("Error while setting %s on %s, key %s" % (techno, hostname, key))
+            msg = "Error while setting h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, value)
+            prin(msg)
+            self.log.warn(msg)
             return "None"
 
 
