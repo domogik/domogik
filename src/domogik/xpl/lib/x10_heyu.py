@@ -91,6 +91,10 @@ class X10API:
     """
 
     def __init__(self, heyuconf, log):
+        if heyuconf is None:
+            raise X10Exception("There is no configuration file for Heyu. " \
+                               "You probably forgot to save Heyu's configuration file in the plugin management :" \
+                               "can't start Heyu")
         if not os.path.isfile(heyuconf):
             raise X10Exception("Config file %s does not exist, can't start heyu" % heyuconf)
         self._log = log
