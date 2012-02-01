@@ -1177,7 +1177,7 @@ class SysManager(XplPlugin):
                         if  ver.match(rel._version):
                             found = True
                             mess.add_data({"dep%s-candidate" % idx : rel._version})
-                            mess.add_data({"dep%s-cmd-line" % idx : "sudo easy_install %s==%s" % (ver.name, rel._version)})
+                            mess.add_data({"dep%s-cmd-line" % idx : "sudo pip install %s==%s" % (ver.name, rel._version)})
                             break
                 except:
                     self.log.error("Error while looking for candidates : %s" % traceback.format_exc())
