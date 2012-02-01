@@ -75,12 +75,12 @@ class DBConnector(XplPlugin):
         Callback to receive a request for some config stuff
         @param message : the xPL message
         '''
-        print("request")
         #try:
         self._db = DbHelper(engine=self._engine)
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
+        print("request for host '%s' - techno '%s' - key '%s'" % (hostname, techno, key))
         if "value" in message.data:
             new_value = message.data['value']
         else:
@@ -120,6 +120,7 @@ class DBConnector(XplPlugin):
         @param value : the value or list of values corresponding to the key(s)
         '''
         self.log.debug("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
+        print("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
         mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
@@ -159,31 +160,30 @@ class DBConnector(XplPlugin):
         '''
         # This array is here for information only but is not used anymore
         # Values are now on the database
-        print("****** key = %s" % key)
-        vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
-                        'heyu-file-0': 'TTY /dev/ttyUSB0',
-                        'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
-                        'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
-                'global': {'pid-dir-path': '/var/run/'},
-                'onewire': {'temperature_refresh_delay' : '10'},
-                'cidmodem': {'device' : '/dev/ttyUSB1',
-                           'nbmaxtry' : '10',
-                           'interval' : '15'},
-                'mirror': {'device' : '/dev/hidraw0',
-                           'nbmaxtry' : '10',
-                           'interval' : '15'},
-                'xbmc_not': {'address' : '192.168.0.20:8080',
-                         'delay' : '15',
-                         'maxdelay' : '20'},
-                'gagenda': {'email' : "fritz.smh@gmail.com",
-                         'password' : 'XXXXXXXX',
-                         'calendarname' : 'fritz.smh@gmail.com',
-                         'startup-plugin':'True'},
-                'teleinfo' : {'device' : '/dev/teleinfo',
-                    'interval' : '30'},
-                    'dawndusk' : {'startup-plugin':'True'},
-                    'plcbus' : {'device':'/dev/ttyUSB0'},
-                }
+        #vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
+        #                'heyu-file-0': 'TTY /dev/ttyUSB0',
+        #                'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+        #                'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
+        #        'global': {'pid-dir-path': '/var/run/'},
+        #        'onewire': {'temperature_refresh_delay' : '10'},
+        #        'cidmodem': {'device' : '/dev/ttyUSB1',
+        #                   'nbmaxtry' : '10',
+        #                   'interval' : '15'},
+        #        'mirror': {'device' : '/dev/hidraw0',
+        #                   'nbmaxtry' : '10',
+        #                   'interval' : '15'},
+        #        'xbmc_not': {'address' : '192.168.0.20:8080',
+        #                 'delay' : '15',
+        #                 'maxdelay' : '20'},
+        #        'gagenda': {'email' : "fritz.smh@gmail.com",
+        #                 'password' : 'XXXXXXXX',
+        #                 'calendarname' : 'fritz.smh@gmail.com',
+        #                 'startup-plugin':'True'},
+        #        'teleinfo' : {'device' : '/dev/teleinfo',
+        #            'interval' : '30'},
+        #            'dawndusk' : {'startup-plugin':'True'},
+        #            'plcbus' : {'device':'/dev/ttyUSB0'},
+        #        }
         try:
             if key:
                 try:
