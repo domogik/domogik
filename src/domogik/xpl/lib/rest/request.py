@@ -2467,6 +2467,15 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
+        ### udev-rule #################################
+        elif self.rest_request[0] == "udev-rule":
+            if len(self.rest_request) == 3:
+                self._rest_plugin_udev_rule(self.rest_request[1],
+                                           self.rest_request[2])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
 
         ### enable ####################################
         elif self.rest_request[0] == "enable" \
@@ -2824,6 +2833,72 @@ target=*
                     loop_again = False
 
         self._rest_get_dependency(host, "plugin", dep_list)
+
+
+    def _rest_plugin_udev_rule(self, host, id):
+        """ Send a xpl message to get udev rules for the plugin
+            @param host : host targetted
+            @param id : id of plugin
+            Return status of each dependency as json
+        """
+        self.log.debug("Plugin : ask for getting udev rules")
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("udev-rules")
+
+        ### Send xpl message to check python dependencies on host
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "get-udev-rules"})
+        message.add_data({"host" : host})
+        message.add_data({"id" : id})
+        message.add_data({"type" : "plugin"})
+        self.myxpl.send(message)
+
+
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Plugin get udev rules : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "get-udev-rules", "host" : host, "id" : id, "type" : "plugin"},
+                                           timeout = WAIT_FOR_DEPENDENCY_CHECK)
+        except Empty:
+            self.log.debug("Plugin get udev rules : no answer")
+            self.send_http_response_error(999, "No data or timeout on getting udev rules",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package get udev rules : message receive : %s" % str(message))
+        
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+            return
+        else:
+            idx = 0
+            loop_again = True
+            rule_list = []
+            while loop_again:
+                try:
+                    model = message.data["rule%s-model" % idx]
+                    description = message.data["rule%s-desc" % idx]
+                    filename = message.data["rule%s-filename" % idx]
+                    rule = message.data["rule%s-rule" % idx]
+                    json_data.add_data({"model" : model,
+                                        "description" : description,
+                                        "filename" : filename,
+                                        "rule" : rule})
+                    idx += 1
+                except:
+                    loop_again = False
+
+        self.send_http_response_ok(json_data.get())
 
 
     def _rest_plugin_start_stop(self, command, host = None, plugin = None):

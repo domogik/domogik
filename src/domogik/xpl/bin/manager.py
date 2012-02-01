@@ -1037,6 +1037,9 @@ class SysManager(XplPlugin):
         if command == "check-dependencies" and host != "*":
             self._pkg_check_dependencies(message)
 
+        if command == "get-udev-rules" and host != "*":
+            self._pkg_get_udev_rules(message)
+
         if command == "install" and host != "*":
             self._pkg_install(message)
 
@@ -1096,6 +1099,35 @@ class SysManager(XplPlugin):
         for dep in pkg_xml.dependencies:
             mess.add_data({"dep%s-id" % idx : dep["id"]})
             mess.add_data({"dep%s-type" % idx : dep["type"]})
+            idx += 1
+        self.myxpl.send(mess)
+
+    def _pkg_get_udev_rules(self, message):
+        """ Return the list of udev rules for a package
+            @param message : xpl message received
+        """
+        pkg_id = message.data["id"]
+        pkg_type = message.data["type"]
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' : 'get-udev-rules'})
+        mess.add_data({'id' : pkg_id})
+        mess.add_data({'type' : pkg_type})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+
+        try:
+            pkg_xml = PackageXml(pkg_id, pkg_type = pkg_type)
+        except PackageException:
+            # bad xml or no such plugin installed
+            self.myxpl.send(mess)
+
+        idx = 0
+        for rule in pkg_xml.udev_rules:
+            mess.add_data({"rule%s-model" % idx : rule["model"]})
+            mess.add_data({"rule%s-desc" % idx : rule["desc"]})
+            mess.add_data({"rule%s-filename" % idx : rule["filename"]})
+            mess.add_data({"rule%s-rule" % idx : rule["rule"]})
             idx += 1
         self.myxpl.send(mess)
 
