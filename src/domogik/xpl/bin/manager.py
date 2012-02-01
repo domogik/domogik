@@ -1121,6 +1121,7 @@ class SysManager(XplPlugin):
         except PackageException:
             # bad xml or no such plugin installed
             self.myxpl.send(mess)
+            return
 
         idx = 0
         for rule in pkg_xml.udev_rules:
