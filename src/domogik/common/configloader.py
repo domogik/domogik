@@ -61,7 +61,7 @@ class Loader():
         @param plugin_name name of the plugin to load config from
         '''
         # Semaphore init
-        self.sema_load = Semaphore(value=1)
+        self.__class__.sema_load = Semaphore(value=1)
 
         self.main_conf_name = "domogik.cfg"
         self.valid_files = None
@@ -95,7 +95,7 @@ class Loader():
         @param refresh : force refreshing config
         @return pair (main_config, plugin_config)
         '''
-        self.sema_load.acquire()
+        self.__class__.sema_load.acquire()
         sys_file = ''
         main_result = {}
         if self.__class__.config == None or refresh == True:
@@ -109,16 +109,16 @@ class Loader():
             main_result[k] = v
         #Check the plugin conf file if defined
         if self.plugin_name == None:
-            self.sema_load.release()
+            self.__class__.sema_load.release()
             return (main_result, None)
 
         if self.plugin_name:
             ret =  (main_result, self.__class__.config.items(self.plugin_name))
-            self.sema_load.release()
+            self.__class__.sema_load.release()
             return ret
         else:
             #If we're here, there is no plugin config
-            self.sema_load.release()
+            self.__class__.sema_load.release()
             return (main_result, None)
 
     def set(self, section, key, value):
