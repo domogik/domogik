@@ -91,6 +91,10 @@ class X10API:
     """
 
     def __init__(self, heyuconf, log):
+        if heyuconf is None:
+            raise X10Exception("There is no configuration file for Heyu. " \
+                               "You probably forgot to save Heyu's configuration file in the plugin management :" \
+                               "can't start Heyu")
         if not os.path.isfile(heyuconf):
             raise X10Exception("Config file %s does not exist, can't start heyu" % heyuconf)
         self._log = log
@@ -141,7 +145,7 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Error during send of command : %s " % output)
+            self._log.error("Error when sending the command : %s " % output)
 
     def _send_lvl(self, cmd, item, lvl):
         """
@@ -156,7 +160,7 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Error during send of command : %s " % output)
+            self._log.error("Error when sending the command : %s " % output)
 
     def on(self, item):
         """
