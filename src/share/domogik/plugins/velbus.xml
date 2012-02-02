@@ -5,9 +5,12 @@
   <description>velbus interface</description>
   <changelog>
 0.1.0
-- create 
+- relays only
+- serial comunication only 
+0.2.0
+- added socket comunication
   </changelog>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <documentation>url</documentation>
   <author>Maikel Punie</author>
   <author-email>maikel.puni@gmail.com</author-email>
@@ -22,15 +25,22 @@
     </key>
     <key>
       <order-id>1</order-id>
+      <name>use-socket</name>
+      <type>boolean</type>
+      <description>use a TCP socket instead of a serial port</description>
+      <default-value>0</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
       <name>device</name>
       <type>string</type>
-      <description>velbus device</description>
+      <description>velbus device (/dev/ttyACM0 for serial, or ip:port for socket</description>
       <default-value>/dev/ttyACM0</default-value>
     </key>
   </configuration-keys>
   <files>
     <file path="src/share/domogik/design/plugin/velbus/icon.png"/>
-    <file path="src/share/domogik/stats/velbus/lighting.basic-velbus.xml"/>
+    <file path="src/share/domogik/stats/velbus/lighting.device-velbus.xml"/>
     <file path="src/share/domogik/url2xpl/velbus/100.xml"/>
     <file path="src/share/domogik/url2xpl/velbus/0.xml"/>
     <file path="src/domogik/xpl/bin/velbus.py"/>

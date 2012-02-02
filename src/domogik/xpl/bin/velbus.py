@@ -38,6 +38,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.velbus import VelbusException
 from domogik.xpl.lib.velbus import VelbusUSB
 import threading
+import re
 
 class VelbusUsbManager(XplPlugin):
     """
@@ -48,7 +49,35 @@ class VelbusUsbManager(XplPlugin):
         """
         XplPlugin.__init__(self, name='velbus')
         self._config = Query(self.myxpl, self.log)
+        # get the config values
+        #device_type = self._config.query('velbus', 'use-socket')
+	if self._config.query('velbus', 'use-socket') == 0:
+            device_type='serial'
+        else:
+            device_type = 'socket'
+        if device_type == None:
+            self.log.error('Devicetype is not configured, exitting') 
+            print('Devicetype is not configured, exitting')
+            self.force_leave()
+            return
         device = self._config.query('velbus', 'device')
+        #device = '192.168.1.101:3788'
+        if device == None:
+            self.log.error('Device is not configured, exitting') 
+            print('Device is not configured, exitting')
+            self.force_leave()
+            return
+        # validate the config vars
+        if (device_type != 'serial') and (device_type != 'socket'):
+            self.log.error('Devicetype must be socket or serial, exitting') 
+            print('Devicetype must be socket or serial, exitting')
+            self.force_leave()
+            return
+        if device_type == 'socket' and not re.match('[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]+', device):
+            self.log.error('A socket device is in the form of <ip>:<port>, exitting') 
+            print('A socket device is in the form of <ip>:<port>, exitting')
+            self.force_leave()
+            return
 
         # Init RFXCOM
         self.manager  = VelbusUSB(self.log, self.send_xpl,
@@ -59,7 +88,7 @@ class VelbusUsbManager(XplPlugin):
                  {'xpltype': 'xpl-cmnd', 'schema': 'lighting.basic'})
         # Create listeners
         try:
-            self.manager.open(device)
+            self.manager.open(device, device_type)
         except VelbusException as ex:
             self.log.error(ex.value)
             self.force_leave()
@@ -96,16 +125,16 @@ class VelbusUsbManager(XplPlugin):
         """ Process xpl chema lightning.basic
         """
         self.send_xpl("lighting.device", message.data)
-	add = message.data['device'].split('-');
-	chan = []
+        add = message.data['device'].split('-')
+        chan = []
         chan.append(int(add[1]))
-	address = add[0]
-	if message.data["level"] == str(100):
-	    self.log.debug("set relay on")
-	    self.manager.send_relayon( address, chan )
-	else:
-	    self.log.debug("set relay off")
-	    self.manager.send_relayoff( address, chan )
+        address = add[0]
+        if message.data["level"] == str(100):
+            self.log.debug("set relay on")
+            self.manager.send_relayon( address, chan )
+        else:
+            self.log.debug("set relay off")
+            self.manager.send_relayoff( address, chan )
 
 
 if __name__ == "__main__":

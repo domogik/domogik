@@ -5,6 +5,7 @@ Velbus domogik plugin
 """
 
 import serial
+import socket
 import traceback
 import threading
 import time
@@ -127,7 +128,8 @@ class VelbusUSB:
         self._callback = cb_send_xpl
         self._cb_send_trig = cb_send_trig
         self._stop = stop
-        self._rfxcom = None
+        self._dev = None
+	self._devtype = 'serial'
 
         # Queue for writing packets to Rfxcom
         self.write_rfx = Queue()
@@ -140,13 +142,20 @@ class VelbusUSB:
                                          {})
         write_process.start()
 
-    def open(self, device):
+    def open(self, device, devicetype):
         """ Open (opens the device once)
 	    @param device : the device string to open
         """
+	self._devtype = devicetype
         try:
             self._log.info("Try to open VELBUS: %s" % device)
-            self._rfxcom = serial.Serial(device, 38400, timeout=0)
+            if devicetype == 'socket':
+		b = device.split(':')
+		b = (b[0], int(b[1]))
+                self._dev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._dev.connect( b )
+            else:
+                self._dev = serial.Serial(device, 38400, timeout=0)
             self._log.info("VELBUS opened")
         except:
             error = "Error while opening Velbus : %s. Check if it is the good device or if you have the good permissions on it." % device
@@ -157,53 +166,56 @@ class VelbusUSB:
         """
         self._log.info("Close VELBUS")
         try:
-            self._rfxcom.close()
+            self._dev.close()
         except:
             error = "Error while closing device"
             raise VelbusException(error)
         
     def send_relayon(self, address, channel):
-	data = chr(0x02) + self._channels_to_byte(channel)
-	#data = chr(0x01) + chr(0x02)
-	self.write_packet(address, data)
+        """ Send relay on message
+        """
+        data = chr(0x02) + self._channels_to_byte(channel)
+        self.write_packet(address, data)
     
     def send_relayoff(self, address, channel):
-	data = chr(0x01) + self._channels_to_byte(channel)
-	self.write_packet(address, data)
+        """ Send relay off message
+        """
+        data = chr(0x01) + self._channels_to_byte(channel)
+        self.write_packet(address, data)
 
     def write_packet(self, address, data):
         """ put a packet in the write queu
         """
         self._log.info("write packet")
         self.write_rfx.put_nowait( {"address": address,
-					"data": data}); 
+					"data": data}) 
 
     def write_daemon(self):
         """ handle the queu
         """
         self._log.info("write deamon")
-	while not self._stop.isSet():
-	    res = self.write_rfx.get(block = True)
-	    self._log.info("START SENDING PACKET %s" % hex(int(res["address"])))
-            addr = hex(int(res["address"]))
-
+        while not self._stop.isSet():
+            res = self.write_rfx.get(block = True)
+            self._log.info("START SENDING PACKET %s" % hex(int(res["address"])))
 	    # start
-	    packet = chr(0x0F)
-	    # priority
-	    packet += chr(0xF8)
-	    # address
-	    packet += chr(int(res["address"]))
-	    # rtr + datasize
-	    packet += chr(len(res["data"]))
-	    # data
-	    packet += res["data"] 
-	    # checksum
-	    checksum = self._checksum(packet)
-            packet += checksum
-	    # end byte
+            packet = chr(0x0F)
+            # priority
+            packet += chr(0xF8)
+            # address
+            packet += chr(int(res["address"]))
+            # rtr + datasize
+            packet += chr(len(res["data"]))
+            # data
+            packet += res["data"]
+            # checksum
+            packet += self._checksum(packet)
+            # end byte
             packet += chr(0x04)
 	    # send
-	    self._log.debug( self._rfxcom.write( packet ) )
+            if self._devtype == 'socket':
+                self._log.debug( self._dev.send( packet ) )
+            else:
+                self._log.debug( self._dev.write( packet ) )
             # sleep for 60ms
             time.sleep(0.06)
  
@@ -215,8 +227,8 @@ class VelbusUSB:
         try:
             while not stop.isSet():
                 self.read()
-        except serial.SerialException:
-            error = "Error while reading rfxcom device (disconnected ?) : %s" % traceback.format_exc()
+        except:
+            error = "Error while reading velbus device (disconnected ?) : %s" % traceback.format_exc()
             print(error)
             self._log.error(error)
             return
@@ -224,7 +236,10 @@ class VelbusUSB:
     def read(self):
         """ Read data from the velbus line
         """
-        data = self._rfxcom.read(9999)
+        if self._devtype == 'socket':
+            data = self._dev.recv(9999)
+        else:
+            data = self._dev.read(9999)
         if len(data) >= 6:
             if ord(data[0]) == 0x0f:
                 size = ord(data[3]) & 0x0F
@@ -250,7 +265,8 @@ class VelbusUSB:
         assert len(data) >= 6
         assert ord(data[0]) == 0x0f
         if len(data) > 14:
-            self._log.warning("Velbus message: maximum %s bytes, this one is %s", str(14, str(len(data))))
+            self._log.warning("Velbus message: maximum %s bytes, this one is %s",
+                str(14, str(len(data))))
             return
         if ord(data[-1]) != 0x04:
             self._log.warning("Velbus message: end byte not correct")
@@ -285,7 +301,6 @@ class VelbusUSB:
         """
            Process a 251 Message
         """
-        address = ord(data[2])
         for channel in self._byte_to_channels(data[5]):
             device = str(ord(data[2])) + "-" + str(channel)
             level = -1
