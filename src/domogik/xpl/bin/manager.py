@@ -41,7 +41,7 @@ import os
 import sys
 import time
 import stat
-from threading import Event, currentThread, Thread, enumerate, Lock, Semaphore
+from threading import Event, Thread, Lock, Semaphore
 from optparse import OptionParser
 import traceback
 from subprocess import Popen, PIPE
@@ -52,18 +52,15 @@ from domogik.xpl.common.xplconnector import READ_NETWORK_TIMEOUT
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR
+from domogik.common.packagemanager import PackageManager, PKG_PART_XPL
 from domogik.common.packagexml import PackageXml, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
-from xml.dom import minidom
 from ConfigParser import NoSectionError
-from distutils2.version import VersionPredicate, _split_predicate, IrrationalVersionError
-from distutils2.install import get_infos
+from distutils2.version import VersionPredicate, IrrationalVersionError
 from distutils2.index.simple import Crawler
 import re
 import tempfile
 import domogik.xpl.bin
-import pkgutil
 import math
 
 
@@ -299,19 +296,20 @@ class SysManager(XplPlugin):
                 external_timer.start()
 
             # inotify 
-            wm = pyinotify.WatchManager() # Watch manager
+            wmgr = pyinotify.WatchManager() # Watch manager
             mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO # watched events
             notify_handler = EventHandler()
             notify_handler.set_callback(self._reload_configuration_file)
             notify_handler.set_config_files(self.get_config_files())
-            notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
+            notifier = pyinotify.ThreadedNotifier(wmgr, notify_handler)
             notifier.start()
             config_files_dir = [self._xml_plugin_directory,
                                 self._xml_external_directory]
             for fic in  self.get_config_files():
                 config_files_dir.append(os.path.dirname(fic))
             for direc in set(config_files_dir):
-                wdd = wm.add_watch(direc, mask, rec = True)
+                #wdd = wmgr.add_watch(direc, mask, rec = True)
+                wmgr.add_watch(direc, mask, rec = True)
             self.add_stop_cb(notifier.join)
 
             self.enable_hbeat()
@@ -355,9 +353,9 @@ class SysManager(XplPlugin):
         print("Reloading plugin and external members model lists")
         self.log.info("Reloading plugin and external members model lists")
         self._list_plugins()
-        self._list_external_models()  # still usefull ? TODO :check
-                                      # externals are automatically loaded by
-                                      # manager now...
+        #self._list_external_models()  # still usefull ? TODO :check
+        #                              # externals are automatically loaded by
+        #                              # manager now...
 
     def _write_fifo(self, level, message):
         """ Write the message into _state_fifo fifo, with ansi color
@@ -412,13 +410,13 @@ class SysManager(XplPlugin):
         self.log.debug("Call _system_action_cb for cmd='%s'" % cmd)
 
         try:
-           plg = message.data['plugin']
+            plg = message.data['plugin']
         except KeyError:
-           plg = "*"
+            plg = "*"
         try:
             host = message.data["host"]
         except KeyError:
-           host = "*"
+            host = "*"
 
         # error if no plugin in list
         error = ""
@@ -603,13 +601,13 @@ class SysManager(XplPlugin):
                   'xplsource':"domogik-%s.%s" % (name, self.get_sanitized_hostname())},
                  cb_params = {'name' : name})
         if only_one_ping:
-            max = 1
+            max_ping = 1
         else:
-            max = self.ping_duration
-        while max != 0:
+            max_ping = self.ping_duration
+        while max_ping != 0:
             self.myxpl.send(mess)
             time.sleep(2)
-            max = max - 1
+            max_ping -= 1
             if self._pinglist[name].isSet():
                 break
         my_listener.unregister()
@@ -699,7 +697,6 @@ class SysManager(XplPlugin):
                 self.log.error(msg)
                 return 
 
-            state_thread = {}
             for external in external_list:
                 external = external[0:-4]
                 print(external)
@@ -821,7 +818,6 @@ class SysManager(XplPlugin):
         # Getplugin list
         cfg_plugins = self.loader_plugins.load(refresh = True)[1]
         plugin_list = dict(cfg_plugins)
-        state_thread = {}
         for plugin in plugin_list:
             self.log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
             if plugin_list[plugin] == "enabled":
@@ -976,7 +972,6 @@ class SysManager(XplPlugin):
         mess.add_data({'plugin' : name})
 
         subp = Popen("dmgenplug %s" % name, shell=True)
-        pid = subp.pid
         subp.communicate()
         self._pkg_list_installed()
         time.sleep(1) # make sure rest receive the updated list before the ack of enable
@@ -994,7 +989,6 @@ class SysManager(XplPlugin):
         mess.add_data({'plugin' : name})
 
         subp = Popen("dmgdisplug %s" % name, shell=True)
-        pid = subp.pid
         subp.communicate()
         self._pkg_list_installed()
         time.sleep(1) # make sure rest receive the updated list before the ack of disable
@@ -1196,11 +1190,10 @@ class SysManager(XplPlugin):
             @param dep : dependency as VersionPredicate. Example : pyserial >= 2.4
         """
         subp = Popen("pip freeze | grep -i %s" % version.name, stdout=PIPE, shell=True)
-        pid = subp.pid
         res = subp.stdout.read()
         subp.communicate()
         if res == "":
-           return False, None
+            return False, None
         tab = res.rstrip().split("==")
         if version.match(tab[1]):
             return True, tab[1]
@@ -1215,8 +1208,8 @@ class SysManager(XplPlugin):
         """
         try:
             source = message.data['source']
-            type = message.data['type']
-            id = message.data['id']
+            pkg_type = message.data['type']
+            pkg_id = message.data['id']
             release = message.data['release']
             package_part = message.data['part']
         except KeyError:
@@ -1229,26 +1222,26 @@ class SysManager(XplPlugin):
         mess.add_data({'command' : 'install'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
         mess.add_data({'source' : source})
-        mess.add_data({'type' : type})
-        mess.add_data({'id' : id})
+        mess.add_data({'type' : pkg_type})
+        mess.add_data({'id' : pkg_id})
         mess.add_data({'release' : release})
 
         if source == "cache":
-            package = "cache:%s/%s/%s" % (type, id, release)
+            package = "cache:%s/%s/%s" % (pkg_type, pkg_id, release)
         else:
             mess.add_data({'error' : "source '%s' not allowed" % source})
             self.myxpl.send(mess)
             return
 
         # check if plugin (for a plugin) is running
-        if type == "plugin":
-            if self._check_component_is_running(id, only_one_ping = True):
-                mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % id})
+        if pkg_type == "plugin":
+            if self._check_component_is_running(pkg_id, only_one_ping = True):
+                mess.add_data({'error' : "Plugin '%s' is running. Stop it before installing plugin." % pkg_id})
                 self.myxpl.send(mess)
                 return
 
         # check if it is a external if current manager handle external
-        if type == "external" and self.options.check_external == False:
+        if pkg_type == "external" and self.options.check_external == False:
             mess.add_data({'error' : "This host doesn't handle external member packages. Please install it on main host"})
             self.myxpl.send(mess)
             return
@@ -1273,7 +1266,7 @@ class SysManager(XplPlugin):
         print "call uninstall"
         try:
             pkg_type = message.data['type']
-            id = message.data['id']
+            pkg_id = message.data['id']
         except KeyError:
             self.log.error("Missing part of xPL message for installing a package : %s" % traceback.format_exc())
             return
@@ -1284,7 +1277,7 @@ class SysManager(XplPlugin):
         mess.add_data({'command' : 'uninstall'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
         mess.add_data({'type' : pkg_type})
-        mess.add_data({'id' : id})
+        mess.add_data({'id' : pkg_id})
 
         # check if plugin (for a plugin) is enabled
         if pkg_type == "plugin":
@@ -1292,7 +1285,7 @@ class SysManager(XplPlugin):
             plugin_list = dict(cfg_plugins)
             try:
                 if plugin_list[id] == "enabled":
-                    mess.add_data({'error' : "Plugin '%s' is enabled. Disable it before uninstalling plugin." % id})
+                    mess.add_data({'error' : "Plugin '%s' is enabled. Disable it before uninstalling plugin." % pkg_id})
                     self.myxpl.send(mess)
                     return
             except KeyError:
@@ -1302,8 +1295,8 @@ class SysManager(XplPlugin):
 
         # check if plugin (for a plugin) is running
         if pkg_type == "plugin":
-            if self._check_component_is_running(id, only_one_ping = True):
-                mess.add_data({'error' : "Plugin '%s' is running. Stop it before uninstalling plugin." % id})
+            if self._check_component_is_running(pkg_id, only_one_ping = True):
+                mess.add_data({'error' : "Plugin '%s' is running. Stop it before uninstalling plugin." % pkg_id})
                 self.myxpl.send(mess)
                 return
 
@@ -1314,15 +1307,15 @@ class SysManager(XplPlugin):
             return
 
         try:
-            status = self.pkg_mgr.uninstall_package(pkg_type, id)
+            status = self.pkg_mgr.uninstall_package(pkg_type, pkg_id)
             if status != True:
                 mess.add_data({'error' : status})
             # if this is a plugin, disable it
             if pkg_type == "plugin":
-                self._disable_plugin(id)
+                self._disable_plugin(pkg_id)
         except:
             mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
-            self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, id, traceback.format_exc()))
+            self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, pkg_id, traceback.format_exc()))
 
         # send updated list of installed packages
         self._pkg_list_installed()
@@ -1336,7 +1329,7 @@ class SysManager(XplPlugin):
 def main():
     ''' Called by the easyinstall mapping script
     '''
-    SYS = SysManager()
+    SysManager()
 
 if __name__ == "__main__":
     main()
