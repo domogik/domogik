@@ -38,10 +38,8 @@ PackageXml
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import traceback
-from xml.sax.saxutils import escape
 import urllib2
 import datetime
-import time #for debug : remove after dev
 
 
 
@@ -63,6 +61,9 @@ class PackageException(Exception):
 
 
 class PackageXml():
+    """ Package Xml class
+        Used to represent a package xml as a python object
+    """
     def __init__(self, id = None, url = None, path = None, pkg_type = "plugin"):
         """ Read xml file of a plugin and make an object from it
             @param id : name of package
@@ -170,16 +171,16 @@ class PackageXml():
             self.files = []
             xml_data = self.xml_content.getElementsByTagName("files")[0]
             for my_file in xml_data.getElementsByTagName("file"):
-               data = {"path" :  my_file.attributes.get("path").value.strip()}
-               self.files.append(data)
+                data = {"path" :  my_file.attributes.get("path").value.strip()}
+                self.files.append(data)
 
             # list of external files
             self.external_files = []
             try:
                 xml_data = self.xml_content.getElementsByTagName("external_files")[0]
                 for my_file in xml_data.getElementsByTagName("file"):
-                   data = {"path" :  my_file.attributes.get("path").value.strip()}
-                   self.external_files.append(data)
+                    data = {"path" :  my_file.attributes.get("path").value.strip()}
+                    self.external_files.append(data)
             except:
                 pass
 
@@ -191,25 +192,25 @@ class PackageXml():
             self.dependencies = []
             xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
-               dep_type = dep.attributes.get("type").value.strip()
-               dep_id = dep.attributes.get("id").value.strip()
-               data = {"type" : dep_type,
-                       "id" : dep_id}
-               self.dependencies.append(data)
+                dep_type = dep.attributes.get("type").value.strip()
+                dep_id = dep.attributes.get("id").value.strip()
+                data = {"type" : dep_type,
+                        "id" : dep_id}
+                self.dependencies.append(data)
 
             # list of udev rules
             self.udev_rules = []
             xml_data = self.xml_content.getElementsByTagName("udev-rules")[0]
             for dep in xml_data.getElementsByTagName("rule"):
-               rule_model = dep.attributes.get("model").value.strip()
-               rule_desc = dep.attributes.get("description").value.strip()
-               rule_filename = dep.attributes.get("filename").value.strip()
-               rule_content = dep.firstChild.nodeValue.strip()
-               data = {"model" : rule_model,
-                       "desc" : rule_desc,
-                       "filename" : rule_filename,
-                       "rule" : rule_content}
-               self.udev_rules.append(data)
+                rule_model = dep.attributes.get("model").value.strip()
+                rule_desc = dep.attributes.get("description").value.strip()
+                rule_filename = dep.attributes.get("filename").value.strip()
+                rule_content = dep.firstChild.nodeValue.strip()
+                data = {"model" : rule_model,
+                        "desc" : rule_desc,
+                        "filename" : rule_filename,
+                        "rule" : rule_content}
+                self.udev_rules.append(data)
 
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.id)
