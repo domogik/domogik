@@ -9,8 +9,10 @@
 - serial comunication only 
 0.2.0
 - added socket comunication
+0.3.0
+- added dimmer support
   </changelog>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
   <documentation>url</documentation>
   <author>Maikel Punie</author>
   <author-email>maikel.puni@gmail.com</author-email>
@@ -41,8 +43,7 @@
   <files>
     <file path="src/share/domogik/design/plugin/velbus/icon.png"/>
     <file path="src/share/domogik/stats/velbus/lighting.device-velbus.xml"/>
-    <file path="src/share/domogik/url2xpl/velbus/100.xml"/>
-    <file path="src/share/domogik/url2xpl/velbus/0.xml"/>
+    <file path="src/share/domogik/url2xpl/velbus/setlevel.xml"/>
     <file path="src/domogik/xpl/bin/velbus.py"/>
     <file path="src/domogik/xpl/lib/velbus.py"/>
   </files>
@@ -57,7 +58,13 @@
       <device_type>
           <id>velbus.relay</id>
           <name>Switch</name>
-          <description>Switch</description>
+          <description>Switch one channel on a device</description>
+          <device_technology_id>velbus</device_technology_id>
+      </device_type>
+      <device_type>
+          <id>velbus.dimmer</id>
+          <name>Dimmer</name>
+          <description>Dim one channel on a device</description>
           <device_technology_id>velbus</device_technology_id>
       </device_type>
   </device_types>
@@ -68,9 +75,33 @@
           <feature_type>actuator</feature_type>
           <device_type_id>velbus.relay</device_type_id>
           <parameters>
-              {&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;100&quot;}
+              {&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}
           </parameters>
           <value_type>binary</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+       </device_feature_model>
+       <device_feature_model>
+          <id>velbus.dimmer.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>velbus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>velbus.dimmer.change</id>
+          <name>Dimmer</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>velbus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;setlevel&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:255}
+          </parameters>
+          <value_type>range</value_type>
           <stat_key>level</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>

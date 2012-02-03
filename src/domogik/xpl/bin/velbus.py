@@ -36,11 +36,11 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.velbus import VelbusException
-from domogik.xpl.lib.velbus import VelbusUSB
+from domogik.xpl.lib.velbus import VelbusDev
 import threading
 import re
 
-class VelbusUsbManager(XplPlugin):
+class VelbusManager(XplPlugin):
     """
 	Managages the velbus domogik plugin
     """
@@ -80,7 +80,7 @@ class VelbusUsbManager(XplPlugin):
             return
 
         # Init RFXCOM
-        self.manager  = VelbusUSB(self.log, self.send_xpl,
+        self.manager  = VelbusDev(self.log, self.send_xpl,
 			self.send_trig, self.get_stop())
         
         # Create a listener for all messages used by RFXCOM
@@ -129,13 +129,16 @@ class VelbusUsbManager(XplPlugin):
         chan = []
         chan.append(int(add[1]))
         address = add[0]
-        if message.data["level"] == str(100):
+        if message.data["level"] == str(255):
             self.log.debug("set relay on")
             self.manager.send_relayon( address, chan )
-        else:
+        elif message.data["level"] == str(0):
             self.log.debug("set relay off")
             self.manager.send_relayoff( address, chan )
+        else:
+            seld.log.debug("set dimmer value")
+            self.manager.send_relayoff( address, chan, message.data["level"] )
 
 
 if __name__ == "__main__":
-    VelbusUsbManager()
+    VelbusManager()

@@ -1,0 +1,17 @@
+<technology id="velbus">
+  <command name="setlevel">
+    <schema>lighting.basic</schema>
+    <address-key>device</address-key>
+    <parameters>
+       <parameter key="level" location="1" />
+    </parameters>
+  </command>
+  <listener>
+    <schema>lighting.device</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+       <key name="level" value="50"/>
+       <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

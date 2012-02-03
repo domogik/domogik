@@ -38,6 +38,7 @@ COMMAND_TYPES = {
   103 : "firmware memory",
   104 : "firmware memory write confirmed",
   105 : "read firmware memory",
+  184 : "dimemr channel status",
   198 : "temperature settings part3",
   199 : "statistics request",
   200 : "statistics",
@@ -113,7 +114,7 @@ class VelbusException(Exception):
         return repr(self.value)
 
 
-class VelbusUSB:
+class VelbusDev:
     """
     Velbus domogik plugin
     """
@@ -181,6 +182,13 @@ class VelbusUSB:
         """ Send relay off message
         """
         data = chr(0x01) + self._channels_to_byte(channel)
+        self.write_packet(address, data)
+
+    def send_setdimmervalue(self, address, channel, level):
+        """ Send dimemr value
+            - speed = 1 second
+        """
+        data = chr(0x07) + self._channels_to_byte(channel) + chr(0x00) + chr(0x01)
         self.write_packet(address, data)
 
     def write_packet(self, address, data):
@@ -297,9 +305,11 @@ class VelbusUSB:
             else:
                 self._log.warning("zero sized message received without rtr set")
 
+# procee the velbus received messages
     def _process_251(self, data):
         """
            Process a 251 Message
+           Switch status => send out when a relay is switched
         """
         for channel in self._byte_to_channels(data[5]):
             device = str(ord(data[2])) + "-" + str(channel)
@@ -307,12 +317,49 @@ class VelbusUSB:
             if (ord(data[7]) & 0x03) == 0:
                 level = 0
             if (ord(data[7]) & 0x03) == 1:
-                level = 100
+                level = 255
             if level != -1:
                 self._callback("lighting.device",
                     {"device" : device,
                     "level" : level})
 
+    def _process_238(self, data):
+        """
+           Process a 251 Message
+           Dimmer status => send out when the dimmer status is changed
+        """
+        device = str(ord(data[2])) + "-" + str(channel)
+        level = -1
+        level = ord(data[76])
+        if level != -1:
+            self._callback("lighting.device",
+                {"device" : device,
+                "level" : level})
+
+    def _process_184(self, data):
+        """
+           Process a 184 Message
+           Dimmer channel status => send out when the dimmer status is changed
+        """
+        for channel in self._byte_to_channels(data[5]):
+            device = str(ord(data[2])) + "-" + str(channel)
+            level = -1
+            level = ord(data[7])
+            if level != -1:
+                self._callback("lighting.device",
+                    {"device" : device,
+                    "level" : level})
+   
+    def _process_236(self, data):
+        """
+           Process a 236 Message
+           blind channel status => send out when the blind status changes
+           chan <X> <status>
+           chan: 00000011=1, 00001100=2
+           status: 0=off, 1=chan 1 up, 2=chan 1 down, 3=chan 2 up, 4=chan 2 down
+        """
+	
+# Some convert procs
     def _channels_to_byte(self, channels):
         """
            Convert a channel list to a byte
