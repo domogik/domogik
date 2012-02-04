@@ -11,6 +11,28 @@ import threading
 import time
 from Queue import Queue
 
+MODULE_TYPES = {
+  1 : "VMB8PB",
+  2 : "VMB1RY",
+  3 : "VMB1BL",
+  5 : "VMB6IN",
+  7 : "VMB1DM",
+  8 : "VMB4RY",
+  9 : "VMB2BL",
+ 10 : "VMB8IR",
+ 11 : "VMB4PD",
+ 12 : "VMB1TS",
+ 13 : "VMB1TC",
+ 15 : "VMB1LED",
+ 16 : "VMB4RYLD",
+ 17 : "VMB4RYNO",
+ 18 : "VMB4DC",
+ 20 : "VMBDME",
+ 21 : "VMBDMI",
+ 22 : "VMB8PBU",
+ 23 : "VMB6PBN",
+}
+
 COMMAND_TYPES = {
   0 : "switch status",
   1 : "switch relay off",
@@ -99,8 +121,6 @@ COMMAND_TYPES = {
   255 : "node type",
 }
 
-
-
 class VelbusException(Exception):
     """
     Velbus exception
@@ -130,7 +150,7 @@ class VelbusDev:
         self._cb_send_trig = cb_send_trig
         self._stop = stop
         self._dev = None
-	self._devtype = 'serial'
+        self._devtype = 'serial'
 
         # Queue for writing packets to Rfxcom
         self.write_rfx = Queue()
@@ -147,14 +167,14 @@ class VelbusDev:
         """ Open (opens the device once)
 	    @param device : the device string to open
         """
-	self._devtype = devicetype
+        self._devtype = devicetype
         try:
             self._log.info("Try to open VELBUS: %s" % device)
             if devicetype == 'socket':
-		b = device.split(':')
-		b = (b[0], int(b[1]))
+                addr = device.split(':')
+                addr = (addr[0], int(addr[1]))
                 self._dev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self._dev.connect( b )
+                self._dev.connect( addr )
             else:
                 self._dev = serial.Serial(device, 38400, timeout=0)
             self._log.info("VELBUS opened")
@@ -172,6 +192,18 @@ class VelbusDev:
             error = "Error while closing device"
             raise VelbusException(error)
         
+    def send_shutterup(self, address, channel):
+        """ Send shutter up message
+        """
+        #data = 
+        #self.write_packet(address, data)
+    
+    def send_shutterdown(self, address, channel):
+        """ Send shutter down message
+        """
+        #data = 
+        #self.write_packet(address, data)
+    
     def send_relayon(self, address, channel):
         """ Send relay on message
         """
@@ -188,8 +220,13 @@ class VelbusDev:
         """ Send dimemr value
             - speed = 1 second
         """
-        data = chr(0x07) + self._channels_to_byte(channel) + chr(0x00) + chr(0x01)
+        data = chr(0x07) + self._channels_to_byte(channel) + chr(ord(level)) + chr(0x00) + chr(0x01)
         self.write_packet(address, data)
+
+    def send_moduletyperequest(self, address):
+        """ Request module type
+        """
+        self.write_packet(address, chr(0x40))
 
     def write_packet(self, address, data):
         """ put a packet in the write queu
@@ -328,9 +365,9 @@ class VelbusDev:
            Process a 251 Message
            Dimmer status => send out when the dimmer status is changed
         """
-        device = str(ord(data[2])) + "-" + str(channel)
+        device = str(ord(data[2])) + "-" + str(ord(data[5]))
         level = -1
-        level = ord(data[76])
+        level = ord(data[7])
         if level != -1:
             self._callback("lighting.device",
                 {"device" : device,

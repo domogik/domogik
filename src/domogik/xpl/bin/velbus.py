@@ -51,8 +51,8 @@ class VelbusManager(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         # get the config values
         #device_type = self._config.query('velbus', 'use-socket')
-	if self._config.query('velbus', 'use-socket') == 0:
-            device_type='serial'
+        if self._config.query('velbus', 'use-socket') == 0:
+            device_type = 'serial'
         else:
             device_type = 'socket'
         if device_type == None:
@@ -86,6 +86,8 @@ class VelbusManager(XplPlugin):
         # Create a listener for all messages used by RFXCOM
         Listener(self.process_lighting_basic, self.myxpl,
                  {'xpltype': 'xpl-cmnd', 'schema': 'lighting.basic'})
+        Listener(self.process_shutter_basic, self.myxpl,
+                 {'xpltype': 'xpl-cmnd', 'schema': 'shutter.basic'})
         # Create listeners
         try:
             self.manager.open(device, device_type)
@@ -136,9 +138,26 @@ class VelbusManager(XplPlugin):
             self.log.debug("set relay off")
             self.manager.send_relayoff( address, chan )
         else:
-            seld.log.debug("set dimmer value")
-            self.manager.send_relayoff( address, chan, message.data["level"] )
+            self.log.debug("set dimmer value")
+            self.manager.send_setdimmervalue( address, chan, message.data["level"] )
 
 
+    def process_shutter_basic(self, message):
+        """ Process xpl chema shutter.basic
+        """
+        self.send_xpl("shutter.device", message.data)
+        add = message.data['device'].split('-')
+        chan = []
+        chan.append(int(add[1]))
+        address = add[0]
+        if message.data["command"] == "up":
+            self.log.debug("set shutter up")
+            self.manager.send_shutterup( address, chan )
+        elif message.data["command"] == "down":
+            self.log.debug("set shutter down")
+            self.manager.send_shutterdown( address, chan )
+        else:
+            self.log.debug("Unknown command in shutter.basic message")
+       
 if __name__ == "__main__":
     VelbusManager()

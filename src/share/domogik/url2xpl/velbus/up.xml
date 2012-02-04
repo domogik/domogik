@@ -1,0 +1,17 @@
+<technology id="velbus">
+  <command name="up">
+    <schema>shutter.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>up</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>shutter.device</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="up"/>
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

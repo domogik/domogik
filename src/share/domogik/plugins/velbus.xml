@@ -11,9 +11,11 @@
 - added socket comunication
 0.3.0
 - added dimmer support
+0.4.0
+- added blind (up/down) support
   </changelog>
-  <version>0.3.0</version>
-  <documentation>url</documentation>
+  <version>0.4.0</version>
+  <documentation>http://wiki.domogik.org/plugin_velbus</documentation>
   <author>Maikel Punie</author>
   <author-email>maikel.puni@gmail.com</author-email>
   <domogik-min-version>0.2.0</domogik-min-version>
@@ -46,6 +48,7 @@
     <file path="src/share/domogik/url2xpl/velbus/setlevel.xml"/>
     <file path="src/domogik/xpl/bin/velbus.py"/>
     <file path="src/domogik/xpl/lib/velbus.py"/>
+    <file path="src/domogik/xpl/helper/velbus.py"/>
   </files>
   <dependencies/>
   <udev-rules/>
@@ -65,6 +68,12 @@
           <id>velbus.dimmer</id>
           <name>Dimmer</name>
           <description>Dim one channel on a device</description>
+          <device_technology_id>velbus</device_technology_id>
+      </device_type>
+      <device_type>
+          <id>velbus.shutter</id>
+          <name>Shutter</name>
+          <description>Shutter control (up, down)</description>
           <device_technology_id>velbus</device_technology_id>
       </device_type>
   </device_types>
@@ -103,6 +112,18 @@
           </parameters>
           <value_type>range</value_type>
           <stat_key>level</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>velbus.shutter.switch</id>
+          <name>Shutter</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>velbus.shutter</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
   </device_feature_models>
