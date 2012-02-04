@@ -36,6 +36,11 @@
     <file path="src/share/domogik/url2xpl/knx/write.xml"/>
     <file path="src/share/domogik/url2xpl/knx/read.xml"/>
     <file path="src/share/domogik/url2xpl/knx/response.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/on.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/off.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/up.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/down.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/preset_dim.xml"/>
   </files>
   <dependencies/>
   <udev-rules/>
@@ -51,9 +56,75 @@
           <name>Raw</name>
           <description>Raw value</description>
       </device_type>
+      <device_type>
+          <id>knx.switch</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Switch</name>
+          <description>switch</description>
+      </device_type>
+      <device_type>
+          <id>knx.dimmer</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Dimmer</name>
+          <description>Eib1</description>
+      </device_type>
+      <device_type>
+          <id>knx.shutter</id>
+          <name>Shutter</name>
+          <description>Shutter</description>
+          <device_technology_id>knx</device_technology_id>
+      </device_type>
   </device_types>
   <device_feature_models>
      <device_feature_model>
+          <id>knx.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>knx.eib1.dimmer</id>
+          <name>Dimmer</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>knx.shutter.switch</id>
+          <name>Shutter</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.shutter</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>knx.shutter.stop</id>
+          <name>Stop</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.shutter</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;stop&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;stop&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
           <id>knx.raw.write</id>
           <name>Write</name>
           <feature_type>actuator</feature_type>
@@ -64,7 +135,7 @@
           <value_type>string</value_type>
           <stat_key>command</stat_key>
           <return_confirmation>1</return_confirmation>
-      </device_feature_model>
+     </device_feature_model>
      <device_feature_model>
           <id>knx.raw.read</id>
           <name>Read</name>
