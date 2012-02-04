@@ -94,7 +94,7 @@ class KNXManager(XplPlugin):
         self.add_stop_cb(self.knx.close)
         self.enable_hbeat()
         self.log.info("Plugin ready :)")
-
+        fichier=open("knx.txt","r")
 
     def send_xpl(self, data):
         """ Send xpl-trig to give status change
@@ -106,77 +106,118 @@ class KNXManager(XplPlugin):
         msg_type = 'None'
         command = 'None'
         if sender<>"pageinatio":
-            #print "%s" %sender
+           print "%s" %sender
            command = data[0:4]  
-   
+           lignetest=""
            groups = data[data.find('to')+2:data.find(':')]
            groups = groups.strip()
-           groups = groups.replace('/',':')
+           fichier=open("knx.txt","r")
+           print "%s" %groups
+	   for ligne in fichier:
+              if groups in ligne:
+                 lignetest=ligne
+           fichier.close
+           if lignetest<>"":
+              datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
+              groups=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
+              print "%s" %datatype
+              print "%s" %groups
+              if command <> 'Read':
+                 val=data[data.find(':')+1:-1]
+                 val = val.strip()
+                 val = int(val,16)
+                 msg_type = "s"
+                 if data[-2:-1]==" ":
+                    msg_type = "l"
+                 msg = XplMessage()
 
-           if command <> 'Read':
-               val=data[data.find(':')+1:-1]
-               val = val.strip()
-               msg_type = "s"
-               if data[-2:-1]==" ":
-                   msg_type = "l"
-           msg = XplMessage()
-           if command == 'Writ':
-              print("knx Write xpl-trig")
-              command = 'Write'
-              msg.set_type("xpl-trig")
-              msg.set_schema('knx.basic')
-           if command == 'Resp':
-              print("knx Response xpl-stat")
-              command = 'Response'
+                 if datatype=="dimmer":
+                    val=int(100*val/255)
+                 if datatype=="shutter":
+                    if val==1:
+                       val="down"
+                    if val==0:
+                       val="up"
+                 if command == 'Writ':
+                    print("knx Write xpl-trig")
+                    command = 'Write'
+                    msg.set_type("xpl-trig")
+                    msg.set_schema('knx.basic')
+                 if command == 'Resp':
+                    print("knx Response xpl-stat")
+                    command = 'Response'
+                    if sender<>"0.0.0":
+                       msg.set_type("xpl-stat")
+                    else:
+                       msg.set_type("xpl-trig")
+                    msg.set_schema('knx.basic')
+                 if command == 'Read':
+                    print("knx Read xpl-cmnd")
+                    if sender<>"0.0.0":
+                       msg.set_type("xpl-cmnd")
+                    else:
+                       msg.set_type("xpl-trig")
+                    msg.set_schema('knx.basic')
+   
               if sender<>"0.0.0":
-                  msg.set_type("xpl-stat")
+                 msg.add_data({'command' : command})
               else:
-                  msg.set_type("xpl-trig")
-              msg.set_schema('knx.basic')
-           if command == 'Read':
-               print("knx Read xpl-cmnd")
-               if sender<>"0.0.0":
-                   msg.set_type("xpl-cmnd")
-               else:
-                   msg.set_type("xpl-trig")
-               msg.set_schema('knx.basic')
+                 msg.add_data({'command': command+' ack'})
+                 msg.add_data({'group' :  groups})
+                 msg.add_data({'type' :  msg_type})
+                 msg.add_data({'data': val})
+              self.myxpl.send(msg)
 
-           if sender<>"0.0.0":
-               msg.add_data({'command' : command})
-           else:
-               msg.add_data({'command': command+' ack'})
-           msg.add_data({'group' :  groups})
-           msg.add_data({'type' :  msg_type})
-           msg.add_data({'data': val})
-           self.myxpl.send(msg)
-                          
+
     def knx_cmd(self, message):
         type_cmd = message.data['command']
         groups = message.data['group']
-        groups = groups.replace(':','/')
-        print("%s" %type_cmd)
+        groups = "adr_dmg:"+groups
+        fichier=open("knx.txt","r")
+        print "%s" %groups
+	for ligne in fichier:
+           if groups in ligne:
+              lignetest=ligne
+        fichier.close
+        datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
+        #adrdmg=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
+        groups=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
+        #adrstat=lignetest[lignetest.find('adr_stat:')+9:lignetest.find(' end')]
+        #print "adr_dmg==%s" %adrdmg
+        #print "datatype==%s" %datatype
+        #print "adr_cmd==%s" %groups
+        #print "adr_stat==%s" %adrstat
+        #print("%s" %type_cmd)
         command=""
         if type_cmd=="Write":
-            print("dmg Write")
-            valeur = message.data['data']
-            data_type = message.data['type']
-            if data_type=="s":
-               command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
-            if data_type=="l":
-               command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
+           print("dmg Write")
+           valeur = message.data['data']
+           data_type = message.data['type']
+           if datatype=="dimmer":
+              if valeur<>"None":
+                 valeur = int(int(valeur)*255/100)
+                 print("%s" %valeur)
+                 valeur=hex(valeur)
+                 print( "%s" %valeur)
+              else:
+                 valeur=0
+           if data_type=="s":
+              command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
+           if data_type=="l":
+              command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
         if type_cmd == "Read":
-            print("dmg Read")
-            command="groupread ip:127.0.0.1 %s" % groups
+           print("dmg Read")
+           command="groupread ip:127.0.0.1 %s" % groups
         if type_cmd == "Response":
-            print("dmg Response")
-            data_type=message.data['type']
-            valeur = message.data['data']
-            if data_type=="s":
-                command="groupsresponse ip:127.0.0.1 %s %s" %(groups,valeur)
-            if data_type=="l":
-                command="groupresponse ip:127.0.0.1 %s %s" %(groups,valeur)
+           print("dmg Response")
+           data_type=message.data['type']
+           valeur = message.data['data']
+           if data_type=="s":
+              command="groupsresponse ip:127.0.0.1 %s %s" %(groups,valeur)
+           if data_type=="l":
+               command="groupresponse ip:127.0.0.1 %s %s" %(groups,valeur)
         if command<>"":
-            subp=subprocess.Popen(command, shell=True)
+           subp=subprocess.Popen(command, shell=True)
         if command=="":
            print("erreur command non définir, type cmd= %s" %type_cmd)
 

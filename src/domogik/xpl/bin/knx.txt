@@ -1,0 +1,3 @@
+datatype:light adr_dmg:1 adr_cmd:1/1/3 adr_stat:2/1/3 end
+datatype:dimmer adr_dmg:2 adr_cmd:10/1/3 adr_stat:10/1/4 end
+datatype:shutter adr_dmg:3 adr_cmd:3/1/10 adr_stat:3/1/10 end
