@@ -92,6 +92,9 @@ class DBConnector(XplPlugin):
         else:
             element = None
 
+        msg = "Request  h=%s, t=%s, k=%s (2)" % (hostname, techno, key)
+        print(msg)
+        self.log.debug(msg)
         # Set configuration
         if new_value:
             msg = "Set config h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, new_value)
@@ -101,14 +104,29 @@ class DBConnector(XplPlugin):
 
         # Send configuration
         else:
+            msg = "Request  h=%s, t=%s, k=%s (send)" % (hostname, techno, key)
+            print(msg)
+            self.log.debug(msg)
             if element:
+                msg = "Request  h=%s, t=%s, k=%s (send if element)" % (hostname, techno, key)
+                print(msg)
+                self.log.debug(msg)
                 self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
             else:
+                msg = "Request  h=%s, t=%s, k=%s (send else)" % (hostname, techno, key)
+                print(msg)
+                self.log.debug(msg)
                 if not key:
+                    msg = "Request  h=%s, t=%s, k=%s (send if not key)" % (hostname, techno, key)
+                    print(msg)
+                    self.log.debug(msg)
                     keys = self._fetch_techno_config(techno, hostname, key).keys()
                     values = self._fetch_techno_config(techno, hostname, key).values()
                     self._send_config(techno, hostname, keys, values)
                 else:
+                    msg = "Request  h=%s, t=%s, k=%s (send else of if not key)" % (hostname, techno, key)
+                    print(msg)
+                    self.log.debug(msg)
                     self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
 
     def _send_config(self, technology, hostname, key, value, element = None):
@@ -186,16 +204,28 @@ class DBConnector(XplPlugin):
         #            'dawndusk' : {'startup-plugin':'True'},
         #            'plcbus' : {'device':'/dev/ttyUSB0'},
         #        }
+        self.log.debug("FTC 1")
         try:
             if key:
+                self.log.debug("FTC 2")
                 try:
-                    val = self._db.get_plugin_config(techno, hostname, key).value
+                    self.log.debug("Get plg conf for %s / %s / %s" % (techno, hostname, key))
+                    result = self._db.get_plugin_config(techno, hostname, key)
+                    self.log.debug("Get plg conf for %s / %s / %s vs %s" % (techno, hostname, key, result.key))
+                    if result.key != key:
+                        self.log.debug("Bad key : %s != %s" % (result.key, key))
+                    self.log.debug("Get plg conf for %s / %s / %s Result=%s" % (techno, hostname, key, result))
+                    val = result.value
+                    self.log.debug("Get plg conf for %s / %s / %s = %s" % (techno, hostname, key, val))
                     if val == '':
                         val = "None"
+                    self.log.debug("Get plg conf for %s / %s / %s = %s (2)" % (techno, hostname, key, val))
                     return val
                 except AttributeError:
+                    self.log.debug("Attribute error for %s / %s / %s" % (techno, hostname, key))
                     return "None"
             else:
+                self.log.debug("FTC 3")
                 vals = self._db.list_plugin_config(techno, hostname)
                 res = {}
                 for val in vals:
