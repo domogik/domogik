@@ -1,0 +1,20 @@
+<technology id="knx">
+  <command name="preset_dim">
+    <schema>knx.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>group</address-key>	
+    <command-xpl-value>Write</command-xpl-value>  
+    <parameters>                                                                                            
+      <parameter key="data" location="1"/>                                                           
+      <parameter key="type" value="l"/>   
+    </parameters>                                                                                           
+  </command>	
+  <listener>
+    <schema>knx.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="Write ack"/>
+      <key name="group" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

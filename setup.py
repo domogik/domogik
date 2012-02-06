@@ -90,7 +90,7 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 
-                      'sqlalchemy == 0.7.2',
+                      'sqlalchemy == 0.7.5',
                       'sqlalchemy-migrate >= 0.7.2',
                       'simplejson >= 1.9.2',
                       'pyOpenSSL >= 0.10', 
