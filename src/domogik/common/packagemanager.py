@@ -39,18 +39,16 @@ TODO
 from domogik.common.packagexml import PackageXml, PackageException
 from domogik.common.packagedata import PackageData
 from domogik.common.configloader import Loader
-from xml.dom import minidom
 import traceback
 import tarfile
 import tempfile
 import os
 import pwd
-from subprocess import Popen
 import urllib
 import shutil
 import sys
 from domogik.common import logger
-from distutils2.version import NormalizedVersion, IrrationalVersionError
+from distutils2.version import NormalizedVersion 
 
 
 from domogik import __path__ as domopath
@@ -90,8 +88,8 @@ class PackageManager():
     def __init__(self):
         """ Init tool
         """
-        l = logger.Logger("package-manager")
-        self._log = l.get_logger("package-manager")
+        log = logger.Logger("package-manager")
+        self._log = log.get_logger("package-manager")
 
     def log(self, message):
         """ Log and print message
@@ -323,13 +321,6 @@ class PackageManager():
             raise PackageException(msg)
         self.log("OK")
         return True
-        
-
-
-
-
-        #self._clean_folder(my_tmp_dir)
-        self.log("Package in cache : %s" % path)
 
     def _create_folder(self, folder):
         """ Try to create a folder (does nothing if it already exists)
@@ -354,7 +345,6 @@ class PackageManager():
             @param release : release to install (default : highest)
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
-        source = path
         self.log("Start install for part '%s' of '%s'" % (package_part, path))
         if path[0:6] == "cache:":
             path = "%s/package/download/%s" % (REST_URL, path[6:])
@@ -457,7 +447,7 @@ class PackageManager():
             elif pkg_type in ('external'):
                 os.unlink("%s/packages/externals/%s.xml" %(INSTALL_PATH, id))
             else:
-                raise "Package type '%s' not uninstallable" % pkg_type
+                raise PackageException("Package type '%s' not uninstallable" % pkg_type)
         except:
             msg = "Error while unstalling package : %s" % (traceback.format_exc())
             self.log(msg)
@@ -616,10 +606,10 @@ class PackageManager():
         # Clean folder
         try:
             for root, dirs, files in os.walk(folder):
-                for f in files:
-                    os.unlink(os.path.join(root, f))
-                for d in dirs:
-                    shutil.rmtree(os.path.join(root, d))
+                for fic in files:
+                    os.unlink(os.path.join(root, fic))
+                for dir in dirs:
+                    shutil.rmtree(os.path.join(root, dir))
         except:
             msg = "Error while cleaning cache folder '%s' : %s" % (folder, traceback.format_exc())
             self.log(msg)
@@ -632,8 +622,6 @@ class PackageManager():
             @param repo_list : repositories list
             @param cache_folder : package cache folder
         """
-        package_list = []
-
         # get all packages url
         file_list = []
         for repo in repo_list:
@@ -694,9 +682,9 @@ class PackageManager():
         """
         upd_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for f in files:
-                if f[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+            for fic in files:
+                if fic[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
                     if pkg_xml.type == pkg_type and pkg_xml.id == id \
                        and pkg_xml.release > release:
                         upd_list.append({"type" : pkg_xml.type,
@@ -712,9 +700,9 @@ class PackageManager():
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for f in files:
-                if f[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+            for fic in files:
+                if fic[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
                     pkg_list.append({"fullname" : pkg_xml.fullname,
                                      "release" : pkg_xml.release,
                                      "priority" : pkg_xml.priority,
@@ -722,7 +710,7 @@ class PackageManager():
         pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                       k['release']))
         for pkg in pkg_list:
-             self.log("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
+            self.log("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
                                                pkg["release"], 
                                                pkg["priority"], 
                                                pkg["desc"]))
@@ -733,9 +721,9 @@ class PackageManager():
             @param release : package's release
         """
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for f in files:
-                if f[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+            for fic in files:
+                if fic[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
                     if fullname == pkg_xml.fullname and release == pkg_xml.release:
                         return pkg_xml.priority
         return None
@@ -750,9 +738,9 @@ class PackageManager():
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for f in files:
-                if f[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+            for fic in files:
+                if fic[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
                     if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
                         if pkg_type == None or pkg_type == pkg_xml.type:
                             pkg_list.append({"id" : pkg_xml.id,
@@ -780,16 +768,17 @@ class PackageManager():
         pkg_list = []
         for rep in [PLUGIN_XML_PATH, EXTERNAL_XML_PATH]:
             for root, dirs, files in os.walk(rep):
-                for f in files:
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                    # filter on rest
-                    if pkg_xml.id != "rest":
-                        pkg_list.append({"fullname" : pkg_xml.fullname,
-                                         "id" : pkg_xml.id,
-                                         "release" : pkg_xml.release,
-                                         "type" : pkg_xml.type,
-                                         "package-url" : pkg_xml.package_url,
-                                         "source" : pkg_xml.source})
+                for fic in files:
+                    if fic[-4:] == ".xml":
+                        pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
+                        # filter on rest
+                        if pkg_xml.id != "rest":
+                            pkg_list.append({"fullname" : pkg_xml.fullname,
+                                             "id" : pkg_xml.id,
+                                             "release" : pkg_xml.release,
+                                             "type" : pkg_xml.type,
+                                             "package-url" : pkg_xml.package_url,
+                                             "source" : pkg_xml.source})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                  k['release']))
 
@@ -812,9 +801,9 @@ class PackageManager():
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for f in files:
-                if f[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+            for fic in files:
+                if fic[-4:] == ".xml":
+                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
                     if release == None:
                         if fullname == pkg_xml.fullname:
                             pkg_list.append({"fullname" : pkg_xml.fullname,
@@ -838,7 +827,7 @@ class PackageManager():
             msg = "Several packages are available for '%s'. Please specify which release you choose" % fullname
             self.log(msg)
             for pkg in pkg_list:
-                 self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
+                self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
                                               pkg["release"],
                                               pkg["priority"]))
             return [], msg
@@ -858,6 +847,8 @@ class PackageManager():
 # already exists. In our case, some directories will exists!
 
 class Error(EnvironmentError):
+    """ Error
+    """
     pass
 
 try:
@@ -889,8 +880,6 @@ def copytree(src, dst, cb_log):
     list of names relative to the `src` directory that should
     not be copied.
 
-    XXX Consider this example code rather than the ultimate tool.
-
     """
     try:
         names = os.listdir(src)
@@ -917,7 +906,6 @@ def copytree(src, dst, cb_log):
                 copytree(srcname, dstname, cb_log)
             else:
                 shutil.copy2(srcname, dstname)
-            # XXX What about devices, sockets etc.?
         except (IOError, os.error), why:
             errors.append((srcname, dstname, str(why)))
         # catch the Error from the recursive copytree so that we can

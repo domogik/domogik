@@ -126,17 +126,17 @@ class Query():
         if element:
             mess.add_data({'element': element})
         mess.add_data({'key': key})
-        self.__myxpl.send(mess)
-        # The key may already be removed if the network is really fast
-        if key in self._keys:
-            try:
-                self._keys[key].wait(10)
-                if not self._keys[key].is_set():
-                    self.log.error("No answer received for t = %s, k = %s" % (technology, key))
-                    raise RuntimeError("No answer received for t = %s, k = %s, check your xpl setup" % (technology, key))
-                    return None
-            except KeyError:
-                pass
+
+        try:
+            self.__myxpl.send(mess)
+            self._keys[key].wait(10)
+            if not self._keys[key].is_set():
+                self.log.error("No answer received for t = %s, k = %s" % (technology, key))
+                raise RuntimeError("No answer received for t = %s, k = %s, check your xpl setup" % (technology, key))
+                return None
+        except KeyError:
+            pass
+
         if self._result[key] != "None":
             return self._result[key]
         else:

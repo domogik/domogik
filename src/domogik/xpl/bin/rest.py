@@ -654,7 +654,7 @@ class Rest(XplPlugin):
         return ret
 
     def _list_installed_packages(self, message):
-        """ Send a xpl message to manager to get installed packages list
+        """ Called when a list of installed packages is received
             @param host : host
             @param pkg_type : type of package
         """

@@ -1366,12 +1366,18 @@ class DbHelper():
         @return a PluginConfig object
 
         """
-        return self.__session.query(
+        self.log.debug("GPC %s, %s, %s" % (pl_id, pl_hostname, pl_key)) 
+        try:
+            ret = self.__session.query(
                         PluginConfig
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).filter_by(key=ucode(pl_key)
                     ).first()
+            self.log.debug("GPC %s, %s, %s => %s=%s" % (pl_id, pl_hostname, pl_key, ret.key, ret.value)) 
+        except:
+            self.log.Debug("oups")
+        return ret
 
     def set_plugin_config(self, pl_id, pl_hostname, pl_key, pl_value):
         """Add / update a plugin parameter
