@@ -220,7 +220,7 @@ class VelbusDev:
         """ Send dimemr value
             - speed = 1 second
         """
-        data = chr(0x07) + self._channels_to_byte(channel) + chr(ord(level)) + chr(0x00) + chr(0x01)
+        data = chr(0x07) + self._channels_to_byte(channel) + chr(int(level)) + chr(0x00) + chr(0x01)
         self.write_packet(address, data)
 
     def send_moduletyperequest(self, address):
