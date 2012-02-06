@@ -662,6 +662,7 @@ class Rest(XplPlugin):
         self.log.debug("*** list_installed_packages")
         self.sema_installed.acquire()
         self.log.debug("*** sema acquired")
+        self.log.debug("*** msg = %s" % message)
         # process message
         host = message.data["host"]
         print "H=%s" % host
@@ -670,8 +671,10 @@ class Rest(XplPlugin):
         pkg_mgr = PackageManager()
         idx = 0
         loop_again = True
+        self.log.debug("*** before while")
         while loop_again:
             try:
+                self.log.debug("*** in while : idx=%s" % idx)
                 pkg_type = message.data["type"+str(idx)]
                 if  message.data["enabled"+str(idx)].lower() == "yes":
                     enabled = True
@@ -690,7 +693,9 @@ class Rest(XplPlugin):
                 self._installed_packages[host][pkg_type].append(data)
                 idx += 1
             except KeyError:
+                self.log.debug("*** except!")
                 loop_again = False
+        self.log.debug("*** before release")
         self.sema_installed.release()
         self.log.debug("*** sema released")
     
