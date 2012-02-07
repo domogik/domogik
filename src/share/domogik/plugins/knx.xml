@@ -26,7 +26,15 @@
       <description>KNX device (IP addres)</description>
       <default-value></default-value>
     </key>
-  </configuration-keys>
+    <key>
+      <order-id>2</order-id>
+      <name>file</name>
+      <type>string</type>
+      <description>Chemin du fichier config</description>
+      <default-value></default-value>
+    </key>
+
+ </configuration-keys>
   <files>
     <file path="src/share/domogik/design/plugin/knx/icon.png"/>
     <file path="src/share/domogik/plugins/knx.xml"/>

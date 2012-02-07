@@ -96,7 +96,8 @@ class KNXManager(XplPlugin):
         self.enable_hbeat()
 
         ### Load the configuration file in the plugin
-        fichier=open("/var/log/domogik/knx.txt","r")
+        filetoopen=self._config.query('knx','file')
+        fichier=open(filetoopen,"r")  #"/var/log/domogik/knx.txt","r")
         for ligne in fichier:
            listknx.append(ligne)
         fichier.close
