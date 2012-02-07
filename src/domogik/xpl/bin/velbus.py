@@ -131,6 +131,8 @@ class VelbusManager(XplPlugin):
         chan = []
         chan.append(int(add[1]))
         address = add[0]
+        if message.data["level"] == 'None':
+            message.data["level"] = 0
         if message.data["level"] == str(255):
             self.log.debug("set relay on")
             self.manager.send_relayon( address, chan )
