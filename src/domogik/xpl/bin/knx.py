@@ -45,6 +45,8 @@ import threading
 import subprocess
 import time
 
+listknx=["debut","fin"]
+
 class KNXManager(XplPlugin):
     """ Implements a listener for KNX command messages 
         and launch background listening for KNX events
@@ -64,7 +66,6 @@ class KNXManager(XplPlugin):
             self.knx = KNX(self.log, self.send_xpl)
             self.log.info("Open KNX for device : %s" % device)
             self.knx.open(device)
-            time.sleep(1)
 
         except KNXException as err:
             self.log.error(err.value)
@@ -93,13 +94,20 @@ class KNXManager(XplPlugin):
         Listener(self.knx_cmd, self.myxpl,{'schema':'knx.basic'})
         self.add_stop_cb(self.knx.close)
         self.enable_hbeat()
+
+        ### Load the configuration file in the plugin
+        fichier=open("/var/log/domogik/knx.txt","r")
+        for ligne in fichier:
+           listknx.append(ligne)
+        fichier.close
         self.log.info("Plugin ready :)")
-        fichier=open("knx.txt","r")
 
     def send_xpl(self, data):
         """ Send xpl-trig to give status change
         """
-        sender=data[data.find('from')+4:data.find('to')-1]
+        ### Identify the sender of the message
+        sender = 'None'
+        sender = data[data.find('from')+4:data.find('to')-1]
         sender = sender.strip()
         groups = 'None'
         val = 'None'
@@ -111,17 +119,23 @@ class KNXManager(XplPlugin):
            lignetest=""
            groups = data[data.find('to')+2:data.find(':')]
            groups = groups.strip()
-           fichier=open("knx.txt","r")
            print "%s" %groups
-	   for ligne in fichier:
-              if groups in ligne:
-                 lignetest=ligne
-           fichier.close
+
+        ### Search the sender in the config list
+           i=0
+           lignetest=""
+           for i in range(len(listknx)):
+              if listknx[i].find(groups)>=0:
+                 lignetest = listknx[i]
+                 break
+
+        ### Extract information of the configuration device  
            if lignetest<>"":
               datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
-              groups=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
-              print "%s" %datatype
-              print "%s" %groups
+              dmgadr=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
+              print "datatype %s f" %datatype
+              print "adresse domogik %s f" %dmgadr
+     
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
@@ -130,14 +144,33 @@ class KNXManager(XplPlugin):
                  if data[-2:-1]==" ":
                     msg_type = "l"
                  msg = XplMessage()
+                 print "send_xpl valeur avant modif: %s" %val
+                 if datatype == "DT_Scaling":
+                    print "send_xpl Datapoint DT_Scaling"
+                    if val<=255:
+                       val=int(100*int(val)/255)
+                       print "reception DT_Scaling val=%s" %val
+                    else:
+                       self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
 
-                 if datatype=="dimmer":
-                    val=int(100*val/255)
-                 if datatype=="shutter":
+                 if datatype=="DT_UpDown":
+                    print "send_xpl DT_UpDown" 
                     if val==1:
-                       val="down"
+                       val="down" 
                     if val==0:
                        val="up"
+                    print "valeur après modif %s" %val
+                 if datatype == "DT_Angle":
+                    print "send_xpl DT Angle"
+                    val=val*360/255
+
+                 if datatype == "DT_Percent":
+                    val=val
+
+                 if datatype == "DT_HVACMode":
+                    if val>="5":
+                       self.log.error("DT_HVACMode unknow code %s from %s" %(val,groups))
+                 
                  if command == 'Writ':
                     print("knx Write xpl-trig")
                     command = 'Write'
@@ -163,9 +196,9 @@ class KNXManager(XplPlugin):
                  msg.add_data({'command' : command})
               else:
                  msg.add_data({'command': command+' ack'})
-                 msg.add_data({'group' :  groups})
-                 msg.add_data({'type' :  msg_type})
-                 msg.add_data({'data': val})
+              msg.add_data({'group' :  dmgadr})
+              msg.add_data({'type' :  msg_type})
+              msg.add_data({'data': val})
               self.myxpl.send(msg)
 
 
@@ -173,38 +206,34 @@ class KNXManager(XplPlugin):
         type_cmd = message.data['command']
         groups = message.data['group']
         groups = "adr_dmg:"+groups
-        fichier=open("knx.txt","r")
         print "%s" %groups
-	for ligne in fichier:
-           if groups in ligne:
-              lignetest=ligne
-        fichier.close
+        for i in range(len(listknx)):
+           if listknx[i].find(groups)>=0:
+              lignetest=listknx[i]
         datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
-        #adrdmg=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
-        groups=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
-        #adrstat=lignetest[lignetest.find('adr_stat:')+9:lignetest.find(' end')]
-        #print "adr_dmg==%s" %adrdmg
-        #print "datatype==%s" %datatype
-        #print "adr_cmd==%s" %groups
-        #print "adr_stat==%s" %adrstat
-        #print("%s" %type_cmd)
+        cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
+        lignetest=""
         command=""
         if type_cmd=="Write":
            print("dmg Write")
            valeur = message.data['data']
            data_type = message.data['type']
-           if datatype=="dimmer":
+           print "valeur avant modif:%s" %valeur
+           if datatype=="DT_Scaling":
               if valeur<>"None":
-                 valeur = int(int(valeur)*255/100)
-                 print("%s" %valeur)
+                 valeur = int(valeur)*255/100
+                 print("command val=%s" %valeur)
                  valeur=hex(valeur)
                  print( "%s" %valeur)
               else:
                  valeur=0
+           else:
+              print "Datapoint non trouver"
+              valeur=hex(int(valeur))
            if data_type=="s":
-              command="groupswrite ip:127.0.0.1 %s %s" %(groups, valeur)
+              command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
            if data_type=="l":
-              command="groupwrite ip:127.0.0.1 %s %s" %(groups, valeur)
+              command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
         if type_cmd == "Read":
            print("dmg Read")
            command="groupread ip:127.0.0.1 %s" % groups
