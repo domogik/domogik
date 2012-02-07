@@ -74,7 +74,7 @@ class Ipx800(Helper):
         """ Try to find IPX800 relay boards
         """
         # Init IPX
-        ipx  = IPX(self._log, None)
+        ipx  = IPX(self._log, None, None)
         
         # Find boards
         data = []
@@ -91,7 +91,7 @@ class Ipx800(Helper):
         """ Get status for relay, inputs, counter, etc
         """
             
-        ipx = IPX(self._log, None)
+        ipx = IPX(self._log, None, None)
         if len(args) == 1:
             ipx.open("foo", args[0])
         elif len(args) == 3:
