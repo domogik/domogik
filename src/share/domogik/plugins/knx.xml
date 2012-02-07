@@ -30,7 +30,7 @@
       <order-id>2</order-id>
       <name>file</name>
       <type>string</type>
-      <description>Chemin du fichier config</description>
+      <description>Path of KNX configuration file</description>
       <default-value></default-value>
     </key>
 
