@@ -7,7 +7,7 @@
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="level" filter_key="event" filter_value="level"/>
+                <value field="command" filter_key="event" filter_value="command"/>
             </mapping>
         </xpltype>
     </schema>
