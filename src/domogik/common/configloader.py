@@ -47,6 +47,7 @@ import threading
 import time
 from threading import Semaphore
 
+MAIN_CONFIG_FILE_NAME = "domogik.cfg"
 
 class Loader():
     '''
@@ -63,24 +64,30 @@ class Loader():
         # Semaphore init
         self.__class__.sema_load = Semaphore(value=1)
 
-        self.main_conf_name = "domogik.cfg"
-        self.valid_files = None
+        self.__class__.config = None
+        self.__class__.valid_files = None
         self.plugin_name = plugin_name
 
-        # get home dir
+        config_dir = self.get_config_dir()
+
+        self.config_file = config_dir + MAIN_CONFIG_FILE_NAME
+
+    def get_config_dir(self):
+        ''' Get homedir 
+        '''
         sys_file = ''
         if os.path.isfile('/etc/default/domogik'):
             sys_file = '/etc/default/domogik'
         elif os.path.isfile('/etc/conf.d/domogik'):
             sys_file = '/etc/conf.d/domogik'
-        homedir = os.getenv('HOME')
-        if sys_file != '':
-            f = open(sys_file)
-            data = f.readlines()
-            data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
-            homedir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
+        else:
+            raise RuntimeError("No /etc/default/domogik of /etc/conf.d/domogik exists")
 
-        self.config_file = homedir + "/.domogik/" + self.main_conf_name
+        f = open(sys_file)
+        data = f.readlines()
+        data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
+        configdir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
+        return configdir + "/.domogik/"
 
     def get_config_files_path(self):
         '''
@@ -96,30 +103,36 @@ class Loader():
         @return pair (main_config, plugin_config)
         '''
         self.__class__.sema_load.acquire()
-        sys_file = ''
-        main_result = {}
+
+        # need to reread or not ?
         if self.__class__.config == None or refresh == True:
+            do_read = True
+        else:
+            do_read = False
+
+        # read config file
+        if do_read == True:
             self.__class__.config = ConfigParser.ConfigParser()
             files = self.__class__.config.read([custom_path, 
                 self.config_file])
             self.__class__.valid_files = files
+
+        # get 'domogik' config part
         result = self.__class__.config.items('domogik')
-        main_result = {}
+        domogik_part = {}
         for k, v in result:
-            main_result[k] = v
-        #Check the plugin conf file if defined
+            domogik_part[k] = v
+
+        # no other config part requested
         if self.plugin_name == None:
             self.__class__.sema_load.release()
-            return (main_result, None)
+            return (domogik_part, None)
 
+        # Get requested (if so) config part
         if self.plugin_name:
-            ret =  (main_result, self.__class__.config.items(self.plugin_name))
+            ret =  (domogik_part, self.__class__.config.items(self.plugin_name))
             self.__class__.sema_load.release()
             return ret
-        else:
-            #If we're here, there is no plugin config
-            self.__class__.sema_load.release()
-            return (main_result, None)
 
     def set(self, section, key, value):
         """ Set a key value for a section in config file and write it
