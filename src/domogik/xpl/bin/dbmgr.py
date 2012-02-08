@@ -211,6 +211,10 @@ class DBConnector(XplPlugin):
                 try:
                     self.log.debug("Get plg conf for %s / %s / %s" % (techno, hostname, key))
                     result = self._db.get_plugin_config(techno, hostname, key)
+                    # tricky loop as workaround for a (sqlalchemy?) bug :
+                    # sometimes the given result is for another plugin/key
+                    # so while we don't get the good data, we loop
+                    # This bug happens rarely
                     while result.id != techno or \
                        result.hostname != hostname or \
                        result.key != key:
