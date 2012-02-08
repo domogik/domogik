@@ -211,9 +211,11 @@ class DBConnector(XplPlugin):
                 try:
                     self.log.debug("Get plg conf for %s / %s / %s" % (techno, hostname, key))
                     result = self._db.get_plugin_config(techno, hostname, key)
-                    self.log.debug("Get plg conf for %s / %s / %s vs %s" % (techno, hostname, key, result.key))
-                    if result.key != key:
-                        self.log.debug("Bad key : %s != %s" % (result.key, key))
+                    while result.id != techno or \
+                       result.hostname != hostname or \
+                       result.key != key:
+                        self.log.debug("Bad result : %s/%s != %s/%s" % (result.id, result.key, technology, key))
+                        result = self._db.get_plugin_config(techno, hostname, key)
                     self.log.debug("Get plg conf for %s / %s / %s Result=%s" % (techno, hostname, key, result))
                     val = result.value
                     self.log.debug("Get plg conf for %s / %s / %s = %s" % (techno, hostname, key, val))
