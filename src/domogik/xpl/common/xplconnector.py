@@ -76,9 +76,11 @@ import sys
 import select
 import threading
 import traceback
-from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
-from domogik.common import logger
-from domogik.xpl.common.baseplugin import BasePlugin
+import random
+#from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
+from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
+#from domogik.common import logger
+#from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 
@@ -132,6 +134,17 @@ class Manager:
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
 
+	# plugin status
+        # 0 = strating (xpl hub discovery)
+        # 1 = config (xpl config phase)
+        # 2 = running (plugin ready for receiving xpl commands)
+        self._status = 0
+	# status (starting, config, started)
+        self._lock_status = threading.Semaphore()
+        # hbeat detected
+        self._foundhub = threading.Event()
+        self._foundhub.clear()
+
         # Try and bind to the base port
         try:
             self._UDPSock.bind(addr)
@@ -155,29 +168,56 @@ class Manager:
             self.p.register_thread(self._network)
             self._network.start()
             self.p.log.debug("xPL thread started for %s " % self.p.get_plugin_name())
+        # start hbeat discovery
+        self.hub_discovery()
+        self._foundhub.wait()
+
+    def hub_discovery(self):
+        """ Start HUB discovery
+        random hbeat timeout between 3 and 10 seconds, and sends HBEAT
+        """
+        if not self._foundhub.is_set():
+            self.p.log.debug("Start HUB discovery")
+            # random send hbeat (between 3 and 10 seconds)
+            rnd = random.randrange(3, 10)
+            self._h_timer = XplTimer(rnd, self._SendHeartbeat, self)
+            self._h_timer.start()
+
+    def foundhub(self):
+        """ resets the timer to the default timeout
+        """
+        self.p.log.debug("Received HBEAT echo, HUB detected")
+        self._foundhub.set()
+        self.update_status(1)
+        if self._h_timer != None:
+            self._h_timer._timer._time = 300
+        Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
 
     def enable_hbeat(self, lock = False):
-        """ Enable the answer to hbeat request 
+        """ Enable the answer to hbeat request
         @param lock : If set to True, the process will lock  on 'should_stop'
         """
-        self.p.log.debug("Try to enable Heartbeat")
-        if self._h_timer == None:
+        self.update_status(2)
+        if lock:
+            self.p.log.debug("Hbeat : Wait for stop flag")
+            self.get_stop().wait() 
+
+    def update_status(self, setto):
+        """ Update internal plugin status
+        Only do this if the status really changes
+        """
+        if setto != self._status:
+            self._lock_status.acquire()
+            self._status = setto
+            self._lock_status.release()
             self._SendHeartbeat()
-            self._h_timer = XplTimer(300, self._SendHeartbeat, self)
-            self._h_timer.start()
-            #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
-            self.p.log.debug("Heartbeat enabled")
-            if lock:
-                self.p.log.debug("Hbeat : Wait for stop flag")
-                self.get_stop().wait()
-        else:
-            self.p.log.warning("_h_timer is not None, don't create another Hbeat process")
 
     def leave(self):
         """
         Stop threads and leave the Manager
         """
+        self.p.log.debug("send hbeat.end")
+        self._SendHeartbeat(schema='hbeat.end')
         self._UDPSock.close()
         self.p.log.debug("xPL thread stopped")
 
@@ -219,34 +259,34 @@ class Manager:
             self.p.log.debug(traceback.format_exc())
         self._lock_send.release()
 
-    def _SendHeartbeat(self, target='*', test=""):
+    def _SendHeartbeat(self, target='*', test="", schema="hbeat.app"):
         """
         Send heartbeat message in broadcast on the network, on the bus port
         (3865)
         This make the application able to be discovered by the hub
         This method is not called by childs, so no need to protect it.
         """
-        # Sub routine for sending a heartbeat
-
-        mess = """\
-xpl-stat
-{
-hop=1
-source=%s
-target=%s
-}
-hbeat.app
-{
-interval=5
-port=%s
-remote-ip=%s
-}
-""" % (self._source, target, self.port, self._ip)
+        self._lock_status.acquire()
+        self.p.log.debug("send hbeat")
+        mesg = XplMessage()
+        mesg.set_type( "xpl-stat" )
+        mesg.set_hop_count( 1 )
+        mesg.set_source( self._source )
+        mesg.set_target( target )
+        mesg.set_schema( schema )
+        mesg.add_single_data( "interval", "5" )
+        mesg.add_single_data( "port", self.port )
+        mesg.add_single_data( "remote-ip", self._ip )
+        if schema != 'hbeat.end':
+            mesg.add_single_data( "status", self._status )
         if self is not None:
             if not self.p.should_stop():
-                self._UDPSock.sendto(mess, (self._broadcast, 3865))
+                self.send( mesg )
+        self._lock_status.release()
 
     def got_hbeat(self, message):
+        """ Callback for hbeat listener
+        """
         if(message.target == self._source or message.target == "*"):
             self._SendHeartbeat(message.source)
 
@@ -271,7 +311,10 @@ remote-ip=%s
                     else:
                         try:
                             mess = XplMessage(data)
-                            if (mess.target == "*" or (mess.target == self._source)) and\
+                            if (not self._foundhub.is_set()) and (mess.source == self._source)\
+                                and (mess.schema == "hbeat.app"):
+                                self.foundhub()
+                            elif (mess.target == "*" or (mess.target == self._source)) and\
                                 (self._source != mess.source):
                                 update = False
                                 if mess.schema == "fragment.basic":
