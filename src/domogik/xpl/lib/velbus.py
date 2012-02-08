@@ -195,14 +195,14 @@ class VelbusDev:
     def send_shutterup(self, address, channel):
         """ Send shutter up message
         """
-        #data = 
-        #self.write_packet(address, data)
+        data = chr(0x05) + self._blinchannel_to_byte(channel) + chr(0x00) + chr(0x00) + chr(0x00)
+        self.write_packet(address, data)
     
     def send_shutterdown(self, address, channel):
         """ Send shutter down message
         """
-        #data = 
-        #self.write_packet(address, data)
+        data = chr(0x06) + self._blinchannel_to_byte(channel) + chr(0x00) + chr(0x00) + chr(0x00)
+        self.write_packet(address, data)
     
     def send_relayon(self, address, channel):
         """ Send relay on message
@@ -393,8 +393,11 @@ class VelbusDev:
            blind channel status => send out when the blind status changes
            chan <X> <status>
            chan: 00000011=1, 00001100=2
-           status: 0=off, 1=chan 1 up, 2=chan 1 down, 3=chan 2 up, 4=chan 2 down
+           status: 0=off, 1=chan 1 up, 2=chan 1 down, 4=chan 2 up, 8=chan 2 down
         """
+        #self._callback("shutter.device",
+        #     {"device" : device,
+        #     "command" : command})    
 	
 # Some convert procs
     def _channels_to_byte(self, channels):
@@ -420,3 +423,25 @@ class VelbusDev:
             if byte & (1 << offset):
                 result.append(offset+1)
         return result
+
+    def _blinchannel_to_byte(self, channel):
+        """
+           Convert a channel 1 or 2 to its correct byte
+        """
+        assert channel > 2
+        assert channel == 0
+        if channel == 1:
+            return chr(0x03)
+        else:
+            return chr(0x0C)
+
+    def _byte_to_blindchannel(self, byte):
+        """
+           Convert a byte to its channel
+        """
+        if byte == chr(0x03):
+            return 1
+        else:
+            return 2
+
+
