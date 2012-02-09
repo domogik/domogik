@@ -64,7 +64,8 @@ class Loader():
         # Semaphore init
         self.__class__.sema_load = Semaphore(value=1)
 
-        self.__class__.config = None
+        if hasattr(self.__class__, "config") == False:
+            self.__class__.config = None
         self.__class__.valid_files = None
         self.plugin_name = plugin_name
 
