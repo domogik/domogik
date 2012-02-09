@@ -66,7 +66,7 @@ class Loader():
 
         if hasattr(self.__class__, "config") == False:
             self.__class__.config = None
-        self.__class__.valid_files = None
+        self.__class__.valid_files = []
         self.plugin_name = plugin_name
 
         config_dir = self.get_config_dir()
