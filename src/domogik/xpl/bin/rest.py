@@ -704,6 +704,7 @@ class Rest(XplPlugin):
             except:
                 self.log.debug("*** except global")
                 self.log.error("Error while creating list of installed packages : %s" % traceback.format_exc())
+                loop_again = False
         self.log.debug("*** before release")
         self.sema_installed.release()
         self.log.debug("*** sema released")
