@@ -2845,7 +2845,7 @@ target=*
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("udev-rules")
+        json_data.set_data_type("udev-rule")
 
         ### Send xpl message to check python dependencies on host
         message = XplMessage()
