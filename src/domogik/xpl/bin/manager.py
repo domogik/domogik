@@ -169,11 +169,13 @@ class SysManager(XplPlugin):
             sys.path.append(self._package_path)
             self._xml_plugin_directory = os.path.join(self._package_path, "packages/plugins/")
             self._xml_external_directory = os.path.join(self._package_path, "packages/externals/")
+            self.package_mode = True
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
             self._xml_plugin_directory = os.path.join(conf['custom_prefix'], "share/domogik/plugins/")
             self._xml_external_directory = os.path.join(conf['custom_prefix'], "share/domogik/externals/")
+            self.package_mode = False
 
         self._pinglist = {}
         self._plugins = []
@@ -324,7 +326,8 @@ class SysManager(XplPlugin):
                 self._state_fifo.close()
 
             ### Send installed packages list
-            self._pkg_list_installed()
+            if self.package_mode == True:
+                self._pkg_list_installed()
 
             ### make an eternal loop to ping plugins
             # the goal is to detect manually launched plugins
@@ -973,7 +976,8 @@ class SysManager(XplPlugin):
 
         subp = Popen("dmgenplug %s" % name, shell=True)
         subp.communicate()
-        self._pkg_list_installed()
+        if self.package_mode == True:
+            self._pkg_list_installed()
         time.sleep(1) # make sure rest receive the updated list before the ack of enable
         self.myxpl.send(mess)          
 
@@ -990,7 +994,8 @@ class SysManager(XplPlugin):
 
         subp = Popen("dmgdisplug %s" % name, shell=True)
         subp.communicate()
-        self._pkg_list_installed()
+        if self.package_mode == True:
+            self._pkg_list_installed()
         time.sleep(1) # make sure rest receive the updated list before the ack of disable
         self.myxpl.send(mess)          
 

@@ -50,24 +50,29 @@ import sys
 from domogik.common import logger
 from distutils2.version import NormalizedVersion 
 
-
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
-PLG_XML_PATH = "src/share/domogik/plugins/"
-TMP_EXTRACT_DIR = "%s/%s" % (tempfile.gettempdir(), "domogik-pkg-mgr")
-CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
-REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
+#PLG_XML_PATH = "src/share/domogik/plugins/"
+
+CONFIG_FOLDER = "%s/.domogik/" % os.getenv("HOME")
+DATA_FOLDER = "%s/.domogik/" % os.getenv("HOME")
+
+TMP_EXTRACT_DIR = "%s/tmp/" % DATA_FOLDER
+CONFIG_FILE = "%s/domogik.cfg" % CONFIG_FOLDER
+REPO_SRC_FILE = "%s/sources.list" % CONFIG_FOLDER
+REPO_CACHE_DIR = "%s/cache" % DATA_FOLDER
+PKG_CACHE_DIR = "%s/pkg-cache" % DATA_FOLDER
 REPO_LST_FILE_HEADER = "Domogik Repository"
-REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
-PKG_CACHE_DIR = "%s/.domogik/pkg-cache" % os.getenv("HOME")
 
 cfg = Loader('domogik')
 config = cfg.load()
 conf = dict(config[1])
 if conf.has_key('package_path'):
     INSTALL_PATH = conf['package_path']
+    PACKAGE_MODE = True
 else:
-    INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
+    INSTALL_PATH = "/tmp/"
+    PACKAGE_MODE = False
 
 cfg = Loader('rest')
 config = cfg.load()
@@ -282,6 +287,8 @@ class PackageManager():
             @param id : package id
             @param release : package release
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         package = "%s-%s" % (pkg_type, id)
         pkg, status = self._find_package(package, release)
         if status != True:
@@ -345,6 +352,8 @@ class PackageManager():
             @param release : release to install (default : highest)
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         self.log("Start install for part '%s' of '%s'" % (package_part, path))
         if path[0:6] == "cache:":
             path = "%s/package/download/%s" % (REST_URL, path[6:])
@@ -438,6 +447,8 @@ class PackageManager():
             @param pkg_type : package type
             @param id : package id
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         self.log("Start uninstall for package '%s-%s'" % (type, id))
         self.log("Only xml description file will be deleted in this Domogik version")
 
@@ -543,6 +554,8 @@ class PackageManager():
     def update_cache(self):
         """ update local package cache
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         # Get repositories list
         try:
             # Read repository source file and generate repositories list
@@ -680,6 +693,8 @@ class PackageManager():
             @param id : package id
             @param release : package release
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         upd_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
@@ -736,6 +751,8 @@ class PackageManager():
             @param pkg_type (optionnal) : package type
             Used by Rest
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
@@ -765,6 +782,8 @@ class PackageManager():
         """ List all packages in install folder 
             and return a detailed list
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         pkg_list = []
         for rep in [PLUGIN_XML_PATH, EXTERNAL_XML_PATH]:
             for root, dirs, files in os.walk(rep):
