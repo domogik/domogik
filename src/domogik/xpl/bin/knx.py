@@ -207,49 +207,52 @@ class KNXManager(XplPlugin):
         type_cmd = message.data['command']
         groups = message.data['group']
         groups = "adr_dmg:"+groups
+        ligentest=""
         print "%s" %groups
         for i in range(len(listknx)):
            if listknx[i].find(groups)>=0:
               lignetest=listknx[i]
-        datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
-        cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
-        lignetest=""
-        command=""
-        if type_cmd=="Write":
-           print("dmg Write")
-           valeur = message.data['data']
-           data_type = message.data['type']
-           print "valeur avant modif:%s" %valeur
-           if datatype=="DT_Scaling":
-              if valeur<>"None":
-                 valeur = int(valeur)*255/100
-                 print("command val=%s" %valeur)
-                 valeur=hex(valeur)
-                 print( "%s" %valeur)
-              else:
-                 valeur=0
-           else:
-              print "Datapoint non trouver"
-              valeur=hex(int(valeur))
-           if data_type=="s":
-              command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
-           if data_type=="l":
-              command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
-        if type_cmd == "Read":
-           print("dmg Read")
-           command="groupread ip:127.0.0.1 %s" % groups
-        if type_cmd == "Response":
-           print("dmg Response")
-           data_type=message.data['type']
-           valeur = message.data['data']
-           if data_type=="s":
-              command="groupsresponse ip:127.0.0.1 %s %s" %(groups,valeur)
-           if data_type=="l":
-               command="groupresponse ip:127.0.0.1 %s %s" %(groups,valeur)
-        if command<>"":
-           subp=subprocess.Popen(command, shell=True)
-        if command=="":
-           print("erreur command non définir, type cmd= %s" %type_cmd)
+        if lignetest<>"":
+           datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
+           cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
+           lignetest=""
+           command=""
+           if type_cmd=="Write":
+              print("dmg Write")
+              valeur = message.data['data']
+              data_type = message.data['type']
+              print "valeur avant modif:%s" %valeur
+              if datatype=="DT_Scaling":
+                 if valeur<>"None":
+                    valeur = int(valeur)*255/100
+                    print("command val=%s" %valeur)
+                    valeur=hex(valeur)
+                    print( "%s" %valeur)
+                 else:
+                    valeur=0
+              #else:
+              #   print "Datapoint non trouver"
+              #   valeur=hex(int(valeur))
+              if data_type=="s":
+                 command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
+              if data_type=="l":
+                 command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
+           if type_cmd == "Read":
+              print("dmg Read")
+              command="groupread ip:127.0.0.1 %s" %cmdadr
+           if type_cmd == "Response":
+              print("dmg Response")
+              data_type=message.data['type']
+              valeur = message.data['data']
+              if data_type=="s":
+                 command="groupsresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
+              if data_type=="l":
+                  command="groupresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
+           if command<>"":
+              print "envoie de la command %s" %command
+              subp=subprocess.Popen(command, shell=True)
+           if command=="":
+              print("erreur command non définir, type cmd= %s" %type_cmd)
 
 
 if __name__ == "__main__":
