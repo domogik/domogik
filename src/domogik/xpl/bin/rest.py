@@ -686,15 +686,21 @@ class Rest(XplPlugin):
                         "type" : message.data["type"+str(idx)],
                         "source" : message.data["source"+str(idx)],
                         "enabled" : enabled}
+                self.log.debug("*** call get_available_updates(%s, %s, %s)" % (data["type"], data["id"], data["release"]))
                 updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
+                self.log.debug("*** after get_available_updates")
                 data["updates"] = updates
                 if self._installed_packages[host].has_key(pkg_type) == False:
                     self._installed_packages[host][pkg_type] = []
                 self._installed_packages[host][pkg_type].append(data)
+                self.log.debug("*** before idx += 1")
                 idx += 1
             except KeyError:
-                self.log.debug("*** except!")
+                self.log.debug("*** except keyerror")
                 loop_again = False
+            except:
+                self.log.debug("*** except global")
+                self.log.error("Error while creating list of installed packages : %s" % traceback.format_exc())
         self.log.debug("*** before release")
         self.sema_installed.release()
         self.log.debug("*** sema released")
