@@ -49,6 +49,10 @@
     <file path="src/share/domogik/url2xpl/knx/up.xml"/>
     <file path="src/share/domogik/url2xpl/knx/down.xml"/>
     <file path="src/share/domogik/url2xpl/knx/preset_dim.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/HVACnofreeze.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/HVACeco.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/HVACstop.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/HVACnormal.xml"/>
   </files>
   <dependencies/>
   <udev-rules/>
@@ -82,8 +86,26 @@
           <description>Shutter</description>
           <device_technology_id>knx</device_technology_id>
       </device_type>
+      <device_type>
+          <id>knx.HVACMode</id>
+          <name>HVACMode</name>
+          <description>HVACMode</description>
+          <device_technology_id>knx</device_technology_id>
+      </device_type>
   </device_types>
   <device_feature_models>
+  <device_feature_model>
+          <id>knx.HVACMode</id>
+          <name>HVACMode</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.HVACMode</device_type_id>
+          <parameters>
+		{&quot;command&quot;:&quot;&quot;,&quot;commandValues&quot;:[&quot;HVACstop&quot;,&quot;HVACnofreeze&quot;,&quot;HVACeco&quot;,&quot;HVACnormal&quot;]}
+          </parameters>
+          <value_type>list</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
      <device_feature_model>
           <id>knx.switch</id>
           <name>Switch</name>

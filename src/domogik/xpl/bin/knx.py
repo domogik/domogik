@@ -206,7 +206,7 @@ class KNXManager(XplPlugin):
     def knx_cmd(self, message):
         type_cmd = message.data['command']
         groups = message.data['group']
-        groups = "adr_dmg:"+groups
+        groups = "adr_dmg:"+groups+" "
         ligentest=""
         print "%s" %groups
         for i in range(len(listknx)):
