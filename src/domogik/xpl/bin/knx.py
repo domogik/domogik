@@ -119,7 +119,7 @@ class KNXManager(XplPlugin):
            command = data[0:4]  
            lignetest=""
            groups = data[data.find('to')+2:data.find(':')]
-           groups = groups.strip()
+           groups =":"+groups.strip()+" "
            print "%s" %groups
 
         ### Search the sender in the config list
@@ -158,8 +158,11 @@ class KNXManager(XplPlugin):
                     print "send_xpl DT_UpDown" 
                     if val==1:
                        val="down" 
+                      # value=0
                     if val==0:
                        val="up"
+                      # value=1
+                    #val=value
                     print "valeur après modif %s" %val
                  if datatype == "DT_Angle":
                     print "send_xpl DT Angle"
@@ -222,6 +225,12 @@ class KNXManager(XplPlugin):
               valeur = message.data['data']
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
+              if datatype=="DT_HVACEib":
+                 if valeur=="3":
+                    value="2"
+                 if valeur=="1":
+                    value="3"
+                 valeur=value
               if datatype=="DT_Scaling":
                  if valeur<>"None":
                     valeur = int(valeur)*255/100
@@ -230,9 +239,6 @@ class KNXManager(XplPlugin):
                     print( "%s" %valeur)
                  else:
                     valeur=0
-              #else:
-              #   print "Datapoint non trouver"
-              #   valeur=hex(int(valeur))
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
               if data_type=="l":
