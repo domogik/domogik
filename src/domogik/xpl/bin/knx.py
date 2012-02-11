@@ -29,7 +29,7 @@ Implements
 
 - KnxManager
 
-@author: Fritz <fritz.smh@gmail.com> Basilic <Basilic3@hotmail.com>...
+@author: Fritz <fritz.smh@gmail.com> Basilic <Basilic3@hotmail.com> ...
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
