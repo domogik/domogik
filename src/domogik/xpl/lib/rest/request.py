@@ -38,7 +38,7 @@ ProcessRequest object
 """
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.common.database import DbHelper
+from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
@@ -2217,6 +2217,8 @@ target=*
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
+        except DbHelperException as e:
+            json_data.set_error(code = 999, description = e.value)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -2236,6 +2238,8 @@ target=*
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
+        except DbHelperException as e:
+            json_data.set_error(code = 999, description = e.value)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
