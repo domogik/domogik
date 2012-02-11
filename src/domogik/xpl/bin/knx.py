@@ -134,47 +134,147 @@ class KNXManager(XplPlugin):
            if lignetest<>"":
               datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
               dmgadr=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
+              typeadr=lignetest[lignetest.find(groups)-4:lignetest.find(groups)]
+	      typeadr=typeadr.replace("_","")
+	      print "type d'adresse %s" %typeadr
               print "datatype %s f" %datatype
               print "adresse domogik %s f" %dmgadr
      
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
-                 val = int(val,16)
                  msg_type = "s"
                  if data[-2:-1]==" ":
                     msg_type = "l"
                  msg = XplMessage()
                  print "send_xpl valeur avant modif: %s" %val
-                 if datatype == "DT_Scaling":
-                    print "send_xpl Datapoint DT_Scaling"
+
+                 if datatype == "1.001":
+                    val=int(val.replace(" ",""),16)
+                    if val>=1:
+                       val=val
+                    else:
+                       self.log.error("DPT_switch 1.001 invalid value %s from %s" %(val,groups))
+
+                 if datatype=="1.008": #"DT_UpDown":
+                    val=int(val.replace(" ",""),16)
+                    if val<=1:        
+                       if val==1:
+                          #val="down" 
+                          value=0
+                       if val==0:
+                          #val="up"
+                          value=1
+                       val=value
+                       print "valeur après modif %s" %val
+
+                 if datatype =="5.001": # "DT_Scaling":
+                    print "DT_Scaling"
+                    val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=int(100*int(val)/255)
                        print "reception DT_Scaling val=%s" %val
                     else:
                        self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
 
-                 if datatype=="DT_UpDown":
-                    print "send_xpl DT_UpDown" 
-                    if val==1:
-                       val="down" 
-                      # value=0
-                    if val==0:
-                       val="up"
-                      # value=1
-                    #val=value
-                    print "valeur après modif %s" %val
-                 if datatype == "DT_Angle":
+                 if datatype == "5.xxx": #8bit unsigned integer (from 0 to 255) (EIS6) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=255:
+                       val=val
+
+                 if datatype == "5.003": #angle (from 0 to 360°) 
+                    val=int(val.replace(" ",""),16)
                     print "send_xpl DT Angle"
-                    val=val*360/255
+                    if val<=255:
+                       val=val*360/255
+                    else:
+                       self.log.error("DPT_Angle not valid argument %s from %s" %(val,groups))
 
-                 if datatype == "DT_Percent":
-                    val=val
+                 if datatype =="6.xxx": #8bit signed integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=255:
+                       val=val-128
+		    else:
+                       self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
-                 if datatype == "DT_HVACMode":
+                 if datatype =="7.xxx": #16bit unsigned integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=65535:
+                       val=val
+                    else:
+                       self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+                 if datatype =="8.xxx": #16bit signed integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=65535:
+                       val=val-32768
+                    else:
+                       self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
+
+                 if datatype =="9.xxx": #16bit unsigned integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=65535:
+                       val=bin(val)[2:]
+                       x=long(val[1,5],2)
+                       y=long(val[0,1]+val[5,16],2)
+                       val=float(((0.01*y)*2**x)-671088.64)
+                    else:
+                       self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
+
+                 if datatype =="10.001": #time (EIS3)
+                    val=int(val.replace(" ",""),16)
+                    if val<=3476283:
+                       val=int(val.replace(" ",""),16)
+                       val=bin(val)[2:]
+                       second=int(val[len(val)-6:len(val)],2)
+                       val=val[0:len(val)-8]
+                       minute=int(val[len(val)-6:len(val)],2)
+                       val=val[0:len(val)-8]
+                       hour=int(val[len(val)-5:len(val)],2)
+                       val=val[0:len(val)-5]
+                       if len(val)>=1:
+                          day=int(val,2)
+                       else:
+                          day="No day"
+                       val=hour+":"+minute+":"+second+".0"
+                    else:
+                       self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
+
+                 if datatype =="11.001": #date (EIS4)
+                    val=int(val.replace(" ",""),16)
+                    if val<=3476283:
+                       val=int(val.replace(" ",""),16)
+                       val=bin(val)[2:]
+                       year=int(val[len(val)-7:len(val)],2)
+                       val=val[0:len(val)-8]
+                       mounth=int(val[len(val)-4:len(val)],2)
+                       val=val[0:len(val)-8]
+                       day=int(val[len(val)-5:len(val)],2)
+                       val=year+"-"+mounth+"-"+day
+                    else:
+                       self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
+
+
+                 if datatype == "20.102": #heating mode (comfort/standby/night/frost) 
+                    val=int(val.replace(" ",""),16)
                     if val>="5":
-                       self.log.error("DT_HVACMode unknow code %s from %s" %(val,groups))
-                 
+                       val=val
+                    else:
+                       self.log.error("DPT_HVACMode unknow code %s from %s" %(val,groups))
+
+                 if datatype == "DT_HVACEib":
+                    val=int(val.replace(" ",""),16)
+                    if val<=4:
+                       if val==2:
+                          value=3
+                       if val==3:
+                          value=1
+                       if val==4:
+                          value=4
+                       val=value
+                    else:
+                       self.log.error("DT_HVACEib unknow value %s from %s" %(val,groups))
+
                  if command == 'Writ':
                     print("knx Write xpl-trig")
                     command = 'Write'
@@ -197,13 +297,14 @@ class KNXManager(XplPlugin):
                     msg.set_schema('knx.basic')
    
               if sender<>"0.0.0":
-                 msg.add_data({'command' : command})
+                 msg.add_data({'command' : command+' bus'})
               else:
                  msg.add_data({'command': command+' ack'})
               msg.add_data({'group' :  dmgadr})
               msg.add_data({'type' :  msg_type})
               msg.add_data({'data': val})
               self.myxpl.send(msg)
+              print "command: %s group: %s type: %s data: %s" %s(command,dmgadr,msg_type,val)
 
 
     def knx_cmd(self, message):
@@ -225,13 +326,9 @@ class KNXManager(XplPlugin):
               valeur = message.data['data']
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
-              if datatype=="DT_HVACEib":
-                 if valeur=="3":
-                    value="2"
-                 if valeur=="1":
-                    value="3"
-                 valeur=value
-              if datatype=="DT_Scaling":
+
+
+              if datatype=="5.001": #"DT_Scaling":
                  if valeur<>"None":
                     valeur = int(valeur)*255/100
                     print("command val=%s" %valeur)
@@ -239,6 +336,19 @@ class KNXManager(XplPlugin):
                     print( "%s" %valeur)
                  else:
                     valeur=0
+
+	      if datatype == "5.003": #"DT_Angle":
+                    val=int(val.replace(" ",""),16)
+                    if val<=360:
+                       val=val*255/360
+
+              if datatype=="DT_HVACEib":
+                 if valeur=="3":
+                    value="2"
+                 if valeur=="1":
+                    value="3"
+                 valeur=value
+
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
               if data_type=="l":
