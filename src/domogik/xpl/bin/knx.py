@@ -221,7 +221,7 @@ class KNXManager(XplPlugin):
                        val=bin(val)[2:]
                        x=long(val[1,5],2)
                        y=long(val[0,1]+val[5,16],2)
-                       val=float(((0.01*y)*2**x)-671088.64)
+                       val=float((0.01*(y-2048))*2**x)
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
 
@@ -352,6 +352,21 @@ class KNXManager(XplPlugin):
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
 
+              if datatype =="5.xxx": #16bit unsigned integer (EIS14) 
+                 val=int(val)
+                 if val>=0:
+                    if val<=255:
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()
+                    else:
+                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
+		 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
               if datatype=="5.001": #"DT_Scaling":
                  if valeur<>"None":
                     valeur = int(valeur)*255/100
@@ -362,9 +377,81 @@ class KNXManager(XplPlugin):
                     valeur=0
 
 	      if datatype == "5.003": #"DT_Angle":
-                    val=int(val.replace(" ",""),16)
                     if val<=360:
-                       val=val*255/360
+                       val=int(val)*255/360
+                       val=hex(val)
+
+              if datatype =="6.xxx": #8bit signed integer (EIS14) 
+                 val=int(val)
+                 if val<=127:
+                    if val>=-128:
+                       val=val+128
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()	
+		 else:
+                    self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
+
+              if datatype =="7.xxx": #16bit unsigned integer (EIS14) 
+                 val=int(val)
+                 if val>=0:
+                    if val<=65535:
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()
+                    else:
+                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
+		 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+              if datatype =="8.xxx": #16bit signed integer (EIS14) 
+                 val=int(val)
+                 if val<=32767:
+                    if val>=-32768:
+                       val=val+32768
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()	
+                 else:
+                    self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
+
+              if datatype =="12.xxx": #32bit unsigned integer (EIS14) 
+                 val=int(val)
+                 if val>=0:
+                    if val<=4294967295:
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()
+                    else:
+                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
+		 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+              if datatype == "13.xxx": #32bit signed integer
+                 val=int(val)
+                 if val<=2147483647:
+                    if val>=-2147483648:
+                       val=val+2147483648
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()	
+                 else:
+                    self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
               if datatype=="DT_HVACEib":
                  if valeur=="3":
