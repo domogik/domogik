@@ -29,7 +29,7 @@ Implements
 
 - KnxManager
 
-@author: Fritz <fritz.smh@gmail.com> Basilic <Basilic3@hotmail.com> ...
+@author: Fritz <fritz.smh@gmail.com> Basilic <Basilic3@hotmail.com>...
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -107,6 +107,10 @@ class KNXManager(XplPlugin):
         """ Send xpl-trig to give status change
         """
         ### Identify the sender of the message
+        command = ""
+        dmgadr =""
+        msg_type=""
+        val=""
         sender = 'None'
         sender = data[data.find('from')+4:data.find('to')-1]
         sender = sender.strip()
@@ -243,7 +247,6 @@ class KNXManager(XplPlugin):
                  if datatype =="11.001": #date (EIS4)
                     val=int(val.replace(" ",""),16)
                     if val<=3476283:
-                       val=int(val.replace(" ",""),16)
                        val=bin(val)[2:]
                        year=int(val[len(val)-7:len(val)],2)
                        val=val[0:len(val)-8]
@@ -253,7 +256,29 @@ class KNXManager(XplPlugin):
                        val=year+"-"+mounth+"-"+day
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
+                 
+                 if datatype == "12.xxx": #32 bit unsigned interger
+                    val=int(val.replace(" ",""),16)
+                    if val>=4294967296:
+                       self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
+                 if datatype == "13.xxx": #32bit signed integer
+                     val=int(val.replace(" ",""),16)
+                     if val<=4294967295:
+                        val=val-2147483648
+                     else:
+                       self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
+
+                 if datatype =="16.xxx": #String
+                    val=val.replace(" ","")
+                    if len(val)/2==14:
+                       phrase=""
+                       for i in range(len(foo)/2):
+                          phrase=phrase+ chr(int(val[0:2],16))
+                          val=val[2:]
+                       val=phrase
+                    else:
+                       self.log.error("define as string, invalid data %s from %s" %s(val,groups))
 
                  if datatype == "20.102": #heating mode (comfort/standby/night/frost) 
                     val=int(val.replace(" ",""),16)
@@ -304,7 +329,7 @@ class KNXManager(XplPlugin):
               msg.add_data({'type' :  msg_type})
               msg.add_data({'data': val})
               self.myxpl.send(msg)
-              print "command: %s group: %s type: %s data: %s" %s(command,dmgadr,msg_type,val)
+              #print "command: %s group: %s type: %s data: %s" %s(command,dmgadr,msg_type,val)
 
 
     def knx_cmd(self, message):
@@ -326,7 +351,6 @@ class KNXManager(XplPlugin):
               valeur = message.data['data']
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
-
 
               if datatype=="5.001": #"DT_Scaling":
                  if valeur<>"None":
