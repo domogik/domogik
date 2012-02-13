@@ -218,10 +218,17 @@ class KNXManager(XplPlugin):
                  if datatype =="9.xxx": #16bit unsigned integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=65535:
-                       val=bin(val)[2:]
-                       x=long(val[1,5],2)
-                       y=long(val[0,1]+val[5,16],2)
-                       val=float((0.01*(y-2048))*2**x)
+                       val=bin(Val)[2:]
+                       if len(val)<=16:
+                          for i in range(16-len(val)):
+                             val="0"+val
+                       Y=long(val[1:5],2)
+                       X=long(val[0:1]+val[5:16],2)
+                       print "Valeur de X=%s" %x
+                       if X>=2047:
+                          print "ce nombre semble negatif"
+                          X=X-4096
+                       Valeur=float(0.01*X*2**Y)
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
 
@@ -268,6 +275,26 @@ class KNXManager(XplPlugin):
                         val=val-2147483648
                      else:
                        self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
+
+                 if datatype == "14.xxx": #32bit IEEE 754 floating point number
+                     val=int(val.replace(" ",""),16)
+                     val=bin(val)[2:]
+                     if len(val)<32:
+                        for i in range(32-len(val)):
+                           val="0"+val
+                        signe=1-2*int(val[:1])
+                        exposant=str(val[1:9])
+                        mantisse=str(val[9:32])
+                        #signe= int(str(signe),2)
+                        exposant= int(str(exposant),2)
+                        mantise=0
+                        for i in range(23):
+                           valut=mantisse[i-1:i]
+                           if valut=="1":
+                              mantise=float(mantise+2**(-i))
+                        mantisse= 1+mantise
+                        val=float(signe*mantisse*2**(exposant-127))
+                        print "résultat %s" %(signe*mantisse*2**(exposant-127))
 
                  if datatype =="16.xxx": #String
                     val=val.replace(" ","")
@@ -424,6 +451,46 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
+              if datatype =="9.xxx": #16bit floating signed (EIS14) 
+                 val=val.replace(",",".")
+                 val=float(val)
+                 if val<0:
+                    val=abs(val)
+                    signe="moin"
+                    print "Signe négatif"
+                 print "val absolue %s" %val
+                 tmp = int(100 * abs(val))
+                 print "tmp = %s" %tmp
+                 for y in range(0, 15):
+                    x = tmp >> y
+                    if x >= 0 and x < 2048:
+                       break
+                 if signe=="moin":
+                    x=4096-x
+                    print "vraiment negatif"
+                    print "Valeur de X=%s" %x
+                 print "Valeur de Y=%s" %y
+                 binaireX=bin(x)[2:]
+                 binairey=bin(y)[2:]
+                 if len(binaireX)<=12:
+                    print "manque des bits a X"
+                    for i in range(12-len(binaireX)):
+                       binaireX="0"+binaireX
+                 if len(binairey)<>4:
+                    print "Manque des bits a Y"
+                    for i in range(4-len(binairey)):
+                       binairey="0"+binairey
+                 print binaireX
+                 print binairey
+                 Valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
+                 print Valeur
+                 Valeur=Valeur.replace(" ","")
+                 Valeur=int(Valeur,2)
+                 Valeur=hex(Valeur)[2:]
+              else:
+                 self.log.error("define 16bit signed float overflow %s from %s" %(val,groups))
+
+
               if datatype =="12.xxx": #32bit unsigned integer (EIS14) 
                  val=int(val)
                  if val>=0:
@@ -452,6 +519,24 @@ class KNXManager(XplPlugin):
                        val=valeur.strip()	
                  else:
                     self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
+
+              if datapoint == "16.000":
+                 codage=""
+                 if len(val)<=14:
+                    for j in range(len(val)):
+                       print ord(val[j:j+1])
+                       codage=codage+hex(ord(val[j:j+1]))[2:]
+                    print codage
+                    if len(val)<14:
+                       print "moins de 14 caractére"
+                       for j in range(14-len(val)):
+                          codage=codage+"00"
+                    print codage
+                    valeur=codage[:2]
+                    for i in range(14):
+                       valeur=valeur+" "+codage[2*(i+1):2*(i+1)+2]
+                 else:
+                    self.log.error("Too many character")
 
               if datatype=="DT_HVACEib":
                  if valeur=="3":
