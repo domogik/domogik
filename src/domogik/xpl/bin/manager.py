@@ -913,6 +913,8 @@ class SysManager(XplPlugin):
                     mess.add_data({'cfg'+str(conf["id"])+'-desc' : conf["desc"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-default' : conf["default"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-int' : conf["interface"]})
+                    if conf["type"] == "enum":
+                        mess.add_data({'cfg'+str(conf["id"])+'-options' : ','.join( map( str, conf["options"] ) )})
                     if conf["optionnal"] == "yes":
                         mess.add_data({'cfg'+str(conf["id"])+'-opt' : conf["optionnal"]})
                 mess.add_data({'type' :  plugin["type"]})

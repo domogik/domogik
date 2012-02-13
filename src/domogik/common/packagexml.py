@@ -154,6 +154,14 @@ class PackageXml():
                 k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
                 k_desc = key.getElementsByTagName("description")[0].firstChild.nodeValue
                 k_type = key.getElementsByTagName("type")[0].firstChild.nodeValue
+                k_options = []
+                if k_type == "enum":
+                    try:
+                        options = key.getElementsByTagName("options")[0]
+                        for option in options.getElementsByTagName("option"):
+                            k_options.append( option.firstChild.nodeValue )
+                    except IndexError:
+                        k_options = []
                 try:
                     k_default = key.getElementsByTagName("default-value")[0].firstChild.nodeValue
                 except AttributeError:
@@ -165,6 +173,7 @@ class PackageXml():
                                            "key" : k_key,
                                            "desc" : k_desc,
                                            "type" : k_type,
+                                           "options": k_options,
                                            "default" : k_default})
 
             # list of files

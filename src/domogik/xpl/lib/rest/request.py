@@ -2721,6 +2721,11 @@ target=*
                     my_type = message.data["cfg"+str(idx)+"-type"]
                     my_desc = message.data["cfg"+str(idx)+"-desc"]
                     my_default = message.data["cfg"+str(idx)+"-default"]
+                    optionskey = "cfg"+str(idx)+"-options"
+                    if message.data.has_key(optionskey):
+                        my_options = message.data[optionskey]
+                    else:
+                        my_options = ""
                     optkey = "cfg"+str(idx)+"-opt"
                     if message.data.has_key(optkey):
                         my_optionnal = message.data[optkey]
@@ -2735,6 +2740,7 @@ target=*
                                             "key" : my_key,
                                             "type" : my_type,
                                             "description" : my_desc,
+                                            "options": my_options,
                                             "default" : my_default})
                     # interface configuration element
                     else:
