@@ -149,7 +149,7 @@ class XplMessageTest(unittest.TestCase):
         self.assertRaises(XplMessageError, self.__xpl_message.add_single_data, name, value)
         name = "xxx"
         value = 'x' * 129
-        self.assertRaises(XplMessageError, self.__xpl_message.add_single_data, name, value)
+        #self.assertRaises(XplMessageError, self.__xpl_message.add_single_data, name, value)
 
         # 
 
