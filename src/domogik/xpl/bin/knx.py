@@ -147,6 +147,7 @@ class KNXManager(XplPlugin):
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
+                 print "valeur reçu:%s" %val
                  msg_type = "s"
                  if data[-2:-1]==" ":
                     msg_type = "l"
@@ -356,7 +357,7 @@ class KNXManager(XplPlugin):
               msg.add_data({'type' :  msg_type})
               msg.add_data({'data': val})
               self.myxpl.send(msg)
-              #print "command: %s group: %s type: %s data: %s" %s(command,dmgadr,msg_type,val)
+              print "command: %s group: %s type: %s data: %s" %(command,dmgadr,msg_type,val)
 
 
     def knx_cmd(self, message):
@@ -378,7 +379,7 @@ class KNXManager(XplPlugin):
               valeur = message.data['data']
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
-
+              val=valeur
               if datatype =="5.xxx": #16bit unsigned integer (EIS14) 
                  val=int(val)
                  if val>=0:
@@ -520,7 +521,7 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
-              if datapoint == "16.000":
+              if datatype == "16.000":
                  codage=""
                  if len(val)<=14:
                     for j in range(len(val)):
@@ -539,11 +540,12 @@ class KNXManager(XplPlugin):
                     self.log.error("Too many character")
 
               if datatype=="DT_HVACEib":
-                 if valeur=="3":
-                    value="2"
-                 if valeur=="1":
-                    value="3"
-                 valeur=value
+                 valeur=val
+                 if val=="3":
+                    valeur="2"
+                 if val=="1":
+                    valeur="3"
+
 
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
