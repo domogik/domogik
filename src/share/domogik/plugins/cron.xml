@@ -71,6 +71,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>cron.toggle</device_type_id>
           <parameters>
+              {}
           </parameters>
           <value_type>string</value_type>
           <stat_key>current</stat_key>

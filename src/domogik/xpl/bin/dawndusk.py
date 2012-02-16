@@ -46,7 +46,6 @@ import datetime
 #from datetime import timedelta
 #from datetime import datetime
 from domogik.xpl.lib.dawndusk import dawnduskAPI
-from domogik.xpl.lib.dawndusk import dawnduskScheduler
 from domogik.xpl.lib.dawndusk import dawnduskException
 import traceback
 import logging
@@ -77,6 +76,10 @@ class dawndusk(XplPlugin):
             if boo==None:
                 boo="False"
             use_cron = eval(boo)
+            boo=self._config.query('dawndusk', 'test')
+            if boo==None:
+                boo="False"
+            test = eval(boo)
             self.devices={}
             num = 1
             loop = True
@@ -102,6 +105,7 @@ class dawndusk(XplPlugin):
             longitude = "5.043"
             latitude = "47.352"
             use_cron = False
+            test = False
             raise dawnduskException(error)
 
         self.log.debug("dawndusk.__init__ : Try to start the dawndusk librairy")
@@ -116,6 +120,10 @@ class dawndusk(XplPlugin):
         self.log.debug("dawndusk.__init__ : Try to add the next event to the scheduler")
         try:
             self.addNextEvent()
+            #for test only
+            if test==True :
+                self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(minutes=1),self.sendDawnDusk,"dawn-test")
+                self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(minutes=6),self.sendDawnDusk,"dusk-test")
         except:
             error = "Something went wrong during dawnduskScheduler init : %s" %  \
                      (traceback.format_exc())
@@ -157,6 +165,7 @@ class dawndusk(XplPlugin):
             #We need to schedule the next one
             self.addNextEvent()
             for dev in self.devices:
+                self.log.debug("sendMessages() : Send message to device %s"%dev)
                 mess = XplMessage()
                 mess.set_type("xpl-cmnd")
                 mess.set_schema(self.devices[dev]["schema"])
@@ -233,14 +242,8 @@ class dawndusk(XplPlugin):
         """
         Get the next event date : dawn or dusk
         """
-        self.log.debug("dawndusk.addNextEvent() : Start ...")
         ddate, dstate = self.getNextEvent()
-        #for test only
-        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=30),self.sendDawnDusk,"dawn")
-        #self._mydawndusk.schedAdd(datetime.datetime.today()+datetime.timedelta(seconds=45),self.sendDawnDusk,"dawn")
-        self.log.info("Add a new event %s at %s to the scheduler" % (dstate,ddate))
         self._mydawndusk.schedAdd(ddate,self.sendDawnDusk,dstate)
-        self.log.debug("dawndusk.addNextEvent() : Done :-)")
 
     def getNextEvent(self):
         """
@@ -248,7 +251,6 @@ class dawndusk(XplPlugin):
         @return rdate : the next event date
         @return rstate : the event type : DAWN or DUSK
         """
-        self.log.debug("dawndusk.getNextEvent() : Start ...")
         dawn = self._mydawndusk.getNextDawn()
         dusk = self._mydawndusk.getNextDusk()
         if dusk < dawn :
@@ -257,12 +259,12 @@ class dawndusk(XplPlugin):
         else :
             rdate = dawn
             rstate = "dawn"
-        self.log.debug("dawndusk.getNextEvent() : Done :-)")
         return rdate,rstate
 
     def sendDawnDusk(self,state):
         """
-        Send a xPL message of the type DAWNDUSK.BASIC when the sun goes down or up
+        Send a xPL message of the type DAWNDUSK.BASIC when the sun goes down or up.
+        This function is called by the internal cron
         @param state : DAWN or DUSK
         """
         self.log.debug("dawndusk.sendDawnDusk() : Start ...")
@@ -270,13 +272,18 @@ class dawndusk(XplPlugin):
         mess.set_type("xpl-trig")
         mess.set_schema("dawndusk.basic")
         mess.add_data({"type" : "dawndusk"})
-        if state=="dawn":
-            mess.add_data({"status" :  "dawn"})
-        elif state=="dawn":
-            mess.add_data({"status" :  "dusk"})
+        mess.add_data({"status" :  state})
         self.myxpl.send(mess)
         self.addNextEvent()
-        self.log.info("dawndusk : send signal for %"%state)
+        for dev in self.devices:
+            self.log.debug("sendMessages() : Send message to device %s"%dev)
+            mess = XplMessage()
+            mess.set_type("xpl-cmnd")
+            mess.set_schema(self.devices[dev]["schema"])
+            mess.add_data({self.devices[dev]["command"] : self.devices[dev][state]})
+            mess.add_data({self.devices[dev]["addname"] : dev})
+            self.myxpl.send(mess)
+        self.log.info("dawndusk : send signal for %s"%state)
         self.log.debug("dawndusk.sendDawnDusk() : Done :-)")
 
 if __name__ == "__main__":

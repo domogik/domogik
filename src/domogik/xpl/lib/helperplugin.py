@@ -74,7 +74,7 @@ A simple helper looks like this
             data.append("No ""device"" parameter found")
         return data
 
-Who to use it :
+How to use it :
 
 Ask the capabilties of the gateinfo
 helper.request
