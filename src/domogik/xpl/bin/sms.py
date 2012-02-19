@@ -118,8 +118,7 @@ class SmsManager(XplPlugin):
         mess.add_data({'status' :  'Sms not send'})
 		mess.add_data({'error' :  self.my_sms.status_error})
 	else:
-        	mess.add_data({'status' :  'Sms send'})
-	
+        mess.add_data({'status' :  'Sms send'})
         self.myxpl.send(mess)
 
 if __name__ == "__main__":
