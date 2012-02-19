@@ -85,7 +85,9 @@ if __name__ == "__main__":
         "text" : "randomtext"
     }
     }
+    print "===="
     TEST.fill_parameters(data)
+    print "===="
     print "I sleep 5s"
     sleep(5)
     print "Trying to evaluate : %s" % TEST.evaluate()
