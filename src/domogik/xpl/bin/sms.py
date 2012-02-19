@@ -57,19 +57,19 @@ class SmsManager(XplPlugin):
         login = self._config.query('sms', 'login')
         password = self._config.query('sms', 'password')
         phone = self._config.query('sms', 'phone')
-	operator = self._config.query('sms', 'operator')
-	operator = operator.lower()
+    operator = self._config.query('sms', 'operator')
+    operator = operator.lower()
 
         if (operator == "orange"):
-		from domogik.xpl.lib.sms_orange import Sms
-	if (operator == "sfr"):
-		from domogik.xpl.lib.sms_sfr import Sms
-	if (operator == "bouygues"):
-		from domogik.xpl.lib.sms_bouygues import Sms		
+        from domogik.xpl.lib.sms_orange import Sms
+    if (operator == "sfr"):
+        from domogik.xpl.lib.sms_sfr import Sms
+    if (operator == "bouygues"):
+        from domogik.xpl.lib.sms_bouygues import Sms        
         self.log.debug("Init info for sms created")
         ### Create Sms objects
         self.my_sms = Sms(self.log,login,password,phone)
-	self.log.debug("Create object for sms created")
+    self.log.debug("Create object for sms created")
         # Create listener
         Listener(self.sms_cb, self.myxpl, {'schema': 'sendmsg.basic','xpltype': 'xpl-cmnd'})
         self.log.debug("Listener for sms created")
@@ -82,7 +82,7 @@ class SmsManager(XplPlugin):
             @param message : xPL message detected by listener
         """
         # body contains the message
-	self.log.debug("Function call back : entry")
+    self.log.debug("Function call back : entry")
         if 'body' in message.data:
             body = message.data['body']
         else:
@@ -95,11 +95,11 @@ class SmsManager(XplPlugin):
             return
 
         try:
-	    self.log.debug("function call back : before send")
+        self.log.debug("function call back : before send")
             self.my_sms.send(to,body)
-	    self.log.debug("function call back : after send")
+        self.log.debug("function call back : after send")
         except:
-	       self.log.error("Error while sending sms : %s" % traceback.format_exc())
+           self.log.error("Error while sending sms : %s" % traceback.format_exc())
                mess = XplMessage()
                mess.set_type('xpl-trig')
                mess.set_schema('sendmsg.confirm')
@@ -114,10 +114,10 @@ class SmsManager(XplPlugin):
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('sendmsg.confirm')
-	if self.my_sms.status_send == 0:
+    if self.my_sms.status_send == 0:
         mess.add_data({'status' :  'Sms not send'})
-		mess.add_data({'error' :  self.my_sms.status_error})
-	else:
+        mess.add_data({'error' :  self.my_sms.status_error})
+    else:
         mess.add_data({'status' :  'Sms send'})
         self.myxpl.send(mess)
 
