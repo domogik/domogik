@@ -115,7 +115,7 @@ class SmsManager(XplPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('sendmsg.confirm')
 	if self.my_sms.status_send == 0:
-        	mess.add_data({'status' :  'Sms not send'})
+        mess.add_data({'status' :  'Sms not send'})
 		mess.add_data({'error' :  self.my_sms.status_error})
 	else:
         	mess.add_data({'status' :  'Sms send'})
