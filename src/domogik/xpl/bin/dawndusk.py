@@ -84,6 +84,7 @@ class dawndusk(XplPlugin):
             num = 1
             loop = True
             while loop == True:
+                xpltype = self._config.query('dawndusk', 'xpltype-%s' % str(num))
                 schema = self._config.query('dawndusk', 'schema-%s' % str(num))
                 addname = self._config.query('dawndusk', 'addname-%s' % str(num))
                 add = self._config.query('dawndusk', 'add-%s' % str(num))
@@ -93,7 +94,8 @@ class dawndusk(XplPlugin):
                 if schema != None:
                     self.log.debug("dawndusk.__init__ : Device from xpl : device=%s," % (add))
                     self.devices[add]={"schema":schema,"command":command,
-                                "dawn":dawn,"dusk":dusk,"addname":addname}
+                                "dawn":dawn,"dusk":dusk,"addname":addname,
+                                "xpltype":xpltype}
                 else:
                     loop = False
                 num += 1
@@ -167,7 +169,7 @@ class dawndusk(XplPlugin):
             for dev in self.devices:
                 self.log.debug("sendMessages() : Send message to device %s"%dev)
                 mess = XplMessage()
-                mess.set_type("xpl-cmnd")
+                mess.set_type(self.devices[dev]["xpltype"])
                 mess.set_schema(self.devices[dev]["schema"])
                 mess.add_data({self.devices[dev]["command"] : self.devices[dev][status]})
                 mess.add_data({self.devices[dev]["addname"] : dev})
@@ -278,7 +280,7 @@ class dawndusk(XplPlugin):
         for dev in self.devices:
             self.log.debug("sendMessages() : Send message to device %s"%dev)
             mess = XplMessage()
-            mess.set_type("xpl-cmnd")
+            mess.set_type(self.devices[dev]["xpltype"])
             mess.set_schema(self.devices[dev]["schema"])
             mess.add_data({self.devices[dev]["command"] : self.devices[dev][state]})
             mess.add_data({self.devices[dev]["addname"] : dev})

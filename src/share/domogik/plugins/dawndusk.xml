@@ -55,6 +55,14 @@
     <key>
       <interface>yes</interface>
       <order-id>5</order-id>
+      <name>xpltype</name>
+      <type>string</type>
+      <description>Xpltype to use in the message</description>
+      <default-value>xpl-cmnd</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>6</order-id>
       <name>schema</name>
       <type>string</type>
       <description>Schema to use to send command</description>
@@ -62,23 +70,23 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>6</order-id>
+      <order-id>7</order-id>
       <name>addname</name>
       <type>string</type>
-      <description>address name</description>
+      <description>Address field name (device)</description>
       <default-value>device</default-value>
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>7</order-id>
+      <order-id>8</order-id>
       <name>add</name>
       <type>string</type>
-      <description>address</description>
+      <description>Device address</description>
       <default-value>TS3</default-value>
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>8</order-id>
+      <order-id>9</order-id>
       <name>command</name>
       <type>string</type>
       <description>Command to send to the device</description>
@@ -86,7 +94,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>9</order-id>
+      <order-id>10</order-id>
       <name>dawn</name>
       <type>string</type>
       <description>Value of command when dawn event</description>
@@ -94,7 +102,7 @@
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>10</order-id>
+      <order-id>11</order-id>
       <name>dusk</name>
       <type>string</type>
       <description>Value of command when dusk event</description>
