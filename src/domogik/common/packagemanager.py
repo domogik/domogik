@@ -54,8 +54,9 @@ from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
 #PLG_XML_PATH = "src/share/domogik/plugins/"
 
-CONFIG_FOLDER = "%s/.domogik/" % os.getenv("HOME")
-DATA_FOLDER = "%s/.domogik/" % os.getenv("HOME")
+CONFIG_FOLDER = "/etc/domogik/"
+DATA_FOLDER = "/usr/share/domogik/"
+LIB_FOLDER = "/usr/lib/domogik/"
 
 TMP_EXTRACT_DIR = "%s/tmp/" % DATA_FOLDER
 CONFIG_FILE = "%s/domogik.cfg" % CONFIG_FOLDER
