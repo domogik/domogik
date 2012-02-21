@@ -72,6 +72,7 @@ WAIT_TIME_BETWEEN_PING = 15
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
 FIFO_DIR = "/var/run/domogik/"
+CONFIG_DIR = "/etc/domogik/"
 
 DESCRIPTION_LEN_IN_DETAIL = 500
 
@@ -85,18 +86,17 @@ class EventHandler(pyinotify.ProcessEvent):
         """
         self.my_callback = callback
 
-    def set_config_files(self, config_files):
-        """ set the list of config files
-        @param list of the monitored config files
-        """
-        self._cfg_files = config_files 
+    #def set_config_files(self, config_files):
+    #    """ set the list of config files
+    #    @param list of the monitored config files
+    #    """
+    #    self._cfg_files = config_files 
 
     def process_default(self, event):
         """ A file is modified
         """
-        if event.pathname in self._cfg_files or event.pathname[-4:] == ".xml":
-            print("File modified : %s" % event.pathname)
-            self.my_callback()
+        print("File modified : %s" % event.pathname)
+        self.my_callback()
 
 class SysManager(XplPlugin):
     """ System management from domogik
@@ -299,16 +299,18 @@ class SysManager(XplPlugin):
 
             # inotify 
             wmgr = pyinotify.WatchManager() # Watch manager
-            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO # watched events
+            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
             notify_handler = EventHandler()
             notify_handler.set_callback(self._reload_configuration_file)
-            notify_handler.set_config_files(self.get_config_files())
+            #notify_handler.set_config_files(self.get_config_files())
             notifier = pyinotify.ThreadedNotifier(wmgr, notify_handler)
+            notifier.setName("thread_notifier")
             notifier.start()
             config_files_dir = [self._xml_plugin_directory,
-                                self._xml_external_directory]
-            for fic in  self.get_config_files():
-                config_files_dir.append(os.path.dirname(fic))
+                                self._xml_external_directory,
+                                CONFIG_DIR]
+            #for fic in  self.get_config_files():
+            #    config_files_dir.append(os.path.dirname(fic))
             for direc in set(config_files_dir):
                 #wdd = wmgr.add_watch(direc, mask, rec = True)
                 wmgr.add_watch(direc, mask, rec = True)
