@@ -116,7 +116,7 @@ function stop_plugins {
 # Check if the directory for lock exists
 function check_lock_dir {
     USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DIRECTORY=$(grep "^pid_dir_path" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
+    DIRECTORY=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
     if [ ! -d $DIRECTORY ];then
         mkdir $DIRECTORY
     fi

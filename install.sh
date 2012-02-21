@@ -82,9 +82,6 @@ function stop_domogik {
                 /etc/init.d/domogik stop
             fi
         fi
-    else
-        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
-        exit 16
     fi
 }
 
@@ -145,19 +142,19 @@ function copy_sample_files {
     # create /usr/share/domogik
     if [ ! -d $DMG_SHARE ];then
         mkdir $DMG_SHARE
-        chown $d_user $DMG_SHARE
+        chown $d_user:root $DMG_SHARE
     fi
     # create /usr/lib/domogik
     if [ ! -d $DMG_LIB ];then
         mkdir $DMG_LIB
-        chown $d_user $DMG_LIB
+        chown $d_user:root $DMG_LIB
     fi
     # create folders for packages management
     for pkg_rep in pkg-cache cache 
       do
         if [ ! -d $DMG_SHARE/$pkg_rep ];then
             mkdir $DMG_SHARE/$pkg_rep
-            chown $d_user $DMG_SHARE/$pkg_rep
+            chown $d_user:root $DMG_SHARE/$pkg_rep
         fi
     done
     # create folders for packages management
@@ -165,24 +162,28 @@ function copy_sample_files {
       do
         if [ ! -d $DMG_LIB/$pkg_rep ];then
             mkdir $DMG_LIB/$pkg_rep
-            chown $d_user $DMG_LIB/$pkg_rep
+            chown $d_user:root $DMG_LIB/$pkg_rep
         fi
     done
 
     # For upgrade with 0.1
     if [ -f $d_home/.domogik/domogik.cfg ];then
         mv $d_home/.domogik/domogik.cfg $DMG_ETC/domogik.cfg
+        chown $d_user:root $DMG_ETC/domogik.cfg
         chmod 640 $DMG_ETC/domogik.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
             cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+            chown $d_user:root $DMG_ETC/sources.list
             chmod 640 $DMG_ETC/sources.list
         fi
     fi
     if [ ! -f $DMG_ETC/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
+        chown $d_user:root $DMG_ETC/domogik.cfg
         chmod 640 $DMG_ETC/domogik.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
             cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+            chown $d_user:root $DMG_ETC/sources.list
             chmod 640 $DMG_ETC/sources.list
         fi
     else
@@ -194,9 +195,11 @@ function copy_sample_files {
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
+            chown $d_user:root $DMG_ETC/domogik.cfg
             chmod 640 $DMG_ETC/domogik.cfg
             if [ $MAIN_INSTALL = "y" ] ; then
                 cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+                chown $d_user:root $DMG_ETC/sources.list
                 chmod 640 $DMG_ETC/sources.list
             fi
         fi
