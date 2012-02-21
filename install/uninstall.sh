@@ -39,7 +39,7 @@ function stop_domogik {
             if [ -d "/var/run/domogik" ];then
                 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
                 [ -f /etc/default/domogik ] && . /etc/default/domogik
-                if [ -f "/home/${DOMOGIK_USER}/.domogik/domogik.cfg" ];then
+                if [ -f "/etc/domogik/domogik.cfg" ];then
                     echo "There is already a Domogik on this system. Try to stop it before uninstall..."
                     /etc/init.d/domogik stop
                 fi
@@ -95,10 +95,16 @@ echo "Delete rc.d script"
 [ -f /etc/init.d/domogik ] && $RM /etc/init.d/domogik
 [ -f /etc/rc.d/domogik ] && $RM /etc/rc.d/domogik
 
+echo "Delete /usr/share/domogik"
+$RM /usr/share/domogik
+
+echo "Delete /usr/lib/domogik"
+$RM /usr/lib/domogik
+
 echo "Delete /usr/local/share/domogik"
 $RM /usr/local/share/domogik
 
-CONFIG_FOLDER=/home/$DOMOGIK_USER/.domogik/
+CONFIG_FOLDER=/etc/domogik/
 echo "Delete config folder : $CONFIG_FOLDER"
 $RM $CONFIG_FOLDER
 
