@@ -24,17 +24,10 @@
 
 # Disable a plugin
 
-function get_user {
-    if [ -f "/etc/default/domogik" ];then
-        eval $(grep USER /etc/default/domogik)
-    elif [ -f "/etc/conf.d/domogik" ];then
-        eval $(grep USER /etc/conf.d/domogik)
-    fi
-    DMG_HOME=$(getent passwd $DOMOGIK_USER|cut -d ":" -f 6)/.domogik
-}
+DMG_ETC=/etc/domogik
 
 function plugin_exists {
-    grep -qs "^$PLUGIN *=" $DMG_HOME/domogik.cfg
+    grep -qs "^$PLUGIN *=" $DMG_ETC/domogik.cfg
     EXISTS=$?
 }
 
@@ -45,14 +38,13 @@ Disables a plugin."
 }
 
 function disable {
-    sed -i "s/^$PLUGIN *=.*$/$PLUGIN =/" $DMG_HOME/domogik.cfg
+    sed -i "s/^$PLUGIN *=.*$/$PLUGIN =/" $DMG_ETC/domogik.cfg
 }
 
 #check params
 [ $# -eq 1 ] && PLUGIN=$1 || syntax
 
 #check if plugin exists
-get_user
 plugin_exists
 if [ $EXISTS -eq 1 ];then
     echo "WARNING : Plugin ($PLUGIN) does not exist. Do nothing"

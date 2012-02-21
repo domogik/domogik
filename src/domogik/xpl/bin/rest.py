@@ -174,7 +174,7 @@ class Rest(XplPlugin):
     
             ### Config
     
-            # directory data in ~/.domogik/domogik.cfg
+            # directory data 
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
