@@ -141,7 +141,8 @@ function copy_sample_files {
     # create /etc/domogik entry
     if [ ! -d $DMG_ETC ];then
         mkdir $DMG_ETC
-        chown $d_user $DMG_ETC
+        chown $d_user:root $DMG_ETC
+        chmod 755 $DMG_ETC
     fi
     # create /usr/share/domogik
     if [ ! -d $DMG_SHARE ];then
@@ -171,16 +172,20 @@ function copy_sample_files {
     done
 
     # For upgrade with 0.1
-    if [ -f $d_home/domogik/domogik.cfg ];then
-        mv $d_home/domogik/domogik.cfg $DMG_ETC/domogik.cfg
-        chown $d_user $DMG_ETC/domogik.cfg
+    if [ -f $d_home/.domogik/domogik.cfg ];then
+        mv $d_home/.domogik/domogik.cfg $DMG_ETC/domogik.cfg
+        chmod 640 $DMG_ETC/domogik.cfg
+        if [ $MAIN_INSTALL = "y" ] ; then
+            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+            chmod 640 $DMG_ETC/sources.list
+        fi
     fi
     if [ ! -f $DMG_ETC/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-        chown $d_user: $DMG_ETC/domogik.cfg
+        chmod 640 $DMG_ETC/domogik.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
             cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-            chown $d_user: $DMG_ETC/sources.list
+            chmod 640 $DMG_ETC/sources.list
         fi
     else
         keep="y"
@@ -191,10 +196,10 @@ function copy_sample_files {
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-            chown $d_user: $DMG_ETC/domogik.cfg
+            chmod 640 $DMG_ETC/domogik.cfg
             if [ $MAIN_INSTALL = "y" ] ; then
                 cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-                chown $d_user: $DMG_ETC/sources.list
+                chmod 640 $DMG_ETC/sources.list
             fi
         fi
     fi
