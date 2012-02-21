@@ -414,10 +414,9 @@ class Rest(XplPlugin):
 
             # Ask for installed packages on all hosts
             # Semaphore init for installed package list update
-            if self.package_mode == True:
-                self.sema_installed = Semaphore(value=1)
-                self._installed_packages = {}
-                self._get_installed_packages_from_manager()
+            self.sema_installed = Semaphore(value=1)
+            self._installed_packages = {}
+            self._get_installed_packages_from_manager()
 
             # Launch server, stats
             self.log.info("REST Initialisation OK")
@@ -648,6 +647,8 @@ class Rest(XplPlugin):
             There is a semaphore in order not to return the list when it is
             updated (may be incomplete)
         """
+        # developper mode : all plugins are installed
+
         # TODO : remove log lines after tests
         self.log.debug("*** get_installed_packages")
         self.sema_installed.acquire()
