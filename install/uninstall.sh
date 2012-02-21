@@ -44,7 +44,7 @@ function stop_domogik {
             fi
         fi
     else
-        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
+        echo "It seems Domogik is not installed : no /etc/init.d|rc.d/domogik file"
         exit 16
     fi
 }
@@ -62,6 +62,7 @@ echo "- Domogik core"
 echo "- Configuration"
 echo "- Plugins"
 echo "- ..."
+echo "Only the database will not be removed"
 echo "Are you sure ? [y/N]"
 read choice
 if [ "x"$choice == "x" ] ; then
