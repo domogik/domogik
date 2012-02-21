@@ -416,7 +416,8 @@ class Rest(XplPlugin):
             # Semaphore init for installed package list update
             self.sema_installed = Semaphore(value=1)
             self._installed_packages = {}
-            self._get_installed_packages_from_manager()
+            if self.package_mode == True:
+                self._get_installed_packages_from_manager()
 
             # Launch server, stats
             self.log.info("REST Initialisation OK")
