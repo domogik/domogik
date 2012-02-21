@@ -407,8 +407,10 @@ class Listener:
         The goal of this function is to check if message match filter rules,
         and to call the callback function if it does
         """
+        suffixe = ""
         ok = True
         for key in self._filter:
+            suffixe = "%s-%s-%s" % (suffixe, key, self._filter[key])
             if key in message.data:
                 if isinstance(self._filter[key], list) and not (message.data[key].lower() in [s.lower() for s in self._filter[key]]):
                     ok = False
@@ -425,9 +427,9 @@ class Listener:
         #The message match the filter, we can call  the callback function
         if ok:
             if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
-                thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
+                thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb-%s" % suffixe)
             else:
-                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
+                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb-%s" % suffixe)
             self._manager.p.register_thread(thread)
             thread.start()
 
