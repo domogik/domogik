@@ -73,15 +73,13 @@ DMG_SHARE=/usr/share/domogik
 DMG_LIB=/usr/lib/domogik
 
 function stop_domogik {
-    if [ -d "/etc/init.d/" -o -d "/etc/rc.d/" ];then
-        if [ -f "/etc/init.d/domogik" ];then
-            if [ -d "/var/run/domogik" ];then
-                [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-                [ -f /etc/default/domogik ] && . /etc/default/domogik
-                if [ -f "/etc/domogik/domogik.cfg" ];then
-                    echo "There is already a Domogik on this system. Try to stop it before installation..."
-                    /etc/init.d/domogik stop
-                fi
+    if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
+        if [ -d "/var/run/domogik" ];then
+            [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+            [ -f /etc/default/domogik ] && . /etc/default/domogik
+            if [ -f "/etc/domogik/domogik.cfg" ];then
+                echo "There is already a Domogik on this system. Try to stop it before installation..."
+                /etc/init.d/domogik stop
             fi
         fi
     else

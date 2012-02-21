@@ -34,19 +34,15 @@
 
 
 function stop_domogik {
-    if [ -d "/etc/init.d/" ];then
-        if [ -f "/etc/init.d/domogik" ];then
-            if [ -d "/var/run/domogik" ];then
-                [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-                [ -f /etc/default/domogik ] && . /etc/default/domogik
-                if [ -f "/etc/domogik/domogik.cfg" ];then
-                    echo "There is already a Domogik on this system. Try to stop it before uninstall..."
-                    /etc/init.d/domogik stop
-                fi
+    if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
+        if [ -d "/var/run/domogik" ];then
+            [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+            [ -f /etc/default/domogik ] && . /etc/default/domogik
+            if [ -f "/etc/domogik/domogik.cfg" ];then
+                echo "There is already a Domogik on this system. Try to stop it before uninstall..."
+                /etc/init.d/domogik stop
             fi
         fi
-    elif [ -d "/etc/rc.d/" ];then
-        echo "TODO"
     else
         echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
         exit 16
@@ -111,7 +107,7 @@ $RM $CONFIG_FOLDER
 echo "Delete $GLOBAL_CONFIG"
 $RM $GLOBAL_CONFIG
 
-for fic in dmgenplug dmgdisplug dmg_manager dmg_send #TODO : DEL#dmg_django
+for fic in dmgenplug dmgdisplug dmg_manager dmg_send
   do
     TO_DEL=$(which $fic)
     echo "Delete $TO_DEL"
