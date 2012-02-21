@@ -44,13 +44,12 @@ class PackageData():
     """ Tool to insert necessary data in database
     """
 
-    def __init__(self, xml_path, custom_path = None):
+    def __init__(self, xml_path):
         """ Init tool
             @param plugin_name : plugin name
-            @param custom_path : full path to domogik.cfg file
         """
 
-        self._db = DbHelper(custom_path = custom_path)
+        self._db = DbHelper()
         try:
             self.plg = PackageXml(path = xml_path)
         except:

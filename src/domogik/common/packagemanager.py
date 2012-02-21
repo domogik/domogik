@@ -433,7 +433,7 @@ class PackageManager():
         if pkg_xml.type in ('plugin', 'external'):
             if package_part == PKG_PART_RINOR:
                 self.log("Insert data in database...")
-                pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
+                pkg_data = PackageData("%s/info.xml" % my_tmp_dir)
                 pkg_data.insert()
 
         self.log("Package installation finished")
