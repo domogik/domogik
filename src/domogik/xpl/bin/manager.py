@@ -280,6 +280,7 @@ class SysManager(XplPlugin):
             # PackageManager instance
             self.pkg_mgr = PackageManager()
     
+            # hbeat management for externals
             if self.options.check_external:
                 Listener(self._refresh_external_list, self.myxpl, {
                     'schema': 'hbeat.app',
@@ -289,6 +290,12 @@ class SysManager(XplPlugin):
                     'schema': 'hbeat.basic',
                     'xpltype': 'xpl-stat',
                 })
+                # TODO : handle hbeat.end
+
+            # hbeat management for plugins
+            Listener(self._set_component_running, self.myxpl, 
+                 {'schema':'hbeat.app', 
+                  'xpltype':'xpl-stat'})
 
             # define timers
             if self.options.check_external:
@@ -599,7 +606,7 @@ class SysManager(XplPlugin):
             mess.set_target("domogik-%s.%s" % (name, self.get_sanitized_hostname()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
-        my_listener = Listener(self._cb_check_component_is_running, 
+        my_listener = Listener(self._set_component_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
@@ -625,10 +632,20 @@ class SysManager(XplPlugin):
             self._set_status(name, "OFF")
             return False
 
-    def _cb_check_component_is_running(self, message, args):
+    def _set_component_running(self, message, args = {}):
         """ Set the Event to true if an answer was received
         """
-        self._pinglist[args["name"]].set()
+        # if this function is called from check_component_is_running
+        # TODO : this part may be removed in the future
+        if args.has_key("name"):
+            self._pinglist[args["name"]].set()
+        # if this function is called from the main listener
+        else:
+            if message.source_vendor_id == "domogik":
+                name = message.source_device_id
+                # hardcoded values for no plugin part of domogik
+                if name not in ("manager", "rest", "dbmgr"):
+                    self._pinglist[message.source_device_id].set()
 
 
     def _exec_plugin(self, name):
