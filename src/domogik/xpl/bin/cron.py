@@ -35,30 +35,38 @@ devicetipes:
 timer
 Parameters : frequence, duration
 Create an infinite timer which beat every 30 seconds:
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=timer,frequence=30"
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=timer,frequence=30"
 Create a timer which beats 3 times every 60 seconds:
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=timer,frequence=60,duration=3"
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=timer,frequence=60,duration=3"
 
 date
 Parameters : date
 Create a unique date schedulered job :
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=date,date=YYYYMMDDHHMMSS"
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=date,date=YYYYMMDDHHMMSS"
 
 
 interval
 Parameters : weeks, days, hours, minutes, seconds, startdate
 Create an interval schedulered job which beats every 2 weeks :
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=interval,weeks=2"
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=interval,weeks=2"
 Create an interval schedulered job which beat every 2 days, after startdate :
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=interval,days=2,startdate=YYYYMMDDHHMMSS"
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=interval,days=2,startdate=YYYYMMDDHHMMSS"
 
 cron
 Parameters : year, month, day, week, day_of_week, hour, minute, second, startdate
 Use a cron like syntax.
-Schedules job_function to be run on the third Friday of June, July, August, November and December at 00:00, 01:00, 02:00 and 03:00
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=cron,month='6-8,11-12', day='3rd fri', hour='0-3'"
+Schedules job_function to be run on the third Friday of June, July, \
+August, November and December at 00:00, 01:00, 02:00 and 03:00
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=cron,month='6-8,11-12', day='3rd fri', hour='0-3'"
 Schedule a backup to run once from Monday to Friday at 5:30 (am)
-./send.py xpl-cmnd timer.basic "action=start,device=timer1,devicetype=cron, day_of_week='mon-fri', hour=5, minute=30"
+./send.py xpl-cmnd timer.basic "action=start,device=timer1,\
+devicetype=cron, day_of_week='mon-fri', hour=5, minute=30"
 
 actions :
 ---------
@@ -83,19 +91,14 @@ request :
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.common.plugin import XplPlugin
-import datetime
-from datetime import timedelta
-from domogik.xpl.lib.cron import cronAPI
-from domogik.xpl.lib.cron import cronJobs
-from domogik.xpl.lib.cron import cronException
+from domogik.xpl.lib.cron import CronAPI
+from domogik.xpl.lib.cron import CronException
 from domogik.xpl.lib.helperplugin import XplHlpPlugin
 import traceback
-import logging
+#import logging
 
-class cron(XplHlpPlugin):
+class Cron(XplHlpPlugin):
     '''
     Manage
     '''
@@ -109,12 +112,12 @@ class cron(XplHlpPlugin):
 
         self.log.debug("cron.__init__ : Try to start the cron API")
         try:
-            self._cron = cronAPI(self.log,self.config,self.myxpl)
+            self._cron = CronAPI(self.log, self.config, self.myxpl)
         except:
             error = "Something went wrong during cronAPI init : %s" %  \
                      (traceback.format_exc())
             self.log.exception("cron.__init__ : "+error)
-            raise cronException(error)
+            raise CronException(error)
 
         self.log.debug("cron.__init__ : Try to create listeners")
         Listener(self.request_cmnd_cb, self.myxpl,
@@ -125,7 +128,7 @@ class cron(XplHlpPlugin):
         self.helpers =   \
            { "list" :
               {
-                "cb" : self._cron.jobs.helperList,
+                "cb" : self._cron.jobs.helper_list,
                 "desc" : "List devices (cron jobs)",
                 "usage" : "list all (all the devices)|aps(jobs in APScheduler)",
                 "param-list" : "which",
@@ -133,7 +136,7 @@ class cron(XplHlpPlugin):
               },
              "ls" :
               {
-                "cb" : self._cron.jobs.helperList,
+                "cb" : self._cron.jobs.helper_list,
                 "desc" : "List devices (cron jobs)",
                 "usage" : "list all the devices",
                 "return-list" : "array1",
@@ -141,7 +144,7 @@ class cron(XplHlpPlugin):
               },
              "test" :
               {
-                "cb" : self._cron.jobs.helperList,
+                "cb" : self._cron.jobs.helper_list,
                 "desc" : "Test return transfert",
                 "usage" : "test",
                 "param-list" : "device",
@@ -151,7 +154,7 @@ class cron(XplHlpPlugin):
               },
              "info" :
               {
-                "cb" : self._cron.jobs.helperInfo,
+                "cb" : self._cron.jobs.helper_info,
                 "desc" : "Display device information",
                 "usage" : "info <device>",
                 "param-list" : "device",
@@ -159,7 +162,7 @@ class cron(XplHlpPlugin):
               },
              "stop" :
               {
-                "cb" : self._cron.jobs.helperStop,
+                "cb" : self._cron.jobs.helper_stop,
                 "desc" : "Stop a device",
                 "usage" : "stop <device>",
                 "param-list" : "device",
@@ -167,7 +170,7 @@ class cron(XplHlpPlugin):
               },
              "halt" :
               {
-                "cb" : self._cron.jobs.helperHalt,
+                "cb" : self._cron.jobs.helper_halt,
                 "desc" : "Halt a device",
                 "usage" : "halt <device>",
                 "param-list" : "device",
@@ -175,7 +178,7 @@ class cron(XplHlpPlugin):
               },
              "resume" :
               {
-                "cb" : self._cron.jobs.helperResume,
+                "cb" : self._cron.jobs.helper_resume,
                 "desc" : "Resume a device",
                 "usage" : "resume <device>",
                 "param-list" : "device",
@@ -193,7 +196,7 @@ class cron(XplHlpPlugin):
         @param message : an XplMessage object
         """
         self.log.debug("cron.request_cmnd_cb() : Start ...")
-        self._cron.requestListener(message)
+        self._cron.request_listener(message)
         self.log.debug("cron.request_cmnd_cb() : Done :)")
 
     def basic_cmnd_cb(self, message):
@@ -202,8 +205,8 @@ class cron(XplHlpPlugin):
         @param message : an XplMessage object
         """
         self.log.debug("cron.basic_cmnd_cb() : Start ...")
-        self._cron.basicListener(message)
+        self._cron.basic_listener(message)
         self.log.debug("cron.basic_cmnd_cb() : Done :)")
 
 if __name__ == "__main__":
-    cron()
+    Cron()
