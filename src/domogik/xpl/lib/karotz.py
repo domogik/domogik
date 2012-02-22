@@ -59,18 +59,17 @@ class Karotz:
         self.INSTALLID=instid
         self._log = log
         
-    def tts(self,txt,lg):
-        #try:
+    def start(self):
         self.parameters = {}
         self.parameters['installid'] = self.INSTALLID
         self.parameters['apikey'] = APIKEY
         self.parameters['once'] = "%d" % random.randint(100000000, 99999999999)
         self.parameters['timestamp'] = "%d" % time.time()
 
-        query = sign(self.parameters, SECRET)
+        self.query = sign(self.parameters, SECRET)
         #print query
 
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/start?%s" % query)
+        f = urllib.urlopen("http://api.karotz.com/api/karotz/start?%s" % self.query)
         token = f.read() # should return an hex string if auth is ok, error 500 if not
         #print token
 
@@ -78,15 +77,46 @@ class Karotz:
 
         for elmt in data:
             if elmt[0]=='interactiveId':
-	           #print elmt[1]
-	           intid=elmt[1]
-
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/tts?action=speak&lang=" + lg + "&text=" + txt + "&interactiveid=%s" % intid)
+               self.intid=elmt[1]   
+               self._log.debug("interactiveid=%s",self.intid)     
+        
+    def stop(self):
+        f = urllib.urlopen("http://api.karotz.com/api/karotz/interactivemode?action=stop&interactiveid=%s" % self.intid)
         token = f.read()
-        #print token
+        self._log.debug("Stop interactiveid=%s",self.intid)
+                
+    def tts(self,txt,lg):
+        
+        self.start()
+
+        f = urllib.urlopen("http://api.karotz.com/api/karotz/tts?action=speak&lang=" + lg + "&text=" + txt + "&interactiveid=%s" % self.intid)
+        token = f.read()
+        
 
         time.sleep(2)
 
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/interactivemode?action=stop&interactiveid=%s" % intid)
+        self.stop()
+   
+        
+    def led(self,color,temps):
+    
+        self.start()
+        
+        f = urllib.urlopen("http://api.karotz.com/api/karotz/led?action=light&color=" + color + "&interactiveid=%s" % self.intid)
         token = f.read()
-        #print token
+        
+        time.sleep(int(temps))
+        
+        self.stop()
+    
+    def ears(self,right,left):
+        
+        self.start()
+ 
+        f = urllib.urlopen("http://api.karotz.com/api/karotz/ears?left=" + left + "&right=" + right + "&reset=false&interactiveid=%s" % self.intid)
+        token = f.read()
+        
+        #time.sleep(10)
+        
+        #self.stop()       
+            

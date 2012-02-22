@@ -89,6 +89,13 @@ class KarotzMain(XplPlugin):
             dev = message.data['device']
         if 'value' in message.data:
             value=message.data['value']
+        if 'time' in message.data:
+            tps=message.data['time']
+        if 'right' in message.data:
+            right=message.data['right']
+            value=right
+        if 'left' in message.data:
+            left=message.data['left']
 
         self.log.debug(message.data)
         if value == None :
@@ -97,8 +104,15 @@ class KarotzMain(XplPlugin):
         else:
             self.log.debug("%s received : device = %s value=%s " % (cmd, dev, value))
             try:
-                self.log.debug("language=%s",self.lang)
-                self.kar.tts(value,self.lang.upper())
+                if cmd=='tts':
+                    self.log.debug("command=%s language=%s" % (cmd, self.lang))
+                    self.kar.tts(value,self.lang.upper())
+                if cmd=='led':
+                    self.log.debug("command=%s color=%s time=%s" % (cmd, value,tps))
+                    self.kar.led(value,tps)
+                if cmd=='ears':
+                    self.log.debug("command=%s right=%s left=%s" % (cmd, right, left))
+                    self.kar.ears(right,left)
             except:
                 self.log.error("Error to send command=%s" % (traceback.format_exc()))
   

@@ -1,14 +1,13 @@
 <technology id="knx">
-  <command name="shut">
+  <command name="HVACstop">
     <schema>knx.basic</schema>
     <command-key>command</command-key>
     <address-key>group</address-key>
     <command-xpl-value>Write</command-xpl-value>
     <parameters>
-      <parameter key="data" value="01"/>          
-      <parameter key="type" value="s"/>          
+      <parameter key="data" value="2"/>          
+      <parameter key="type" value="l"/>          
     </parameters>
-  </command>
   </command>
   <listener>
     <schema>knx.basic</schema>

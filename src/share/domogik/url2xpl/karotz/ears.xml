@@ -1,0 +1,20 @@
+<technology id="karotz">
+  <command name="ears">
+    <schema>karotz.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>ears</command-xpl-value>
+    <parameters>
+      <parameter key="right" location="1"/>
+      <parameter key="left" location="2"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>karotz.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="ears" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

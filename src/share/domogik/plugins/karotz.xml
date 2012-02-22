@@ -45,6 +45,8 @@
     <file path="src/share/domogik/design/plugin/karotz/icon.png"/>
     <file path="src/share/domogik/plugins/karotz.xml"/>
     <file path="src/share/domogik/url2xpl/karotz/tts.xml"/>
+    <file path="src/share/domogik/url2xpl/karotz/led.xml"/>
+    <file path="src/share/domogik/url2xpl/karotz/ears.xml"/>
     <file path="src/domogik/xpl/bin/karotz.py"/>
     <file path="src/domogik/xpl/lib/karotz.py"/>
   </files>

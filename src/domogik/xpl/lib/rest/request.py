@@ -38,7 +38,7 @@ ProcessRequest object
 """
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.common.database import DbHelper
+from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
@@ -2217,6 +2217,8 @@ target=*
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
+        except DbHelperException as e:
+            json_data.set_error(code = 999, description = e.value)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -2236,6 +2238,8 @@ target=*
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
+        except DbHelperException as e:
+            json_data.set_error(code = 999, description = e.value)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -2717,6 +2721,11 @@ target=*
                     my_type = message.data["cfg"+str(idx)+"-type"]
                     my_desc = message.data["cfg"+str(idx)+"-desc"]
                     my_default = message.data["cfg"+str(idx)+"-default"]
+                    optionskey = "cfg"+str(idx)+"-options"
+                    if message.data.has_key(optionskey):
+                        my_options = message.data[optionskey]
+                    else:
+                        my_options = ""
                     optkey = "cfg"+str(idx)+"-opt"
                     if message.data.has_key(optkey):
                         my_optionnal = message.data[optkey]
@@ -2731,6 +2740,7 @@ target=*
                                             "key" : my_key,
                                             "type" : my_type,
                                             "description" : my_desc,
+                                            "options": my_options,
                                             "default" : my_default})
                     # interface configuration element
                     else:

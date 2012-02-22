@@ -12,7 +12,7 @@
 - plugin creation
 </changelog>
   <version>0.1a0</version>
-  <documentation>to do</documentation>
+  <documentation>http://wiki.domogik.org/plugin_cron</documentation>
   <author>Sebastien GALLET</author>
   <author-email>sgallet at gmail dot com</author-email>
   <domogik-min-version>0.2.0</domogik-min-version>
@@ -71,6 +71,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>cron.toggle</device_type_id>
           <parameters>
+              {}
           </parameters>
           <value_type>string</value_type>
           <stat_key>current</stat_key>

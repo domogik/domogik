@@ -51,22 +51,6 @@ from ephem import NeverUpError
 from ephem import AlwaysUpError
 from domogik.xpl.lib.cron_query import cronQuery
 
-class dawnduskScheduler:
-    """
-    dawndusk scheduler
-    """
-    def __init__(self):
-        # Start the scheduler
-        self._sched = Scheduler()
-        self._sched.start()
-
-    def __del__(self):
-        self._sched.shutdown()
-
-    def add(self,cb_function, sdate,label):
-        # Start the scheduler
-        self.job = self._sched.add_date_job(cb_function, sdate, label)
-
 class dawnduskException(Exception):
     """
     dawndusk exception
@@ -94,7 +78,8 @@ class dawnduskAPI:
         self.log = log
         self.myxpl = myxpl
         if self.use_cron == False:
-            self._scheduler = dawnduskScheduler()
+            self._scheduler = Scheduler()
+            self._scheduler.start()
         else:
             self._cronQuery = cronQuery(self.myxpl,self.log)
         self.mycity = ephem.Observer()
@@ -108,9 +93,11 @@ class dawnduskAPI:
         @param lat : latitude of the observer
         """
         if self.use_cron == True:
-            self._cronQuery.haltJob(device)
+            self._cronQuery.haltJob("dawndusk")
+            self._cronQuery.haltJob("dawn-test")
+            self._cronQuery.haltJob("dusk-test")
         else :
-            del(self._scheduler)
+            self._scheduler.shutdown()
 
     def schedAdd(self,sdate,cb_function,label):
         """
@@ -119,15 +106,27 @@ class dawnduskAPI:
         @param cb_function : the callback function to call
         @param : the label of the event
         """
-        self.log.debug("dawndusk.schedAdd : Start ...")
+        self.log.debug("dawndusk.schedAdd : Start ... %s"%label)
         if self.use_cron == False:
-            self.job = self._scheduler.add(cb_function, sdate, label)
-            self.log.debug("dawndusk.schedAdd : Use internal cron ...")
-            return True
+            if label=="dawn" or label=="dusk":
+                self.job = self._scheduler.add_date_job(cb_function, sdate, args=[label])
+                self.log.debug("dawndusk.schedAdd : Use internal cron for %s"%label)
+            elif label=="dawn-test":
+                self.job_test_dawn = self._scheduler.add_date_job(cb_function, sdate, args=["dawn"])
+                self.log.debug("dawndusk.schedAdd : Use internal cron for %s"%"dawn")
+            elif label=="dusk-test":
+                self.job_test_dawn = self._scheduler.add_date_job(cb_function, sdate, args=["dusk"])
+                self.log.debug("dawndusk.schedAdd : Use internal cron for %s"%"dusk")
+            for i in self._scheduler.get_jobs():
+                self.log.debug("APScheduler : %-10s | %8s"%(str(i.trigger), i.runs))
         else :
-
             self.log.debug("dawndusk.schedAdd : Use external cron ...")
-            device="dawndusk"
+            if label=="dawn" or label=="dusk":
+                device="dawndusk"
+            elif label=="dawn-test":
+                device="dawn-test"
+            elif label=="dusk-test":
+                device="dusk-test"
             #print "status=%s"%self._cronQuery.statusJob(device,extkey="current")
             if self._cronQuery.statusJob(device,extkey="current")!="halted":
                 self._cronQuery.haltJob(device)
@@ -140,15 +139,18 @@ class dawnduskAPI:
                 nstMess.add_data({"status" :  "dawn"})
             elif label=="dusk":
                 nstMess.add_data({"status" :  "dusk"})
+            elif label=="dawn-test":
+                nstMess.add_data({"status" :  "dawn"})
+            elif label=="dusk-test":
+                nstMess.add_data({"status" :  "dusk"})
             if self._cronQuery.startDateJob(device,nstMess,sdate):
                 self.log.debug("dawndusk.schedAdd : External cron activated")
                 self.log.debug("dawndusk.schedAdd : Done :)")
-                return True
             else:
                 self.log.error("dawndusk.schedAdd : Can't activate external cron")
                 self.log.debug("dawndusk.schedAdd : Done :(")
                 return False
-            self.log.info("Add a new event of type %s at %s"%(label,sdate))
+        self.log.info("Add a new event of type %s at %s"%(label,sdate))
         return True
 
     def getNextDawn(self):

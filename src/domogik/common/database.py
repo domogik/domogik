@@ -1533,6 +1533,8 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % d_type_id)
         if not self.__session.query(DeviceUsage).filter_by(id=d_usage_id).first():
             self.__raise_dbhelper_exception("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
+        if self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==d_type_id).count() != 0:
+            self.__raise_dbhelper_exception("Couldn't add device, same device with adress %s and type %s already exists" % (d_address,d_type_id))
         device = Device(name=d_name, address=d_address, description=d_description, reference=d_reference,
                         device_type_id=d_type_id, device_usage_id=d_usage_id)
         self.__session.add(device)
@@ -1574,6 +1576,9 @@ class DbHelper():
         if d_name is not None:
             device.name = ucode(d_name)
         if d_address is not None:
+            # only do the check if we update the device address
+            if device.address != ucode(d_address) and self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==device.device_type_id).count() != 0:
+                self.__raise_dbhelper_exception("Couldn't update device, same device with adress %s and type %s already exists" % (d_address,device.device_type_id))
             device.address = ucode(d_address)
         if d_description is not None:
             if d_description == '': d_description = None

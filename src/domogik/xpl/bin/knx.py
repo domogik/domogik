@@ -107,6 +107,10 @@ class KNXManager(XplPlugin):
         """ Send xpl-trig to give status change
         """
         ### Identify the sender of the message
+        command = ""
+        dmgadr =""
+        msg_type=""
+        val=""
         sender = 'None'
         sender = data[data.find('from')+4:data.find('to')-1]
         sender = sender.strip()
@@ -119,7 +123,7 @@ class KNXManager(XplPlugin):
            command = data[0:4]  
            lignetest=""
            groups = data[data.find('to')+2:data.find(':')]
-           groups = groups.strip()
+           groups =":"+groups.strip()+" "
            print "%s" %groups
 
         ### Search the sender in the config list
@@ -134,44 +138,205 @@ class KNXManager(XplPlugin):
            if lignetest<>"":
               datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
               dmgadr=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
+              typeadr=lignetest[lignetest.find(groups)-4:lignetest.find(groups)]
+	      typeadr=typeadr.replace("_","")
+	      print "type d'adresse %s" %typeadr
               print "datatype %s f" %datatype
               print "adresse domogik %s f" %dmgadr
      
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
-                 val = int(val,16)
+                 print "valeur reçu:%s" %val
                  msg_type = "s"
                  if data[-2:-1]==" ":
                     msg_type = "l"
                  msg = XplMessage()
                  print "send_xpl valeur avant modif: %s" %val
-                 if datatype == "DT_Scaling":
-                    print "send_xpl Datapoint DT_Scaling"
+
+                 if datatype == "1.001":
+                    val=int(val.replace(" ",""),16)
+                    if val>=1:
+                       val=val
+                    else:
+                       self.log.error("DPT_switch 1.001 invalid value %s from %s" %(val,groups))
+
+                 if datatype=="1.008": #"DT_UpDown":
+                    val=int(val.replace(" ",""),16)
+                    if val<=1:        
+                       if val==1:
+                          #val="down" 
+                          value=0
+                       if val==0:
+                          #val="up"
+                          value=1
+                       val=value
+                       print "valeur après modif %s" %val
+
+                 if datatype =="5.001": # "DT_Scaling":
+                    print "DT_Scaling"
+                    val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=int(100*int(val)/255)
                        print "reception DT_Scaling val=%s" %val
                     else:
                        self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
 
-                 if datatype=="DT_UpDown":
-                    print "send_xpl DT_UpDown" 
-                    if val==1:
-                       val="down" 
-                    if val==0:
-                       val="up"
-                    print "valeur après modif %s" %val
-                 if datatype == "DT_Angle":
+                 if datatype == "5.xxx": #8bit unsigned integer (from 0 to 255) (EIS6) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=255:
+                       val=val
+
+                 if datatype == "5.003": #angle (from 0 to 360°) 
+                    val=int(val.replace(" ",""),16)
                     print "send_xpl DT Angle"
-                    val=val*360/255
+                    if val<=255:
+                       val=val*360/255
+                    else:
+                       self.log.error("DPT_Angle not valid argument %s from %s" %(val,groups))
 
-                 if datatype == "DT_Percent":
-                    val=val
+                 if datatype =="6.xxx": #8bit signed integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=255:
+                       val=val-128
+		    else:
+                       self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
-                 if datatype == "DT_HVACMode":
-                    if val>="5":
-                       self.log.error("DT_HVACMode unknow code %s from %s" %(val,groups))
+                 if datatype =="7.xxx": #16bit unsigned integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=65535:
+                       val=val
+                    else:
+                       self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+                 if datatype =="8.xxx": #16bit signed integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=65535:
+                       val=val-32768
+                    else:
+                       self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
+
+                 if datatype =="9.xxx": #16bit unsigned integer (EIS14) 
+                    val=int(val.replace(" ",""),16)
+                    if val<=65535:
+                       val=bin(Val)[2:]
+                       if len(val)<=16:
+                          for i in range(16-len(val)):
+                             val="0"+val
+                       Y=long(val[1:5],2)
+                       X=long(val[0:1]+val[5:16],2)
+                       print "Valeur de X=%s" %x
+                       if X>=2047:
+                          print "ce nombre semble negatif"
+                          X=X-4096
+                       Valeur=float(0.01*X*2**Y)
+                    else:
+                       self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
+
+                 if datatype =="10.001": #time (EIS3)
+                    val=int(val.replace(" ",""),16)
+                    if val<=3476283:
+                       val=int(val.replace(" ",""),16)
+                       val=bin(val)[2:]
+                       second=int(val[len(val)-6:len(val)],2)
+                       val=val[0:len(val)-8]
+                       minute=int(val[len(val)-6:len(val)],2)
+                       val=val[0:len(val)-8]
+                       hour=int(val[len(val)-5:len(val)],2)
+                       val=val[0:len(val)-5]
+                       if len(val)>=1:
+                          day=int(val,2)
+                       else:
+                          day="No day"
+                       val=hour+":"+minute+":"+second+".0"
+                    else:
+                       self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
+
+                 if datatype =="11.001": #date (EIS4)
+                    val=int(val.replace(" ",""),16)
+                    if val<=3476283:
+                       val=bin(val)[2:]
+                       year=int(val[len(val)-7:len(val)],2)
+                       val=val[0:len(val)-8]
+                       mounth=int(val[len(val)-4:len(val)],2)
+                       val=val[0:len(val)-8]
+                       day=int(val[len(val)-5:len(val)],2)
+                       val=year+"-"+mounth+"-"+day
+                    else:
+                       self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
                  
+                 if datatype == "12.xxx": #32 bit unsigned interger
+                    val=int(val.replace(" ",""),16)
+                    if val>=4294967296:
+                       self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
+
+                 if datatype == "13.xxx": #32bit signed integer
+                     val=int(val.replace(" ",""),16)
+                     if val<=4294967295:
+                        val=val-2147483648
+                     else:
+                       self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
+
+                 if datatype == "14.xxx": #32bit IEEE 754 floating point number
+                     val=int(val.replace(" ",""),16)
+                     val=bin(val)[2:]
+                     if len(val)<32:
+                        for i in range(32-len(val)):
+                           val="0"+val
+                        signe=1-2*int(val[:1])
+                        exposant=str(val[1:9])
+                        mantisse=str(val[9:32])
+                        #signe= int(str(signe),2)
+                        exposant= int(str(exposant),2)
+                        mantise=0
+                        for i in range(23):
+                           valut=mantisse[i-1:i]
+                           if valut=="1":
+                              mantise=float(mantise+2**(-i))
+                        mantisse= 1+mantise
+                        val=float(signe*mantisse*2**(exposant-127))
+                        print "résultat %s" %(signe*mantisse*2**(exposant-127))
+
+                 if datatype =="16.xxx": #String
+                    val=val.replace(" ","")
+                    if len(val)/2==14:
+                       phrase=""
+                       for i in range(len(foo)/2):
+                          phrase=phrase+ chr(int(val[0:2],16))
+                          val=val[2:]
+                       val=phrase
+                    else:
+                       self.log.error("define as string, invalid data %s from %s" %s(val,groups))
+
+                 if datatype == "20.102": #heating mode (comfort/standby/night/frost) 
+                    val=int(val.replace(" ",""),16)
+                    if val>="5":
+                       val=val
+                    else:
+                       self.log.error("DPT_HVACMode unknow code %s from %s" %(val,groups))
+
+                 if datatype == "DT_HVACEib":
+                    val=int(val.replace(" ",""),16)
+                    print "reception DT_HVAC %s" %val
+                    value=val
+		    if val==value:
+                       if val==2:
+                          value=3
+                       if val==3:
+                          value=1
+                       if val==4:
+                          value=4
+                       if val==19:
+                          value=3
+                       if val==17:
+                          value=4
+                       if val==20:
+                          value=1
+                       val=value
+                    else:
+                       self.log.error("DT_HVACEib unknow value %s from %s" %(val,groups))
+                       
+
                  if command == 'Writ':
                     print("knx Write xpl-trig")
                     command = 'Write'
@@ -194,62 +359,223 @@ class KNXManager(XplPlugin):
                     msg.set_schema('knx.basic')
    
               if sender<>"0.0.0":
-                 msg.add_data({'command' : command})
+                 msg.add_data({'command' : command+' bus'})
               else:
                  msg.add_data({'command': command+' ack'})
               msg.add_data({'group' :  dmgadr})
               msg.add_data({'type' :  msg_type})
               msg.add_data({'data': val})
               self.myxpl.send(msg)
+              print "command: %s group: %s type: %s data: %s" %(command,dmgadr,msg_type,val)
 
 
     def knx_cmd(self, message):
         type_cmd = message.data['command']
         groups = message.data['group']
-        groups = "adr_dmg:"+groups
+        groups = "adr_dmg:"+groups+" "
+        ligentest=""
         print "%s" %groups
         for i in range(len(listknx)):
            if listknx[i].find(groups)>=0:
               lignetest=listknx[i]
-        datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
-        cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
-        lignetest=""
-        command=""
-        if type_cmd=="Write":
-           print("dmg Write")
-           valeur = message.data['data']
-           data_type = message.data['type']
-           print "valeur avant modif:%s" %valeur
-           if datatype=="DT_Scaling":
-              if valeur<>"None":
-                 valeur = int(valeur)*255/100
-                 print("command val=%s" %valeur)
-                 valeur=hex(valeur)
-                 print( "%s" %valeur)
+        if lignetest<>"":
+           datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
+           cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
+           lignetest=""
+           command=""
+           if type_cmd=="Write":
+              print("dmg Write")
+              valeur = message.data['data']
+              data_type = message.data['type']
+              print "valeur avant modif:%s" %valeur
+              val=valeur
+              if datatype =="5.xxx": #16bit unsigned integer (EIS14) 
+                 val=int(val)
+                 if val>=0:
+                    if val<=255:
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()
+                    else:
+                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
+		 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+              if datatype=="5.001": #"DT_Scaling":
+                 if valeur<>"None":
+                    valeur = int(valeur)*255/100
+                    print("command val=%s" %valeur)
+                    valeur=hex(valeur)
+                    print( "%s" %valeur)
+                 else:
+                    valeur=0
+
+	      if datatype == "5.003": #"DT_Angle":
+                    if val<=360:
+                       val=int(val)*255/360
+                       val=hex(val)
+
+              if datatype =="6.xxx": #8bit signed integer (EIS14) 
+                 val=int(val)
+                 if val<=127:
+                    if val>=-128:
+                       val=val+128
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()	
+		 else:
+                    self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
+
+              if datatype =="7.xxx": #16bit unsigned integer (EIS14) 
+                 val=int(val)
+                 if val>=0:
+                    if val<=65535:
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()
+                    else:
+                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
+		 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+              if datatype =="8.xxx": #16bit signed integer (EIS14) 
+                 val=int(val)
+                 if val<=32767:
+                    if val>=-32768:
+                       val=val+32768
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()	
+                 else:
+                    self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
+
+              if datatype =="9.xxx": #16bit floating signed (EIS14) 
+                 val=val.replace(",",".")
+                 val=float(val)
+                 if val<0:
+                    val=abs(val)
+                    signe="moin"
+                    print "Signe négatif"
+                 print "val absolue %s" %val
+                 tmp = int(100 * abs(val))
+                 print "tmp = %s" %tmp
+                 for y in range(0, 15):
+                    x = tmp >> y
+                    if x >= 0 and x < 2048:
+                       break
+                 if signe=="moin":
+                    x=4096-x
+                    print "vraiment negatif"
+                    print "Valeur de X=%s" %x
+                 print "Valeur de Y=%s" %y
+                 binaireX=bin(x)[2:]
+                 binairey=bin(y)[2:]
+                 if len(binaireX)<=12:
+                    print "manque des bits a X"
+                    for i in range(12-len(binaireX)):
+                       binaireX="0"+binaireX
+                 if len(binairey)<>4:
+                    print "Manque des bits a Y"
+                    for i in range(4-len(binairey)):
+                       binairey="0"+binairey
+                 print binaireX
+                 print binairey
+                 Valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
+                 print Valeur
+                 Valeur=Valeur.replace(" ","")
+                 Valeur=int(Valeur,2)
+                 Valeur=hex(Valeur)[2:]
               else:
-                 valeur=0
-           else:
-              print "Datapoint non trouver"
-              valeur=hex(int(valeur))
-           if data_type=="s":
-              command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
-           if data_type=="l":
-              command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
-        if type_cmd == "Read":
-           print("dmg Read")
-           command="groupread ip:127.0.0.1 %s" % groups
-        if type_cmd == "Response":
-           print("dmg Response")
-           data_type=message.data['type']
-           valeur = message.data['data']
-           if data_type=="s":
-              command="groupsresponse ip:127.0.0.1 %s %s" %(groups,valeur)
-           if data_type=="l":
-               command="groupresponse ip:127.0.0.1 %s %s" %(groups,valeur)
-        if command<>"":
-           subp=subprocess.Popen(command, shell=True)
-        if command=="":
-           print("erreur command non définir, type cmd= %s" %type_cmd)
+                 self.log.error("define 16bit signed float overflow %s from %s" %(val,groups))
+
+
+              if datatype =="12.xxx": #32bit unsigned integer (EIS14) 
+                 val=int(val)
+                 if val>=0:
+                    if val<=4294967295:
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()
+                    else:
+                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
+		 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+
+              if datatype == "13.xxx": #32bit signed integer
+                 val=int(val)
+                 if val<=2147483647:
+                    if val>=-2147483648:
+                       val=val+2147483648
+                       val=hex(val)[2:]
+                       valeur=""
+                       for i in range(len(val)/2):
+                          valeur=valeur+" "+val[0:2]
+                          val=val[2:]
+                       val=valeur.strip()	
+                 else:
+                    self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
+
+              if datatype == "16.000":
+                 codage=""
+                 if len(val)<=14:
+                    for j in range(len(val)):
+                       print ord(val[j:j+1])
+                       codage=codage+hex(ord(val[j:j+1]))[2:]
+                    print codage
+                    if len(val)<14:
+                       print "moins de 14 caractére"
+                       for j in range(14-len(val)):
+                          codage=codage+"00"
+                    print codage
+                    valeur=codage[:2]
+                    for i in range(14):
+                       valeur=valeur+" "+codage[2*(i+1):2*(i+1)+2]
+                 else:
+                    self.log.error("Too many character")
+
+              if datatype=="DT_HVACEib":
+                 valeur=val
+                 if val=="3":
+                    valeur="2"
+                 if val=="1":
+                    valeur="3"
+
+
+              if data_type=="s":
+                 command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
+              if data_type=="l":
+                 command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
+           if type_cmd == "Read":
+              print("dmg Read")
+              command="groupread ip:127.0.0.1 %s" %cmdadr
+           if type_cmd == "Response":
+              print("dmg Response")
+              data_type=message.data['type']
+              valeur = message.data['data']
+              if data_type=="s":
+                 command="groupsresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
+              if data_type=="l":
+                  command="groupresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
+           if command<>"":
+              print "envoie de la command %s" %command
+              subp=subprocess.Popen(command, shell=True)
+           if command=="":
+              print("erreur command non définir, type cmd= %s" %type_cmd)
 
 
 if __name__ == "__main__":
