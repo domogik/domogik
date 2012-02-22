@@ -644,8 +644,8 @@ class SysManager(XplPlugin):
                 Set the plugin to "on" in the list
         """
         # if this function is called from check_component_is_running
-        # TODO : this part may be removed in the future
         if args.has_key("name"):
+            self.log.debug("Component %s is running" % args["name"])
             self._pinglist[args["name"]].set()
         # if this function is called from the main listener
         else:
