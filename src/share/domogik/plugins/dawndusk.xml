@@ -3,7 +3,7 @@
   <technology>dawndusk</technology>
   <description>
   Get the dawn and dusk events using the geocoordinates.
-  Can also send command to devices using this events.
+  Can also send commands to devices using this event.
   </description>
   <changelog>
 0.2

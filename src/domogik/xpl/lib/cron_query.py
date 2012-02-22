@@ -33,22 +33,23 @@ A client librairy to speak with the cron plugin, via xpl language
 """
 
 from threading import Event
-from domogik.common import logger
+#from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.common.configloader import Loader
+#from domogik.common.configloader import Loader
 import traceback
+import datetime
 
-ERROR_NO=0
-ERROR_PARAMETER=1
-ERROR_DEVICE_EXIST=10
-ERROR_DEVICE_NOT_EXIST=11
-ERROR_DEVICE_NOT_STARTED=12
-ERROR_DEVICE_NOT_STOPPED=13
-ERROR_SCHEDULER=20
-ERROR_NOT_IMPLEMENTED=30
+ERROR_NO = 0
+ERROR_PARAMETER = 1
+ERROR_DEVICE_EXIST = 10
+ERROR_DEVICE_NOT_EXIST = 11
+ERROR_DEVICE_NOT_STARTED = 12
+ERROR_DEVICE_NOT_STOPPED = 13
+ERROR_SCHEDULER = 20
+ERROR_NOT_IMPLEMENTED = 30
 
-cronErrors = { ERROR_NO: 'No error',
+CRONERRORS = { ERROR_NO: 'No error',
                ERROR_PARAMETER: 'Missing or wrong parameter',
                ERROR_DEVICE_EXIST: 'Device already exist',
                ERROR_DEVICE_NOT_EXIST: 'Device does not exist',
@@ -57,7 +58,7 @@ cronErrors = { ERROR_NO: 'No error',
                ERROR_SCHEDULER: 'Error with the scheduler',
                }
 
-class cronQuery():
+class CronQuery():
     '''
     Query throw xPL network to get a config item
     '''
@@ -71,12 +72,12 @@ class cronQuery():
         self.__myxpl = xpl
         self.log.debug("Init config query instance")
         self._keys = {}
-        self._l = {}
+        self._listens = {}
         self._result = None
-        self.parameters =["parameter0","parameter1"]
-        self.values =["valueon","valueoff"]
+        self.parameters = ["parameter0", "parameter1"]
+        self.values = ["valueon", "valueoff"]
 
-    def query(self, device, configMess,extkey=None):
+    def query(self, device, configmess, extkey=None):
         '''
         Ask the config system for the value. Calling this function will make
         your program wait until it got an answer
@@ -88,24 +89,25 @@ class cronQuery():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
-        l = Listener(self._query_cb, self.__myxpl, {'schema': 'timer.basic',
+        liste = Listener(self._query_cb, self.__myxpl, {'schema': 'timer.basic',
                                                     'xpltype': 'xpl-trig',
                                                     'device': device
                                                     })
         self._keys['device'] = Event()
-        self._l['device'] = l
-        self.__myxpl.send(configMess)
+        self._listens['device'] = liste
+        self.__myxpl.send(configmess)
         if 'device' in self._keys:
             try:
                 self._keys['device'].wait(10)
                 if not self._keys['device'].is_set():
-                    self.log.error("No answer received for device=%s" % (device))
-                    raise RuntimeError("No answer received for device=%s, check your cron xpl setup" % (device))
-                    return False
+                    self.log.error("No answer received for device=%s" \
+                       % (device))
+                    raise RuntimeError("No answer received for device=%s,  \
+                        check your cron xpl setup" % (device))
             except KeyError:
                 pass
         if 'error' not in self._result:
-            if extkey!=None:
+            if extkey != None:
                 #print "extkey=%s"%extkey
                 #print "result=%s"%self._result
                 if extkey in self._result:
@@ -115,8 +117,10 @@ class cronQuery():
                     return False
             return True
         else:
-            self.log.error("Error %s when communicating device=%s" % (self._result['errorcode'],device))
-            self.log.error("%s : %s" % (self._result['errorcode'],self._result['error']))
+            self.log.error("Error %s when communicating device=%s" % \
+                (self._result['errorcode'], device))
+            self.log.error("%s : %s" % \
+                (self._result['errorcode'], self._result['error']))
             return False
 
     def _query_cb(self, message):
@@ -129,79 +133,83 @@ class cronQuery():
         if 'device' in message.data:
             device = message.data['device']
         #print "result=%s"%result
-        for r in self._keys:
-            if r in result:
+        for resp in self._keys:
+            if resp in result:
                 self.log.debug("Timer value received : device=%s" % (device))
-                res = self._keys.pop(r)
-                self._l[r].unregister()
-                del self._l[r]
+                res = self._keys.pop(resp)
+                self._listens[resp].unregister()
+                del self._listens[resp]
                 self._result = result
                 res.set()
                 break
 
-    def nestedKey(self, key):
-        return "nst-%s"%key
+    def nested_key(self, key):
+        '''
+        Callback to receive message after a query() call
+        @param message : the message received
+        '''
+        return "nst-%s" % key
 
-    def startJob(self, device, configMess, nstMess):
+    def start_job(self, device, configmess, nstmess):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
-        @param configMess : the XPL configuration message to send to the plugin
+        @param configmess : the XPL configuration message to send to the plugin
         @param nstMess : the XPL message which will be sent by the cron job
         '''
-        if configMess==None or nstMess==None or device==None:
+        if configmess == None or nstmess == None or device == None:
             return False
-        configMess.add_data({self.nestedKey("schema"):nstMess.schema})
-        configMess.add_data({self.nestedKey("xpltype"):nstMess.type})
-        for key in nstMess.data:
-                configMess.add_data({self.nestedKey(key):nstMess.data[key]})
+        configmess.add_data({self.nested_key("schema"):nstmess.schema})
+        configmess.add_data({self.nested_key("xpltype"):nstmess.type})
+        for key in nstmess.data:
+            configmess.add_data({self.nested_key(key):nstmess.data[key]})
         try:
-            res=self.query(device, configMess)
+            res = self.query(device, configmess)
             return res
         except:
-            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def startTimerJob(self, device, nstMess, frequence, duration=0):
+    def start_timer_job(self, device, nstmess, frequence, duration=0):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
         @param frequence : the frequence of the signal (in seconds).
         '''
-        if frequence==0:
-            return false
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"action" : "start"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"devicetype" : "timer"})
-        configMess.add_data({"frequence" : frequence})
-        if duration!=0:
-            configMess.add_data({"duration" : duration})
-        return self.startJob(device, configMess, nstMess)
+        if frequence == 0:
+            return False
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"action" : "start"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"devicetype" : "timer"})
+        configmess.add_data({"frequence" : frequence})
+        if duration != 0:
+            configmess.add_data({"duration" : duration})
+        return self.start_job(device, configmess, nstmess)
 
-    def startDateJob(self, device, nstMess, sdate):
+    def start_date_job(self, device, nstmess, sdate):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
         @param nstMess : the XPL message which will be sent by the cron job
         @param sdate : the date/time to run the job at
         '''
-        if sdate==None:
-            return false
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"devicetype" : "date"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"action" : "start"})
-        configMess.add_data({"date" : self.dateToXPL(sdate)})
-        return self.startJob(device, configMess, nstMess)
+        if sdate == None:
+            return False
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"devicetype" : "date"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"action" : "start"})
+        configmess.add_data({"date" : self.date_to_xpl(sdate)})
+        return self.start_job(device, configmess, nstmess)
 
-    def startIntervalJob( self, device, nstMess, weeks=0,days=0,hours=0,
-                          minutes=0,seconds=0,startdate=None):
+    def start_interval_job( self, device, nstmess, weeks=0, days=0, hours=0,
+                          minutes=0, seconds=0, startdate=None):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
@@ -214,39 +222,37 @@ class cronQuery():
         @param startdate: when to first execute the job and start the
                counter (default is after the given interval)
         '''
-        if sdate==None:
-            return false
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"devicetype" : "interval"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"action" : "start"})
-        ok=False
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"devicetype" : "interval"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"action" : "start"})
+        cont = False
         if weeks != 0:
-            configMess.add_data({"weeks" : weeks})
-            ok=True
+            configmess.add_data({"weeks" : weeks})
+            cont = True
         if days != 0:
-            configMess.add_data({"days" : days})
-            ok=True
+            configmess.add_data({"days" : days})
+            cont = True
         if hours != 0:
-            configMess.add_data({"hours" : hours})
-            ok=True
+            configmess.add_data({"hours" : hours})
+            cont = True
         if minutes != 0:
-            configMess.add_data({"minutes" : minutes})
-            ok=True
+            configmess.add_data({"minutes" : minutes})
+            cont = True
         if seconds != 0:
-            configMess.add_data({"seconds" : seconds})
-            ok=True
+            configmess.add_data({"seconds" : seconds})
+            cont = True
         if startdate != None:
-            startdate = self.dateToXPL(startdate)
-        if ok==False:
+            configmess.add_data({"startdate" : self.date_to_xpl(startdate)})
+        if cont == False:
             return ERROR_PARAMETER
-        return self.startJob(device, configMess, nstMess)
+        return self.start_job(device, configmess, nstmess)
 
-    def startCronJob( self, device, nstMess, year=None,month=None,day=None,
-                      week=None,dayofweek=None,hour=None,
-                      minute=None,second=None,startdate=None):
+    def start_cron_job( self, device, nstmess, year=None, month=None,
+                      day=None, week=None, dayofweek=None, hour=None,
+                      minute=None, second=None, startdate=None):
 
         '''
         Add and start a job to the cron plugin
@@ -262,44 +268,44 @@ class cronQuery():
         @param startdate: when to first execute the job and start the
                counter (default is after the given interval)
        '''
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"devicetype" : "cron"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"action" : "start"})
-        ok=False
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"devicetype" : "cron"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"action" : "start"})
+        cont = False
         if year != None:
-            configMess.add_data({"year" : year})
-            ok=True
+            configmess.add_data({"year" : year})
+            cont = True
         if month != None:
-            configMess.add_data({"month" : month})
-            ok=True
+            configmess.add_data({"month" : month})
+            cont = True
         if day != None:
-            configMess.add_data({"day" : day})
-            ok=True
+            configmess.add_data({"day" : day})
+            cont = True
         if week != None:
-            configMess.add_data({"week" : week})
-            ok=True
+            configmess.add_data({"week" : week})
+            cont = True
         if dayofweek != None:
-            configMess.add_data({"dayofweek" : dayofweek})
-            ok=True
+            configmess.add_data({"dayofweek" : dayofweek})
+            cont = True
         if hour != None:
-            configMess.add_data({"hour" : hour})
-            ok=True
+            configmess.add_data({"hour" : hour})
+            cont = True
         if minute != None:
-            configMess.add_data({"minute" : minute})
-            ok=True
+            configmess.add_data({"minute" : minute})
+            cont = True
         if second != None:
-            configMess.add_data({"second" : second})
-            ok=True
+            configmess.add_data({"second" : second})
+            cont = True
         if startdate != None:
-            startdate = self.dateToXPL(startdate)
-        if ok==False:
+            configmess.add_data({"startdate" : self.date_to_xpl(startdate)})
+        if cont == False:
             return ERROR_PARAMETER
-        return self.startJob(device, configMess, nstMess)
+        return self.start_job(device, configmess, nstmess)
 
-    def startHvacJob( self, device, nstMess, params={}, timers={}):
+    def start_hvac_job( self, device, nstmess, params={}, timers={}):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
@@ -307,33 +313,34 @@ class cronQuery():
         @param params : parameters in a dict with valueon and valueoff fields
         @param timers: the list of timers to use
        '''
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"devicetype" : "hvac"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"action" : "start"})
-        ok=True
-        i=0
-        if params !=None:
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"devicetype" : "hvac"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"action" : "start"})
+        cont = True
+        i = 0
+        if params != None:
             for param in params:
                 #try:
-                    configMess.add_data({"parameter"+str(i) : param})
-                    for value in params[param]:
-                        configMess.add_data({value+str(i) : params[param][value]})
-                    i=i+1
+                configmess.add_data({"parameter"+str(i) : param})
+                for value in params[param]:
+                    configmess.add_data({value+str(i) : \
+                        params[param][value]})
+                i = i+1
                 #except:
-                #    ok=False
-        if ok and len(timers)>0 :
+                #    cont=False
+        if cont and len(timers)>0 :
             for key in timers:
-                configMess.add_data({key : timers[key]})
+                configmess.add_data({key : timers[key]})
         else:
-            ok=False
-        if ok==False:
+            cont = False
+        if cont == False:
             return ERROR_PARAMETER
-        return self.startJob(device, configMess, nstMess)
+        return self.start_job(device, configmess, nstmess)
 
-    def startAlarmJob( self, device, nstMess, params={}, alarms=list()):
+    def start_alarm_job( self, device, nstmess, params={}, alarms=list()):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
@@ -341,33 +348,34 @@ class cronQuery():
         @param params : parameters in a dict with valueon and valueoff fields
         @param alarms : the list of alarms to use
        '''
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"devicetype" : "alarm"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"action" : "start"})
-        ok=True
-        i=0
-        if params !=None:
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"devicetype" : "alarm"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"action" : "start"})
+        cont = True
+        i = 0
+        if params != None:
             for param in params:
                 #try:
-                    configMess.add_data({"parameter"+str(i) : param})
-                    for value in params[param]:
-                        configMess.add_data({value+str(i) : params[param][value]})
-                    i=i+1
+                configmess.add_data({"parameter"+str(i) : param})
+                for value in params[param]:
+                    configmess.add_data({value+str(i) : \
+                        params[param][value]})
+                i = i+1
                 #except:
-                #    ok=False
-        if alarms!=None:
+                #    cont=False
+        if alarms != None:
             for key in alarms:
-                configMess.add_data({"alarm" : key})
+                configmess.add_data({"alarm" : key})
         else:
-            ok=False
-        if ok==False:
+            cont = False
+        if cont == False:
             return ERROR_PARAMETER
-        return self.startJob(device, configMess, nstMess)
+        return self.start_job(device, configmess, nstmess)
 
-    def startDawnAlarmJob( self, device, nstMess, params={}, alarms=list()):
+    def start_dawn_alarm_job( self, device, nstmess, params={}, alarms=list()):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
@@ -375,126 +383,127 @@ class cronQuery():
         @param params : parameters in a dict with valueon and valueoff fields
         @param alarms : the list of alarms to use
        '''
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"devicetype" : "dawnalarm"})
-        configMess.add_data({"device" : device})
-        configMess.add_data({"action" : "start"})
-        ok=True
-        i=0
-        if params !=None:
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"devicetype" : "dawnalarm"})
+        configmess.add_data({"device" : device})
+        configmess.add_data({"action" : "start"})
+        cont = True
+        i = 0
+        if params != None:
             for param in params:
                 #try:
-                    configMess.add_data({"parameter"+str(i) : param})
-                    for value in params[param]:
-                        configMess.add_data({value+str(i) : params[param][value]})
-                    i=i+1
+                configmess.add_data({"parameter"+str(i) : param})
+                for value in params[param]:
+                    configmess.add_data({value+str(i) : \
+                        params[param][value]})
+                i = i+1
                 #except:
-                #    ok=False
-        if alarms!=None:
+                #    cont=False
+        if alarms != None:
             for key in alarms:
-                configMess.add_data({"alarm" : key})
+                configmess.add_data({"alarm" : key})
         else:
-            ok=False
-        if ok==False:
+            cont = False
+        if cont == False:
             return ERROR_PARAMETER
-        return self.startJob(device, configMess, nstMess)
+        return self.start_job(device, configmess, nstmess)
 
-    def stopJob(self, device,extkey=None):
+    def stop_job(self, device, extkey=None):
         """
         Stop a job to the cron plugin. The cron job could be restarted via a
         resume command.
         @param device : the name of the timer
         """
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"action" : "stop"})
-        configMess.add_data({"device" : device})
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"action" : "stop"})
+        configmess.add_data({"device" : device})
         try :
-            res=self.query(device, configMess,extkey=extkey)
+            res = self.query(device, configmess, extkey=extkey)
             return res
         except:
-            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def resumeJob(self, device,extkey=None):
+    def resume_job(self, device, extkey=None):
         """
         Resume a previous stopped job to the cron plugin.*
         @param device : the name of the timer
         """
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"action" : "resume"})
-        configMess.add_data({"device" : device})
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"action" : "resume"})
+        configmess.add_data({"device" : device})
         try:
-            res=self.query(device, configMess,extkey=extkey)
+            res = self.query(device, configmess, extkey=extkey)
             return res
         except:
-            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def haltJob(self, device,extkey=None):
+    def halt_job(self, device, extkey=None):
         """
         Stop a job and delete the device.
         @param device : the name of the timer
         """
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"action" : "halt"})
-        configMess.add_data({"device" : device})
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"action" : "halt"})
+        configmess.add_data({"device" : device})
         try:
-            res=self.query(device, configMess,extkey=extkey)
+            res = self.query(device, configmess, extkey=extkey)
             #print res
             return res
         except:
-            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def statusJob(self, device,extkey=None):
+    def status_job(self, device, extkey=None):
         """
         Get the status of a job to the cron plugin.
         @param device : the name of the timer
         """
-        configMess = XplMessage()
-        configMess.set_type("xpl-cmnd")
-        configMess.set_schema("timer.basic")
-        configMess.add_data({"action" : "status"})
-        configMess.add_data({"device" : device})
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"action" : "status"})
+        configmess.add_data({"device" : device})
         try:
-            res=self.query(device, configMess,extkey=extkey)
+            res = self.query(device, configmess, extkey=extkey)
             return res
         except:
-            self.log.error("cron_query : %s"%(traceback.format_exc()))
+            self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def dateFromXPL(self,xpldate):
+    def date_from_xpl(self, xpldate):
         """
         Tranform an XPL date "yyyymmddhhmmss" to datetime
         form
         """
-        y = int(xpldate[0:4])
+        yy = int(xpldate[0:4])
         mo = int(xpldate[4:6])
-        d = int(xpldate[6:8])
-        h = int(xpldate[8:10])
-        m = int(xpldate[10:12])
-        s = int(xpldate[12:14])
-        return datetime.datetime(y,mo,d,h,m,s)
+        dd = int(xpldate[6:8])
+        hh = int(xpldate[8:10])
+        mm = int(xpldate[10:12])
+        ss = int(xpldate[12:14])
+        return datetime.datetime(yy, mo, dd, hh, mm, ss)
 
-    def dateToXPL(self,sdate):
+    def date_to_xpl(self, sdate):
         """
         Tranform an datetime date to an xpl one "yyyymmddhhmmss"
         form
         """
-        h = "%.2i" % sdate.hour
-        m = "%.2i" % sdate.minute
-        s = "%.2i" % sdate.second
-        y = sdate.year
+        hh = "%.2i" % sdate.hour
+        mm = "%.2i" % sdate.minute
+        ss = "%.2i" % sdate.second
+        yy = sdate.year
         mo = "%.2i" % sdate.month
-        d = "%.2i" % sdate.day
-        xpldate = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
+        dd = "%.2i" % sdate.day
+        xpldate = "%s%s%s%s%s%s" % (yy, mo, dd, hh, mm, ss)
         return xpldate
 
