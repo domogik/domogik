@@ -61,6 +61,7 @@ class IPXManager(XplPlugin):
         loop = True
         self._config = Query(self.myxpl, self.log)
         while loop == True:
+            model = self._config.query('ipx800', 'model-%s' % str(num))
             login = self._config.query('ipx800', 'login-%s' % str(num))
             password = self._config.query('ipx800', 'password-%s' % str(num))
             name = self._config.query('ipx800', 'name-%s' % str(num))
@@ -71,6 +72,7 @@ class IPXManager(XplPlugin):
                                (login, name, address, inter))
                 self.ipx_list[name] = {"login" : login,
                                        "password" : password,
+                                       "model" : model,
                                        "ip" : address,
                                        "interval" : float(inter)}
                 num += 1
@@ -93,6 +95,7 @@ class IPXManager(XplPlugin):
                 self.log.info("Opening IPX800 named '%s' (ip : %s)" % 
                                (ipx, self.ipx_list[ipx]['ip']))
                 self.ipx_list[ipx]['obj'].open(ipx, self.ipx_list[ipx]['ip'],
+                                               self.ipx_list[ipx]['model'],
                                                self.ipx_list[ipx]['login'],
                                                self.ipx_list[ipx]['password'])
             except:
@@ -148,7 +151,8 @@ class IPXManager(XplPlugin):
         msg.set_type("xpl-trig")
         msg.set_schema('sensor.basic')
         msg.add_data({'device' :  msg_device})
-        msg.add_data({'type' :  msg_type})
+        if msg_type != None:
+            msg.add_data({'type' :  msg_type})
         msg.add_data({'current' :  msg_current})
         self.myxpl.send(msg)
 
