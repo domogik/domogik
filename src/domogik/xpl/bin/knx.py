@@ -317,16 +317,25 @@ class KNXManager(XplPlugin):
 
                  if datatype == "DT_HVACEib":
                     val=int(val.replace(" ",""),16)
-                    if val<=4:
+                    print "reception DT_HVAC %s" %val
+                    value=val
+		    if val==value:
                        if val==2:
                           value=3
                        if val==3:
                           value=1
                        if val==4:
                           value=4
+                       if val==19:
+                          value=3
+                       if val==17:
+                          value=4
+                       if val==20:
+                          value=1
                        val=value
                     else:
                        self.log.error("DT_HVACEib unknow value %s from %s" %(val,groups))
+                       
 
                  if command == 'Writ':
                     print("knx Write xpl-trig")
