@@ -296,6 +296,9 @@ class SysManager(XplPlugin):
             Listener(self._set_component_running, self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat'})
+            Listener(self._set_component_not_running, self.myxpl, 
+                 {'schema':'hbeat.end', 
+                  'xpltype':'xpl-stat'})
 
             # define timers
             if self.options.check_external:
@@ -420,6 +423,7 @@ class SysManager(XplPlugin):
         """
         cmd = message.data['command']
         self.log.debug("Call _system_action_cb for cmd='%s'" % cmd)
+        print("Call _system_action_cb for cmd='%s'" % cmd)
 
         try:
             plg = message.data['plugin']
@@ -633,7 +637,11 @@ class SysManager(XplPlugin):
             return False
 
     def _set_component_running(self, message, args = {}):
-        """ Set the Event to true if an answer was received
+        """ Set plugin state to true
+            Called from check_component_is_running : 
+                Set the Event to true if an answer was received
+            Called from the main Listener :
+                Set the plugin to "on" in the list
         """
         # if this function is called from check_component_is_running
         # TODO : this part may be removed in the future
@@ -645,8 +653,12 @@ class SysManager(XplPlugin):
                 name = message.source_device_id
                 # hardcoded values for no plugin part of domogik
                 if name not in ("manager", "rest", "dbmgr"):
-                    self._pinglist[message.source_device_id].set()
+                    self._set_status(name, "ON")
 
+    def _set_component_not_running(self, message):
+        """ Set the component to off in the list
+        """
+        print "HBEAT.END : %s" % message.source
 
     def _exec_plugin(self, name):
         """ Internal method
@@ -1070,6 +1082,7 @@ class SysManager(XplPlugin):
             This function use a semaphore to be used only by 1 command at a time
         """
         self.sema_installed.acquire()
+        print "*** acquire ***"
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.package')
@@ -1097,6 +1110,7 @@ class SysManager(XplPlugin):
         self.myxpl.send(mess)
         time.sleep(0.3) # make sure to make a pause between 2 messages
         self.sema_installed.release()
+        print "*** release ***"
 
     def _pkg_get_dependencies(self, message):
         """ Return the list of dependencies for a package
