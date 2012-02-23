@@ -174,7 +174,7 @@ class Rest(XplPlugin):
     
             ### Config
     
-            # directory data in ~/.domogik/domogik.cfg
+            # directory data 
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
@@ -187,12 +187,14 @@ class Rest(XplPlugin):
                 self._design_dir = "%s/packages/design/" % self._package_path
                 self._xml_cmd_dir = "%s/packages/url2xpl/" % self._package_path
                 self._xml_stat_dir = "%s/packages/stats/" % self._package_path
+                self.package_mode = True
             else:
                 self.log.info("No package path defined in config file")
                 self._package_path = None
                 self._design_dir = "%s/share/domogik/design/" % conf['custom_prefix']
                 self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
                 self._xml_stat_dir = "%s/share/domogik/stats/" % conf['custom_prefix']
+                self.package_mode = False
     
             # HTTP server ip and port
             try:
@@ -332,10 +334,11 @@ class Rest(XplPlugin):
     
             # define listeners for queues
             self.log.debug("Create listeners")
-            Listener(self._list_installed_packages, self.myxpl, \
-                     {'schema': 'domogik.package',
-                      'xpltype': 'xpl-trig',
-                      'command' : 'installed-packages-list'})
+            if self.package_mode == True:
+                Listener(self._list_installed_packages, self.myxpl, \
+                         {'schema': 'domogik.package',
+                          'xpltype': 'xpl-trig',
+                          'command' : 'installed-packages-list'})
             Listener(self._add_to_queue_package, self.myxpl, \
                      {'schema': 'domogik.package',
                       'xpltype': 'xpl-trig'})
@@ -413,7 +416,8 @@ class Rest(XplPlugin):
             # Semaphore init for installed package list update
             self.sema_installed = Semaphore(value=1)
             self._installed_packages = {}
-            self._get_installed_packages_from_manager()
+            if self.package_mode == True:
+                self._get_installed_packages_from_manager()
 
             # Launch server, stats
             self.log.info("REST Initialisation OK")
@@ -644,6 +648,8 @@ class Rest(XplPlugin):
             There is a semaphore in order not to return the list when it is
             updated (may be incomplete)
         """
+        # developper mode : all plugins are installed
+
         # TODO : remove log lines after tests
         self.log.debug("*** get_installed_packages")
         self.sema_installed.acquire()
@@ -658,7 +664,6 @@ class Rest(XplPlugin):
             @param host : host
             @param pkg_type : type of package
         """
-        
         self.log.debug("*** list_installed_packages")
         self.sema_installed.acquire()
         self.log.debug("*** sema acquired")
@@ -701,6 +706,7 @@ class Rest(XplPlugin):
             except:
                 self.log.debug("*** except global")
                 self.log.error("Error while creating list of installed packages : %s" % traceback.format_exc())
+                loop_again = False
         self.log.debug("*** before release")
         self.sema_installed.release()
         self.log.debug("*** sema released")

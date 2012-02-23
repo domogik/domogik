@@ -43,6 +43,11 @@ import copy
 import urllib2
 
 
+# IPX800 models
+IPX800_MODELS = ['ipx800v1', 'ipx800pro', 'ipx800v2', 'ipx800v3']
+IPX800_MODELS_LIKE_V2 = ['ipx800v1', 'ipx800pro', 'ipx800v2']
+IPX800_MODELS_LIKE_V3 = ['ipx800v3']
+
 # For searching IPX with UDP request
 IPX_UDP_HOST = ''
 IPX_UDP_PORT = 30303
@@ -86,33 +91,52 @@ class IPX:
         self._stop = stop
         self.login = None
         self.password = None
+        self.model = ""
         self.name = ""
         self.url = ""
         self.url_status = ""
         self.url_cgi_change = ""
         self.url_cgi_pulse = ""
         self.url_cgi_reset_counter = ""
-        self.ipx_led = {}  # relays
-        self.ipx_btn = {}  # digital input
-        self.ipx_an = {}   # analogic input
-        self.ipx_count = {}# counters
-        self.start_led = {}  # relays
-        self.start_btn = {}  # digital input
-        self.start_an = {}   # analogic input
-        self.start_count = {}# counters
-        self.nb_led = {}  # relays
-        self.nb_btn = {}  # digital input
-        self.nb_an = {}   # analogic input
-        self.nb_count = {}# counters
-        self.ipx_old_led = {}  # relays
-        self.ipx_old_btn = {}  # digital input
-        self.ipx_old_an = {}   # analogic input
-        self.ipx_old_count = {}# counters
 
-    def open(self, name, host, login = None, password = None):
+        self.ipx_led = {}        # relays
+        self.ipx_btn = {}        # digital input
+        self.ipx_an = {}         # analogic input for ipx800 v1, pro, v2
+        self.ipx_analog = {}     # analogic input for ipx800 v3
+        self.ipx_anselect = {}   # analogic type for ipx800 v3
+        self.ipx_count = {}      # counters
+
+        self.start_led = 0       # relays
+        self.start_btn = 0       # digital input
+        self.start_an = 0        # analogic input for ipx800 v1, pro, v2
+        self.start_analog = 0    # analogic input for ipx800 v3
+        self.start_anselect = 0  # analogic type for ipx800 v3
+        self.start_count = 0     # counters
+
+        self.nb_led = 0          # relays
+        self.nb_btn = 0          # digital input
+        self.nb_an = 0           # analogic input for ipx800 v1, pro, v2
+        self.nb_analog = 0       # analogic input for ipx800 v3
+        self.nb_anselect = 0     # analogic type for ipx800 v3
+        self.nb_count = 0        # counters
+
+        self.ipx_old_led = {}    # relays
+        self.ipx_old_btn = {}    # digital input
+        self.ipx_old_an = {}     # analogic input for ipx800 v1, pro, v2
+        self.ipx_old_analog = {} # analogic input for ipx800 v3
+        self.ipx_old_anselect ={}# analogic type for ipx800 v3
+        self.ipx_old_count = {}  # counters
+
+    def open(self, name, host, model, login = None, password = None):
         """ Try to access to IPX board and return error if not possible
-            @param ip : ip or dns of host
         """
+        if model not in IPX800_MODELS:
+            error = "Bad ipx800 model : %s" % model
+            print(error)
+            self._log.error(error)
+            raise IPXException(error)
+        self.model = model
+            
         self.name = name
         # define all urls
         self.url = "http://%s" % (host)
@@ -124,8 +148,10 @@ class IPX:
         self.url_cgi_reset_counter = "%s/counter.cgi?count=" % self.url
 
         # setting status will raise an error if no access to status.xml
-        self._log.info("Opening board : %s" % (host))
-        self.get_status(first = True)
+        msg = "Opening board : %s. Model : %s" % (host, model)
+        self._log.info(msg)
+        print(msg)
+        self.get_status(is_first = True)
 
     def urlopen(self, url):
         # Login/password management
@@ -149,8 +175,13 @@ class IPX:
         for idx in self.ipx_btn:
             status.append(" - btn%s : %s" % (idx, self.ipx_btn[idx]))
         status.append("List of analog input :")
-        for idx in self.ipx_an:
-            status.append(" - an%s : %s" % (idx, self.ipx_an[idx]))
+        if self.model in IPX800_MODELS_LIKE_V2:
+            for idx in self.ipx_an:
+                status.append(" - an%s : %s" % (idx, self.ipx_an[idx]))
+        if self.model in IPX800_MODELS_LIKE_V3:
+            for idx in self.ipx_analog:
+                status.append(" - anselect%s : %s" % (idx, self.ipx_anselect[idx]))
+                status.append(" - analog%s : %s" % (idx, self.ipx_analog[idx]))
         status.append("List of counters :")
         for idx in self.ipx_count:
             status.append(" - count%s : %s" % (idx, self.ipx_count[idx]))
@@ -298,8 +329,36 @@ class IPX:
             elt_type = 'output'
         if data['elt'] == "btn":
             elt_type = 'input'
-        if data['elt'] == "an":
-            elt_type = 'voltage'
+        if self.model in IPX800_MODELS_LIKE_V2:
+            if data['elt'] == "an":       # ipx800 v1, pro, v2
+                elt_type = 'voltage'
+        if self.model in IPX800_MODELS_LIKE_V3:
+            if data['elt'] == "analog":   # ipx800 v3
+                # TODO : type to change in f(anselect)
+                sel = self.ipx_anselect[data['num']]
+                if sel == '0':
+                    elt_type = None
+                elif sel == '1':
+                    elt_type = 'voltage'
+                    current = current * 0.00323
+                elif sel == '2':
+                    elt_type = 'temp'
+                    current = current * 0.323 - 50
+                elif sel == '3':
+                    elt_type = 'percent'
+                    current = current * 0.09775
+                elif sel == '4':
+                    elt_type = 'temp'
+                    current = ((current * 0.00323) - 1.63) / 0.0326
+                elif sel == '5':
+                    elt_type = 'percent'
+                    current = (((current * 0.00323) / 3.3) - 0.1515) / 0.00636
+                else:
+                    elt_type = None
+                
+            # type of analogic data : used as a type : don't process as value
+            if data['elt'] == "anselect":   # ipx800 v3
+                return
         if data['elt'] == "count":
             elt_type = 'count'
 
@@ -307,9 +366,9 @@ class IPX:
         self._callback(device, current, elt_type)
 
 
-    def get_status(self, first = False):
+    def get_status(self, is_first = False):
         """ Get status.xml content on board
-            @param first : optionnal : if True, first call so we will check
+            @param is_first : optionnal : if True, first call so we will check
                            number of relay, input (ana and digi)
         """
         try:
@@ -334,34 +393,38 @@ class IPX:
         response = dom.getElementsByTagName("response")[0]
 
         # First call : count items
-        if first == True:
+        if is_first == True:
             self.get_count(response)
 
         # Save old status
         else:
             self.ipx_old_led = copy.copy(self.ipx_led)
             self.ipx_old_btn = copy.copy(self.ipx_btn)
-            self.ipx_old_an = copy.copy(self.ipx_an)
+            if self.model in IPX800_MODELS_LIKE_V2:
+                self.ipx_old_an = copy.copy(self.ipx_an)
+            if self.model in IPX800_MODELS_LIKE_V3:
+                self.ipx_old_anselect = copy.copy(self.ipx_anselect)
+                self.ipx_old_analog = copy.copy(self.ipx_analog)
             self.ipx_old_count = copy.copy(self.ipx_count)
 
         # List each status
-        self.get_status_of(dom, "led", first)
-        #print "LED=%s" % self.ipx_led
-        self.get_status_of(dom, "btn", first)
-        #print "BTN=%s" % self.ipx_btn
-        self.get_status_of(dom, "an", first)
-        #print "AN=%s" % self.ipx_an
-        self.get_status_of(dom, "count", first)
-        #print "COUNT=%s" % self.ipx_count
+        self.get_status_of(dom, "led", is_first)
+        self.get_status_of(dom, "btn", is_first)
+        if self.model in IPX800_MODELS_LIKE_V2:
+            self.get_status_of(dom, "an", is_first)
+        if self.model in IPX800_MODELS_LIKE_V3:
+            self.get_status_of(dom, "anselect", is_first)
+            self.get_status_of(dom, "analog", is_first)
+        self.get_status_of(dom, "count", is_first)
 
 
-    def get_status_of(self, dom, elt, first = False):
+    def get_status_of(self, dom, elt, is_first = False):
         """ get value for <eltX> in <dom> and store then in self.<elt>[X]
             @param dom : xml data
             @param elt : led, btn, an
-            @param first : first launch ?
+            @param is_first : first launch ?
         """
-        if first == False:
+        if is_first == False:
             old_data = getattr(self, "ipx_old_%s" % elt)
         start = getattr(self, "start_" + elt)
         end = getattr(self, "nb_" + elt) + start
@@ -371,7 +434,7 @@ class IPX:
             data = getattr(self, "ipx_%s" % elt)
             data[idx] = resp
             # status of element changed : we will have to send a xPl message
-            if first == True or (first == False and old_data[idx] != data[idx]):
+            if is_first == True or (is_first == False and old_data[idx] != data[idx]):
                 self.send_change({'elt' : elt,
                                   'num' : idx,
                                   'value' : resp})
@@ -388,9 +451,15 @@ class IPX:
         self.start_btn, self.nb_btn = self.get_count_of(dom, "btn")
         self._log.info("Number of digital input : %s (start at %s)" % 
                        (self.nb_btn, self.start_btn))
-        self.start_an, self.nb_an = self.get_count_of(dom, "an")
-        self._log.info("Number of anal input : %s (start at %s)" % 
-                       (self.nb_an, self.start_an))
+        if self.model in IPX800_MODELS_LIKE_V2:
+            self.start_an, self.nb_an = self.get_count_of(dom, "an")
+            self._log.info("Number of analogic input : %s (start at %s)" % 
+                           (self.nb_an, self.start_an))
+        if self.model in IPX800_MODELS_LIKE_V3:
+            self.start_anselect, self.nb_anselect = self.get_count_of(dom, "anselect")
+            self.start_analog, self.nb_analog = self.get_count_of(dom, "analog")
+            self._log.info("Number of analogic input : %s (start at %s)" % 
+                           (self.nb_analog, self.start_analog))
         self.start_count, self.nb_count = self.get_count_of(dom, "count")
         self._log.info("Number of counters : %s (start at %s)" % 
                        (self.nb_count, self.start_count))

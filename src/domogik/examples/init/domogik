@@ -57,9 +57,9 @@ function start_xpl {
 }
 
 function start_manager {
-    [ -p /tmp/dmg-manager-state ] && rm -f /tmp/dmg-manager-state
-    mkfifo /tmp/dmg-manager-state
-    chown ${DOMOGIK_USER}: /tmp/dmg-manager-state
+    [ -p /var/run/domogik/dmg-manager-state ] && rm -f /var/run/domogik/dmg-manager-state
+    mkfifo /var/run/domogik/dmg-manager-state
+    chown ${DOMOGIK_USER}: /var/run/domogik/dmg-manager-state
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
     /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS"
     if [ $? -gt 0 ]; then
@@ -67,8 +67,8 @@ function start_manager {
         exit 1
     fi
     #Get the startup status
-    cat < /tmp/dmg-manager-state
-    rm -f /tmp/dmg-manager-state
+    cat < /var/run/domogik/dmg-manager-state
+    rm -f /var/run/domogik/dmg-manager-state
 }
 
 function update_cache {
@@ -116,7 +116,7 @@ function stop_plugins {
 # Check if the directory for lock exists
 function check_lock_dir {
     USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DIRECTORY=$(grep "^pid_dir_path" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
+    DIRECTORY=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
     if [ ! -d $DIRECTORY ];then
         mkdir $DIRECTORY
     fi

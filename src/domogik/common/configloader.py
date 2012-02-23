@@ -77,18 +77,19 @@ class Loader():
         ''' Get homedir 
         '''
         sys_file = ''
-        if os.path.isfile('/etc/default/domogik'):
-            sys_file = '/etc/default/domogik'
-        elif os.path.isfile('/etc/conf.d/domogik'):
-            sys_file = '/etc/conf.d/domogik'
-        else:
-            raise RuntimeError("No /etc/default/domogik of /etc/conf.d/domogik exists")
+        #if os.path.isfile('/etc/default/domogik'):
+        #    sys_file = '/etc/default/domogik'
+        #elif os.path.isfile('/etc/conf.d/domogik'):
+        #    sys_file = '/etc/conf.d/domogik'
+        #else:
+        #    raise RuntimeError("No /etc/default/domogik of /etc/conf.d/domogik exists")
 
-        f = open(sys_file)
-        data = f.readlines()
-        data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
-        configdir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
-        return configdir + "/.domogik/"
+        #f = open(sys_file)
+        #data = f.readlines()
+        #data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
+        #configdir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
+        #return configdir + "/.domogik/"
+        return "/etc/domogik/"
 
     def get_config_files_path(self):
         '''
@@ -96,10 +97,9 @@ class Loader():
         '''
         return self.__class__.valid_files
 
-    def load(self, custom_path = "", refresh = False):
+    def load(self, refresh = False):
         '''
         Parse the config
-        @param custom_path : Custom path to config file, will superseed others
         @param refresh : force refreshing config
         @return pair (main_config, plugin_config)
         '''
@@ -114,8 +114,7 @@ class Loader():
         # read config file
         if do_read == True:
             self.__class__.config = ConfigParser.ConfigParser()
-            files = self.__class__.config.read([custom_path, 
-                self.config_file])
+            files = self.__class__.config.read([self.config_file])
             self.__class__.valid_files = files
 
         # get 'domogik' config part

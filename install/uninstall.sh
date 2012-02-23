@@ -34,21 +34,17 @@
 
 
 function stop_domogik {
-    if [ -d "/etc/init.d/" ];then
-        if [ -f "/etc/init.d/domogik" ];then
-            if [ -d "/var/run/domogik" ];then
-                [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-                [ -f /etc/default/domogik ] && . /etc/default/domogik
-                if [ -f "/home/${DOMOGIK_USER}/.domogik/domogik.cfg" ];then
-                    echo "There is already a Domogik on this system. Try to stop it before uninstall..."
-                    /etc/init.d/domogik stop
-                fi
+    if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
+        if [ -d "/var/run/domogik" ];then
+            [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+            [ -f /etc/default/domogik ] && . /etc/default/domogik
+            if [ -f "/etc/domogik/domogik.cfg" ];then
+                echo "There is already a Domogik on this system. Try to stop it before uninstall..."
+                /etc/init.d/domogik stop
             fi
         fi
-    elif [ -d "/etc/rc.d/" ];then
-        echo "TODO"
     else
-        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
+        echo "It seems Domogik is not installed : no /etc/init.d|rc.d/domogik file"
         exit 16
     fi
 }
@@ -66,6 +62,7 @@ echo "- Domogik core"
 echo "- Configuration"
 echo "- Plugins"
 echo "- ..."
+echo "Only the database will not be removed"
 echo "Are you sure ? [y/N]"
 read choice
 if [ "x"$choice == "x" ] ; then
@@ -95,17 +92,23 @@ echo "Delete rc.d script"
 [ -f /etc/init.d/domogik ] && $RM /etc/init.d/domogik
 [ -f /etc/rc.d/domogik ] && $RM /etc/rc.d/domogik
 
+echo "Delete /usr/share/domogik"
+$RM /usr/share/domogik
+
+echo "Delete /usr/lib/domogik"
+$RM /usr/lib/domogik
+
 echo "Delete /usr/local/share/domogik"
 $RM /usr/local/share/domogik
 
-CONFIG_FOLDER=/home/$DOMOGIK_USER/.domogik/
+CONFIG_FOLDER=/etc/domogik/
 echo "Delete config folder : $CONFIG_FOLDER"
 $RM $CONFIG_FOLDER
 
 echo "Delete $GLOBAL_CONFIG"
 $RM $GLOBAL_CONFIG
 
-for fic in dmgenplug dmgdisplug dmg_manager dmg_send #TODO : DEL#dmg_django
+for fic in dmgenplug dmgdisplug dmg_manager dmg_send
   do
     TO_DEL=$(which $fic)
     echo "Delete $TO_DEL"
