@@ -2755,6 +2755,7 @@ target=*
                                               "key" : my_key,
                                               "type" : my_type,
                                               "description" : my_desc,
+                                              "options": my_options,
                                               "default" : my_default})
                         # not found
                         if found == False:
@@ -2765,6 +2766,7 @@ target=*
                                                         "key" : my_key,
                                                         "type" : my_type,
                                                         "description" : my_desc,
+                                            		"options": my_options,
                                                         "default" : my_default
                                                        }]})
                     idx += 1
