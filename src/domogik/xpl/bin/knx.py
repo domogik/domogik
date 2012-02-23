@@ -101,6 +101,13 @@ class KNXManager(XplPlugin):
         for ligne in fichier:
            listknx.append(ligne)
         fichier.close
+        for i in range(len(listknx)):
+           stat=listknx[i]
+           stat=stat[stat.find("adr_stat:")+9:]
+           stat=stat[:stat.find(" ")]
+           print stat  
+           command="groupread ip:127.0.0.1 %s" %stat
+           subp2=subprocess.Popen(command, shell=True)
         self.log.info("Plugin ready :)")
 
     def send_xpl(self, data):
@@ -143,7 +150,7 @@ class KNXManager(XplPlugin):
 	      print "type d'adresse %s" %typeadr
               print "datatype %s f" %datatype
               print "adresse domogik %s f" %dmgadr
-     
+              msg=XplMessage()
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
@@ -151,7 +158,7 @@ class KNXManager(XplPlugin):
                  msg_type = "s"
                  if data[-2:-1]==" ":
                     msg_type = "l"
-                 msg = XplMessage()
+                 #msg = XplMessage()
                  print "send_xpl valeur avant modif: %s" %val
 
                  if datatype == "1.001":
