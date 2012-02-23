@@ -282,15 +282,6 @@ REMOTE_ATI_WONDER = {
 }
 
 
-AC_CMND = {
-  "00" : "off",
-  "01" : "on",
-  "02" : "preset",
-  "03" : "off",
-  "04" : "on",
-  "05" : "Set group level",
-}
-
 #TODO : X10 RF Remote
 #       ATI Remote Wonder
 #       ATI Remote Wonder Plus
@@ -354,9 +345,14 @@ class RfxcomUsb:
         try:
             self._log.info("Try to open RFXCOM : %s" % device)
             self._rfxcom = serial.Serial(device, 38400)
-            #                          timeout=1)
-
             self._log.info("RFXCOM opened")
+            self._log.info("Send reset...")
+            self._rfxcom.write(binascii.unhexlify("0D00000000000000000000000000"))
+            self._log.info("Wait 1s...")
+            time.sleep(1)
+            self._log.info("Send 'get status' message")
+            self._rfxcom.write(binascii.unhexlify("0D00000102000000000000000000"))
+            # TODO (not urgent) : add a check on response from the get status
         except:
             error = "Error while opening RFXCOM : %s. Check if it is the good device or if you have the good permissions on it." % device
             raise RfxcomException(error)
@@ -623,7 +619,7 @@ class RfxcomUsb:
         # seqnbr
         cmd += self.get_seqnbr()
         # address
-        cmd += "%08x" % int(bin(int(address, 16))+'00', 2)
+        cmd += "%08x" % int(bin(int(address, 16)), 2)
         # unit code
         cmd += "%02x" % unit
         # cmnd
@@ -646,6 +642,15 @@ class RfxcomUsb:
             SDK version : 2.06
             Tested : No
         """
+        AC_CMND = {
+          "00" : "off",
+          "01" : "on",
+          "02" : "preset",
+          "03" : "off",
+          "04" : "on",
+          "05" : "Set group level",
+        }
+
         subtype = gh(data, 1)
         seqnbr = gh(data, 2)
         # TODO : it is more complexe... see spec !!!!!!!!!!!!!!!!!!
@@ -668,6 +673,7 @@ class RfxcomUsb:
                        {"address" : address, 
                         "unit" : unit_code,
                         "command" : AC_CMND[cmnd]})
+
         self._callback("sensor.basic",
                        {"device" : address, 
                         "type" : "battery", 
