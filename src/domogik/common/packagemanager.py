@@ -52,17 +52,16 @@ from distutils2.version import NormalizedVersion
 
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
-#PLG_XML_PATH = "src/share/domogik/plugins/"
 
 CONFIG_FOLDER = "/etc/domogik/"
-DATA_FOLDER = "/usr/share/domogik/"
+CACHE_FOLDER = "/var/cache/domogik/"
 LIB_FOLDER = "/usr/lib/domogik/"
 
-TMP_EXTRACT_DIR = "%s/tmp/" % DATA_FOLDER
+TMP_EXTRACT_DIR = "%s/tmp/" % CACHE_FOLDER
 CONFIG_FILE = "%s/domogik.cfg" % CONFIG_FOLDER
 REPO_SRC_FILE = "%s/sources.list" % CONFIG_FOLDER
-REPO_CACHE_DIR = "%s/cache" % DATA_FOLDER
-PKG_CACHE_DIR = "%s/pkg-cache" % DATA_FOLDER
+REPO_CACHE_DIR = "%s/cache" % CACHE_FOLDER
+PKG_CACHE_DIR = "%s/pkg-cache" % CACHE_FOLDER
 REPO_LST_FILE_HEADER = "Domogik Repository"
 
 cfg = Loader('domogik')
@@ -556,7 +555,8 @@ class PackageManager():
         """ update local package cache
         """
         if PACKAGE_MODE != True:
-            raise PackageException("Package mode not activated")
+            self.log("Update cache not possible : Package mode not activated")
+            return
         # Get repositories list
         try:
             # Read repository source file and generate repositories list

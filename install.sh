@@ -69,7 +69,7 @@ done
 DMG_HOME=
 
 DMG_ETC=/etc/domogik
-DMG_SHARE=/usr/share/domogik
+DMG_CACHE=/var/cache/domogik
 DMG_LIB=/usr/lib/domogik
 
 function stop_domogik {
@@ -139,10 +139,10 @@ function copy_sample_files {
         chown $d_user:root $DMG_ETC
         chmod 755 $DMG_ETC
     fi
-    # create /usr/share/domogik
-    if [ ! -d $DMG_SHARE ];then
-        mkdir $DMG_SHARE
-        chown $d_user:root $DMG_SHARE
+    # create /var/cache/domogik
+    if [ ! -d $DMG_CACHE ];then
+        mkdir $DMG_CACHE
+        chown $d_user:root $DMG_CACHE
     fi
     # create /usr/lib/domogik
     if [ ! -d $DMG_LIB ];then
@@ -152,9 +152,9 @@ function copy_sample_files {
     # create folders for packages management
     for pkg_rep in pkg-cache cache 
       do
-        if [ ! -d $DMG_SHARE/$pkg_rep ];then
-            mkdir $DMG_SHARE/$pkg_rep
-            chown $d_user:root $DMG_SHARE/$pkg_rep
+        if [ ! -d $DMG_CACHE/$pkg_rep ];then
+            mkdir $DMG_CACHE/$pkg_rep
+            chown $d_user:root $DMG_CACHE/$pkg_rep
         fi
     done
     # create folders for packages management
