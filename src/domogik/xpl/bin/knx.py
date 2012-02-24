@@ -126,12 +126,12 @@ class KNXManager(XplPlugin):
         msg_type = 'None'
         command = 'None'
         if sender<>"pageinatio":
-           print "%s" %sender
+           print "emetteur |%s|" %sender
            command = data[0:4]  
            lignetest=""
            groups = data[data.find('to')+2:data.find(':')]
            groups =":"+groups.strip()+" "
-           print "%s" %groups
+           print "groups |%s|" %groups
 
         ### Search the sender in the config list
            i=0
@@ -147,19 +147,17 @@ class KNXManager(XplPlugin):
               dmgadr=lignetest[lignetest.find('adr_dmg:')+8:lignetest.find(' adr_cmd')]
               typeadr=lignetest[lignetest.find(groups)-4:lignetest.find(groups)]
 	      typeadr=typeadr.replace("_","")
-	      print "type d'adresse %s" %typeadr
-              print "datatype %s f" %datatype
-              print "adresse domogik %s f" %dmgadr
+              
+	      print "type d'adresse |%s|" %typeadr
+              print "datatype |%s|" %datatype
+              print "adresse domogik |%s|" %dmgadr
               msg=XplMessage()
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
-                 print "valeur reçu:%s" %val
                  msg_type = "s"
                  if data[-2:-1]==" ":
                     msg_type = "l"
-                 #msg = XplMessage()
-                 print "send_xpl valeur avant modif: %s" %val
 
                  if datatype == "1.001":
                     val=int(val.replace(" ",""),16)
@@ -326,22 +324,34 @@ class KNXManager(XplPlugin):
                     val=int(val.replace(" ",""),16)
                     print "reception DT_HVAC %s" %val
                     value=val
-		    if val==value:
-                       if val==2:
-                          value=3
-                       if val==3:
-                          value=1
-                       if val==4:
-                          value=4
-                       if val==19:
-                          value=3
-                       if val==17:
-                          value=4
-                       if val==20:
-                          value=1
-                       val=value
-                    else:
-                       self.log.error("DT_HVACEib unknow value %s from %s" %(val,groups))
+                    if typeadr=="stat":
+                       if val==value:
+                          if val==2:
+                             value=3
+                          if val==3:
+                             value=1
+                          if val==4:
+                             value=4
+                          if val==19:
+                             value=3
+                          if val==17:
+                             value=4
+                          if val==20:
+                             value=1
+                          if val==86:
+                             value=2
+                    if typeadr=="stp":
+                       if val==1:
+                          value=2
+                       else:
+                          time.sleep(2)
+                          stat=lignetest[lignetest.find('adr_stat:')+9:]
+                          stat=stat[:stat.find(' ')]
+                          commandask = "groupread ip:127.0.0.1 %s" %stat
+                          prob=subprocess.Popen(commandask,shell=True)
+                    val=value
+
+
                        
 
                  if command == 'Writ':
@@ -373,7 +383,7 @@ class KNXManager(XplPlugin):
               msg.add_data({'type' :  msg_type})
               msg.add_data({'data': val})
               self.myxpl.send(msg)
-              print "command: %s group: %s type: %s data: %s" %(command,dmgadr,msg_type,val)
+              print "XPL command: %s group: %s type: %s data: %s" %(command,dmgadr,msg_type,val)
 
 
     def knx_cmd(self, message):
@@ -381,15 +391,20 @@ class KNXManager(XplPlugin):
         groups = message.data['group']
         groups = "adr_dmg:"+groups+" "
         ligentest=""
-        print "%s" %groups
+        valeur=message.data['data']
+        print "Message XPL %s" %message
         for i in range(len(listknx)):
            if listknx[i].find(groups)>=0:
               lignetest=listknx[i]
+
         if lignetest<>"":
            datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
            cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
-           lignetest=""
            command=""
+           if lignetest.find('adr_stp:')<>-1:
+              stpadr=lignetest[lignetest.find('adr_stp:')+8:]
+              stpadr=stpadr[:stpadr.find(' ')]
+
            if type_cmd=="Write":
               print("dmg Write")
               valeur = message.data['data']
@@ -414,9 +429,7 @@ class KNXManager(XplPlugin):
               if datatype=="5.001": #"DT_Scaling":
                  if valeur<>"None":
                     valeur = int(valeur)*255/100
-                    print("command val=%s" %valeur)
                     valeur=hex(valeur)
-                    print( "%s" %valeur)
                  else:
                     valeur=0
 
@@ -474,33 +487,22 @@ class KNXManager(XplPlugin):
                  if val<0:
                     val=abs(val)
                     signe="moin"
-                    print "Signe négatif"
-                 print "val absolue %s" %val
                  tmp = int(100 * abs(val))
-                 print "tmp = %s" %tmp
                  for y in range(0, 15):
                     x = tmp >> y
                     if x >= 0 and x < 2048:
                        break
                  if signe=="moin":
                     x=4096-x
-                    print "vraiment negatif"
-                    print "Valeur de X=%s" %x
-                 print "Valeur de Y=%s" %y
                  binaireX=bin(x)[2:]
                  binairey=bin(y)[2:]
                  if len(binaireX)<=12:
-                    print "manque des bits a X"
                     for i in range(12-len(binaireX)):
                        binaireX="0"+binaireX
                  if len(binairey)<>4:
-                    print "Manque des bits a Y"
                     for i in range(4-len(binairey)):
                        binairey="0"+binairey
-                 print binaireX
-                 print binairey
                  Valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
-                 print Valeur
                  Valeur=Valeur.replace(" ","")
                  Valeur=int(Valeur,2)
                  Valeur=hex(Valeur)[2:]
@@ -541,14 +543,10 @@ class KNXManager(XplPlugin):
                  codage=""
                  if len(val)<=14:
                     for j in range(len(val)):
-                       print ord(val[j:j+1])
                        codage=codage+hex(ord(val[j:j+1]))[2:]
-                    print codage
                     if len(val)<14:
-                       print "moins de 14 caractére"
                        for j in range(14-len(val)):
                           codage=codage+"00"
-                    print codage
                     valeur=codage[:2]
                     for i in range(14):
                        valeur=valeur+" "+codage[2*(i+1):2*(i+1)+2]
@@ -556,12 +554,19 @@ class KNXManager(XplPlugin):
                     self.log.error("Too many character")
 
               if datatype=="DT_HVACEib":
+                 print "Hello val=%s" %val
                  valeur=val
+                 command_stp="groupswrite ip:127.0.0.1 %s 0" %stpadr
+                 subp2=subprocess.Popen(command_stp,shell=True)
                  if val=="3":
                     valeur="2"
                  if val=="1":
                     valeur="3"
-
+                 if val=="2":
+                    cmdadr=stpadr
+                    print "stop chauffage %s" %command_stp
+                    data_type="s"
+                    valeur=1
 
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
@@ -583,7 +588,6 @@ class KNXManager(XplPlugin):
               subp=subprocess.Popen(command, shell=True)
            if command=="":
               print("erreur command non définir, type cmd= %s" %type_cmd)
-
 
 if __name__ == "__main__":
     INST = KNXManager()
