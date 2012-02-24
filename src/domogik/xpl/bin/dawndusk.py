@@ -83,34 +83,22 @@ class Dawndusk(XplPlugin):
             num = 1
             loop = True
             while loop == True:
-<<<<<<< local
                 xpltype = self._config.query('dawndusk', \
                     'xpltype-%s' % str(num))
                 schema = self._config.query('dawndusk', \
                     'schema-%s' % str(num))
                 addname = self._config.query('dawndusk', \
                     'addname-%s' % str(num))
-=======
-                xpltype = self._config.query('dawndusk', 'xpltype-%s' % str(num))
-                schema = self._config.query('dawndusk', 'schema-%s' % str(num))
-                addname = self._config.query('dawndusk', 'addname-%s' % str(num))
->>>>>>> other
                 add = self._config.query('dawndusk', 'add-%s' % str(num))
                 command = self._config.query('dawndusk', \
                     'command-%s' % str(num))
                 dawn = self._config.query('dawndusk', 'dawn-%s' % str(num))
                 dusk = self._config.query('dawndusk', 'dusk-%s' % str(num))
                 if schema != None:
-<<<<<<< local
                     self.log.debug("dawndusk.__init__ : Device from \
                         xpl : device=%s," % (add))
                     self.devices[add] = {"schema":schema, "command":command,
                                 "dawn":dawn,"dusk":dusk, "addname":addname,
-=======
-                    self.log.debug("dawndusk.__init__ : Device from xpl : device=%s," % (add))
-                    self.devices[add]={"schema":schema,"command":command,
-                                "dawn":dawn,"dusk":dusk,"addname":addname,
->>>>>>> other
                                 "xpltype":xpltype}
                 else:
                     loop = False
