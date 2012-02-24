@@ -14,7 +14,7 @@
 0.4.0
 - added blind (up/down) support
   </changelog>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
   <documentation>http://wiki.domogik.org/plugin_velbus</documentation>
   <author>Maikel Punie</author>
   <author-email>maikel.puni@gmail.com</author-email>
@@ -29,9 +29,13 @@
     </key>
     <key>
       <order-id>1</order-id>
-      <name>use-socket</name>
-      <type>boolean</type>
-      <description>use a TCP socket instead of a serial port</description>
+      <name>connection-type</name>
+      <type>enum</type>
+      <options>
+	<option>serial</option>
+	<option>socket</option>
+      </options>
+      <description>define the connection type to velbus</description>
       <default-value>0</default-value>
     </key>
     <key>
@@ -50,8 +54,14 @@
     <file path="src/domogik/xpl/lib/velbus.py"/>
     <file path="src/domogik/xpl/helper/velbus.py"/>
   </files>
-  <dependencies/>
-  <udev-rules/>
+  <dependencies>
+      <dep type="python" id="pyserial (>=2.6)"/>
+  </dependencies>
+  <udev-rules>
+      <rule model="VMB1USB" description="Velbus USB interface" filename="velbus.rules">
+SUBSYSTEM=="tty" ATTRS(manufacturer)=="Velleman Projects" ATTRS{product}=="VMB1USB Velbus USB interface" SYMLINK+="velbus" MODE="0666"
+      </rule>
+  </udev-rules>
   <device_technology>
       <id>velbus</id>
       <name>Velbus</name>

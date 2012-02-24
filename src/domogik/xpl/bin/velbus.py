@@ -50,11 +50,7 @@ class VelbusManager(XplPlugin):
         XplPlugin.__init__(self, name='velbus')
         self._config = Query(self.myxpl, self.log)
         # get the config values
-        device_type = self._config.query('velbus', 'use-socket')
-        if self._config.query('velbus', 'use-socket') == 'False':
-            device_type = 'serial'
-        else:
-            device_type = 'socket'
+        device_type = self._config.query('velbus', 'connection-type')
         if device_type == None:
             self.log.error('Devicetype is not configured, exitting') 
             print('Devicetype is not configured, exitting')
