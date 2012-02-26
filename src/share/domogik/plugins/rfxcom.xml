@@ -44,6 +44,18 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <description>RFXCom</description>
   </device_technology>
   <device_types>
+    <!-- Lighting1 -->
+    <device_type>
+      <id>rfxcom.lighting1_x10_dimmer</id>
+      <name>Lighting1 x10 Dimmer</name>
+      <description>Lighting1 x10 Dimmer</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+
+
+
+
+    <!-- not reviewed -->
       <device_type>
           <id>rfxcom.temp</id>
           <device_technology_id>rfxcom</device_technology_id>
@@ -122,20 +134,69 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
           <name>Remote</name>
           <description>Received X10 RF Remote, Medion remote, ATI Remote or ATI Remote Plus</description>
       </device_type>
-      <device_type>
-          <id>rfxcom.ac_switch</id>
-          <name>Switch</name>
-          <description>Switch</description>
-          <device_technology_id>rfxcom</device_technology_id>
-      </device_type>
-      <device_type>
-          <id>rfxcom.ac_dimmer</id>
-          <name>Dimmer</name>
-          <description>Dimmer</description>
-          <device_technology_id>rfxcom</device_technology_id>
-      </device_type>
   </device_types>
+
+
+
   <device_feature_models>
+    <!-- Lighting1 -->
+    <device_feature_model>
+      <id>rfxcom.lighting_x10_dimmer.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;ac_off&quot;, &quot;value1&quot;:&quot;ac_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.lighting_x10_dimmer.reduce</id>
+      <name>Reduce</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.lighting_x10_dimmer.increase</id>
+      <name>Increase</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+
+
+    <!-- template lighting 2 -->
+    <device_feature_model>
+      <id>rfxcom.lighting_x10_dimmer.dim</id>
+      <name>Dim</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;ac_preset&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}
+      </parameters>
+      <value_type>range</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+
+
+
+    <!-- not reviewed -->
       <device_feature_model>
           <id>rfxcom.temp.temperature</id>
           <name>Temperature</name>
@@ -506,42 +567,6 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
           </parameters>
           <value_type>string</value_type>
           <stat_key>keys</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.ac_switch.switch</id>
-          <name>Switch</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>rfxcom.ac_switch</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;ac_off&quot;, &quot;value1&quot;:&quot;ac_on&quot;}
-          </parameters>
-          <value_type>binary</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.ac_dimmer.switch</id>
-          <name>Switch</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>rfxcom.ac_dimmer</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;ac_off&quot;, &quot;value1&quot;:&quot;ac_on&quot;}
-          </parameters>
-          <value_type>binary</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.ac_dimmer.change</id>
-          <name>Change</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>rfxcom.ac_dimmer</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;ac_preset&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}
-          </parameters>
-          <value_type>range</value_type>
-          <stat_key>level</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
   </device_feature_models>
