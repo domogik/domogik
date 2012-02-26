@@ -4134,7 +4134,7 @@ target=*
                            "id" : dep["id"],
                            "installed" : installed,
                            "release" : "",
-                           "cmd-line" : "Install from Domogik Administration",
+                           "cmd_line" : "Install from Domogik Administration",
                            "candidate" : "",
                            "error" : "",
                            }
@@ -4210,7 +4210,7 @@ target=*
                                    "id" : my_key,
                                    "installed" : installed,
                                    "release" : release,
-                                   "cmd-line" : cmd_line,
+                                   "cmd_line" : cmd_line,
                                    "candidate" : candidate,
                                    "error" : error,
                                }

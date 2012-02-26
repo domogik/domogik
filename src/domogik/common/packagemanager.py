@@ -50,24 +50,29 @@ import sys
 from domogik.common import logger
 from distutils2.version import NormalizedVersion 
 
-
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
-PLG_XML_PATH = "src/share/domogik/plugins/"
-TMP_EXTRACT_DIR = "%s/%s" % (tempfile.gettempdir(), "domogik-pkg-mgr")
-CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
-REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
+
+CONFIG_FOLDER = "/etc/domogik/"
+CACHE_FOLDER = "/var/cache/domogik/"
+LIB_FOLDER = "/usr/lib/domogik/"
+
+TMP_EXTRACT_DIR = "%s/tmp/" % CACHE_FOLDER
+CONFIG_FILE = "%s/domogik.cfg" % CONFIG_FOLDER
+REPO_SRC_FILE = "%s/sources.list" % CONFIG_FOLDER
+REPO_CACHE_DIR = "%s/cache" % CACHE_FOLDER
+PKG_CACHE_DIR = "%s/pkg-cache" % CACHE_FOLDER
 REPO_LST_FILE_HEADER = "Domogik Repository"
-REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
-PKG_CACHE_DIR = "%s/.domogik/pkg-cache" % os.getenv("HOME")
 
 cfg = Loader('domogik')
 config = cfg.load()
 conf = dict(config[1])
 if conf.has_key('package_path'):
     INSTALL_PATH = conf['package_path']
+    PACKAGE_MODE = True
 else:
-    INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
+    INSTALL_PATH = "/tmp/"
+    PACKAGE_MODE = False
 
 cfg = Loader('rest')
 config = cfg.load()
@@ -282,6 +287,8 @@ class PackageManager():
             @param id : package id
             @param release : package release
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         package = "%s-%s" % (pkg_type, id)
         pkg, status = self._find_package(package, release)
         if status != True:
@@ -345,6 +352,8 @@ class PackageManager():
             @param release : release to install (default : highest)
             @param package_part : PKG_PART_XPL (for manager), PKG_PART_RINOR (for RINOR)
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         self.log("Start install for part '%s' of '%s'" % (package_part, path))
         if path[0:6] == "cache:":
             path = "%s/package/download/%s" % (REST_URL, path[6:])
@@ -424,7 +433,7 @@ class PackageManager():
         if pkg_xml.type in ('plugin', 'external'):
             if package_part == PKG_PART_RINOR:
                 self.log("Insert data in database...")
-                pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
+                pkg_data = PackageData("%s/info.xml" % my_tmp_dir)
                 pkg_data.insert()
 
         self.log("Package installation finished")
@@ -438,6 +447,8 @@ class PackageManager():
             @param pkg_type : package type
             @param id : package id
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         self.log("Start uninstall for package '%s-%s'" % (type, id))
         self.log("Only xml description file will be deleted in this Domogik version")
 
@@ -543,6 +554,9 @@ class PackageManager():
     def update_cache(self):
         """ update local package cache
         """
+        if PACKAGE_MODE != True:
+            self.log("Update cache not possible : Package mode not activated")
+            return
         # Get repositories list
         try:
             # Read repository source file and generate repositories list
@@ -680,6 +694,8 @@ class PackageManager():
             @param id : package id
             @param release : package release
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         upd_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
@@ -736,6 +752,8 @@ class PackageManager():
             @param pkg_type (optionnal) : package type
             Used by Rest
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
@@ -765,6 +783,8 @@ class PackageManager():
         """ List all packages in install folder 
             and return a detailed list
         """
+        if PACKAGE_MODE != True:
+            raise PackageException("Package mode not activated")
         pkg_list = []
         for rep in [PLUGIN_XML_PATH, EXTERNAL_XML_PATH]:
             for root, dirs, files in os.walk(rep):

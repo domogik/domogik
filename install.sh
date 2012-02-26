@@ -68,23 +68,20 @@ done
 
 DMG_HOME=
 
+DMG_ETC=/etc/domogik
+DMG_CACHE=/var/cache/domogik
+DMG_LIB=/usr/lib/domogik
+
 function stop_domogik {
-    if [ -d "/etc/init.d/" ];then
-        if [ -f "/etc/init.d/domogik" ];then
-            if [ -d "/var/run/domogik" ];then
-                [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-                [ -f /etc/default/domogik ] && . /etc/default/domogik
-                if [ -f "/home/${DOMOGIK_USER}/.domogik/domogik.cfg" ];then
-                    echo "There is already a Domogik on this system. Try to stop it before installation..."
-                    /etc/init.d/domogik stop
-                fi
+    if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
+        if [ -d "/var/run/domogik" ];then
+            [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+            [ -f /etc/default/domogik ] && . /etc/default/domogik
+            if [ -f "/etc/domogik/domogik.cfg" ];then
+                echo "There is already a Domogik on this system. Try to stop it before installation..."
+                /etc/init.d/domogik stop
             fi
         fi
-    elif [ -d "/etc/rc.d/" ];then
-        echo "TODO"
-    else
-        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
-        exit 16
     fi
 }
 
@@ -131,33 +128,63 @@ function copy_sample_files {
             exit 9
         fi
     fi
+    # For upgrade with 0.1.0
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
-    dmg_home=$d_home/.domogik
+
     keep="n"
     already_cfg=
-    if [ ! -d $dmg_home ];then
-        mkdir $dmg_home
-        chown $d_user $dmg_home
+    # create /etc/domogik entry
+    if [ ! -d $DMG_ETC ];then
+        mkdir $DMG_ETC
+        chown $d_user:root $DMG_ETC
+        chmod 755 $DMG_ETC
+    fi
+    # create /var/cache/domogik
+    if [ ! -d $DMG_CACHE ];then
+        mkdir $DMG_CACHE
+        chown $d_user:root $DMG_CACHE
+    fi
+    # create /usr/lib/domogik
+    if [ ! -d $DMG_LIB ];then
+        mkdir $DMG_LIB
+        chown $d_user:root $DMG_LIB
     fi
     # create folders for packages management
-    for pkg_rep in pkg-cache cache packages packages/plugins packages/externals packages/stats packages/url2xpl packages/design
+    for pkg_rep in pkg-cache cache 
       do
-        if [ ! -d $dmg_home/$pkg_rep ];then
-            mkdir $dmg_home/$pkg_rep
-            chown $d_user $dmg_home/$pkg_rep
+        if [ ! -d $DMG_CACHE/$pkg_rep ];then
+            mkdir $DMG_CACHE/$pkg_rep
+            chown $d_user:root $DMG_CACHE/$pkg_rep
         fi
     done
-    # Check for old version when .domogik.cfg was in $HOME
-    if [ -f $d_home/.domogik.cfg ];then
-        mv $d_home/.domogik.cfg $dmg_home/domogik.cfg
-        chown $d_user $dmg_home/domogik.cfg
-    fi
-    if [ ! -f $dmg_home/domogik.cfg ];then
-        cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
-        chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
+    # create folders for packages management
+    for pkg_rep in packages packages/plugins packages/externals packages/stats packages/url2xpl packages/design
+      do
+        if [ ! -d $DMG_LIB/$pkg_rep ];then
+            mkdir $DMG_LIB/$pkg_rep
+            chown $d_user:root $DMG_LIB/$pkg_rep
+        fi
+    done
+
+    # For upgrade with 0.1
+    if [ -f $d_home/.domogik/domogik.cfg ];then
+        mv $d_home/.domogik/domogik.cfg $DMG_ETC/domogik.cfg
+        chown $d_user:root $DMG_ETC/domogik.cfg
+        chmod 640 $DMG_ETC/domogik.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
-            cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
-            chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
+            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+            chown $d_user:root $DMG_ETC/sources.list
+            chmod 640 $DMG_ETC/sources.list
+        fi
+    fi
+    if [ ! -f $DMG_ETC/domogik.cfg ];then
+        cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
+        chown $d_user:root $DMG_ETC/domogik.cfg
+        chmod 640 $DMG_ETC/domogik.cfg
+        if [ $MAIN_INSTALL = "y" ] ; then
+            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+            chown $d_user:root $DMG_ETC/sources.list
+            chmod 640 $DMG_ETC/sources.list
         fi
     else
         keep="y"
@@ -167,11 +194,13 @@ function copy_sample_files {
             keep="y"
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
-            chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
+            cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
+            chown $d_user:root $DMG_ETC/domogik.cfg
+            chmod 640 $DMG_ETC/domogik.cfg
             if [ $MAIN_INSTALL = "y" ] ; then
-                cp -f src/domogik/examples/packages/sources.list $dmg_home/sources.list
-                chown $d_user: src/domogik/examples/packages/sources.list $dmg_home/sources.list
+                cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+                chown $d_user:root $DMG_ETC/sources.list
+                chmod 640 $DMG_ETC/sources.list
             fi
         fi
     fi
@@ -203,8 +232,6 @@ function update_default_config {
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
 
 
-    #[ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
-
     if [ "$MODE" = "develop" ];then
         arch_path=$(python install/get_arch.py)
         d_custom_path=$PWD/$arch_path
@@ -225,12 +252,12 @@ function update_user_config {
     if [ "$keep" = "n" -o "$keep" = "N" ];then
         if [ "$MODE" = "install" ];then
             prefix="/usr/local"
-            sed -i "s;^#package_path.*$;package_path = $dmg_home;" $dmg_home/domogik.cfg
+            sed -i "s;^#package_path.*$;package_path = $DMG_LIB;" $DMG_ETC/domogik.cfg
         else
             prefix=$PWD/src
-            sed -i "s;^#package_path.*$;#package_path = $dmg_home;" $dmg_home/domogik.cfg
+            sed -i "s;^#package_path.*$;#package_path = $DMG_LIB;" $DMG_ETC/domogik.cfg
         fi
-        sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $dmg_home/domogik.cfg
+        sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $DMG_ETC/domogik.cfg
 
         read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
         bind_iface=${bind_iface:-lo}
@@ -239,10 +266,10 @@ function update_user_config {
             echo "Can't find the address associated to the interface!"
             exit 20
         fi
-        sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $dmg_home/domogik.cfg
+        sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $DMG_ETC/domogik.cfg
         sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
         # will be overide on secondary host
-        sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
+        sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $DMG_ETC/domogik.cfg
     fi
 }    
 
@@ -251,8 +278,8 @@ function update_rest_config_for_secondary_host {
     if [ "$keep" = "n" -o "$keep" = "N" ];then
         read -p "Ip of the main Domogik installation (ip of Rest server) : " rest_server_ip
         read -p "Port of the main Domogik installation (port of Rest server) : " rest_server_port
-        sed -i "s/^rest_server_ip.*$/rest_server_ip = $rest_server_ip/" $dmg_home/domogik.cfg
-        sed -i "s/^rest_server_port.*$/rest_server_port = $rest_server_port/" $dmg_home/domogik.cfg
+        sed -i "s/^rest_server_ip.*$/rest_server_ip = $rest_server_ip/" $DMG_ETC/domogik.cfg
+        sed -i "s/^rest_server_port.*$/rest_server_port = $rest_server_port/" $DMG_ETC/domogik.cfg
     fi
 }
 
@@ -270,12 +297,12 @@ function update_user_config_db {
     mysql_ok=
 
     if [ "$keep" = "y" -o "$keep" = "Y" ];then
-        db_user=$(grep "^db_user" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_type=$(grep "^db_type" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_password=$(grep "^db_password" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_port=$(grep "^db_port" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_name=$(grep "^db_name" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_host=$(grep "^db_host" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_user=$(grep "^db_user" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_type=$(grep "^db_type" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_password=$(grep "^db_password" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_port=$(grep "^db_port" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_name=$(grep "^db_name" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_host=$(grep "^db_host" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
         mysql_client=$(which mysql)
         while [ ! -f "$mysql_client" ];do
             read -p "Mysql client not installed, please install it and press Enter."
@@ -317,12 +344,12 @@ function update_user_config_db {
         else
             mysql_ok=true
             echo "Connection test OK"
-            sed -i "s;^db_type.*$;db_type = mysql;" $dmg_home/domogik.cfg
-            sed -i "s;^db_user.*$;db_user = $db_user;" $dmg_home/domogik.cfg
-            sed -i "s;^db_password.*$;db_password = $db_password;" $dmg_home/domogik.cfg
-            sed -i "s;^db_port.*$;db_port = $db_port;" $dmg_home/domogik.cfg
-            sed -i "s;^db_name.*$;db_name = $db_name;" $dmg_home/domogik.cfg
-            sed -i "s;^db_host.*$;db_host = $db_host;" $dmg_home/domogik.cfg
+            sed -i "s;^db_type.*$;db_type = mysql;" $DMG_ETC/domogik.cfg
+            sed -i "s;^db_user.*$;db_user = $db_user;" $DMG_ETC/domogik.cfg
+            sed -i "s;^db_password.*$;db_password = $db_password;" $DMG_ETC/domogik.cfg
+            sed -i "s;^db_port.*$;db_port = $db_port;" $DMG_ETC/domogik.cfg
+            sed -i "s;^db_name.*$;db_name = $db_name;" $DMG_ETC/domogik.cfg
+            sed -i "s;^db_host.*$;db_host = $db_host;" $DMG_ETC/domogik.cfg
         fi
     done
 }

@@ -6,6 +6,7 @@ Supported  models :
 - IPX 800
 - IPX 800 pro
 - IPX 800 v2
+- IPX 800 v3
 Supported features :
 - Relay : set and get state
 - Digital input 
@@ -13,11 +14,12 @@ Supported features :
   <changelog>
 0.2
 - adapt plugin for release 0.2.0
+- add support for ipx800 v3 (new features)
 
 0.1
 - plugin creation
   </changelog>
-  <version>0.2a0</version>
+  <version>0.2a1</version>
   <documentation>http://wiki.domogik.org/plugin_ipx800</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
@@ -33,6 +35,20 @@ Supported features :
     <key>
       <interface>yes</interface>
       <order-id>1</order-id>
+      <name>model</name>
+      <type>enum</type>
+      <options>
+        <option>ipx800v1</option>
+        <option>ipx800pro</option>
+        <option>ipx800v2</option>
+        <option>ipx800v3</option>
+      </options>
+      <description>Ipx800 model</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>2</order-id>
       <name>name</name>
       <type>string</type>
       <description>Name</description>
@@ -40,7 +56,7 @@ Supported features :
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>2</order-id>
+      <order-id>3</order-id>
       <name>ip</name>
       <type>string</type>
       <description>Ip</description>
@@ -48,7 +64,7 @@ Supported features :
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>3</order-id>
+      <order-id>4</order-id>
       <name>int</name>
       <type>string</type>
       <description>Interval between each poll</description>
@@ -57,7 +73,7 @@ Supported features :
     <key>
       <interface>yes</interface>
       <optionnal>yes</optionnal>
-      <order-id>4</order-id>
+      <order-id>5</order-id>
       <name>login</name>
       <type>string</type>
       <description>HTTP Login</description>
@@ -66,7 +82,7 @@ Supported features :
     <key>
       <interface>yes</interface>
       <optionnal>yes</optionnal>
-      <order-id>5</order-id>
+      <order-id>6</order-id>
       <name>password</name>
       <type>password</type>
       <description>HTTP Password</description>

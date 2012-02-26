@@ -71,7 +71,8 @@ WAIT_TIME_BETWEEN_PING = 15
 
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
-TMP_DIR = tempfile.gettempdir()
+FIFO_DIR = "/var/run/domogik/"
+CONFIG_DIR = "/etc/domogik/"
 
 DESCRIPTION_LEN_IN_DETAIL = 500
 
@@ -85,18 +86,17 @@ class EventHandler(pyinotify.ProcessEvent):
         """
         self.my_callback = callback
 
-    def set_config_files(self, config_files):
-        """ set the list of config files
-        @param list of the monitored config files
-        """
-        self._cfg_files = config_files 
+    #def set_config_files(self, config_files):
+    #    """ set the list of config files
+    #    @param list of the monitored config files
+    #    """
+    #    self._cfg_files = config_files 
 
     def process_default(self, event):
         """ A file is modified
         """
-        if event.pathname in self._cfg_files or event.pathname[-4:] == ".xml":
-            print("File modified : %s" % event.pathname)
-            self.my_callback()
+        print("File modified : %s" % event.pathname)
+        self.my_callback()
 
 class SysManager(XplPlugin):
     """ System management from domogik
@@ -148,10 +148,10 @@ class SysManager(XplPlugin):
 
         # Fifo to communicate with the init script
         self._state_fifo = None
-        if os.path.exists("%s/dmg-manager-state" % TMP_DIR):
-            mode = os.stat("%s/dmg-manager-state" % TMP_DIR).st_mode
+        if os.path.exists("%s/dmg-manager-state" % FIFO_DIR):
+            mode = os.stat("%s/dmg-manager-state" % FIFO_DIR).st_mode
             if mode & stat.S_IFIFO == stat.S_IFIFO:
-                self._state_fifo = open("%s/dmg-manager-state" % TMP_DIR,"w")    
+                self._state_fifo = open("%s/dmg-manager-state" % FIFO_DIR,"w")    
                 self._startup_count = 0
                 self._startup_count_lock = Lock()
                 self._write_fifo("NONE","\n")
@@ -169,11 +169,13 @@ class SysManager(XplPlugin):
             sys.path.append(self._package_path)
             self._xml_plugin_directory = os.path.join(self._package_path, "packages/plugins/")
             self._xml_external_directory = os.path.join(self._package_path, "packages/externals/")
+            self.package_mode = True
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
             self._xml_plugin_directory = os.path.join(conf['custom_prefix'], "share/domogik/plugins/")
             self._xml_external_directory = os.path.join(conf['custom_prefix'], "share/domogik/externals/")
+            self.package_mode = False
 
         self._pinglist = {}
         self._plugins = []
@@ -278,6 +280,7 @@ class SysManager(XplPlugin):
             # PackageManager instance
             self.pkg_mgr = PackageManager()
     
+            # hbeat management for externals
             if self.options.check_external:
                 Listener(self._refresh_external_list, self.myxpl, {
                     'schema': 'hbeat.app',
@@ -287,6 +290,15 @@ class SysManager(XplPlugin):
                     'schema': 'hbeat.basic',
                     'xpltype': 'xpl-stat',
                 })
+                # TODO : handle hbeat.end
+
+            # hbeat management for plugins
+            Listener(self._set_component_running, self.myxpl, 
+                 {'schema':'hbeat.app', 
+                  'xpltype':'xpl-stat'})
+            Listener(self._set_component_not_running, self.myxpl, 
+                 {'schema':'hbeat.end', 
+                  'xpltype':'xpl-stat'})
 
             # define timers
             if self.options.check_external:
@@ -297,16 +309,18 @@ class SysManager(XplPlugin):
 
             # inotify 
             wmgr = pyinotify.WatchManager() # Watch manager
-            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO # watched events
+            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
             notify_handler = EventHandler()
             notify_handler.set_callback(self._reload_configuration_file)
-            notify_handler.set_config_files(self.get_config_files())
+            #notify_handler.set_config_files(self.get_config_files())
             notifier = pyinotify.ThreadedNotifier(wmgr, notify_handler)
+            notifier.setName("thread_notifier")
             notifier.start()
             config_files_dir = [self._xml_plugin_directory,
-                                self._xml_external_directory]
-            for fic in  self.get_config_files():
-                config_files_dir.append(os.path.dirname(fic))
+                                self._xml_external_directory,
+                                CONFIG_DIR]
+            #for fic in  self.get_config_files():
+            #    config_files_dir.append(os.path.dirname(fic))
             for direc in set(config_files_dir):
                 #wdd = wmgr.add_watch(direc, mask, rec = True)
                 wmgr.add_watch(direc, mask, rec = True)
@@ -324,7 +338,8 @@ class SysManager(XplPlugin):
                 self._state_fifo.close()
 
             ### Send installed packages list
-            self._pkg_list_installed()
+            if self.package_mode == True:
+                self._pkg_list_installed()
 
             ### make an eternal loop to ping plugins
             # the goal is to detect manually launched plugins
@@ -408,6 +423,7 @@ class SysManager(XplPlugin):
         """
         cmd = message.data['command']
         self.log.debug("Call _system_action_cb for cmd='%s'" % cmd)
+        print("Call _system_action_cb for cmd='%s'" % cmd)
 
         try:
             plg = message.data['plugin']
@@ -594,7 +610,7 @@ class SysManager(XplPlugin):
             mess.set_target("domogik-%s.%s" % (name, self.get_sanitized_hostname()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
-        my_listener = Listener(self._cb_check_component_is_running, 
+        my_listener = Listener(self._set_component_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
@@ -620,11 +636,29 @@ class SysManager(XplPlugin):
             self._set_status(name, "OFF")
             return False
 
-    def _cb_check_component_is_running(self, message, args):
-        """ Set the Event to true if an answer was received
+    def _set_component_running(self, message, args = {}):
+        """ Set plugin state to true
+            Called from check_component_is_running : 
+                Set the Event to true if an answer was received
+            Called from the main Listener :
+                Set the plugin to "on" in the list
         """
-        self._pinglist[args["name"]].set()
+        # if this function is called from check_component_is_running
+        if args.has_key("name"):
+            self.log.debug("Component %s is running" % args["name"])
+            self._pinglist[args["name"]].set()
+        # if this function is called from the main listener
+        else:
+            if message.source_vendor_id == "domogik":
+                name = message.source_device_id
+                # hardcoded values for no plugin part of domogik
+                if name not in ("manager", "rest", "dbmgr"):
+                    self._set_status(name, "ON")
 
+    def _set_component_not_running(self, message):
+        """ Set the component to off in the list
+        """
+        print "HBEAT.END : %s" % message.source
 
     def _exec_plugin(self, name):
         """ Internal method
@@ -975,7 +1009,8 @@ class SysManager(XplPlugin):
 
         subp = Popen("dmgenplug %s" % name, shell=True)
         subp.communicate()
-        self._pkg_list_installed()
+        if self.package_mode == True:
+            self._pkg_list_installed()
         time.sleep(1) # make sure rest receive the updated list before the ack of enable
         self.myxpl.send(mess)          
 
@@ -992,7 +1027,8 @@ class SysManager(XplPlugin):
 
         subp = Popen("dmgdisplug %s" % name, shell=True)
         subp.communicate()
-        self._pkg_list_installed()
+        if self.package_mode == True:
+            self._pkg_list_installed()
         time.sleep(1) # make sure rest receive the updated list before the ack of disable
         self.myxpl.send(mess)          
 
@@ -1048,6 +1084,7 @@ class SysManager(XplPlugin):
             This function use a semaphore to be used only by 1 command at a time
         """
         self.sema_installed.acquire()
+        print "*** acquire ***"
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.package')
@@ -1075,6 +1112,7 @@ class SysManager(XplPlugin):
         self.myxpl.send(mess)
         time.sleep(0.3) # make sure to make a pause between 2 messages
         self.sema_installed.release()
+        print "*** release ***"
 
     def _pkg_get_dependencies(self, message):
         """ Return the list of dependencies for a package
