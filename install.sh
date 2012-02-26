@@ -420,7 +420,7 @@ if [ "$(dirname $0)" != "." ];then
     exit 15
 fi
 
-stop_domogik
+#stop_domogik
 check_python
 test_sources $0
 read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE
