@@ -191,7 +191,7 @@ class CronJobs():
             return ERROR_PARAMETER
         if xpldate != None:
             try:
-                job = self._scheduler.add_date_job(self._api.sendXplJob, \
+                job = self._scheduler.add_date_job(self._api.send_xpl_job, \
                     sdate, args=[device])
                 self.data[device]['current'] = "started"
                 self.data[device]['apjob'] = job
@@ -238,7 +238,7 @@ class CronJobs():
         if duration == 0:
             #we create an infinite timer
             try:
-                job = self._scheduler.add_interval_job(self._api.sendXplJob, \
+                job = self._scheduler.add_interval_job(self._api.send_xpl_job, \
                     seconds=frequence, args=[device])
                 self.data[device]['current'] = "started"
                 self.data[device]['apjob'] = job
@@ -258,7 +258,7 @@ class CronJobs():
                 i = duration
                 while i > 0:
                     jobs.append(self._scheduler.add_date_job(\
-                        self._api.sendXplJob, now+i*delta, args=[device]))
+                        self._api.send_xpl_job, now+i*delta, args=[device]))
                     i = i-1
                 self.data[device]['current'] = "started"
                 self.data[device]['apjobs'] = jobs
@@ -326,7 +326,7 @@ class CronJobs():
             del(self.data[device])
             return ERROR_PARAMETER
         try:
-            job = self._scheduler.add_interval_job(self._api.sendXplJob, \
+            job = self._scheduler.add_interval_job(self._api.send_xpl_job, \
                 weeks=weeks, days=days, hours=hours, minutes=minutes, \
                 seconds=seconds, start_date=startdate, args=[device])
             self.data[device]['current'] = "started"
@@ -410,7 +410,7 @@ class CronJobs():
             del(self.data[device])
             return ERROR_PARAMETER
         try:
-            job = self._scheduler.add_cron_job(self._api.sendXplJob, \
+            job = self._scheduler.add_cron_job(self._api.send_xpl_job, \
                 year=year, month=month, day=day, week=week, \
                 day_of_week=dayofweek, hour=hour, minute=minute, \
                 second=second, start_date=startdate, args=[device])
@@ -619,7 +619,7 @@ class CronJobs():
                         hour = int(h[0:2])
                         minute = int(h[3:5])
                         jobs.append(self._scheduler.add_cron_job(\
-                            self._api.sendXplJob, day_of_week=dayofweek, \
+                            self._api.send_xpl_job, day_of_week=dayofweek, \
                             hour=hour, minute=minute, \
                             args=[device, parameters, events[d][h]]))
                 self.data[device]['current'] = "started"
@@ -743,13 +743,13 @@ class CronJobs():
                         minute = int(h[3:5])
                         if "single" == events[d][h]:
                             jobs.append(self._scheduler.add_cron_job(\
-                            self._api.sendXplJob, day_of_week=dayofweek, \
+                            self._api.send_xpl_job, day_of_week=dayofweek, \
                             hour=hour, minute=minute, args=[device]))
                         else:
                             #print "parameters=%s"%parameters
                             #print "value=%s"%events[d][h]
                             jobs.append(self._scheduler.add_cron_job(\
-                                self._api.sendXplJob, day_of_week=dayofweek, \
+                                self._api.send_xpl_job, day_of_week=dayofweek, \
                                 hour=hour, minute=minute, \
                                 args=[device, parameters, events[d][h]]))
                 self.data[device]['current'] = "started"
@@ -938,12 +938,12 @@ class CronJobs():
                             #This is the last message
                             hour, minute = self._add_hour(events[d]["end"], 0)
                             jobs.append(self._scheduler.add_cron_job(\
-                                self._api.sendXplJob, day_of_week=dayofweek, \
+                                self._api.send_xpl_job, day_of_week=dayofweek, \
                                 hour=hour, minute=minute, \
                                 args = [device, param_dim, "valueon"]))
                         else:
                             jobs.append(self._scheduler.add_cron_job(\
-                                self._api.sendXplJob, day_of_week = dayofweek, \
+                                self._api.send_xpl_job, day_of_week = dayofweek, \
                                 hour=hour, minute=minute, \
                                 args=[device, param_dim, "valueon"]))
                         i = i+1
@@ -1316,12 +1316,12 @@ class CronAPI:
         @param current : current state
         @param elapsed : elapsed time
         """
-        self.log.debug("cronAPI._sendXPLJob : Start ...")
+        self.log.debug("cronAPI._send_xpl_job : Start ...")
         mess = self.jobs.get_xpl_trig(device, parameters, value)
         if mess != None:
             self.myxpl.send(mess)
-            self.log.debug("cronAPI._sendXPLJob : xplmessage = %s" % mess)
-        self.log.debug("cronAPI._sendXPLJob : Done :)")
+            self.log.debug("cronAPI._send_xpl_job : xplmessage = %s" % mess)
+        self.log.debug("cronAPI._send_xpl_job : Done :)")
 
     def request_listener(self, message):
         """

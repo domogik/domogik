@@ -30,7 +30,7 @@ Class cron
 
 Helps
 =====
-devicetipes:
+devicetypes:
 ------------
 timer
 Parameters : frequence, duration
@@ -58,7 +58,8 @@ Create an interval schedulered job which beat every 2 days, after startdate :
 devicetype=interval,days=2,startdate=YYYYMMDDHHMMSS"
 
 cron
-Parameters : year, month, day, week, day_of_week, hour, minute, second, startdate
+Parameters : year, month, day, week, day_of_week, hour,
+ minute, second, startdate
 Use a cron like syntax.
 Schedules job_function to be run on the third Friday of June, July, \
 August, November and December at 00:00, 01:00, 02:00 and 03:00
