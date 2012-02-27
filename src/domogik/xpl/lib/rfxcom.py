@@ -341,6 +341,8 @@ class RfxcomUsb:
     def open(self, device):
         """ Open RFXCOM device
             @param device : RFXCOM device (/dev/ttyACMx)
+
+            SDK version : 4.8
         """
         try:
             self._log.info("Try to open RFXCOM : %s" % device)
@@ -550,10 +552,6 @@ class RfxcomUsb:
         # log also the informations in INFO level
         pass
 
-    ### 0x10 : Lighting1
-    #TODO
-    
-
     def _process_02(self, data):
         """ Receiver/Transmitter Message
         
@@ -587,6 +585,53 @@ class RfxcomUsb:
                                       "status" : status})
         
 
+
+    def command_10(self, address, command, protocol, trig_msg):
+        """ Type 0x10, Lighting1
+
+            Type : command
+            SDK version : 4.8
+
+            Remarks :
+        """
+        COMMAND = {"off"    : "00",
+                   "on"     : "01",
+                   "dim"    : "02",
+                   "bright" : "03",
+                   "all_lights_off"    : "05",
+                   "all_lights_on"     : "06",
+                   "chime"  : "07"}
+        # type
+        cmd = "10" 
+        # subtype
+        if protocol == "x10":
+            cmd += "00"
+        elif protocol == "arc":
+            cmd += "01"
+        elif protocol == "elro":
+            cmd += "02"
+        elif protocol == "waveman":
+            cmd += "03"
+        elif protocol == "chacon":
+            cmd += "04"
+        elif protocol == "impuls":
+            cmd += "05"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1], 16)
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x10 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
+
+    
 
     def command_11(self, address, unit, command, level, eu, group, trig_msg):
         """ Type 0x11, Lighting2

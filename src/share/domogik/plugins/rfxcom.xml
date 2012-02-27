@@ -141,10 +141,10 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
   <device_feature_models>
     <!-- Lighting1 -->
     <device_feature_model>
-      <id>rfxcom.lighting_x10_dimmer.switch</id>
+      <id>rfxcom.lighting1_x10_dimmer.switch</id>
       <name>Switch</name>
       <feature_type>actuator</feature_type>
-      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <device_type_id>rfxcom.lighting1_x10_dimmer</device_type_id>
       <parameters>
         {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;ac_off&quot;, &quot;value1&quot;:&quot;ac_on&quot;}
       </parameters>
@@ -153,24 +153,24 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
     <device_feature_model>
-      <id>rfxcom.lighting_x10_dimmer.reduce</id>
+      <id>rfxcom.lighting1_x10_dimmer.reduce</id>
       <name>Reduce</name>
       <feature_type>actuator</feature_type>
-      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <device_type_id>rfxcom.lighting1_x10_dimmer</device_type_id>
       <parameters>
-        {&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+        {&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
       </parameters>
       <value_type>number</value_type>
       <stat_key>level</stat_key>
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
     <device_feature_model>
-      <id>rfxcom.lighting_x10_dimmer.increase</id>
+      <id>rfxcom.lighting1_x10_dimmer.increase</id>
       <name>Increase</name>
       <feature_type>actuator</feature_type>
-      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <device_type_id>rfxcom.lighting1_x10_dimmer</device_type_id>
       <parameters>
-        {&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+        {&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
       </parameters>
       <value_type>number</value_type>
       <stat_key>level</stat_key>
@@ -181,7 +181,7 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
 
     <!-- template lighting 2 -->
     <device_feature_model>
-      <id>rfxcom.lighting_x10_dimmer.dim</id>
+      <id>rfxcom.lighting_x11_dimmer.dim</id>
       <name>Dim</name>
       <feature_type>actuator</feature_type>
       <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>

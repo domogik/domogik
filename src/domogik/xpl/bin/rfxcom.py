@@ -99,12 +99,22 @@ class RfxcomUsbManager(XplPlugin):
         rfxcom_process.start()
         self.enable_hbeat()
 
+    # lighting1
     def process_x10_basic(self, message):
         """ Process command xpl message and call the librairy for processing command
             @param message : xpl message
         """
-        # TODO
-        pass
+        address = message.data["device"].lower()
+        command = message.data["command"].lower()
+        if message.data.has_key("protocol"):
+            protocol = message.data["protocol"].lower()
+        else:
+            protocol = "x10"
+
+        # Prepare xpl-trig to send if success
+        trig_msg = message
+        trig_msg.set_type("xpl-trig")
+        self.rfxcom.command_10(address, command, protocol, trig_msg)
 
     def process_x10_security(self, message):
         """ Process command xpl message and call the librairy for processing command
