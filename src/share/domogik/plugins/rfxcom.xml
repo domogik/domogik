@@ -51,6 +51,36 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <description>Lighting1 x10 Dimmer</description>
       <device_technology_id>rfxcom</device_technology_id>
     </device_type>
+    <device_type>
+      <id>rfxcom.lighting1_arc_switch</id>
+      <name>Lighting1 ARC Switch</name>
+      <description>Lighting1 ARC Switch</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+    <device_type>
+      <id>rfxcom.lighting1_elro_switch</id>
+      <name>Lighting1 ELRO AB400D Switch</name>
+      <description>Lighting1 ELRO AB400D Switch</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+    <device_type>
+      <id>rfxcom.lighting1_waveman_switch</id>
+      <name>Lighting1 Waveman Switch</name>
+      <description>Lighting1 Waveman Switch</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+    <device_type>
+      <id>rfxcom.lighting1_chacon_switch</id>
+      <name>Lighting1 Chacon EMW200 Switch</name>
+      <description>Lighting1 Chacon EMW200 Switch</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+    <device_type>
+      <id>rfxcom.lighting1_impuls_switch</id>
+      <name>Lighting1 IMPULS Switch</name>
+      <description>Lighting1 IMPULS Switch</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
 
 
 
@@ -146,7 +176,7 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <feature_type>actuator</feature_type>
       <device_type_id>rfxcom.lighting1_x10_dimmer</device_type_id>
       <parameters>
-        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;ac_off&quot;, &quot;value1&quot;:&quot;ac_on&quot;}
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_x10_off&quot;, &quot;value1&quot;:&quot;lighting1_x10_on&quot;}
       </parameters>
       <value_type>binary</value_type>
       <stat_key>command</stat_key>
@@ -158,7 +188,7 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <feature_type>actuator</feature_type>
       <device_type_id>rfxcom.lighting1_x10_dimmer</device_type_id>
       <parameters>
-        {&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
+        {&quot;command&quot;:&quot;lighting1_x10_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
       </parameters>
       <value_type>number</value_type>
       <stat_key>level</stat_key>
@@ -170,13 +200,77 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <feature_type>actuator</feature_type>
       <device_type_id>rfxcom.lighting1_x10_dimmer</device_type_id>
       <parameters>
-        {&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
+        {&quot;command&quot;:&quot;lighting1_x10_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
       </parameters>
       <value_type>number</value_type>
       <stat_key>level</stat_key>
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
 
+    <device_feature_model>
+      <id>rfxcom.lighting1_arc_switch.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting1_arc_switch</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_arc_off&quot;, &quot;value1&quot;:&quot;lighting1_arc_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <device_feature_model>
+      <id>rfxcom.lighting1_elro_switch.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting1_elro_switch</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_elro_off&quot;, &quot;value1&quot;:&quot;lighting1_elro_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <device_feature_model>
+      <id>rfxcom.lighting1_waveman_switch.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting1_waveman_switch</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_waveman_off&quot;, &quot;value1&quot;:&quot;lighting1_waveman_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <device_feature_model>
+      <id>rfxcom.lighting1_chacon_switch.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting1_chacon_switch</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_chacon_off&quot;, &quot;value1&quot;:&quot;lighting1_chacon_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <device_feature_model>
+      <id>rfxcom.lighting1_impuls_switch.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting1_impuls_switch</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_impuls_off&quot;, &quot;value1&quot;:&quot;lighting1_impuls_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
 
 
     <!-- template lighting 2 -->
