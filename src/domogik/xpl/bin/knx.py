@@ -338,21 +338,8 @@ class KNXManager(XplPlugin):
                              value=4
                           if val==20:
                              value=1
-                          if val==86:
-                             value=2
-                    if typeadr=="stp":
-                       if val==1:
-                          value=2
-                       else:
-                          time.sleep(2)
-                          stat=lignetest[lignetest.find('adr_stat:')+9:]
-                          stat=stat[:stat.find(' ')]
-                          commandask = "groupread ip:127.0.0.1 %s" %stat
-                          prob=subprocess.Popen(commandask,shell=True)
                     val=value
-
-
-                       
+                     
 
                  if command == 'Writ':
                     print("knx Write xpl-trig")
@@ -563,10 +550,7 @@ class KNXManager(XplPlugin):
                  if val=="1":
                     valeur="3"
                  if val=="2":
-                    cmdadr=stpadr
-                    print "stop chauffage %s" %command_stp
-                    data_type="s"
-                    valeur=1
+                    valeur=4
 
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
