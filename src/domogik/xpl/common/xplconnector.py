@@ -280,7 +280,6 @@ class Manager:
         if schema != 'hbeat.end':
             mesg.add_single_data( "status", self._status )
         if self is not None:
-            if not self.p.should_stop():
                 self.send( mesg )
         self._lock_status.release()
 
