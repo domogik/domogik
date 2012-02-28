@@ -8,7 +8,6 @@ import serial
 import socket
 import traceback
 import threading
-import time
 from Queue import Queue
 
 MODULE_TYPES = {
@@ -241,7 +240,7 @@ class VelbusDev:
         self._log.info("write deamon")
         while not self._stop.isSet():
             res = self.write_rfx.get(block = True)
-            self._log.info("START SENDING PACKET %s" % hex(int(res["address"])))
+            self._log.info("START SENDING PACKET TO %s" % hex(int(res["address"])))
 	    # start
             packet = chr(0x0F)
             # priority
@@ -256,13 +255,14 @@ class VelbusDev:
             packet += self._checksum(packet)
             # end byte
             packet += chr(0x04)
+	    self._log.debug( packet.encode('hex') )
 	    # send
             if self._devtype == 'socket':
                 self._log.debug( self._dev.send( packet ) )
             else:
                 self._log.debug( self._dev.write( packet ) )
             # sleep for 60ms
-            time.sleep(0.06)
+            self._stop.wait(0.06)
  
     def listen(self, stop):
         """ Listen thread for incomming VELBUS messages
@@ -429,7 +429,6 @@ class VelbusDev:
            Convert a channel 1 or 2 to its correct byte
         """
         assert channel > 2
-        assert channel == 0
         if channel == 1:
             return chr(0x03)
         else:
