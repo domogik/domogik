@@ -101,15 +101,14 @@ class KNXManager(XplPlugin):
         for ligne in fichier:
            listknx.append(ligne)
         fichier.close
-"""        for i in range(len(listknx)):
+        for i in range(len(listknx)):
            stat=listknx[i]
            stat=stat[stat.find("adr_stat:")+9:]
            stat=stat[:stat.find(" ")]
            print stat  
            command="groupread ip:127.0.0.1 %s" %stat
-           subp2=subprocess.Popen(command, shell=True)
- ### mauvaise bonne idée
-"""        self.log.info("Plugin ready :)")
+        #   subp2=subprocess.Popen(command, shell=True)
+        self.log.info("Plugin ready :)")
 
     def send_xpl(self, data):
         """ Send xpl-trig to give status change
