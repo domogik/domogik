@@ -107,7 +107,7 @@ class KNXManager(XplPlugin):
            stat=stat[:stat.find(" ")]
            print stat  
            command="groupread ip:127.0.0.1 %s" %stat
-        #   subp2=subprocess.Popen(command, shell=True)
+           subp2=subprocess.Popen(command, shell=True)
         self.log.info("Plugin ready :)")
 
     def send_xpl(self, data):
@@ -221,10 +221,10 @@ class KNXManager(XplPlugin):
                     else:
                        self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
-                 if datatype =="9.xxx": #16bit unsigned integer (EIS14) 
+                 if datatype[:2] =="9.": #16bit unsigned integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=65535:
-                       val=bin(Val)[2:]
+                       val=bin(val)[2:]
                        if len(val)<=16:
                           for i in range(16-len(val)):
                              val="0"+val
