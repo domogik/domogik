@@ -113,16 +113,61 @@
           <name>Humidity</name>
           <description>Humidity</description>
       </device_type>
+
+      <device_type>
+          <id>knx.pressure</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Pressure</name>
+          <description>Pressure</description>
+      </device_type>
+
+      <device_type>
+          <id>knx.windspeed</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>WindSpeed</name>
+          <description>Wind Speed</description>
+      </device_type>
+
+
   </device_types>
 
   <device_feature_models>
+    <device_feature_model>
+          <id>knx.windspeed.speed</id>
+          <name>Speed</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>knx.windspeed</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;ms&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+
+     <device_feature_model>
+          <id>knx.pressure.pressure</id>
+          <name>Pressure</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>knx.pressure</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;Pa&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+
+
+
+
      <device_feature_model>
           <id>knx.humidity.humidity</id>
           <name>Humidity</name>
           <feature_type>sensor</feature_type>
           <device_type_id>knx.humidity</device_type_id>
           <parameters>
-             {&quot;unit&quot;:&quot;&quot;}
+             {}
           </parameters>
           <value_type>number</value_type>
           <stat_key>data</stat_key>
