@@ -1,5 +1,5 @@
 <technology id="rfxcom">
-  <command name="ac_off">
+  <command name="lighting2_homeasy_eu_off">
     <schema>ac.basic</schema>
     <command-key>command</command-key>
     <address-key>address</address-key>

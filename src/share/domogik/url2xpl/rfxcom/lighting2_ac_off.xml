@@ -1,9 +1,9 @@
 <technology id="rfxcom">
-  <command name="ac_on">
+  <command name="lighting2_ac_off">
     <schema>ac.basic</schema>
     <command-key>command</command-key>
     <address-key>address</address-key>
-    <command-xpl-value>on</command-xpl-value>
+    <command-xpl-value>off</command-xpl-value>
     <parameters>
       <parameter key="unit" value="1"/>
     </parameters>
@@ -12,7 +12,7 @@
     <schema>ac.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="command" value="on" />
+      <key name="command" value="off" />
       <key name="address" value="@address@"/>
       <key name="unit" value="1"/>
     </filter>

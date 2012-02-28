@@ -1,20 +1,20 @@
 <technology id="rfxcom">
-  <command name="lighting1_impuls_on">
-    <schema>impuls.basic</schema>
+  <command name="lighting2_ac_on">
+    <schema>ac.basic</schema>
     <command-key>command</command-key>
-    <address-key>device</address-key>
+    <address-key>address</address-key>
     <command-xpl-value>on</command-xpl-value>
     <parameters>
-      <parameter key="protocol" value="impuls"/>
+      <parameter key="unit" value="1"/>
     </parameters>
   </command>
   <listener>
-    <schema>impuls.basic</schema>
+    <schema>ac.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="on" />
-      <key name="device" value="@address@"/>
-      <key name="protocol" value="impuls" />
+      <key name="address" value="@address@"/>
+      <key name="unit" value="1"/>
     </filter>
   </listener>
 </technology>

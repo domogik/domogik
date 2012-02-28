@@ -82,6 +82,19 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <device_technology_id>rfxcom</device_technology_id>
     </device_type>
 
+    <!-- Lighting2 -->
+    <device_type>
+      <id>rfxcom.lighting2_ac_dimmer</id>
+      <name>Lighting2 AC Dimmer</name>
+      <description>Lighting2 AC Dimmer</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+    <device_type>
+      <id>rfxcom.lighting2_homeeasy_eu_dimmer</id>
+      <name>Lighting2 Homeeasy EU Dimmer</name>
+      <description>Lighting2 Homeeasy EU Dimmer</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
 
 
 
@@ -273,19 +286,59 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
     </device_feature_model>
 
 
-    <!-- template lighting 2 -->
+    <!-- Lighting2 -->
     <device_feature_model>
-      <id>rfxcom.lighting_x11_dimmer.dim</id>
-      <name>Dim</name>
+      <id>rfxcom.lighting2_ac_dimmer.switch</id>
+      <name>Switch</name>
       <feature_type>actuator</feature_type>
-      <device_type_id>rfxcom.lighting_x10_dimmer</device_type_id>
+      <device_type_id>rfxcom.lighting2_ac_dimmer</device_type_id>
       <parameters>
-        {&quot;command&quot;:&quot;ac_preset&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting2_ac_off&quot;, &quot;value1&quot;:&quot;lighting2_ac_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.lighting2_ac_dimmer.change</id>
+      <name>Change</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting2_ac_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;lighting2_ac_preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}
       </parameters>
       <value_type>range</value_type>
       <stat_key>level</stat_key>
+      <return_confirmation>1</return_confirmation>
+    </device_feature_model>
+
+    <device_feature_model>
+      <id>rfxcom.lighting2_homeesay_eu_dimmer.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting2_homeesay_eu_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting2_homeesay_eu_off&quot;, &quot;value1&quot;:&quot;lighting2_homeesay_eu_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.lighting2_homeesay_eu_dimmer.change</id>
+      <name>Change</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting2_homeesay_eu_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;lighting2_homeesay_eu_preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}
+      </parameters>
+      <value_type>range</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>1</return_confirmation>
+    </device_feature_model>
+
+
+
 
 
 
