@@ -61,6 +61,7 @@
       <name>KNX</name>
       <description>KNX with Eibd</description>
   </device_technology>
+
   <device_types>
       <device_type>
           <id>knx.raw</id>
@@ -106,32 +107,27 @@
           <name>Lux</name>
           <description>Lux</description>
       </device_type>
-
-
       <device_type>
           <id>knx.humidity</id>
           <device_technology_id>knx</device_technology_id>
           <name>Humidity</name>
           <description>Humidity</description>
       </device_type>
-
+  </device_types>
 
   <device_feature_models>
-
      <device_feature_model>
           <id>knx.humidity.humidity</id>
           <name>Humidity</name>
           <feature_type>sensor</feature_type>
           <device_type_id>knx.humidity</device_type_id>
           <parameters>
-              {}
+             {&quot;unit&quot;:&quot;&quot;}
           </parameters>
           <value_type>number</value_type>
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
-
      <device_feature_model>
           <id>knx.thermometer.temperature</id>
           <name>Temperature</name>
@@ -144,7 +140,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
      <device_feature_model>
           <id>knx.lux.lux</id>
           <name>Luxmeter</name>
