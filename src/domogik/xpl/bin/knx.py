@@ -107,7 +107,7 @@ class KNXManager(XplPlugin):
            stat=stat[:stat.find(" ")]
            print stat  
            command="groupread ip:127.0.0.1 %s" %stat
-           subp2=subprocess.Popen(command, shell=True)
+          # subp2=subprocess.Popen(command, shell=True)
         self.log.info("Plugin ready :)")
 
     def send_xpl(self, data):
@@ -187,7 +187,7 @@ class KNXManager(XplPlugin):
                     else:
                        self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
 
-                 if datatype == "5.xxx": #8bit unsigned integer (from 0 to 255) (EIS6) 
+                 if datatype[:2] == "5." datatype!="5.001" and datatype!="5.003": #8bit unsigned integer (from 0 to 255) (EIS6) 
                     val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=val
@@ -200,21 +200,21 @@ class KNXManager(XplPlugin):
                     else:
                        self.log.error("DPT_Angle not valid argument %s from %s" %(val,groups))
 
-                 if datatype =="6.xxx": #8bit signed integer (EIS14) 
+                 if datatype[:2] =="6.": #8bit signed integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=val-128
 		    else:
                        self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
-                 if datatype =="7.xxx": #16bit unsigned integer (EIS14) 
+                 if datatype[:2] =="7.": #16bit unsigned integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=65535:
                        val=val
                     else:
                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
-                 if datatype =="8.xxx": #16bit signed integer (EIS14) 
+                 if datatype[:2] =="8.": #16bit signed integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=65535:
                        val=val-32768
@@ -230,11 +230,11 @@ class KNXManager(XplPlugin):
                              val="0"+val
                        Y=long(val[1:5],2)
                        X=long(val[0:1]+val[5:16],2)
-                       print "Valeur de X=%s" %x
+                       print "Valeur de X=%s" %X
                        if X>=2047:
                           print "ce nombre semble negatif"
                           X=X-4096
-                       Valeur=float(0.01*X*2**Y)
+                       val=float(0.01*X*2**Y)
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
 
@@ -270,19 +270,19 @@ class KNXManager(XplPlugin):
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
                  
-                 if datatype == "12.xxx": #32 bit unsigned interger
+                 if datatype[:3] == "12.": #32 bit unsigned interger
                     val=int(val.replace(" ",""),16)
                     if val>=4294967296:
                        self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
-                 if datatype == "13.xxx": #32bit signed integer
+                 if datatype[:3] == "13.": #32bit signed integer
                      val=int(val.replace(" ",""),16)
                      if val<=4294967295:
                         val=val-2147483648
                      else:
                        self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
-                 if datatype == "14.xxx": #32bit IEEE 754 floating point number
+                 if datatype[:3] == "14.": #32bit IEEE 754 floating point number
                      val=int(val.replace(" ",""),16)
                      val=bin(val)[2:]
                      if len(val)<32:
@@ -302,7 +302,7 @@ class KNXManager(XplPlugin):
                         val=float(signe*mantisse*2**(exposant-127))
                         print "résultat %s" %(signe*mantisse*2**(exposant-127))
 
-                 if datatype =="16.xxx": #String
+                 if datatype[:3] =="16.": #String
                     val=val.replace(" ","")
                     if len(val)/2==14:
                        phrase=""
