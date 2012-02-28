@@ -280,7 +280,7 @@ class Manager:
         if schema != 'hbeat.end':
             mesg.add_single_data( "status", self._status )
         if self is not None:
-                self.send( mesg )
+            self.send( mesg )
         self._lock_status.release()
 
     def got_hbeat(self, message):
