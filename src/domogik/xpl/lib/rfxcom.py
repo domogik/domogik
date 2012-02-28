@@ -591,8 +591,6 @@ class RfxcomUsb:
 
             Type : command
             SDK version : 4.8
-
-            Remarks :
         """
         COMMAND = {"off"    : "00",
                    "on"     : "01",
@@ -631,13 +629,58 @@ class RfxcomUsb:
         self.write_packet(cmd, trig_msg)
 
 
+    def _process_10(self, data):
+        """ Type 0x10, Lighting1
+        
+            Type : command/sensor
+            SDK version : 4.8
+            Tested : No
+        """
+        PROTOCOL = {
+          "00" : "x10",
+          "01" : "arc",
+          "02" : "elro",
+          "03" : "waveman",
+          "04" : "chacon",
+          "05" : "impuls",
+        }
+        CMND = {
+          "00" : "off",
+          "01" : "on",
+          "02" : "dim",
+          "03" : "bright",
+          "05" : "all_lights_off",
+          "06" : "all_lights_on",
+          "07" : "chime",
+        }
+
+        subtype = gh(data, 1)
+        protocol = PROTOCOL[subtype]
+        seqnbr = gh(data, 2)
+        housecode = binascii.unhexlify(gh(data, 3))
+        unitcode = int(gh(data, 4), 16)
+        device = housecode + unitcode
+        cmnd = COMMAND[gh(data, 5)]
+        # no battery level
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        self._callback("x10.basic",
+                   {"device" : device, 
+                    "command" : cmnd,
+                    "protocol" : protocol})
+
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "rssi", 
+                        "current" : rssi})
+ 
     
 
     def command_11(self, address, unit, command, level, eu, group, trig_msg):
         """ Type 0x11, Lighting2
 
             Type : command
-            SDK version : 2.07
+            SDK version : 4.8
             Tested : yes
 
             Remarks :
@@ -684,7 +727,7 @@ class RfxcomUsb:
         """ Type 0x11, Lighting2
         
             Type : command/sensor
-            SDK version : 2.06
+            SDK version : 4.8
             Tested : No
         """
         AC_CMND = {
@@ -730,8 +773,44 @@ class RfxcomUsb:
  
     
 
-    ### 0x12 : Lighting3
-    #TODO
+    def command_12(self, address, command, level, protocol, trig_msg):
+        """ Type 0x12, Lighting3
+
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"off"    : "00",
+                   "on"     : "01",
+                   "dim"    : "02",
+                   "bright" : "03",
+                   "all_lights_off"    : "05",
+                   "all_lights_on"     : "06",
+                   "chime"  : "07"}
+        # type
+        cmd = "12" 
+        # subtype
+        cmd += "00"
+        # seqnbr
+        cmd += self.get_seqnbr()
+
+
+        # <========== J'EN SUIS LA !!!!!!!!!! TODO !!!!!!!!!!!!!!!
+
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1], 16)
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x10 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
+
+    
+
     
 
     ### 0x13 : Lighting4
