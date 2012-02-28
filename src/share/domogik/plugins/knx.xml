@@ -92,9 +92,74 @@
           <description>HVACMode</description>
           <device_technology_id>knx</device_technology_id>
       </device_type>
-  </device_types>
+
+      <device_type>
+          <id>knx.thermometer</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Temperature</name>
+          <description>Temperature</description>
+      </device_type>
+
+      <device_type>
+          <id>knx.lux</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Lux</name>
+          <description>Lux</description>
+      </device_type>
+
+
+      <device_type>
+          <id>knx.humidity</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Humidity</name>
+          <description>Humidity</description>
+      </device_type>
+
+
   <device_feature_models>
-  <device_feature_model>
+
+     <device_feature_model>
+          <id>knx.humidity.humidity</id>
+          <name>Humidity</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>knx.humidity</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+
+
+     <device_feature_model>
+          <id>knx.thermometer.temperature</id>
+          <name>Temperature</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>knx.thermometer</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;\u00B0C&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+
+     <device_feature_model>
+          <id>knx.lux.lux</id>
+          <name>Luxmeter</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>knx.lux</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;lux&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+
+
+     <device_feature_model>
           <id>knx.HVACMode</id>
           <name>HVACMode</name>
           <feature_type>actuator</feature_type>
@@ -106,7 +171,7 @@
           <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
-     <device_feature_model>
+      <device_feature_model>
           <id>knx.switch</id>
           <name>Switch</name>
           <feature_type>actuator</feature_type>
