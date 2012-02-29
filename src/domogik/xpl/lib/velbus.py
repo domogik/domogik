@@ -428,8 +428,8 @@ class VelbusDev:
         """
            Convert a channel 1 or 2 to its correct byte
         """
-        assert channel > 2
-        if channel == 1:
+        assert int(channel) > 2
+        if int(channel) == 1:
             return chr(0x03)
         else:
             return chr(0x0C)
