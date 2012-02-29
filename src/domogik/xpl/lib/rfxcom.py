@@ -814,8 +814,33 @@ class RfxcomUsb:
     
 
     ### 0x13 : Lighting4
-    #TODO
+    # Not done for the moment : cf Bert : 
+    """ PT2262 is a decoder IC that is often used in cheap lamp and appliance modules.
+
+    For the moment PT2262 is not used so don’t spend time implementing it. It is more or less implemented to be able to test new devices and add them afterwards to Lighting1.
+
+    For xPL we have also a problem because this type of device is not defined.
+    """
     
+
+    ### 0x14 : Lighting5
+    # Not done for the moment : cf Bert : 
+    """ LightwaveRF=Siemens and is a new product used in the UK. This is named the AD protocol by us.
+
+    http://www.lightwaverf.com/productsLighting.php
+
+    This protocol is still in development in the RFXtrx and I hope we are able to add dim set level.
+
+    For xPL the ac.basic can probably be used with some extensions or we have to define the ad.basic. 
+    """
+
+
+    ### 0x15 : Lighting6
+    # Not done for the moment : cf Bert : 
+    """ For the moment skip Novatys. If we are able to add this protocol it can be added to the x10.basic. But for now I’m not able to have the protocol correct reverse engineered.
+    """
+
+
 
     ### 0x18 : Curtain1
     #TODO
