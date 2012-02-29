@@ -619,7 +619,7 @@ class RfxcomUsb:
         # address : housecode
         cmd += binascii.hexlify(address[0].upper())
         # address : unitcode
-        cmd += "%02x" % int(address[1], 16)
+        cmd += "%02x" % int(address[1:])
         # cmnd
         cmd += COMMAND[command.lower()]
         # filler + rssi : 0x00
@@ -670,7 +670,7 @@ class RfxcomUsb:
                     "protocol" : protocol})
 
         self._callback("sensor.basic",
-                       {"device" : address, 
+                       {"device" : device, 
                         "type" : "rssi", 
                         "current" : rssi})
  
@@ -779,29 +779,32 @@ class RfxcomUsb:
             Type : command
             SDK version : 4.8
         """
-        COMMAND = {"off"    : "00",
-                   "on"     : "01",
-                   "dim"    : "02",
-                   "bright" : "03",
-                   "all_lights_off"    : "05",
-                   "all_lights_on"     : "06",
-                   "chime"  : "07"}
+        COMMAND = {"bright"    : "00",
+                   "dim"       : "08",
+                   "on"        : "10",
+                   "off"       : "1a",
+                   "program"   : "1c"}
         # type
         cmd = "12" 
         # subtype
         cmd += "00"
         # seqnbr
         cmd += self.get_seqnbr()
-
-
-        # <========== J'EN SUIS LA !!!!!!!!!! TODO !!!!!!!!!!!!!!!
-
-        # address : housecode
+        # address : system
         cmd += binascii.hexlify(address[0].upper())
-        # address : unitcode
-        cmd += "%02x" % int(address[1], 16)
+        # address : channel
+        nb_zero = int(address) - 1
+        cmd += "%04x" % (1 << (nb_zero))
         # cmnd
-        cmd += COMMAND[command.lower()]
+        if command.lower() != "level":
+            cmd += COMMAND[command.lower()]
+        else:
+            cmd += "1"
+            if level >= 100:
+                level = 90
+            if level <=0 : 
+                level = 0
+            cmd += "%s" % int(level/100)
         # filler + rssi : 0x00
         cmd += "00"
         
@@ -809,6 +812,65 @@ class RfxcomUsb:
         self.write_packet(cmd, trig_msg)
 
 
+    def _process_12(self, data):
+        """ Type 0x12, Lighting3
+        
+            Type : command/sensor
+            SDK version : 4.8
+            Tested : No
+        """
+        }
+        COMMAND = {
+          "00" : "bright",
+          "08" : "dim",
+          "10" : "on",
+          "1a" : "off",
+          "1c" : "program",
+          "11" : "level1",
+          "12" : "level2",
+          "13" : "level3",
+          "14" : "level4",
+          "15" : "level5",
+          "16" : "level6",
+          "17" : "level7",
+          "18" : "level8",
+          "19" : "level9",
+        }
+
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        system = binascii.unhexlify(gh(data, 3))
+        channel = int(gh(data, 4, 5), 16)
+        idx = 1
+        while idx < 10 and bin(channel)[-(idx)] != "1":
+            idx += 1
+
+        device = housecode + unitcode
+        cmnd = COMMAND[gh(data, 6)]
+        if cmnd[0:5] == "level":
+            level = int(cmnd[5])*10
+        else:
+            level = None
+        # no battery level
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        if level == None:
+            self._callback("x10.basic",
+                       {"device" : device, 
+                        "command" : cmnd,
+                        "protocol" : "koppla"})
+        else:
+            self._callback("x10.basic",
+                       {"device" : device, 
+                        "command" : "level",
+                        "level" : level,
+                        "protocol" : "koppla"})
+
+        self._callback("sensor.basic",
+                       {"device" : device, 
+                        "type" : "rssi", 
+                        "current" : rssi})
+ 
     
 
     
