@@ -187,7 +187,7 @@ class KNXManager(XplPlugin):
                     else:
                        self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
 
-                 if datatype[:2] == "5." datatype!="5.001" and datatype!="5.003": #8bit unsigned integer (from 0 to 255) (EIS6) 
+                 if datatype[:2] == "5." and  datatype!="5.001" and datatype!="5.003": #8bit unsigned integer (from 0 to 255) (EIS6) 
                     val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=val
