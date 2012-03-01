@@ -5,7 +5,7 @@
     <address-key>device</address-key>
     <command-xpl-value>off</command-xpl-value>
     <parameters>
-      <parameter key="protocol" value="arc"/>
+      <parameter key="protocol" value="koppla"/>
     </parameters>
   </command>
   <listener>
@@ -14,7 +14,7 @@
     <filter>
       <key name="command" value="off" />
       <key name="device" value="@address@"/>
-      <key name="protocol" value="arc" />
+      <key name="protocol" value="koppla" />
     </filter>
   </listener>
 </technology>

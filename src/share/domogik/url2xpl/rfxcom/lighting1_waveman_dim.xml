@@ -1,6 +1,6 @@
 <technology id="rfxcom">
-  <command name="lighting1_waveman_dim">
-    <schema>waveman.basic</schema>
+  <command name="lighting1_x10_dim">
+    <schema>x10.basic</schema>
     <command-key>command</command-key>
     <address-key>device</address-key>
     <command-xpl-value>dim</command-xpl-value>
@@ -10,7 +10,7 @@
     </parameters>
   </command>
   <listener>
-    <schema>waveman.basic</schema>
+    <schema>x10.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="dim" />

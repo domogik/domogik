@@ -96,6 +96,14 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <device_technology_id>rfxcom</device_technology_id>
     </device_type>
 
+    <!-- Lighting3 -->
+    <device_type>
+      <id>rfxcom.lighting3_koppla_dimmer</id>
+      <name>Lighting3 Koppla Dimmer</name>
+      <description>Lighting3 Koppla Dimmer</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+
 
 
     <!-- not reviewed -->
@@ -337,6 +345,43 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <return_confirmation>1</return_confirmation>
     </device_feature_model>
 
+    <!-- Lighting3 -->
+    <device_feature_model>
+      <id>rfxcom.lighting3_koppla_dimmer.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting3_koppla_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting3_koppla_off&quot;, &quot;value1&quot;:&quot;lighting3_koppla_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.lighting3_koppla_dimmer.reduce</id>
+      <name>Reduce</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting3_koppla_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;lighting3_koppla_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.lighting3_koppla_dimmer.increase</id>
+      <name>Increase</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.lighting3_koppla_dimmer</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;lighting3_koppla_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
 
 
 
