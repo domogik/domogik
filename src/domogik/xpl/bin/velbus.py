@@ -146,8 +146,7 @@ class VelbusManager(XplPlugin):
         """
         self.send_xpl("shutter.device", message.data)
         add = message.data['device'].split('-')
-        chan = []
-        chan.append(int(add[1]))
+        chan = int(add[1])
         address = add[0]
         if message.data["command"] == "up":
             self.log.debug("set shutter up")
