@@ -127,7 +127,12 @@
           <name>WindSpeed</name>
           <description>Wind Speed</description>
       </device_type>
-
+      <device_type>
+          <id>knx.thermostat</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>Thermostat</name>
+          <description>send Value for Thermostat</description>
+      </device_type>
 
   </device_types>
 
@@ -283,6 +288,20 @@
           <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
+
+      <device_feature_model>
+          <id>knx.thermostat.number</id>
+          <name>thermostat</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.thermostat</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:7, &quot;valueMax&quot;:30}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+
   </device_feature_models>
 </package>
 
