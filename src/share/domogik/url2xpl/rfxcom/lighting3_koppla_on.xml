@@ -1,5 +1,5 @@
 <technology id="rfxcom">
-  <command name="lighting1_x10_on">
+  <command name="lighting3_koppla_on">
     <schema>x10.basic</schema>
     <command-key>command</command-key>
     <address-key>device</address-key>

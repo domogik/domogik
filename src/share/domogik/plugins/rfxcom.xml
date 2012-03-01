@@ -104,6 +104,13 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <device_technology_id>rfxcom</device_technology_id>
     </device_type>
 
+    <!-- Curtain1 -->
+    <device_type>
+      <id>rfxcom.curtain1_harrison</id>
+      <name>Curtain1 Harrison command</name>
+      <description>Curtain1 Harrison command</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
 
 
     <!-- not reviewed -->
@@ -377,6 +384,44 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <device_type_id>rfxcom.lighting3_koppla_dimmer</device_type_id>
       <parameters>
         {&quot;command&quot;:&quot;lighting3_koppla_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <!-- Curtain1 -->
+    <device_feature_model>
+      <id>rfxcom.curtain1_harrison.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.curtain1_harrison</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;curtain1_harrison_off&quot;, &quot;value1&quot;:&quot;curtain1_harrison_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.curtain1_harrison.reduce</id>
+      <name>Reduce</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.curtain1_harrison</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;curtain1_harrison_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>level</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.curtain1_harrison.increase</id>
+      <name>Increase</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.curtain1_harrison</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;curtain1_harrison_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}
       </parameters>
       <value_type>number</value_type>
       <stat_key>level</stat_key>

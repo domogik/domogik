@@ -1,21 +1,20 @@
 <technology id="rfxcom">
-  <command name="lighting1_impuls_bright">
+  <command name="curtain1_harrison_on">
     <schema>x10.basic</schema>
     <command-key>command</command-key>
     <address-key>device</address-key>
-    <command-xpl-value>bright</command-xpl-value>
+    <command-xpl-value>on</command-xpl-value>
     <parameters>
-      <parameter key="level" location="1"/>
-      <parameter key="protocol" value="impuls"/>
+      <parameter key="protocol" value="harrison"/>
     </parameters>
   </command>
   <listener>
     <schema>x10.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="command" value="bright" />
+      <key name="command" value="on" />
       <key name="device" value="@address@"/>
-      <key name="protocol" value="impuls" />
+      <key name="protocol" value="harrison" />
     </filter>
   </listener>
 </technology>

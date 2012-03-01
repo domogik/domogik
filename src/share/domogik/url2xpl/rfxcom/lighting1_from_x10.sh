@@ -4,6 +4,6 @@ for PROTO in arc elro waveman chacon impuls
       do
         newFic=$(echo $fic | sed "s/x10/$PROTO/")
         sed  "s/1_x10/1_$PROTO/g" $fic > $newFic
-        sed  "s/\"x10\"/\"$PROTO\"/g" $fic > $newFic
+        sed  -i "s/\"x10\"/\"$PROTO\"/g" $newFic
       done
   done
