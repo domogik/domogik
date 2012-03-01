@@ -317,6 +317,14 @@ class KNXManager(XplPlugin):
                     val=int(val.replace(" ",""),16)
                     if val>="5":
                        val=val
+                    if val=20:
+                       val=1
+                    if val=19:
+                       val=3
+                    if val=7:
+                       val=4
+                    if val=26:
+                       val=2
                     else:
                        self.log.error("DPT_HVACMode unknow code %s from %s" %(val,groups))
 
