@@ -903,9 +903,79 @@ class RfxcomUsb:
     """
 
 
+    def command_18(self, address, command, protocol, trig_msg):
+        """ Type 0x18, Curtain1
 
-    ### 0x18 : Curtain1
-    #TODO
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"open"   : "00",
+                   "on"     : "00",  # open (for comp. with rfxcom lan xpl)
+                   "close"  : "01",
+                   "off"    : "01",  # close (for ....)
+                   "stop"   : "02",
+                   "dim"    : "02",  # stop (for ....)
+                   "bright" : "02",  # stop
+
+                   "program"        : "03",
+                   "all_lights_off" : "03",  # program (for ....)
+                   "all_lights_on"  : "03",  # program
+                  }
+        # type
+        cmd = "18" 
+        # subtype
+        cmd += "00"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1:])
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x18 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
+
+    def _process_18(self, data):
+        """ Type 0x18, Curtain1
+        
+            Type : command/sensor
+            SDK version : 4.8
+            Tested : No
+        """
+        CMND = {
+          "00" : "on",   # open
+          "01" : "off",  # close
+          "02" : "dim",  # stop
+          "03" : "all_lights_off",   #program
+        }
+
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        housecode = binascii.unhexlify(gh(data, 3))
+        unitcode = int(gh(data, 4), 16)
+        device = housecode + unitcode
+        cmnd = COMMAND[gh(data, 5)]
+        # no battery level
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        self._callback("x10.basic",
+                   {"device" : device, 
+                    "command" : cmnd,
+                    "protocol" : protocol})
+
+        self._callback("sensor.basic",
+                       {"device" : device, 
+                        "type" : "rssi", 
+                        "current" : rssi})
+ 
+    
+
+
     
 
     ### 0x20 : Security1

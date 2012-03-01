@@ -124,6 +124,8 @@ class RfxcomUsbManager(XplPlugin):
             self.rfxcom.command_10(address, command, protocol, trig_msg)
         elif protocol in ("koppla"):
             self.rfxcom.command_12(address, command, level, protocol, trig_msg)
+        elif protocol in ("harrison"):
+            self.rfxcom.command_18(address, command, protocol, trig_msg)
 
     def process_x10_security(self, message):
         """ Process command xpl message and call the librairy for processing command
