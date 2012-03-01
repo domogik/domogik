@@ -396,6 +396,11 @@ class KNXManager(XplPlugin):
            datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
            cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
            command=""
+           print "Command: |%s|" %type_cmd
+           print "Groups: |%s|" %cmdadr
+           print "datatype: |%s|" %datatype
+           print "valeur avant codage: |%s|" %valeur
+
            if lignetest.find('adr_stp:')<>-1:
               stpadr=lignetest[lignetest.find('adr_stp:')+8:]
               stpadr=stpadr[:stpadr.find(' ')]
@@ -497,10 +502,10 @@ class KNXManager(XplPlugin):
                  if len(binairey)<>4:
                     for i in range(4-len(binairey)):
                        binairey="0"+binairey
-                 Valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
-                 Valeur=Valeur.replace(" ","")
-                 Valeur=int(Valeur,2)
-                 Valeur=hex(Valeur)[2:]
+                 valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
+                 valeur=valeur.replace(" ","")
+                 valeur=int(Valeur,2)
+                 valeur=hex(Valeur)[2:]
               else:
                  self.log.error("define 16bit signed float overflow %s from %s" %(val,groups))
 
@@ -514,7 +519,7 @@ class KNXManager(XplPlugin):
                        for i in range(len(val)/2):
                           valeur=valeur+" "+val[0:2]
                           val=val[2:]
-                       val=valeur.strip()
+                       valeur=valeur.strip()
                     else:
                         self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
 		 else:
@@ -530,7 +535,7 @@ class KNXManager(XplPlugin):
                        for i in range(len(val)/2):
                           valeur=valeur+" "+val[0:2]
                           val=val[2:]
-                       val=valeur.strip()	
+                       valeur=valeur.strip()	
                  else:
                     self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
@@ -559,7 +564,7 @@ class KNXManager(XplPlugin):
                     valeur="3"
                  if val=="2":
                     valeur=4
-
+              print "Valeur modifier |%s|" %valeur
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
               if data_type=="l":
