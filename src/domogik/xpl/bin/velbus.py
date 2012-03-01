@@ -78,7 +78,7 @@ class VelbusManager(XplPlugin):
         # Init RFXCOM
         self.manager  = VelbusDev(self.log, self.send_xpl,
 			self.send_trig, self.get_stop())
-	self.add_stop_cb(self.manager.close)
+        self.add_stop_cb(self.manager.close)
         
         # Create a listener for all messages used by RFXCOM
         Listener(self.process_lighting_basic, self.myxpl,

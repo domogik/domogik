@@ -255,7 +255,7 @@ class VelbusDev:
             packet += self._checksum(packet)
             # end byte
             packet += chr(0x04)
-	    self._log.debug( packet.encode('hex') )
+            self._log.debug( packet.encode('hex') )
 	    # send
             if self._devtype == 'socket':
                 self._log.debug( self._dev.send( packet ) )
