@@ -315,11 +315,11 @@ class KNXManager(XplPlugin):
 
                  if datatype == "20.102": #heating mode (comfort/standby/night/frost) 
                     val=int(val.replace(" ",""),16)
-                    if val>="5":
+                    if val<="5":
                        val=val
-                    if val=20:
+                    if val=20 or val=28:
                        val=1
-                    if val=19:
+                    if val=19 or val=24:
                        val=3
                     if val=7:
                        val=4
