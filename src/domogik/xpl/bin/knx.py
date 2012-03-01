@@ -406,7 +406,7 @@ class KNXManager(XplPlugin):
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
               val=valeur
-              if datatype =="5.xxx": #16bit unsigned integer (EIS14) 
+              if datatype[:2] =="5." and datatype!="5.001" and datatype!="5.003": #16bit unsigned integer (EIS14) 
                  val=int(val)
                  if val>=0:
                     if val<=255:
@@ -433,7 +433,7 @@ class KNXManager(XplPlugin):
                        val=int(val)*255/360
                        val=hex(val)
 
-              if datatype =="6.xxx": #8bit signed integer (EIS14) 
+              if datatype[:2] =="6.": #8bit signed integer (EIS14) 
                  val=int(val)
                  if val<=127:
                     if val>=-128:
@@ -447,7 +447,7 @@ class KNXManager(XplPlugin):
 		 else:
                     self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
-              if datatype =="7.xxx": #16bit unsigned integer (EIS14) 
+              if datatype[:2] =="7.": #16bit unsigned integer (EIS14) 
                  val=int(val)
                  if val>=0:
                     if val<=65535:
@@ -462,7 +462,7 @@ class KNXManager(XplPlugin):
 		 else:
                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
-              if datatype =="8.xxx": #16bit signed integer (EIS14) 
+              if datatype[:2] =="8.": #16bit signed integer (EIS14) 
                  val=int(val)
                  if val<=32767:
                     if val>=-32768:
@@ -476,7 +476,7 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
-              if datatype =="9.xxx": #16bit floating signed (EIS14) 
+              if datatype[:2] =="9.": #16bit floating signed (EIS14) 
                  val=val.replace(",",".")
                  val=float(val)
                  if val<0:
@@ -505,7 +505,7 @@ class KNXManager(XplPlugin):
                  self.log.error("define 16bit signed float overflow %s from %s" %(val,groups))
 
 
-              if datatype =="12.xxx": #32bit unsigned integer (EIS14) 
+              if datatype[:3] =="12.": #32bit unsigned integer (EIS14) 
                  val=int(val)
                  if val>=0:
                     if val<=4294967295:
@@ -520,7 +520,7 @@ class KNXManager(XplPlugin):
 		 else:
                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
-              if datatype == "13.xxx": #32bit signed integer
+              if datatype[:3] == "13.": #32bit signed integer
                  val=int(val)
                  if val<=2147483647:
                     if val>=-2147483648:
