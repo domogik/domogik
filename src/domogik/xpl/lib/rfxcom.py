@@ -972,15 +972,58 @@ class RfxcomUsb:
                        {"device" : device, 
                         "type" : "rssi", 
                         "current" : rssi})
- 
     
 
-
     
+    def command_20(self, address, command, delay, trig_msg):
+        """ Type 0x20, Security1
 
-    ### 0x20 : Security1
-    #TODO
-    
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"normal"           : "00",
+                   "normal-delayed"   : "01",
+                   "alarm"            : "02",
+                   "alarm-delayed"    : "03",
+                   "motion"           : "04",
+                   "motion-delayed"   : "05",
+                   "panic"            : "06",
+                   "end-panic"        : "07",
+                   "tamper"           : "08",
+                   "arm-away"         : "09",
+                   "arm-away-delayed" : "0a",
+                   "arm-home"         : "0b",
+                   "arm-home-delayed" : "0c",
+                   "disarm"           : "0d",
+                   "light1-off"       : "10",
+                   "light1-on"        : "11",
+                   "light2-off"       : "12",
+                   "light2-on"        : "13",
+                   "dark-detected"    : "14",
+                   "light-detected"   : "15",
+                   "battery-low"      : "16",
+                   "pair-kd101"       : "17",
+                  }
+        # type
+        cmd = "20" 
+
+        # <============================ ici
+        # subtype
+        cmd += "00"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1:])
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x18 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
 
     ### 0x21 : Security2
     #TODO

@@ -131,8 +131,18 @@ class RfxcomUsbManager(XplPlugin):
         """ Process command xpl message and call the librairy for processing command
             @param message : xpl message
         """
-        # TODO
-        pass
+        address = message.data["device"].lower()
+        command = message.data["command"].lower()
+        if message.data.has_key("delay"):
+            delay = message.data["delay"].lower()
+        else:
+            delay = None
+
+        # Prepare xpl-trig to send if success
+        trig_msg = message
+        trig_msg.set_type("xpl-trig")
+
+        self.rfxcom.command_20(address, command, delay, trig_msg)
         
     def process_ac_basic(self, message):
         """ Process command xpl message and call the librairy for processing command
