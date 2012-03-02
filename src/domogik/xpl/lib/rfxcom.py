@@ -840,7 +840,7 @@ class RfxcomUsb:
         subtype = gh(data, 1)
         seqnbr = gh(data, 2)
         system = binascii.unhexlify(gh(data, 3))
-        channel = int(gh(data, 4, 5), 16)
+        channel = int(gh(data, 4, 2), 16)
         idx = 1
         while idx < 10 and bin(channel)[-(idx)] != "1":
             idx += 1
@@ -1158,13 +1158,38 @@ class RfxcomUsb:
     def _process_51(self, data):
         """ Humidity sensors
 
-            !!! Not use actually !!!
-
             Type : sensor
-            SDK version : 2.06
+            SDK version : 4.8
             Tested : No
         """
-        pass        
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        id = gh(data, 3,2)
+        address = "h%s 0x%s" %(subtype[1], id)
+        humidity = int(gh(data, 5), 16) 
+        humidity_status_code = ghexa(data, 6)
+        humidity_status = HUMIDITY_STATUS[humidity_status_code]
+        battery = int(gh(data, 7)[0], 16) * 10  # percent
+        rssi = int(gh(data, 8)[1], 16) * 100/16 # percent
+ 
+        # send xPL
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "humidity", 
+                        "current" : humidity, 
+                        "description" : humidity_status})
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "status", 
+                        "current" : humidity_status})
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "battery", 
+                        "current" : battery})
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "rssi", 
+                        "current" : rssi})
 
         
     def _process_52(self, data):

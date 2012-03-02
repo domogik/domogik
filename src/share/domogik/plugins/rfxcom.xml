@@ -120,13 +120,16 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <description>Oregon THR128/138, THC138, THC238/268, THN132, THWR288, THRN122, THN122, AW129/131, THWR800, RTHN318. La Crosse TX3, TX4, TX17 (not for RFXCOM xPL).</description>
     </device_type>
 
+    <!-- Type 0x51 -->
+    <device_type>
+      <id>rfxcom.humidity</id>
+      <device_technology_id>rfxcom</device_technology_id>
+      <name>La Crosse Inside/Outside Hygro</name>
+      <description>LaCrosse TX3</description>
+    </device_type>
+
+
     <!-- not reviewed -->
-      <device_type>
-          <id>rfxcom.th</id>
-          <device_technology_id>rfxcom</device_technology_id>
-          <name>Oregon Inside/Outside Temp-Hygro</name>
-          <description>Oregon-THGN122N/123N, Oregon-THGR122NX, Oregon-THGR228N, Oregon-THGR238/268, Oregon-THGR810, Oregon-RTGR328N, Oregon-THGR328N, Oregon-WTGR800, Oregon-THGR918, Oregon-THGRN228NX, Oregon-THGN500</description>
-      </device_type>
       <device_type>
           <id>rfxcom.thb</id>
           <device_technology_id>rfxcom</device_technology_id>
@@ -457,6 +460,43 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
 
+    <!-- Type 0x51 -->
+    <device_feature_model>
+      <id>rfxcom.humidity.humidity</id>
+      <name>Humidity</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.humidity</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>humidity</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.humidity.humidity-desc</id>
+      <name>Humidity Description</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.humidity</device_type_id>
+      <parameters>
+          {}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>humidity-desc</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.humidity.battery</id>
+      <name>Battery</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.humidity</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>battery</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
 
 
 
@@ -510,7 +550,7 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
           <stat_key>battery</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
-            <device_feature_model>
+      <device_feature_model>
           <id>rfxcom.thb.temperature</id>
           <name>Temperature</name>
           <feature_type>sensor</feature_type>
