@@ -4,31 +4,68 @@
         <xpltype type="xpl-trig">
             <listener>
                 <filter>
+                    <!-- Global to all types -->
                     <key name="type" value="battery"/>
+                    <key name="type" value="rssi"/>
+
+                    <!-- Type 0x50 
+                              0x51 
+                              0x52 
+                              0x54 
+                         Temp also used in 0x70
+                    -->
                     <key name="type" value="temp"/>
                     <key name="type" value="humidity"/>
                     <key name="type" value="pressure"/>
+
+                    <!-- Type 0x55 --> 
+                    <key name="type" value="rainrate"/>
+                    <key name="type" value="raintotal"/>
+
+                    <!-- Type 0x56 --> 
                     <key name="type" value="gust"/>
                     <key name="type" value="average-speed"/>
                     <key name="type" value="direction"/>
+
+                    <!-- Type 0x57 --> 
                     <key name="type" value="uv"/>
-                    <key name="type" value="rainrate"/>
-                    <key name="type" value="raintotal"/>
+
+                    <!-- Type 0x59 --> 
                     <key name="type" value="current"/>
+
+                    <!-- Type 0x5a --> 
                     <key name="type" value="power"/>
                     <key name="type" value="energy"/>
-                    <key name="type" value="temp"/>
+
+                    <!-- Type 0x5d --> 
+                    <key name="type" value="weight"/>
+
+                    <!-- Type 0x70 - RFXCOM xPL only --> 
                     <key name="type" value="voltage"/>
+
+                    <!-- Type 0x70 - RFXCOM xPL only --> 
                     <key name="type" value="count"/>
-                    <key name="type" value="temp"/>
+
+                    <!-- not reviewed -->
                     <key name="type" value="setpoint"/>
                     <key name="type" value="demand"/>
                 </filter>
             </listener>
             <mapping>
                 <device field="device"/>
+
+                <!-- Global to all types -->
                 <value field="current" new_name="battery" 
                        filter_key="type" filter_value="battery" />
+                <value field="current" new_name="rssi" 
+                       filter_key="type" filter_value="rssi" />
+
+                <!-- Type 0x50 
+                          0x51 
+                          0x52 
+                          0x54 
+                     Temp also used in 0x70
+                -->
                 <value field="current" new_name="temperature" 
                        filter_key="type" filter_value="temp" />
                 <value field="current" new_name="humidity" 
@@ -39,32 +76,49 @@
                        filter_key="type" filter_value="pressure" />
                 <value field="forcast" new_name="forcast" 
                        filter_key="type" filter_value="pressure" />
+
+                <!-- Type 0x55 -->
+                <value field="current" new_name="rainrate" 
+                       filter_key="type" filter_value="rainrate" />
+                <value field="current" new_name="raintotal" 
+                       filter_key="type" filter_value="raintotal" />
+
+
+                <!-- Type 0x56 -->
                 <value field="current" new_name="gust" 
                        filter_key="type" filter_value="gust" />
                 <value field="current" new_name="average-speed" 
                        filter_key="type" filter_value="average-speed" />
                 <value field="current" new_name="direction" 
                        filter_key="type" filter_value="direction" />
+
+                <!-- Type 0x57 -->
                 <value field="current" new_name="uv" 
                        filter_key="type" filter_value="uv" />
-                <value field="current" new_name="rainrate" 
-                       filter_key="type" filter_value="rainrate" />
-                <value field="current" new_name="raintotal" 
-                       filter_key="type" filter_value="raintotal" />
+
+                <!-- Type 0x59 -->
                 <value field="current" new_name="current" 
                        filter_key="type" filter_value="current" />
+
+                <!-- Type 0x5a -->
                 <value field="current" new_name="power" 
                        filter_key="type" filter_value="power" />
                 <value field="current" new_name="energy" 
                        filter_key="type" filter_value="energy" />
-                <value field="current" new_name="temperature" 
-                       filter_key="type" filter_value="temp" />
+
+                <!-- Type 0x5d -->
+                <value field="current" new_name="weight" 
+                       filter_key="type" filter_value="weight" />
+
+                <!-- Type 0x70 - RFXCOM xPL only -->
                 <value field="current" new_name="voltage" 
                        filter_key="type" filter_value="voltage" />
+
+                <!-- Type 0x71 - RFXCOM xPL only -->
                 <value field="current" new_name="count" 
                        filter_key="type" filter_value="count" />
-                <value field="current" new_name="temperature" 
-                       filter_key="type" filter_value="temp" />
+
+                <!-- not reviewed -->
                 <value field="current" new_name="setpoint" 
                        filter_key="type" filter_value="setpoint" />
                 <value field="current" new_name="demand" 

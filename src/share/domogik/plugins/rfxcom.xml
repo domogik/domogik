@@ -197,6 +197,8 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
 
 
   <device_feature_models>
+    <!-- TODO : add battery/rssi on everybody!!!!! -->
+
     <!-- Lighting1 -->
     <device_feature_model>
       <id>rfxcom.lighting1_x10_dimmer.switch</id>
