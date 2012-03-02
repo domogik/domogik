@@ -128,31 +128,46 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <description>LaCrosse TX3</description>
     </device_type>
 
+    <!-- Type 0x52 -->
+    <device_type>
+      <id>rfxcom.th</id>
+      <device_technology_id>rfxcom</device_technology_id>
+      <name>Oregon and other Inside/Outside Temp-Hygro-Baro</name>
+      <description>Oregon THGN122/123, THGN132, THGR122/228/238/268 THGR810, RTGR328, THGR328, WTGR800, THGR918, THGRN228, THGN500. TFA. TS34C.</description>
+    </device_type>
+
+    <!-- Type 0x54 -->
+    <device_type>
+      <id>rfxcom.thb</id>
+      <device_technology_id>rfxcom</device_technology_id>
+      <name>Oregon and Huger Inside Temp-Hygro-Baro</name>
+      <description>Huger BTHR918. Oregon BTHR918N, BTHR968</description>
+    </device_type>
+
+    <!-- Type 0x55 -->
+    <device_type>
+      <id>rfxcom.rain</id>
+      <device_technology_id>rfxcom</device_technology_id>
+      <name>Rain Gauge</name>
+      <description>Oregon RGR126, RGR682, RGR918, PCR800. TFA.</description>
+    </device_type>
+
+    <!-- Type 0x56 -->
+    <device_type>
+      <id>rfxcom.wind</id>
+      <device_technology_id>rfxcom</device_technology_id>
+      <name>Anemometer</name>
+      <description>Oregon WTGR800, WGR800, WGR918. Huger-STR918. TFA.</description>
+    </device_type>
+
+
 
     <!-- not reviewed -->
-      <device_type>
-          <id>rfxcom.thb</id>
-          <device_technology_id>rfxcom</device_technology_id>
-          <name>Oregon Inside Temp-Hygro-Baro</name>
-          <description>Huger-BTHR918, Oregon-BTHR918N, Oregon-BTHR968</description>
-      </device_type>
-      <device_type>
-          <id>rfxcom.wind</id>
-          <device_technology_id>rfxcom</device_technology_id>
-          <name>Anemometer</name>
-          <description>Oregon-WTGR800, Oregon-WGR800, Huger-STR918, Oregon-WGR918</description>
-      </device_type>
       <device_type>
           <id>rfxcom.uv</id>
           <device_technology_id>rfxcom</device_technology_id>
           <name>UV sensor</name>
           <description>Oregon-UVN128, Oregon-UV138, Oregon-UVN800</description>
-      </device_type>
-      <device_type>
-          <id>rfxcom.rain</id>
-          <device_technology_id>rfxcom</device_technology_id>
-          <name>Rain Gauge</name>
-          <description>Oregon-RGR126, Oregon-RGR682, Oregon-RGR918, Oregon-PCR800</description>
       </device_type>
       <device_type>
           <id>rfxcom.weight</id>
@@ -498,178 +513,221 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
 
+    <!-- Type 0x52 -->
+    <device_feature_model>
+      <id>rfxcom.th.temperature</id>
+      <name>Temperature</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.th</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;\u00B0C&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>temperature</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.th.humidity</id>
+      <name>Humidity</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.th</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>humidity</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.th.humidity-desc</id>
+      <name>Humidity Description</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.th</device_type_id>
+      <parameters>
+          {}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>humidity-desc</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.th.battery</id>
+      <name>Battery</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.th</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>battery</stat_key>
+      <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+
+    <!-- Type 0x54 -->
+    <device_feature_model>
+      <id>rfxcom.thb.temperature</id>
+      <name>Temperature</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.thb</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;\u00B0C&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>temperature</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.thb.humidity</id>
+      <name>Humidity</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.thb</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>humidity</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.thb.humidity-desc</id>
+      <name>Humidity Description</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.thb</device_type_id>
+      <parameters>
+          {}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>humidity-desc</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.thb.pressure</id>
+      <name>Pressure</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.thb</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;hPa&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>pressure</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.thb.forcast</id>
+      <name>Forcast</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.thb</device_type_id>
+      <parameters>
+          {}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>forcast</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model> 
+    <device_feature_model>
+      <id>rfxcom.thb.battery</id>
+      <name>Battery</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.thb</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>battery</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <!-- Type 0x55 -->
+    <device_feature_model>
+      <id>rfxcom.rain.rainrate</id>
+      <name>Rain Rate</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.rain</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;mm/hr&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>rainrate</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.rain.raintotal</id>
+      <name>Rain Total</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.rain</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;mm&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>raintotal</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.rain.battery</id>
+      <name>Battery</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.rain</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>battery</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+
+    <!-- Type 0x56 -->
+    <device_feature_model>
+      <id>rfxcom.wind.gust</id>
+      <name>Gust</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.wind</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;m/sec&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>gust</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.wind.average-speed</id>
+      <name>Average Speed</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.wind</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;m/sec&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>average-speed</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.wind.direction</id>
+      <name>Direction</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.wind</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;\u00B0&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>direction</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.wind.battery</id>
+      <name>Battery</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.wind</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>battery</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
 
 
 
     <!-- not reviewed -->
-      <device_feature_model>
-          <id>rfxcom.th.temperature</id>
-          <name>Temperature</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.th</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;\u00B0C&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>temperature</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.th.humidity</id>
-          <name>Humidity</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.th</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>humidity</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.th.humidity-desc</id>
-          <name>Humidity Description</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.th</device_type_id>
-          <parameters>
-              {}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>humidity-desc</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.th.battery</id>
-          <name>Battery</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.th</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>battery</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.thb.temperature</id>
-          <name>Temperature</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.thb</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;\u00B0C&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>temperature</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.thb.humidity</id>
-          <name>Humidity</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.thb</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>humidity</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.thb.humidity-desc</id>
-          <name>Humidity Description</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.thb</device_type_id>
-          <parameters>
-              {}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>humidity-desc</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.thb.pressure</id>
-          <name>Pressure</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.thb</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;hPa&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>pressure</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.thb.forcast</id>
-          <name>Forcast</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.thb</device_type_id>
-          <parameters>
-              {}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>forcast</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model> 
-      <device_feature_model>
-          <id>rfxcom.thb.battery</id>
-          <name>Battery</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.thb</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>battery</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.wind.gust</id>
-          <name>Gust</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.wind</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;m/sec&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>gust</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.wind.average-speed</id>
-          <name>Average Speed</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.wind</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;m/sec&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>average-speed</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.wind.direction</id>
-          <name>Direction</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.wind</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;\u00B0&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>direction</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.wind.battery</id>
-          <name>Battery</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.wind</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>battery</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
       <device_feature_model>
           <id>rfxcom.uv.uv</id>
           <name>U.V.</name>
@@ -687,42 +745,6 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
           <name>Battery</name>
           <feature_type>sensor</feature_type>
           <device_type_id>rfxcom.uv</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>battery</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.rain.rainrate</id>
-          <name>Rain Rate</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.rain</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;mm/hr&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>rainrate</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.rain.raintotal</id>
-          <name>Rain Total</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.rain</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;mm&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>raintotal</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.rain.battery</id>
-          <name>Battery</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.rain</device_type_id>
           <parameters>
               {&quot;unit&quot;:&quot;%&quot;}
           </parameters>
