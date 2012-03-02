@@ -161,21 +161,25 @@ class KNXManager(XplPlugin):
 
                  if datatype == "1.001":
                     val=int(val.replace(" ",""),16)
-                    if val>=1:
-                       val=val
-                    else:
+                    print "Switch"
+                    if val==1:
+                       val="on"
+                    if val==0:
+                       val="off"
+                    if val>=2:
                        self.log.error("DPT_switch 1.001 invalid value %s from %s" %(val,groups))
 
                  if datatype=="1.008": #"DT_UpDown":
+                    print "Shutter"
                     val=int(val.replace(" ",""),16)
                     if val<=1:        
                        if val==1:
-                          #val="down" 
-                          value=0
+                          val="Down"
+                          #value=0
                        if val==0:
-                          #val="up"
-                          value=1
-                       val=value
+                          val="Up"
+                          #value=1
+                       #val=value
                        print "valeur après modif %s" %val
 
                  if datatype =="5.001": # "DT_Scaling":
