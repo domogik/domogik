@@ -112,14 +112,15 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <device_technology_id>rfxcom</device_technology_id>
     </device_type>
 
+    <!-- Type 0x50 -->
+    <device_type>
+      <id>rfxcom.temp</id>
+      <device_technology_id>rfxcom</device_technology_id>
+      <name>Oregon and La Crosse Inside/Outside/Water Temperature</name>
+      <description>Oregon THR128/138, THC138, THC238/268, THN132, THWR288, THRN122, THN122, AW129/131, THWR800, RTHN318. La Crosse TX3, TX4, TX17 (not for RFXCOM xPL).</description>
+    </device_type>
 
     <!-- not reviewed -->
-      <device_type>
-          <id>rfxcom.temp</id>
-          <device_technology_id>rfxcom</device_technology_id>
-          <name>Oregon Inside/Outside/Water Temperature</name>
-          <description>Oregon-THR128, Oregon-THR138, Oregon-THC138, Oregon-THC238/268, Oregon-THN122N/132N, Oregon-THWR288A, Oregon-THRN122N, Oregon-AW129, Oregon-AW131, Oregon-THWR800, Oregon-RTHN318</description>
-      </device_type>
       <device_type>
           <id>rfxcom.th</id>
           <device_technology_id>rfxcom</device_technology_id>
@@ -430,36 +431,37 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
 
+    <!-- Type 0x50 -->
+    <device_feature_model>
+      <id>rfxcom.temp.temperature</id>
+      <name>Temperature</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.temp</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;\u00B0C&quot;}
+      </parameters>
+      <value_type>number</value_type>
+      <stat_key>temperature</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <device_feature_model>
+      <id>rfxcom.temp.battery</id>
+      <name>Battery</name>
+      <feature_type>sensor</feature_type>
+      <device_type_id>rfxcom.temp</device_type_id>
+      <parameters>
+          {&quot;unit&quot;:&quot;%&quot;}
+      </parameters>
+      <value_type>string</value_type>
+      <stat_key>battery</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
 
 
 
 
 
     <!-- not reviewed -->
-      <device_feature_model>
-          <id>rfxcom.temp.temperature</id>
-          <name>Temperature</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.temp</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;\u00B0C&quot;}
-          </parameters>
-          <value_type>number</value_type>
-          <stat_key>temperature</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>rfxcom.temp.battery</id>
-          <name>Battery</name>
-          <feature_type>sensor</feature_type>
-          <device_type_id>rfxcom.temp</device_type_id>
-          <parameters>
-              {&quot;unit&quot;:&quot;%&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>battery</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
       <device_feature_model>
           <id>rfxcom.th.temperature</id>
           <name>Temperature</name>
