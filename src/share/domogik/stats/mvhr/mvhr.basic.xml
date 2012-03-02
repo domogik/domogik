@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="mvhr">
+    <schema name="mvhr.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="mvhr"/>
+                <value field="mvhr-indoor"/>
+                <value field="exchng-eff"/>
+                <value field="mvhr-outdoor"/>
+                <value field="mvhr-insuffl"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
