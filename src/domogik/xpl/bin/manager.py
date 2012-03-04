@@ -659,6 +659,7 @@ class SysManager(XplPlugin):
         """ Set the component to off in the list
         """
         print "HBEAT.END : %s" % message.source
+        # TODO : finish
 
     def _exec_plugin(self, name):
         """ Internal method
@@ -920,7 +921,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'plugin'+str(idx)+'-name' : external["name"]})
                 mess.add_data({'plugin'+str(idx)+'-type' : external["type"]})
                 mess.add_data({'plugin'+str(idx)+'-techno' : external["technology"]})
-                mess.add_data({'plugin'+str(idx)+'-desc' : external["description"]})
+                #mess.add_data({'plugin'+str(idx)+'-desc' : external["description"]})
                 mess.add_data({'plugin'+str(idx)+'-status' : external["status"]})
                 mess.add_data({'plugin'+str(idx)+'-host' : external["host"]})
                 idx += 1

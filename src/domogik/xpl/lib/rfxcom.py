@@ -341,6 +341,8 @@ class RfxcomUsb:
     def open(self, device):
         """ Open RFXCOM device
             @param device : RFXCOM device (/dev/ttyACMx)
+
+            SDK version : 4.8
         """
         try:
             self._log.info("Try to open RFXCOM : %s" % device)
@@ -550,10 +552,6 @@ class RfxcomUsb:
         # log also the informations in INFO level
         pass
 
-    ### 0x10 : Lighting1
-    #TODO
-    
-
     def _process_02(self, data):
         """ Receiver/Transmitter Message
         
@@ -588,11 +586,101 @@ class RfxcomUsb:
         
 
 
+    def command_10(self, address, command, protocol, trig_msg):
+        """ Type 0x10, Lighting1
+
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"off"    : "00",
+                   "on"     : "01",
+                   "dim"    : "02",
+                   "bright" : "03",
+                   "all_lights_off"    : "05",
+                   "all_lights_on"     : "06",
+                   "chime"  : "07"}
+        # type
+        cmd = "10" 
+        # subtype
+        if protocol == "x10":
+            cmd += "00"
+        elif protocol == "arc":
+            cmd += "01"
+        elif protocol == "elro":
+            cmd += "02"
+        elif protocol == "waveman":
+            cmd += "03"
+        elif protocol == "chacon":
+            cmd += "04"
+        elif protocol == "impuls":
+            cmd += "05"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1:])
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x10 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
+
+    def _process_10(self, data):
+        """ Type 0x10, Lighting1
+        
+            Type : command/sensor
+            SDK version : 4.8
+            Tested : No
+        """
+        PROTOCOL = {
+          "00" : "x10",
+          "01" : "arc",
+          "02" : "elro",
+          "03" : "waveman",
+          "04" : "chacon",
+          "05" : "impuls",
+        }
+        CMND = {
+          "00" : "off",
+          "01" : "on",
+          "02" : "dim",
+          "03" : "bright",
+          "05" : "all_lights_off",
+          "06" : "all_lights_on",
+          "07" : "chime",
+        }
+
+        subtype = gh(data, 1)
+        protocol = PROTOCOL[subtype]
+        seqnbr = gh(data, 2)
+        housecode = binascii.unhexlify(gh(data, 3))
+        unitcode = int(gh(data, 4), 16)
+        device = housecode + unitcode
+        cmnd = COMMAND[gh(data, 5)]
+        # no battery level
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        self._callback("x10.basic",
+                   {"device" : device, 
+                    "command" : cmnd,
+                    "protocol" : protocol})
+
+        self._callback("sensor.basic",
+                       {"device" : device, 
+                        "type" : "rssi", 
+                        "current" : rssi})
+ 
+    
+
     def command_11(self, address, unit, command, level, eu, group, trig_msg):
         """ Type 0x11, Lighting2
 
             Type : command
-            SDK version : 2.07
+            SDK version : 4.8
             Tested : yes
 
             Remarks :
@@ -639,7 +727,7 @@ class RfxcomUsb:
         """ Type 0x11, Lighting2
         
             Type : command/sensor
-            SDK version : 2.06
+            SDK version : 4.8
             Tested : No
         """
         AC_CMND = {
@@ -685,21 +773,257 @@ class RfxcomUsb:
  
     
 
-    ### 0x12 : Lighting3
-    #TODO
+    def command_12(self, address, command, level, protocol, trig_msg):
+        """ Type 0x12, Lighting3
+
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"bright"    : "00",
+                   "dim"       : "08",
+                   "on"        : "10",
+                   "off"       : "1a",
+                   "program"   : "1c"}
+        # type
+        cmd = "12" 
+        # subtype
+        cmd += "00"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : system
+        cmd += binascii.hexlify(address[0].upper())
+        # address : channel
+        nb_zero = int(address) - 1
+        cmd += "%04x" % (1 << (nb_zero))
+        # cmnd
+        if command.lower() != "level":
+            cmd += COMMAND[command.lower()]
+        else:
+            cmd += "1"
+            if level >= 100:
+                level = 90
+            if level <=0 : 
+                level = 0
+            cmd += "%s" % int(level/100)
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x10 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
+
+    def _process_12(self, data):
+        """ Type 0x12, Lighting3
+        
+            Type : command/sensor
+            SDK version : 4.8
+            Tested : No
+        """
+        }
+        COMMAND = {
+          "00" : "bright",
+          "08" : "dim",
+          "10" : "on",
+          "1a" : "off",
+          "1c" : "program",
+          "11" : "level1",
+          "12" : "level2",
+          "13" : "level3",
+          "14" : "level4",
+          "15" : "level5",
+          "16" : "level6",
+          "17" : "level7",
+          "18" : "level8",
+          "19" : "level9",
+        }
+
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        system = binascii.unhexlify(gh(data, 3))
+        channel = int(gh(data, 4, 2), 16)
+        idx = 1
+        while idx < 10 and bin(channel)[-(idx)] != "1":
+            idx += 1
+
+        device = housecode + unitcode
+        cmnd = COMMAND[gh(data, 6)]
+        if cmnd[0:5] == "level":
+            level = int(cmnd[5])*10
+        else:
+            level = None
+        # no battery level
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        if level == None:
+            self._callback("x10.basic",
+                       {"device" : device, 
+                        "command" : cmnd,
+                        "protocol" : "koppla"})
+        else:
+            self._callback("x10.basic",
+                       {"device" : device, 
+                        "command" : "level",
+                        "level" : level,
+                        "protocol" : "koppla"})
+
+        self._callback("sensor.basic",
+                       {"device" : device, 
+                        "type" : "rssi", 
+                        "current" : rssi})
+ 
+    
+
     
 
     ### 0x13 : Lighting4
-    #TODO
+    # Not done for the moment : cf Bert : 
+    """ PT2262 is a decoder IC that is often used in cheap lamp and appliance modules.
+
+    For the moment PT2262 is not used so don’t spend time implementing it. It is more or less implemented to be able to test new devices and add them afterwards to Lighting1.
+
+    For xPL we have also a problem because this type of device is not defined.
+    """
     
 
-    ### 0x18 : Curtain1
-    #TODO
+    ### 0x14 : Lighting5
+    # Not done for the moment : cf Bert : 
+    """ LightwaveRF=Siemens and is a new product used in the UK. This is named the AD protocol by us.
+
+    http://www.lightwaverf.com/productsLighting.php
+
+    This protocol is still in development in the RFXtrx and I hope we are able to add dim set level.
+
+    For xPL the ac.basic can probably be used with some extensions or we have to define the ad.basic. 
+    """
+
+
+    ### 0x15 : Lighting6
+    # Not done for the moment : cf Bert : 
+    """ For the moment skip Novatys. If we are able to add this protocol it can be added to the x10.basic. But for now I’m not able to have the protocol correct reverse engineered.
+    """
+
+
+    def command_18(self, address, command, protocol, trig_msg):
+        """ Type 0x18, Curtain1
+
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"open"   : "00",
+                   "on"     : "00",  # open (for comp. with rfxcom lan xpl)
+                   "close"  : "01",
+                   "off"    : "01",  # close (for ....)
+                   "stop"   : "02",
+                   "dim"    : "02",  # stop (for ....)
+                   "bright" : "02",  # stop
+
+                   "program"        : "03",
+                   "all_lights_off" : "03",  # program (for ....)
+                   "all_lights_on"  : "03",  # program
+                  }
+        # type
+        cmd = "18" 
+        # subtype
+        cmd += "00"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1:])
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x18 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
+
+    def _process_18(self, data):
+        """ Type 0x18, Curtain1
+        
+            Type : command/sensor
+            SDK version : 4.8
+            Tested : No
+        """
+        CMND = {
+          "00" : "on",   # open
+          "01" : "off",  # close
+          "02" : "dim",  # stop
+          "03" : "all_lights_off",   #program
+        }
+
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        housecode = binascii.unhexlify(gh(data, 3))
+        unitcode = int(gh(data, 4), 16)
+        device = housecode + unitcode
+        cmnd = COMMAND[gh(data, 5)]
+        # no battery level
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        self._callback("x10.basic",
+                   {"device" : device, 
+                    "command" : cmnd,
+                    "protocol" : protocol})
+
+        self._callback("sensor.basic",
+                       {"device" : device, 
+                        "type" : "rssi", 
+                        "current" : rssi})
     
 
-    ### 0x20 : Security1
-    #TODO
     
+    def command_20(self, address, command, delay, trig_msg):
+        """ Type 0x20, Security1
+
+            Type : command
+            SDK version : 4.8
+        """
+        COMMAND = {"normal"           : "00",
+                   "normal-delayed"   : "01",
+                   "alarm"            : "02",
+                   "alarm-delayed"    : "03",
+                   "motion"           : "04",
+                   "motion-delayed"   : "05",
+                   "panic"            : "06",
+                   "end-panic"        : "07",
+                   "tamper"           : "08",
+                   "arm-away"         : "09",
+                   "arm-away-delayed" : "0a",
+                   "arm-home"         : "0b",
+                   "arm-home-delayed" : "0c",
+                   "disarm"           : "0d",
+                   "light1-off"       : "10",
+                   "light1-on"        : "11",
+                   "light2-off"       : "12",
+                   "light2-on"        : "13",
+                   "dark-detected"    : "14",
+                   "light-detected"   : "15",
+                   "battery-low"      : "16",
+                   "pair-kd101"       : "17",
+                  }
+        # type
+        cmd = "20" 
+
+        # <============================ ici
+        # subtype
+        cmd += "00"
+        # seqnbr
+        cmd += self.get_seqnbr()
+        # address : housecode
+        cmd += binascii.hexlify(address[0].upper())
+        # address : unitcode
+        cmd += "%02x" % int(address[1:])
+        # cmnd
+        cmd += COMMAND[command.lower()]
+        # filler + rssi : 0x00
+        cmd += "00"
+        
+        self._log.debug("Type x18 : write '%s'" % cmd)
+        self.write_packet(cmd, trig_msg)
+
 
     ### 0x21 : Security2
     #TODO
@@ -834,13 +1158,38 @@ class RfxcomUsb:
     def _process_51(self, data):
         """ Humidity sensors
 
-            !!! Not use actually !!!
-
             Type : sensor
-            SDK version : 2.06
+            SDK version : 4.8
             Tested : No
         """
-        pass        
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        id = gh(data, 3,2)
+        address = "h%s 0x%s" %(subtype[1], id)
+        humidity = int(gh(data, 5), 16) 
+        humidity_status_code = ghexa(data, 6)
+        humidity_status = HUMIDITY_STATUS[humidity_status_code]
+        battery = int(gh(data, 7)[0], 16) * 10  # percent
+        rssi = int(gh(data, 8)[1], 16) * 100/16 # percent
+ 
+        # send xPL
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "humidity", 
+                        "current" : humidity, 
+                        "description" : humidity_status})
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "status", 
+                        "current" : humidity_status})
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "battery", 
+                        "current" : battery})
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "rssi", 
+                        "current" : rssi})
 
         
     def _process_52(self, data):

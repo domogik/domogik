@@ -99,19 +99,50 @@ class RfxcomUsbManager(XplPlugin):
         rfxcom_process.start()
         self.enable_hbeat()
 
+    # lighting1
     def process_x10_basic(self, message):
         """ Process command xpl message and call the librairy for processing command
             @param message : xpl message
         """
-        # TODO
-        pass
+        address = message.data["device"].lower()
+        command = message.data["command"].lower()
+        if message.data.has_key("level"):
+            level = message.data["level"].lower()
+        else:
+            level = 0
+        if message.data.has_key("protocol"):
+            protocol = message.data["protocol"].lower()
+        else:
+            protocol = "x10"
+
+        # Prepare xpl-trig to send if success
+        trig_msg = message
+        trig_msg.set_type("xpl-trig")
+
+        # call appropriate function
+        if protocol in ("x10", "arc", "elro", "waveman", "chacon", "impuls"):
+            self.rfxcom.command_10(address, command, protocol, trig_msg)
+        elif protocol in ("koppla"):
+            self.rfxcom.command_12(address, command, level, protocol, trig_msg)
+        elif protocol in ("harrison"):
+            self.rfxcom.command_18(address, command, protocol, trig_msg)
 
     def process_x10_security(self, message):
         """ Process command xpl message and call the librairy for processing command
             @param message : xpl message
         """
-        # TODO
-        pass
+        address = message.data["device"].lower()
+        command = message.data["command"].lower()
+        if message.data.has_key("delay"):
+            delay = message.data["delay"].lower()
+        else:
+            delay = None
+
+        # Prepare xpl-trig to send if success
+        trig_msg = message
+        trig_msg.set_type("xpl-trig")
+
+        self.rfxcom.command_20(address, command, delay, trig_msg)
         
     def process_ac_basic(self, message):
         """ Process command xpl message and call the librairy for processing command

@@ -1,20 +1,20 @@
 <technology id="rfxcom">
-  <command name="ac_off">
-    <schema>ac.basic</schema>
+  <command name="curtain1_harrison_off">
+    <schema>x10.basic</schema>
     <command-key>command</command-key>
-    <address-key>address</address-key>
+    <address-key>device</address-key>
     <command-xpl-value>off</command-xpl-value>
     <parameters>
-      <parameter key="unit" value="1"/>
+      <parameter key="protocol" value="harrison"/>
     </parameters>
   </command>
   <listener>
-    <schema>ac.basic</schema>
+    <schema>x10.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="off" />
-      <key name="address" value="@address@"/>
-      <key name="unit" value="1"/>
+      <key name="device" value="@address@"/>
+      <key name="protocol" value="harrison" />
     </filter>
   </listener>
 </technology>

@@ -1,0 +1,21 @@
+<technology id="rfxcom">
+  <command name="lighting2_homeasy_eu_preset">
+    <schema>ac.basic</schema>
+    <command-key>command</command-key>
+    <address-key>address</address-key>
+    <command-xpl-value>preset</command-xpl-value>
+    <parameters>
+      <parameter key="unit" value="1"/>
+      <parameter key="level" location="1"/>
+    </parameters>         
+  </command>
+  <listener>
+    <schema>ac.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="preset" />
+      <key name="address" value="@address@"/>
+      <key name="unit" value="1"/>
+    </filter>
+  </listener>
+</technology>

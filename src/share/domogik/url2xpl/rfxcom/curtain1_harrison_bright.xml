@@ -1,0 +1,21 @@
+<technology id="rfxcom">
+  <command name="curtain1_harrison_bright">
+    <schema>x10.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>bright</command-xpl-value>
+    <parameters>
+      <parameter key="level" location="1"/>
+      <parameter key="protocol" value="harrison"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>x10.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="bright" />
+      <key name="device" value="@address@"/>
+      <key name="protocol" value="harrison" />
+    </filter>
+  </listener>
+</technology>
