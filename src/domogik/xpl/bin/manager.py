@@ -659,6 +659,7 @@ class SysManager(XplPlugin):
         """ Set the component to off in the list
         """
         print "HBEAT.END : %s" % message.source
+        # TODO : finish
 
     def _exec_plugin(self, name):
         """ Internal method

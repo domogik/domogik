@@ -2611,6 +2611,7 @@ target=*
 
         # process messages
         host_list = {}
+        external_list = {} # dedicated list for external members
         for message in messages:
             cmd = message.data['command']
             host = message.data["host"]
@@ -2624,24 +2625,36 @@ target=*
             while loop_again:
                 try:
                     plg_name = message.data["plugin"+str(idx)+"-name"]
+                    print plg_name
                     plg_type = message.data["plugin"+str(idx)+"-type"]
                     #plg_description = message.data["plugin"+str(idx)+"-desc"]
                     plg_technology = message.data["plugin"+str(idx)+"-techno"]
                     plg_status = message.data["plugin"+str(idx)+"-status"]
                     plg_host = message.data["plugin"+str(idx)+"-host"]
                     plugin_data = ({"id" : plg_name, 
-                                        "technology" : plg_technology, 
-                                        #"description" : plg_description, 
-                                        "status" : plg_status, 
-                                        "type" : plg_type, 
-                                        "host" : plg_host})
-                    host_list[plg_host].append(plugin_data)
+                                    "technology" : plg_technology, 
+                                    #"description" : plg_description, 
+                                    "status" : plg_status, 
+                                    "type" : plg_type, 
+                                    "host" : plg_host})
+                    if plg_type == "plugin":
+                        host_list[plg_host].append(plugin_data)
+                    elif plg_type == "external":
+                        if not external_list.has_key(plg_host):
+                            external_list[plg_host] = []
+                        external_list[plg_host].append(plugin_data)
+
                     idx += 1
                 except KeyError:
                     loop_again = False
         for host_name in host_list:
+            print host_name
             json_data.add_data({"host" : host_name, 
                                 "list" : host_list[host_name]})   
+        for host_name in external_list:
+            print host_name
+            json_data.add_data({"host" : host_name, 
+                                "list" : external_list[host_name]})   
         self.send_http_response_ok(json_data.get())
 
 
