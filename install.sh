@@ -252,10 +252,10 @@ function update_user_config {
     if [ "$keep" = "n" -o "$keep" = "N" ];then
         if [ "$MODE" = "install" ];then
             prefix="/usr/local"
-            sed -i "s;^#package_path.*$;package_path = $DMG_LIB;" $DMG_ETC/domogik.cfg
+            sed -i "s;^package_path.*$;package_path = $DMG_LIB;" $DMG_ETC/domogik.cfg
         else
             prefix=$PWD/src
-            sed -i "s;^#package_path.*$;#package_path = $DMG_LIB;" $DMG_ETC/domogik.cfg
+            sed -i "s;^package_path.*$;#package_path = $DMG_LIB;" $DMG_ETC/domogik.cfg
         fi
         sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $DMG_ETC/domogik.cfg
 
