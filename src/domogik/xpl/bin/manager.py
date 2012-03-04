@@ -471,7 +471,7 @@ class SysManager(XplPlugin):
             # detail plugin
             elif cmd == "detail": # and host == self.get_sanitized_hostname():
                                   # no check on host for external
-                self._send_plugin_detail(plg)
+                self._send_plugin_detail(plg, host)
 
         # if error
         else:
@@ -968,9 +968,10 @@ class SysManager(XplPlugin):
         except:
             self.log.error("Error while sending plugin list : %s" % traceback.format_exc())
 
-    def _send_plugin_detail(self, plg):
+    def _send_plugin_detail(self, plg, host):
         """ send details about a component 
             @param plg : plugin name
+            @param host : hostname for external members requests
         """
         mess = XplMessage()
         mess.set_type('xpl-trig')
@@ -1006,7 +1007,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'host' : self.get_sanitized_hostname()})
                 host_in_msg = True
         for external in self._externals:
-            if external["name"] == plg:
+            if external["name"] == plg and external["host"] == host:
                 for conf in external["configuration"]:
                     mess.add_data({'cfg'+str(conf["id"])+'-id' : conf["id"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-key' : conf["key"]})
