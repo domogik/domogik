@@ -767,15 +767,24 @@ class SysManager(XplPlugin):
             @param message : xpl message
         """
         vendor_device = message.source.split(".")[0]
+        vendor_id = vendor_device.split("-")[0].lower()
+        device_id = vendor_device.split("-")[1].lower()
         instance = message.source.split(".")[1]
+
+        # don't handle domogik elements
+        if vendor_id == "domogik":
+            return
+
         for external_model in self._external_models:
             msg_vendor_device = "%s-%s" % (external_model["vendor_id"], 
                                            external_model["device_id"])
+            unknown = True
             if vendor_device == msg_vendor_device:
+                unknown = False
                 self.log.debug("Refresh external members list with : %s" % str(message))
                 found = False
                 for external in self._externals:
-                    if external["host"] == instance:
+                    if external["host"] == instance and external["vendor_id"] == vendor_id and external["device_id"] == device_id:
                         external["status"] = "ON"
                         external["last_seen"] = time.time()
                         # interval converted from minutes to seconds : *60
@@ -806,6 +815,34 @@ class SysManager(XplPlugin):
                               "last_seen" : time.time()})
                     self.log.info("Add external : %s on %s" % \
                                              (external_model["name"], instance))
+        # an unknown external member : we will add it in the list (only for information)
+        if unknown:
+            found = False
+            for external in self._externals:
+                if external["host"] == instance and external["vendor_id"] == vendor_id and external["device_id"] == device_id:
+                    external["status"] = "ON"
+                    external["last_seen"] = time.time()
+                    # interval converted from minutes to seconds : *60
+                    external["interval"] = int(message.data["interval"])*60
+                    found = True
+                    self.log.info("Set unknown external member status ON : %s on %s" % \
+                                               (vendor_device, instance))
+            if found == False:
+                self._externals.append({"type" : "external",
+                          "name" : vendor_device,
+                          "description" : "",
+                          "technology" : "unknown",
+                          "status" : "ON",
+                          "host" : instance,
+                          "release" : "",
+                          "documentation" : "",
+                          "vendor_id" : vendor_id,
+                          "device_id" : device_id,
+                          "configuration" : {},
+                          "interval" : int(message.data["interval"]) * 60,
+                          "last_seen" : time.time()})
+                self.log.info("Add unknown external : %s on %s" % \
+                                         (vendor_device, instance))
 
     def _get_external_configuration(self, message):
         """ Get external configuration from hbeat message
