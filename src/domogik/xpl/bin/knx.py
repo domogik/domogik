@@ -339,17 +339,17 @@ class KNXManager(XplPlugin):
                     if typeadr=="stat":
                        if val==value:
                           if val==2:
-                             value=3
+                             value="HVACeco"
                           if val==3:
-                             value=1
+                             value="HVACnormal"
                           if val==4:
-                             value=4
+                             value="HVACnofreeze"
                           if val==19:
-                             value=3
+                             value="HVACeco"
                           if val==17:
-                             value=4
+                             value="HVACnofreeze"
                           if val==20:
-                             value=1
+                             value="HVACnormal"
                     val=value
                      
 
