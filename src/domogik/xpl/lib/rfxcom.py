@@ -819,7 +819,6 @@ class RfxcomUsb:
             SDK version : 4.8
             Tested : No
         """
-        }
         COMMAND = {
           "00" : "bright",
           "08" : "dim",
