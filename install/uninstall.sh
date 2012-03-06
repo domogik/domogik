@@ -95,8 +95,8 @@ echo "Delete rc.d script"
 echo "Delete /var/cache/domogik"
 $RM /var/cache/domogik
 
-echo "Delete /usr/lib/domogik"
-$RM /usr/lib/domogik
+echo "Delete /var/lib/domogik"
+$RM /var/lib/domogik
 
 echo "Delete /usr/local/share/domogik"
 $RM /usr/local/share/domogik

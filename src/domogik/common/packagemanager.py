@@ -55,7 +55,7 @@ SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
 
 CONFIG_FOLDER = "/etc/domogik/"
 CACHE_FOLDER = "/var/cache/domogik/"
-LIB_FOLDER = "/usr/lib/domogik/"
+LIB_FOLDER = "/var/lib/domogik/"
 
 TMP_EXTRACT_DIR = "%s/tmp/" % CACHE_FOLDER
 CONFIG_FILE = "%s/domogik.cfg" % CONFIG_FOLDER

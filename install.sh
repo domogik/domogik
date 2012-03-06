@@ -70,7 +70,7 @@ DMG_HOME=
 
 DMG_ETC=/etc/domogik
 DMG_CACHE=/var/cache/domogik
-DMG_LIB=/usr/lib/domogik
+DMG_LIB=/var/lib/domogik
 
 function stop_domogik {
     if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
@@ -144,7 +144,7 @@ function copy_sample_files {
         mkdir $DMG_CACHE
         chown $d_user:root $DMG_CACHE
     fi
-    # create /usr/lib/domogik
+    # create /var/lib/domogik
     if [ ! -d $DMG_LIB ];then
         mkdir $DMG_LIB
         chown $d_user:root $DMG_LIB
