@@ -43,9 +43,6 @@ import datetime
 
 
 
-PLUGIN_XML_PATH = "share/domogik/plugins/"
-HARDWARE_XML_PATH = "share/domogik/externals/"
-DESIGN_PATH = "share/domogik/design/"
 
 class PackageException(Exception):
     """
@@ -82,9 +79,15 @@ class PackageXml():
                 conf = dict(config[1])
 
                 if pkg_type == "plugin":
-                    xml_directory = "%s/%s" % (conf['src_prefix'], PLUGIN_XML_PATH)
+                    if conf.has_key('package_path'):
+                        xml_directory = "%s/packages/plugins/" % (conf['package_path'])
+                    else:
+                        xml_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/plugins/")
                 elif pkg_type == "external":
-                    xml_directory = "%s/%s" % (conf['src_prefix'], HARDWARE_XML_PATH)
+                    if conf.has_key('package_path'):
+                        xml_directory = "%s/packages/externals/" % (conf['package_path'])
+                    else:
+                        xml_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '%s' doesn't exists" % pkg_type)
                 xml_file = "%s/%s.xml" % (xml_directory, id)
@@ -93,7 +96,10 @@ class PackageXml():
                 self.xml_content = minidom.parse(xml_file)
 
                 # icon file
-                self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['custom_prefix'], DESIGN_PATH, pkg_type, id)
+                if conf.has_key('package_path'):
+                    xml_directory = "%s/packages/design/" % (conf['package_path'])
+                else:
+                    self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['src_prefix'], "share/domogik/design/", pkg_type, id)
     
             elif path != None:
                 xml_file = path
