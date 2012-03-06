@@ -349,7 +349,7 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
     </device_feature_model>
 
     <device_feature_model>
-      <id>rfxcom.lighting2_homeesay_eu_dimmer.switch</id>
+      <id>rfxcom.lighting2_homeeasy_eu_dimmer.switch</id>
       <name>Switch</name>
       <feature_type>actuator</feature_type>
       <device_type_id>rfxcom.lighting2_homeesay_eu_dimmer</device_type_id>
@@ -361,7 +361,7 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
     <device_feature_model>
-      <id>rfxcom.lighting2_homeesay_eu_dimmer.change</id>
+      <id>rfxcom.lighting2_homeeasy_eu_dimmer.change</id>
       <name>Change</name>
       <feature_type>actuator</feature_type>
       <device_type_id>rfxcom.lighting2_homeesay_eu_dimmer</device_type_id>
