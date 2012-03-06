@@ -186,7 +186,7 @@ class KNXManager(XplPlugin):
                     print "DT_Scaling"
                     val=int(val.replace(" ",""),16)
                     if val<=255:
-                       val=int(100*int(val)/255)
+                       val=(100*int(val)/255)
                        print "reception DT_Scaling val=%s" %val
                     else:
                        self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
@@ -198,16 +198,20 @@ class KNXManager(XplPlugin):
 
                  if datatype == "5.003": #angle (from 0 to 360°) 
                     val=int(val.replace(" ",""),16)
-                    print "send_xpl DT Angle"
+                    print "send_xpl DT Angle %s" %val
                     if val<=255:
                        val=val*360/255
+                       print val
                     else:
                        self.log.error("DPT_Angle not valid argument %s from %s" %(val,groups))
 
                  if datatype[:2] =="6.": #8bit signed integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=255:
-                       val=val-128
+                       if val<128:
+                          val=val
+                       else:
+                          val=val-256
 		    else:
                        self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
@@ -221,7 +225,10 @@ class KNXManager(XplPlugin):
                  if datatype[:2] =="8.": #16bit signed integer (EIS14) 
                     val=int(val.replace(" ",""),16)
                     if val<=65535:
-                       val=val-32768
+                       if val<=32767:
+                          val=val
+                       else:
+                          val=-65536+val
                     else:
                        self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
@@ -277,12 +284,17 @@ class KNXManager(XplPlugin):
                  if datatype[:3] == "12.": #32 bit unsigned interger
                     val=int(val.replace(" ",""),16)
                     if val>=4294967296:
+                       val=val
+                    else:
                        self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
                  if datatype[:3] == "13.": #32bit signed integer
                      val=int(val.replace(" ",""),16)
                      if val<=4294967295:
-                        val=val-2147483648
+                        if val<2147483647:
+                           val=val
+                        else:
+                           val=-4294967296+val
                      else:
                        self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
@@ -292,25 +304,25 @@ class KNXManager(XplPlugin):
                      if len(val)<32:
                         for i in range(32-len(val)):
                            val="0"+val
-                        signe=1-2*int(val[:1])
-                        exposant=str(val[1:9])
-                        mantisse=str(val[9:32])
-                        #signe= int(str(signe),2)
-                        exposant= int(str(exposant),2)
-                        mantise=0
-                        for i in range(23):
-                           valut=mantisse[i-1:i]
-                           if valut=="1":
-                              mantise=float(mantise+2**(-i))
-                        mantisse= 1+mantise
-                        val=float(signe*mantisse*2**(exposant-127))
-                        print "résultat %s" %(signe*mantisse*2**(exposant-127))
+                     signe=1-2*int(val[:1])
+                     exposant=str(val[1:9])
+                     mantisse=str(val[9:32])
+                     #signe= int(str(signe),2)
+                     exposant= int(str(exposant),2)
+                     mantise=0
+                     for i in range(23):
+                        valut=mantisse[i-1:i]
+                        if valut=="1":
+                           mantise=float(mantise+2**(-i))
+                     mantisse= 1+mantise
+                     val=float(signe*mantisse*2**(exposant-127))
+                     print "résultat %s" %(signe*mantisse*2**(exposant-127))
 
                  if datatype[:3] =="16.": #String
                     val=val.replace(" ","")
                     if len(val)/2==14:
                        phrase=""
-                       for i in range(len(foo)/2):
+                       for i in range(len(val)/2):
                           phrase=phrase+ chr(int(val[0:2],16))
                           val=val[2:]
                        val=phrase
