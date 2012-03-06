@@ -377,7 +377,7 @@ fi
 }
 
 function copy_tools {
-    [ -d "/usr/local/bin" ] && (cp -f src/tools/dmg* /usr/local/bin;chmod +x /usr/local/bin/dmg*)
+    [ -d "/usr/bin" ] && (cp -f src/tools/dmg* /usr/bin;chmod +x /usr/bin/dmg*)
 }
 
 function modify_hosts {

@@ -62,14 +62,14 @@ def list_all_files(path, dst):
 arch = get_path()
 
 d_files = [
-        ('/usr/local/bin/', ['src/tools/dmgenplug']),
-        ('/usr/local/bin/', ['src/tools/dmgdisplug']),
+        ('/usr/bin/', ['src/tools/dmgenplug']),
+        ('/usr/bin/', ['src/tools/dmgdisplug']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
 
 if arch != None:
-    d_files.append(('/usr/local/bin/', [arch]))
+    d_files.append(('/usr/bin/', [arch]))
 else:
     print "*************** WARNING ***************"
     print "* Can't find an xPL Hub for your arch *"
@@ -77,10 +77,6 @@ else:
     print "*  src/domogik/xpl/tools/COMPILE.txt  *"
     print "* to get the sources and compile them.*"
     print "***************************************"
-
-#d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/stats/'))
-#d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
-#d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
 
 setup(
     name = 'Domogik',

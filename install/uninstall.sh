@@ -98,9 +98,6 @@ $RM /var/cache/domogik
 echo "Delete /var/lib/domogik"
 $RM /var/lib/domogik
 
-echo "Delete /usr/local/share/domogik"
-$RM /usr/local/share/domogik
-
 CONFIG_FOLDER=/etc/domogik/
 echo "Delete config folder : $CONFIG_FOLDER"
 $RM $CONFIG_FOLDER
