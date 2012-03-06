@@ -82,9 +82,9 @@ class PackageXml():
                 conf = dict(config[1])
 
                 if pkg_type == "plugin":
-                    xml_directory = "%s/%s" % (conf['custom_prefix'], PLUGIN_XML_PATH)
+                    xml_directory = "%s/%s" % (conf['src_prefix'], PLUGIN_XML_PATH)
                 elif pkg_type == "external":
-                    xml_directory = "%s/%s" % (conf['custom_prefix'], HARDWARE_XML_PATH)
+                    xml_directory = "%s/%s" % (conf['src_prefix'], HARDWARE_XML_PATH)
                 else:
                     raise PackageException("Type '%s' doesn't exists" % pkg_type)
                 xml_file = "%s/%s.xml" % (xml_directory, id)

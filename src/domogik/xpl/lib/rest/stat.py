@@ -83,7 +83,7 @@ class StatsManager:
             else:
                 self._log_stats.info("No package path defined in config file")
                 self._package_path = None
-                self.directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
+                self.directory = "%s/share/domogik/stats/" % cfg_db['src_prefix']
 
             self._db = DbHelper()
 

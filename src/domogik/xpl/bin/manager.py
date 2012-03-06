@@ -173,8 +173,8 @@ class SysManager(XplPlugin):
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
-            self._xml_plugin_directory = os.path.join(conf['custom_prefix'], "share/domogik/plugins/")
-            self._xml_external_directory = os.path.join(conf['custom_prefix'], "share/domogik/externals/")
+            self._xml_plugin_directory = os.path.join(conf['src_prefix'], "share/domogik/plugins/")
+            self._xml_external_directory = os.path.join(conf['src_prefix'], "share/domogik/externals/")
             self.package_mode = False
 
         self._pinglist = {}
