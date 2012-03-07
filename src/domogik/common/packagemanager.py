@@ -516,6 +516,7 @@ class PackageManager():
                     type_path = "externals"
                 print("%s => %s" % ("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path)))
                 copytree("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path), self.log)
+                copytree("%s/src/share/domogik/data/" % pkg_dir, "%s/data/" % plg_path, self.log)
 
             # design/*
             # stats/* 

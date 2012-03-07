@@ -158,7 +158,7 @@ function copy_sample_files {
         fi
     done
     # create folders for packages management
-    for pkg_rep in packages packages/plugins packages/externals packages/stats packages/url2xpl packages/design
+    for pkg_rep in packages packages/plugins packages/externals packages/stats packages/url2xpl packages/design packages/data
       do
         if [ ! -d $DMG_LIB/$pkg_rep ];then
             mkdir $DMG_LIB/$pkg_rep
