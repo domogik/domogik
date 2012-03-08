@@ -41,9 +41,10 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.knx import KNXException
 from domogik.xpl.lib.knx import KNX
+from struct import * 
 import threading
 import subprocess
-import time
+from time import *
 
 listknx=["debut","fin"]
 
@@ -114,6 +115,7 @@ class KNXManager(XplPlugin):
         """ Send xpl-trig to give status change
         """
         ### Identify the sender of the message
+        lignetest=""
         command = ""
         dmgadr =""
         msg_type=""
@@ -251,8 +253,8 @@ class KNXManager(XplPlugin):
 
                  if datatype =="10.001": #time (EIS3)
                     val=int(val.replace(" ",""),16)
-                    if val<=3476283:
-                       val=int(val.replace(" ",""),16)
+                    if val!=0: #val<=3476283:
+                       #val=int(val.replace(" ",""),16)
                        val=bin(val)[2:]
                        second=int(val[len(val)-6:len(val)],2)
                        val=val[0:len(val)-8]
@@ -264,7 +266,14 @@ class KNXManager(XplPlugin):
                           day=int(val,2)
                        else:
                           day="No day"
-                       val=hour+":"+minute+":"+second+".0"
+                       if len(str(hour))<2:
+                          hour="0"+str(hour)
+                       if len(str(minute))<2:
+                          minute="0"+minute
+                       if len(str(second))<2:
+                          second="0"+second
+                       val=str(hour)+":"+str(minute)+":"+str(second)+".0"
+                       print "heure: %s" %val
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
 
@@ -300,23 +309,28 @@ class KNXManager(XplPlugin):
 
                  if datatype[:3] == "14.": #32bit IEEE 754 floating point number
                      val=int(val.replace(" ",""),16)
-                     val=bin(val)[2:]
-                     if len(val)<32:
-                        for i in range(32-len(val)):
-                           val="0"+val
-                     signe=1-2*int(val[:1])
-                     exposant=str(val[1:9])
-                     mantisse=str(val[9:32])
-                     #signe= int(str(signe),2)
-                     exposant= int(str(exposant),2)
-                     mantise=0
-                     for i in range(23):
-                        valut=mantisse[i-1:i]
-                        if valut=="1":
-                           mantise=float(mantise+2**(-i))
-                     mantisse= 1+mantise
-                     val=float(signe*mantisse*2**(exposant-127))
-                     print "résultat %s" %(signe*mantisse*2**(exposant-127))
+#                     val1=val
+#                     val=bin(val)[2:]
+#                     if len(val)<32:
+#                        for i in range(32-len(val)):
+#                           val="0"+val
+#                     signe=1-2*int(val[:1])
+#                     exposant=str(val[1:9])
+#                     mantisse=str(val[9:32])
+#                     #signe= int(str(signe),2)
+#                     exposant= int(str(exposant),2)
+#                     mantise=0
+#                     for i in range(24):
+#                        valut=mantisse[i-1:i]
+#                        if valut=="1":
+#                           mantise=float(mantise+2**(-i))
+#                     mantisse= 1+mantise
+#                     val=float(signe*mantisse*2**(exposant-127))
+                     val= unpack('f',pack('I',val))[0]
+#                     print "résultat %s" %(signe*mantisse*2**(exposant-127))
+                     print val
+#                     val= unpack('f',pack('I',val1))[0]
+#                     print "Valeur unpack %s" %test
 
                  if datatype[:3] =="16.": #String
                     val=val.replace(" ","")
@@ -401,13 +415,13 @@ class KNXManager(XplPlugin):
         type_cmd = message.data['command']
         groups = message.data['group']
         groups = "adr_dmg:"+groups+" "
-        ligentest=""
+        lignetest=""
         valeur=message.data['data']
         print "Message XPL %s" %message
         for i in range(len(listknx)):
            if listknx[i].find(groups)>=0:
               lignetest=listknx[i]
-
+        print "ligne test=|%s|" %lignetest
         if lignetest<>"":
            datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
            cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
@@ -525,6 +539,29 @@ class KNXManager(XplPlugin):
               else:
                  self.log.error("define 16bit signed float overflow %s from %s" %(val,groups))
 
+              if datatype=="10.001": #time
+                 hour=int(strftime('%H',localtime()))
+                 minute=int(strftime('%M',localtime()))
+                 seconde=int(strftime('%S',localtime()))
+                 weekday=int(strftime('%w',localtime()))
+                 hour=bin(hour)[2:]
+                 minute=hex(minute)[2:]
+                 weekday=bin(weekday)[2:]
+                 seconde=hex(seconde)[2:]
+                 if len(hour)<5:
+                    for i in range(5-len(hour)):
+                       hour="0"+hour
+                 if len(weekday)<3:
+                    for i in range(3-len(weekday)):
+                       weekday="0"+weekday
+                 if len(minute)<2:
+                    minute="0"+minute
+                 if len(seconde)<2:
+                    seconde="0"+seconde
+                 dayhour=weekday+hour
+                 dayhour=hex(int(dayhour,2))[2:]
+                 valeur=str(dayhour)+" "+str(minute)+" "+str(seconde)
+                 data_type="l"
 
               if datatype[:3] =="12.": #32bit unsigned integer (EIS14) 
                  val=int(val)
@@ -581,6 +618,8 @@ class KNXManager(XplPlugin):
                  if val=="2":
                     valeur=4
               print "Valeur modifier |%s|" %valeur
+
+              
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
               if data_type=="l":
