@@ -253,8 +253,7 @@ class KNXManager(XplPlugin):
 
                  if datatype =="10.001": #time (EIS3)
                     val=int(val.replace(" ",""),16)
-                    if val!=0: #val<=3476283:
-                       #val=int(val.replace(" ",""),16)
+                    if valeur!=0: #val<=347628                       
                        val=bin(val)[2:]
                        second=int(val[len(val)-6:len(val)],2)
                        val=val[0:len(val)-8]
@@ -279,7 +278,7 @@ class KNXManager(XplPlugin):
 
                  if datatype =="11.001": #date (EIS4)
                     val=int(val.replace(" ",""),16)
-                    if val<=3476283:
+                    if val!=0:
                        val=bin(val)[2:]
                        year=int(val[len(val)-7:len(val)],2)
                        val=val[0:len(val)-8]
@@ -309,39 +308,19 @@ class KNXManager(XplPlugin):
 
                  if datatype[:3] == "14.": #32bit IEEE 754 floating point number
                      val=int(val.replace(" ",""),16)
-#                     val1=val
-#                     val=bin(val)[2:]
-#                     if len(val)<32:
-#                        for i in range(32-len(val)):
-#                           val="0"+val
-#                     signe=1-2*int(val[:1])
-#                     exposant=str(val[1:9])
-#                     mantisse=str(val[9:32])
-#                     #signe= int(str(signe),2)
-#                     exposant= int(str(exposant),2)
-#                     mantise=0
-#                     for i in range(24):
-#                        valut=mantisse[i-1:i]
-#                        if valut=="1":
-#                           mantise=float(mantise+2**(-i))
-#                     mantisse= 1+mantise
-#                     val=float(signe*mantisse*2**(exposant-127))
                      val= unpack('f',pack('I',val))[0]
-#                     print "résultat %s" %(signe*mantisse*2**(exposant-127))
                      print val
-#                     val= unpack('f',pack('I',val1))[0]
-#                     print "Valeur unpack %s" %test
 
                  if datatype[:3] =="16.": #String
                     val=val.replace(" ","")
-                    if len(val)/2==14:
+		    if len(val)/2==14:
                        phrase=""
                        for i in range(len(val)/2):
                           phrase=phrase+ chr(int(val[0:2],16))
                           val=val[2:]
                        val=phrase
                     else:
-                       self.log.error("define as string, invalid data %s from %s" %s(val,groups))
+                       self.log.error("define as string, invalid data %s from %s" %(val,groups))
 
                  if datatype == "20.102": #heating mode (comfort/standby/night/frost) 
                     val=int(val.replace(" ",""),16)
@@ -441,73 +420,61 @@ class KNXManager(XplPlugin):
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
               val=valeur
-              if datatype[:2] =="5." and datatype!="5.001" and datatype!="5.003": #16bit unsigned integer (EIS14) 
+
+              if datatype[:2] =="5." and datatype!="5.001" and datatype!="5.003": #8bit unsignet int 
                  val=int(val)
-                 if val>=0:
-                    if val<=255:
-                       val=hex(val)[2:]
-                       valeur=""
-                       for i in range(len(val)/2):
-                          valeur=valeur+" "+val[0:2]
-                          val=val[2:]
-                       val=valeur.strip()
-                    else:
-                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
-		 else:
+                 data_type="l"
+                 if val>=0 and val<=255:
+                    val=hex(val)[2:]
+                    valeur=""
+                    for i in range(len(val)/2):
+                       valeur=valeur+" "+val[0:2]
+                    valeur=valeur.strip()
+                 else:
                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
-              if datatype=="5.001": #"DT_Scaling":
-                 if valeur<>"None":
-                    valeur = int(valeur)*255/100
-                    valeur=hex(valeur)
+              if datatype == '5.001':
+                 if val<>"None":
+                    val = int(valeur)*255/100
+                    valeur=hex(val)[2:]
                  else:
                     valeur=0
 
-	      if datatype == "5.003": #"DT_Angle":
-                    if val<=360:
-                       val=int(val)*255/360
-                       val=hex(val)
+	      if datatype == "5.003":
+                 if val<=360 and val>=0:
+                    val=int(val)*255/360
+                    val=hex(val)
 
               if datatype[:2] =="6.": #8bit signed integer (EIS14) 
+                 data_type="l"
                  val=int(val)
-                 if val<=127:
-                    if val>=-128:
-                       val=val+128
-                       val=hex(val)[2:]
-                       valeur=""
-                       for i in range(len(val)/2):
-                          valeur=valeur+" "+val[0:2]
-                          val=val[2:]
-                       val=valeur.strip()	
+                 if val<=127 and val>=-128:
+                    if val<0:
+                       val=255+val
+                    valeur=hex(val)[2:]	
 		 else:
                     self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
               if datatype[:2] =="7.": #16bit unsigned integer (EIS14) 
                  val=int(val)
-                 if val>=0:
-                    if val<=65535:
-                       val=hex(val)[2:]
-                       valeur=""
-                       for i in range(len(val)/2):
-                          valeur=valeur+" "+val[0:2]
-                          val=val[2:]
-                       val=valeur.strip()
-                    else:
-                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
-		 else:
-                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+                 if val>=0 and val<=65535:
+                    val=hex(val)[2:]
+                    valeur=""
+                    if len(val)<4:
+                       for i in range(4-len(val)):
+                          val="0"+val
+                    valeur=val[:2]+" "+val[2:4]                      
+                    print "Valeur 16 bit unsigned val=|%s|" %valeur
+                 else:
+                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
 
               if datatype[:2] =="8.": #16bit signed integer (EIS14) 
                  val=int(val)
-                 if val<=32767:
-                    if val>=-32768:
-                       val=val+32768
-                       val=hex(val)[2:]
-                       valeur=""
-                       for i in range(len(val)/2):
-                          valeur=valeur+" "+val[0:2]
-                          val=val[2:]
-                       val=valeur.strip()	
+                 if val<=32767 and val>=-32768:
+                    if val<0:
+                       val=65535+val
+                    val=hex(val)[2:]
+                    valeur=val[:2]+" "+val[2:4]
                  else:
                     self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
@@ -534,10 +501,12 @@ class KNXManager(XplPlugin):
                        binairey="0"+binairey
                  valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
                  valeur=valeur.replace(" ","")
-                 valeur=int(Valeur,2)
-                 valeur=hex(Valeur)[2:]
-              else:
-                 self.log.error("define 16bit signed float overflow %s from %s" %(val,groups))
+                 valeur=int(valeur,2)
+                 valeur=hex(valeur)[2:]
+                 if len(valeur)<4:
+                    for i in range(4-len(valeur)):
+                       valeur="0"+valeur
+                 valeur=valeur[:2]+" "+valeur[2:4]
 
               if datatype=="10.001": #time
                  hour=int(strftime('%H',localtime()))
@@ -565,46 +534,48 @@ class KNXManager(XplPlugin):
 
               if datatype[:3] =="12.": #32bit unsigned integer (EIS14) 
                  val=int(val)
-                 if val>=0:
-                    if val<=4294967295:
-                       val=hex(val)[2:]
-                       valeur=""
-                       for i in range(len(val)/2):
-                          valeur=valeur+" "+val[0:2]
-                          val=val[2:]
-                       valeur=valeur.strip()
-                    else:
-                        self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
-		 else:
-                    self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
+                 if val>=0 and val<=4294967295:
+                    val=hex(val)[2:]
+                    if len(val)<8:
+                       for i in range(8-len(val)):
+                          val="0"+val                    
+                    valeur=val.strip()
+                    valeur=valeur[:2]+" "+valeur[2:4]+" "+valeur[4:6]+" "+valeur[6:8]
+                 else:
+                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
               if datatype[:3] == "13.": #32bit signed integer
                  val=int(val)
-                 if val<=2147483647:
-                    if val>=-2147483648:
-                       val=val+2147483648
-                       val=hex(val)[2:]
-                       valeur=""
-                       for i in range(len(val)/2):
-                          valeur=valeur+" "+val[0:2]
-                          val=val[2:]
-                       valeur=valeur.strip()	
+                 if val<=2147483647 and val>=-2147483648:
+                    if val<0:
+                       val=4294967295+val
+                    val=hex(val)[2:]
+                    if len(val)<8:
+                       for i in range(8-len(val)):
+                          val="0"+val
+                    valeur=val.strip()
+                    valeur=valeur[:2]+" "+valeur[2:4]+" "+valeur[4:6]+" "+valeur[6:8]
                  else:
                     self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
               if datatype == "16.000":
                  codage=""
-                 if len(val)<=14:
-                    for j in range(len(val)):
-                       codage=codage+hex(ord(val[j:j+1]))[2:]
-                    if len(val)<14:
-                       for j in range(14-len(val)):
-                          codage=codage+"00"
-                    valeur=codage[:2]
-                    for i in range(14):
-                       valeur=valeur+" "+codage[2*(i+1):2*(i+1)+2]
-                 else:
-                    self.log.error("Too many character")
+                 text=val
+                 for j in range(int(len(val)/14)+1):
+                    val=text[j*14:j*14+14]
+                    codage=""
+                    if len(val)<=14:
+                       for j in range(len(val)):
+                          codage=codage+" "+hex(ord(val[j:j+1]))[2:]
+                       if len(val)<14:
+                          for j in range(14-len(val)):
+                             codage=codage+" 00"
+                       print codage
+                       command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr,codage)
+                       subp2=subprocess.Popen(command,shell=True)
+                    else:
+                       self.log.error("Too many character")
+                 type_cmd="déjà fait" 
 
               if datatype=="DT_HVACEib":
                  print "Hello val=%s" %val
@@ -617,8 +588,8 @@ class KNXManager(XplPlugin):
                     valeur="3"
                  if val=="2":
                     valeur=4
-              print "Valeur modifier |%s|" %valeur
 
+              print "Valeur modifier |%s|" %valeur
               
               if data_type=="s":
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
