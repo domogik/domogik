@@ -45,6 +45,7 @@ from struct import *
 import threading
 import subprocess
 from time import *
+from binascii import *
 
 listknx=["debut","fin"]
 
@@ -157,6 +158,7 @@ class KNXManager(XplPlugin):
               if command <> 'Read':
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
+                 print "-%s|" %val
                  msg_type = "s"
                  if data[-2:-1]==" ":
                     msg_type = "l"
@@ -253,7 +255,7 @@ class KNXManager(XplPlugin):
 
                  if datatype =="10.001": #time (EIS3)
                     val=int(val.replace(" ",""),16)
-                    if valeur!=0: #val<=347628                       
+                    if val!=0: #val<=347628                       
                        val=bin(val)[2:]
                        second=int(val[len(val)-6:len(val)],2)
                        val=val[0:len(val)-8]
@@ -280,12 +282,21 @@ class KNXManager(XplPlugin):
                     val=int(val.replace(" ",""),16)
                     if val!=0:
                        val=bin(val)[2:]
+                       if len(val)<24:
+                          for i in range(24-len(val)):
+                             val="0"+val
                        year=int(val[len(val)-7:len(val)],2)
                        val=val[0:len(val)-8]
                        mounth=int(val[len(val)-4:len(val)],2)
                        val=val[0:len(val)-8]
                        day=int(val[len(val)-5:len(val)],2)
-                       val=year+"-"+mounth+"-"+day
+                       if len(str(year))<2:
+                          year="0"+str(year)
+                       if len(str(mounth))<2:
+                          mounth="0"+str(mounth)
+                       if len(str(day))<2:
+                          day="0"+str(day)
+                       val=str(year)+"-"+str(mounth)+"-"+str(day)
                     else:
                        self.log.error("define 16bit floating overflow %s from %s" %(val,groups))
                  
@@ -299,10 +310,10 @@ class KNXManager(XplPlugin):
                  if datatype[:3] == "13.": #32bit signed integer
                      val=int(val.replace(" ",""),16)
                      if val<=4294967295:
-                        if val<2147483647:
+                        if val<=2147483647:
                            val=val
                         else:
-                           val=-4294967296+val
+                           val=-4294967295+val
                      else:
                        self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
@@ -434,6 +445,8 @@ class KNXManager(XplPlugin):
                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
               if datatype == '5.001':
+                 data_type="l"
+                 print 'envoie d un pourcent'
                  if val<>"None":
                     val = int(valeur)*255/100
                     valeur=hex(val)[2:]
@@ -441,21 +454,27 @@ class KNXManager(XplPlugin):
                     valeur=0
 
 	      if datatype == "5.003":
+                 data_type="l"
+                 print 'envoie d un angle %s' %val
+                 val=int(val)
                  if val<=360 and val>=0:
                     val=int(val)*255/360
-                    val=hex(val)
+                    print val
+                    valeur=hex(val)
 
               if datatype[:2] =="6.": #8bit signed integer (EIS14) 
                  data_type="l"
                  val=int(val)
+                 print "|%s|" %val
                  if val<=127 and val>=-128:
                     if val<0:
-                       val=255+val
+                       val=256+val
                     valeur=hex(val)[2:]	
 		 else:
                     self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
               if datatype[:2] =="7.": #16bit unsigned integer (EIS14) 
+                 data_type="l"
                  val=int(val)
                  if val>=0 and val<=65535:
                     val=hex(val)[2:]
@@ -469,17 +488,20 @@ class KNXManager(XplPlugin):
                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
 
               if datatype[:2] =="8.": #16bit signed integer (EIS14) 
+                 data_type="l"
                  val=int(val)
                  if val<=32767 and val>=-32768:
                     if val<0:
-                       val=65535+val
+                       val=65536+val
                     val=hex(val)[2:]
                     valeur=val[:2]+" "+val[2:4]
                  else:
                     self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
               if datatype[:2] =="9.": #16bit floating signed (EIS14) 
+                 data_type="l"
                  val=val.replace(",",".")
+                 signe="plus"
                  val=float(val)
                  if val<0:
                     val=abs(val)
@@ -509,6 +531,7 @@ class KNXManager(XplPlugin):
                  valeur=valeur[:2]+" "+valeur[2:4]
 
               if datatype=="10.001": #time
+                 data_type="l"
                  hour=int(strftime('%H',localtime()))
                  minute=int(strftime('%M',localtime()))
                  seconde=int(strftime('%S',localtime()))
@@ -530,9 +553,23 @@ class KNXManager(XplPlugin):
                  dayhour=weekday+hour
                  dayhour=hex(int(dayhour,2))[2:]
                  valeur=str(dayhour)+" "+str(minute)+" "+str(seconde)
+
+              if datatype=="11.001":
                  data_type="l"
+                 dayofmounth=hex(int(strftime('%d',localtime())))[2:]
+                 mounth=hex(int(strftime('%m',localtime())))[2:]
+                 years=hex(int(strftime('%y',localtime())))[2:]
+                 if len(dayofmounth)<2:
+                    dayofmounth="0"+dayofmounth
+                 if len(mounth)<2:
+                    mounth="0"+mounth
+                 if len(years)<2:
+                    years="0"+years
+                 valeur=dayofmounth+" "+mounth+" "+years
+
 
               if datatype[:3] =="12.": #32bit unsigned integer (EIS14) 
+                 data_type="l"
                  val=int(val)
                  if val>=0 and val<=4294967295:
                     val=hex(val)[2:]
@@ -545,6 +582,7 @@ class KNXManager(XplPlugin):
                      self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))
 
               if datatype[:3] == "13.": #32bit signed integer
+                 data_type="l"
                  val=int(val)
                  if val<=2147483647 and val>=-2147483648:
                     if val<0:
@@ -558,7 +596,21 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
+              if datatype == "14.001":
+                 data_type="l"
+                 print "valeur 14.001 %s" %val
+                 val=float(val)
+                 valeur=hexlify(pack('>f',val))
+                 print "IEE754 %s" %valeur
+                 if len(valeur)==8:
+                    valeur=valeur[0:2]+" "+valeur[2:4]+" "+valeur[4:6]+" "+valeur[6:8]
+                 else:
+                    self.log.erreur("Variable len(valeur) infusffisante")              
+                    valuer=""
+                 print valeur
+
               if datatype == "16.000":
+                 data_type="l"
                  codage=""
                  text=val
                  for j in range(int(len(val)/14)+1):
@@ -578,10 +630,9 @@ class KNXManager(XplPlugin):
                  type_cmd="déjà fait" 
 
               if datatype=="DT_HVACEib":
+                 data_type="s"
                  print "Hello val=%s" %val
                  valeur=val
-                 command_stp="groupswrite ip:127.0.0.1 %s 0" %stpadr
-                 subp2=subprocess.Popen(command_stp,shell=True)
                  if val=="3":
                     valeur="2"
                  if val=="1":
