@@ -130,11 +130,11 @@ class APIZiBase(object):
         s.settimeout(5)
         s.connect((self.ip, self.port))        
         s.send(buffer)
-        ack = s.recv(512)
-        if len(ack) > 0:
-            response = ZbResponse(ack)        
+        #ack = s.recv(512)
+        #if len(ack) > 0:
+        #response = ZbResponse(ack)        
         s.close()
-        return response
+        #return response
     
     
     def sendCommand(self, address, action, protocol = 0, dimLevel = 0, nbBurst = 1):
@@ -180,7 +180,7 @@ class APIZiBase(object):
         req.param3 = 0
         req.param4 = 0
         self._log.debug('Send request for link')
-        rep=self.sendRequest(req)
+        self.sendRequest(req)
 
     def Disconnect(self,ip_host,port_host):
         req = ZbRequest()
@@ -190,7 +190,7 @@ class APIZiBase(object):
         req.param3 = 0
         req.param4 = 0
         self._log.debug('Send request for unlink')
-        rep=self.sendRequest(req)
+        self.sendRequest(req)
 
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
