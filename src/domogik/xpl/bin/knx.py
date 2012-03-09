@@ -101,7 +101,9 @@ class KNXManager(XplPlugin):
         filetoopen=self._config.query('knx','file')
         fichier=open(filetoopen,"r")  #"/var/log/domogik/knx.txt","r")
         for ligne in fichier:
-           listknx.append(ligne)
+           if ligne[:1]<>"#":
+              listknx.append(ligne)
+              print ligne
         fichier.close
         for i in range(len(listknx)):
            stat=listknx[i]

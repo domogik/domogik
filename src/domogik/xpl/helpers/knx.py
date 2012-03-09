@@ -10,7 +10,7 @@ from domogik.xpl.lib.knx import KNX
 from domogik.common.configloader import *
 
 datatype=["1.001","1.008","5.xxx","5.001","5.003","6.xxx","7.xxx","8.xxx","9.xxx","10.001","11.001","12.xxx","13.xxx","14.xxx","16.000","20.102","DT_HVACEib"]
-datatypedesc=[]
+datatypedesc=["Switch on/off","Blinds controle up/down","8 bit unsigned int","Scaling 0-100%","Angle 0-360","8bit signed int EIS14","16bit unsigned int EIS10","16bit signed int","16bit floating point number EIS5","Time","Date","32bit unsigned int EIS11","32bit signed int","32bit IEEE754 floating point number","String EIS15","HVAC Heating mode (comfort,standby,night,frost)","Special for TB042"]
 
 usagelist=[]
 typelist=[]
@@ -55,7 +55,7 @@ if usagel<>"":
 Adr_cmd=raw_input('KNX command groups: ')
 
 for i in range(len(datatype)):
-   print "%s - %s" %(i,datatype[i])
+   print "%s - %s - %s" %(i,datatype[i],datatypedesc[i])
 Datatype_cmd=raw_input('Select your Datapoint type: ')
 if Datatype_cmd<>"":
    Datatype_cmd=int(Datatype_cmd)
@@ -81,7 +81,7 @@ strpage=page.read()
 print strpage
 
 #config = Query(self.myxpl, self.log)
-filetoopen="/home/domogik/knx.txt" #config.query('knx','file')
+filetoopen="/home/domogik/knx.txt" # a mettre dans /src/share/domogik/data
 fichier=open(filetoopen,"a")  #"/var/log/domogik/knx.txt","r")
 ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(datatype[Datatype_cmd],Adr_dmg,Adr_cmd,Adr_stat)
 print ligne
