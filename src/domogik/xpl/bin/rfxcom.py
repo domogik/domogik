@@ -54,8 +54,8 @@ class RfxcomUsbManager(XplPlugin):
         XplPlugin.__init__(self, name='rfxcom')
         # Get config
         #   - device
-        #self._config = Query(self.myxpl, self.log)
-        #device = self._config.query('rfxcom', 'device')
+        self._config = Query(self.myxpl, self.log)
+        device = self._config.query('rfxcom', 'device')
         device = "/dev/rfxcom"
 
         # Init RFXCOM
