@@ -62,14 +62,14 @@ def list_all_files(path, dst):
 arch = get_path()
 
 d_files = [
-        ('/usr/bin/', ['src/tools/dmgenplug']),
-        ('/usr/bin/', ['src/tools/dmgdisplug']),
+        ('/usr/sbin/', ['src/tools/dmgenplug']),
+        ('/usr/sbin/', ['src/tools/dmgdisplug']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
 
 if arch != None:
-    d_files.append(('/usr/bin/', [arch]))
+    d_files.append(('/usr/sbin/', [arch]))
 else:
     print "*************** WARNING ***************"
     print "* Can't find an xPL Hub for your arch *"
