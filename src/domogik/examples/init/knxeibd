@@ -1,0 +1,110 @@
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:          linknx through eibd connection 
+# Required-Start:    $networking
+# Required-Stop:     $networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: linknx
+# Description:       Daemon for communication with the KNX bus.
+### END INIT INFO
+
+DESC="KNX daemon"
+EIBD_NAME="eibd"
+EIBD_PIDFILE=/var/run/$EIBD_NAME.pid
+EIBD_DAEMON=/usr/bin/$EIBD_NAME
+EIBD_LOG=/var/log/eibd.log
+EIBD_DAEMON_OPTS="--pid-file=$EIBD_PIDFILE -i -d -D ipt:192.168.0.148"
+
+SCRIPTNAME=/etc/init.d/dmg_knx
+
+. /lib/lsb/init-functions
+
+#
+#	Function that starts the daemon/service.
+#
+d_start() {
+	start_daemon $EIBD_PIDFILE $EIBD_NAME $EIBD_DAEMON "$EIBD_DAEMON_OPTS" $EIBD_LOG domogik
+}
+
+d_stop() {
+	stop_daemon $EIBD_PIDFILE $EIBD_DAEMON
+}
+
+start_daemon()
+{
+	PIDFILE=$1
+	DAEMON_NAME=$2
+	DAEMON=$3
+	DAEMON_OPTS=$4
+	LOGFILE=$5
+	USER=$6
+
+	log_daemon_msg "Starting "  "$DAEMON_NAME"
+	
+	if [[ -z $USER ]]
+	then
+		USER=root
+	fi
+
+	[[ -f "$LOGFILE" ]] && rm "$LOGFILE"
+
+        start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON -c $USER -- $DAEMON_OPTS && echo `ps -C $DAEMON_NAME -o pid=` > $PIDFILE
+	
+	case "$?" in
+		0) log_end_msg 0 ;;
+		1) log_progress_msg "already started"
+		   log_end_msg 0 ;;
+		*) log_end_msg 1 ;;
+	esac
+}
+
+stop_daemon()
+{
+	PIDFILE=$1
+	DAEMON=$2
+	
+	log_daemon_msg "Stopping "  "$DAEMON"
+
+	start-stop-daemon --stop --retry 5 --quiet --pidfile $PIDFILE \
+		--exec $DAEMON && rm $PIDFILE
+	
+	case "$?" in
+		0) log_end_msg 0 ;;
+		1) log_progress_msg "already stopped"
+		   log_end_msg 0 ;;
+		*) log_end_msg 1 ;;
+	esac
+}
+
+case "$1" in
+  start)
+	d_start
+	;;
+
+  restart-admin)
+	d_stop
+	cp /etc/linknx/linknx.conf.xml{,.bak}
+	LINKNX_DAEMON_OPTS="$LINKNX_DAEMON_OPTS -w"
+	d_start
+	;;
+  
+  stop)
+	d_stop
+	;;
+  
+restart|force-reload)
+	$0 stop
+	$0 start
+	;;
+  status)
+	status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|restart|restart-admin|force-reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
