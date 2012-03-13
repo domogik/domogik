@@ -123,10 +123,9 @@ class VelbusManager(XplPlugin):
     def process_lighting_basic(self, message):
         """ Process xpl chema lightning.basic
         """
-        self.send_xpl("lighting.device", message.data)
+        #self.send_xpl("lighting.device", message.data)
         add = message.data['device'].split('-')
-        chan = []
-        chan.append(int(add[1]))
+        chan = int(add[1])
         address = add[0]
         if message.data["level"] == 'None':
             message.data["level"] = 0
