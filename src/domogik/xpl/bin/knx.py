@@ -694,32 +694,32 @@ class KNXManager(XplPlugin):
            strpage=page.read()
            print strpage
            print adresse
-           filetoopen=self._config.query('knx','file')
-           print filetoopen
+           status=strpage[strpage.find('"status" : "'):]
+           status=status[:status.find('"')]
+           
+           if status=="OK":
+           
+              filetoopen=self._config.query('knx','file')
+              print filetoopen
 
-           fichier=open(filetoopen,"a")
-           ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(datatype,Adr_dmg,Adr_cmd,Adr_stat)
-           print ligne
-           fichier.write(ligne)
-           fichier.close
-           groups=groups[groups.find(":")+1:]
-           groups=groups.strip()
+              fichier=open(filetoopen,"a")
+              ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(datatype,Adr_dmg,Adr_cmd,Adr_stat)
+              print ligne
+              fichier.write(ligne)
+              fichier.close
+              listknx.append(ligne)
+              groups=groups[groups.find(":")+1:]
+              groups=groups.strip()
 
-           msg=XplMessage()
-           msg.set_type("xpl-trig")
-           msg.set_schema('knx.basic')
-           msg.add_data({'command': 'Add-ack'})
-           msg.add_data({'group' :  groups})
-           msg.add_data({'type' : 'None' })
-           msg.add_data({'data': 'None'})
-           self.myxpl.send(msg)
-           stknx=["debut","fin"]
-           fichier=open(filetoopen,"r")  #"/var/log/domogik/knx.txt","r")
-              for ligne in fichier:
-                 if ligne[:1]<>"#":
-                    listknx.append(ligne)
-                    print ligne
-           fichier.close
+              msg=XplMessage()
+              msg.set_type("xpl-trig")
+              msg.set_schema('knx.basic')
+              msg.add_data({'command': 'Add-ack'})
+              msg.add_data({'group' :  groups})
+              msg.add_data({'type' : 'None' })
+              msg.add_data({'data': 'None'})
+              self.myxpl.send(msg)
+                  
 
 
 
