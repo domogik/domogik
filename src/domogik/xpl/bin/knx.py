@@ -35,12 +35,14 @@ Implements
 @organization: Domogik
 """
 
+from urllib import *
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.knx import KNXException
 from domogik.xpl.lib.knx import KNX
+from domogik.common.configloader import *
 from struct import * 
 import threading
 import subprocess
@@ -368,6 +370,7 @@ class KNXManager(XplPlugin):
                              value="HVACnofreeze"
                           if val==20:
                              value="HVACnormal"
+
                     val=value
                      
 
@@ -664,6 +667,61 @@ class KNXManager(XplPlugin):
               subp=subprocess.Popen(command, shell=True)
            if command=="":
               print("erreur command non définir, type cmd= %s" %type_cmd)
+        if type_cmd=="Add":
+           print "Add device"
+           Name=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(':')+1:]
+           Adr_dmg=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           knxtype=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           usage=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           datatype=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           Adr_cmd=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           Adr_stat=valeur
+
+           cfg = Loader('rest')
+           config = cfg.load()
+           conf = dict(config[1])
+           REST_URL= "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
+
+           adresse=REST_URL+'/base/device/add/name/'+Name+"/address/"+Adr_dmg+'/type_id/'+knxtype+'/usage_id/'+usage
+
+           page=urlopen(adresse)
+           strpage=page.read()
+           print strpage
+           print adresse
+           filetoopen=self._config.query('knx','file')
+           print filetoopen
+
+           fichier=open(filetoopen,"a")
+           ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(datatype,Adr_dmg,Adr_cmd,Adr_stat)
+           print ligne
+           fichier.write(ligne)
+           fichier.close
+           groups=groups[groups.find(":")+1:]
+           groups=groups.strip()
+
+           msg=XplMessage()
+           msg.set_type("xpl-trig")
+           msg.set_schema('knx.basic')
+           msg.add_data({'command': 'Add-ack'})
+           msg.add_data({'group' :  groups})
+           msg.add_data({'type' : 'None' })
+           msg.add_data({'data': 'None'})
+           self.myxpl.send(msg)
+           stknx=["debut","fin"]
+           fichier=open(filetoopen,"r")  #"/var/log/domogik/knx.txt","r")
+              for ligne in fichier:
+                 if ligne[:1]<>"#":
+                    listknx.append(ligne)
+                    print ligne
+           fichier.close
+
+
 
 if __name__ == "__main__":
     INST = KNXManager()

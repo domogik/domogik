@@ -59,7 +59,7 @@ COMMAND_TYPES = {
   103 : "firmware memory",
   104 : "firmware memory write confirmed",
   105 : "read firmware memory",
-  184 : "dimemr channel status",
+  184 : "dimmer channel status",
   198 : "temperature settings part3",
   199 : "statistics request",
   200 : "statistics",
@@ -333,7 +333,7 @@ class VelbusDev:
                     methodcall = getattr(self, "_process_" + str(ord(data[4])))
                     methodcall( data )
                 except AttributeError:
-                    self._log.warning("Messagetype unimplemented")		
+                    self._log.debug("Messagetype unimplemented")		
             else:
                 self._log.warning("Received message with unknown type %s" % ord(data[4]))
         else:
@@ -386,7 +386,19 @@ class VelbusDev:
                 self._callback("lighting.device",
                     {"device" : device,
                     "level" : level})
-   
+  
+    def _process_0(self, data):
+        """
+           Process a 0 Message
+           switch status => send out when an input (switch changed)
+        """
+        chanPres = self._byte_to_channels(data[5])
+        chanLPres = self._byte_to_channels(data[6])
+        chanRel = self._byte_to_channels(data[7])
+	self._log.debug("channels just pressed " + ''.join(map(str,chanPres)) )
+	self._log.debug("channels long pressed " + ''.join(map(str,chanLPres)) )
+	self._log.debug("channels just released " + ''.join(map(str,chanRel)) )
+
     def _process_236(self, data):
         """
            Process a 236 Message
@@ -394,22 +406,38 @@ class VelbusDev:
            chan <X> <status>
            chan: 00000011=1, 00001100=2
            status: 0=off, 1=chan 1 up, 2=chan 1 down, 4=chan 2 up, 8=chan 2 down
+
+           foreach _byte_to_blindchannel(data[5])
+		status _byte_to_channels data[7]                
         """
-        #self._callback("shutter.device",
-        #     {"device" : device,
-        #     "command" : command})    
+        chan = self._blinchannel_to_byte(data[5])
+        device = str(ord(data[2]))
+        status = self._byte_to_channels(data[7])
+        command = []
+        if chan == 1:
+            if 1 in status:
+                command = "up"
+            if 2 in status:
+                command = "down"
+        elif chan == 2:
+            if 4 in status:
+                command = "up"
+            if 8 in status:
+                command = "down"
+        else:
+           command = "off"
+        if command == "":
+            self._callback("shutter.device",
+               {"device" : device + "-" + chan,
+               "command" : command})    
 	
 # Some convert procs
-    def _channels_to_byte(self, channels):
+    def _channels_to_byte(self, chan):
         """
-           Convert a channel list to a byte
+           Convert a channel to a byte
+           only works for one channel at a time
         """
-        assert isinstance(channels, list)
-        result = 0
-        for offset in range(0, 8):
-            if offset+1 in channels:
-                result = result + (1 << offset)
-        return chr(result)
+        return chr( (1 << (chan -1)) )
 
     def _byte_to_channels(self, byte):
         """

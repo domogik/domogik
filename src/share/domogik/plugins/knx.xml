@@ -53,6 +53,7 @@
     <file path="src/share/domogik/url2xpl/knx/HVACeco.xml"/>
     <file path="src/share/domogik/url2xpl/knx/HVACstop.xml"/>
     <file path="src/share/domogik/url2xpl/knx/HVACnormal.xml"/>
+    <file path="src/share/domogik/url2xpl/knx/Add.xml"/>
   </files>
   <dependencies/>
   <udev-rules/>
@@ -63,6 +64,12 @@
   </device_technology>
 
   <device_types>
+    <device_type>
+          <id>knx.knx</id>
+          <device_technology_id>knx</device_technology_id>
+          <name>KNX_Creator</name>
+          <description>knx Creator</description>
+      </device_type>
       <device_type>
           <id>knx.raw</id>
           <device_technology_id>knx</device_technology_id>
@@ -276,6 +283,20 @@
           <stat_key>command</stat_key>
           <return_confirmation>1</return_confirmation>
      </device_feature_model>
+
+     <device_feature_model>
+          <id>knx.knx</id>
+          <name>KNXCreator</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>knx.knx</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+
      <device_feature_model>
           <id>knx.raw.read</id>
           <name>Read</name>
