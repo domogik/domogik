@@ -30,7 +30,7 @@ Implements
 - KnxManager
 
 @author: Fritz <fritz.smh@gmail.com> Basilic <Basilic3@hotmail.com>...
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -68,7 +68,7 @@ class KNXManager(XplPlugin):
         ### Create KNX object
         try:
             self.knx = KNX(self.log, self.send_xpl)
-            self.log.info("Open KNX for device : %s" % device)
+            self.log.info("Open KNX")
             self.knx.open(device)
 
         except KNXException as err:
@@ -113,7 +113,7 @@ class KNXManager(XplPlugin):
            stat=stat[:stat.find(" ")]
            print stat  
            command="groupread ip:127.0.0.1 %s" %stat
-          # subp2=subprocess.Popen(command, shell=True)
+        #   subp2=subprocess.Popen(command, shell=True)
         self.log.info("Plugin ready :)")
 
     def send_xpl(self, data):
@@ -155,11 +155,12 @@ class KNXManager(XplPlugin):
               typeadr=lignetest[lignetest.find(groups)-4:lignetest.find(groups)]
 	      typeadr=typeadr.replace("_","")
               
-	      print "type d'adresse |%s|" %typeadr
-              print "datatype |%s|" %datatype
-              print "adresse domogik |%s|" %dmgadr
+#              print "type d'adresse |%s|" %typeadr
+#              print "datatype |%s|" %datatype
+#              print "adresse domogik |%s|" %dmgadr
               msg=XplMessage()
               if command <> 'Read':
+                 print "%s %s" %(typeadr,command)
                  val=data[data.find(':')+1:-1]
                  val = val.strip()
                  print "-%s|" %val
@@ -402,9 +403,13 @@ class KNXManager(XplPlugin):
               msg.add_data({'group' :  dmgadr})
               msg.add_data({'type' :  msg_type})
               msg.add_data({'data': val})
-              self.myxpl.send(msg)
-              print "XPL command: %s group: %s type: %s data: %s" %(command,dmgadr,msg_type,val)
-
+              print "sender: %s typeadr:%s" %(sender, typeadr)
+              if sender=="0.0.0" and typeadr=="cmd":
+                 self.myxpl.send(msg)
+                 print "XPL command: %s group: %s type: %s data: %s" %(command,dmgadr,msg_type,val)
+              if typeadr=="stat":
+                 self.myxpl.send(msg)
+                 print "Envoie d'une stat"
 
     def knx_cmd(self, message):
         type_cmd = message.data['command']
@@ -431,7 +436,7 @@ class KNXManager(XplPlugin):
               stpadr=stpadr[:stpadr.find(' ')]
 
            if type_cmd=="Write":
-              print("dmg Write")
+              print("dmg Write %s") %type_cmd
               valeur = message.data['data']
               data_type = message.data['type']
               print "valeur avant modif:%s" %valeur
@@ -661,7 +666,7 @@ class KNXManager(XplPlugin):
               if data_type=="s":
                  command="groupsresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
               if data_type=="l":
-                  command="groupresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
+                 command="groupresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
            if command<>"":
               print "envoie de la command %s" %command
               subp=subprocess.Popen(command, shell=True)
