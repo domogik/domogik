@@ -59,6 +59,7 @@
     <file path="src/share/domogik/design/plugin/zibase/icon.png"/>
     <file path="src/share/domogik/plugins/zibase.xml"/>
     <file path="src/share/domogik/stats/zibase/zibase.basic-zibase.xml"/>
+    <file path="src/share/domogik/stats/zibase/sensor.basic-zibase.xml"/>
     <file path="src/share/domogik/url2xpl/zibase/preset-dim.xml"/>
     <file path="src/share/domogik/url2xpl/zibase/on.xml"/>
     <file path="src/share/domogik/url2xpl/zibase/off.xml"/>
