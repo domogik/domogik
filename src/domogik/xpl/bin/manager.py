@@ -57,7 +57,11 @@ from domogik.common.packagexml import PackageXml, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
 from distutils2.version import VersionPredicate, IrrationalVersionError
-from distutils2.index.simple import Crawler
+# the try/except it to handle http://bugs.python.org/issue14317
+try:
+    from distutils2.index.simple import Crawler
+except ImportError:  
+    from distutils2.pypi.simple import Crawler
 import re
 import tempfile
 import domogik.xpl.bin
