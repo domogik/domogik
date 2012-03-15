@@ -114,6 +114,7 @@ setup(
             dmg_pkgmgr = domogik.xpl.bin.pkgmgr:main
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
+            dmg_dump = domogik.xpl.bin.dump_xpl:main
             dmg_version = domogik.xpl.bin.version:main
             """
         ],

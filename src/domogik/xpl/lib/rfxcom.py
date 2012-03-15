@@ -1005,18 +1005,20 @@ class RfxcomUsb:
                   }
         # type
         cmd = "20" 
-
-        # <============================ ici
         # subtype
+        """ Notice from Bert : It does in fact make no difference which subtype is used for transmit. So it is possible to use subtype = 0x00 (door/window sensor) and transmit a keyfob panic command. The RFXtrx will transmit a correct keyfob panic.
+So to make it simple you can always use subtype=0x00 for an X10 sec command.
+        """
         cmd += "00"
         # seqnbr
         cmd += self.get_seqnbr()
-        # address : housecode
-        cmd += binascii.hexlify(address[0].upper())
-        # address : unitcode
-        cmd += "%02x" % int(address[1:])
+        # address (id)
+        cmd += "%06x" % int(bin(int(address, 16)), 2)
         # cmnd
-        cmd += COMMAND[command.lower()]
+        if delay == "max":
+            command += "-delayed"
+        # TODO : how do we handle light1-on/off and lignt2-on/off ?
+        cmd += COMMAND[command]
         # filler + rssi : 0x00
         cmd += "00"
         
