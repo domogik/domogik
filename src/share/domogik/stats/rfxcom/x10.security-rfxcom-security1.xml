@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <statistic technology="rfxcom">
-    <schema name="x10.basic">
+    <schema name="x10.security">
         <xpltype type="*">
             <listener>
                 <filter/>
@@ -8,7 +8,10 @@
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-                <value field="level"/>
+                <value field="low-battery"/>
+                <value field="tamper"/>
+                <value field="delay"/>
+                <value field="type"/>
             </mapping>
         </xpltype>
     </schema>

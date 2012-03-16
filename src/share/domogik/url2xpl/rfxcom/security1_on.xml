@@ -1,0 +1,17 @@
+<technology id="rfxcom">
+  <command name="security1_on">
+    <schema>x10.security</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>lights-on</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>x10.security</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="lights-on" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
