@@ -92,8 +92,9 @@ class Sniffer(XplPlugin):
         else:
             return number
 
+def main():
+    S = Sniffer()
+
 if __name__ == "__main__":
     main()
 
-def main():
-    S = Sniffer()
