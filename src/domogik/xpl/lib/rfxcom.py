@@ -978,7 +978,7 @@ class RfxcomUsb:
         """ Type 0x20, Security1
 
             Type : command
-            SDK version : 4.8
+            SDK version : 4.12
         """
         COMMAND = {"normal"           : "00",
                    "normal-delayed"   : "01",
@@ -994,10 +994,13 @@ class RfxcomUsb:
                    "arm-home"         : "0b",
                    "arm-home-delayed" : "0c",
                    "disarm"           : "0d",
-                   "light1-off"       : "10",
-                   "light1-on"        : "11",
-                   "light2-off"       : "12",
-                   "light2-on"        : "13",
+                   "light1-off"       : "10", # not use by official x10.security
+                   "light1-on"        : "11", # not use by official x10.security
+                   # like for the RFXCOM Lan xPL, the lights-on|off command will only command the light1
+                   "lights-off"       : "10",
+                   "lights-on"        : "11",
+                   "light2-off"       : "12", # not use by official x10.security
+                   "light2-on"        : "13", # not use by official x10.security
                    "dark-detected"    : "14",
                    "light-detected"   : "15",
                    "battery-low"      : "16",
@@ -1017,17 +1020,79 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         # cmnd
         if delay == "max":
             command += "-delayed"
-        # TODO : how do we handle light1-on/off and lignt2-on/off ?
+        # like for the RFXCOM Lan xPL, the lights-on|off command will only command the light1
         cmd += COMMAND[command]
         # filler + rssi : 0x00
         cmd += "00"
         
-        self._log.debug("Type x18 : write '%s'" % cmd)
+        self._log.debug("Type x20 : write '%s'" % cmd)
         self.write_packet(cmd, trig_msg)
 
+    def _process_20(self, data):
+        """ Type 0x20, Security1
+        
+            Type : command/sensor
+            SDK version : 4.12
+            Tested : No
+        """
+        COMMAND = {"00" : "normal",
+                   "01" : "normal-delayed",
+                   "02" : "alert",
+                   "03" : "alert-delayed",
+                   "04" : "motion",
+                   "05" : "motion-delayed",
+                   "06" : "panic",
+                   "07" : "end-panic",
+                   "08" : "tamper",
+                   "09" : "arm-away",
+                   "0a" : "arm-away-delayed",
+                   "0b" : "arm-home",
+                   "0c" : "arm-home-delayed",
+                   "0d" : "disarm",
+                   # like for the RFXCOM Lan xPL, the lights-on|off command will only command the light1
+                   "10" : "lights-off",   # light 1
+                   "11" : "lights-on",
+                   "12" : "lights-off",   # light 2
+                   "13" : "lights-on",
+                   "14" : "dark-detected",
+                   "15" : "light-detected",
+                   "16" : "battery-low",
+                   "17" : "pair-kd101",
+                  }
 
-    ### 0x21 : Security2
-    #TODO
+        options = {}
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        id = gh(data, 3,3)
+        address = "0x%s" %(id)
+        status = COMMAND[gh(data, 6)]
+        if status[-8:] == "-delayed":
+            cmnd = status[0:-8]
+            options["delay"] = "max"
+        if status == "battery-low":
+            cmnd = "alert"
+            options["low-battery"] = "true"
+        if status == "tamper":
+            cmnd = "alert"
+            options["tamper"] = "true"
+  
+        battery = int(gh(data, 7)[0], 16) * 10  # percent
+        rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
+
+        msg = {"device" : address, 
+               "command" : cmnd}
+        msg.update(options))
+        self._callback("x10.security", msg)
+
+        self._callback("sensor.basic",
+                       {"device" : address, 
+                        "type" : "battery", 
+                        "current" : battery})
+        self._callback("sensor.basic",
+                       {"device" : device, 
+                        "type" : "rssi", 
+                        "current" : rssi})
+
     
 
     def command_28(self, device, current):

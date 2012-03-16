@@ -112,6 +112,14 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <device_technology_id>rfxcom</device_technology_id>
     </device_type>
 
+    <!-- Security1 -->
+    <device_type>
+      <id>rfxcom.security1</id>
+      <name>Security</name>
+      <description>Security devices (alarms, smoke detectors, ...)</description>
+      <device_technology_id>rfxcom</device_technology_id>
+    </device_type>
+
     <!-- Type 0x50 -->
     <device_type>
       <id>rfxcom.temp</id>
@@ -448,6 +456,21 @@ SUBSYSTEM=="tty" ATTRS{product}=="RFXCOM USB 438.92MHz transceiver" SYMLINK+="rf
       <stat_key>level</stat_key>
       <return_confirmation>0</return_confirmation>
     </device_feature_model>
+
+    <!-- Security1 -->
+    <device_feature_model>
+      <id>rfxcom.security1.switch</id>
+      <name>Switch</name>
+      <feature_type>actuator</feature_type>
+      <device_type_id>rfxcom.security1</device_type_id>
+      <parameters>
+        {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;security1_off&quot;, &quot;value1&quot;:&quot;security1_on&quot;}
+      </parameters>
+      <value_type>binary</value_type>
+      <stat_key>command</stat_key>
+      <return_confirmation>0</return_confirmation>
+    </device_feature_model>
+    <!-- TO FINISH !!!!!! -->
 
     <!-- Type 0x50 -->
     <device_feature_model>
