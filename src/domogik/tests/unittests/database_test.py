@@ -1311,11 +1311,12 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert default_user is not None
         # Make sure we can't add twice a default account
         assert db.add_default_user_account() is None
-        user1 = db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
+        password = '@#?Iwont*GiveIt+-'
+        user1 = db.add_user_account(a_login='mschneider', a_password=password,
                                     a_person_id=person1.id, a_is_admin=True)
         print(user1)
         assert user1.person.first_name == 'Marc'
-        assert db.authenticate('mschneider', 'IwontGiveIt')
+        assert db.authenticate('mschneider', password)
         assert not db.authenticate('mschneider', 'plop')
         assert not db.authenticate('hello', 'boy')
         try:
