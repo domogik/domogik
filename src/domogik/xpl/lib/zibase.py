@@ -285,9 +285,10 @@ class ServerZiBase(threading.Thread):
             'cra' : 'rainrate',
             'uvl' : 'uv',
             'awi' : 'speed',
-            'dir' : 'direction',
+            'drt' : 'direction',
             'temc' : 'setpoint',
-            'sta' : 'status'
+            'sta' : 'status',
+            'flag3' : 'status'
             }
 
         for data in datas:
