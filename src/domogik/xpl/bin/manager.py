@@ -1068,11 +1068,15 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : self.get_sanitized_hostname()})
         mess.add_data({'plugin' : name})
 
-        subp = Popen("dmgdisplug %s" % name, shell=True)
-        subp.communicate()
-        if self.package_mode == True:
-            self._pkg_list_installed()
-        time.sleep(1) # make sure rest receive the updated list before the ack of disable
+        # check the component is nut running
+        if self._check_component_is_running(name, only_one_ping = True):
+            mess.add_data({'error' : "Component '%s' is running. Please stop it before trying to disable" % name})
+        else:
+            subp = Popen("dmgdisplug %s" % name, shell=True)
+            subp.communicate()
+            if self.package_mode == True:
+                self._pkg_list_installed()
+            time.sleep(1) # make sure rest receive the updated list before the ack of disable
         self.myxpl.send(mess)          
 
     def _send_broadcast_hbeat(self):
