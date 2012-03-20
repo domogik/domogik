@@ -32,6 +32,12 @@
           <name>Generic webcam</name>
           <description>Generic Webcam support</description>
       </device_type>
+      <device_type>
+          <id>camera.foscam</id>
+          <device_technology_id>camera</device_technology_id>
+          <name>Generic foscam</name>
+          <description>Generic Foscam support</description>
+      </device_type>
   </device_types>
   <device_feature_models>
       <device_feature_model>
@@ -39,6 +45,18 @@
           <name>MJPEG stream</name>
           <feature_type>sensor</feature_type>
           <device_type_id>camera.webcam</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>none</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+     <device_feature_model>
+          <id>camera.foscam.mjpeg</id>
+          <name>foscam-heden</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>camera.foscam</device_type_id>
           <parameters>
               {}
           </parameters>
