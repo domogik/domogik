@@ -1,8 +1,19 @@
 #!/bin/bash
 
-REVISION=a32a4824492a
-RELEASE=0.1.0-alpha3-$REVISION
-SHORT_RELEASE=0.1.0-alpha3  # for base directory
+if [[ $# -eq 0 ]] ; then
+    REVISION=a32a4824492a
+    SHORT_RELEASE=0.1.0-alpha3
+else
+    case $1 in
+        "tip")
+            REVISION=$(hg log -r tip --template '{node|short}')
+            SHORT_RELEASE=tip-$REVISION
+            ;;
+        *)
+            echo "Bad usage. Exiting..."
+            exit 1
+    esac
+fi
 
 ARCHIVE_NAME=domogik-temp
 ARCHIVE=/tmp/$ARCHIVE_NAME.tgz
@@ -14,59 +25,36 @@ function generate_pkg() {
     hg archive \
     -p domogik-$SHORT_RELEASE \
     -r $REVISION \
+    -I . \
     -X re:package.*.sh \
     -X .hg_archival.txt  \
     -X .coverage  \
     -X .hgignore  \
-    -X src/domogik/ui/xbmc/  \
-    -X src/domogik/xpl/bin/dawndusk.py  \
-    -X src/domogik/xpl/bin/gagenda.py  \
-    -X src/domogik/xpl/bin/knx.py  \
-    -X src/domogik/xpl/bin/module_sample.py  \
-    -X src/domogik/xpl/bin/tv_samsg.py  \
-    -X src/domogik/xpl/bin/xbmc_not.py  \
-    -X src/domogik/xpl/bin/yweather.py  \
-    -X src/domogik/xpl/lib/dawndusk.py  \
-    -X src/domogik/xpl/lib/gagenda.py  \
-    -X src/domogik/xpl/lib/knx.py  \
-    -X src/domogik/xpl/lib/tv_samsg.py  \
-    -X src/domogik/xpl/lib/tv_samsg_led.py  \
-    -X src/domogik/xpl/lib/xbmc_not.py  \
-    -X src/domogik/xpl/lib/yweather.py  \
+    -X src/domogik/ui/  \
+    -X src/domogik/xpl/bin/ \
+    -X src/domogik/xpl/lib/ \
+    -X src/domogik/xpl/helpers/ \
     -X src/domogik/xpl/mocks/  \
-    -X src/mpris/README.txt  \
-    -X src/mpris/XPLSCHEMA  \
-    -X src/mpris/__init__.py  \
-    -X src/mpris/controlers/GenericController.py  \
-    -X src/mpris/controlers/MPD.py  \
-    -X src/mpris/mprisMPD.py  \
-    -X src/mpris/xPLmpris.py  \
-    -X src/share/domogik/plugins/gagenda.xml  \
-    -X src/share/domogik/plugins/knx.xml  \
-    -X src/share/domogik/plugins/tv_samsung.xml  \
-    -X src/share/domogik/plugins/xbmc_not.xml  \
-    -X src/share/domogik/plugins/yweather.xml  \
-    -X src/share/domogik/scenarios/  \
-    -X src/share/domogik/stats/notification/notify.basic.xml  \
-    -X src/share/domogik/stats/online_service/sensor.basic-yweather.xml  \
-    -X src/share/domogik/stats/sample_databasemanager.xml  \
-    -X src/share/domogik/url2xpl/multimedia/  \
+    -X src/external/ \
+    -X src/mpris/ \
+    -X src/share/ \
     -X src/tools/demo/ \
-    -X src/domogik/xpl/helpers/zwave.py \
-    -X src/domogik/xpl/bin/zwave.py \
-    -X src/domogik/xpl/lib/zwave.py \
-    -X src/share/domogik/url2xpl/zwave/ \
-    -X src/share/domogik/url2xpl/zwave/on.xml \
-    -X src/share/domogik/url2xpl/zwave/level.xml \
-    -X src/share/domogik/url2xpl/zwave/off.xml \
-    -X src/share/domogik/plugins/zwave.xml \
-    -X src/share/domogik/stats/zwave/ \
-    -X src/share/domogik/stats/zwave/zwave.basic-zwave.xml \
-    -X src/share/domogik/url2xpl/arduino/ \
-    -X src/share/domogik/stats/arduino/ \
-    -X src/share/domogik/hardwares/ \
-    -t tgz $ARCHIVE 
-
+    -X src/tools/drm/ \
+    -X src/tools/drm-yii/ \
+    -X src/tools/ipx800/ \
+    -I src/domogik/xpl/__init__.py \
+    -I src/domogik/xpl/bin/__init__.py \
+    -I src/domogik/xpl/bin/dbmgr.py \
+    -I src/domogik/xpl/bin/dump_xpl.py \
+    -I src/domogik/xpl/bin/manager.py \
+    -I src/domogik/xpl/bin/pkgmgr.py \
+    -I src/domogik/xpl/bin/rest.py \
+    -I src/domogik/xpl/bin/send.py \
+    -I src/domogik/xpl/bin/version.py \
+    -I src/domogik/xpl/helpers/__init__.py \
+    -I src/domogik/xpl/lib/__init__.py \
+    -I src/domogik/xpl/lib/rest \
+    -t tgz $ARCHIVE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
         exit 1
