@@ -640,7 +640,7 @@ class KNXManager(XplPlugin):
                  type_cmd="déjà fait" 
 
               if datatype=="DT_HVACEib":
-                 data_type="s"
+                 data_type="l"
                  print "Hello val=%s" %val
                  valeur=val
                  if val=="3":
