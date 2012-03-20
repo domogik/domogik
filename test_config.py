@@ -124,9 +124,14 @@ def test_config_files():
             custom_path = value
         elif item.strip() == "HUB_IFACE":
             hub_iface = value
+        elif item.strip() == "LAUNCH_DOMOGIK_XPL_HUB":
+            launch_domogik_xpl_hub = value
         else:
             warning("Unknown config value in the main config file : %s" % item)
     ok("Global config file exists and contains right stuff")
+
+    if launch_domogik_xpl_hub not in ["true", "false"]:
+        warning("LAUNCH_DOMOGIK_XPL_HUB= must be 'true' or 'false'.")
 
     #Check manager params
     info("Check manager params")
