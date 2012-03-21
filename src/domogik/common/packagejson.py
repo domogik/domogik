@@ -93,7 +93,7 @@ class PackageJson():
                 json_file = "%s/%s.json" % (json_directory, id)
 
                 self.info_file = json_file
-                self.json = json.load(self.info_file)
+                self.json = json.load(open(self.info_file))
 
                 # icon file
                 if conf.has_key('package_path'):
@@ -104,18 +104,19 @@ class PackageJson():
             elif path != None:
                 json_file = path
                 self.info_file = json_file
-                self.xml_content = minidom.parse(json_file)
+                self.json = json.load(open(self.info_file))
                 self.icon_file = None
 
             elif url != None:
                 json_file = url
                 self.info_file = json_file
-                xml_data = urllib2.urlopen(json_file)
-                self.xml_content = minidom.parseString(xml_data.read())
+                json_data = urllib2.urlopen(json_file)
+                self.json = json.load(xml_data)
                 self.icon_file = None
 
             # complete json
-            # TODO : fullname
+            self.json["identity"]["fullname"] = "%s-%s" % (self.json["type"],
+                                                           self.json["identity"]["id"])
 
         except:
             raise PackageException("Error reading json file : %s : %s" % (json_file, str(traceback.format_exc())))
@@ -166,7 +167,7 @@ class PackageJson():
         """ Display xml data in a fine way
         """
         print("---- Package informations -------------------------------")
-        print("Type                : %s" % self.json["identity"]["type"])
+        print("Type                : %s" % self.json["type"])
         print("Id                  : %s" % self.json["identity"]["id"])
         print("Full name           : %s" % self.json["identity"]["fullname"])
         print("Release             : %s" % self.json["identity"]["release"])
@@ -182,3 +183,7 @@ class PackageJson():
             print("- %s" % my_file)
         print("---------------------------------------------------------")
 
+
+if __name__ == "__main__":
+    pjson = PackageJson("ipx800")
+    print pjson.json
