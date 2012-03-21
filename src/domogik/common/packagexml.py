@@ -40,6 +40,7 @@ from xml.dom import minidom
 import traceback
 import urllib2
 import datetime
+import json
 
 
 
@@ -382,5 +383,77 @@ class PackageXml():
             print("Priority            : %s" % self.priority)
         print("---------------------------------------------------------")
 
+    def get_json(self):
+        """ transform xml in json
+        """
+        my_json = \
+        {
+            "json_version" : 1,
+            "type" : self.type,
+            "identity" : {
+                "id" : self.id,
+                "release" : self.release,
+                "name" : self.id,   
+                "fullname" : self.fullname,  
+                "category" : self.techno,
+                "description" : self.desc,
+                "documentation" : self.doc,
+                "changelog" : self.changelog,
+                "author" : self.author,
+                "author_email" : self.email,
+                "domogik_min_release" : self.domogik_min_release,
+            },
+        }
+
+        # external members specific
+        if self.type == "external":
+            my_json["vendor_id"] = self.vendor_id
+            my_json["device_id"] = self.device_id
+
+        # dependencies
+        my_dep = []
+        for dep in self.dependencies:
+            my_dep.append({"type" : dep["type"],
+                           "id" : dep["id"]})
+        my_json["dependencies"] = my_dep
+
+        # udev rules
+        my_udev = [] 
+        for rule in self.udev_rules:
+            my_udev.append({"model" : rule["model"],
+                            "desc" : rule["desc"],
+                            "filename" : rule["filename"],
+                            "rule" : rule["rule"]})
+        my_json["udev-rules"] = my_udev
+
+        # package files
+        my_files = []
+        for my_file in self.files:
+            my_files.append(my_file["path"])
+        my_json["files"] = my_files
+        
+        # configuration elements
+        my_json["configuration"] = self.configuration
+
+        # external files
+        # ! TODO !
+
+        # cache related informations
+        if self.package_url != None:
+            my_json["package-url"] = self.package_url
+            my_json["priority"] = self.priority
+
+        # technology detail
+        my_json["technology"] = self.technology
+
+        # type
+        my_json["device_types"] = self.device_types = []
+
+        # features
+        my_json["device_feature_models"] = self.device_feature_models 
+            
+        return my_json
+
 if __name__ == "__main__":
-    PX = PackageXml("bts_gen")
+    PX = PackageXml("ipx800")
+    print json.dumps(PX.get_json())
