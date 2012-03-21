@@ -49,7 +49,7 @@ import subprocess
 from time import *
 from binascii import *
 
-listknx=["debut","fin"]
+listknx=[]
 
 class KNXManager(XplPlugin):
     """ Implements a listener for KNX command messages 
@@ -63,13 +63,13 @@ class KNXManager(XplPlugin):
 
         # Configuration : KNX device
         self._config = Query(self.myxpl, self.log)
-        device = self._config.query('knx', 'device')
+#        device = self._config.query('knx', 'device')
 
         ### Create KNX object
         try:
             self.knx = KNX(self.log, self.send_xpl)
             self.log.info("Open KNX")
-            self.knx.open(device)
+ #           self.knx.open(device)
 
         except KNXException as err:
             self.log.error(err.value)
@@ -101,7 +101,11 @@ class KNXManager(XplPlugin):
 
         ### Load the configuration file in the plugin
         filetoopen=self._config.query('knx','file')
-        fichier=open(filetoopen,"r")  #"/var/log/domogik/knx.txt","r")
+        whereisfile='locate "*/data/knx.txt"'
+        print whereisfile
+        subpp=subprocess.Popen(whereisfile,shell=True)
+        print "||%s||" %subpp
+        fichier=open(filetoopen,"r")
         for ligne in fichier:
            if ligne[:1]<>"#":
               listknx.append(ligne)
@@ -155,9 +159,6 @@ class KNXManager(XplPlugin):
               typeadr=lignetest[lignetest.find(groups)-4:lignetest.find(groups)]
 	      typeadr=typeadr.replace("_","")
               
-#              print "type d'adresse |%s|" %typeadr
-#              print "datatype |%s|" %datatype
-#              print "adresse domogik |%s|" %dmgadr
               msg=XplMessage()
               if command <> 'Read':
                  print "%s %s" %(typeadr,command)
@@ -356,22 +357,19 @@ class KNXManager(XplPlugin):
                  if datatype == "DT_HVACEib":
                     val=int(val.replace(" ",""),16)
                     print "reception DT_HVAC %s" %val
-                    value=val
-                    if typeadr=="stat":
-                       if val==value:
-                          if val==2:
-                             value="HVACeco"
-                          if val==3:
-                             value="HVACnormal"
-                          if val==4:
-                             value="HVACnofreeze"
-                          if val==19:
-                             value="HVACeco"
-                          if val==17:
-                             value="HVACnofreeze"
-                          if val==20:
-                             value="HVACnormal"
-
+                    value="DT_HVACEib"
+                    if val==2:
+                       value="HVACeco"
+                    if val==3:
+                       value="HVACnormal"
+                    if val==4:
+                       value="HVACnofreeze"
+                    if val==19:
+                       value="HVACeco"
+                    if val==17:
+                       value="HVACnofreeze"
+                    if val==20:
+                       value="HVACnormal"
                     val=value
                      
 
@@ -442,6 +440,30 @@ class KNXManager(XplPlugin):
               print "valeur avant modif:%s" %valeur
               val=valeur
 
+              if datatype =="1.001":
+                 data_type="s"
+                 if val == "on" or val == "1":
+                    valeur=1
+                 if val == "off" or val == "0":
+                    valeur=0
+
+              if datatype == "1.008":
+                 data_type="s"
+                 if val == "up" or val == "0":
+                    valeur=0
+                 if val == "down" or val ==1:
+                    valeur=1
+
+              if datatype[:2] =="3.":
+                 if val=="+":
+                    valeur="9"
+                 if val == "-":
+                    valeur="1"
+                 if val=="stop+":
+                    valeur=8
+                 if val=="stop-":
+                    valeur=0
+
               if datatype[:2] =="5." and datatype!="5.001" and datatype!="5.003": #8bit unsignet int 
                  val=int(val)
                  data_type="l"
@@ -472,7 +494,7 @@ class KNXManager(XplPlugin):
                     print val
                     valeur=hex(val)
 
-              if datatype[:2] =="6.": #8bit signed integer (EIS14) 
+              if datatype[:2] == "6.": #8bit signed integer (EIS14) 
                  data_type="l"
                  val=int(val)
                  print "|%s|" %val
@@ -483,7 +505,7 @@ class KNXManager(XplPlugin):
 		 else:
                     self.log.error("define 8bit signed integer overflow %s from %s" %(val,groups))
 
-              if datatype[:2] =="7.": #16bit unsigned integer (EIS14) 
+              if datatype[:2] == "7.": #16bit unsigned integer (EIS14) 
                  data_type="l"
                  val=int(val)
                  if val>=0 and val<=65535:
@@ -497,7 +519,7 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 16bit unsigned integer overflow %s from %s" %(val,groups))	
 
-              if datatype[:2] =="8.": #16bit signed integer (EIS14) 
+              if datatype[:2] == "8.": #16bit signed integer (EIS14) 
                  data_type="l"
                  val=int(val)
                  if val<=32767 and val>=-32768:
@@ -508,7 +530,7 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 16bit signed integer overflow %s from %s" %(val,groups))
 
-              if datatype[:2] =="9.": #16bit floating signed (EIS14) 
+              if datatype[:2] == "9.": #16bit floating signed (EIS14) 
                  data_type="l"
                  val=val.replace(",",".")
                  signe="plus"
@@ -540,7 +562,7 @@ class KNXManager(XplPlugin):
                        valeur="0"+valeur
                  valeur=valeur[:2]+" "+valeur[2:4]
 
-              if datatype=="10.001": #time
+              if datatype == "10.001": #time
                  data_type="l"
                  hour=int(strftime('%H',localtime()))
                  minute=int(strftime('%M',localtime()))
@@ -564,7 +586,7 @@ class KNXManager(XplPlugin):
                  dayhour=hex(int(dayhour,2))[2:]
                  valeur=str(dayhour)+" "+str(minute)+" "+str(seconde)
 
-              if datatype=="11.001":
+              if datatype == "11.001": #Date
                  data_type="l"
                  dayofmounth=hex(int(strftime('%d',localtime())))[2:]
                  mounth=hex(int(strftime('%m',localtime())))[2:]
@@ -578,7 +600,7 @@ class KNXManager(XplPlugin):
                  valeur=dayofmounth+" "+mounth+" "+years
 
 
-              if datatype[:3] =="12.": #32bit unsigned integer (EIS14) 
+              if datatype[:3] == "12.": #32bit unsigned integer (EIS14) 
                  data_type="l"
                  val=int(val)
                  if val>=0 and val<=4294967295:
@@ -606,7 +628,7 @@ class KNXManager(XplPlugin):
                  else:
                     self.log.error("define 32 bit unsignet integer owerflow %s from %s" %(val,groups))
 
-              if datatype == "14.001":
+              if datatype == "14.001": #IEE754 floating
                  data_type="l"
                  print "valeur 14.001 %s" %val
                  val=float(val)
@@ -619,7 +641,7 @@ class KNXManager(XplPlugin):
                     valuer=""
                  print valeur
 
-              if datatype == "16.000":
+              if datatype == "16.000": #string
                  data_type="l"
                  codage=""
                  text=val
@@ -637,17 +659,27 @@ class KNXManager(XplPlugin):
                        subp2=subprocess.Popen(command,shell=True)
                     else:
                        self.log.error("Too many character")
-                 type_cmd="déjà fait" 
+                 type_cmd="None" 
 
-              if datatype=="DT_HVACEib":
+              if datatype == "20.102": #HVAC Mode
+                 if val == "1" or val == "Normal":
+                    valeur=1
+                 if val == "2" or val == "Stop":
+                    valeur=2
+                 if val == "3" or val == "Eco":
+                    valeur=3
+                 if val == "4" or val == "Nofreeze":
+                    valeur=4
+
+              if datatype == "DT_HVACEib": #Datapoint type for TB042
                  data_type="l"
-                 print "Hello val=%s" %val
-                 valeur=val
-                 if val=="3":
+                 if val == "4" or val == "Nofreeze":
+                    valeur=4
+                 if val == "3" or val == "Eco":
                     valeur="2"
-                 if val=="1":
+                 if val == "1" or val == "Normal":
                     valeur="3"
-                 if val=="2":
+                 if val == "2" or val == "Stop":
                     valeur=4
 
               print "Valeur modifier |%s|" %valeur
@@ -656,6 +688,7 @@ class KNXManager(XplPlugin):
                  command="groupswrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
               if data_type=="l":
                  command="groupwrite ip:127.0.0.1 %s %s" %(cmdadr, valeur)
+
            if type_cmd == "Read":
               print("dmg Read")
               command="groupread ip:127.0.0.1 %s" %cmdadr
@@ -672,63 +705,30 @@ class KNXManager(XplPlugin):
               subp=subprocess.Popen(command, shell=True)
            if command=="":
               print("erreur command non définir, type cmd= %s" %type_cmd)
+
+        ### ajout d'un device dans le fichier de configuration du KNX
+
         if type_cmd=="Add":
            print "Add device"
-           Name=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(':')+1:]
-           Adr_dmg=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           knxtype=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           usage=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           datatype=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           Adr_cmd=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           Adr_stat=valeur
+           valeur=valeur[1:]
+           Adr_dmg=valeur[:valeur.find(",")]
+           valeur=valeur[valeur.find(",")+1:]
+           dptype=valeur[:valeur.find(",")]
+           valeur=valeur[valeur.find(",")+1:]
+           Adr_cmd=valeur[:valeur.find(",:")]
+           valeur=valeur[valeur.find(",")+1:]
+           Adr_stat=valeur[:-1]
 
-           cfg = Loader('rest')
-           config = cfg.load()
-           conf = dict(config[1])
-           REST_URL= "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
+           filetoopen=self._config.query('knx','file')
+           print filetoopen
 
-           adresse=REST_URL+'/base/device/add/name/'+Name+"/address/"+Adr_dmg+'/type_id/'+knxtype+'/usage_id/'+usage
-
-           page=urlopen(adresse)
-           strpage=page.read()
-           print strpage
-           print adresse
-           status=strpage[strpage.find('"status" : "'):]
-           status=status[:status.find('"')]
-           
-           if status=="OK":
-           
-              filetoopen=self._config.query('knx','file')
-              print filetoopen
-
-              fichier=open(filetoopen,"a")
-              ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(datatype,Adr_dmg,Adr_cmd,Adr_stat)
-              print ligne
-              fichier.write(ligne)
-              fichier.close
-              listknx.append(ligne)
-              groups=groups[groups.find(":")+1:]
-              groups=groups.strip()
-
-              msg=XplMessage()
-              msg.set_type("xpl-trig")
-              msg.set_schema('knx.basic')
-              msg.add_data({'command': 'Add-ack'})
-              msg.add_data({'group' :  groups})
-              msg.add_data({'type' : 'None' })
-              msg.add_data({'data': 'None'})
-              self.myxpl.send(msg)
-                  
-
+           fichier=open(filetoopen,"a")
+           ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat)
+           print ligne
+           fichier.write(ligne)
+           fichier.close
+           listknx.append(ligne)
 
 
 if __name__ == "__main__":
     INST = KNXManager()
-
-

@@ -59,14 +59,14 @@ class KNX:
         self._ser = None
 
 
-    def open(self, device):
+    def open(self):
         """ open 
             @param device :
         """
-        print("Lancement de EIBD")
+#        print("Lancement de EIBD")
         # device example : "ipt:192.168.0.148"
-        command = "eibd -i -d -D %s" % device
-        print("lancement de la commande: %s" %command)
+#        command = "eibd -i -d -D %s" 
+#        print("lancement de la commande: %s" %command)
         ##subp = subprocess.Popen(command, shell=True)        
         ##self.eibd_pid = subp.pid 
 
@@ -75,7 +75,7 @@ class KNX:
         """ close t
         """
         #subp = subprocess.Popen("kill -9 %s" % self.eibd_pid, shell=True)   
-        ##subp = subprocess.Popen("pkill eibd", shell=True)
+        subp = subprocess.Popen("pkill groupsocketlisten", shell=True)
 
         # TODOD : add check and kill -9 if necessary
 
