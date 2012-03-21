@@ -1,0 +1,69 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "john.doc@gmail.com", 
+            "desc": "Google email account", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "email", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "password", 
+            "desc": "Password for email account", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "password", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "password"
+        }, 
+        {
+            "default": "john.doe@gmail.com", 
+            "desc": "Calendar name (default : your email)", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "calendarname", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [], 
+    "device_types": [], 
+    "files": [], 
+    "identity": {
+        "author": "Fritz", 
+        "author_email": "fritz.smh at gmail.com", 
+        "category": "communication", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Connect to a google agenda to get events agenda", 
+        "documentation": "http://wiki.domogik.org/plugin_gagenda", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-gagenda", 
+        "id": "gagenda", 
+        "name": "gagenda", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Messaging", 
+        "id": "communication", 
+        "name": "Communication"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

@@ -1,0 +1,129 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "Camera1", 
+            "desc": "To report on widget address", 
+            "id": "1", 
+            "interface": "yes", 
+            "key": "name", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "192.168.1.32", 
+            "desc": "Camera Ip address", 
+            "id": "2", 
+            "interface": "yes", 
+            "key": "ip", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "http port", 
+            "id": "3", 
+            "interface": "yes", 
+            "key": "port", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "admin", 
+            "desc": "User allowed to connect the camera", 
+            "id": "4", 
+            "interface": "yes", 
+            "key": "user", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "User Password", 
+            "id": "5", 
+            "interface": "yes", 
+            "key": "password", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "password"
+        }, 
+        {
+            "default": "5", 
+            "desc": "pulse delay", 
+            "id": "6", 
+            "interface": "yes", 
+            "key": "delay", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "foscam.relay", 
+            "feature_type": "actuator", 
+            "id": "foscam.relay.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "output", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "foscam.relay", 
+            "feature_type": "actuator", 
+            "id": "foscam.relay.trigger", 
+            "name": "Trigger", 
+            "parameters": "{&quot;command&quot;:&quot;pulse&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "output", 
+            "value_type": "trigger"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/foscam/icon.png", 
+        "src/share/domogik/plugins/foscam.xml", 
+        "src/share/domogik/stats/foscam/sensor.basic-foscam_relay.xml", 
+        "src/share/domogik/url2xpl/foscam/high.xml", 
+        "src/share/domogik/url2xpl/foscam/low.xml", 
+        "src/share/domogik/url2xpl/foscam/pulse.xml", 
+        "src/domogik/xpl/bin/foscam.py", 
+        "src/domogik/xpl/lib/foscam.py"
+    ], 
+    "identity": {
+        "author": "Capof", 
+        "author_email": "capof1000 at gmail.com", 
+        "category": "foscam", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Allows to open an close foscam relay, your device must be plug on pin 1 and 2", 
+        "documentation": "http://wiki.domogik.org/plugin_foscam_relay", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-foscam", 
+        "id": "foscam", 
+        "name": "foscam", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Foscam Camera relay command", 
+        "id": "foscam", 
+        "name": "Foscam Camera"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

@@ -1,0 +1,77 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": null, 
+            "desc": "Karotz Name", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "Name", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "Domogik installID into Kartoz", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "installid", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "EN", 
+            "desc": "Language spoken by the Karotz (EN, FR, DE, ES)", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "language", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/karotz/icon.png", 
+        "src/share/domogik/plugins/karotz.xml", 
+        "src/share/domogik/url2xpl/karotz/tts.xml", 
+        "src/share/domogik/url2xpl/karotz/led.xml", 
+        "src/share/domogik/url2xpl/karotz/ears.xml", 
+        "src/domogik/xpl/bin/karotz.py", 
+        "src/domogik/xpl/lib/karotz.py"
+    ], 
+    "identity": {
+        "author": "Cedric BOLLINI", 
+        "author_email": "cb.dev@sfr.fr", 
+        "category": "karotz", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Karotz support", 
+        "documentation": "http://wiki.domogik.org/plugin_karotz", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-karotz", 
+        "id": "karotz", 
+        "name": "karotz", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Karotz controlling : tts, led, ears", 
+        "id": "karotz", 
+        "name": "Karotz"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

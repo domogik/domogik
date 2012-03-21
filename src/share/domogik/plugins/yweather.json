@@ -1,0 +1,226 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "True", 
+            "desc": "Enable current weather data", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "en-current", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "True", 
+            "desc": "Enable previsionnal weather data", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "en-prev", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "c", 
+            "desc": "'c' : Celcius ; 'f' : Farenheit", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "unit", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "City code. See http://weather.yahoo.com to find code", 
+            "id": "4", 
+            "interface": "yes", 
+            "key": "city", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "Device address for this city (ex : weather_home)", 
+            "id": "5", 
+            "interface": "yes", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.temperature", 
+            "name": "Temperature", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.pressure", 
+            "name": "Pressure", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "pressure", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.humidity", 
+            "name": "Humidity", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.visibility", 
+            "name": "Visibility", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "visibility", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.rising", 
+            "name": "Rising", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "rising", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.chill", 
+            "name": "Chill", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "chill", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.direction", 
+            "name": "Direction", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "direction", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.speed", 
+            "name": "Speed", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "speed", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.uv", 
+            "name": "UV index", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "uv", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.rainfall", 
+            "name": "Rain fall", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "rainfall", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.drewpoint", 
+            "name": "Drew point", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "drewpoint", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.condition_code", 
+            "name": "Condition code", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "condition-code", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "online_service.weather", 
+            "feature_type": "sensor", 
+            "id": "online_service.weather.condition_text", 
+            "name": "Condition text", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "condition-text", 
+            "value_type": "string"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/yweather/icon.png", 
+        "src/share/domogik/plugins/yweather.xml", 
+        "src/domogik/xpl/bin/yweather.py", 
+        "src/domogik/xpl/lib/yweather.py", 
+        "src/share/domogik/stats/online_service/sensor.basic-yweather.xml"
+    ], 
+    "identity": {
+        "author": "Fritz", 
+        "author_email": "fritz.smh at gmail.com", 
+        "category": "online_service", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Get weather informations from Yahoo! Weather  about your town", 
+        "documentation": "http://wiki.domogik.org/plugin_yweather", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-yweather", 
+        "id": "yweather", 
+        "name": "yweather", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Online services : weather API, etc.", 
+        "id": "online_service", 
+        "name": "Online service"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

@@ -1,0 +1,590 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "/dev/rfxcom", 
+            "desc": "Rfxcom device", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "rfxcom.lighting1_x10_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_x10_dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_x10_off&quot;, &quot;value1&quot;:&quot;lighting1_x10_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_x10_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_x10_dimmer.reduce", 
+            "name": "Reduce", 
+            "parameters": "{&quot;command&quot;:&quot;lighting1_x10_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_x10_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_x10_dimmer.increase", 
+            "name": "Increase", 
+            "parameters": "{&quot;command&quot;:&quot;lighting1_x10_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_arc_switch", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_arc_switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_arc_off&quot;, &quot;value1&quot;:&quot;lighting1_arc_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_elro_switch", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_elro_switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_elro_off&quot;, &quot;value1&quot;:&quot;lighting1_elro_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_waveman_switch", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_waveman_switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_waveman_off&quot;, &quot;value1&quot;:&quot;lighting1_waveman_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_chacon_switch", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_chacon_switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_chacon_off&quot;, &quot;value1&quot;:&quot;lighting1_chacon_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting1_impuls_switch", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting1_impuls_switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting1_impuls_off&quot;, &quot;value1&quot;:&quot;lighting1_impuls_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting2_ac_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting2_ac_dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting2_ac_off&quot;, &quot;value1&quot;:&quot;lighting2_ac_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting2_ac_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting2_ac_dimmer.change", 
+            "name": "Change", 
+            "parameters": "{&quot;command&quot;:&quot;lighting2_ac_preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting2_homeeasy_eu_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting2_homeeasy_eu_dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting2_homeesay_eu_off&quot;, &quot;value1&quot;:&quot;lighting2_homeesay_eu_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting2_homeeasy_eu_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting2_homeeasy_eu_dimmer.change", 
+            "name": "Change", 
+            "parameters": "{&quot;command&quot;:&quot;lighting2_homeesay_eu_preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:15}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting3_koppla_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting3_koppla_dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;lighting3_koppla_off&quot;, &quot;value1&quot;:&quot;lighting3_koppla_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting3_koppla_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting3_koppla_dimmer.reduce", 
+            "name": "Reduce", 
+            "parameters": "{&quot;command&quot;:&quot;lighting3_koppla_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.lighting3_koppla_dimmer", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.lighting3_koppla_dimmer.increase", 
+            "name": "Increase", 
+            "parameters": "{&quot;command&quot;:&quot;lighting3_koppla_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.curtain1_harrison", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.curtain1_harrison.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;curtain1_harrison_off&quot;, &quot;value1&quot;:&quot;curtain1_harrison_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.curtain1_harrison", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.curtain1_harrison.reduce", 
+            "name": "Reduce", 
+            "parameters": "{&quot;command&quot;:&quot;curtain1_harrison_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.curtain1_harrison", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.curtain1_harrison.increase", 
+            "name": "Increase", 
+            "parameters": "{&quot;command&quot;:&quot;curtain1_harrison_bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.security1", 
+            "feature_type": "actuator", 
+            "id": "rfxcom.security1.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;security1_off&quot;, &quot;value1&quot;:&quot;security1_on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "rfxcom.temp", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.temp.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.temp", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.temp.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.humidity", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.humidity.humidity", 
+            "name": "Humidity", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.humidity", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.humidity.humidity-desc", 
+            "name": "Humidity Description", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity-desc", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.humidity", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.humidity.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.th", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.th.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.th", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.th.humidity", 
+            "name": "Humidity", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.th", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.th.humidity-desc", 
+            "name": "Humidity Description", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity-desc", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.th", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.th.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.thb", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.thb.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.thb", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.thb.humidity", 
+            "name": "Humidity", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.thb", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.thb.humidity-desc", 
+            "name": "Humidity Description", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity-desc", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.thb", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.thb.pressure", 
+            "name": "Pressure", 
+            "parameters": "{&quot;unit&quot;:&quot;hPa&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "pressure", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.thb", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.thb.forcast", 
+            "name": "Forcast", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "forcast", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.thb", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.thb.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.rain", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.rain.rainrate", 
+            "name": "Rain Rate", 
+            "parameters": "{&quot;unit&quot;:&quot;mm/hr&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "rainrate", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.rain", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.rain.raintotal", 
+            "name": "Rain Total", 
+            "parameters": "{&quot;unit&quot;:&quot;mm&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "raintotal", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.rain", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.rain.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.wind", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.wind.gust", 
+            "name": "Gust", 
+            "parameters": "{&quot;unit&quot;:&quot;m/sec&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "gust", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.wind", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.wind.average-speed", 
+            "name": "Average Speed", 
+            "parameters": "{&quot;unit&quot;:&quot;m/sec&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "average-speed", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.wind", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.wind.direction", 
+            "name": "Direction", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "direction", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.wind", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.wind.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.uv", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.uv.uv", 
+            "name": "U.V.", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "uv", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.uv", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.uv.battery", 
+            "name": "Battery", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "rfxcom.weight", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.weight.weight", 
+            "name": "Weight", 
+            "parameters": "{&quot;unit&quot;:&quot;kg&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "weight", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.elec1", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.elec1.current", 
+            "name": "Current", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "current", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.elec2", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.elec2.power", 
+            "name": "Power", 
+            "parameters": "{&quot;unit&quot;:&quot;kW&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "power", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.elec2", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.elec2.energy", 
+            "name": "Energy", 
+            "parameters": "{&quot;unit&quot;:&quot;kWh&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "energy", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.rfxsensor", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.rfxsensor.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.rfxsensor", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.rfxsensor.voltage", 
+            "name": "Voltage", 
+            "parameters": "{&quot;unit&quot;:&quot;V&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "voltage", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.rfxmeter", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.rfxmeter.count", 
+            "name": "Count", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "count", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.digimax", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.digimax.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.digimax", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.digimax.setpoint", 
+            "name": "Set Point", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "setpoint", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "rfxcom.remote", 
+            "feature_type": "sensor", 
+            "id": "rfxcom.remote.keys", 
+            "name": "Keys", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "keys", 
+            "value_type": "string"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/rfxcom/icon.png", 
+        "src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"
+    ], 
+    "identity": {
+        "author": "Fritz", 
+        "author_email": "fritz.smh at gmail.com", 
+        "category": "rfxcom", 
+        "changelog": "0.1\n- create", 
+        "description": "RFXCOM Usb 433.92MHz receiver and transmitter", 
+        "documentation": "http://wiki.domogik.org/plugin_rfxcom", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-rfxcom", 
+        "id": "rfxcom", 
+        "name": "rfxcom", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "RFXCom", 
+        "id": "rfxcom", 
+        "name": "RFXCom"
+    }, 
+    "type": "plugin", 
+    "udev-rules": [
+        {
+            "desc": "RFXCOM Usb transceiver and receiver", 
+            "filename": "rfxcom.rules", 
+            "model": "RFXCOM Usb", 
+            "rule": "SUBSYSTEM==\"tty\" ATTRS{product}==\"RFXCOM USB 438.92MHz transceiver\" SYMLINK+=\"rfxcom\" MODE=\"0666\""
+        }
+    ]
+}

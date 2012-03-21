@@ -1,0 +1,102 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "/dev/zwave", 
+            "desc": "Z-wave device", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "115200", 
+            "desc": "Serial speed", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "speed", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [
+        {
+            "id": "pyserial (>=2.5)", 
+            "type": "python"
+        }
+    ], 
+    "device_feature_models": [
+        {
+            "device_type_id": "zwave.switch", 
+            "feature_type": "actuator", 
+            "id": "zwave.switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "zwave.dimmer", 
+            "feature_type": "actuator", 
+            "id": "zwave.dimmer.switch", 
+            "name": "Dimmer", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "zwave.dimmer", 
+            "feature_type": "actuator", 
+            "id": "zwave.dimmer.change", 
+            "name": "Change", 
+            "parameters": "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/zwave/icon.png", 
+        "src/share/domogik/plugins/zwave.xml", 
+        "src/share/domogik/stats/zwave/zwave.basic-zwave.xml", 
+        "src/share/domogik/url2xpl/zwave/level.xml", 
+        "src/domogik/xpl/bin/zwave.py", 
+        "src/domogik/xpl/lib/zwave.py"
+    ], 
+    "identity": {
+        "author": "Michael Ricart", 
+        "author_email": "ricart.michael at gmail.com", 
+        "category": "zwave", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Z-wave is a radio based protocol to control lights, appliances and others things in your house", 
+        "documentation": "http://wiki.domogik.org/tiki-index.php?page=plugin_zwave", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-zwave", 
+        "id": "zwave", 
+        "name": "zwave", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Z-wave", 
+        "id": "zwave", 
+        "name": "Z-wave"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

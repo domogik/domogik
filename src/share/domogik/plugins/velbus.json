@@ -1,0 +1,122 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "0", 
+            "desc": "define the connection type to velbus", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "connection-type", 
+            "optionnal": "no", 
+            "options": [
+                "serial", 
+                "socket"
+            ], 
+            "type": "enum"
+        }, 
+        {
+            "default": "/dev/ttyACM0", 
+            "desc": "velbus device (/dev/ttyACM0 for serial, or ip:port for socket", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [
+        {
+            "id": "pyserial (>=2.6)", 
+            "type": "python"
+        }
+    ], 
+    "device_feature_models": [
+        {
+            "device_type_id": "velbus.relay", 
+            "feature_type": "actuator", 
+            "id": "velbus.relay.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "velbus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "velbus.dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "velbus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "velbus.dimmer.change", 
+            "name": "Dimmer", 
+            "parameters": "{&quot;command&quot;:&quot;setlevel&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:255}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }, 
+        {
+            "device_type_id": "velbus.shutter", 
+            "feature_type": "actuator", 
+            "id": "velbus.shutter.switch", 
+            "name": "Shutter", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/velbus/icon.png", 
+        "src/share/domogik/stats/velbus/lighting.device-velbus.xml", 
+        "src/share/domogik/url2xpl/velbus/setlevel.xml", 
+        "src/domogik/xpl/bin/velbus.py", 
+        "src/domogik/xpl/lib/velbus.py", 
+        "src/domogik/xpl/helper/velbus.py"
+    ], 
+    "identity": {
+        "author": "Maikel Punie", 
+        "author_email": "maikel.puni@gmail.com", 
+        "category": "velbus", 
+        "changelog": "0.1.0\n- relays only\n- serial comunication only \n0.2.0\n- added socket comunication\n0.3.0\n- added dimmer support\n0.4.0\n- added blind (up/down) support", 
+        "description": "velbus interface", 
+        "documentation": "http://wiki.domogik.org/plugin_velbus", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-velbus", 
+        "id": "velbus", 
+        "name": "velbus", 
+        "release": "0.4.1"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Velbus http://www.velbus.eu", 
+        "id": "velbus", 
+        "name": "Velbus"
+    }, 
+    "type": "plugin", 
+    "udev-rules": [
+        {
+            "desc": "Velbus USB interface", 
+            "filename": "velbus.rules", 
+            "model": "VMB1USB", 
+            "rule": "SUBSYSTEM==\"tty\" ATTRS(manufacturer)==\"Velleman Projects\" ATTRS{product}==\"VMB1USB Velbus USB interface\" SYMLINK+=\"velbus\" MODE=\"0666\""
+        }
+    ]
+}

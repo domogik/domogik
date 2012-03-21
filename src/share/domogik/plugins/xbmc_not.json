@@ -1,0 +1,69 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "xbmc:8000", 
+            "desc": "XBMC Media center HTTP API address(ip:port)", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "address", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "15", 
+            "desc": "Default delay for displaying a notification (seconds)", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "delay", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "number"
+        }, 
+        {
+            "default": "10", 
+            "desc": "Max delay between sending title and message with osd.basic xpl message (seconds)", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "maxdelay", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "number"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [], 
+    "device_types": [], 
+    "files": [], 
+    "identity": {
+        "author": "Fritz", 
+        "author_email": "fritz.smh at gmail.com", 
+        "category": "multimedia", 
+        "changelog": "Obsolete plugin - will be suppressed\n\n0.1.0\n- plugin creation", 
+        "description": "Send notifications to XBMC", 
+        "documentation": "http://wiki.domogik.org/plugin_xbmc_not", 
+        "domogik_min_release": "0.1.0", 
+        "fullname": "plugin-xbmc_not", 
+        "id": "xbmc_not", 
+        "name": "xbmc_not", 
+        "release": "0.1"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Multimedia", 
+        "id": "multimedia", 
+        "name": "Multimedia"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

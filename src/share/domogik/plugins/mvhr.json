@@ -1,0 +1,196 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "mvhr1", 
+            "desc": "Name of the MVHR", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "name", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "10", 
+            "desc": "The timeout (in minutes) of the sensors before sending an alert", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "timeout", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "integer"
+        }, 
+        {
+            "default": "5", 
+            "desc": "The delay (in minutes) between two status messages", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "delay", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "integer"
+        }, 
+        {
+            "default": "SENSOR1", 
+            "desc": "The indoor sensor of the mvhr", 
+            "id": "4", 
+            "interface": "no", 
+            "key": "mvhr-indoor", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "SENSOR2", 
+            "desc": "The outdoor sensor of the mvhr", 
+            "id": "5", 
+            "interface": "no", 
+            "key": "mvhr-outdoor", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "SENSOR3", 
+            "desc": "The insufflation sensor of the mvhr", 
+            "id": "6", 
+            "interface": "no", 
+            "key": "mvhr-insuffl", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "The reject sensor of the mvhr", 
+            "id": "7", 
+            "interface": "no", 
+            "key": "mvhr-reject", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "The electric power sensor of the mvhr", 
+            "id": "8", 
+            "interface": "no", 
+            "key": "mvhr-power", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "False", 
+            "desc": "Sould we manage a ECT (Earth Cooling Tube)", 
+            "id": "9", 
+            "interface": "no", 
+            "key": "ect", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": null, 
+            "desc": "The tube sensor of the ect", 
+            "id": "10", 
+            "interface": "no", 
+            "key": "ect-tube", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "The outdoor sensor of the ect", 
+            "id": "11", 
+            "interface": "no", 
+            "key": "ect-outdoor", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "mvhr.exchanger_efficiency", 
+            "feature_type": "sensor", 
+            "id": "mvhr.exchanger_efficiency.efficiency", 
+            "name": "Exchanger eff.", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u0025&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "exchng-eff", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "mvhr.indoor_temperature", 
+            "feature_type": "sensor", 
+            "id": "mvhr.indoor_temperature.temperature", 
+            "name": "Indoor temp.", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "mvhr-indoor", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "mvhr.outdoor_temperature", 
+            "feature_type": "sensor", 
+            "id": "mvhr.outdoor_temperature.temperature", 
+            "name": "Outdoor temp.", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "mvhr-outdoor", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "mvhr.insuffl_temperature", 
+            "feature_type": "sensor", 
+            "id": "mvhr.insuffl_temperature.temperature", 
+            "name": "Insufflation temp.", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "mvhr-insuffl", 
+            "value_type": "number"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/mvhr/icon.png", 
+        "src/share/domogik/plugins/mvhr.xml", 
+        "src/domogik/xpl/bin/mvhr.py", 
+        "src/domogik/xpl/lib/mvhr.py", 
+        "src/share/domogik/stats/mvhr/mvhr.basic.xml"
+    ], 
+    "identity": {
+        "author": "Sebastien GALLET", 
+        "author_email": "sgallet at gmail dot com", 
+        "category": "mvhr", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Calculate statistics of a Continuous Mechanical Extract\n  Ventilation with Heat Recovery (MVHR) and a Earth Cooling Tubes (ECT)", 
+        "documentation": "http://wiki.domogik.org/plugin_mvhr", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-mvhr", 
+        "id": "mvhr", 
+        "name": "mvhr", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Mechanical Ventilation with Heat Recovery", 
+        "id": "mvhr", 
+        "name": "Mvhr"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

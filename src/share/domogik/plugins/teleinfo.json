@@ -1,0 +1,215 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "/dev/teleinfo", 
+            "desc": "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "60", 
+            "desc": "Interval between each request (seconds)", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "interval", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "number"
+        }
+    ], 
+    "dependencies": [
+        {
+            "id": "pyserial (>=2.5)", 
+            "type": "python"
+        }
+    ], 
+    "device_feature_models": [
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.max_power", 
+            "name": "Maximum power", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.instant_power", 
+            "name": "Instant power", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.off_peak_hours", 
+            "name": "Off peak hours", 
+            "parameters": "{&quot;unit&quot;:&quot;Wh&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "hchc", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.peak_hours", 
+            "name": "Peak hours", 
+            "parameters": "{&quot;unit&quot;:&quot;Wh&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "hchp", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.tariff_period", 
+            "name": "Tariff period", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "ptec", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.apparent_power", 
+            "name": "Apparent power", 
+            "parameters": "{&quot;unit&quot;:&quot;Va&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "papp", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.hourly_group", 
+            "name": "Hourly group", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "hhphc", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.instant_power_1", 
+            "name": "Instant power on phasis 1", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst1", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.instant_power_2", 
+            "name": "Instant power on phasis 2", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst2", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.instant_power_3", 
+            "name": "Instant power on phasis 3", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst3", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.max_power_1", 
+            "name": "Maximum power on phasis 1", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax1", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.max_power_2", 
+            "name": "Maximum power on phasis 2", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax2", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "service.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "service.teleinfo.max_power_3", 
+            "name": "Maximum power on phasis 3", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax3", 
+            "value_type": "number"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/teleinfo/icon.png", 
+        "src/share/domogik/plugins/teleinfo.xml", 
+        "src/share/domogik/stats/teleinfo/teleinfo.basic-teleinfo.xml", 
+        "src/share/domogik/stats/teleinfo/teleinfo.short-teleinfo.xml", 
+        "src/domogik/xpl/bin/teleinfo.py", 
+        "src/domogik/xpl/lib/teleinfo.py"
+    ], 
+    "identity": {
+        "author": "Maxence Dunnewind", 
+        "author_email": "maxence at dunnewind.net", 
+        "category": "service", 
+        "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "description": "Teleinfo is a french method to get power related informations.", 
+        "documentation": "http://wiki.domogik.org/plugin_teleinfo", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-teleinfo", 
+        "id": "teleinfo", 
+        "name": "teleinfo", 
+        "release": "0.2a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Distributed services, water, gas, electricity", 
+        "id": "service", 
+        "name": "Service"
+    }, 
+    "type": "plugin", 
+    "udev-rules": [
+        {
+            "desc": "Dauguet Usb assembly", 
+            "filename": "teleinfo.rules", 
+            "model": "Dauguet Usb", 
+            "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYMLINK+=\"teleinfo\", MODE=\"0666\""
+        }, 
+        {
+            "desc": "Dauguet serial assembly with a modchip usb to serial adapter", 
+            "filename": "teleinfo.rules", 
+            "model": "Modchip usb to serial adapter", 
+            "rule": "KERNEL==\"ttyUSB*\", ATTRS{port_number}==\"0\", DRIVERS==\"moschip7720\", SYMLINK+=\"teleinfo\", MODE=\"0666\""
+        }
+    ]
+}

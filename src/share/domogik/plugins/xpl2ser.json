@@ -1,0 +1,69 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": null, 
+            "desc": "Serial device (ex: /dev/ttyUSB0)", 
+            "id": "1", 
+            "interface": "yes", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "9600", 
+            "desc": "Serial speed (ex: 9600 bauds)", 
+            "id": "2", 
+            "interface": "yes", 
+            "key": "baudrate", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [
+        {
+            "id": "pySerial > 2.4", 
+            "type": "python"
+        }
+    ], 
+    "device_feature_models": [], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/xpl2ser/icon.png", 
+        "src/share/domogik/plugins/xpl2ser.xml", 
+        "src/domogik/xpl/bin/xpl2ser.py", 
+        "src/domogik/xpl/lib/xpl2ser.py"
+    ], 
+    "identity": {
+        "author": "Kriss", 
+        "author_email": "#", 
+        "category": "bridge", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.", 
+        "documentation": "#", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-xpl2ser", 
+        "id": "xpl2ser", 
+        "name": "xpl2ser", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Bridge from xpl network to a device", 
+        "id": "bridge", 
+        "name": "Bridge"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

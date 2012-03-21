@@ -1,0 +1,105 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "/etc/heyu/x10.conf", 
+            "desc": "Heyu configuration path", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "heyu-cfg-path", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [
+        {
+            "id": "heyu", 
+            "type": "other"
+        }
+    ], 
+    "device_feature_models": [
+        {
+            "device_type_id": "x10.switch", 
+            "feature_type": "actuator", 
+            "id": "x10.switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "x10.dimmer", 
+            "feature_type": "actuator", 
+            "id": "x10.dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "x10.dimmer", 
+            "feature_type": "actuator", 
+            "id": "x10.dimmer.reduce", 
+            "name": "Reduce", 
+            "parameters": "{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "x10.dimmer", 
+            "feature_type": "actuator", 
+            "id": "x10.dimmer.increase", 
+            "name": "Increase", 
+            "parameters": "{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/x10_heyu/icon.png", 
+        "src/share/domogik/plugins/x10_heyu.xml", 
+        "src/share/domogik/stats/x10/x10.basic-x10_heyu.xml", 
+        "src/share/domogik/url2xpl/x10/bright.xml", 
+        "src/share/domogik/url2xpl/x10/dim.xml", 
+        "src/share/domogik/url2xpl/x10/on.xml", 
+        "src/share/domogik/url2xpl/x10/off.xml", 
+        "src/domogik/xpl/bin/x10_heyu.py", 
+        "src/domogik/xpl/lib/x10_heyu.py"
+    ], 
+    "identity": {
+        "author": "Maxence Dunnewind, Mirelsol", 
+        "author_email": "maxence at dunnewind.net; marc at mirelsol.org", 
+        "category": "x10", 
+        "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "description": "X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work", 
+        "documentation": "http://wiki.domogik.org/plugin_x10_heyu", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-x10_heyu", 
+        "id": "x10_heyu", 
+        "name": "x10_heyu", 
+        "release": "0.2a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "X10 technology", 
+        "id": "x10", 
+        "name": "X10"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

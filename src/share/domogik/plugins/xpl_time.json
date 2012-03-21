@@ -1,0 +1,43 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/xpl_time/icon.png", 
+        "src/share/domogik/plugins/xpl_time.xml", 
+        "src/domogik/xpl/bin/xpl_time.py"
+    ], 
+    "identity": {
+        "author": "Maxence Dunnewind", 
+        "author_email": "maxence at dunnewind.net", 
+        "category": "domogik", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "This plugin sends date and time on the xPL network every minute", 
+        "documentation": "http://wiki.domogik.org/plugin_xpl_time", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-xpl_time", 
+        "id": "xpl_time", 
+        "name": "xpl_time", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Domogik", 
+        "id": "domogik", 
+        "name": "Domogik"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

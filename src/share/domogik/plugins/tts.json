@@ -1,0 +1,66 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "espeak -v fr %s", 
+            "desc": "Command Line : espeak -v fr %s", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "TTS software", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "communication.tts", 
+            "feature_type": "actuator", 
+            "id": "communication.tts.tts", 
+            "name": "tts", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "", 
+            "value_type": "trigger"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/tts/icon.png", 
+        "src/share/domogik/plugins/tts.xml", 
+        "src/share/domogik/url2xpl/communication/tts.xml", 
+        "src/domogik/xpl/bin/tts.py", 
+        "src/domogik/xpl/lib/tts.py"
+    ], 
+    "identity": {
+        "author": "Gizmo - Guillaume MORLET", 
+        "author_email": "contact@gizmo-network.fr", 
+        "category": "communication", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "Text to speech", 
+        "documentation": "http://wiki.domogik.org/plugin_tts", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-tts", 
+        "id": "tts", 
+        "name": "tts", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Telephony, videophone, mails, messaging", 
+        "id": "communication", 
+        "name": "communication"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

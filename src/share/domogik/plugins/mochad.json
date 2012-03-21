@@ -1,0 +1,130 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "127.0.0.1", 
+            "desc": "mochad host address", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "mochad-host", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "1099", 
+            "desc": "mochad port address", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "mochad-port", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "True", 
+            "desc": "If you use a cm15 with communication to devices via PL", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "cm15", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "False", 
+            "desc": "if you use a cm19 with communication to devices via RF", 
+            "id": "4", 
+            "interface": "no", 
+            "key": "cm19", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "x10.switch", 
+            "feature_type": "actuator", 
+            "id": "x10.switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "x10.dimmer", 
+            "feature_type": "actuator", 
+            "id": "x10.dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "x10.dimmer", 
+            "feature_type": "actuator", 
+            "id": "x10.dimmer.reduce", 
+            "name": "Reduce", 
+            "parameters": "{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "x10.dimmer", 
+            "feature_type": "actuator", 
+            "id": "x10.dimmer.increase", 
+            "name": "Increase", 
+            "parameters": "{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/mochad/icon.png", 
+        "src/share/domogik/plugins/mochad.xml", 
+        "src/share/domogik/stats/x10/x10.basic-mochad.xml", 
+        "src/share/domogik/url2xpl/x10/bright.xml", 
+        "src/share/domogik/url2xpl/x10/dim.xml", 
+        "src/share/domogik/url2xpl/x10/on.xml", 
+        "src/share/domogik/url2xpl/x10/off.xml", 
+        "src/domogik/xpl/bin/mochad.py", 
+        "src/domogik/xpl/lib/mochad.py"
+    ], 
+    "identity": {
+        "author": "Julien Garet, jgaret", 
+        "author_email": "julien at garet dot info", 
+        "category": "x10", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs mochad to work", 
+        "documentation": "http://wiki.domogik.org/plugin_mochad", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-mochad", 
+        "id": "mochad", 
+        "name": "mochad", 
+        "release": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "X10 technology", 
+        "id": "x10", 
+        "name": "X10"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

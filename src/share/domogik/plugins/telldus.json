@@ -1,0 +1,211 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "False", 
+            "desc": "Send dawn/dusk messages using an obscurity detector", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "dawndusk", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "False", 
+            "desc": "Send sensor.basic messages using a door detector", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "windoor", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "False", 
+            "desc": "Send sensor.basic messages using a move detector", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "move", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "400", 
+            "desc": "Delay between 2 RF orders (default 400ms)", 
+            "id": "4", 
+            "interface": "no", 
+            "key": "delayrf", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "Address of the device (TSxx)", 
+            "id": "5", 
+            "interface": "yes", 
+            "key": "name", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "Type of the device (DAWNDUSK,WINDOOR,MOVE)", 
+            "id": "6", 
+            "interface": "yes", 
+            "key": "devicetype", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "Parameter 1", 
+            "id": "7", 
+            "interface": "yes", 
+            "key": "param1", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": null, 
+            "desc": "Parameter 2", 
+            "id": "8", 
+            "interface": "yes", 
+            "key": "param2", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "telldus.switch", 
+            "feature_type": "actuator", 
+            "id": "telldus.switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "telldus.shutter", 
+            "feature_type": "actuator", 
+            "id": "telldus.shutter.switch", 
+            "name": "Shutter", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "telldus.shutter", 
+            "feature_type": "actuator", 
+            "id": "telldus.shutter.stop", 
+            "name": "Stop", 
+            "parameters": "{&quot;command&quot;:&quot;stop&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;stop&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "telldus.shutter", 
+            "feature_type": "actuator", 
+            "id": "telldus.shutter.shut", 
+            "name": "Shut", 
+            "parameters": "{&quot;command&quot;:&quot;shut&quot;,&quot;valueMin&quot;:&quot;0&quot;, &quot;valueMax&quot;:&quot;4&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "telldus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "telldus.dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "telldus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "telldus.dimmer.change", 
+            "name": "Change", 
+            "parameters": "{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:&quot;0&quot;, &quot;valueMax&quot;:&quot;100&quot;, &quot;step&quot;:&quot;10&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }, 
+        {
+            "device_type_id": "telldus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "telldus.dimmer.bright", 
+            "name": "Bright", 
+            "parameters": "{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:&quot;0&quot;, &quot;valueMax&quot;:&quot;100&quot;, &quot;step&quot;:&quot;10&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/telldus/icon.png", 
+        "src/share/domogik/plugins/telldus.xml", 
+        "src/share/domogik/stats/telldus/telldus.xml", 
+        "src/share/domogik/stats/telldus/dawndusk.request.xml", 
+        "src/share/domogik/stats/telldus/dawndusk.basic.xml", 
+        "src/share/domogik/stats/telldus/sensor.request.xml", 
+        "src/share/domogik/stats/telldus/sensor.basic.xml", 
+        "src/share/domogik/url2xpl/telldus/dim.xml", 
+        "src/share/domogik/url2xpl/telldus/down.xml", 
+        "src/share/domogik/url2xpl/telldus/off.xml", 
+        "src/share/domogik/url2xpl/telldus/on.xml", 
+        "src/share/domogik/url2xpl/telldus/shut.xml", 
+        "src/share/domogik/url2xpl/telldus/stop.xml", 
+        "src/share/domogik/url2xpl/telldus/up.xml", 
+        "src/domogik/xpl/bin/telldus.py", 
+        "src/domogik/xpl/helpers/telldus.py", 
+        "src/domogik/xpl/lib/telldus.py", 
+        "src/domogik/xpl/lib/telldus_dawndusk.py", 
+        "src/domogik/xpl/lib/telldus_windoor.py", 
+        "src/domogik/xpl/lib/telldus_move.py"
+    ], 
+    "identity": {
+        "author": "Sebastien GALLET", 
+        "author_email": "sgallet at gmail dot com", 
+        "category": "telldus", 
+        "changelog": "0.2\n- Update XML description", 
+        "description": "Manage many devices through TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n  they will appear automatically in Domogik", 
+        "documentation": "http://wiki.domogik.org/plugin_telldus", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-telldus", 
+        "id": "telldus", 
+        "name": "telldus", 
+        "release": "0.2a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Manage many devices through TellStick (Chacon, Ikea, ...)", 
+        "id": "telldus", 
+        "name": "Telldus"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

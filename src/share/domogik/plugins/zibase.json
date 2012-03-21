@@ -1,0 +1,330 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": null, 
+            "desc": "ZiBase IP", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "ip", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "eth0", 
+            "desc": "Network Interface", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "interface", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "17100", 
+            "desc": "Listening Port", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "port", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "int"
+        }, 
+        {
+            "default": "False", 
+            "desc": "Enable reading internal variable", 
+            "id": "4", 
+            "interface": "no", 
+            "key": "envar", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "10", 
+            "desc": "Interval between each reading of the internal variables", 
+            "id": "5", 
+            "interface": "no", 
+            "key": "interv", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "int"
+        }
+    ], 
+    "dependencies": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "zibase.switch", 
+            "feature_type": "actuator", 
+            "id": "zibase.switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "zibase.dimmer", 
+            "feature_type": "actuator", 
+            "id": "zibase.dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "zibase.dimmer", 
+            "feature_type": "actuator", 
+            "id": "zibase.dimmer.change", 
+            "name": "Change", 
+            "parameters": "{&quot;command&quot;:&quot;preset-dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
+            "return_confirmation": "1", 
+            "stat_key": "preset-dim", 
+            "value_type": "range"
+        }, 
+        {
+            "device_type_id": "zibase.temp", 
+            "feature_type": "sensor", 
+            "id": "zibase.temp.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.temp", 
+            "feature_type": "sensor", 
+            "id": "zibase.temp.battery", 
+            "name": "Battery", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.th", 
+            "feature_type": "sensor", 
+            "id": "zibase.th.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.th", 
+            "feature_type": "sensor", 
+            "id": "zibase.th.humidity", 
+            "name": "Humidity", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.th", 
+            "feature_type": "sensor", 
+            "id": "zibase.th.battery", 
+            "name": "Battery", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.wind", 
+            "feature_type": "sensor", 
+            "id": "zibase.wind.average-speed", 
+            "name": "Average Speed", 
+            "parameters": "{&quot;unit&quot;:&quot;m/sec&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "speed", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.wind", 
+            "feature_type": "sensor", 
+            "id": "zibase.wind.direction", 
+            "name": "Direction", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "direction", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.wind", 
+            "feature_type": "sensor", 
+            "id": "zibase.wind.battery", 
+            "name": "Battery", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.uv", 
+            "feature_type": "sensor", 
+            "id": "zibase.uv.uv", 
+            "name": "U.V.", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "uv", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.uv", 
+            "feature_type": "sensor", 
+            "id": "zibase.uv.battery", 
+            "name": "Battery", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.rain", 
+            "feature_type": "sensor", 
+            "id": "zibase.rain.rainrate", 
+            "name": "Rain Rate", 
+            "parameters": "{&quot;unit&quot;:&quot;mm/hr&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "rainrate", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.rain", 
+            "feature_type": "sensor", 
+            "id": "zibase.rain.raintotal", 
+            "name": "Rain Total", 
+            "parameters": "{&quot;unit&quot;:&quot;mm&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "raintotal", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.rain", 
+            "feature_type": "sensor", 
+            "id": "zibase.rain.battery", 
+            "name": "Battery", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "battery", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.elec", 
+            "feature_type": "sensor", 
+            "id": "zibase.elec.power", 
+            "name": "Power", 
+            "parameters": "{&quot;unit&quot;:&quot;kW&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "power", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.elec", 
+            "feature_type": "sensor", 
+            "id": "zibase.elec.energy", 
+            "name": "Energy", 
+            "parameters": "{&quot;unit&quot;:&quot;kWh&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "energy", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.digimax", 
+            "feature_type": "sensor", 
+            "id": "zibase.digimax.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.digimax", 
+            "feature_type": "sensor", 
+            "id": "zibase.digimax.setpoint", 
+            "name": "Set Point", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "setpoint", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "zibase.digimax", 
+            "feature_type": "sensor", 
+            "id": "zibase.digimax.status", 
+            "name": "Status", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "status", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.sensor", 
+            "feature_type": "sensor", 
+            "id": "zibase.sensor.status", 
+            "name": "Status", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "status", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "zibase.intvar", 
+            "feature_type": "sensor", 
+            "id": "zibase.intvar.status", 
+            "name": "Status", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "status", 
+            "value_type": "number"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/zibase/icon.png", 
+        "src/share/domogik/plugins/zibase.xml", 
+        "src/share/domogik/stats/zibase/zibase.basic-zibase.xml", 
+        "src/share/domogik/stats/zibase/sensor.basic-zibase.xml", 
+        "src/share/domogik/url2xpl/zibase/preset-dim.xml", 
+        "src/share/domogik/url2xpl/zibase/on.xml", 
+        "src/share/domogik/url2xpl/zibase/off.xml", 
+        "src/domogik/xpl/bin/zibase.py", 
+        "src/domogik/xpl/lib/zibase.py"
+    ], 
+    "identity": {
+        "author": "Cedric BOLLINI", 
+        "author_email": "cb.dev@sfr.fr", 
+        "category": "zibase", 
+        "changelog": "0.1\n- plugin creation", 
+        "description": "ZiBase support (zodianet)", 
+        "documentation": "http://wiki.domogik.org/plugin_zibase", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-zibase", 
+        "id": "zibase", 
+        "name": "zibase", 
+        "release": "0.1a2"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "ZiBase monitoring and controlling", 
+        "id": "zibase", 
+        "name": "ZiBase"
+    }, 
+    "type": "plugin", 
+    "udev-rules": []
+}

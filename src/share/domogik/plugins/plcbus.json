@@ -1,0 +1,136 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "desc": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "/dev/plcbus", 
+            "desc": "Plcbus device", 
+            "id": "1", 
+            "interface": "no", 
+            "key": "device", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "FF", 
+            "desc": "Usercode value (between 00 and FF), defaults to FF", 
+            "id": "2", 
+            "interface": "no", 
+            "key": "usercode", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "30", 
+            "desc": "Interval between 2 probes to discover devices and check their state (0 = don't do probing).", 
+            "id": "3", 
+            "interface": "no", 
+            "key": "probe-interval", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "ABCDEFGHIJKLMNOP", 
+            "desc": "List of housecode to probe. If you know you don't use an house code remove it from the list.", 
+            "id": "4", 
+            "interface": "no", 
+            "key": "probe-list", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "dependencies": [
+        {
+            "id": "pyserial (>=2.5)", 
+            "type": "python"
+        }
+    ], 
+    "device_feature_models": [
+        {
+            "device_type_id": "plcbus.switch", 
+            "feature_type": "actuator", 
+            "id": "plcbus.switch.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "plcbus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "plcbus.dimmer.switch", 
+            "name": "Dimmer", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "plcbus.dimmer", 
+            "feature_type": "actuator", 
+            "id": "plcbus.dimmer.change", 
+            "name": "Change", 
+            "parameters": "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "range"
+        }
+    ], 
+    "device_types": [], 
+    "files": [
+        "src/share/domogik/design/plugin/plcbus/icon.png", 
+        "src/share/domogik/plugins/plcbus.xml", 
+        "src/share/domogik/stats/plcbus/plcbus.basic-plcbus.xml", 
+        "src/share/domogik/url2xpl/plcbus/all_lights_off.xml", 
+        "src/share/domogik/url2xpl/plcbus/all_lights_on.xml", 
+        "src/share/domogik/url2xpl/plcbus/bright.xml", 
+        "src/share/domogik/url2xpl/plcbus/dim.xml", 
+        "src/share/domogik/url2xpl/plcbus/on.xml", 
+        "src/share/domogik/url2xpl/plcbus/off.xml", 
+        "src/share/domogik/url2xpl/plcbus/preset_dim.xml", 
+        "src/domogik/xpl/bin/plcbus.py", 
+        "src/domogik/xpl/lib/plcbus.py", 
+        "src/domogik/xpl/lib/PLCBusSerialHandler.py"
+    ], 
+    "identity": {
+        "author": "Francois Pinet, Maxence Dunnewind", 
+        "author_email": "domopyx at gmail.com ; maxence at dunnewind.net", 
+        "category": "plcbus", 
+        "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "description": "Plcbus is a CPL based protocol to control lights, appliances and others things in your house", 
+        "documentation": "http://wiki.domogik.org/plugin_plcbus", 
+        "domogik_min_release": "0.2.0", 
+        "fullname": "plugin-plcbus", 
+        "id": "plcbus", 
+        "name": "plcbus", 
+        "release": "0.2a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "PLCBus", 
+        "id": "plcbus", 
+        "name": "PLCBus"
+    }, 
+    "type": "plugin", 
+    "udev-rules": [
+        {
+            "desc": "Plcbus 1141U Usb adaptator", 
+            "filename": "plcbus.rules", 
+            "model": "Plcbus 1141U", 
+            "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"067b\", ATTRS{idProduct}==\"2303\", SYMLINK+=\"plcbus\", MODE=\"0666\""
+        }
+    ]
+}
