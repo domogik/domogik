@@ -37,6 +37,7 @@ TODO
 """
 
 from domogik.common.packagemanager import PackageManager
+from domogik.common.packagexml import PackageXml, PackageException
 from optparse import OptionParser
 
 PACKAGE_TYPES = ['plugin', 'external']
@@ -85,6 +86,11 @@ def main():
                       action = "store", 
                       dest = "output_dir",
                       help = "Directory where you want to create packages")
+    parser.add_option("-j", "--to-json",
+                      action = "store_true", 
+                      dest = "action_json",
+                      default = False,
+                      help = "Convert the xml to json")
     
     (options, args) = parser.parse_args()
     
@@ -130,6 +136,11 @@ def main():
             mgr.show_packages(args[0])
         if len(args) == 2:
             mgr.show_packages(args[0], args[1])
+
+    if options.action_json == True:
+        pkg_xml = PackageXml(args[0])
+        print (pkg_xml.get_json())
+
     
 if __name__ == "__main__":
     main()

@@ -452,8 +452,8 @@ class PackageXml():
         # features
         my_json["device_feature_models"] = self.device_feature_models 
             
-        return my_json
+        return json.dumps(my_json, sort_keys=True, indent=4)
 
 if __name__ == "__main__":
     PX = PackageXml("ipx800")
-    print json.dumps(PX.get_json())
+    print(PX.get_json())
