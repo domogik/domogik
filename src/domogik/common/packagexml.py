@@ -407,8 +407,8 @@ class PackageXml():
 
         # external members specific
         if self.type == "external":
-            my_json["vendor_id"] = self.vendor_id
-            my_json["device_id"] = self.device_id
+            my_json["external"] = {"vendor_id" : self.vendor_id,
+                                   "device_id" : self.device_id}
 
         # dependencies
         my_dep = []
