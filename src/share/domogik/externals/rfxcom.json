@@ -313,8 +313,11 @@
             "value_type": "string"
         }
     ], 
-    "device_id": "lan", 
     "device_types": [], 
+    "external": {
+        "device_id": "lan", 
+        "vendor_id": "rfxcom"
+    }, 
     "files": [
         "src/share/domogik/design/external/rfxcom/icon.png", 
         "src/share/domogik/externals/rfxcom.xml", 
@@ -340,6 +343,5 @@
         "name": "RFXCom"
     }, 
     "type": "external", 
-    "udev-rules": [], 
-    "vendor_id": "rfxcom"
+    "udev-rules": []
 }

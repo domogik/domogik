@@ -23,8 +23,11 @@
             "value_type": "binary"
         }
     ], 
-    "device_id": "rgb", 
     "device_types": [], 
+    "external": {
+        "device_id": "rgb", 
+        "vendor_id": "arduino"
+    }, 
     "files": [
         "src/share/domogik/design/external/ar_rgb/icon.png", 
         "src/share/domogik/externals/ar_rgb.xml", 
@@ -51,6 +54,5 @@
         "name": "Arduino"
     }, 
     "type": "external", 
-    "udev-rules": [], 
-    "vendor_id": "arduino"
+    "udev-rules": []
 }

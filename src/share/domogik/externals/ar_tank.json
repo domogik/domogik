@@ -23,8 +23,11 @@
             "value_type": "number"
         }
     ], 
-    "device_id": "tank", 
     "device_types": [], 
+    "external": {
+        "device_id": "tank", 
+        "vendor_id": "arduino"
+    }, 
     "files": [
         "src/share/domogik/design/external/ar_tank/icon.png", 
         "src/share/domogik/externals/ar_tank.xml", 
@@ -50,6 +53,5 @@
         "name": "Arduino"
     }, 
     "type": "external", 
-    "udev-rules": [], 
-    "vendor_id": "arduino"
+    "udev-rules": []
 }

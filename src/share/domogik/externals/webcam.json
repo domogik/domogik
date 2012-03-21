@@ -23,8 +23,11 @@
             "value_type": "string"
         }
     ], 
-    "device_id": "none", 
     "device_types": [], 
+    "external": {
+        "device_id": "none", 
+        "vendor_id": "none"
+    }, 
     "files": [
         "src/share/domogik/design/external/webcam/icon.png"
     ], 
@@ -48,6 +51,5 @@
         "name": "Camera"
     }, 
     "type": "external", 
-    "udev-rules": [], 
-    "vendor_id": "none"
+    "udev-rules": []
 }
