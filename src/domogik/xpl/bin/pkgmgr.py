@@ -138,7 +138,10 @@ def main():
             mgr.show_packages(args[0], args[1])
 
     if options.action_json == True:
-        pkg_xml = PackageXml(args[0])
+        if options.package_type not in PACKAGE_TYPES:
+            print("Error : : type must be in this list : %s" % PACKAGE_TYPES)
+            exit()
+        pkg_xml = PackageXml(args[0], pkg_type = options.package_type)
         print (pkg_xml.get_json())
 
     
