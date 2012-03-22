@@ -5,7 +5,8 @@
     <address-key>group</address-key>
     <command-xpl-value>Write</command-xpl-value>
     <parameters>                                                                                       
-      <parameter key="data" location="1"/>                                          <parameter key="type" location="2"/>                 
+      <parameter key="data" location="1"/>
+      <parameter key="type" location="2"/>
     </parameters>                                                                
   </command>
   <listener>

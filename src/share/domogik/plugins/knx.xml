@@ -156,7 +156,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
      <device_feature_model>
           <id>knx.pressure.pressure</id>
           <name>Pressure</name>
@@ -169,10 +168,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
-
-
-
      <device_feature_model>
           <id>knx.humidity.humidity</id>
           <name>Humidity</name>
@@ -209,8 +204,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
-
      <device_feature_model>
           <id>knx.HVACMode</id>
           <name>HVACMode</name>
@@ -260,44 +253,6 @@
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
       <device_feature_model>
-          <id>knx.shutter.stop</id>
-          <name>Stop</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.shutter</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;stop&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;stop&quot;}
-          </parameters>
-          <value_type>binary</value_type>
-          <stat_key>data</stat_key>
-          <return_confirmation>1</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>knx.raw.write</id>
-          <name>Write</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.raw</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;write&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>1</return_confirmation>
-     </device_feature_model>
-
-     <device_feature_model>
-          <id>knx.knx</id>
-          <name>KNXCreator</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.knx</device_type_id>
-          <parameters>
-              {}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-
-     <device_feature_model>
           <id>knx.raw.read</id>
           <name>Read</name>
           <feature_type>sensor</feature_type>
@@ -309,7 +264,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
-
       <device_feature_model>
           <id>knx.thermostat.number</id>
           <name>thermostat</name>
@@ -322,7 +276,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
-
   </device_feature_models>
 </package>
 

@@ -169,7 +169,7 @@ class KNXManager(XplPlugin):
                  if data[-2:-1]==" ":
                     msg_type = "l"
 
-                 if datatype == "1.001":
+                 if datatype == "1.001": #DT_switch
                     val=int(val.replace(" ",""),16)
                     print "Switch"
                     if val==1:
@@ -185,28 +185,42 @@ class KNXManager(XplPlugin):
                     if val<=1:        
                        if val==1:
                           val="Down"
-                          #value=0
                        if val==0:
                           val="Up"
-                          #value=1
-                       #val=value
-                       print "valeur après modif %s" %val
+
+                 if datatype == "3.007": #DT_Control_Dimming
+                    val=int(val)
+                    if val>=1 and val <= 7:
+                       val= "dim-"
+                    if val>=9:
+                       val="dim+"
+                    if val==8 or val==0:
+                       val="stop"
+
+                 if datatype == "3.008": #DT_Control_Blinds
+                    val=int(val)
+                    if val>=1 and val <= 7:
+                       val= "up"
+                    if val>=9:
+                       val="down"
+                    if val==8 or val==0:
+                       val="stop"
+
 
                  if datatype =="5.001": # "DT_Scaling":
                     print "DT_Scaling"
                     val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=(100*int(val)/255)
-                       print "reception DT_Scaling val=%s" %val
                     else:
                        self.log.error("DT_Scaling invalide value %s from %s" %(val,groups))
 
-                 if datatype[:2] == "5." and  datatype!="5.001" and datatype!="5.003": #8bit unsigned integer (from 0 to 255) (EIS6) 
+                 if datatype[:2] == "5." and  datatype!="5.001" and datatype!="5.003": #8bit unsigned integer
                     val=int(val.replace(" ",""),16)
                     if val<=255:
                        val=val
 
-                 if datatype == "5.003": #angle (from 0 to 360°) 
+                 if datatype == "5.003": #DT_Angle
                     val=int(val.replace(" ",""),16)
                     print "send_xpl DT Angle %s" %val
                     if val<=255:
@@ -341,38 +355,27 @@ class KNXManager(XplPlugin):
 
                  if datatype == "20.102": #heating mode (comfort/standby/night/frost) 
                     val=int(val.replace(" ",""),16)
-                    if val<="5":
-                       val=val
                     if val==20 or val==28:
-                       val=1
+                       val="HVACnormal" #1
                     if val==19 or val==24:
-                       val=3
+                       val="HVACeco" #3
                     if val==7:
-                       val=4
+                       val="HVACnofreeze" #4
                     if val==26:
-                       val=2
-                    else:
-                       self.log.error("DPT_HVACMode unknow code %s from %s" %(val,groups))
+                       val="HVACstop" #2
 
                  if datatype == "DT_HVACEib":
                     val=int(val.replace(" ",""),16)
                     print "reception DT_HVAC %s" %val
                     value="DT_HVACEib"
-                    if val==2:
+                    if val==2 or val==19:
                        value="HVACeco"
-                    if val==3:
+                    if val==3 or val==20:
                        value="HVACnormal"
-                    if val==4:
+                    if val==4 or val==17:
                        value="HVACnofreeze"
-                    if val==19:
-                       value="HVACeco"
-                    if val==17:
-                       value="HVACnofreeze"
-                    if val==20:
-                       value="HVACnormal"
                     val=value
                      
-
                  if command == 'Writ':
                     print("knx Write xpl-trig")
                     command = 'Write'
@@ -454,14 +457,26 @@ class KNXManager(XplPlugin):
                  if val == "down" or val ==1:
                     valeur=1
 
-              if datatype[:2] =="3.":
-                 if val=="+":
+              if datatype =="3.007":
+                 data_type="s"
+                 if val=="dim+":
                     valeur="9"
-                 if val == "-":
+                 if val == "dim-":
                     valeur="1"
                  if val=="stop+":
                     valeur=8
                  if val=="stop-":
+                    valeur=0
+
+              if datatype =="3.008":
+                 data_type="s"
+                 if val=="downstep":
+                    valeur="9"
+                 if val == "upstep":
+                    valeur="1"
+                 if val=="downstop":
+                    valeur=8
+                 if val=="upstop":
                     valeur=0
 
               if datatype[:2] =="5." and datatype!="5.001" and datatype!="5.003": #8bit unsignet int 
@@ -662,24 +677,24 @@ class KNXManager(XplPlugin):
                  type_cmd="None" 
 
               if datatype == "20.102": #HVAC Mode
-                 if val == "1" or val == "Normal":
+                 if val == "1" or val == "HVACnormal":
                     valeur=1
-                 if val == "2" or val == "Stop":
+                 if val == "2" or val == "HVACstop":
                     valeur=2
-                 if val == "3" or val == "Eco":
+                 if val == "3" or val == "HVACeco":
                     valeur=3
-                 if val == "4" or val == "Nofreeze":
+                 if val == "4" or val == "HVACnofreeze":
                     valeur=4
 
               if datatype == "DT_HVACEib": #Datapoint type for TB042
                  data_type="l"
-                 if val == "4" or val == "Nofreeze":
+                 if val == "4" or val == "HVACnofreeze":
                     valeur=4
-                 if val == "3" or val == "Eco":
+                 if val == "3" or val == "HVACeco":
                     valeur="2"
-                 if val == "1" or val == "Normal":
+                 if val == "1" or val == "HVACnormal":
                     valeur="3"
-                 if val == "2" or val == "Stop":
+                 if val == "2" or val == "HVACstop":
                     valeur=4
 
               print "Valeur modifier |%s|" %valeur
