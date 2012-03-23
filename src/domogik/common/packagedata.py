@@ -35,7 +35,7 @@ PluginData
 @organization: Domogik
 """
 
-from domogik.common.packagexml import PackageXml, PackageException
+from domogik.common.packagejson import PackageJson, PackageException
 from domogik.common.database import DbHelper
 import sys
 import traceback
@@ -51,58 +51,55 @@ class PackageData():
 
         self._db = DbHelper()
         try:
-            self.plg = PackageXml(path = xml_path)
+            self.pkg = PackageJson(path = json_path)
         except:
             print(str(traceback.format_exc()))
             return
-        print("Xml file OK")
+        print("Json file OK")
 
         # check type == plugin
-        if self.plg.type not in ["plugin", "external"]:
-            print("Error : this package is not recognized")
+        if self.pkg.type not in ["plugin", "external"]:
+            print("Error : this package type is not recognized")
             exit()
-
-        # display plugin informations
-        #self.plg.display()
 
     def insert(self):
         """ Insert data for plugin
         """
         ### Technology
-        print("Technology %s" % self.plg.technology["id"])
-        if self._db.get_device_technology_by_id(self.plg.technology["id"]) == None:
+        print("Technology %s" % self.pkg.technology["id"])
+        if self._db.get_device_technology_by_id(self.pkg.technology["id"]) == None:
             # add if not exists
             print("add...")
-            self._db.add_device_technology(self.plg.technology["id"],
-                                           self.plg.technology["name"],
-                                           self.plg.technology["description"])
+            self._db.add_device_technology(self.pkg.technology["id"],
+                                           self.pkg.technology["name"],
+                                           self.pkg.technology["description"])
         else:
             # update if exists
             print("update...")
-            self._db.update_device_technology(self.plg.technology["id"],
-                                           self.plg.technology["name"],
-                                           self.plg.technology["description"])
+            self._db.update_device_technology(self.pkg.technology["id"],
+                                           self.pkg.technology["name"],
+                                           self.pkg.technology["description"])
  
         ### Device types
-        for device_type in self.plg.device_types:
+        for device_type in self.pkg.device_types:
             print("Device type %s" % device_type["id"])
             if self._db.get_device_type_by_id(device_type["id"]) == None:
                 # add if not exists
                 print("add...")
                 self._db.add_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.plg.technology["id"],
+                                         self.pkg.technology["id"],
                                          device_type["description"])
             else:
                 # update if exists
                 print("update...")
                 self._db.update_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.plg.technology["id"],
+                                         self.pkg.technology["id"],
                                          device_type["description"])
  
         ### Device feature model
-        for device_feature_model in self.plg.device_feature_models:
+        for device_feature_model in self.pkg.device_feature_models:
             print("Device feature model %s" % device_feature_model["id"])
             print("M.P=%s" % device_feature_model["parameters"])
             if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:

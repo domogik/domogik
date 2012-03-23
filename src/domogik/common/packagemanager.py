@@ -36,7 +36,7 @@ TODO
 @organization: Domogik
 """
 
-from domogik.common.packagexml import PackageXml, PackageException
+from domogik.common.packagejson import PackageJson, PackageException
 from domogik.common.packagedata import PackageData
 from domogik.common.configloader import Loader
 import traceback
@@ -79,8 +79,8 @@ config = cfg.load()
 conf = dict(config[1])
 REST_URL = "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
 
-PLUGIN_XML_PATH = "%s/packages/plugins" % INSTALL_PATH
-EXTERNAL_XML_PATH = "%s/packages/externals" % INSTALL_PATH
+PLUGIN_JSON_PATH = "%s/packages/plugins" % INSTALL_PATH
+EXTERNAL_JSON_PATH = "%s/packages/externals" % INSTALL_PATH
 
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
@@ -106,7 +106,7 @@ class PackageManager():
 
     def _create_package_for_plugin(self, id, output_dir, force):
         """ Create package for a plugin
-            1. read xml file to get informations and list of files
+            1. read json file to get informations and list of files
             2. generate package
             @param id : name of plugin
             @param output_dir : target directory for package
@@ -115,35 +115,35 @@ class PackageManager():
         self.log("Plugin id : %s" % id)
 
         try:
-            plg_xml = PackageXml(id)
+            pkg_json = PackageJson(id).json
         except:
             self.log(str(traceback.format_exc()))
             return
 
         # check release format
         try:
-            NormalizedVersion(plg_xml.release)
+            NormalizedVersion(pkg_json.release)
         except:
-            self.log("Plugin release '%s' is not valid. Exiting." % plg_xml.release)
+            self.log("Plugin release '%s' is not valid. Exiting." % pkg_json.release)
             return
         try:
-            NormalizedVersion(plg_xml.domogik_min_release)
+            NormalizedVersion(pkg_json.domogik_min_release)
         except:
-            self.log("Domogik min release '%s' is not valid. Exiting." % plg_xml.domogik_min_release)
+            self.log("Domogik min release '%s' is not valid. Exiting." % pkg_json.domogik_min_release)
             return
 
-        self.log("Xml file OK")
+        self.log("Json file OK")
 
         # check type == plugin
-        if plg_xml.type != "plugin":
+        if pkg_json.type != "plugin":
             self.log("Error : this package is not a plugin")
             return
 
         # display plugin informations
-        plg_xml.display()
+        pkg_json.display()
 
         # check file existence
-        if plg_xml.files == []:
+        if pkg_json.files == []:
             self.log("There is no file defined : the package won't be created")
             return
 
@@ -154,25 +154,25 @@ class PackageManager():
                 self.log("Exiting...")
                 return
 
-        # Copy xml file in a temporary location in order to complete it
-        xml_tmp_file = "%s/plugin-%s-%s.xml" % (tempfile.gettempdir(),
-                                                plg_xml.id,
-                                                plg_xml.release)
-        shutil.copyfile(plg_xml.info_file, xml_tmp_file)
+        # Copy Json file in a temporary location in order to complete it
+        json_tmp_file = "%s/plugin-%s-%s.json" % (tempfile.gettempdir(),
+                                                pkg_json.id,
+                                                pkg_json.release)
+        shutil.copyfile(pkg_json.info_file, json_tmp_file)
         
-        # Update info.xml with generation date
-        plg_xml.set_generated(xml_tmp_file)
+        # Update info.json with generation date
+        pkg_json.set_generated(json_tmp_file)
 
         # Create .tgz
-        self._create_tar_gz("plugin-%s-%s" % (plg_xml.id, plg_xml.release), 
+        self._create_tar_gz("plugin-%s-%s" % (pkg_json.id, pkg_json.release), 
                             output_dir,
-                            plg_xml.all_files, 
-                            xml_tmp_file,
-                            plg_xml.icon_file)
+                            pkg_json.all_files, 
+                            json_tmp_file,
+                            pkg_json.icon_file)
 
     def _create_package_for_external(self, id, output_dir, force):
         """ Create package for a external
-            1. read xml file to get informations and list of files
+            1. read json file to get informations and list of files
             2. generate package
             @param id : name of external
             @param output_dir : target directory for package
@@ -181,34 +181,34 @@ class PackageManager():
         self.log("Hardware id : %s" % id)
 
         try:
-            plg_xml = PackageXml(id, pkg_type = "external")
+            pkg_json = PackageJson(id, pkg_type = "external").json
         except:
             self.log(str(traceback.format_exc()))
             return
 
         # check release format
         try:
-            NormalizedVersion(plg_xml.release)
+            NormalizedVersion(pkg_json.release)
         except:
-            self.log("Plugin release '%s' is not valid. Exiting." % plg_xml.release)
+            self.log("Plugin release '%s' is not valid. Exiting." % pkg_json.release)
             return
         try:
-            NormalizedVersion(plg_xml.domogik_min_release)
+            NormalizedVersion(pkg_json.domogik_min_release)
         except:
-            self.log("Domogik min release '%s' is not valid. Exiting." % plg_xml.domogik_min_release)
+            self.log("Domogik min release '%s' is not valid. Exiting." % pkg_json.domogik_min_release)
             return
 
-        self.log("Xml file OK")
+        self.log("Json file OK")
 
-        if plg_xml.type != "external":
+        if pkg_json.type != "external":
             self.log("Error : this package is not an external member")
             return
 
         # display external informations
-        plg_xml.display()
+        pkg_json.display()
 
         # check file existence
-        if plg_xml.files == []:
+        if pkg_json.files == []:
             self.log("There is no file defined : the package won't be created")
             return
 
@@ -219,21 +219,21 @@ class PackageManager():
                 self.log("Exiting...")
                 return
 
-        # Copy xml file in a temporary location in order to complete it
-        xml_tmp_file = "%s/external-%s-%s.xml" % (tempfile.gettempdir(),
-                                                plg_xml.id,
-                                                plg_xml.release)
-        shutil.copyfile(plg_xml.info_file, xml_tmp_file)
+        # Copy Json file in a temporary location in order to complete it
+        json_tmp_file = "%s/external-%s-%s.json" % (tempfile.gettempdir(),
+                                                pkg_json.id,
+                                                pkg_json.release)
+        shutil.copyfile(pkg_json.info_file, json_tmp_file)
         
-        # Update info.xml with generation date
-        plg_xml.set_generated(xml_tmp_file)
+        # Update info.json with generation date
+        pkg_json.set_generated(json_tmp_file)
 
         # Create .tgz
-        self._create_tar_gz("external-%s-%s" % (plg_xml.id, plg_xml.release), 
+        self._create_tar_gz("external-%s-%s" % (pkg_json.id, pkg_json.release), 
                             output_dir,
-                            plg_xml.all_files, 
-                            xml_tmp_file,
-                            plg_xml.icon_file)
+                            pkg_json.all_files, 
+                            json_tmp_file,
+                            pkg_json.icon_file)
 
 
     def _create_tar_gz(self, name, output_dir, files, info_file = None, icon_file = None):
@@ -241,7 +241,7 @@ class PackageManager():
             @param name : file name
             @param output_dir : if != None, the path to put .tar.gz
             @param files : table of file names to add in tar.gz
-            @param info_file : path for info.xml file
+            @param info_file : path for info.json file
             @param icon_file : path for icon.png file
         """
         if output_dir == None:
@@ -259,21 +259,21 @@ class PackageManager():
                 else:
                     self.log("  WARNING : file doesn't exists")
             if info_file != None:
-                self.log("- info.xml")
-                tar.add(info_file, arcname="info.xml")
+                self.log("- info.json")
+                tar.add(info_file, arcname="info.json")
             if icon_file != None:
                 if os.path.isfile(icon_file):
                     self.log("- icon.png")
                     tar.add(icon_file, arcname="icon.png")
             tar.close()
 
-            # delete temporary xml file
+            # delete temporary Json file
             if info_file != None:
                 os.unlink(info_file) 
         except: 
             msg = "Error generating package : %s : %s" % (my_tar, traceback.format_exc())
             self.log(msg)
-            # delete temporary xml file
+            # delete temporary Json file
             if info_file != None:
                 os.unlink(info_file) 
             raise PackageException(msg)
@@ -300,15 +300,15 @@ class PackageManager():
         urllib.urlretrieve(path, dl_path)
         path = dl_path
  
-        # extract package to update xml with source repo
+        # extract package to update Json with source repo
         my_tmp_dir = "%s/%s/" % (TMP_EXTRACT_DIR, id)
         self._create_folder(my_tmp_dir)
         self._extract_package(path, my_tmp_dir)
 
-        # update xml
-        xml_path = "%s/src/share/domogik/%ss/%s.xml" % (my_tmp_dir, pkg_type, id)
-        pkg_xml = PackageXml(path = xml_path)
-        pkg_xml.set_repo_source(pkg.source)
+        # update Json
+        json_path = "%s/src/share/domogik/%ss/%s.json" % (my_tmp_dir, pkg_type, id)
+        pkg_json = PackageJson(path = json_path).json
+        pkg_json.set_repo_source(pkg.source)
 
         # recreate tgz
         my_tar = path
@@ -399,17 +399,17 @@ class PackageManager():
             raise PackageException(msg)
         self.log("Package successfully extracted.")
 
-        # get xml informations
-        pkg_xml = PackageXml(path = "%s/info.xml" % my_tmp_dir)
+        # get Json informations
+        pkg_json = PackageJson(path = "%s/info.json" % my_tmp_dir).json
 
         # check compatibility with domogik installed release
         __import__("domogik")
         dmg = sys.modules["domogik"]
         self.log("Domogik release = %s" % dmg.__version__)
-        self.log("Minimum Domogik release required for package = %s" % pkg_xml.domogik_min_release)
-        print("%s < %s" % ( pkg_xml.domogik_min_release , dmg.__version__))
-        if pkg_xml.domogik_min_release > dmg.__version__:
-            msg = "This package needs a Domogik release >= %s. Actual is %s. Installation ABORTED!" % (pkg_xml.domogik_min_release, dmg.__version__)
+        self.log("Minimum Domogik release required for package = %s" % pkg_json.domogik_min_release)
+        print("%s < %s" % ( pkg_json.domogik_min_release , dmg.__version__))
+        if pkg_json.domogik_min_release > dmg.__version__:
+            msg = "This package needs a Domogik release >= %s. Actual is %s. Installation ABORTED!" % (pkg_json.domogik_min_release, dmg.__version__)
             self.log(msg)
             raise PackageException(msg)
 
@@ -417,12 +417,12 @@ class PackageManager():
         self._create_folder(INSTALL_PATH)
 
         # install plugin in $HOME
-        self.log("Installing package (%s)..." % pkg_xml.type)
+        self.log("Installing package (%s)..." % pkg_json.type)
         try:
-            if pkg_xml.type in ('plugin', 'external'):
-                self._install_plugin_or_external(my_tmp_dir, INSTALL_PATH, pkg_xml.type, package_part)
+            if pkg_json.type in ('plugin', 'external'):
+                self._install_plugin_or_external(my_tmp_dir, INSTALL_PATH, pkg_json.type, package_part)
             else:
-                raise "Package type '%s' not installable" % pkg_xml.type
+                raise "Package type '%s' not installable" % pkg_json.type
         except:
             msg = "Error while installing package : %s" % (traceback.format_exc())
             self.log(msg)
@@ -430,10 +430,10 @@ class PackageManager():
         self.log("Package successfully extracted.")
 
         # insert data in database
-        if pkg_xml.type in ('plugin', 'external'):
+        if pkg_json.type in ('plugin', 'external'):
             if package_part == PKG_PART_RINOR:
                 self.log("Insert data in database...")
-                pkg_data = PackageData("%s/info.xml" % my_tmp_dir)
+                pkg_data = PackageData("%s/info.json" % my_tmp_dir)
                 pkg_data.insert()
 
         self.log("Package installation finished")
@@ -442,7 +442,7 @@ class PackageManager():
 
     def uninstall_package(self, pkg_type, id):
         """ Uninstall a package
-            For the moment, we will only delete the package xml file for 
+            For the moment, we will only delete the package Json file for 
             plugins and external
             @param pkg_type : package type
             @param id : package id
@@ -450,13 +450,13 @@ class PackageManager():
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
         self.log("Start uninstall for package '%s-%s'" % (type, id))
-        self.log("Only xml description file will be deleted in this Domogik version")
+        self.log("Only Json description file will be deleted in this Domogik version")
 
         try:
             if pkg_type in ('plugin'):
-                os.unlink("%s/packages/plugins/%s.xml" %(INSTALL_PATH, id))
+                os.unlink("%s/packages/plugins/%s.json" %(INSTALL_PATH, id))
             elif pkg_type in ('external'):
-                os.unlink("%s/packages/externals/%s.xml" %(INSTALL_PATH, id))
+                os.unlink("%s/packages/externals/%s.json" %(INSTALL_PATH, id))
             else:
                 raise PackageException("Package type '%s' not uninstallable" % pkg_type)
         except:
@@ -503,7 +503,7 @@ class PackageManager():
         ### copy files
         self.log("Copying files for %s..." % pkg_type)
         try:
-            # xpl/* and plugins/*.xml are installed on target host 
+            # xpl/* and plugins/*.json are installed on target host 
             if package_part == PKG_PART_XPL:
                 if pkg_type == "plugin":
                     copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
@@ -573,7 +573,7 @@ class PackageManager():
             self.log(str(traceback.format_exc()))
             return False
              
-        # for each list, get files and associated xml
+        # for each list, get files and associated Json
         try:
             self._parse_repository(repo_list, REPO_CACHE_DIR)
         except:
@@ -637,29 +637,31 @@ class PackageManager():
             @param repo_list : repositories list
             @param cache_folder : package cache folder
         """
-        # get all packages url
-        file_list = []
-        for repo in repo_list:
-            file_list.extend(self._get_files_list_from_repository(repo["url"], repo["priority"]))
+        # TODO
+        print "TODO : CACHE FEATURE TO IMPLEMENT"
+        ## get all packages url
+        #file_list = []
+        #for repo in repo_list:
+        #    file_list.extend(self._get_files_list_from_repository(repo["url"], repo["priority"]))
 
-        # for each package, put it in cache if it corresponds to priority
-        for file_info in file_list:
-            try:
-                pkg_xml = PackageXml(url = "%s" % file_info["file"])
-                priority = self._get_package_priority_in_cache(pkg_xml.fullname, pkg_xml.release)
-                # our package has a prioriry >= to other packages with same name/rel
-                if priority == None or priority < file_info["priority"]:
-                    self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.fullname, pkg_xml.release, file_info["repo_url"]))
-                    pkg_xml.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
+        ## for each package, put it in cache if it corresponds to priority
+        #for file_info in file_list:
+        #    try:
+        #        pkg_json = PackageJson(url = "%s" % file_info["file"]).json
+        #        priority = self._get_package_priority_in_cache(pkg_json.fullname, pkg_json.release)
+        #        # our package has a prioriry >= to other packages with same name/rel
+        #        if priority == None or priority < file_info["priority"]:
+        #            self.log("Add '%s (%s)' in cache from %s" % (pkg_json.fullname, pkg_json.release, file_info["repo_url"]))
+        #            pkg_json.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
 
-                    # try to cache the icon (if it exists)
-                    try:
-                        urllib.urlretrieve(file_info["icon"],  \
-                             "%s/%s.png" % (cache_folder, file_info["suffixe"]))
-                    except:
-                        self.log("Warning : no icon found : '%s'" % file_info["icon"])
-            except:
-                self.log("Error while caching file from '%s' : %s" % (file_info["file"], traceback.format_exc()))
+        #            # try to cache the icon (if it exists)
+        #            try:
+        #                urllib.urlretrieve(file_info["icon"],  \
+        #                     "%s/%s.png" % (cache_folder, file_info["suffixe"]))
+        #            except:
+        #                self.log("Warning : no icon found : '%s'" % file_info["icon"])
+        #    except:
+        #        self.log("Error while caching file from '%s' : %s" % (file_info["file"], traceback.format_exc()))
 
     def _get_files_list_from_repository(self, url, priority):
         """ Read packages.lst on repository
@@ -678,7 +680,7 @@ class PackageManager():
                                    (url))
                         break
                 else:
-                    my_list.append({"file" : "%sxml/%s" % (url, data.strip()),
+                    my_list.append({"file" : "%sjson/%s" % (url, data.strip()),
                                     "icon" : "%sicon/%s" % (url, data.strip()),
                                     "suffixe" :  data.strip().replace("/", "-"),
                                     "priority" : priority,
@@ -700,15 +702,15 @@ class PackageManager():
         upd_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
-                if fic[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
-                    if pkg_xml.type == pkg_type and pkg_xml.id == id \
-                       and pkg_xml.release > release:
-                        upd_list.append({"type" : pkg_xml.type,
-                                         "id" : pkg_xml.id,
-                                         "release" : pkg_xml.release,
-                                         "priority" : pkg_xml.priority,
-                                         "changelog" : pkg_xml.changelog})
+                if fic[-5:] == ".json":
+                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+                    if pkg_json.type == pkg_type and pkg_json.id == id \
+                       and pkg_json.release > release:
+                        upd_list.append({"type" : pkg_json.type,
+                                         "id" : pkg_json.id,
+                                         "release" : pkg_json.release,
+                                         "priority" : pkg_json.priority,
+                                         "changelog" : pkg_json.changelog})
         return upd_list
 
     def list_packages(self):
@@ -718,12 +720,12 @@ class PackageManager():
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
-                if fic[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
-                    pkg_list.append({"fullname" : pkg_xml.fullname,
-                                     "release" : pkg_xml.release,
-                                     "priority" : pkg_xml.priority,
-                                     "desc" : pkg_xml.desc})
+                if fic[-5:] == ".json":
+                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+                    pkg_list.append({"fullname" : pkg_json.fullname,
+                                     "release" : pkg_json.release,
+                                     "priority" : pkg_json.priority,
+                                     "desc" : pkg_json.desc})
         pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                       k['release']))
         for pkg in pkg_list:
@@ -739,10 +741,10 @@ class PackageManager():
         """
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
-                if fic[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
-                    if fullname == pkg_xml.fullname and release == pkg_xml.release:
-                        return pkg_xml.priority
+                if fic[-5:] == ".json":
+                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+                    if fullname == pkg_json.fullname and release == pkg_json.release:
+                        return pkg_json.priority
         return None
 
     def get_packages_list(self, fullname = None, release = None, pkg_type = None):
@@ -758,26 +760,26 @@ class PackageManager():
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
-                if fic[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
-                    if fullname == None or (fullname == pkg_xml.fullname and release == pkg_xml.release):
-                        if pkg_type == None or pkg_type == pkg_xml.type:
-                            pkg_list.append({"id" : pkg_xml.id,
-                                         "type" : pkg_xml.type,
-                                         "fullname" : pkg_xml.fullname,
-                                         "release" : pkg_xml.release,
-                                         "source" : pkg_xml.source,
-                                         "generated" : pkg_xml.generated,
-                                         "techno" : pkg_xml.techno,
-                                         "doc" : pkg_xml.doc,
-                                         "desc" : pkg_xml.desc,
-                                         "changelog" : pkg_xml.changelog,
-                                         "author" : pkg_xml.author,
-                                         "email" : pkg_xml.email,
-                                         "domogik_min_release" : pkg_xml.domogik_min_release,
-                                         "priority" : pkg_xml.priority,
-                                         "dependencies" : pkg_xml.dependencies,
-                                         "package_url" : pkg_xml.package_url})
+                if fic[-5:] == ".json":
+                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+                    if fullname == None or (fullname == pkg_json.fullname and release == pkg_json.release):
+                        if pkg_type == None or pkg_type == pkg_json.type:
+                            pkg_list.append({"id" : pkg_json.id,
+                                         "type" : pkg_json.type,
+                                         "fullname" : pkg_json.fullname,
+                                         "release" : pkg_json.release,
+                                         "source" : pkg_json.source,
+                                         "generated" : pkg_json.generated,
+                                         "techno" : pkg_json.techno,
+                                         "doc" : pkg_json.doc,
+                                         "desc" : pkg_json.desc,
+                                         "changelog" : pkg_json.changelog,
+                                         "author" : pkg_json.author,
+                                         "email" : pkg_json.email,
+                                         "domogik_min_release" : pkg_json.domogik_min_release,
+                                         "priority" : pkg_json.priority,
+                                         "dependencies" : pkg_json.dependencies,
+                                         "package_url" : pkg_json.package_url})
         return sorted(pkg_list, key = lambda k: (k['id']))
 
     def get_installed_packages_list(self):
@@ -787,19 +789,19 @@ class PackageManager():
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
         pkg_list = []
-        for rep in [PLUGIN_XML_PATH, EXTERNAL_XML_PATH]:
+        for rep in [PLUGIN_JSON_PATH, EXTERNAL_JSON_PATH]:
             for root, dirs, files in os.walk(rep):
                 for fic in files:
-                    if fic[-4:] == ".xml":
-                        pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
+                    if fic[-5:] == ".json":
+                        pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
                         # filter on rest
-                        if pkg_xml.id != "rest":
-                            pkg_list.append({"fullname" : pkg_xml.fullname,
-                                             "id" : pkg_xml.id,
-                                             "release" : pkg_xml.release,
-                                             "type" : pkg_xml.type,
-                                             "package-url" : pkg_xml.package_url,
-                                             "source" : pkg_xml.source})
+                        if pkg_json.id != "rest":
+                            pkg_list.append({"fullname" : pkg_json.fullname,
+                                             "id" : pkg_json.id,
+                                             "release" : pkg_json.release,
+                                             "type" : pkg_json.type,
+                                             "package-url" : pkg_json.package_url,
+                                             "source" : pkg_json.source})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                  k['release']))
 
@@ -815,7 +817,7 @@ class PackageManager():
 
     def _find_package(self, fullname, release = None):
         """ Find a package and return 
-                               - xml data or None if not found
+                               - json data or None if not found
                                - a status : True if ok, a message elsewhere
             @param fullname : fullname of package (type-name)
             @param release : optionnal : release to display (if several)
@@ -823,21 +825,21 @@ class PackageManager():
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
-                if fic[-4:] == ".xml":
-                    pkg_xml = PackageXml(path = "%s/%s" % (root, fic))
+                if fic[-5:] == ".json":
+                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
                     if release == None:
-                        if fullname == pkg_xml.fullname:
-                            pkg_list.append({"fullname" : pkg_xml.fullname,
-                                             "release" : pkg_xml.release,
-                                             "priority" : pkg_xml.priority,
-                                             "source" : pkg_xml.source,
-                                             "xml" : pkg_xml})
+                        if fullname == pkg_json.fullname:
+                            pkg_list.append({"fullname" : pkg_json.fullname,
+                                             "release" : pkg_json.release,
+                                             "priority" : pkg_json.priority,
+                                             "source" : pkg_json.source,
+                                             "json" : pkg_json})
                     else:
-                        if fullname == pkg_xml.fullname and release == pkg_xml.release:
-                            pkg_list.append({"fullname" : pkg_xml.fullname,
-                                             "release" : pkg_xml.release,
-                                             "priority" : pkg_xml.priority,
-                                             "xml" : pkg_xml})
+                        if fullname == pkg_json.fullname and release == pkg_json.release:
+                            pkg_list.append({"fullname" : pkg_json.fullname,
+                                             "release" : pkg_json.release,
+                                             "priority" : pkg_json.priority,
+                                             "json" : pkg_json})
         if len(pkg_list) == 0:
             if release == None:
                 release = "*"
@@ -853,7 +855,7 @@ class PackageManager():
                                               pkg["priority"]))
             return [], msg
 
-        return pkg_list[0]["xml"], True
+        return pkg_list[0]["json"], True
 
     def is_root(self):
         """ return True is current user is root
