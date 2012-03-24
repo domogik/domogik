@@ -90,7 +90,7 @@ def main():
                       action = "store_true", 
                       dest = "action_json",
                       default = False,
-                      help = "Convert the xml to json")
+                      help = "Convert the xml to json (temporary option for 0.2.0 development)")
     
     (options, args) = parser.parse_args()
     

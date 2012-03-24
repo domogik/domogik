@@ -53,7 +53,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL
-from domogik.common.packagexml import PackageXml, PackageException
+from domogik.common.packagejson import PackageJson, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
 from distutils2.version import VersionPredicate, IrrationalVersionError
@@ -171,14 +171,14 @@ class SysManager(XplPlugin):
             self.log.info("Set package path to '%s' " % self._package_path)
             print("Set package path to '%s' " % self._package_path)
             sys.path.append(self._package_path)
-            self._xml_plugin_directory = os.path.join(self._package_path, "packages/plugins/")
-            self._xml_external_directory = os.path.join(self._package_path, "packages/externals/")
+            self._json_plugin_directory = os.path.join(self._package_path, "packages/plugins/")
+            self._json_external_directory = os.path.join(self._package_path, "packages/externals/")
             self.package_mode = True
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
-            self._xml_plugin_directory = os.path.join(conf['src_prefix'], "share/domogik/plugins/")
-            self._xml_external_directory = os.path.join(conf['src_prefix'], "share/domogik/externals/")
+            self._json_plugin_directory = os.path.join(conf['src_prefix'], "share/domogik/plugins/")
+            self._json_external_directory = os.path.join(conf['src_prefix'], "share/domogik/externals/")
             self.package_mode = False
 
         self._pinglist = {}
@@ -320,8 +320,8 @@ class SysManager(XplPlugin):
             notifier = pyinotify.ThreadedNotifier(wmgr, notify_handler)
             notifier.setName("thread_notifier")
             notifier.start()
-            config_files_dir = [self._xml_plugin_directory,
-                                self._xml_external_directory,
+            config_files_dir = [self._json_plugin_directory,
+                                self._json_external_directory,
                                 CONFIG_DIR]
             #for fic in  self.get_config_files():
             #    config_files_dir.append(os.path.dirname(fic))
@@ -727,9 +727,9 @@ class SysManager(XplPlugin):
 
         # Get external list
         try:
-            # list xml files
+            # list json files
             try:
-                external_list = os.listdir(self._xml_external_directory)
+                external_list = os.listdir(self._json_external_directory)
             except:
                 msg = "Error accessing external directory : %s. You should create it" % str(traceback.format_exc())
                 print(msg)
@@ -740,24 +740,24 @@ class SysManager(XplPlugin):
                 external = external[0:-4]
                 print(external)
                 self.log.info("==> %s" % (external))
-                # try open xml file
-                xml_file = "%s/%s.xml" % (self._xml_external_directory, external)
+                # try open json file
+                json_file = "%s/%s.json" % (self._json_external_directory, external)
                 try:
                     # get data for external
-                    plg_xml = PackageXml(path = xml_file)
+                    pkg_json = PackageJson(path = json_file).json
    
                     # register plugin
-                    self._external_models.append({"type" : plg_xml.type,
-                                      "name" : plg_xml.id, 
-                                      "description" : plg_xml.desc, 
-                                      "technology" : plg_xml.techno,
-                                      "release" : plg_xml.release,
-                                      "documentation" : plg_xml.doc,
-                                      "vendor_id" : plg_xml.vendor_id,
-                                      "device_id" : plg_xml.device_id})
+                    self._external_models.append({"type" : pkg_json.type,
+                                      "name" : pkg_json.id, 
+                                      "description" : pkg_json.desc, 
+                                      "technology" : pkg_json.techno,
+                                      "release" : pkg_json.release,
+                                      "documentation" : pkg_json.doc,
+                                      "vendor_id" : pkg_json.vendor_id,
+                                      "device_id" : pkg_json.device_id})
 
                 except:
-                    msg = "Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc()))
+                    msg = "Error reading json file : %s\n%s" % (json_file, str(traceback.format_exc()))
                     print(msg)
                     self.log.error(msg)
         except NoSectionError:
@@ -898,27 +898,27 @@ class SysManager(XplPlugin):
             self.log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
             if plugin_list[plugin] == "enabled":
                 print(plugin)
-                # try open xml file
-                xml_file = "%s/%s.xml" % (self._xml_plugin_directory, plugin)
+                # try open json file
+                json_file = "%s/%s.json" % (self._json_plugin_directory, plugin)
                 try:
                     # get data for plugin
-                    plg_xml = PackageXml(path = xml_file)
+                    pkg_json = PackageJson(path = json_file).json
 
                     # register plugin
-                    self._plugins.append({"type" : plg_xml.type,
-                                      "name" : plg_xml.id, 
-                                      "description" : plg_xml.desc, 
-                                      "technology" : plg_xml.techno,
+                    self._plugins.append({"type" : pkg_json.type,
+                                      "name" : pkg_json.id, 
+                                      "description" : pkg_json.desc, 
+                                      "technology" : pkg_json.techno,
                                       "status" : "OFF",
                                       "host" : self.get_sanitized_hostname(), 
-                                      "release" : plg_xml.release,
-                                      "documentation" : plg_xml.doc,
-                                      "configuration" : plg_xml.configuration,
+                                      "release" : pkg_json.release,
+                                      "documentation" : pkg_json.doc,
+                                      "configuration" : pkg_json.configuration,
                                       "check_startup_option" : True})
 
                 except:
-                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
-                    self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
+                    print("Error reading json file : %s\n%s" % (json_file, str(traceback.format_exc())))
+                    self.log.error("Error reading json file : %s. Detail : \n%s" % (json_file, str(traceback.format_exc())))
 
         return
 
@@ -1175,9 +1175,9 @@ class SysManager(XplPlugin):
         mess.add_data({'type' : pkg_type})
         mess.add_data({'host' : self.get_sanitized_hostname()})
 
-        pkg_xml = PackageXml(pkg_id, pkg_type = pkg_type)
+        pkg_json = PackageJson(pkg_id, pkg_type = pkg_type).json
         idx = 0
-        for dep in pkg_xml.dependencies:
+        for dep in pkg_json.dependencies:
             mess.add_data({"dep%s-id" % idx : dep["id"]})
             mess.add_data({"dep%s-type" % idx : dep["type"]})
             idx += 1
@@ -1198,14 +1198,14 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : self.get_sanitized_hostname()})
 
         try:
-            pkg_xml = PackageXml(pkg_id, pkg_type = pkg_type)
+            pkg_json = PackageJson(pkg_id, pkg_type = pkg_type).json
         except PackageException:
-            # bad xml or no such plugin installed
+            # bad json or no such plugin installed
             self.myxpl.send(mess)
             return
 
         idx = 0
-        for rule in pkg_xml.udev_rules:
+        for rule in pkg_json.udev_rules:
             mess.add_data({"rule%s-model" % idx : rule["model"]})
             mess.add_data({"rule%s-desc" % idx : rule["desc"]})
             mess.add_data({"rule%s-filename" % idx : rule["filename"]})
