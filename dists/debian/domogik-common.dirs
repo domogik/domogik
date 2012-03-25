@@ -1,0 +1,17 @@
+/etc/domogik
+/usr/lib/domogik
+/usr/lib/domogik/tools
+/usr/lib/domogik/install
+/var/lib/domogik
+/var/lib/domogik/packages
+/var/lib/domogik/packages/plugins
+/var/lib/domogik/packages/externals
+/var/lib/domogik/packages/stats
+/var/lib/domogik/packages/url2xpl
+/var/lib/domogik/packages/design
+/var/lib/domogik/data/plugins
+/var/cache/domogik
+/var/cache/domogik/pkg-cache
+/var/cache/domogik/cache
+/var/log/domogik
+/var/run/domogik

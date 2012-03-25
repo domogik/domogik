@@ -1,0 +1,78 @@
+#!/bin/sh -e
+set -e
+
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+restart_server() {
+  set +e
+  if [ -x /usr/sbin/invoke-rc.d ]; then
+    invoke-rc.d domogik restart
+  else
+    /etc/init.d/domogik restart
+  fi
+  errno=$?
+  set -e
+
+  if [ "$?" != 0 ]; then
+    echo "Trying to restart the Domogik server resulted in exitcode $?." 1>&2
+    echo "Stop it yourself and try again!" 1>&2
+    exit 1
+  fi
+}
+
+case "$1" in
+  configure|upgrade)
+		db_get "domogik/interface"
+		INTERFACE="$RET"
+        ADDR=$(/sbin/ifconfig $INTERFACE|/bin/egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|/usr/bin/head -1)
+        if [ "x$INTERFACE" = "x" ];then
+            echo "Can't find the address associated to the interface!"
+            exit 20
+        fi
+        sed -i "s/^bind_interface.*$/bind_interface = $ADDR/" /etc/domogik/domogik.cfg
+        sed -i "s/^rest_server_port.*$/rest_server_port = 40405/" /etc/domogik/domogik.cfg
+        sed -i "s/^rest_server_ip.*$/rest_server_ip = $ADDR/" /etc/domogik/domogik.cfg
+        sed -i "s;^MANAGER_PARAMS.*$;MANAGER_PARAMS=\"-d -r -p -E\";" /etc/default/domogik
+
+		set +e
+		db_get "domogik/db_host"
+		DBHOST="$RET"
+		db_get "domogik/db_name"
+		DBNAME="$RET"
+		db_get "domogik/db_user"
+		DBUSER="$RET"
+		db_get "domogik/db_password"
+		DBPASSWORD="$RET"
+   		echo "CONNECT $DBNAME;" | \
+			/usr/bin/mysql --user=$DBUSER --password=$DBPASSWORD  --host=$DBHOST
+		RES=$?
+		set -e
+		if [ "$RES" = "0" ]
+		then
+			/bin/su -c "/usr/bin/python /usr/lib/domogik/install/installer.py" domogik
+			echo "Database update"
+		else
+			echo "Can't connect to database"
+			exit 20
+		fi
+
+        /bin/su -c "/usr/sbin/dmg_pkgmgr -u" domogik
+
+        #restart_server
+  ;;
+
+  abort-upgrade|abort-remove|abort-configure)
+  ;;
+
+  *)
+    echo "postinst called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

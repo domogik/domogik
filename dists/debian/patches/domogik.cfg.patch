@@ -1,0 +1,14 @@
+diff -Nru domogik-0.1.99.orig/src/domogik/examples/config/domogik.cfg domogik-0.1.99/src/domogik/examples/config/domogik.cfg
+--- domogik-0.1.99.orig/src/domogik/examples/config/domogik.cfg	2012-03-08 22:14:21.000000000 +0100
++++ domogik-0.1.99/src/domogik/examples/config/domogik.cfg	2012-03-08 22:17:35.000000000 +0100
+@@ -29,7 +29,7 @@
+ pid_dir_path = /var/run/domogik/
+
+ # Debug levels are debug, info, warning, error, critical
+-log_level = debug
++log_level = debug
+
+
+ # This parameter defines which interface the Domogik plugins should listen.
+
+

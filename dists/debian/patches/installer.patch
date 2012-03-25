@@ -1,0 +1,74 @@
+--- domogik-0.1.99.orig/install/installer.py	2012-03-13 10:28:10.000000000 +0100
++++ domogik-0.1.99/install/installer.py	2012-03-13 10:52:35.000000000 +0100
+@@ -48,6 +48,8 @@
+ from domogik.common import database
+ from domogik.common.configloader import Loader
+ 
++import datetime
++
+ DB_BACKUP_FILE = tempfile.gettempdir() + "/domogik.sql"
+ # Get full path for 'upgrade_repository'
+ UPGRADE_REPOSITORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "upgrade_repository")
+@@ -77,10 +79,12 @@
+         print("Can't backup your database, only mysql is supported (you have : %s)" % _db.get_db_type())
+         return
+     if confirm:
+-        answer = raw_input("Do you want to backup your database? [Y/n] ")
++        #answer = raw_input("Do you want to backup your database? [Y/n] ")
++        answer = 'y'
+         if answer == 'n':
+             return
+-    answer = raw_input("Backup file? [%s] " % DB_BACKUP_FILE)
++    #answer = raw_input("Backup file? [%s] " % DB_BACKUP_FILE)
++    answer = "/var/lib/domogik/backup/debupdate-"+datetime.datetime.today().strftime("%Y%m%dT_%H%M%S")+".sql"
+     if answer != '':
+         backup_directory = answer
+     print("Backing up your database to %s" % DB_BACKUP_FILE)
+@@ -173,7 +177,8 @@
+     update.execute(version=int(rep_v))
+ 
+ def user_want_database_upgrade():
+-    answer = raw_input("Do you want to upgrade your database? [Y/n] ")
++    #answer = raw_input("Do you want to upgrade your database? [Y/n] ")
++    answer = "y"
+     if answer == 'n':
+         return False
+     return True
+@@ -212,7 +217,8 @@
+     #TODO: improve this test
+     if not sql_schema.SystemConfig.__table__.exists(bind=_engine):
+         print("It appears that your database doesn't contain the required tables.")
+-        answer = raw_input("Should they be created? [Y/n] ")
++        #answer = raw_input("Should they be created? [Y/n] ")
++        answer = "y"
+         if answer == "n":
+             abort_install_process("Can't continue, system tables are missing")
+         else:
+@@ -233,7 +239,7 @@
+     db_v = get_db_version()
+     rep_v = get_repository_version()
+     if int(db_v) != int(rep_v):
+-        abort_install_process("Something is wrong with your installation : repository and database version are not " 
++        abort_install_process("Something is wrong with your installation : repository and database version are not "
+                              +"the same\nDatabase version:\t %s\nRepository version:\t %s" % (db_v, rep_v))
+     print("Installation complete.")
+ 
+@@ -248,7 +254,7 @@
+         if len(args) != 0:
+             usage()
+             sys.exit(2)
+-        
++
+     except getopt.GetoptError:
+         usage()
+         sys.exit(2)
+@@ -258,7 +264,8 @@
+             sys.exit()
+         else:
+             if opt in ('-r', '--reset'):
+-                answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
++                #answer = raw_input("Are you sure you want to drop all your tables? [y/N] ")
++                answer = "y"
+                 if answer == 'y':
+                     drop_all_tables()
+                 sys.exit()
