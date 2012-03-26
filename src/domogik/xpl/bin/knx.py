@@ -101,11 +101,11 @@ class KNXManager(XplPlugin):
         self.enable_hbeat()
 
         ### Load the configuration file in the plugin
-        filetoopen=self._config.query('knx','file')
-        whereisfile='locate "*/data/knx.txt"'
-        print whereisfile
-        subpp=subprocess.Popen(whereisfile,shell=True)
-        print "||%s||" %subpp
+#        filetoopen=self._config.query('knx','file')
+        print self.get_data_files_directory()
+        filetoopen= self.get_data_files_directory()
+        filetoopen= filetoopen+"/knx.txt"
+        print filetoopen 
         fichier=open(filetoopen,"r")
         for ligne in fichier:
            if ligne[:1]<>"#":
@@ -533,19 +533,22 @@ class KNXManager(XplPlugin):
         if type_cmd=="Add":
            print "Add device"
            valeur=valeur[1:]
-           Adr_dmg=valeur[:valeur.find(",")]
-           valeur=valeur[valeur.find(",")+1:]
-           dptype=valeur[:valeur.find(",")]
-           valeur=valeur[valeur.find(",")+1:]
-           Adr_cmd=valeur[:valeur.find(",:")]
-           valeur=valeur[valeur.find(",")+1:]
-           Adr_stat=valeur[:-1]
-
-           filetoopen=self._config.query('knx','file')
-           print filetoopen
-
+           Adr_dmg=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           dptype=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           Adr_cmd=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           Adr_stat=valeur[:valeur.find(":")]]
+           valeur=valeur[valeur.find(":")+1:]
+           dpt_stat=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           check=valeur[:-1]
+           
+           filetoopen= self.get_data_files_directory()
+           filetoopen= filetoopen+"/knx.txt"
            fichier=open(filetoopen,"a")
-           ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat)
+           ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s dpt_stat:%s check:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat,dpt_stat,check)
            print ligne
            fichier.write(ligne)
            fichier.close
