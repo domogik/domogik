@@ -121,6 +121,18 @@ class XplPlugin(BasePlugin):
        """
        return self._config_files
 
+    def get_data_files_directory(self):
+       """ Return the directory where a plugin developper can store data files
+       """
+       cfg = Loader('domogik')
+       my_conf = cfg.load()
+       config = dict(my_conf[1])
+       if config.has_key('package_path'):
+           path = "%s/data/%s" % (config['package_path'], self._name)
+       else:
+           path = "%s/share/domogik/data/%s" % (config['src_prefix'], self._name)
+       return path
+
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()
         """
