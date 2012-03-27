@@ -29,7 +29,7 @@ Implements
 
 
 @author: Marc Schneider <marc@mirelsol.org>
-@copyright: (C) 2007-2010 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

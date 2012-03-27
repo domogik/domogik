@@ -27,7 +27,7 @@ Get water level of your tank
 This arduino program may be used without Domogik with any xPL project
 
 @author: Fritz <fritz.smh@gmail.com>
-@copyright: (C) 2007-2011 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 

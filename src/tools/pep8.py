@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # pep8.py - Check Python source code formatting, according to PEP 8
-# Copyright (C) 2006 Johann C. Rocholl <johann@browsershots.org>
+# Copyright (C) 2012 Johann C. Rocholl <johann@browsershots.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files

@@ -27,7 +27,7 @@ A client librairy to speak with the cron plugin, via xpl language
 
 @author: Sebastien GALLET <sgallet@gmail.com>
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2011 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
