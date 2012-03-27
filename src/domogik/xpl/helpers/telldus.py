@@ -35,7 +35,7 @@ class telldusTool(Helper)
 
 @author: Sebastien GALLET <sgallet@gmail.com>
 @license: GPL(v3)
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 """
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError

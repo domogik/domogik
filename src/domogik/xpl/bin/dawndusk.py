@@ -33,7 +33,7 @@ Class dawndusk
 
 @author: Sébastien Gallet <sgallet@gmail.com>
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

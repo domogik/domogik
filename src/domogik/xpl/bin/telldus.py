@@ -40,7 +40,7 @@ Thanks to :
 Julien Garet <julien@garet.info>
 @author: Sebastien GALLET <sgallet@gmail.com>
 @license: GPL(v3)
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 """
 
 import traceback
