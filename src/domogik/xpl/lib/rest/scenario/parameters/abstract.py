@@ -66,7 +66,7 @@ class AbstractParameter:
         """ Call the trigger in a thread.
         Does nothing if no trigger is defined
         """
-        print "calling trigger"
+        print "calling trigger %s" % self._trigger
         if self._trigger == None:
             return
         else:

@@ -57,7 +57,7 @@ class AbstractTest:
         """ Callback called by a parameter when the fill() method is called
         Basically, it only calls the underlying ttrigger if exists
         """
-        self._log.debug("Trigger called by parameter %s" % param)
+        self._log.warning("Trigger %s called by parameter %s" % (self._trigger, param))
         if self._trigger != None:
             self._trigger(self)
 

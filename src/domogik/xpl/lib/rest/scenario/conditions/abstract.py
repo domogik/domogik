@@ -26,7 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 import json
-
+from exceptions import ValueError
 class AbstractCondition:
     """ This class provides base methods for the scenario conditions
     It must not be instanciated directly but need to be extended.
@@ -84,6 +84,7 @@ class AbstractCondition:
         self._log = log
         self._condition = condition
         self._mapping = mapping
+        self._parsed_condition = None
 
     def set_condition(self, condition):
         """ Set the condition to  some JSON expression
@@ -98,11 +99,12 @@ class AbstractCondition:
         self._mapping = mapping
 
     def __parse_boolean(self, json):
-    """ Recursive method which returns a string which represent the boolean expression defined by a json
-    @param json : a json expression which represents some boolean expression
-    """
+        """ Recursive method which returns a string which represent the boolean expression defined by a json
+        @param json : a json expression which represents some boolean expression
+        """
         if type(json) == dict:
-            for k, v in json:
+            for k in json.keys():
+                v = json[k]
                 if k in ["AND","OR"]:
                     return "( %s %s %s )" % (self.__parse_boolean(v[0]), k.lower(), self.__parse_boolean(v[1]))
                 elif k == "NOT":
@@ -112,7 +114,13 @@ class AbstractCondition:
                     uuid = k
                     test = self._mapping[k]
                     test.fill_parameters(v)
-                    return "self._mapping['%s'].evaluate()"
+                    return "self._mapping['%s'].evaluate()" % k
+
+    def get_parsed_condition(self):
+        """Returns the parsed condition
+        @return None if parse_condition as never called with a valid condition else the parsed condition
+        """
+        return self._parsed_condition
 
     def parse_condition(self):
         """ Parse the JSON to create the list of tests, parametrize them, and create a boolean condition
@@ -125,3 +133,13 @@ class AbstractCondition:
             self._log.warning("Can't load json : %s" % self._condition)
             raise e
         self._parsed_condition = self.__parse_boolean(_j)
+        return True
+
+    def eval_condition(self):
+        """ Evaluate the condition. 
+        @raise ValueError if no parsed condition is avaiable
+        @return a boolean representing result of evaluation
+        """
+        if self._parsed_condition is None:
+            raise ValueError("No parsed condition")
+        return eval(self._parsed_condition)

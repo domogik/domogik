@@ -25,9 +25,44 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.xpl.lib.rest.scenario.conditions import AbstractCondition
+from domogik.xpl.lib.rest.scenario.conditions.abstract import AbstractCondition
 
 class Condition(AbstractCondition):
     """ We have nothing to extend right now
     """
     pass
+
+if __name__ == "__main__":
+    import logging
+    FORMAT = "%(asctime)-15s %(message)s"
+    logging.basicConfig(format=FORMAT)
+
+    from domogik.xpl.lib.rest.scenario.tests.textinpage import TextInPageTest
+    c = None
+
+    def mytrigger(test):
+        logging.warning("Trigger called by test %s, refreshing state" % test)
+        if c.get_parsed_condition() == None:
+            return
+        st = c.eval_condition()
+        logging.warning("state of condition '%s' is %s" % (c.get_parsed_condition(), st))
+
+    cond1 = """{ "NOT": {
+        "990137de-25c9-4d47-8598-bb2eaec18e35": {
+            "url": { 
+                "urlpath": "http://localhost/index.html",
+                "interval": "5"
+            },
+            "text": {
+                "text": "nginx"
+            }
+        }
+    }
+    }"""
+    mapping = {}
+    mapping['990137de-25c9-4d47-8598-bb2eaec18e35'] = TextInPageTest(logging, trigger = mytrigger)
+    c = Condition(logging, cond1, mapping)
+    print "Condition created : %s" % c
+    print "Trying to parse the condition ..."
+    pc = c.parse_condition()
+    print "Condition parsed, result is %s, condition is %s " % (pc, c.get_parsed_condition())
