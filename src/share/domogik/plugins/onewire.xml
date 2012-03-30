@@ -9,13 +9,16 @@ List of supported devices :
 - DS2438
 - DS2408</description>
   <changelog>
+0.3.a
+- Add DS2408 support
+
 0.2
 - adapt plugin for release 0.2.0
 
 0.1
 - plugin creation
   </changelog>
-  <version>0.2a0</version>
+  <version>0.3.a</version>
   <documentation>http://wiki.domogik.org/plugin_onewire</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
