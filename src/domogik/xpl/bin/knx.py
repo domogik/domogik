@@ -112,7 +112,7 @@ class KNXManager(XplPlugin):
         fichier.close
         for i in range(len(listknx)):
            stat=listknx[i]
-           if stat.find("check:True")>=0:
+           if stat.find("check:true")>=0:
               stat=stat[stat.find("adr_stat:")+9:]
               stat=stat[:stat.find(" ")]
               print stat  
@@ -129,6 +129,7 @@ class KNXManager(XplPlugin):
         command = ""
         dmgadr =""
         msg_type=""
+        test = ""
         val=""
         sender = 'None'
         sender = data[data.find('from')+4:data.find('to')-1]
@@ -157,7 +158,7 @@ class KNXManager(XplPlugin):
                  datatype=test[:test.find(' ')]
                  if typeadr=="stat":
                     if lignetest.find('dpt_stat')<>-1:
-                       test=lignetest[lignetest.find('dpt_stat:'+9):]
+                       test=lignetest[lignetest.find('dpt_stat:')+9:]
                        datatype=test[:test.find(' ')]
                  test=lignetest[lignetest.find('adr_dmg:')+8:]
                  dmgadr=test[:test.find(' ')]
@@ -268,27 +269,51 @@ class KNXManager(XplPlugin):
 
         if type_cmd=="Add":
            print "Add device"
-           valeur=valeur[1:]
            Adr_dmg=valeur[:valeur.find(":")]
            valeur=valeur[valeur.find(":")+1:]
-           dptype=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
            Adr_cmd=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           dptype=valeur[:valeur.find(":")]
            valeur=valeur[valeur.find(":")+1:]
            Adr_stat=valeur[:valeur.find(":")]
            valeur=valeur[valeur.find(":")+1:]
            dpt_stat=valeur[:valeur.find(":")]
            valeur=valeur[valeur.find(":")+1:]
-           check=valeur[:-1]
+           check=valeur[:valeur.find(":")]
+           valeur=valeur[valeur.find(":")+1:]
+           commentaire=valeur
+           test=""
+           for i in range(len(listknx)):
+              print listknx[i]
+              if listknx[i].find(Adr_dmg)>=0:
+                 test=listknx[i]
+                 print test
+                 break
+           msg=XplMessage()
+           msg.set_schema('knx.basic')
+           msg.set_type("xpl-trig")
+           msg.add_data({'command': 'Add-ack'})
+           msg.add_data({'group' : 'UI'})
+           msg.add_data({'type' : 's'})
+
+
+           if test=="":
+              filetoopen= self.get_data_files_directory()
+              filetoopen= filetoopen+"/knx.txt"
+              fichier=open(filetoopen,"a")
+              ligne1="# %s \n" %commentaire
+              ligne2="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s dpt_stat:%s check:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat,dpt_stat,check)
+              fichier.write(ligne1)
+              fichier.write(ligne2)
+              fichier.close
+              listknx.append(ligne2)
+              print "Retour du xPL"
+              msg.add_data({'data': 'OK'})
+           else:
+              print "Error"
+              msg.add_data({'data': 'Error domogik address:'+Adr_dmg+' already exist'})
+           self.myxpl.send(msg)
            
-           filetoopen= self.get_data_files_directory()
-           filetoopen= filetoopen+"/knx.txt"
-           fichier=open(filetoopen,"a")
-           ligne="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s dpt_stat:%s check:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat,dpt_stat,check)
-           print ligne
-           fichier.write(ligne)
-           fichier.close
-           listknx.append(ligne)
 
 
 if __name__ == "__main__":
