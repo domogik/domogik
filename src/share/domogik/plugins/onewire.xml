@@ -2,11 +2,12 @@
   <id>onewire</id>
   <technology>1wire</technology>
   <description>Manage 1-wire devices.
-List of supported devices :
+List of supported devices : 
 - DS18B20
 - DS18S20
 - DS2401
-- DS2438</description>
+- DS2438
+- DS2408</description>
   <changelog>
 0.2
 - adapt plugin for release 0.2.0
@@ -110,6 +111,20 @@ List of supported devices :
       <description>Interval</description>
       <default-value>60</default-value>
     </key>
+    <key>
+      <order-id>12</order-id>
+      <name>ds2408-en</name>
+      <type>boolean</type>
+      <description>Enable DS2408. EXPERIMENTAL </description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>13</order-id>
+      <name>ds2408-int</name>
+      <type>number</type>
+      <description>Interval. EXPERIMENTAL </description>
+      <default-value>60</default-value>
+    </key>
   </configuration-keys>
   <files>
     <file path="src/share/domogik/design/plugin/onewire/icon.png"/>
@@ -149,6 +164,12 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", SYMLINK+="
           <device_technology_id>onewire</device_technology_id>
           <name>Serial number</name>
           <description>Serial number</description>
+      </device_type>
+      <device_type>
+          <id>onewire.gpio</id>
+          <device_technology_id>onewire</device_technology_id>
+          <name>General purpose IO</name>
+          <description>Onewire GPIO Chipset</description>
       </device_type>
   </device_types>
   <device_feature_models>
@@ -200,5 +221,125 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", SYMLINK+="
           <stat_key>present</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
+      <device_feature_model>
+          <id>onewire.gpio.status</id>
+          <name>Status</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>onewire.gpio</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>data</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+
+
+<device_feature_model>
+    <id>onewire.gpio.io0</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch0&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data0</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+<device_feature_model>
+    <id>onewire.gpio.io1</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch1&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data1</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+<device_feature_model>
+    <id>onewire.gpio.io2</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch2&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data2</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+
+<device_feature_model>
+    <id>onewire.gpio.io3</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch3&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data3</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+<device_feature_model>
+    <id>onewire.gpio.io4</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch4&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data4</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+<device_feature_model>
+    <id>onewire.gpio.io5</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch5&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data5</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+<device_feature_model>
+    <id>onewire.gpio.io6</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch6&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data6</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
+
+<device_feature_model>
+    <id>onewire.gpio.io7</id>
+    <name>Status</name>
+    <feature_type>actuator</feature_type>
+    <device_type_id>onewire.gpio</device_type_id>
+    <parameters>
+        {&quot;command&quot;:&quot;switch7&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}
+    </parameters>
+    <value_type>binary</value_type>
+    <stat_key>data7</stat_key>
+    <return_confirmation>1</return_confirmation>
+</device_feature_model>
   </device_feature_models>
+
+
 </package>

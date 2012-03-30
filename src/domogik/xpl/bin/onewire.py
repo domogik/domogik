@@ -36,6 +36,7 @@ TODO
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.onewire import OneWireException
@@ -44,6 +45,7 @@ from domogik.xpl.lib.onewire import ComponentDs18b20
 from domogik.xpl.lib.onewire import ComponentDs18s20
 from domogik.xpl.lib.onewire import ComponentDs2401
 from domogik.xpl.lib.onewire import ComponentDs2438
+from domogik.xpl.lib.onewire import ComponentDs2408
 import ow
 import traceback
 import time
@@ -66,6 +68,8 @@ class OneWireManager(XplPlugin):
                 cache = True
             else:
                 cache = False
+            ### Add Event listener
+            Listener(self.read_xpl, self.myxpl,{'schema':'sensor.basic'})
 
             ### DS18B20 config
             ds18b20_enabled = self._config.query('onewire', 'ds18b20-en')
@@ -89,9 +93,17 @@ class OneWireManager(XplPlugin):
 
             ds2438_interval = self._config.query('onewire', 'ds2438-int')
     
+
+            ### DS2408 config
+            ds2408_enabled = self._config.query('onewire', 'ds2408-en')
+
+            ds2408_interval = self._config.query('onewire', 'ds2408-int')
+
+
             ### Open one wire network
             try:
                 ow = OneWireNetwork(self.log, device, cache)
+                self.ow = ow
             except OneWireException as e:
                 self.log.error(e.value)
                 print(e.value)
@@ -156,6 +168,25 @@ class OneWireManager(XplPlugin):
                                            {})
                 ds2438.start()
     
+
+
+            ### DS2408 support
+            if ds2408_enabled == "True":
+                self.log.info("DS2408 support enabled")
+                ds2408 = threading.Thread(None,
+                                           ComponentDs2408,
+                                           "ds2408",
+                                           (self.log,
+                                            ow,
+                                            float(ds2408_interval),
+                                            self.send_xpl,
+                                            self.get_stop()),
+                                           {})
+                ds2408.start()
+
+
+
+
         except:
             self.log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
             print(traceback.format_exc())
@@ -176,6 +207,28 @@ class OneWireManager(XplPlugin):
         self.log.debug("Send xpl message...")
         self.myxpl.send(msg)
 
+
+    def read_xpl(self, message):
+        switch = message.data['switch']
+        device = message.data['device']
+        data = message.data['data']
+        print "Message XPL %s" %message
+        r = self.ow.write(device, switch, data)
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("sensor.basic")
+        mess.add_data({"device" :  device})
+        mess.add_data({"command" :  "switch"+switch})
+        self.myxpl.send(mess)
+	print "Setting PIO "+switch+"="+data+" for device "+device
+
+	mess2 = XplMessage()
+        mess2.set_type("xpl-trig")
+        mess2.set_schema("sensor.basic")
+        mess2.add_data({"device" :  device})
+        mess2.add_data({"data"+switch : r })
+        mess2.add_data({"type" : "PIO_ALL"})
+        self.myxpl.send(mess2)
 
 
 if __name__ == "__main__":

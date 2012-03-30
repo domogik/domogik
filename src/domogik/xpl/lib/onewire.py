@@ -32,6 +32,7 @@ class ComponentDs18b20
 class ComponentDs18s20
 class ComponentDs2401
 class ComponentDs2438
+class ComponentDs2408
 class OneWireNetwork
 
 @author: Fritz SMH <fritz.smh@gmail.com>
@@ -305,6 +306,74 @@ class ComponentDs2438:
 
 
 
+
+class ComponentDs2408:
+    """
+    DS2408 support
+    """
+
+    def __init__(self, log, onewire, interval, callback, stop):
+        """
+        Return PIO state each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_PIO_ALL = {}
+        self._stop = stop
+        self.start_listening()
+
+    def start_listening(self):
+        """
+        Start listening for onewire ds2408
+        """
+        while not self._stop.isSet():
+            for comp in self.root.find(type = "DS2408"):
+                my_id = comp.family+"."+comp.id
+                try:
+                    PIO_ALL = comp.PIO_ALL
+                    print("PIO.ALL=%s" % PIO_ALL)
+
+                except AttributeError:
+                    error = "DS2408 : error while reading value"
+                    self._log.error(error)
+                    print(error)
+
+                else:
+
+                    # ALL switchs status
+                    if my_id in self.old_PIO_ALL:
+                        if PIO_ALL != self.old_PIO_ALL[my_id]:
+                            my_type = "xpl-trig"
+                        else:
+                            my_type = "xpl-stat"
+                    else:
+                        my_type = "xpl-trig"
+                    self.old_PIO_ALL[my_id] = PIO_ALL
+                    print("type=%s, id=%s, PIO_ALL=%s" % (my_type, my_id, PIO_ALL))
+                    self.callback(my_type, {"device" : my_id,
+                                         "type" : "PIO_ALL",
+                                         "data0" : comp.PIO_0,
+                                         "data1" : comp.PIO_1,
+                                         "data2" : comp.PIO_2,
+                                         "data3" : comp.PIO_3,
+                                         "data4" : comp.PIO_4,
+                                         "data5" : comp.PIO_5,
+                                         "data6" : comp.PIO_6,
+                                         "data7" : comp.PIO_7,
+                                         "current" : PIO_ALL})
+
+            self._stop.wait(self.interval)
+
+
+
+
 class OneWireNetwork:
     """
     Get informations about 1wire network
@@ -334,3 +403,7 @@ class OneWireNetwork:
         """
         return self._root 
 
+    def write(self,device,pio,value):
+        s = ow.Sensor( '/'+device)
+        setattr(s,"PIO_"+pio, value)
+	return getattr(s,"PIO_"+pio)
