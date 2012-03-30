@@ -3,13 +3,12 @@
   <technology>knx</technology>
   <description>KNX management with Eibd</description>
   <changelog>
-0.1
-- plugin creation
+    0.1-plugin creation
   </changelog>
   <version>0.1a0</version>
 <documentation>http://wiki.domogik.org/plugin_knx</documentation>
   <author>Basilic</author>
-  <author-email>foof@fuu.bar</author-email>
+  <author-email>basilic3@hotmail.com</author-email>
   <domogik-min-version>0.2.0</domogik-min-version>
   <configuration-keys>
     <key>
@@ -20,20 +19,12 @@
       <default-value>False</default-value>
     </key>
     <key>
-      <order-id>1</order-id>
-      <name>device</name>
-      <type>string</type>
-      <description>KNX device (IP addres)</description>
-      <default-value></default-value>
-    </key>
-    <key>
       <order-id>2</order-id>
       <name>file</name>
       <type>string</type>
       <description>Path of KNX configuration file</description>
       <default-value></default-value>
     </key>
-
  </configuration-keys>
   <files>
     <file path="src/share/domogik/design/plugin/knx/icon.png"/>
@@ -55,14 +46,15 @@
     <file path="src/share/domogik/url2xpl/knx/HVACnormal.xml"/>
     <file path="src/share/domogik/url2xpl/knx/Add.xml"/>
   </files>
-  <dependencies/>
+  <dependencies>
+   <dep type="other" id="EIBD bcusdk"/>
+  </dependencies>
   <udev-rules/>
   <device_technology>
       <id>knx</id>
       <name>KNX</name>
       <description>KNX with Eibd</description>
   </device_technology>
-
   <device_types>
     <device_type>
           <id>knx.knx</id>
@@ -156,7 +148,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
      <device_feature_model>
           <id>knx.pressure.pressure</id>
           <name>Pressure</name>
@@ -169,10 +160,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
-
-
-
      <device_feature_model>
           <id>knx.humidity.humidity</id>
           <name>Humidity</name>
@@ -209,8 +196,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>0</return_confirmation>
      </device_feature_model>
-
-
      <device_feature_model>
           <id>knx.HVACMode</id>
           <name>HVACMode</name>
@@ -260,44 +245,6 @@
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
       <device_feature_model>
-          <id>knx.shutter.stop</id>
-          <name>Stop</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.shutter</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;stop&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;stop&quot;}
-          </parameters>
-          <value_type>binary</value_type>
-          <stat_key>data</stat_key>
-          <return_confirmation>1</return_confirmation>
-      </device_feature_model>
-      <device_feature_model>
-          <id>knx.raw.write</id>
-          <name>Write</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.raw</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;write&quot;}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>1</return_confirmation>
-     </device_feature_model>
-
-     <device_feature_model>
-          <id>knx.knx</id>
-          <name>KNXCreator</name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>knx.knx</device_type_id>
-          <parameters>
-              {}
-          </parameters>
-          <value_type>string</value_type>
-          <stat_key>command</stat_key>
-          <return_confirmation>0</return_confirmation>
-      </device_feature_model>
-
-     <device_feature_model>
           <id>knx.raw.read</id>
           <name>Read</name>
           <feature_type>sensor</feature_type>
@@ -309,7 +256,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
-
       <device_feature_model>
           <id>knx.thermostat.number</id>
           <name>thermostat</name>
@@ -322,7 +268,6 @@
           <stat_key>data</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
-
   </device_feature_models>
 </package>
 
