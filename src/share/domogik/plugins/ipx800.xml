@@ -140,7 +140,7 @@ Supported features :
           <feature_type>actuator</feature_type>
           <device_type_id>relayboard.relay</device_type_id>
           <parameters>
-              {&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}
           </parameters>
           <value_type>binary</value_type>
           <stat_key>output</stat_key>
