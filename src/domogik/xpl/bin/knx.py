@@ -268,52 +268,85 @@ class KNXManager(XplPlugin):
         ### ajout d'un device dans le fichier de configuration du KNX
 
         if type_cmd=="Add":
-           print "Add device"
-           Adr_dmg=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           Adr_cmd=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           dptype=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           Adr_stat=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           dpt_stat=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           check=valeur[:valeur.find(":")]
-           valeur=valeur[valeur.find(":")+1:]
-           commentaire=valeur
-           test=""
-           for i in range(len(listknx)):
-              print listknx[i]
-              if listknx[i].find(Adr_dmg)>=0:
-                 test=listknx[i]
-                 print test
-                 break
-           msg=XplMessage()
-           msg.set_schema('knx.basic')
-           msg.set_type("xpl-trig")
-           msg.add_data({'command': 'Add-ack'})
-           msg.add_data({'group' : 'UI'})
-           msg.add_data({'type' : 's'})
+           print "Commande Add Valeur=|%s|" %valeur
+           if valeur<>"Request":
+              print "Add device"
+              Adr_dmg=valeur[:valeur.find(":")]
+              valeur=valeur[valeur.find(":")+1:]
+              Adr_cmd=valeur[:valeur.find(":")]
+              valeur=valeur[valeur.find(":")+1:]
+              dptype=valeur[:valeur.find(":")]
+              valeur=valeur[valeur.find(":")+1:]
+              Adr_stat=valeur[:valeur.find(":")]
+              valeur=valeur[valeur.find(":")+1:]
+              dpt_stat=valeur[:valeur.find(":")]
+              valeur=valeur[valeur.find(":")+1:]
+              check=valeur[:valeur.find(":")]
+              valeur=valeur[valeur.find(":")+1:]
+              comentaire=valeur
+              test=""
+              print "test |%s|" %test
+              print "Adr_dmg |%s|" %Adr_dmg
+              self.log.info("Valeur du test= %s") %Adr_dmg
 
+              if Adr_dmg<>"Request":
+                 print "Search Adr_dmg |%s|" %Adr_dmg
+                 for i in range(len(listknx)):
+                    print listknx[i]
+                    if listknx[i].find(Adr_dmg)>=0:
+                       test=listknx[i]
+                       print test
+                       break
+              else:
+                 print "Demande du fichier"
+                 test="Request"
+              msg=XplMessage()
+              msg.set_schema('knx.basic')
+              msg.set_type("xpl-trig")
+              msg.add_data({'command': 'Add-ack'})
+              msg.add_data({'group' : 'UI'})
+              msg.add_data({'type' : 's'})
 
-           if test=="":
+              self.log.info("Valeur du test2= %s") %Adr_dmg
+           
+              if test=="":
+                 filetoopen= self.get_data_files_directory()
+                 filetoopen= filetoopen+"/knx.txt"
+                 fichier=open(filetoopen,"a")
+                 ligne1="# %s \n" %commentaire
+                 ligne2="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s dpt_stat:%s check:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat,dpt_stat,check)
+                 fichier.write(ligne1)
+                 fichier.write(ligne2)
+                 fichier.close
+                 listknx.append(ligne2)
+                 print "Retour du xPL"
+                 msg.add_data({'data': 'OK'})
+              else:
+                 print "Error"
+                 msg.add_data({'data': 'Error domogik address:'+Adr_dmg+' already exist'})
+              self.myxpl.send(msg)
+           else:
+              print "Requette de fichier"
+              msg=XplMessage()
+              msg.set_schema('knx.basic')
+              msg.set_type("xpl-trig")
+              msg.add_data({'command': 'Add-ack'})
+              msg.add_data({'group' : 'UI'})
+              msg.add_data({'type' : 's'})
+
+              print "Resquest files"
               filetoopen= self.get_data_files_directory()
               filetoopen= filetoopen+"/knx.txt"
-              fichier=open(filetoopen,"a")
-              ligne1="# %s \n" %commentaire
-              ligne2="datatype:%s adr_dmg:%s adr_cmd:%s adr_stat:%s dpt_stat:%s check:%s end \n" %(dptype,Adr_dmg,Adr_cmd,Adr_stat,dpt_stat,check)
-              fichier.write(ligne1)
-              fichier.write(ligne2)
+              fichier=open(filetoopen,"r")
+              data=[]
+              for ligne in fichier:
+                 data.append(ligne[:ligne.find("end")])
+              message=""
+              for i in range(len(data)):
+                 message=message+data[i]+","
+              msg.add_data({'data': message})
               fichier.close
-              listknx.append(ligne2)
-              print "Retour du xPL"
-              msg.add_data({'data': 'OK'})
-           else:
-              print "Error"
-              msg.add_data({'data': 'Error domogik address:'+Adr_dmg+' already exist'})
-           self.myxpl.send(msg)
-           
+              self.myxpl.send(msg)
 
 
 if __name__ == "__main__":
