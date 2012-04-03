@@ -116,7 +116,9 @@ class PackageJson():
 
             # complete json
             self.json["identity"]["fullname"] = "%s-%s" % (self.json["type"],
-                                                           self.json["identity"]["id"])
+                                                           self.json["id"])
+            self.json["identity"]["info_file"] = self.info_file
+            self.json["identity"]["icon_file"] = self.icon_file
 
         except:
             raise PackageException("Error reading json file : %s : %s" % (json_file, str(traceback.format_exc())))
@@ -170,14 +172,14 @@ class PackageJson():
         print("Type                : %s" % self.json["type"])
         print("Id                  : %s" % self.json["identity"]["id"])
         print("Full name           : %s" % self.json["identity"]["fullname"])
-        print("Release             : %s" % self.json["identity"]["release"])
+        print("Version             : %s" % self.json["identity"]["version"])
         print("Category            : %s" % self.json["identity"]["category"])
         print("Link for doc        : %s" % self.json["identity"]["documentation"])
         print("Description         : %s" % self.json["identity"]["description"])
         print("Changelog           : %s" % self.json["identity"]["changelog"])
         print("Author              : %s" % self.json["identity"]["author"])
         print("Author's email      : %s" % self.json["identity"]["email"])
-        print("Domogik min release : %s" % self.json["identity"]["domogik_min_release"])
+        print("Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
         print("----- Package files -------------------------------------")
         for my_file in self.json["files"]:
             print("- %s" % my_file)
