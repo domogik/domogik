@@ -100,11 +100,12 @@
         "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
         "description": "This plugin allows to wake up computers on a LAN and to ping them to check if they are alive", 
         "documentation": "http://wiki.domogik.org/plugin_wol_ping", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-wol_ping", 
         "id": "wol_ping", 
         "name": "wol_ping", 
-        "release": "0.2"
+        "type": "plugin", 
+        "version": "0.2"
     }, 
     "json_version": 1, 
     "technology": {
@@ -112,6 +113,5 @@
         "id": "computer", 
         "name": "Computer"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

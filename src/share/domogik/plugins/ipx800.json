@@ -147,11 +147,12 @@
         "changelog": "0.2\n- adapt plugin for release 0.2.0\n- add support for ipx800 v3 (new features)\n\n0.1\n- plugin creation", 
         "description": "IPX800 relayboard support.\nSupported  models :\n- IPX 800\n- IPX 800 pro\n- IPX 800 v2\n- IPX 800 v3\nSupported features :\n- Relay : set and get state\n- Digital input \n- Analog input", 
         "documentation": "http://wiki.domogik.org/plugin_ipx800", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-ipx800", 
         "id": "ipx800", 
         "name": "ipx800", 
-        "release": "0.2a1"
+        "type": "plugin", 
+        "version": "0.2a1"
     }, 
     "json_version": 1, 
     "technology": {
@@ -159,6 +160,5 @@
         "id": "relayboard", 
         "name": "Relay board"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

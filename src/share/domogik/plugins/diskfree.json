@@ -89,11 +89,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Send over xPL disk usage", 
         "documentation": "http://wiki.domogik.org/plugin_diskfree", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-diskfree", 
         "id": "diskfree", 
         "name": "diskfree", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -101,6 +102,5 @@
         "id": "computer", 
         "name": "Computer"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

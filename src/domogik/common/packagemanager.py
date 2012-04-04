@@ -115,7 +115,8 @@ class PackageManager():
         self.log("Plugin id : %s" % id)
 
         try:
-            pkg_json = PackageJson(id).json
+            pkg_obj = PackageJson(id)
+            pkg_json = pkg_obj.json
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -135,12 +136,12 @@ class PackageManager():
         self.log("Json file OK")
 
         # check type == plugin
-        if pkg_json["type"] != "plugin":
+        if pkg_json["identity"]["type"] != "plugin":
             self.log("Error : this package is not a plugin")
             return
 
         # display plugin informations
-        pkg_json.display()
+        pkg_obj.display()
 
         # check file existence
         if pkg_json["files"] == []:
@@ -156,15 +157,15 @@ class PackageManager():
 
         # Copy Json file in a temporary location in order to complete it
         json_tmp_file = "%s/plugin-%s-%s.json" % (tempfile.gettempdir(),
-                                                pkg_json["id"],
+                                                pkg_json["identity"]["id"],
                                                 pkg_json["identity"]["version"])
         shutil.copyfile(pkg_json["identity"]["info_file"], json_tmp_file)
         
         # Update info.json with generation date
-        pkg_json.set_generated(json_tmp_file)
+        pkg_obj.set_generated(json_tmp_file)
 
         # Create .tgz
-        self._create_tar_gz("plugin-%s-%s" % (pkg_json["id"], pkg_json["identity"]["version"]), 
+        self._create_tar_gz("plugin-%s-%s" % (pkg_json["identity"]["id"], pkg_json["identity"]["version"]), 
                             output_dir,
                             pkg_json["all_files"], 
                             json_tmp_file,
@@ -181,7 +182,8 @@ class PackageManager():
         self.log("Hardware id : %s" % id)
 
         try:
-            pkg_json = PackageJson(id, pkg_type = "external").json
+            pkg_obj = PackageJson(id, pkg_type = "external")
+            pkg_json = pkg_obj.json
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -200,12 +202,12 @@ class PackageManager():
 
         self.log("Json file OK")
 
-        if pkg_json["type"] != "external":
+        if pkg_json["identity"]["type"] != "external":
             self.log("Error : this package is not an external member")
             return
 
         # display external informations
-        pkg_json.display()
+        pkg_obj.display()
 
         # check file existence
         if pkg_json["files"] == []:
@@ -221,7 +223,7 @@ class PackageManager():
 
         # Copy Json file in a temporary location in order to complete it
         json_tmp_file = "%s/external-%s-%s.json" % (tempfile.gettempdir(),
-                                                pkg_json["id"],
+                                                pkg_json["identity"]["id"],
                                                 pkg_json["identity"]["version"])
         shutil.copyfile(pkg_json["identity"]["info_file"], json_tmp_file)
         
@@ -229,7 +231,7 @@ class PackageManager():
         pkg_json.set_generated(json_tmp_file)
 
         # Create .tgz
-        self._create_tar_gz("external-%s-%s" % (pkg_json["id"], pkg_json["identity"]["version"]), 
+        self._create_tar_gz("external-%s-%s" % (pkg_json["identity"]["id"], pkg_json["identity"]["version"]), 
                             output_dir,
                             pkg_json["all_files"], 
                             json_tmp_file,
@@ -252,7 +254,7 @@ class PackageManager():
         try:
             tar = tarfile.open(my_tar, "w:gz")
             for my_file in files:
-                path =  str(my_file["path"])
+                path =  str(my_file)
                 self.log("- %s" % path)
                 if os.path.isfile(SRC_PATH + path):
                     tar.add(SRC_PATH + path, arcname = path)
@@ -417,12 +419,12 @@ class PackageManager():
         self._create_folder(INSTALL_PATH)
 
         # install plugin in $HOME
-        self.log("Installing package (%s)..." % pkg_json["type"])
+        self.log("Installing package (%s)..." % pkg_json["identity"]["type"])
         try:
-            if pkg_json["type"] in ('plugin', 'external'):
-                self._install_plugin_or_external(my_tmp_dir, INSTALL_PATH, pkg_json["type"], package_part)
+            if pkg_json["identity"]["type"] in ('plugin', 'external'):
+                self._install_plugin_or_external(my_tmp_dir, INSTALL_PATH, pkg_json["identity"]["type"], package_part)
             else:
-                raise "Package type '%s' not installable" % pkg_json["type"]
+                raise "Package type '%s' not installable" % pkg_json["identity"]["type"]
         except:
             msg = "Error while installing package : %s" % (traceback.format_exc())
             self.log(msg)
@@ -430,7 +432,7 @@ class PackageManager():
         self.log("Package successfully extracted.")
 
         # insert data in database
-        if pkg_json["type"] in ('plugin', 'external'):
+        if pkg_json["identity"]["type"] in ('plugin', 'external'):
             if package_part == PKG_PART_RINOR:
                 self.log("Insert data in database...")
                 pkg_data = PackageData("%s/info.json" % my_tmp_dir)
@@ -704,10 +706,10 @@ class PackageManager():
             for fic in files:
                 if fic[-5:] == ".json":
                     pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-                    if pkg_json["type"] == pkg_type and pkg_json["id"] == id \
+                    if pkg_json["identity"]["type"] == pkg_type and pkg_json["identity"]["id"] == id \
                        and pkg_json["identity"]["version"] > version:
-                        upd_list.append({"type" : pkg_json["type"],
-                                         "id" : pkg_json["id"],
+                        upd_list.append({"type" : pkg_json["identity"]["type"],
+                                         "id" : pkg_json["identity"]["id"],
                                          "version" : pkg_json["identity"]["version"],
                                          "priority" : pkg_json["identity"]["priority"],
                                          "changelog" : pkg_json["identity"]["changelog"]})
@@ -763,9 +765,9 @@ class PackageManager():
                 if fic[-5:] == ".json":
                     pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
                     if fullname == None or (fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]):
-                        if pkg_type == None or pkg_type == pkg_json["type"]:
-                            pkg_list.append({"id" : pkg_json["id"],
-                                         "type" : pkg_json["type"],
+                        if pkg_type == None or pkg_type == pkg_json["identity"]["type"]:
+                            pkg_list.append({"id" : pkg_json["identity"]["id"],
+                                         "type" : pkg_json["identity"]["type"],
                                          "fullname" : pkg_json["identity"]["fullname"],
                                          "version" : pkg_json["identity"]["version"],
                                          "source" : pkg_json["identity"]["source"],
@@ -775,7 +777,7 @@ class PackageManager():
                                          "desc" : pkg_json["identity"]["description"],
                                          "changelog" : pkg_json["identity"]["changelog"],
                                          "author" : pkg_json["identity"]["author"],
-                                         "email" : pkg_json["identity"]["email"],
+                                         "email" : pkg_json["identity"]["author_email"],
                                          "domogik_min_version" : pkg_json["identity"]["domogik_min_version"],
                                          "priority" : pkg_json["identity"]["priority"],
                                          "dependencies" : pkg_json["dependencies"],
@@ -795,11 +797,11 @@ class PackageManager():
                     if fic[-5:] == ".json":
                         pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
                         # filter on rest
-                        if pkg_json["id"] != "rest":
+                        if pkg_json["identity"]["id"] != "rest":
                             pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-                                             "id" : pkg_json["id"],
+                                             "id" : pkg_json["identity"]["id"],
                                              "version" : pkg_json["identity"]["version"],
-                                             "type" : pkg_json["type"],
+                                             "type" : pkg_json["identity"]["type"],
                                              "package-url" : pkg_json["identity"]["package_url"],
                                              "source" : pkg_json["identity"]["source"]})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
@@ -810,9 +812,9 @@ class PackageManager():
             @param fullname : fullname of package (type-name)
             @param version : optionnal : version to display (if several)
         """
-        pkg, status = self._find_package(fullname, version)
+        pkg_obj, status = self._find_package(fullname, version)
         if status == True:
-            pkg.display()
+            pkg_obj.display()
 
 
     def _find_package(self, fullname, version = None):
@@ -826,19 +828,22 @@ class PackageManager():
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
                 if fic[-5:] == ".json":
-                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+                    pkg_obj = PackageJson(path = "%s/%s" % (root, fic))
+                    pkg_json = pkg_obj.json
                     if version == None:
                         if fullname == pkg_json["identity"]["fullname"]:
                             pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
                                              "version" : pkg_json["identity"]["version"],
                                              "priority" : pkg_json["identity"]["priority"],
                                              "source" : pkg_json["identity"]["source"],
+                                             "obj" : pkg_obj,
                                              "json" : pkg_json})
                     else:
                         if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
                             pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
                                              "version" : pkg_json["identity"]["version"],
                                              "priority" : pkg_json["identity"]["priority"],
+                                             "obj" : pkg_obj,
                                              "json" : pkg_json})
         if len(pkg_list) == 0:
             if version == None:
@@ -855,7 +860,7 @@ class PackageManager():
                                               pkg["priority"]))
             return [], msg
 
-        return pkg_list[0]["json"], True
+        return pkg_list[0]["obj"], True
 
     def is_root(self):
         """ return True is current user is root

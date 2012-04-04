@@ -98,11 +98,12 @@
         "changelog": "0.1.0\n- relays only\n- serial comunication only \n0.2.0\n- added socket comunication\n0.3.0\n- added dimmer support\n0.4.0\n- added blind (up/down) support", 
         "description": "velbus interface", 
         "documentation": "http://wiki.domogik.org/plugin_velbus", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-velbus", 
         "id": "velbus", 
         "name": "velbus", 
-        "release": "0.4.1"
+        "type": "plugin", 
+        "version": "0.4.1"
     }, 
     "json_version": 1, 
     "technology": {
@@ -110,7 +111,6 @@
         "id": "velbus", 
         "name": "Velbus"
     }, 
-    "type": "plugin", 
     "udev-rules": [
         {
             "desc": "Velbus USB interface", 

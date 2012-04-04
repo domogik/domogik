@@ -217,11 +217,12 @@
         "changelog": "0.2\n- #TO DEFINE#\n0.1\n- Initial release", 
         "description": "A poor interface to the cron plugin.\n  You can only create an alarm message.\n  Read the wiki for documentation.", 
         "documentation": "http://wiki.domogik.org/plugin_zalarms", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-zalarms", 
         "id": "zalarms", 
         "name": "zalarms", 
-        "release": "0.2a0"
+        "type": "plugin", 
+        "version": "0.2a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -229,6 +230,5 @@
         "id": "cron", 
         "name": "Cron"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

@@ -209,11 +209,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Get weather informations from Yahoo! Weather  about your town", 
         "documentation": "http://wiki.domogik.org/plugin_yweather", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-yweather", 
         "id": "yweather", 
         "name": "yweather", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -221,6 +222,5 @@
         "id": "online_service", 
         "name": "Online service"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

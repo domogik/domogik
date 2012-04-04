@@ -83,11 +83,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs cm15a driver to work", 
         "documentation": "http://wiki.domogik.org/plugin_x10cm15a", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-x10cm15a", 
         "id": "x10cm15a", 
         "name": "x10cm15a", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -95,7 +96,6 @@
         "id": "x10", 
         "name": "X10"
     }, 
-    "type": "plugin", 
     "udev-rules": [
         {
             "desc": "X10 CM15A interface", 

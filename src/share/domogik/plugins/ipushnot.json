@@ -27,11 +27,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Iphone/Ipad notification system base on external service provide by pushme.to", 
         "documentation": "http://wiki.domogik.org/plugin_ipushnot", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-ipushnot", 
         "id": "ipushnot", 
         "name": "ipushnot", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -39,6 +40,5 @@
         "id": "notification", 
         "name": "Notification"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

@@ -40,11 +40,12 @@
         "changelog": "0.1\n- create", 
         "description": "Get water level from a tank with an arduino\nThis hardware plugin is a xPL program for arduino which get water level of a tank\n\nIt requires : \n- Arduino Uno or similar\n- Xbee shield and xbee serie 1\n\nOpen the following files as a sketchbook with the Arduino Java IDE :\n- ar_tank.pde\n- time.pde\n- xpl.pde\n- float.pde\n\nConfigure parameters in ar_tank.pde\n- xPL part\n- tank parameters\n\nUpload project to Arduino with the IDE", 
         "documentation": "http://wiki.domogik.org/external_ar_tank", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "external-ar_tank", 
         "id": "ar_tank", 
         "name": "ar_tank", 
-        "release": "0.1a0"
+        "type": "external", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -52,6 +53,5 @@
         "id": "arduino", 
         "name": "Arduino"
     }, 
-    "type": "external", 
     "udev-rules": []
 }

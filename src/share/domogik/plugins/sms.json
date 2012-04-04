@@ -86,11 +86,12 @@
         "changelog": "0.1.0\n- plugin creation", 
         "description": "Send SMS with french telephony providers : Orange, SFR, Bouygues", 
         "documentation": "http://wiki.domogik.org/plugin_sms", 
-        "domogik_min_release": "0.1.0", 
+        "domogik_min_version": "0.1.0", 
         "fullname": "plugin-sms", 
         "id": "sms", 
         "name": "sms", 
-        "release": "0.1.0"
+        "type": "plugin", 
+        "version": "0.1.0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -98,6 +99,5 @@
         "id": "communication", 
         "name": "communication"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

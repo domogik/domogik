@@ -330,11 +330,12 @@
         "changelog": "0.1\n- create", 
         "description": "RFXCOM with xPL support LAN 433.92MHz receiver transmitter", 
         "documentation": "#TODO", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "external-rfxcom", 
         "id": "rfxcom", 
         "name": "rfxcom", 
-        "release": "0.1a0"
+        "type": "external", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -342,6 +343,5 @@
         "id": "rfxcom", 
         "name": "RFXCom"
     }, 
-    "type": "external", 
     "udev-rules": []
 }

@@ -38,11 +38,12 @@
         "changelog": "0.1\n- create", 
         "description": "Generic Webcam support", 
         "documentation": "#TODO", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "external-webcam", 
         "id": "webcam", 
         "name": "webcam", 
-        "release": "0.1a0"
+        "type": "external", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -50,6 +51,5 @@
         "id": "camera", 
         "name": "Camera"
     }, 
-    "type": "external", 
     "udev-rules": []
 }

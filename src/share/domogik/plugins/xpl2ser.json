@@ -52,11 +52,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.", 
         "documentation": "#", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-xpl2ser", 
         "id": "xpl2ser", 
         "name": "xpl2ser", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -64,6 +65,5 @@
         "id": "bridge", 
         "name": "Bridge"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

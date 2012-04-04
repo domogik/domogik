@@ -179,11 +179,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Calculate statistics of a Continuous Mechanical Extract\n  Ventilation with Heat Recovery (MVHR) and a Earth Cooling Tubes (ECT)", 
         "documentation": "http://wiki.domogik.org/plugin_mvhr", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-mvhr", 
         "id": "mvhr", 
         "name": "mvhr", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -191,6 +192,5 @@
         "id": "mvhr", 
         "name": "Mvhr"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

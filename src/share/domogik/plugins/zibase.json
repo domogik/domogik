@@ -313,11 +313,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "ZiBase support (zodianet)", 
         "documentation": "http://wiki.domogik.org/plugin_zibase", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-zibase", 
         "id": "zibase", 
         "name": "zibase", 
-        "release": "0.1a2"
+        "type": "plugin", 
+        "version": "0.1a2"
     }, 
     "json_version": 1, 
     "technology": {
@@ -325,6 +326,5 @@
         "id": "zibase", 
         "name": "ZiBase"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

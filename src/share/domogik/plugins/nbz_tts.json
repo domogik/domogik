@@ -67,11 +67,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server", 
         "documentation": "http://wiki.domogik.org/plugin_nbz_tts", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-nbz_tts", 
         "id": "nbz_tts", 
         "name": "nbz_tts", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -79,6 +80,5 @@
         "id": "communication", 
         "name": "Communication"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

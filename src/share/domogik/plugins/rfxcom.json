@@ -566,11 +566,12 @@
         "changelog": "0.1\n- create", 
         "description": "RFXCOM Usb 433.92MHz receiver and transmitter", 
         "documentation": "http://wiki.domogik.org/plugin_rfxcom", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-rfxcom", 
         "id": "rfxcom", 
         "name": "rfxcom", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -578,7 +579,6 @@
         "id": "rfxcom", 
         "name": "RFXCom"
     }, 
-    "type": "plugin", 
     "udev-rules": [
         {
             "desc": "RFXCOM Usb transceiver and receiver", 

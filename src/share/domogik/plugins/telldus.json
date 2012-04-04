@@ -194,11 +194,12 @@
         "changelog": "0.2\n- Update XML description", 
         "description": "Manage many devices through TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n  they will appear automatically in Domogik", 
         "documentation": "http://wiki.domogik.org/plugin_telldus", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-telldus", 
         "id": "telldus", 
         "name": "telldus", 
-        "release": "0.2a0"
+        "type": "plugin", 
+        "version": "0.2a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -206,6 +207,5 @@
         "id": "telldus", 
         "name": "Telldus"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

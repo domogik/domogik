@@ -163,11 +163,12 @@
         "changelog": "0.2\n- Update the plugin to domogik 0.2.0\n0.1\n- plugin creation", 
         "description": "Get the dawn and dusk events using the geocoordinates.\n  Can also send commands to devices using this event.", 
         "documentation": "http://wiki.domogik.org/plugin_dawndusk", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-dawndusk", 
         "id": "dawndusk", 
         "name": "dawndusk", 
-        "release": "0.2a0"
+        "type": "plugin", 
+        "version": "0.2a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -175,6 +176,5 @@
         "id": "dawndusk", 
         "name": "Dawndusk"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

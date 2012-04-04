@@ -26,11 +26,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "This plugin sends date and time on the xPL network every minute", 
         "documentation": "http://wiki.domogik.org/plugin_xpl_time", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-xpl_time", 
         "id": "xpl_time", 
         "name": "xpl_time", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -38,6 +39,5 @@
         "id": "domogik", 
         "name": "Domogik"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

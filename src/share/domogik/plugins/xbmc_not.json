@@ -52,11 +52,12 @@
         "changelog": "Obsolete plugin - will be suppressed\n\n0.1.0\n- plugin creation", 
         "description": "Send notifications to XBMC", 
         "documentation": "http://wiki.domogik.org/plugin_xbmc_not", 
-        "domogik_min_release": "0.1.0", 
+        "domogik_min_version": "0.1.0", 
         "fullname": "plugin-xbmc_not", 
         "id": "xbmc_not", 
         "name": "xbmc_not", 
-        "release": "0.1"
+        "type": "plugin", 
+        "version": "0.1"
     }, 
     "json_version": 1, 
     "technology": {
@@ -64,6 +65,5 @@
         "id": "multimedia", 
         "name": "Multimedia"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

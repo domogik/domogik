@@ -85,11 +85,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Z-wave is a radio based protocol to control lights, appliances and others things in your house", 
         "documentation": "http://wiki.domogik.org/tiki-index.php?page=plugin_zwave", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-zwave", 
         "id": "zwave", 
         "name": "zwave", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -97,6 +98,5 @@
         "id": "zwave", 
         "name": "Z-wave"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

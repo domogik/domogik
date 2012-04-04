@@ -115,10 +115,11 @@ class PackageJson():
                 self.icon_file = None
 
             # complete json
-            self.json["identity"]["fullname"] = "%s-%s" % (self.json["type"],
-                                                           self.json["id"])
+            self.json["identity"]["fullname"] = "%s-%s" % (self.json["identity"]["type"],
+                                                           self.json["identity"]["id"])
             self.json["identity"]["info_file"] = self.info_file
             self.json["identity"]["icon_file"] = self.icon_file
+            self.json["all_files"] = self.json["files"]
 
         except:
             raise PackageException("Error reading json file : %s : %s" % (json_file, str(traceback.format_exc())))
@@ -159,17 +160,17 @@ class PackageJson():
         """ Add generation date info in xml data
             @param xml_path : path to xml file
         """
-        # TODO : load json from given path
-        #        complete file
-        #        my_json["generated"] = str(datetime.datetime.now())
-        #        write json in file
-        pass
+        my_json = json.load(open(path))
+        my_json["identity"]["generated"] = str(datetime.datetime.now())
+        my_file = open(path, "w")
+        my_file.write(json.dumps(my_json))
+        my_file.close()
 
     def display(self):
         """ Display xml data in a fine way
         """
         print("---- Package informations -------------------------------")
-        print("Type                : %s" % self.json["type"])
+        print("Type                : %s" % self.json["identity"]["type"])
         print("Id                  : %s" % self.json["identity"]["id"])
         print("Full name           : %s" % self.json["identity"]["fullname"])
         print("Version             : %s" % self.json["identity"]["version"])
@@ -178,7 +179,7 @@ class PackageJson():
         print("Description         : %s" % self.json["identity"]["description"])
         print("Changelog           : %s" % self.json["identity"]["changelog"])
         print("Author              : %s" % self.json["identity"]["author"])
-        print("Author's email      : %s" % self.json["identity"]["email"])
+        print("Author's email      : %s" % self.json["identity"]["author_email"])
         print("Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
         print("----- Package files -------------------------------------")
         for my_file in self.json["files"]:

@@ -202,11 +202,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "KNX management with Eibd", 
         "documentation": "http://wiki.domogik.org/plugin_knx", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-knx", 
         "id": "knx", 
         "name": "knx", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -214,6 +215,5 @@
         "id": "knx", 
         "name": "KNX"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }

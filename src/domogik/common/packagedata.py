@@ -44,14 +44,14 @@ class PackageData():
     """ Tool to insert necessary data in database
     """
 
-    def __init__(self, xml_path):
+    def __init__(self, json_path):
         """ Init tool
             @param plugin_name : plugin name
         """
 
         self._db = DbHelper()
         try:
-            self.pkg = PackageJson(path = json_path)
+            self.pkg = PackageJson(path = json_path).json
         except:
             print(str(traceback.format_exc()))
             return

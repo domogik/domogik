@@ -389,10 +389,10 @@ class PackageXml():
         my_json = \
         {
             "json_version" : 1,
-            "type" : self.type,
             "identity" : {
+                "type" : self.type,
                 "id" : self.id,
-                "release" : self.release,
+                "version" : self.release,
                 "name" : self.id,   
                 "fullname" : self.fullname,  
                 "category" : self.techno,
@@ -401,7 +401,7 @@ class PackageXml():
                 "changelog" : self.changelog,
                 "author" : self.author,
                 "author_email" : self.email,
-                "domogik_min_release" : self.domogik_min_release,
+                "domogik_min_version" : self.domogik_min_release,
             },
         }
 

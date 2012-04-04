@@ -41,11 +41,12 @@
         "changelog": "0.1\n- plugin creation", 
         "description": "Manage Chacon / Di-O devices through TellStick", 
         "documentation": "#TODO", 
-        "domogik_min_release": "0.2.0", 
+        "domogik_min_version": "0.2.0", 
         "fullname": "plugin-tschacon", 
         "id": "tschacon", 
         "name": "tschacon", 
-        "release": "0.1a0"
+        "type": "plugin", 
+        "version": "0.1a0"
     }, 
     "json_version": 1, 
     "technology": {
@@ -53,6 +54,5 @@
         "id": "tschacon", 
         "name": "tsChacon"
     }, 
-    "type": "plugin", 
     "udev-rules": []
 }
