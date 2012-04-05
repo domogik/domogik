@@ -44,7 +44,7 @@ from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, REPO_CACHE_DIR
-from domogik.common.packagexml import PackageXml, PackageException
+from domogik.common.packagexml import PackageException
 import time
 import urllib
 import urlparse
