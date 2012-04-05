@@ -113,6 +113,10 @@ class PackageManager():
             @param force : False : ask for confirmation
         """
         self.log("Plugin id : %s" % id)
+        if PACKAGE_MODE == True:
+            msg = "Domogik in 'production' mode (packages management activated) : creating a package is not possible"
+            self.log(msg)
+            return
 
         try:
             pkg_obj = PackageJson(id)
@@ -180,6 +184,10 @@ class PackageManager():
             @param force : False : ask for confirmation
         """
         self.log("Hardware id : %s" % id)
+        if PACKAGE_MODE == True:
+            msg = "Domogik in 'production' mode (packages management activated) : creating a package is not possible"
+            self.log(msg)
+            return
 
         try:
             pkg_obj = PackageJson(id, pkg_type = "external")
