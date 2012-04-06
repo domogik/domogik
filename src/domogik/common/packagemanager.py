@@ -48,6 +48,8 @@ import shutil
 import sys
 from domogik.common import logger
 from distutils2.version import NormalizedVersion 
+import json
+import re
 
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
@@ -582,9 +584,13 @@ class PackageManager():
             self.log(str(traceback.format_exc()))
             return False
              
-        # for each list, get files and associated Json
+        # for each repository, get files and associated Json
+        # the higher priority is processed first. If a package is duplicate, for
+        # the lower priorities, it will be skipped
         try:
-            self._parse_repository(repo_list, REPO_CACHE_DIR)
+            for my_repo in repo_list:
+                print my_repo
+                self._cache_repository(my_repo["url"], REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
             return False
@@ -600,8 +606,12 @@ class PackageManager():
             for line in src_file.readlines():
                 # if the line is not a comment
                 if line.strip()[0] != "#": 
+                    url = line.split()[1]
+                    # remove all useless final "/"
+                    while url[-1] == "/":
+                        url = url[0:-1]
                     repo_list.append({"priority" : line.split()[0],
-                                      "url" : line.split()[1]})
+                                      "url" : url})
             src_file.close()
         except:
             msg = "Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc()))
@@ -610,6 +620,36 @@ class PackageManager():
         # return sorted list
         return sorted(repo_list, key = lambda k: k['priority'], reverse = True)
 
+    def _cache_repository(self, base_url, cache_dir):
+        """ Download the json describing the repository
+            @param base_url : repo url in sources.list
+            @param cache_dir : dir for the cache
+        """
+        ### read status json
+        repo_status_url = "%s/status" % base_url
+        self.log("Processing '%s'..." % repo_status_url)
+        resp = urllib.urlopen(repo_status_url)
+        repo_json = json.load(resp)
+        self.log("Counter = %s" % repo_json["count"])
+
+        ### download tgz data
+        repo_data_url = "%s/data" % base_url
+        self.log("Processing '%s'..." % repo_data_url)
+        tmp_repo_dir = "%s/%s" % (cache_dir, \
+                                   re.sub('\W+', '_', repo_data_url))
+        tmp_repo_file = "%s.tgz" % tmp_repo_dir
+        urllib.urlretrieve(repo_data_url, \
+                           tmp_repo_file)
+
+        ### extract tgz data
+        self._create_folder(tmp_repo_dir)
+        my_tar = tarfile.open(tmp_repo_file)
+        my_tar.extractall(path = tmp_repo_dir)
+        my_tar.close()
+
+        # TODO
+        # put json in the good location
+        # put icons in the good location
 
     def _clean_cache(self, folder):
         """ If not exists, create <folder>
@@ -646,8 +686,8 @@ class PackageManager():
             @param repo_list : repositories list
             @param cache_folder : package cache folder
         """
-        # TODO
-        print "TODO : CACHE FEATURE TO IMPLEMENT"
+
+
         ## get all packages url
         #file_list = []
         #for repo in repo_list:
@@ -672,32 +712,32 @@ class PackageManager():
         #    except:
         #        self.log("Error while caching file from '%s' : %s" % (file_info["file"], traceback.format_exc()))
 
-    def _get_files_list_from_repository(self, url, priority):
-        """ Read packages.lst on repository
-            @param url : repo url
-            @param prioriry : repo priority
-        """
-        try:
-            resp = urllib.urlopen("%s" % (url))
-            my_list = []
-            first_line = True
-            for data in resp.readlines():
-                if first_line == True:
-                    first_line = False
-                    if data.strip() != REPO_LST_FILE_HEADER:
-                        self.log("This is not a Domogik repository : '%s'" %
-                                   (url))
-                        break
-                else:
-                    my_list.append({"file" : "%sjson/%s" % (url, data.strip()),
-                                    "icon" : "%sicon/%s" % (url, data.strip()),
-                                    "suffixe" :  data.strip().replace("/", "-"),
-                                    "priority" : priority,
-                                    "repo_url" : url})
-            return my_list
-        except IOError:
-            self.log("Bad url :'%s'" % (url))
-            return []
+    #def _get_files_list_from_repository(self, url, priority):
+    #    """ Read packages.lst on repository
+    #        @param url : repo url
+    #        @param prioriry : repo priority
+    #    """
+    #    try:
+    #        resp = urllib.urlopen("%s" % (url))
+    #        my_list = []
+    #        first_line = True
+    #        for data in resp.readlines():
+    #            if first_line == True:
+    #                first_line = False
+    #                if data.strip() != REPO_LST_FILE_HEADER:
+    #                    self.log("This is not a Domogik repository : '%s'" %
+    #                               (url))
+    #                    break
+    #            else:
+    #                my_list.append({"file" : "%sjson/%s" % (url, data.strip()),
+    #                                "icon" : "%sicon/%s" % (url, data.strip()),
+    #                                "suffixe" :  data.strip().replace("/", "-"),
+    #                                "priority" : priority,
+    #                                "repo_url" : url})
+    #        return my_list
+    #    except IOError:
+    #        self.log("Bad url :'%s'" % (url))
+    #        return []
 
 
     def get_available_updates(self, pkg_type, id, version):
