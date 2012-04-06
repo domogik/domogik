@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #
 # This is a Python binding library for TellStick RF transciever.
 # It allows you to control several RF home automation device using
