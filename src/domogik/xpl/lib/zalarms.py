@@ -36,7 +36,7 @@ import datetime
 import math
 from domogik.xpl.common.xplmessage import XplMessage
 import traceback
-from domogik.xpl.lib.cron_query import cronQuery
+from domogik.xpl.lib.cron_query import CronQuery
 
 class zalarmsAPI:
     """
@@ -51,7 +51,7 @@ class zalarmsAPI:
         self.log=log
         self.myxpl=myxpl
         self.config=config
-        self._cronQuery = cronQuery(self.myxpl,self.log)
+        self._cron_query = CronQuery(self.myxpl,self.log)
         self._devices=set()
 
         if self.config!=None :
@@ -61,10 +61,10 @@ class zalarmsAPI:
                 device = self.config.query('zalarms', 'device-%s' % str(num))
                 if device!=None:
                     self._devices.add(device)
-                    #print "status=%s"%self._cronQuery.statusJob(device,extkey="current")
+                    #print "status=%s"%self._cron_query.statusJob(device,extkey="current")
                     alarmtype = self.config.query('zalarms', 'alarmtype-%s' % str(num))
-                    if self._cronQuery.statusJob(device,extkey="current")!="halted":
-                        self._cronQuery.haltJob(device)
+                    if self._cron_query.status_job(device,extkey="current")!="halted":
+                        self._cron_query.halt_job(device)
                     alarms=list()
                     alarm1 = self.config.query('zalarms', 'alarm1-%s' % str(num))
                     if alarm1!=None:
@@ -104,10 +104,10 @@ class zalarmsAPI:
                     if nstfield3!=None:
                         nstMess.add_data({nstfield3 : nstvalue3})
                     if alarmtype=="alarm":
-                        self._cronQuery.startAlarmJob(device, nstMess,
+                        self._cron_query.start_alarm_job(device, nstMess,
                             params=params, alarms=alarms)
                     else :
-                        self._cronQuery.startDawnAlarmJob(device,nstMess,params=params,alarms=alarms)
+                        self._cron_query.start_dawn_alarm_job(device,nstMess,params=params,alarms=alarms)
                 else:
                     loop = False
                 num += 1
@@ -116,8 +116,8 @@ class zalarmsAPI:
         """
 
         """
-        for dev in self._devices:
-            self._cronQuery.haltJob(dev)
+        #for dev in self._devices:
+        #    self._cron_query.haltJob(dev)
 
     def requestListener(self,message):
         """
