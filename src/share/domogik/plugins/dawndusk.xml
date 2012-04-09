@@ -113,7 +113,6 @@
     <file path="src/share/domogik/design/plugin/dawndusk/icon.png"/>
     <file path="src/share/domogik/plugins/dawndusk.xml"/>
     <file path="src/share/domogik/stats/dawndusk/dawndusk.basic.xml"/>
-    <file path="src/share/domogik/url2xpl/dawndusk/daynight.xml"/>
     <file path="src/domogik/xpl/bin/dawndusk.py"/>
     <file path="src/domogik/xpl/lib/dawndusk.py"/>
   </files>
@@ -143,7 +142,7 @@
           <feature_type>sensor</feature_type>
           <device_type_id>dawndusk.status</device_type_id>
           <parameters>
-              {&quot;status&quot;:&quot;&quot;,&quot;value0&quot;:&quot;dusk&quot;, &quot;value1&quot;:&quot;dawn&quot;}
+              {}
           </parameters>
           <value_type>string</value_type>
           <stat_key>status</stat_key>
