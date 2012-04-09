@@ -2,8 +2,8 @@
   <id>zalarms</id>
   <technology>cron</technology>
   <description>
-  A poor interface to the cron plugin.
-  You can only create an alarm message.
+  A light interface to the cron plugin.
+  You can only create an alarm or an dawnalarm message.
   Read the wiki for documentation.
   </description>
   <changelog>
@@ -183,7 +183,9 @@
     <file path="src/domogik/xpl/bin/zalarms.py"/>
     <file path="src/domogik/xpl/lib/zalarms.py"/>
   </files>
-  <dependencies/>
+  <dependencies>
+    <dep type="plugin" id="cron"/>
+  </dependencies>
   <udev-rules/>
   <device_technology>
       <id>cron</id>

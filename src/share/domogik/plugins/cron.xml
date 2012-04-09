@@ -32,11 +32,11 @@
     <file path="src/domogik/xpl/bin/cron.py"/>
     <file path="src/domogik/xpl/lib/cron.py"/>
     <file path="src/domogik/xpl/lib/cron_query.py"/>
+    <file path="src/domogik/xpl/lib/cron_tools.py"/>
+    <file path="src/domogik/xpl/lib/cron_helpers.py"/>
   </files>
   <dependencies>
     <dep type="python" id="apscheduler (>=2.0.2)"/>
-    <dep type="python" id="pyserial (>=2.5)"/>
-    <dep type="plugin" id="xpl_time"/>
   </dependencies>
   <udev-rules/>
   <device_technology>
