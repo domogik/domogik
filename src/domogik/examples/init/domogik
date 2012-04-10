@@ -35,7 +35,7 @@ NAME=dmg_manager
 XPLHUB=xPL_Hub
 DAEMON=$(which $NAME)
 DIETIME=2
-STARTTIME=2
+STARTTIME=3
 PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
 PIDFILE="$PIDDIR/manager.pid"
 
@@ -98,8 +98,8 @@ function status {
     [ ! -f $PIDFILE ] && \
         echo " * Domogik is not running (can't find pid file)" &&
         exit 0
-    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null))
-    if [ $RUNNING -eq 1 ]; then
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
         echo " * Domogik is running"
     else
         echo " * Domogik is not running"
@@ -107,17 +107,17 @@ function status {
 }
 
 function status_manager {
-    if [ -f $PIDFILE ] && [ $(/bin/ps `cat $PIDFILE` | /bin/grep -c "$") -gt 1 ] ; then
+    if [ -f $PIDFILE ] && [ $(/bin/ps `cat $PIDFILE 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
         echo " * manager is running"
     else
         echo " * manager is not running"
     fi
-    if [ -f $PIDDIR/dbmgr.pid ] && [ $(/bin/ps `cat $PIDDIR/dbmgr.pid` | /bin/grep -c "$") -gt 1 ] ; then
+    if [ -f $PIDDIR/dbmgr.pid ] && [ $(/bin/ps `cat $PIDDIR/dbmgr.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
         echo " * dbmgr is running"
     else
         echo " * dbmgr is not running"
     fi
-    if [ -f $PIDDIR/rest.pid ] && [ $(/bin/ps `cat $PIDDIR/rest.pid` | /bin/grep -c "$") -gt 1 ] ; then
+    if [ -f $PIDDIR/rest.pid ] && [ $(/bin/ps `cat $PIDDIR/rest.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
         echo " * rest is running"
     else
         echo " * rest is not running"
@@ -128,7 +128,7 @@ function status_xpl {
     set +e
     RUNNING=$(/usr/bin/pgrep -c $XPLHUB)
     set -e
-    if [ $RUNNING -gt 0 ] ; then
+    if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ] ; then
         echo " * $XPLHUB is running"
     else
         echo " * $XPLHUB is not running"
@@ -150,7 +150,7 @@ function stop_xpl {
     echo -n " * Stopping XPL..."
     for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
-        sleep 1
+        sleep $DIETIME
         kill -9 $pid 2>/dev/null 1>&2
     done
     echo " Done."
@@ -159,30 +159,31 @@ function stop_xpl {
 function stop_manager {
     echo -n " * Stopping Manager..."
     kill $(cat $PIDFILE 2>/dev/null) >/dev/null 2>&1
-    sleep 3
-    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null))
-    if [ $RUNNING -eq 1 ]; then
+    sleep $DIETIME
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
         kill $(cat $PIDFILE 2>/dev/null) >/dev/null 2>&1
-        sleep 3
+        sleep $DIETIME
     fi
-    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null))
-    if [ $RUNNING -eq 1 ]; then
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
         kill -9 $(cat $PIDFILE 2>/dev/null) >/dev/null 2>&1
-        sleep 3
+        sleep $DIETIME
     fi
-    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null))
-    if [ $RUNNING -eq 0 ]; then
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ]; then
+        echo " Can't stop domogik."
+    else
         rm -f $PIDFILE 2>/dev/null
         echo " Done."
-    else
-        echo " Can't stop domogik."
     fi
 }
 
 function stop_plugins {
     echo -n " * Stopping Plugins..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
-    sleep 2
+    [ -z $HOSTNAME ] && HOSTNAME=$(/bin/cat /etc/hostname)
+    [ -f $PIDFILE ] && su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
+    sleep $DIETIME
 #    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
 #        kill -15 $pid 2>/dev/null 1>&2
 #    done
@@ -233,6 +234,8 @@ case "$1" in
         [ -f $PIDFILE ] && echo "Domogik seems to be running. Please stop it." && exit 0
         if [ $# -eq 1 ];then
             start
+            sleep $STARTTIME
+            sleep $STARTTIME
             update_cache
         else
             case "$2" in
@@ -275,6 +278,7 @@ case "$1" in
             sleep $DIETIME
             sleep $DIETIME
             start
+            sleep $STARTTIME
         else
             case "$2" in
                 xpl)
