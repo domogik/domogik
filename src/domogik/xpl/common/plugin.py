@@ -194,8 +194,10 @@ class XplPlugin(BasePlugin):
             self.log.info("domogik.system command not recognized : %s" % cmd)
 
     def __del__(self):
-        self.log.debug("__del__ Single xpl plugin")
-        self.force_leave()
+        if hasattr(self, "log"):
+            self.log.debug("__del__ Single xpl plugin")
+            # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
+            self.force_leave()
 
     def _answer_stop(self):
         """ Ack a stop request
@@ -221,31 +223,40 @@ class XplPlugin(BasePlugin):
         '''
         Leave threads & timers
         '''
-        self.log.debug("force_leave called")
+        if hasattr(self, "log"):
+            self.log.debug("force_leave called")
         self.get_stop().set()
         for t in self._timers:
-            self.log.debug("Try to stop timer %s"  % t)
+            if hasattr(self, "log"):
+                self.log.debug("Try to stop timer %s"  % t)
             t.stop()
-            self.log.debug("Timer stopped %s" % t)
+            if hasattr(self, "log"):
+                self.log.debug("Timer stopped %s" % t)
         for cb in self._stop_cb:
-            self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
+            if hasattr(self, "log"):
+                self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
             cb()
         for t in self._threads:
-            self.log.debug("Try to stop thread %s" % t)
+            if hasattr(self, "log"):
+                self.log.debug("Try to stop thread %s" % t)
             try:
                 t.join()
             except RuntimeError:
                 pass
-            self.log.debug("Thread stopped %s" % t)
+            if hasattr(self, "log"):
+                self.log.debug("Thread stopped %s" % t)
             #t._Thread__stop()
         #Finally, we try to delete all remaining threads
         for t in threading.enumerate():
             if t != threading.current_thread() and t.__class__ != threading._MainThread:
-                self.log.info("The thread %s was not registered, killing it" % t.name)
+                if hasattr(self, "log"):
+                    self.log.info("The thread %s was not registered, killing it" % t.name)
                 t.join()
-                self.log.info("Thread %s stopped." % t.name)
+                if hasattr(self, "log"):
+                    self.log.info("Thread %s stopped." % t.name)
         if threading.activeCount() > 1:
-            self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
+            if hasattr(self, "log"):
+                self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
 
 
 class XplResult():

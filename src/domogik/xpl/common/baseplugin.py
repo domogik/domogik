@@ -177,5 +177,6 @@ class BasePlugin():
         return gethostname().lower().split('.')[0].replace('-','')[0:16]
 
     def __del__(self):
-        self.log.debug("__del__ baseplugin")
+        if hasattr(self, log):
+            self.log.debug("__del__ baseplugin")
 
