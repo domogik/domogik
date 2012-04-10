@@ -36,7 +36,6 @@ class cronTools
 import datetime
 import traceback
 import ConfigParser
-from sets import Set
 import os
 import glob
 
@@ -95,12 +94,12 @@ class CronStore():
             for option in config.options('Stats'):
                 data[option] = config.get('Stats', option)
             if config.has_section('Timers'):
-                timers = Set()
+                timers = set()
                 for option in config.options('Timers'):
                     timers.add(config.get('Timers', option))
                 data['timer'] = timers
             if config.has_section('Alarms'):
-                alarms = Set()
+                alarms = set()
                 for option in config.options('Alarms'):
                     alarms.add(config.get('Alarms', option))
                 data['alarm'] = alarms
