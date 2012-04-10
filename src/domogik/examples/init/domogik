@@ -182,8 +182,9 @@ function stop_manager {
 function stop_plugins {
     echo -n " * Stopping Plugins..."
     [ -z $HOSTNAME ] && HOSTNAME=$(/bin/cat /etc/hostname)
-    [ -f $PIDFILE ] && su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
-    sleep $DIETIME
+    [ -f $PIDFILE ] && \
+        su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'" && \
+        sleep $DIETIME
 #    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
 #        kill -15 $pid 2>/dev/null 1>&2
 #    done
