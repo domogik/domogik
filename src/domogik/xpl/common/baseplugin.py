@@ -36,6 +36,7 @@ Implements
 
 import threading
 from socket import gethostname 
+import sys
 
 from domogik.common import logger
 from optparse import OptionParser
@@ -53,23 +54,6 @@ class BasePlugin():
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
-        if p is not None and isinstance(p, OptionParser):
-            parser = p
-        else:
-            parser = OptionParser()
-        parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
-                          help="Run the plugin in foreground, default to background.")
-        (self.options, self.args) = parser.parse_args()
-        if not self.options.run_in_foreground and daemonize:
-            createDaemon()
-            l = logger.Logger(name)
-            self.log = l.get_logger()
-            self.log.info("Daemonize plugin %s" % name)
-            self.is_daemon = True
-        else:
-            l = logger.Logger(name)
-            self.log = l.get_logger()
-            self.is_daemon = False
         self._threads = []
         self._timers = []
         if name is not None:
@@ -82,6 +66,39 @@ class BasePlugin():
             self._stop_cb = [stop_cb]
         else:
             self._stop_cb = []
+
+        # options management
+        if p is not None and isinstance(p, OptionParser):
+            parser = p
+        else:
+            parser = OptionParser()
+        parser.add_option("-V", 
+                          "--version", 
+                          action="store_true", 
+                          dest="display_version", 
+                          default=False, 
+                          help="Display Domogik version.")
+        parser.add_option("-f", 
+                          action="store_true", 
+                          dest="run_in_foreground", 
+                          default=False, 
+                          help="Run the plugin in foreground, default to background.")
+        (self.options, self.args) = parser.parse_args()
+        if self.options.display_version:
+            __import__("domogik")
+            global_release = sys.modules["domogik"].__version__
+            print global_release
+            sys.exit(0)
+        elif not self.options.run_in_foreground and daemonize:
+            createDaemon()
+            l = logger.Logger(name)
+            self.log = l.get_logger()
+            self.log.info("Daemonize plugin %s" % name)
+            self.is_daemon = True
+        else:
+            l = logger.Logger(name)
+            self.log = l.get_logger()
+            self.is_daemon = False
 
     def should_stop(self):
         '''

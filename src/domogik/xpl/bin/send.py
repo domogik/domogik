@@ -60,8 +60,10 @@ class Sender(XplPlugin):
         parser.add_option("-s", "--source", type="string",
                 dest="source", default=None)
         XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser)
+        print "foo"
         mess = self.forge_message()
         self.log.debug("Send message : %s" % mess)
+        print("Send message : %s" % mess)
         self.myxpl.send(mess)
         self.force_leave()
 

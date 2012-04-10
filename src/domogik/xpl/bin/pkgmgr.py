@@ -36,6 +36,7 @@ TODO
 @organization: Domogik
 """
 
+import sys
 from domogik.common.packagemanager import PackageManager
 from domogik.common.packagexml import PackageXml, PackageException
 from optparse import OptionParser
@@ -91,9 +92,21 @@ def main():
                       dest = "action_json",
                       default = False,
                       help = "Convert the xml to json (temporary option for 0.2.0 development)")
+    parser.add_option("-V", "--version",
+                      action="store_true",
+                      dest="display_version",
+                      default=False,
+                      help="Display Domogik version.")
+
     
     (options, args) = parser.parse_args()
     
+    if options.display_version:
+        __import__("domogik")
+        global_release = sys.modules["domogik"].__version__
+        print global_release
+        return
+
     # check args
     if (options.action_update == False \
             and options.action_list == False )\

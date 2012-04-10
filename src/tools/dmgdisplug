@@ -32,9 +32,18 @@ function plugin_exists {
 }
 
 function syntax {
-    echo -e "$0 <plugin>\n
-Disables a plugin."
+    echo -e "Usage: dmgenplug <plugin name>
+Disable a plugin
+
+Options:
+  -h, --help            show this help message and exit
+  -V, --version         display Domogik version"
     exit 1
+}
+
+function version {
+    # launch manager to display Domogik's version
+    dmg_manager --version
 }
 
 function disable {
@@ -42,7 +51,13 @@ function disable {
 }
 
 #check params
-[ $# -eq 1 ] && PLUGIN=$1 || syntax
+[ $# -ne 1 ] && syntax
+[ $1 = "-h" ] && syntax && exit 0
+[ $1 = "--help" ] && syntax && exit 0
+[ $1 = "-V" ] && version && exit 0
+[ $1 = "--version" ] && version && exit 0
+[ $# -eq 1 ] && PLUGIN=$1
+
 
 #check if plugin exists
 plugin_exists
