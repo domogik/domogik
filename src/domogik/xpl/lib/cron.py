@@ -883,7 +883,7 @@ class CronJobs():
                                 args = [device, param_dim, "valueon"]))
                         else:
                             jobs.append(self._scheduler.add_cron_job(\
-                                self._api.send_xpl_job, day_of_week = dayofweek, \
+                                self._api.send_xpl_job, day_of_week=dayofweek, \
                                 hour=hour, minute=minute, \
                                 args=[device, param_dim, "valueon"]))
                         i = i+1
