@@ -50,6 +50,7 @@ from domogik.common import logger
 from distutils2.version import NormalizedVersion 
 import json
 import re
+import zipfile
 
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
@@ -638,18 +639,34 @@ class PackageManager():
         tmp_repo_dir = "%s/%s" % (cache_dir, \
                                    re.sub('\W+', '_', repo_data_url))
         tmp_repo_file = "%s.tgz" % tmp_repo_dir
+        repo_json = "%s.json" % tmp_repo_dir
         urllib.urlretrieve(repo_data_url, \
                            tmp_repo_file)
 
         ### extract tgz data
         self._create_folder(tmp_repo_dir)
-        my_tar = tarfile.open(tmp_repo_file)
-        my_tar.extractall(path = tmp_repo_dir)
-        my_tar.close()
 
-        # TODO
-        # put json in the good location
-        # put icons in the good location
+        # dirty trick for ferllings bug
+        my_zip = zipfile.ZipFile(tmp_repo_file) 
+        my_zip.extractall(path = tmp_repo_dir)
+
+        #my_tar = tarfile.open(tmp_repo_file)
+        #my_tar.extractall(path = tmp_repo_dir)
+        #my_tar.close()
+
+        ### Remove tgz file
+        os.unlink(tmp_repo_file)
+
+        ### Move json from tgz extracted
+        shutil.move("%s/repo.info" % tmp_repo_dir, \
+                    repo_json)
+
+        ### Move icons from tgz extracted
+        # TODO !!!
+
+        ### Delete the directory
+        self._clean_folder(tmp_repo_dir) 
+        os.rmdir(tmp_repo_dir)
 
     def _clean_cache(self, folder):
         """ If not exists, create <folder>
@@ -679,67 +696,6 @@ class PackageManager():
             self.log(msg)
             raise PackageException(msg)
 
-
-    def _parse_repository(self, repo_list, cache_folder):
-        """ For each repo, get file list, check if the file has the higher 
-            priority
-            @param repo_list : repositories list
-            @param cache_folder : package cache folder
-        """
-
-
-        ## get all packages url
-        #file_list = []
-        #for repo in repo_list:
-        #    file_list.extend(self._get_files_list_from_repository(repo["url"], repo["priority"]))
-
-        ## for each package, put it in cache if it corresponds to priority
-        #for file_info in file_list:
-        #    try:
-        #        pkg_json = PackageJson(url = "%s" % file_info["file"]).json
-        #        priority = self._get_package_priority_in_cache(pkg_json["fullname"], pkg_json.release)
-        #        # our package has a prioriry >= to other packages with same name/rel
-        #        if priority == None or priority < file_info["priority"]:
-        #            self.log("Add '%s (%s)' in cache from %s" % (pkg_json["fullname"], pkg_json.release, file_info["repo_url"]))
-        #            pkg_json.cache_xml(cache_folder, file_info["file"].replace("/xml/", "/download/"), file_info["repo_url"], file_info["priority"])
-
-        #            # try to cache the icon (if it exists)
-        #            try:
-        #                urllib.urlretrieve(file_info["icon"],  \
-        #                     "%s/%s.png" % (cache_folder, file_info["suffixe"]))
-        #            except:
-        #                self.log("Warning : no icon found : '%s'" % file_info["icon"])
-        #    except:
-        #        self.log("Error while caching file from '%s' : %s" % (file_info["file"], traceback.format_exc()))
-
-    #def _get_files_list_from_repository(self, url, priority):
-    #    """ Read packages.lst on repository
-    #        @param url : repo url
-    #        @param prioriry : repo priority
-    #    """
-    #    try:
-    #        resp = urllib.urlopen("%s" % (url))
-    #        my_list = []
-    #        first_line = True
-    #        for data in resp.readlines():
-    #            if first_line == True:
-    #                first_line = False
-    #                if data.strip() != REPO_LST_FILE_HEADER:
-    #                    self.log("This is not a Domogik repository : '%s'" %
-    #                               (url))
-    #                    break
-    #            else:
-    #                my_list.append({"file" : "%sjson/%s" % (url, data.strip()),
-    #                                "icon" : "%sicon/%s" % (url, data.strip()),
-    #                                "suffixe" :  data.strip().replace("/", "-"),
-    #                                "priority" : priority,
-    #                                "repo_url" : url})
-    #        return my_list
-    #    except IOError:
-    #        self.log("Bad url :'%s'" % (url))
-    #        return []
-
-
     def get_available_updates(self, pkg_type, id, version):
         """ List all available updates for a package
             @param pkg_type : package type
@@ -748,53 +704,49 @@ class PackageManager():
         """
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
-        upd_list = []
-        for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for fic in files:
-                if fic[-5:] == ".json":
-                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-                    if pkg_json["identity"]["type"] == pkg_type and pkg_json["identity"]["id"] == id \
-                       and pkg_json["identity"]["version"] > version:
-                        upd_list.append({"type" : pkg_json["identity"]["type"],
-                                         "id" : pkg_json["identity"]["id"],
-                                         "version" : pkg_json["identity"]["version"],
-                                         "priority" : pkg_json["identity"]["priority"],
-                                         "changelog" : pkg_json["identity"]["changelog"]})
-        return upd_list
+        
+        # TODO : to review
+        
+
+        #upd_list = []
+        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
+        #    for fic in files:
+        #        if fic[-5:] == ".json":
+        #            pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+        #            if pkg_json["identity"]["type"] == pkg_type and pkg_json["identity"]["id"] == id \
+        #               and pkg_json["identity"]["version"] > version:
+        #                upd_list.append({"type" : pkg_json["identity"]["type"],
+        #                                 "id" : pkg_json["identity"]["id"],
+        #                                 "version" : pkg_json["identity"]["version"],
+        #                                 "priority" : pkg_json["identity"]["priority"],
+        #                                 "changelog" : pkg_json["identity"]["changelog"]})
+        #return upd_list
 
     def list_packages(self):
         """ List all packages in cache folder 
             Used for printing on command line
         """
         pkg_list = []
-        for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for fic in files:
-                if fic[-5:] == ".json":
-                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-                                     "version" : pkg_json["identity"]["version"],
-                                     "priority" : pkg_json["identity"]["priority"],
-                                     "desc" : pkg_json["identity"]["description"]})
-        pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
-                                                      k['version']))
-        for pkg in pkg_list:
-            self.log("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
-                                               pkg["version"], 
-                                               pkg["priority"], 
-                                               pkg["desc"]))
+        
+        print self.get_packages_list()
+        #TODO  :review output format
+
 
     def _get_package_priority_in_cache(self, fullname, version):
         """ Get priority of a cache package/version
             @param fullname : fullname of package
             @param version : package's version
         """
-        for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for fic in files:
-                if fic[-5:] == ".json":
-                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-                    if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
-                        return pkg_json["identity"]["priority"]
-        return None
+
+        # TODO : to review
+
+        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
+        #    for fic in files:
+        #        if fic[-5:] == ".json":
+        #            pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
+        #            if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
+        #                return pkg_json["identity"]["priority"]
+        #return None
 
     def get_packages_list(self, fullname = None, version = None, pkg_type = None):
         """ List all packages in cache folder 
@@ -806,30 +758,36 @@ class PackageManager():
         """
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
+
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for fic in files:
-                if fic[-5:] == ".json":
-                    pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-                    if fullname == None or (fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]):
-                        if pkg_type == None or pkg_type == pkg_json["identity"]["type"]:
-                            pkg_list.append({"id" : pkg_json["identity"]["id"],
-                                         "type" : pkg_json["identity"]["type"],
-                                         "fullname" : pkg_json["identity"]["fullname"],
-                                         "version" : pkg_json["identity"]["version"],
-                                         "source" : pkg_json["identity"]["source"],
-                                         "generated" : pkg_json["identity"]["generated"],
-                                         "techno" : pkg_json["identity"]["category"],
-                                         "doc" : pkg_json["identity"]["documentation"],
-                                         "desc" : pkg_json["identity"]["description"],
-                                         "changelog" : pkg_json["identity"]["changelog"],
-                                         "author" : pkg_json["identity"]["author"],
-                                         "email" : pkg_json["identity"]["author_email"],
-                                         "domogik_min_version" : pkg_json["identity"]["domogik_min_version"],
-                                         "priority" : pkg_json["identity"]["priority"],
-                                         "dependencies" : pkg_json["dependencies"],
-                                         "package_url" : pkg_json["identity"]["package_url"]})
+                if fic[-5:] != ".json":
+                    continue
+                my_json = json.load(open("%s/%s" % (root, fic)))
+                for my_pkg in my_json["packages"]:
+                    if fullname == None or (fullname == my_pkg["fullname"] and version == my_pkg["version"]):
+                        if pkg_type == None or pkg_type == my_pkg["type"]:
+                            pkg_list.append(my_pkg)
         return sorted(pkg_list, key = lambda k: (k['id']))
+
+        # FOR HISTORY (temp) : 
+        #                    pkg_list.append({"id" : pkg_json["identity"]["id"],
+        #                                 "type" : pkg_json["identity"]["type"],
+        #                                 "fullname" : pkg_json["identity"]["fullname"],
+        #                                 "version" : pkg_json["identity"]["version"],
+        #                                 "source" : pkg_json["identity"]["source"],
+        #                                 "generated" : pkg_json["identity"]["generated"],
+        #                                 "techno" : pkg_json["identity"]["category"],
+        #                                 "doc" : pkg_json["identity"]["documentation"],
+        #                                 "desc" : pkg_json["identity"]["description"],
+        #                                 "changelog" : pkg_json["identity"]["changelog"],
+        #                                 "author" : pkg_json["identity"]["author"],
+        #                                 "email" : pkg_json["identity"]["author_email"],
+        #                                 "domogik_min_version" : pkg_json["identity"]["domogik_min_version"],
+        #                                 "priority" : pkg_json["identity"]["priority"],
+        #                                 "dependencies" : pkg_json["dependencies"],
+        #                                 "package_url" : pkg_json["identity"]["package_url"]})
 
     def get_installed_packages_list(self):
         """ List all packages in install folder 
@@ -845,6 +803,8 @@ class PackageManager():
                         pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
                         # filter on rest
                         if pkg_json["identity"]["id"] != "rest":
+                            # TODO : replace by identity and repo informations
+                            #   from the json ???
                             pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
                                              "id" : pkg_json["identity"]["id"],
                                              "version" : pkg_json["identity"]["version"],
@@ -872,50 +832,44 @@ class PackageManager():
             @param version : optionnal : version to display (if several)
         """
         pkg_list = []
-        for root, dirs, files in os.walk(REPO_CACHE_DIR):
-            for fic in files:
-                if fic[-5:] == ".json":
-                    pkg_obj = PackageJson(path = "%s/%s" % (root, fic))
-                    pkg_json = pkg_obj.json
-                    if version == None:
-                        if fullname == pkg_json["identity"]["fullname"]:
-                            pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-                                             "version" : pkg_json["identity"]["version"],
-                                             "priority" : pkg_json["identity"]["priority"],
-                                             "source" : pkg_json["identity"]["source"],
-                                             "obj" : pkg_obj,
-                                             "json" : pkg_json})
-                    else:
-                        if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
-                            pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-                                             "version" : pkg_json["identity"]["version"],
-                                             "priority" : pkg_json["identity"]["priority"],
-                                             "obj" : pkg_obj,
-                                             "json" : pkg_json})
-        if len(pkg_list) == 0:
-            if version == None:
-                version = "*"
-            msg = "No package corresponding to '%s' in version '%s'" % (fullname, version)
-            self.log(msg)
-            return [], msg
-        if len(pkg_list) > 1:
-            msg = "Several packages are available for '%s'. Please specify which version you choose" % fullname
-            self.log(msg)
-            for pkg in pkg_list:
-                self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
-                                              pkg["version"],
-                                              pkg["priority"]))
-            return [], msg
 
-        return pkg_list[0]["obj"], True
+        # TODO : review
+        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
+        #    for fic in files:
+        #        if fic[-5:] == ".json":
+        #            pkg_obj = PackageJson(path = "%s/%s" % (root, fic))
+        #            pkg_json = pkg_obj.json
+        #            if version == None:
+        #                if fullname == pkg_json["identity"]["fullname"]:
+        #                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
+        #                                     "version" : pkg_json["identity"]["version"],
+        #                                     "priority" : pkg_json["identity"]["priority"],
+        #                                     "source" : pkg_json["identity"]["source"],
+        #                                     "obj" : pkg_obj,
+        #                                     "json" : pkg_json})
+        #            else:
+        #                if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
+        #                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
+        #                                     "version" : pkg_json["identity"]["version"],
+        #                                     "priority" : pkg_json["identity"]["priority"],
+        #                                     "obj" : pkg_obj,
+        #                                     "json" : pkg_json})
+        #if len(pkg_list) == 0:
+        #    if version == None:
+        #        version = "*"
+        #    msg = "No package corresponding to '%s' in version '%s'" % (fullname, version)
+        #    self.log(msg)
+        #    return [], msg
+        #if len(pkg_list) > 1:
+        #    msg = "Several packages are available for '%s'. Please specify which version you choose" % fullname
+        #    self.log(msg)
+        #    for pkg in pkg_list:
+        #        self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
+        #                                      pkg["version"],
+        #                                      pkg["priority"]))
+        #    return [], msg
 
-    def is_root(self):
-        """ return True is current user is root
-        """
-        if pwd.getpwuid(os.getuid())[0] == "root":
-            return True
-        return False
-
+        #return pkg_list[0]["obj"], True
 
 ##### shutil.copytree fork #####
 # the fork is necessary because original function raise an error if a directory
