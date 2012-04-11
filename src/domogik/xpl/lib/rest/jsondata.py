@@ -137,6 +137,7 @@ class JSonHelper():
       
         data_out = self._process_data(data, max_depth = max_depth)
         data_out = data_out.replace('\n', "\\n")
+        data_out = data_out.replace('\r', "\\r")
         self._data_values += data_out
             
 
