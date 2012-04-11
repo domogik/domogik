@@ -176,7 +176,9 @@ class Manager:
         random hbeat timeout between 3 and 10 seconds, and sends HBEAT
         """
         if not self._foundhub.is_set():
-            self.p.log.debug("Start HUB discovery")
+            msg = "Start HUB discovery"
+            self.p.log.debug(msg)
+            print(msg)
             # random send hbeat (between 3 and 10 seconds)
             rnd = random.randrange(3, 10)
             self._h_timer = XplTimer(rnd, self._SendHeartbeat, self)
@@ -185,7 +187,9 @@ class Manager:
     def foundhub(self):
         """ resets the timer to the default timeout
         """
-        self.p.log.debug("Received HBEAT echo, HUB detected")
+        msg = "Received HBEAT echo, HUB detected"
+        self.p.log.debug(msg)
+        print(msg)
         self._foundhub.set()
         self.update_status(1)
         if self._h_timer != None:
