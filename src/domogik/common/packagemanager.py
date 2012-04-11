@@ -345,9 +345,9 @@ class PackageManager():
         """ Try to create a folder (does nothing if it already exists)
             @param folder : folder path
         """
-        self.log("Creating directory : %s" % folder)
         try:
             if os.path.isdir(folder) == False:
+                self.log("Creating directory : %s" % folder)
                 os.makedirs(folder)
         except:
             msg = "Error while creating temporary folder '%s' : %s" % (folder, traceback.format_exc())
@@ -590,7 +590,6 @@ class PackageManager():
         # the lower priorities, it will be skipped
         try:
             for my_repo in repo_list:
-                print my_repo
                 self._cache_repository(my_repo["url"], REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
@@ -635,7 +634,6 @@ class PackageManager():
 
         ### download tgz data
         repo_data_url = "%s/data" % base_url
-        self.log("Processing '%s'..." % repo_data_url)
         tmp_repo_dir = "%s/%s" % (cache_dir, \
                                    re.sub('\W+', '_', repo_data_url))
         tmp_repo_file = "%s.tgz" % tmp_repo_dir
@@ -662,7 +660,13 @@ class PackageManager():
                     repo_json)
 
         ### Move icons from tgz extracted
-        # TODO !!!
+        icon_dir = "%s/images/" % cache_dir
+        self._create_folder(icon_dir)
+        for root, dirs, files in os.walk("%s/images/" % tmp_repo_dir):
+            for fic in files:
+                if fic[-4:] == ".png":
+                    shutil.move("%s/%s" % (root, fic), \
+                                icon_dir)
 
         ### Delete the directory
         self._clean_folder(tmp_repo_dir) 
