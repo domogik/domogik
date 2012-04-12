@@ -670,7 +670,6 @@ class Rest(XplPlugin):
         self.log.debug("*** msg = %s" % message)
         # process message
         host = message.data["host"]
-        print "H=%s" % host
         self._installed_packages[host] = {}
 
         pkg_mgr = PackageManager()
@@ -687,12 +686,12 @@ class Rest(XplPlugin):
                     enabled = False
                 data = {"fullname" : message.data["fullname"+str(idx)],
                         "id" : message.data["id"+str(idx)],
-                        "release" : message.data["release"+str(idx)],
+                        "version" : message.data["version"+str(idx)],
                         "type" : message.data["type"+str(idx)],
-                        "source" : message.data["source"+str(idx)],
+                        #"source" : message.data["source"+str(idx)],
                         "enabled" : enabled}
-                self.log.debug("*** call get_available_updates(%s, %s, %s)" % (data["type"], data["id"], data["release"]))
-                updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["release"])
+                self.log.debug("*** call get_available_updates(%s, %s, %s)" % (data["type"], data["id"], data["version"]))
+                updates = pkg_mgr.get_available_updates(data["type"], data["id"], data["version"])
                 self.log.debug("*** after get_available_updates")
                 data["updates"] = updates
                 if self._installed_packages[host].has_key(pkg_type) == False:
