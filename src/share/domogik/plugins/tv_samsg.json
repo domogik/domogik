@@ -72,7 +72,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/tv_samsg/icon.png", 
-        "src/share/domogik/plugins/tv_samsg.xml", 
+        "src/share/domogik/plugins/tv_samsg.json", 
         "src/share/domogik/url2xpl/multimedia/power_on.xml", 
         "src/share/domogik/url2xpl/multimedia/power_standby.xml", 
         "src/share/domogik/url2xpl/multimedia/channel_up.xml", 

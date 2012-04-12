@@ -97,7 +97,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/foscam/icon.png", 
-        "src/share/domogik/plugins/foscam.xml", 
+        "src/share/domogik/plugins/foscam.json", 
         "src/share/domogik/stats/foscam/sensor.basic-foscam_relay.xml", 
         "src/share/domogik/url2xpl/foscam/high.xml", 
         "src/share/domogik/url2xpl/foscam/low.xml", 

@@ -27,7 +27,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/tschacon/icon.png", 
-        "src/share/domogik/plugins/tschacon.xml", 
+        "src/share/domogik/plugins/tschacon.json", 
         "src/share/domogik/stats/tschacon/arctech.tschacon.xml", 
         "src/share/domogik/url2xpl/tschacon/on.xml", 
         "src/share/domogik/url2xpl/tschacon/off.xml", 

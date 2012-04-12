@@ -368,11 +368,16 @@ class ProcessRequest():
 
         # Description and parameters
         info = {}
-        info["REST_API_release"] = self._rest_api_version
+        info["REST_API_version"] = self._rest_api_version
         info["SSL"] = self.use_ssl
-        info["Domogik_release"] = self.rest_status_dmg_release()
-        info["Sources_release"] = self.rest_status_src_release()
+        info["Domogik_version"] = self.rest_status_dmg_version()
+        info["Sources_version"] = self.rest_status_src_version()
         info["Host"] = self.get_sanitized_hostname()
+
+        # for compatibility with Rest API < 0.6
+        info["REST_API_release"] = self._rest_api_version
+        info["Domogik_release"] = self.rest_status_dmg_version()
+        info["Sources_release"] = self.rest_status_src_version()
 
 
         # Xml command files
@@ -518,8 +523,8 @@ class ProcessRequest():
         self.send_http_response_ok(json_data.get())
 
 
-    def rest_status_src_release(self):
-        """ Return sources release
+    def rest_status_src_version(self):
+        """ Return sources version
         """
         domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
         #subp = Popen("cd %s ; hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
@@ -528,16 +533,16 @@ class ProcessRequest():
         # if hg id has no error, we are using source  repository
         if subp.returncode == 0:
             return "%s" % (stdout)
-        # else, we send dmg release
+        # else, we send dmg version
         else:
-            return self.rest_status_dmg_release()
+            return self.rest_status_dmg_version()
 
-    def rest_status_dmg_release(self):
-        """ Return Domogik release
+    def rest_status_dmg_version(self):
+        """ Return Domogik version
         """
         __import__("domogik")
-        global_release = sys.modules["domogik"].__version__
-        return global_release
+        global_version = sys.modules["domogik"].__version__
+        return global_version
 
 
 ######
@@ -807,7 +812,6 @@ target=*
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         idx = 1
-        print self.rest_request
         while idx < len(self.rest_request):
             for data in self._db.list_last_n_stats_of_device_by_key(self.rest_request[idx+1], self.rest_request[idx],  1):
                 json_data.add_data(data)
@@ -2624,7 +2628,6 @@ target=*
             while loop_again:
                 try:
                     plg_name = message.data["plugin"+str(idx)+"-name"]
-                    print plg_name
                     plg_type = message.data["plugin"+str(idx)+"-type"]
                     #plg_description = message.data["plugin"+str(idx)+"-desc"]
                     plg_technology = message.data["plugin"+str(idx)+"-techno"]
@@ -2647,11 +2650,9 @@ target=*
                 except KeyError:
                     loop_again = False
         for host_name in host_list:
-            print host_name
             json_data.add_data({"host" : host_name, 
                                 "list" : host_list[host_name]})   
         for host_name in external_list:
-            print host_name
             json_data.add_data({"host" : host_name, 
                                 "list" : external_list[host_name]})   
         self.send_http_response_ok(json_data.get())
@@ -2715,7 +2716,7 @@ target=*
             idx += 1
         technology = message.data["technology"]
         status = message.data["status"]
-        release = message.data["release"]
+        version = message.data["version"]
         documentation = message.data["documentation"]
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2798,7 +2799,7 @@ target=*
                 except:
                     loop_again = False
 
-        json_data.add_data({"id" : id, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : release, "documentation" : documentation, "configuration" : config_data})
+        json_data.add_data({"id" : id, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : version, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 
@@ -3559,7 +3560,7 @@ target=*
             ### check is plugin is shut
             if self._check_component_is_running(command):
                 self.send_http_response_error(999, 
-                                             "Warning : plugin '%s' is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use helper. In next releases, helpers will be implemented in a different way, so that they should be used while associated plugin is running" % command,
+                                             "Warning : plugin '%s' is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use helper. In next versions, helpers will be implemented in a different way, so that they should be used while associated plugin is running" % command,
                                               self.jsonp, self.jsonp_cb)
                 return
 
@@ -4086,12 +4087,12 @@ target=*
     #    return True, message
 
 
-    def _rest_package_dependency(self, host, pkg_type, id, release):
+    def _rest_package_dependency(self, host, pkg_type, id, version):
         """ Send a xpl message to check python dependencies
             @param host : host targetted
             @param pkg_type : type of package
             @param id ; id of package
-            @param release : package release
+            @param version : package version
             Return status of each dependency as json
         """
         self.log.debug("Package : ask for checking dependencies for a package")
@@ -4099,7 +4100,7 @@ target=*
 
         ### check package exists in cache
         pkg_mgr = PackageManager()
-        data = pkg_mgr.get_packages_list(fullname = package, release = release)
+        data = pkg_mgr.get_packages_list(fullname = package, version = version)
         # if there is no package corresponding
         if data == []:
             self.log.debug("No package corresponding to check dependency request")
@@ -4123,7 +4124,6 @@ target=*
         idx_python = 0
         idx_plugin = 0
         python_dep = []
-        print "D=%s" %  dep_list
         pkg_mgr = PackageManager()
         pkg_list = self.get_installed_packages()
         for dep in dep_list:
@@ -4145,7 +4145,7 @@ target=*
                            "type" : "plugin",
                            "id" : dep["id"],
                            "installed" : installed,
-                           "release" : "",
+                           "version" : "",
                            "cmd_line" : "Install from Domogik Administration",
                            "candidate" : "",
                            "error" : "",
@@ -4200,10 +4200,10 @@ target=*
                             installed = True
                         else:
                             installed = False
-                        if message.data.has_key("dep%s-release" % idx):
-                            release = message.data["dep%s-release" % idx]
+                        if message.data.has_key("dep%s-version" % idx):
+                            version = message.data["dep%s-version" % idx]
                         else:
-                            release = "";
+                            version = "";
                         if message.data.has_key("dep%s-cmd-line" % idx):
                             cmd_line = message.data["dep%s-cmd-line" % idx]
                         else:
@@ -4221,7 +4221,7 @@ target=*
                                    "type" : "python",
                                    "id" : my_key,
                                    "installed" : installed,
-                                   "release" : release,
+                                   "version" : version,
                                    "cmd_line" : cmd_line,
                                    "candidate" : candidate,
                                    "error" : error,
@@ -4232,21 +4232,21 @@ target=*
                         loop_again = False
         self.send_http_response_ok(json_data.get())
 
-    def _rest_package_install(self, host, type, id, release):
+    def _rest_package_install(self, host, type, id, version):
         """ Send xpl messages to install a package :
             - one to manager on target host for "bin" files
             - one to manager on rinor's host for rest's xml files
             @param host : host targetted
             @param type : type of package
             @param id : id of package
-            @param release : package release
+            @param version : package version
             Return ok/ko as json
         """
         self.log.debug("Package : ask for installing a package")
-        package = "%s/%s/%s" % (type, id, release)
+        package = "%s/%s/%s" % (type, id, version)
 
         pkg_mgr = PackageManager()
-        res = pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, release)
+        res = pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, version)
         # if package not cachable (doesn't exists, ...)
         if res == False:
             self.send_http_response_error(999, "Error on putting package in cache", self.jsonp, self.jsonp_cb)
@@ -4260,7 +4260,7 @@ target=*
         message.add_data({"source" : "cache"})
         message.add_data({"type" : type})
         message.add_data({"id" : id})
-        message.add_data({"release" : release})
+        message.add_data({"version" : version})
         message.add_data({"part" : PKG_PART_RINOR})
         self.myxpl.send(message)
         
@@ -4276,7 +4276,7 @@ target=*
                                                           "source" : "cache",
                                                           "type" : type,
                                                           "id" : id,
-                                                          "release" : release,
+                                                          "version" : version,
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
@@ -4301,7 +4301,7 @@ target=*
         message.add_data({"source" : "cache"})
         message.add_data({"type" : type})
         message.add_data({"id" : id})
-        message.add_data({"release" : release})
+        message.add_data({"version" : version})
         message.add_data({"part" : PKG_PART_XPL})
         self.myxpl.send(message)
 
@@ -4317,7 +4317,7 @@ target=*
                                                           "source" : "cache",
                                                           "type" : type,
                                                           "id" : id,
-                                                          "release" : release,
+                                                          "version" : version,
                                                           "host" : host},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
@@ -4396,10 +4396,10 @@ target=*
             self.send_http_response_ok(json_data.get())
 
 
-    def _rest_package_icon_available(self, type, id, release):
+    def _rest_package_icon_available(self, type, id, version):
         """ Download a package icon storen in cache
         """
-        icon_name = "%s-%s-%s.png" % (type, id, release)
+        icon_name = "%s-%s-%s.png" % (type, id, version)
         file_name = "%s/%s" % (REPO_CACHE_DIR, icon_name)
         self._download_file(file_name)
 
@@ -4411,10 +4411,10 @@ target=*
         self._download_file(file_name)
 
 
-    def _rest_package_download(self, type, id, release):
+    def _rest_package_download(self, type, id, version):
         """ Download a package storen in cache
         """
-        pkg_path = "%s-%s-%s.tgz" % (type, id, release)
+        pkg_path = "%s-%s-%s.tgz" % (type, id, version)
         file_name = "%s/%s" % (PKG_CACHE_DIR, pkg_path)
         self._download_file(file_name)
 
@@ -4580,7 +4580,6 @@ target=*
         # Get informations on file
         ctype = None
         file_stat = os.fstat(my_file.fileno())
-        print file_name
         #last_modified = os.stat("%s" % (file_name))[stat.ST_MTIME]
         last_modified = os.path.getmtime(file_name)
 

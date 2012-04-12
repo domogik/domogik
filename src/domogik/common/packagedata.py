@@ -57,7 +57,7 @@ class PackageData():
         print("Json file OK")
 
         # check type == plugin
-        if self.pkg.type not in ["plugin", "external"]:
+        if self.pkg["identity"]["type"] not in ["plugin", "external"]:
             print("Error : this package type is not recognized")
             exit()
 
@@ -65,40 +65,40 @@ class PackageData():
         """ Insert data for plugin
         """
         ### Technology
-        print("Technology %s" % self.pkg.technology["id"])
-        if self._db.get_device_technology_by_id(self.pkg.technology["id"]) == None:
+        print("Technology %s" % self.pkg["technology"]["id"])
+        if self._db.get_device_technology_by_id(self.pkg["technology"]["id"]) == None:
             # add if not exists
             print("add...")
-            self._db.add_device_technology(self.pkg.technology["id"],
-                                           self.pkg.technology["name"],
-                                           self.pkg.technology["description"])
+            self._db.add_device_technology(self.pkg["technology"]["id"],
+                                           self.pkg["technology"]["name"],
+                                           self.pkg["technology"]["description"])
         else:
             # update if exists
             print("update...")
-            self._db.update_device_technology(self.pkg.technology["id"],
-                                           self.pkg.technology["name"],
-                                           self.pkg.technology["description"])
+            self._db.update_device_technology(self.pkg["technology"]["id"],
+                                           self.pkg["technology"]["name"],
+                                           self.pkg["technology"]["description"])
  
         ### Device types
-        for device_type in self.pkg.device_types:
+        for device_type in self.pkg["device_types"]:
             print("Device type %s" % device_type["id"])
             if self._db.get_device_type_by_id(device_type["id"]) == None:
                 # add if not exists
                 print("add...")
                 self._db.add_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg.technology["id"],
+                                         self.pkg["technology"]["id"],
                                          device_type["description"])
             else:
                 # update if exists
                 print("update...")
                 self._db.update_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg.technology["id"],
+                                         self.pkg["technology"]["id"],
                                          device_type["description"])
  
         ### Device feature model
-        for device_feature_model in self.pkg.device_feature_models:
+        for device_feature_model in self.pkg["device_feature_models"]:
             print("Device feature model %s" % device_feature_model["id"])
             print("M.P=%s" % device_feature_model["parameters"])
             if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:

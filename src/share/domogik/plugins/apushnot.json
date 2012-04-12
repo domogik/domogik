@@ -51,7 +51,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/apushnot/icon.png", 
-        "src/share/domogik/plugins/apushnot.xml", 
+        "src/share/domogik/plugins/apushnot.json", 
         "src/domogik/xpl/bin/apushnot.py", 
         "src/domogik/xpl/lib/apushnot.py"
     ], 

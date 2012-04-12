@@ -297,7 +297,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/zibase/icon.png", 
-        "src/share/domogik/plugins/zibase.xml", 
+        "src/share/domogik/plugins/zibase.json", 
         "src/share/domogik/stats/zibase/zibase.basic-zibase.xml", 
         "src/share/domogik/stats/zibase/sensor.basic-zibase.xml", 
         "src/share/domogik/url2xpl/zibase/preset-dim.xml", 

@@ -177,7 +177,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/knx/icon.png", 
-        "src/share/domogik/plugins/knx.xml", 
+        "src/share/domogik/plugins/knx.json", 
         "src/share/domogik/stats/knx/knx.basic.xml", 
         "src/domogik/xpl/bin/knx.py", 
         "src/domogik/xpl/lib/knx.py", 

@@ -156,8 +156,8 @@ class PackageJson():
     #    my_file.close()
 
     def set_generated(self, path):
-        """ Add generation date info in xml data
-            @param xml_path : path to xml file
+        """ Add generation date info in json data
+            @param path : path to json file
         """
         my_json = json.load(open(path))
         my_json["identity"]["generated"] = str(datetime.datetime.now())

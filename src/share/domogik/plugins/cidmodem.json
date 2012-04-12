@@ -52,7 +52,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/cidmodem/icon.png", 
-        "src/share/domogik/plugins/cidmodem.xml", 
+        "src/share/domogik/plugins/cidmodem.json", 
         "src/share/domogik/stats/communication/cid.basic-cidmodem.xml", 
         "src/domogik/xpl/bin/cidmodem.py", 
         "src/domogik/xpl/lib/cidmodem.py"

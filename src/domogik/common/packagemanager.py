@@ -292,9 +292,9 @@ class PackageManager():
         self.log("OK")
     
 
-    def cache_package(self, cache_folder, pkg_type, id, version):
+    def cache_package(self, cache_dir, pkg_type, id, version):
         """ Download package to put it in cache
-            @param cache_folder : folder in which we want to cache the file
+            @param cache_dir : folder in which we want to cache the file
             @param pkg_type : package type
             @param id : package id
             @param version : package version
@@ -306,38 +306,11 @@ class PackageManager():
         if status != True:
             return False
         # download package
-        path = pkg.package_url
-        dl_path = "%s/%s-%s-%s.tgz" % (cache_folder, pkg_type, id, version)
+        path = pkg["archive_url"]
+        dl_path = "%s/%s-%s-%s.tgz" % (cache_dir, pkg_type, id, version)
         self.log("Caching package : '%s' to '%s'" % (path, dl_path))
         urllib.urlretrieve(path, dl_path)
         path = dl_path
- 
-        # extract package to update Json with source repo
-        my_tmp_dir = "%s/%s/" % (TMP_EXTRACT_DIR, id)
-        self._create_folder(my_tmp_dir)
-        self._extract_package(path, my_tmp_dir)
-
-        # update Json
-        json_path = "%s/src/share/domogik/%ss/%s.json" % (my_tmp_dir, pkg_type, id)
-        pkg_json = PackageJson(path = json_path).json
-        pkg_json.set_repo_source(pkg.source)
-
-        # recreate tgz
-        my_tar = path
-        self.log("Generating package : '%s'" % my_tar)
-        try:
-            tar = tarfile.open(my_tar, "w:gz")
-
-            for root, dirnames, filenames in os.walk(my_tmp_dir):
-                for filename in filenames:
-                    src_file = os.path.join(root, filename)
-                    dst_file = src_file.replace(my_tmp_dir, "")
-                    tar.add(name = src_file, arcname = dst_file)
-            tar.close()
-        except: 
-            msg = "Error generating package : %s : %s" % (my_tar, traceback.format_exc())
-            self.log(msg)
-            raise PackageException(msg)
         self.log("OK")
         return True
 
@@ -374,7 +347,7 @@ class PackageManager():
             pkg, status = self._find_package(path[5:], version)
             if status != True:
                 return status
-            path = pkg.package_url
+            path = pkg.archive_url
 
         # get package name
         if path[0:4] == "http": # special process for a http path
@@ -590,7 +563,7 @@ class PackageManager():
         # the lower priorities, it will be skipped
         try:
             for my_repo in repo_list:
-                self._cache_repository(my_repo["url"], REPO_CACHE_DIR)
+                self._cache_repository(my_repo["url"], my_repo["priority"], REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
             return False
@@ -620,9 +593,10 @@ class PackageManager():
         # return sorted list
         return sorted(repo_list, key = lambda k: k['priority'], reverse = True)
 
-    def _cache_repository(self, base_url, cache_dir):
+    def _cache_repository(self, base_url, priority, cache_dir):
         """ Download the json describing the repository
             @param base_url : repo url in sources.list
+            @param priority : repo priority
             @param cache_dir : dir for the cache
         """
         ### read status json
@@ -655,9 +629,13 @@ class PackageManager():
         ### Remove tgz file
         os.unlink(tmp_repo_file)
 
-        ### Move json from tgz extracted
-        shutil.move("%s/repo.info" % tmp_repo_dir, \
-                    repo_json)
+        ### Move json from tgz extracted and complete it
+        my_json = json.load(open("%s/repo.info" % tmp_repo_dir))
+        for my_pkg in my_json["packages"]:
+            my_pkg["priority"] = priority
+        my_file = open(repo_json, "w")
+        my_file.write(json.dumps(my_json, sort_keys=True, indent=4))
+        my_file.close()
 
         ### Move icons from tgz extracted
         icon_dir = "%s/images/" % cache_dir
@@ -791,7 +769,7 @@ class PackageManager():
         #                                 "domogik_min_version" : pkg_json["identity"]["domogik_min_version"],
         #                                 "priority" : pkg_json["identity"]["priority"],
         #                                 "dependencies" : pkg_json["dependencies"],
-        #                                 "package_url" : pkg_json["identity"]["package_url"]})
+        #                                 "archive_url" : pkg_json["identity"]["archive_url"]})
 
     def get_installed_packages_list(self):
         """ List all packages in install folder 
@@ -805,16 +783,9 @@ class PackageManager():
                 for fic in files:
                     if fic[-5:] == ".json":
                         pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-                        # filter on rest
-                        if pkg_json["identity"]["id"] != "rest":
-                            # TODO : replace by identity and repo informations
-                            #   from the json ???
-                            pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-                                             "id" : pkg_json["identity"]["id"],
-                                             "version" : pkg_json["identity"]["version"],
-                                             "type" : pkg_json["identity"]["type"],
-                                             "package-url" : pkg_json["identity"]["package_url"],
-                                             "source" : pkg_json["identity"]["source"]})
+                        # TODO : replace by identity and repo informations
+                        #   from the json ???
+                        pkg_list.append(pkg_json["identity"])
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                  k['version']))
 
@@ -836,6 +807,19 @@ class PackageManager():
             @param version : optionnal : version to display (if several)
         """
         pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for fic in files:
+                if fic[-5:] != ".json":
+                    continue
+                print fic
+                my_json = json.load(open("%s/%s" % (root, fic)))
+                for my_pkg in my_json["packages"]:
+                    if (version == None and \
+                        fullname == my_pkg["fullname"]) or \
+                       (version == my_pkg["version"] and \
+                        fullname == my_pkg["fullname"]):
+                        pkg_list.append(my_pkg)
+                       
 
         # TODO : review
         #for root, dirs, files in os.walk(REPO_CACHE_DIR):
@@ -858,22 +842,23 @@ class PackageManager():
         #                                     "priority" : pkg_json["identity"]["priority"],
         #                                     "obj" : pkg_obj,
         #                                     "json" : pkg_json})
-        #if len(pkg_list) == 0:
-        #    if version == None:
-        #        version = "*"
-        #    msg = "No package corresponding to '%s' in version '%s'" % (fullname, version)
-        #    self.log(msg)
-        #    return [], msg
-        #if len(pkg_list) > 1:
-        #    msg = "Several packages are available for '%s'. Please specify which version you choose" % fullname
-        #    self.log(msg)
-        #    for pkg in pkg_list:
-        #        self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
-        #                                      pkg["version"],
-        #                                      pkg["priority"]))
-        #    return [], msg
 
-        #return pkg_list[0]["obj"], True
+        if len(pkg_list) == 0:
+            if version == None:
+                version = "*"
+            msg = "No package corresponding to '%s' in version '%s'" % (fullname, version)
+            self.log(msg)
+            return [], msg
+        if len(pkg_list) > 1:
+            msg = "Several packages are available for '%s'. Please specify which version you choose" % fullname
+            self.log(msg)
+            for pkg in pkg_list:
+                self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
+                                              pkg["version"],
+                                              pkg["priority"]))
+            return [], msg
+
+        return pkg_list[0], True
 
 ##### shutil.copytree fork #####
 # the fork is necessary because original function raise an error if a directory

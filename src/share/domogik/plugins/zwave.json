@@ -72,7 +72,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/zwave/icon.png", 
-        "src/share/domogik/plugins/zwave.xml", 
+        "src/share/domogik/plugins/zwave.json", 
         "src/share/domogik/stats/zwave/zwave.basic-zwave.xml", 
         "src/share/domogik/url2xpl/zwave/level.xml", 
         "src/domogik/xpl/bin/zwave.py", 

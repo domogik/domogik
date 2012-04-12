@@ -751,7 +751,7 @@ class SysManager(XplPlugin):
                                       "name" : pkg_json.id, 
                                       "description" : pkg_json.desc, 
                                       "technology" : pkg_json.techno,
-                                      "release" : pkg_json.release,
+                                      "version" : pkg_json.version,
                                       "documentation" : pkg_json.doc,
                                       "vendor_id" : pkg_json.vendor_id,
                                       "device_id" : pkg_json.device_id})
@@ -810,7 +810,7 @@ class SysManager(XplPlugin):
                               "technology" : external_model["technology"],
                               "status" : "ON",
                               "host" : instance,
-                              "release" : external_model["release"],
+                              "version" : external_model["version"],
                               "documentation" : external_model["documentation"],
                               "vendor_id" : external_model["vendor_id"],
                               "device_id" : external_model["device_id"],
@@ -838,7 +838,7 @@ class SysManager(XplPlugin):
                           "technology" : "unknown",
                           "status" : "ON",
                           "host" : instance,
-                          "release" : "n/a",
+                          "version" : "n/a",
                           "documentation" : "#",
                           "vendor_id" : vendor_id,
                           "device_id" : device_id,
@@ -911,7 +911,7 @@ class SysManager(XplPlugin):
                                       "technology" : pkg_json.techno,
                                       "status" : "OFF",
                                       "host" : self.get_sanitized_hostname(), 
-                                      "release" : pkg_json.release,
+                                      "version" : pkg_json.version,
                                       "documentation" : pkg_json.doc,
                                       "configuration" : pkg_json.configuration,
                                       "check_startup_option" : True})
@@ -1006,7 +1006,7 @@ class SysManager(XplPlugin):
                     idx += 1
                 mess.add_data({'technology' :  plugin["technology"]})
                 mess.add_data({'status' :  plugin["status"]})
-                mess.add_data({'release' :  plugin["release"]})
+                mess.add_data({'version' :  plugin["version"]})
                 mess.add_data({'documentation' :  plugin["documentation"]})
                 mess.add_data({'host' : self.get_sanitized_hostname()})
                 host_in_msg = True
@@ -1028,7 +1028,7 @@ class SysManager(XplPlugin):
                     idx += 1
                 mess.add_data({'technology' :  external["technology"]})
                 mess.add_data({'status' :  external["status"]})
-                mess.add_data({'release' :  external["release"]})
+                mess.add_data({'version' :  external["version"]})
                 mess.add_data({'documentation' :  external["documentation"]})
                 mess.add_data({'host' : external["host"]})
                 host_in_msg = True
@@ -1151,9 +1151,9 @@ class SysManager(XplPlugin):
             # Add data to xpl
             mess.add_data({'id%s' % idx : package['id'],
                            'fullname%s' % idx : package['fullname'],
-                           'release%s' % idx : package['release'],
+                           'version%s' % idx : package['version'],
                            'type%s' % idx : package['type'],
-                           'source%s' % idx : package['source'],
+                           #'source%s' % idx : package['archive_url'],
                            'enabled%s' % idx : enabled})
             idx += 1
         self.myxpl.send(mess)
@@ -1243,14 +1243,14 @@ class SysManager(XplPlugin):
                 self.myxpl.send(mess)
                 return
 
-            is_installed, installed_release = self._pkg_is_dep_installed(ver)
+            is_installed, installed_version = self._pkg_is_dep_installed(ver)
             if is_installed:
                 installed = "yes"
-                mess.add_data({"dep%s-release" % idx : installed_release})
+                mess.add_data({"dep%s-version" % idx : installed_version})
             else:
                 installed = "no"
-                if installed_release != None:
-                    mess.add_data({"dep%s-release" % idx : installed_release})
+                if installed_version != None:
+                    mess.add_data({"dep%s-version" % idx : installed_version})
                 crawler = Crawler()
                 found = False
                 try:
@@ -1297,7 +1297,7 @@ class SysManager(XplPlugin):
             source = message.data['source']
             pkg_type = message.data['type']
             pkg_id = message.data['id']
-            release = message.data['release']
+            version = message.data['version']
             package_part = message.data['part']
         except KeyError:
             self.log.error("Missing part of xPL message for installing a package : %s" % traceback.format_exc())
@@ -1311,10 +1311,10 @@ class SysManager(XplPlugin):
         mess.add_data({'source' : source})
         mess.add_data({'type' : pkg_type})
         mess.add_data({'id' : pkg_id})
-        mess.add_data({'release' : release})
+        mess.add_data({'version' : version})
 
         if source == "cache":
-            package = "cache:%s/%s/%s" % (pkg_type, pkg_id, release)
+            package = "cache:%s/%s/%s" % (pkg_type, pkg_id, version)
         else:
             mess.add_data({'error' : "source '%s' not allowed" % source})
             self.myxpl.send(mess)

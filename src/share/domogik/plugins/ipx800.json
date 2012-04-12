@@ -132,7 +132,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/ipx800/icon.png", 
-        "src/share/domogik/plugins/ipx800.xml", 
+        "src/share/domogik/plugins/ipx800.json", 
         "src/share/domogik/stats/relayboard/sensor.basic-ipx800.xml", 
         "src/share/domogik/url2xpl/relayboard/high.xml", 
         "src/share/domogik/url2xpl/relayboard/low.xml", 

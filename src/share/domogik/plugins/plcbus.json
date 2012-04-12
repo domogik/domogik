@@ -92,7 +92,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/plcbus/icon.png", 
-        "src/share/domogik/plugins/plcbus.xml", 
+        "src/share/domogik/plugins/plcbus.json", 
         "src/share/domogik/stats/plcbus/plcbus.basic-plcbus.xml", 
         "src/share/domogik/url2xpl/plcbus/all_lights_off.xml", 
         "src/share/domogik/url2xpl/plcbus/all_lights_on.xml", 
