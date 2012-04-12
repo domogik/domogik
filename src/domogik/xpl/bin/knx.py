@@ -221,7 +221,7 @@ class KNXManager(XplPlugin):
               break
         print "ligne test=|%s|" %lignetest
 
-#si wirte groups_cmd/si read, groups stat
+           #si wirte groups_cmd/si read, groups stat
         if lignetest<>"":
            datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
            cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
@@ -268,9 +268,11 @@ class KNXManager(XplPlugin):
         ### ajout d'un device dans le fichier de configuration du KNX
 
         if type_cmd=="Add":
+           groups = message.data['group']
            test=""
            print "Commande Add Valeur=|%s|" %valeur
-           if valeur<>"Request":
+           print groups
+           if groups=="UI":
               print "Add device"
               Adr_dmg=valeur[:valeur.find(":")]
               valeur=valeur[valeur.find(":")+1:]
@@ -286,39 +288,48 @@ class KNXManager(XplPlugin):
               valeur=valeur[valeur.find(":")+1:]
               comentaire=valeur
               test=""
-              print "test |%s|" %test
-              print "Adr_dmg |%s|" %Adr_dmg
-              self.log.info("Valeur du test= %s" %Adr_dmg)
+              
+              for i in range(len(listknx)):
+                 print listknx[i]
+                 if listknx[i].find(Adr_dmg)>=0:
+                    test=listknx[i]
+                    print test
+                    break
 
-              if Adr_dmg<>"Request" and Adr_dmg<>"Delete":
-                 print "Search Adr_dmg |%s|" %Adr_dmg
-                 for i in range(len(listknx)):
-                    print listknx[i]
-                    if listknx[i].find(Adr_dmg)>=0:
-                       test=listknx[i]
-                       print test
-                       break
-              if Adr_dmg=="Request":
-                 print "Demande du fichier"
-                 test="Request"
-              if Adr_dmg=="Delete":
-                 test="Delete"
-                 filetoopen= self.get_data_files_directory()
-                 filetoopen= filetoopen+"/knx.txt"
-                 e=open(filetoopen,"r")
-                 o=e.read().split("\n")
-                 e.close()
-                 f=open(filetoopen,"w")
-                 ligne=int(comentaire,10)-1
-                 print ligne
-                 for i in range(len(o)):
-                    if i<>ligne:
-                       if o[i]<>"":
-                          f.write(o[i]+"\n")
-                       print o[i]
-#                 f.write("\n".join(o[0:ligne]))
-#                 f.write("\n".join(o[ligne+1:]))
-                 f.close()                  
+           if groups=="Delete":
+              test=""
+              filetoopen= self.get_data_files_directory()
+              filetoopen= filetoopen+"/knx.txt"
+              e=open(filetoopen,"r")
+              o=e.read().split("\n")
+              e.close()
+              f=open(filetoopen,"w")
+              ligne=int(valeur,10)-1
+              print ligne
+              for i in range(len(o)):
+                 if i<>ligne:
+                    if o[i]<>"":
+                       f.write(o[i]+"\n")
+                    else:
+                       print "ligne a supprimer:|%s|" %o[ligne]
+                       testy=str(o[ligne])+"\n"
+                       if listknx.count(testy)>=1:
+                          listknx.remove(testy)
+                       else:
+                          print listknx
+                    print o[i]
+              f.close()
+
+              msg=XplMessage()
+              msg.set_schema('knx.basic')
+              msg.set_type("xpl-trig")
+              msg.add_data({'command': 'Add-ack'})
+              msg.add_data({'group' : 'Delete'})
+              msg.add_data({'type' : 's'})
+              msg.add_data({'data': 'OK'})
+              self.myxpl.send(msg)
+           
+           if groups=="UI":
 
               msg=XplMessage()
               msg.set_schema('knx.basic')
@@ -327,9 +338,7 @@ class KNXManager(XplPlugin):
               msg.add_data({'group' : 'UI'})
               msg.add_data({'type' : 's'})
 
-              self.log.info("Valeur du test2= %s" %Adr_dmg)
-           
-              if test=="":
+              if test == "":
                  filetoopen= self.get_data_files_directory()
                  filetoopen= filetoopen+"/knx.txt"
                  fichier=open(filetoopen,"a")
@@ -343,40 +352,34 @@ class KNXManager(XplPlugin):
                  msg.add_data({'data': 'OK'})
               else:
                  print "Error"
-                 msg.add_data({'data': 'Error domogik address:'+Adr_dmg+' already exist'})
+                 msg.add_data({'data': 'Error domogik address:'+Adr_dmg+' already existe'})
+
               self.myxpl.send(msg)
-              if test=="Request":
-                 print "Requette de fichier"
-                 msg=XplMessage()
-                 msg.set_schema('knx.basic')
-                 msg.set_type("xpl-trig")
-                 msg.add_data({'command': 'Add-ack'})
-                 msg.add_data({'group' : 'UI'})
-                 msg.add_data({'type' : 's'})
 
-                 print "Resquest files"
-                 filetoopen= self.get_data_files_directory()
-                 filetoopen= filetoopen+"/knx.txt"
-                 fichier=open(filetoopen,"r")
-                 data=[]
-                 for ligne in fichier:
-                    data.append(ligne[:ligne.find("end")])
-                 message=""
-                 for i in range(len(data)):
-                    message=message+data[i]+","
-                 msg.add_data({'data': message})
-                 fichier.close
-                 self.myxpl.send(msg)
+           if groups=="Request":
+              print "Requette de fichier"
+              msg=XplMessage()
+              msg.set_schema('knx.basic')
+              msg.set_type("xpl-trig")
+              msg.add_data({'command': 'Add-ack'})
+              msg.add_data({'group' : 'Request'})
+              msg.add_data({'type' : 's'})
 
-              if Adr_dmg=="Delete":
-                 msg=XplMessage()
-                 msg.set_schema('knx.basic')
-                 msg.set_type("xpl-trig")
-                 msg.add_data({'command': 'Add-ack'})
-                 msg.add_data({'group' : 'UI'})
-                 msg.add_data({'type' : 's'})
-                 msg.add_data({'data': 'OK'})
-                 self.myxpl.send(msg)
+              print "Resquest files"
+              filetoopen= self.get_data_files_directory()
+              filetoopen= filetoopen+"/knx.txt"
+              fichier=open(filetoopen,"r")
+              data=[]
+              for ligne in fichier:
+                 data.append(ligne[:ligne.find("end")])
+              message=""
+              for i in range(len(data)):
+                 message=message+data[i]+","
+              if message=="":
+                 message="None"
+              msg.add_data({'data': message})
+              fichier.close
+              self.myxpl.send(msg)
 
 if __name__ == "__main__":
     INST = KNXManager()
