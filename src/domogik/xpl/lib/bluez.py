@@ -24,6 +24,7 @@ Bluetooth detection.
 
 Implements
 ==========
+class BluezAPI
 
 @author: Sébastien Gallet <sgallet@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
@@ -45,13 +46,18 @@ LOW = "low"
 
 class BluezAPI:
     """
-    bluez API
+    bluez API.
+    Encapsulate the access to the bluetooth equipment
     """
 
     def __init__(self, log, config, myxpl, stop):
         """
         Constructor
-        @param plugin : the parent plugin (used to retrieve)
+        @param log : the logger to use
+        @param config : the config to use
+        @param myxpl : the xpl sender to use
+        @param stop : the stop method of the plugin thread
+
         """
         self.log = log
         self.myxpl = myxpl
@@ -68,6 +74,7 @@ class BluezAPI:
 
     def reload_config(self):
         """
+        Reload config of the plugin.
         """
         self.log.debug("reload_config : Try to get configuration from XPL")
         try:
@@ -102,11 +109,10 @@ class BluezAPI:
 
     def start_adaptator(self):
         """
-        Start the thread adaptator
+        Start the thread listening to the bluetooth adaptator.
         """
         self.log.debug("start_adaptator : Start ...")
         if self._state != "started":
-            self._state = "started"
             self.reload_config()
             self._thread = threading.Thread(None,
                                             self.listen_adaptator,
@@ -114,11 +120,12 @@ class BluezAPI:
                                             (),
                                             {})
             self._thread.start()
+            self._state = "started"
         self.log.debug("start_adaptator : Done :)")
 
     def stop_adaptator(self):
         """
-        Stop the thread adaptator
+        Stop the thread listening to the bluetooth adaptator.
         """
         self.log.debug("stop_adaptator : Start ...")
         if self._state != "stopped":
@@ -128,7 +135,9 @@ class BluezAPI:
 
     def _listen_adaptator_discovery(self):
         """
-        Listen to bluetooth adaptator
+        Listen to bluetooth adaptator. This method use the
+        bluetooth.discover_devices(). It takes approcimatively 10 seconds
+        to proceed. Phones must be "visible" in bluetooth.
         """
         self.log.debug("listen_adaptator : Start ...")
         while not self._stop.isSet() and self._state == "started":
@@ -168,7 +177,9 @@ adaptator")
 
     def _listen_adaptator_lookup(self):
         """
-        Listen to bluetooth adaptator
+        Listen to bluetooth adaptator. This method use the
+        bluetooth.lookup_name(). It takes approcimatively 3 seconds
+        to proceed.
         """
         self.log.debug("listen_adaptator : Start ...")
         while not self._stop.isSet() and self._state == "started":
@@ -210,9 +221,8 @@ adaptator")
 
     def basic_listener(self, message):
         """
-        Listen to bluez.basic messages
-        @param message : The XPL message
-        @param myxpl : The XPL sender
+        Listen to bluez.basic messages.
+        @param message : The XPL message received.
 
         bluez.basic
            {
@@ -230,22 +240,29 @@ adaptator")
         device = None
         if 'device' in message.data:
             device = message.data['device']
-        try:
-            action = None
-            if 'action' in message.data:
-                action = message.data['action']
-            self.log.debug("basic_listener : action %s received \
-with device %s" % (action, device))
-            actions[action](self.myxpl, device, message)
-        except:
-            self.log.error("action _ %s _ unknown." % (action))
-            error = "Exception : %s" %  \
-                     (traceback.format_exc())
-            self.log.debug("basic_listener : "+error)
+        if device != None and device == self._device_name:
+            try:
+                action = None
+                if 'action' in message.data:
+                    action = message.data['action']
+                self.log.debug("basic_listener : action %s received \
+for device %s" % (action, device))
+                actions[action](self.myxpl, device, message)
+            except:
+                self.log.error("action _ %s _ unknown." % (action))
+                error = "Exception : %s" %  \
+                         (traceback.format_exc())
+                self.log.debug("basic_listener : "+error)
+        else:
+                self.log.warning("basic_listener : action %s received \
+for unknown device %s" % (action, device))
 
     def _action_status(self, myxpl, device):
         """
-        Status of the bluez plugin
+        Status of the bluez plugin.
+        @param myxpl : The xpl sender to use.
+        @param device : The "plugin" device.
+
         timer.basic
            {
             action=status
@@ -256,62 +273,49 @@ with device %s" % (action, device))
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("bluez.basic")
-        if device == None:
-            mess.add_data({"device" : "unknown"})
-        else:
-            mess.add_data({"device" : device})
-        if device == None and device != self._device_name :
-            mess.add_data({"error" : "Unknown device"})
-        else:
-            mess.add_data({"status" : self._state})
-            mess.add_data({"adaptator" : "on"})
+        mess.add_data({"device" : device})
+        mess.add_data({"status" : self._state})
         myxpl.send(mess)
         self.log.debug("action_status : Done :)")
 
     def _action_stop(self, myxpl, device):
         """
         Stop the bluetooth detection
-        @param device : The timer to stop
+        @param myxpl : The xpl sender to use.
+        @param device : The "plugin" device.
         """
         self.log.debug("_action_stop : Start ...")
+        self.stop_adaptator()
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("bluez.basic")
-        if device == None:
-            mess.add_data({"device" : "unknown"})
-        else:
-            mess.add_data({"device" : device})
-        if device == None and device != self._device_name :
-            mess.add_data({"error" : "Unknown device"})
-        else:
-            self.stop_adaptator()
-            mess.add_data({"status" : self._state})
+        mess.add_data({"device" : device})
+        mess.add_data({"status" : self._state})
         myxpl.send(mess)
         self.log.debug("_action_stop : Done :)")
 
     def _action_start(self, myxpl, device):
         """
         Start the bluetooth detection
-        @param device : The timer to resume
+        @param myxpl : The xpl sender to use.
+        @param device : The "plugin" device.
         """
         self.log.debug("_action_start : Start ...")
+        self.start_adaptator()
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("bluez.basic")
-        if device == None:
-            mess.add_data({"device" : "unknown"})
-        else:
-            mess.add_data({"device" : device})
-        if device == None and device != self._device_name :
-            mess.add_data({"error" : "Unknown device"})
-        else:
-            self.start_adaptator()
-            mess.add_data({"status" : self._state})
+        mess.add_data({"device" : device})
+        mess.add_data({"status" : self._state})
         myxpl.send(mess)
         self.log.debug("_action_start : Done :)")
 
     def _trig_detect(self, xpltype, addr, status):
         """
+        Send a message with the status of the "phone" device.
+        @param xpltype : The xpltype of the message to send.
+        @param addr : the mac address of the bluetooth device.
+        @param status : the status of the bluetooth device.
         """
         self.log.debug("_trig_detect : Start ...")
         mess = XplMessage()

@@ -2,7 +2,7 @@
   <id>bluez</id>
   <technology>bluez</technology>
   <description>
-  A blue tooth dectector. Send a message when a friend device is found.
+  A blue tooth dectector. Send an XPL message when a friend device is found.
   </description>
   <changelog>
 0.1
@@ -54,7 +54,7 @@
       <order-id>5</order-id>
       <name>bt-name</name>
       <type>string</type>
-      <description>Bluetooth name of the device to scan.</description>
+      <description>XPL name of the device to scan. It will be used as device address in domogik.</description>
       <default-value></default-value>
     </key>
     <key>
@@ -62,7 +62,7 @@
       <order-id>6</order-id>
       <name>bt-addr</name>
       <type>string</type>
-      <description>Bluetooth address of the device to scan.</description>
+      <description>Bluetooth address of the device to scan (01:23:45:67:89:AB).</description>
       <default-value></default-value>
     </key>
   </configuration-keys>
@@ -77,7 +77,7 @@
   </files>
   <dependencies/>
 <!--  <dependencies>
-    <dep type="python" id="PyBluez"</dep>
+    <dep type="python" id="PyBluez (>=0.18)"</dep>
   </dependencies> -->
   <udev-rules/>
   <device_technology>

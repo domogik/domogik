@@ -48,7 +48,7 @@ class Bluez(XplHlpPlugin):
     '''
     def __init__(self):
         """
-        Create the bluez class
+        Create the bluez plugin.
         """
         XplHlpPlugin.__init__(self, name = 'bluez')
         self.log.info("__init__ : Start ...")
@@ -69,7 +69,6 @@ class Bluez(XplHlpPlugin):
 
         #self.enable_helper()
         self.enable_hbeat()
-        #self._bluez.reload_config()
         self._bluez.start_adaptator()
         self.log.info("bluez plugin correctly started")
 
