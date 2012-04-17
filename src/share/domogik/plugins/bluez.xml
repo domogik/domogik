@@ -46,7 +46,7 @@
       <order-id>4</order-id>
       <name>listen-method</name>
       <type>string</type>
-      <description>The listen method to use : dicovery,lookup</description>
+      <description>The listen method to use : discovery,lookup</description>
       <default-value>lookup</default-value>
     </key>
     <key>
