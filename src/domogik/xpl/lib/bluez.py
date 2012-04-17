@@ -97,6 +97,7 @@ class BluezAPI:
                     'bt-name-%s' % str(num))
                 if addr != None:
                     self._targets[addr] = {"name":name, "count":0, "status":LOW}
+                    self._trig_detect("xpl-trig", addr, LOW)
                 else:
                     loop = False
                 num += 1
@@ -115,7 +116,7 @@ class BluezAPI:
         if self._state != "started":
             self.reload_config()
             self._thread = threading.Thread(None,
-                                            self.listen_adaptator,
+                                            self._listen_adaptator,
                                             "listen_adaptator",
                                             (),
                                             {})
@@ -131,7 +132,32 @@ class BluezAPI:
         if self._state != "stopped":
             self._state = "stopped"
             self._thread = None
+            for aaddr in self._targets:
+                self._trig_detect("xpl-trig", aaddr, LOW)
         self.log.debug("stop_adaptator : Done :)")
+
+    def _listen_adaptator(self):
+        """
+        Encapsulate the call to the callback function.
+        Catch exception and test thread stop.
+        """
+        self.log.debug("_listen_adaptator : Start ...")
+        while not self._stop.isSet() and self._state == "started":
+            try:
+                if self.listen_adaptator() == True:
+                    self._stop.wait(self._scan_delay)
+                else:
+                    for aaddr in self._targets:
+                        self._trig_detect("xpl-trig", aaddr, LOW)
+                    self._stop.wait(self._error_delay)
+            except:
+                self.log.error("_listen_adaptator : Error when calling \
+listen_method")
+                error = "traceback : %s" %  \
+                     (traceback.format_exc())
+                self.log.error("listen_adaptator : " + error)
+                self._stop.wait(self._error_delay)
+        self.log.debug("_listen_adaptator : Done :)")
 
     def _listen_adaptator_discovery(self):
         """
@@ -139,41 +165,36 @@ class BluezAPI:
         bluetooth.discover_devices(). It takes approcimatively 10 seconds
         to proceed. Phones must be "visible" in bluetooth.
         """
-        self.log.debug("listen_adaptator : Start ...")
-        while not self._stop.isSet() and self._state == "started":
-            try:
-                self.log.debug("listen_adaptator : Start \
-bluetooth.discover_devices at %s" % datetime.datetime.today())
-                nearby_devices = bluetooth.discover_devices()
-                self.log.debug("listen_adaptator : Stop \
-bluetooth.discover_devices at %s" % datetime.datetime.today())
-                for aaddr in self._targets:
-                    if self._targets[aaddr]["status"] == HIGH :
-                        if aaddr not in nearby_devices:
-                            self._targets[aaddr]["count"] = \
-                                self._targets[aaddr]["count"] +1
-                            if self._targets[aaddr]["count"] >= \
-                                self._hysteresis:
-                                self._trig_detect("xpl-trig", aaddr, LOW)
-                                self._targets[aaddr]["status"] = LOW
-                for bdaddr in nearby_devices:
-                    target_name = bluetooth.lookup_name( bdaddr )
-                    if bdaddr in self._targets:
-                        self._targets[bdaddr]["count"] = 0
-                        if self._targets[bdaddr]["status"] == LOW:
-                            self._trig_detect("xpl-trig", bdaddr, HIGH)
-                            self._targets[bdaddr]["status"] = HIGH
-                            self.log.info("Match bluetooth device %s with \
-address %s" % (target_name, bdaddr))
-            except:
-                self.log.error("listen_adaptator : Can't find bluetooth \
+        try:
+    #        self.log.debug("_listen_adaptator_discovery : Start \
+    #bluetooth.discover_devices at %s" % datetime.datetime.today())
+            nearby_devices = bluetooth.discover_devices()
+    #        self.log.debug("_listen_adaptator_discovery : Stop \
+    #bluetooth.discover_devices at %s" % datetime.datetime.today())
+            for aaddr in self._targets:
+                if self._targets[aaddr]["status"] == HIGH :
+                    if aaddr not in nearby_devices:
+                        self._targets[aaddr]["count"] = \
+                            self._targets[aaddr]["count"] +1
+                        if self._targets[aaddr]["count"] >= \
+                            self._hysteresis:
+                            self._trig_detect("xpl-trig", aaddr, LOW)
+            for bdaddr in nearby_devices:
+                target_name = bluetooth.lookup_name( bdaddr )
+                if bdaddr in self._targets:
+                    self._targets[bdaddr]["count"] = 0
+                    if self._targets[bdaddr]["status"] == LOW:
+                        self._trig_detect("xpl-trig", bdaddr, HIGH)
+                        self.log.info("Match bluetooth device %s with \
+    address %s" % (target_name, bdaddr))
+            return True
+        except:
+            self.log.error("_listen_adaptator : Error with bluetooth \
 adaptator")
-                error = "traceback : %s" %  \
-                     (traceback.format_exc())
-                self.log.error("listen_adaptator : " + error)
-                self._stop.wait(self._error_delay)
-            self._stop.wait(self._scan_delay)
-        self.log.debug("listen_adaptator : Done :)")
+            error = "traceback : %s" %  \
+                 (traceback.format_exc())
+            self.log.error("listen_adaptator : " + error)
+            return False
 
     def _listen_adaptator_lookup(self):
         """
@@ -181,43 +202,36 @@ adaptator")
         bluetooth.lookup_name(). It takes approcimatively 3 seconds
         to proceed.
         """
-        self.log.debug("listen_adaptator : Start ...")
-        while not self._stop.isSet() and self._state == "started":
-            try:
-                for aaddr in self._targets:
-                    self.log.debug("listen_adaptator : Start \
-bluetooth.lookup_name at %s" % datetime.datetime.today())
-                    target_name = bluetooth.lookup_name( aaddr )
-                    self.log.debug("listen_adaptator : Stop \
-bluetooth.lookup_name at %s" % datetime.datetime.today())
-                    self.log.debug("listen_adaptator : target_name = %s|%s" \
-                        % (target_name, aaddr))
-                    if target_name == None:
-                        if self._targets[aaddr]["status"] == HIGH :
-                            self._targets[aaddr]["count"] = \
-                                self._targets[aaddr]["count"] +1
-                            if self._targets[aaddr]["count"] >= \
-                                self._hysteresis:
-                                self._trig_detect("xpl-trig", aaddr, LOW)
-                                self._targets[aaddr]["status"] = LOW
-                                self.log.info("bluetooth device %s with \
-address %s is gone" % (target_name, aaddr))
-                    else:
-                        self._targets[aaddr]["count"] = 0
-                        if self._targets[aaddr]["status"] == LOW:
-                            self._trig_detect("xpl-trig", aaddr, HIGH)
-                            self._targets[aaddr]["status"] = HIGH
-                            self.log.info("Match bluetooth device %s with \
-address %s" % (target_name, aaddr))
-            except:
-                self.log.error("listen_adaptator : Can't find bluetooth \
+        try:
+            for aaddr in self._targets:
+    #            self.log.debug("_listen_adaptator_lookup : Start \
+    #bluetooth.lookup_name at %s" % datetime.datetime.today())
+                target_name = bluetooth.lookup_name( aaddr )
+    #            self.log.debug("_listen_adaptator_lookup : Stop \
+    #bluetooth.lookup_name at %s" % datetime.datetime.today())
+                if target_name == None:
+                    if self._targets[aaddr]["status"] == HIGH :
+                        self._targets[aaddr]["count"] = \
+                            self._targets[aaddr]["count"] +1
+                        if self._targets[aaddr]["count"] >= \
+                            self._hysteresis:
+                            self._trig_detect("xpl-trig", aaddr, LOW)
+                            self.log.info("bluetooth device %s with \
+    address %s is gone" % (target_name, aaddr))
+                else:
+                    self._targets[aaddr]["count"] = 0
+                    if self._targets[aaddr]["status"] == LOW:
+                        self._trig_detect("xpl-trig", aaddr, HIGH)
+                        self.log.info("Match bluetooth device %s with \
+    address %s" % (target_name, aaddr))
+            return True
+        except:
+            self.log.error("_listen_adaptator : Error with bluetooth \
 adaptator")
-                error = "traceback : %s" %  \
-                     (traceback.format_exc())
-                self.log.error("listen_adaptator : " + error)
-                self._stop.wait(self._error_delay)
-            self._stop.wait(self._scan_delay)
-        self.log.debug("listen_adaptator : Done :)")
+            error = "traceback : %s" %  \
+                 (traceback.format_exc())
+            self.log.error("listen_adaptator : " + error)
+            return False
 
     def basic_listener(self, message):
         """
@@ -318,6 +332,7 @@ for unknown device %s" % (action, device))
         @param status : the status of the bluetooth device.
         """
         self.log.debug("_trig_detect : Start ...")
+        self._targets[addr]["status"] = status
         mess = XplMessage()
         mess.set_type(xpltype)
         mess.set_schema("sensor.basic")
