@@ -1,0 +1,17 @@
+<technology id="bluez">
+  <command name="stop">
+    <schema>bluez.basic</schema>
+    <command-key>action</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>stop</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>bluez.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="status" value="stopped" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
