@@ -35,7 +35,7 @@ NAME=dmg_manager
 XPLHUB=xPL_Hub
 DAEMON=$(which $NAME)
 DIETIME=2
-STARTTIME=3
+STARTTIME=5
 PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
 PIDFILE="$PIDDIR/manager.pid"
 
@@ -232,8 +232,8 @@ function check_lock_dir {
 case "$1" in
     start)
         check_lock_dir
-        [ -f $PIDFILE ] && echo "Domogik seems to be running. Please stop it." && exit 0
         if [ $# -eq 1 ];then
+			[ -f $PIDFILE ] && echo "Domogik seems to be running. Please stop it." && exit 0
             start
             sleep $STARTTIME
             sleep $STARTTIME
@@ -244,6 +244,7 @@ case "$1" in
                     start_xpl
                 ;;
                 manager)
+                    start_xpl
                     start_manager
                     ;;
                 *)
