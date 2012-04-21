@@ -75,10 +75,9 @@
     <file path="src/domogik/xpl/bin/bluez.py"/>
     <file path="src/domogik/xpl/lib/bluez.py"/>
   </files>
-  <dependencies/>
-<!--  <dependencies>
-    <dep type="python" id="PyBluez (>=0.18)"</dep>
-  </dependencies> -->
+  <dependencies>
+    <dep type="python" id="pybluez (>=0.18)"/>
+  </dependencies>
   <udev-rules/>
   <device_technology>
       <id>bluez</id>
