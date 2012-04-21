@@ -226,6 +226,7 @@ function check_lock_dir {
     if [ ! -d $PIDDIR ];then
         mkdir $PIDDIR
     fi
+    [ -p $PIDDIR/dmg-manager-state ] && rm -f $PIDDIR/dmg-manager-state
     chown ${DOMOGIK_USER}: $PIDDIR
 }
 
@@ -244,7 +245,6 @@ case "$1" in
                     start_xpl
                 ;;
                 manager)
-                    start_xpl
                     start_manager
                     ;;
                 *)
@@ -262,13 +262,12 @@ case "$1" in
                     stop_xpl
                 ;;
                 manager)
+                    stop_plugins
+                    sleep $DIETIME
                     stop_manager
                 ;;
-                plugins)
-                    stop_plugins
-                ;;
                 *)
-                    echo "usage: $0 stop [manager|xpl|plugins]"
+                    echo "usage: $0 stop [manager|xpl]"
                 ;;
             esac
         fi
