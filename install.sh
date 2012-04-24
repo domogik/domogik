@@ -212,6 +212,10 @@ function copy_sample_files {
         echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
         exit 6
     fi
+    if [ -d "/etc/logrotate.d/" ];then
+		cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
+        chmod 644 /etc/logrotate.d/domogik
+    fi
     if [ -d "/etc/init.d/" ];then
         cp src/domogik/examples/init/domogik /etc/init.d/
         chmod +x /etc/init.d/domogik
@@ -272,8 +276,7 @@ function update_user_config {
         # will be overide on secondary host
         sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $DMG_ETC/domogik.cfg
     fi
-}    
-
+}
 
 function update_rest_config_for_secondary_host {
     if [ "$keep" = "n" -o "$keep" = "N" ];then
