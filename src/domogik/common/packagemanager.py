@@ -63,6 +63,7 @@ TMP_EXTRACT_DIR = "%s/tmp/" % CACHE_FOLDER
 CONFIG_FILE = "%s/domogik.cfg" % CONFIG_FOLDER
 REPO_SRC_FILE = "%s/sources.list" % CONFIG_FOLDER
 REPO_CACHE_DIR = "%s/cache" % CACHE_FOLDER
+ICON_CACHE_DIR = "%s/images" % REPO_CACHE_DIR
 PKG_CACHE_DIR = "%s/pkg-cache" % CACHE_FOLDER
 REPO_LST_FILE_HEADER = "Domogik Repository"
 

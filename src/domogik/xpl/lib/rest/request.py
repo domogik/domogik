@@ -42,7 +42,7 @@ from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
-from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, REPO_CACHE_DIR
+from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, ICON_CACHE_DIR 
 from domogik.common.packagexml import PackageException
 import time
 import urllib
@@ -4101,6 +4101,7 @@ target=*
         ### check package exists in cache
         pkg_mgr = PackageManager()
         data = pkg_mgr.get_packages_list(fullname = package, version = version)
+        print data
         # if there is no package corresponding
         if data == []:
             self.log.debug("No package corresponding to check dependency request")
@@ -4399,8 +4400,8 @@ target=*
     def _rest_package_icon_available(self, type, id, version):
         """ Download a package icon storen in cache
         """
-        icon_name = "%s-%s-%s.png" % (type, id, version)
-        file_name = "%s/%s" % (REPO_CACHE_DIR, icon_name)
+        icon_name = "icon_%s_%s_%s.png" % (type, id, version)
+        file_name = "%s/%s" % (ICON_CACHE_DIR, icon_name)
         self._download_file(file_name)
 
 
