@@ -619,12 +619,12 @@ class PackageManager():
         self._create_folder(tmp_repo_dir)
 
         # dirty trick for ferllings bug
-        my_zip = zipfile.ZipFile(tmp_repo_file) 
-        my_zip.extractall(path = tmp_repo_dir)
+        #my_zip = zipfile.ZipFile(tmp_repo_file) 
+        #my_zip.extractall(path = tmp_repo_dir)
 
-        #my_tar = tarfile.open(tmp_repo_file)
-        #my_tar.extractall(path = tmp_repo_dir)
-        #my_tar.close()
+        my_tar = tarfile.open(tmp_repo_file)
+        my_tar.extractall(path = tmp_repo_dir)
+        my_tar.close()
 
         ### Remove tgz file
         os.unlink(tmp_repo_file)
