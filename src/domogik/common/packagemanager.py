@@ -434,7 +434,7 @@ class PackageManager():
         """
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
-        self.log("Start uninstall for package '%s-%s'" % (type, id))
+        self.log("Start uninstall for package '%s-%s'" % (pkg_type, id))
         self.log("Only Json description file will be deleted in this Domogik version")
 
         try:
@@ -600,7 +600,7 @@ class PackageManager():
             @param cache_dir : dir for the cache
         """
         ### read status json
-        repo_status_url = "%s/status" % base_url
+        repo_status_url = "%s" % base_url
         self.log("Processing '%s'..." % repo_status_url)
         resp = urllib.urlopen(repo_status_url)
         repo_json = json.load(resp)
