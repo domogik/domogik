@@ -20,7 +20,7 @@
 #Module purpose
 #==============
 #
-# Generate all packages from sources
+# Generate all nightly packages from sources
 #
 #Implements
 #==========
@@ -33,8 +33,8 @@
 
 SRC_PATH="../../../"
 PKGMGR="../../domogik/xpl/bin/pkgmgr.py"
-PLG_XML_PATH="src/share/domogik/plugins/"
-HDW_XML_PATH="src/share/domogik/externals/"
+PLG_JSON_PATH="src/share/domogik/plugins/"
+EXT_JSON_PATH="src/share/domogik/externals/"
 
 if [[ $# -ne 1 ]] ; then
     echo "Usage : $0 <directory>"
@@ -43,24 +43,26 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 FOLDER=$1
-mkdir -p $FOLDER
+mkdir -p ${FOLDER}
 
-for fic in $(find $SRC_PATH/$PLG_XML_PATH -name "*.xml")
+for fic in $(find ${SRC_PATH}/${PLG_JSON_PATH} -name "*.json")
   do
-    plugin=$(basename $fic | sed "s/\.xml//")
+    plugin=$(basename ${fic} | sed "s/\.json//")
     echo "********************************************************"
-    echo "*    Generating package for $plugin"
+    echo "*    Generating package for plugin $plugin"
     echo "********************************************************"
   
-    $PKGMGR -f -c -t plugin -o $FOLDER $plugin
+    ${PKGMGR} -n ${fic}
+    ${PKGMGR} -f -c -t plugin -o ${FOLDER} ${plugin}
 done
 
-for fic in $(find $SRC_PATH/$HDW_XML_PATH -name "*.xml")
+for fic in $(find ${SRC_PATH}/${EXT_JSON_PATH} -name "*.json")
   do
-    external=$(basename $fic | sed "s/\.xml//")
+    external=$(basename ${fic} | sed "s/\.json//")
     echo "********************************************************"
-    echo "*    Generating package for $external"
+    echo "*    Generating package for external member $external"
     echo "********************************************************"
   
-    $PKGMGR -f -c -t external -o $FOLDER $external
+    ${PKGMGR} -n ${fic}
+    ${PKGMGR} -f -c -t external -o ${FOLDER} ${external}
 done
