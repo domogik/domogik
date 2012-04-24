@@ -178,7 +178,6 @@ class Manager:
         if not self._foundhub.is_set():
             msg = "Start HUB discovery"
             self.p.log.debug(msg)
-            print(msg)
             # random send hbeat (between 3 and 10 seconds)
             rnd = random.randrange(3, 10)
             self._h_timer = XplTimer(rnd, self._SendHeartbeat, self)
@@ -189,7 +188,6 @@ class Manager:
         """
         msg = "Received HBEAT echo, HUB detected"
         self.p.log.debug(msg)
-        print(msg)
         self._foundhub.set()
         self.update_status(1)
         if self._h_timer != None:
