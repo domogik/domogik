@@ -39,6 +39,7 @@ TODO
 import sys
 from domogik.common.packagemanager import PackageManager
 from domogik.common.packagexml import PackageXml, PackageException
+from domogik.common.packagejson import set_nightly_version
 from optparse import OptionParser
 
 PACKAGE_TYPES = ['plugin', 'external']
@@ -87,6 +88,11 @@ def main():
                       action = "store", 
                       dest = "output_dir",
                       help = "Directory where you want to create packages")
+    parser.add_option("-n", "--nightly",
+                      action = "store_true", 
+                      dest = "action_nightly",
+                      default = False,
+                      help = "Change the version in json file for nightly build")
     parser.add_option("-j", "--to-json",
                       action = "store_true", 
                       dest = "action_json",
@@ -156,6 +162,9 @@ def main():
             exit()
         pkg_xml = PackageXml(args[0], pkg_type = options.package_type)
         print (pkg_xml.get_json())
+
+    if options.action_nightly == True:
+        set_nightly_version(args[0])
 
     
 if __name__ == "__main__":

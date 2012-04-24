@@ -186,6 +186,18 @@ class PackageJson():
         print("---------------------------------------------------------")
 
 
+def set_nightly_version(path):
+    """ update version for the nightly build
+        @param path : path to json file
+    """
+    my_json = json.load(open(path))
+    # suffix the version with .devYYYYMMDD
+    suffix = ".dev%s" % datetime.datetime.now().strftime('%Y%m%d')
+    my_json["identity"]["version"] += suffix
+    my_file = open(path, "w")
+    my_file.write(json.dumps(my_json))
+    my_file.close()
+
 if __name__ == "__main__":
     pjson = PackageJson("ipx800")
     print pjson.json
