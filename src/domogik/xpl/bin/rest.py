@@ -664,7 +664,8 @@ class Rest(XplPlugin):
             @param host : host
             @param pkg_type : type of package
         """
-        self.log.debug("*** list_installed_packages")
+        print("Get new installed packages list")
+        self.log.debug("Get new installed packages list")
         self.sema_installed.acquire()
         self.log.debug("*** sema acquired")
         self.log.debug("*** msg = %s" % message)
