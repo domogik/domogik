@@ -22,7 +22,7 @@ TELLDUS_UNKNOWN=0
 TELLDUS_ON=1
 TELLDUS_OFF=2
 
-class telldusMoveAPI:
+class TelldusMoveAPI:
     '''
     Move extension to telldus pugin
     '''
@@ -84,7 +84,7 @@ class telldusMoveAPI:
             self._plugin.myxpl.send(mess)
         self._plugin.log.debug("telldusMoveAPI.move_cmnd_cb() : Done :)")
 
-    def sendMove(self,deviceId,state):
+    def send_move(self,deviceId,state):
         """
         Send a xPL message of the type SENSOR.BASIC when a door / window is open/close
         @param state : TELLDUS_UNKNOWN | TELLDUS_ON | TELLDUS_OFF

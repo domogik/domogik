@@ -23,7 +23,7 @@ TELLDUS_UNKNOWN=0
 TELLDUS_ON=1
 TELLDUS_OFF=2
 
-class telldusWindoorAPI:
+class TelldusWindoorAPI:
     '''
     Windoor extension to telldus pugin
     '''
@@ -85,7 +85,7 @@ class telldusWindoorAPI:
             self._plugin.myxpl.send(mess)
         self._plugin.log.debug("telldusWindoorAPI.windoor_cmnd_cb() : Done :)")
 
-    def sendWindoor(self,deviceId,state):
+    def send_windoor(self,deviceId,state):
         """
         Send a xPL message of the type SENSOR.BASIC when a door / window is open/close
         @param state : TELLDUS_UNKNOWN | TELLDUS_ON | TELLDUS_OFF
