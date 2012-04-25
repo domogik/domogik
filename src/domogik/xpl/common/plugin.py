@@ -47,6 +47,27 @@ from domogik.common.processinfo import ProcessInfo
 # time between each read of cpu/memory usage for process
 TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
+def load_plugin_library(name, element):
+    '''
+    Function to call in the bin part of each plugin to load the appropriate library :  from the sources in development mode and from packages folder in package mode
+    To do a : from foo import bar
+    Do      : bar = load_plugin_library("foo", "bar")
+    '''
+ 
+    # Read config files to get mode
+    cfg = Loader('domogik')
+    config = cfg.load()
+    conf = dict(config[1])
+    if conf.has_key('package_path'):
+        print("Load library from packages")
+        lib_path = "packages.xpl.lib." + name
+    else:
+        print("Load library from sources")
+        lib_path = "domogik.xpl.lib." + name
+    imp = __import__(lib_path, globals(), locals(), element)
+    ret = "imp." + element
+    return eval(ret)
+
 class XplPlugin(BasePlugin):
     '''
     Global plugin class, manage signal handlers.

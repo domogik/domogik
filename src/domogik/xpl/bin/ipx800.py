@@ -36,13 +36,16 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import XplPlugin, load_plugin_library
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.ipx800 import IPXException
-from domogik.xpl.lib.ipx800 import IPX
+#from domogik.xpl.lib.ipx800 import IPXException
+#from domogik.xpl.lib.ipx800 import IPX
 import threading
 import traceback
+
+IPXException = load_plugin_library("ipx800", "IPXException")
+IPX = load_plugin_library("ipx800", "IPX")
 
 
 class IPXManager(XplPlugin):
