@@ -21,12 +21,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "heyu", 
-            "type": "other"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "x10.switch", 
@@ -72,7 +66,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/x10_heyu/icon.png", 
-        "src/share/domogik/plugins/x10_heyu.json", 
+        "src/share/domogik/plugins/x10_heyu.xml", 
         "src/share/domogik/stats/x10/x10.basic-x10_heyu.xml", 
         "src/share/domogik/url2xpl/x10/bright.xml", 
         "src/share/domogik/url2xpl/x10/dim.xml", 
@@ -86,6 +80,12 @@
         "author_email": "maxence at dunnewind.net; marc at mirelsol.org", 
         "category": "x10", 
         "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "heyu", 
+                "type": "other"
+            }
+        ], 
         "description": "X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work", 
         "documentation": "http://wiki.domogik.org/plugin_x10_heyu", 
         "domogik_min_version": "0.2.0", 

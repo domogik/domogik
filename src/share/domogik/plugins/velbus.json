@@ -34,12 +34,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "pyserial (>=2.6)", 
-            "type": "python"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "velbus.relay", 
@@ -85,7 +79,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/velbus/icon.png", 
-        "src/share/domogik/stats/velbus/lighting.device-velbus.json", 
+        "src/share/domogik/stats/velbus/lighting.device-velbus.xml", 
         "src/share/domogik/url2xpl/velbus/setlevel.xml", 
         "src/domogik/xpl/bin/velbus.py", 
         "src/domogik/xpl/lib/velbus.py", 
@@ -96,6 +90,12 @@
         "author_email": "maikel.puni@gmail.com", 
         "category": "velbus", 
         "changelog": "0.1.0\n- relays only\n- serial comunication only \n0.2.0\n- added socket comunication\n0.3.0\n- added dimmer support\n0.4.0\n- added blind (up/down) support", 
+        "dependencies": [
+            {
+                "id": "pyserial (>=2.6)", 
+                "type": "python"
+            }
+        ], 
         "description": "velbus interface", 
         "documentation": "http://wiki.domogik.org/plugin_velbus", 
         "domogik_min_version": "0.2.0", 

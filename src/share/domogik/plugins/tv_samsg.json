@@ -31,12 +31,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "pyserial (>=2.5)", 
-            "type": "python"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "multimedia.television", 
@@ -72,7 +66,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/tv_samsg/icon.png", 
-        "src/share/domogik/plugins/tv_samsg.json", 
+        "src/share/domogik/plugins/tv_samsg.xml", 
         "src/share/domogik/url2xpl/multimedia/power_on.xml", 
         "src/share/domogik/url2xpl/multimedia/power_standby.xml", 
         "src/share/domogik/url2xpl/multimedia/channel_up.xml", 
@@ -85,6 +79,12 @@
         "author_email": "fritz.smh at gmail.com", 
         "category": "multimedia", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "pyserial (>=2.5)", 
+                "type": "python"
+            }
+        ], 
         "description": "Control Samsung televisions :\n- Channel up/down\n- Volume up/down\n- 16/9, 4/3\n- Select input\n- ...", 
         "documentation": "http://wiki.domogik.org/plugin_tv_samsg", 
         "domogik_min_version": "0.2.0", 

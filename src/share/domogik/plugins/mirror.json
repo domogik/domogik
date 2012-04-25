@@ -21,12 +21,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "pyserial (>=2.5)", 
-            "type": "python"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "rfid.mirror_base", 
@@ -52,7 +46,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/mirror/icon.png", 
-        "src/share/domogik/plugins/mirror.json", 
+        "src/share/domogik/plugins/mirror.xml", 
         "src/share/domogik/stats/rfid/sensor.basic-mirror.xml", 
         "src/domogik/xpl/bin/mirror.py", 
         "src/domogik/xpl/lib/mirror.py"
@@ -62,6 +56,12 @@
         "author_email": "fritz.smh at gmail.com", 
         "category": "rfid", 
         "changelog": "0.2\n- adapt plugin for Domogik 0.2.0\n\n0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "pyserial (>=2.5)", 
+                "type": "python"
+            }
+        ], 
         "description": "Mir:ror device allow to detect RFID devices", 
         "documentation": "http://wiki.domogik.org/plugin_mirror", 
         "domogik_min_version": "0.2.0", 

@@ -51,12 +51,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "mechanize (>= 0.2.5)", 
-            "type": "python"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "communication.sms", 
@@ -72,7 +66,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/sms/icon.png", 
-        "src/share/domogik/plugins/sms.json", 
+        "src/share/domogik/plugins/sms.xml", 
         "src/share/domogik/url2xpl/communication/send_sms.xml", 
         "src/domogik/xpl/bin/sms.py", 
         "src/domogik/xpl/lib/sms_orange.py", 
@@ -84,6 +78,12 @@
         "author_email": "contact@gizmo-network.fr", 
         "category": "communication", 
         "changelog": "0.1.0\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "mechanize (>= 0.2.5)", 
+                "type": "python"
+            }
+        ], 
         "description": "Send SMS with french telephony providers : Orange, SFR, Bouygues", 
         "documentation": "http://wiki.domogik.org/plugin_sms", 
         "domogik_min_version": "0.1.0", 

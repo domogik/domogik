@@ -41,7 +41,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [], 
     "device_types": [], 
     "files": [], 
@@ -50,6 +49,7 @@
         "author_email": "fritz.smh at gmail.com", 
         "category": "communication", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
         "description": "Connect to a google agenda to get events agenda", 
         "documentation": "http://wiki.domogik.org/plugin_gagenda", 
         "domogik_min_version": "0.2.0", 

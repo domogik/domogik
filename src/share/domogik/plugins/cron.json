@@ -11,20 +11,6 @@
             "type": "boolean"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "apscheduler (>=2.0.2)", 
-            "type": "python"
-        }, 
-        {
-            "id": "pyserial (>=2.5)", 
-            "type": "python"
-        }, 
-        {
-            "id": "xpl_time", 
-            "type": "plugin"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "cron.toggle", 
@@ -50,7 +36,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/cron/icon.png", 
-        "src/share/domogik/plugins/cron.json", 
+        "src/share/domogik/plugins/cron.xml", 
         "src/share/domogik/stats/cron/cron.xml", 
         "src/domogik/xpl/bin/cron.py", 
         "src/domogik/xpl/lib/cron.py", 
@@ -61,6 +47,20 @@
         "author_email": "sgallet at gmail dot com", 
         "category": "cron", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "apscheduler (>=2.0.2)", 
+                "type": "python"
+            }, 
+            {
+                "id": "pyserial (>=2.5)", 
+                "type": "python"
+            }, 
+            {
+                "id": "xpl_time", 
+                "type": "plugin"
+            }
+        ], 
         "description": "Add a cron like to the XPL network.\n  Alpha release. Use with caution.\n  Actually this plugin stores jobs in RAM.\n  If you stop this plugin, you must resend all the jobs.", 
         "documentation": "http://wiki.domogik.org/plugin_cron", 
         "domogik_min_version": "0.2.0", 

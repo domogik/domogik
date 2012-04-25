@@ -121,20 +121,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "apscheduler (>=2.0.2)", 
-            "type": "python"
-        }, 
-        {
-            "id": "pyephem (>=3.7.5)", 
-            "type": "python"
-        }, 
-        {
-            "id": "xpl_time", 
-            "type": "plugin"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "dawndusk.status", 
@@ -150,7 +136,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/dawndusk/icon.png", 
-        "src/share/domogik/plugins/dawndusk.json", 
+        "src/share/domogik/plugins/dawndusk.xml", 
         "src/share/domogik/stats/dawndusk/dawndusk.basic.xml", 
         "src/share/domogik/url2xpl/dawndusk/daynight.xml", 
         "src/domogik/xpl/bin/dawndusk.py", 
@@ -161,6 +147,20 @@
         "author_email": "sgallet at gmail dot com", 
         "category": "dawndusk", 
         "changelog": "0.2\n- Update the plugin to domogik 0.2.0\n0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "apscheduler (>=2.0.2)", 
+                "type": "python"
+            }, 
+            {
+                "id": "pyephem (>=3.7.5)", 
+                "type": "python"
+            }, 
+            {
+                "id": "xpl_time", 
+                "type": "plugin"
+            }
+        ], 
         "description": "Get the dawn and dusk events using the geocoordinates.\n  Can also send commands to devices using this event.", 
         "documentation": "http://wiki.domogik.org/plugin_dawndusk", 
         "domogik_min_version": "0.2.0", 

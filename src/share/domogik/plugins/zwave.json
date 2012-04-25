@@ -31,12 +31,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "pyserial (>=2.5)", 
-            "type": "python"
-        }
-    ], 
     "device_feature_models": [
         {
             "device_type_id": "zwave.switch", 
@@ -72,7 +66,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/zwave/icon.png", 
-        "src/share/domogik/plugins/zwave.json", 
+        "src/share/domogik/plugins/zwave.xml", 
         "src/share/domogik/stats/zwave/zwave.basic-zwave.xml", 
         "src/share/domogik/url2xpl/zwave/level.xml", 
         "src/domogik/xpl/bin/zwave.py", 
@@ -83,6 +77,12 @@
         "author_email": "ricart.michael at gmail.com", 
         "category": "zwave", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "pyserial (>=2.5)", 
+                "type": "python"
+            }
+        ], 
         "description": "Z-wave is a radio based protocol to control lights, appliances and others things in your house", 
         "documentation": "http://wiki.domogik.org/tiki-index.php?page=plugin_zwave", 
         "domogik_min_version": "0.2.0", 

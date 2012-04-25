@@ -121,7 +121,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "mvhr.exchanger_efficiency", 
@@ -167,7 +166,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/mvhr/icon.png", 
-        "src/share/domogik/plugins/mvhr.json", 
+        "src/share/domogik/plugins/mvhr.xml", 
         "src/domogik/xpl/bin/mvhr.py", 
         "src/domogik/xpl/lib/mvhr.py", 
         "src/share/domogik/stats/mvhr/mvhr.basic.xml"
@@ -177,6 +176,7 @@
         "author_email": "sgallet at gmail dot com", 
         "category": "mvhr", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
         "description": "Calculate statistics of a Continuous Mechanical Extract\n  Ventilation with Heat Recovery (MVHR) and a Earth Cooling Tubes (ECT)", 
         "documentation": "http://wiki.domogik.org/plugin_mvhr", 
         "domogik_min_version": "0.2.0", 

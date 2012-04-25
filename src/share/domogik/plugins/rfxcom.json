@@ -21,7 +21,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "rfxcom.lighting1_x10_dimmer", 
@@ -564,6 +563,7 @@
         "author_email": "fritz.smh at gmail.com", 
         "category": "rfxcom", 
         "changelog": "0.1\n- create", 
+        "dependencies": [], 
         "description": "RFXCOM Usb 433.92MHz receiver and transmitter", 
         "documentation": "http://wiki.domogik.org/plugin_rfxcom", 
         "domogik_min_version": "0.2.0", 

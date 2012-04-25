@@ -51,12 +51,11 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [], 
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/nbz_tts/icon.png", 
-        "src/share/domogik/plugins/nbz_tts.json", 
+        "src/share/domogik/plugins/nbz_tts.xml", 
         "src/domogik/xpl/bin/nbz_tts.py", 
         "src/domogik/xpl/lib/nbz_tts.py"
     ], 
@@ -65,6 +64,7 @@
         "author_email": "Kriss@domogik.org", 
         "category": "communication", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
         "description": "Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server", 
         "documentation": "http://wiki.domogik.org/plugin_nbz_tts", 
         "domogik_min_version": "0.2.0", 

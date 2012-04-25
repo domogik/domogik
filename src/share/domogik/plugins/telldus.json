@@ -91,7 +91,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "telldus.switch", 
@@ -167,7 +166,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/telldus/icon.png", 
-        "src/share/domogik/plugins/telldus.json", 
+        "src/share/domogik/plugins/telldus.xml", 
         "src/share/domogik/stats/telldus/telldus.xml", 
         "src/share/domogik/stats/telldus/dawndusk.request.xml", 
         "src/share/domogik/stats/telldus/dawndusk.basic.xml", 
@@ -192,6 +191,7 @@
         "author_email": "sgallet at gmail dot com", 
         "category": "telldus", 
         "changelog": "0.2\n- Update XML description", 
+        "dependencies": [], 
         "description": "Manage many devices through TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n  they will appear automatically in Domogik", 
         "documentation": "http://wiki.domogik.org/plugin_telldus", 
         "domogik_min_version": "0.2.0", 

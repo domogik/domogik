@@ -11,7 +11,6 @@
             "type": "boolean"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "tschacon.switch", 
@@ -27,7 +26,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/tschacon/icon.png", 
-        "src/share/domogik/plugins/tschacon.json", 
+        "src/share/domogik/plugins/tschacon.xml", 
         "src/share/domogik/stats/tschacon/arctech.tschacon.xml", 
         "src/share/domogik/url2xpl/tschacon/on.xml", 
         "src/share/domogik/url2xpl/tschacon/off.xml", 
@@ -39,6 +38,7 @@
         "author_email": "julien at garet dot info", 
         "category": "tschacon", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
         "description": "Manage Chacon / Di-O devices through TellStick", 
         "documentation": "#TODO", 
         "domogik_min_version": "0.2.0", 

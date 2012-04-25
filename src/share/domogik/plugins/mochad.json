@@ -51,7 +51,6 @@
             "type": "boolean"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "x10.switch", 
@@ -97,7 +96,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/mochad/icon.png", 
-        "src/share/domogik/plugins/mochad.json", 
+        "src/share/domogik/plugins/mochad.xml", 
         "src/share/domogik/stats/x10/x10.basic-mochad.xml", 
         "src/share/domogik/url2xpl/x10/bright.xml", 
         "src/share/domogik/url2xpl/x10/dim.xml", 
@@ -111,6 +110,7 @@
         "author_email": "julien at garet dot info", 
         "category": "x10", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
         "description": "X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs mochad to work", 
         "documentation": "http://wiki.domogik.org/plugin_mochad", 
         "domogik_min_version": "0.2.0", 

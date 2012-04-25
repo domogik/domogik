@@ -21,7 +21,6 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "communication.tts", 
@@ -37,7 +36,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/tts/icon.png", 
-        "src/share/domogik/plugins/tts.json", 
+        "src/share/domogik/plugins/tts.xml", 
         "src/share/domogik/url2xpl/communication/tts.xml", 
         "src/domogik/xpl/bin/tts.py", 
         "src/domogik/xpl/lib/tts.py"
@@ -47,6 +46,7 @@
         "author_email": "contact@gizmo-network.fr", 
         "category": "communication", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
         "description": "Text to speech", 
         "documentation": "http://wiki.domogik.org/plugin_tts", 
         "domogik_min_version": "0.2.0", 

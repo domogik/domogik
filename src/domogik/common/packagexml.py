@@ -414,7 +414,7 @@ class PackageXml():
         for dep in self.dependencies:
             my_dep.append({"type" : dep["type"],
                            "id" : dep["id"]})
-        my_json["dependencies"] = my_dep
+        my_json["identity"]["dependencies"] = my_dep
 
         # udev rules
         my_udev = [] 

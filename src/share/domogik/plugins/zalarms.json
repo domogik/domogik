@@ -201,12 +201,11 @@
             "type": "string"
         }
     ], 
-    "dependencies": [], 
     "device_feature_models": [], 
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/zalarms/icon.png", 
-        "src/share/domogik/plugins/zalarms.json", 
+        "src/share/domogik/plugins/zalarms.xml", 
         "src/domogik/xpl/bin/zalarms.py", 
         "src/domogik/xpl/lib/zalarms.py"
     ], 
@@ -215,6 +214,7 @@
         "author_email": "sgallet at gmail dot com", 
         "category": "cron", 
         "changelog": "0.2\n- #TO DEFINE#\n0.1\n- Initial release", 
+        "dependencies": [], 
         "description": "A poor interface to the cron plugin.\n  You can only create an alarm message.\n  Read the wiki for documentation.", 
         "documentation": "http://wiki.domogik.org/plugin_zalarms", 
         "domogik_min_version": "0.2.0", 

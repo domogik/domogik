@@ -31,17 +31,11 @@
             "type": "string"
         }
     ], 
-    "dependencies": [
-        {
-            "id": "pySerial > 2.4", 
-            "type": "python"
-        }
-    ], 
     "device_feature_models": [], 
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/xpl2ser/icon.png", 
-        "src/share/domogik/plugins/xpl2ser.json", 
+        "src/share/domogik/plugins/xpl2ser.xml", 
         "src/domogik/xpl/bin/xpl2ser.py", 
         "src/domogik/xpl/lib/xpl2ser.py"
     ], 
@@ -50,6 +44,12 @@
         "author_email": "#", 
         "category": "bridge", 
         "changelog": "0.1\n- plugin creation", 
+        "dependencies": [
+            {
+                "id": "pySerial > 2.4", 
+                "type": "python"
+            }
+        ], 
         "description": "When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.", 
         "documentation": "#", 
         "domogik_min_version": "0.2.0", 
