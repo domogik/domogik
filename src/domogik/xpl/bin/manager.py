@@ -747,14 +747,14 @@ class SysManager(XplPlugin):
                     pkg_json = PackageJson(path = json_file).json
    
                     # register plugin
-                    self._external_models.append({"type" : pkg_json.type,
-                                      "name" : pkg_json.id, 
-                                      "description" : pkg_json.desc, 
-                                      "technology" : pkg_json.techno,
-                                      "version" : pkg_json.version,
-                                      "documentation" : pkg_json.doc,
-                                      "vendor_id" : pkg_json.vendor_id,
-                                      "device_id" : pkg_json.device_id})
+                    self._external_models.append({"type" : pkg_json["identity"]["type"],
+                                      "name" : pkg_json["identity"]["id"], 
+                                      "description" : pkg_json["identity"]["description"], 
+                                      "technology" : pkg_json["identity"]["category"],
+                                      "version" : pkg_json["identity"]["version"],
+                                      "documentation" : pkg_json["identity"]["documentation"],
+                                      "vendor_id" : pkg_json["external"]["vendor_id"],
+                                      "device_id" : pkg_json["external"]["device_id"]})
 
                 except:
                     msg = "Error reading json file : %s\n%s" % (json_file, str(traceback.format_exc()))
@@ -905,15 +905,15 @@ class SysManager(XplPlugin):
                     pkg_json = PackageJson(path = json_file).json
 
                     # register plugin
-                    self._plugins.append({"type" : pkg_json.type,
-                                      "name" : pkg_json.id, 
-                                      "description" : pkg_json.desc, 
-                                      "technology" : pkg_json.techno,
+                    self._plugins.append({"type" : pkg_json["identity"]["type"],
+                                      "name" : pkg_json["identity"]["id"], 
+                                      "description" : pkg_json["identity"]["description"], 
+                                      "technology" : pkg_json["identity"]["category"],
                                       "status" : "OFF",
                                       "host" : self.get_sanitized_hostname(), 
-                                      "version" : pkg_json.version,
-                                      "documentation" : pkg_json.doc,
-                                      "configuration" : pkg_json.configuration,
+                                      "version" : pkg_json["identity"]["version"],
+                                      "documentation" : pkg_json["identity"]["documentation"],
+                                      "configuration" : pkg_json["configuration"],
                                       "check_startup_option" : True})
 
                 except:
@@ -1177,7 +1177,7 @@ class SysManager(XplPlugin):
 
         pkg_json = PackageJson(pkg_id, pkg_type = pkg_type).json
         idx = 0
-        for dep in pkg_json.dependencies:
+        for dep in pkg_json["identity"]["dependencies"]:
             mess.add_data({"dep%s-id" % idx : dep["id"]})
             mess.add_data({"dep%s-type" % idx : dep["type"]})
             idx += 1
@@ -1205,7 +1205,7 @@ class SysManager(XplPlugin):
             return
 
         idx = 0
-        for rule in pkg_json.udev_rules:
+        for rule in pkg_json["udev-rules"]:
             mess.add_data({"rule%s-model" % idx : rule["model"]})
             mess.add_data({"rule%s-desc" % idx : rule["desc"]})
             mess.add_data({"rule%s-filename" % idx : rule["filename"]})
