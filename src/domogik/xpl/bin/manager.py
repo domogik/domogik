@@ -170,6 +170,7 @@ class SysManager(XplPlugin):
             self._package_path = conf['package_path']
             self.log.info("Set package path to '%s' " % self._package_path)
             print("Set package path to '%s' " % self._package_path)
+            # TODO : move the sys.path.append near the __import__ and add a test if already appended
             sys.path.append(self._package_path)
             self._json_plugin_directory = os.path.join(self._package_path, "packages/plugins/")
             self._json_external_directory = os.path.join(self._package_path, "packages/externals/")

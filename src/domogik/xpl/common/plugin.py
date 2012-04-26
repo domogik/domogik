@@ -60,6 +60,7 @@ def load_plugin_library(name, element):
     conf = dict(config[1])
     if conf.has_key('package_path'):
         print("Load library from packages")
+        sys.path.append(conf["package_path"])
         lib_path = "packages.xpl.lib." + name
     else:
         print("Load library from sources")
