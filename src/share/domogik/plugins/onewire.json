@@ -166,7 +166,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/onewire/icon.png", 
-        "src/share/domogik/plugins/onewire.xml", 
+        "src/share/domogik/plugins/onewire.json", 
         "src/share/domogik/stats/1wire/sensor.basic-onewire.xml", 
         "src/domogik/xpl/bin/onewire.py", 
         "src/domogik/xpl/lib/onewire.py"

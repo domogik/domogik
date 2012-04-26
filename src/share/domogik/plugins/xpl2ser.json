@@ -35,7 +35,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/xpl2ser/icon.png", 
-        "src/share/domogik/plugins/xpl2ser.xml", 
+        "src/share/domogik/plugins/xpl2ser.json", 
         "src/domogik/xpl/bin/xpl2ser.py", 
         "src/domogik/xpl/lib/xpl2ser.py"
     ], 

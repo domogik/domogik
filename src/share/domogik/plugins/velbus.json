@@ -79,7 +79,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/velbus/icon.png", 
-        "src/share/domogik/stats/velbus/lighting.device-velbus.xml", 
+        "src/share/domogik/stats/velbus/lighting.device-velbus.json", 
         "src/share/domogik/url2xpl/velbus/setlevel.xml", 
         "src/domogik/xpl/bin/velbus.py", 
         "src/domogik/xpl/lib/velbus.py", 

@@ -166,7 +166,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/mvhr/icon.png", 
-        "src/share/domogik/plugins/mvhr.xml", 
+        "src/share/domogik/plugins/mvhr.json", 
         "src/domogik/xpl/bin/mvhr.py", 
         "src/domogik/xpl/lib/mvhr.py", 
         "src/share/domogik/stats/mvhr/mvhr.basic.xml"

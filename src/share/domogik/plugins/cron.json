@@ -36,7 +36,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/cron/icon.png", 
-        "src/share/domogik/plugins/cron.xml", 
+        "src/share/domogik/plugins/cron.json", 
         "src/share/domogik/stats/cron/cron.xml", 
         "src/domogik/xpl/bin/cron.py", 
         "src/domogik/xpl/lib/cron.py", 

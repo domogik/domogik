@@ -166,7 +166,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/telldus/icon.png", 
-        "src/share/domogik/plugins/telldus.xml", 
+        "src/share/domogik/plugins/telldus.json", 
         "src/share/domogik/stats/telldus/telldus.xml", 
         "src/share/domogik/stats/telldus/dawndusk.request.xml", 
         "src/share/domogik/stats/telldus/dawndusk.basic.xml", 

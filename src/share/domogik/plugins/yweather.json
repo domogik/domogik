@@ -196,7 +196,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/yweather/icon.png", 
-        "src/share/domogik/plugins/yweather.xml", 
+        "src/share/domogik/plugins/yweather.json", 
         "src/domogik/xpl/bin/yweather.py", 
         "src/domogik/xpl/lib/yweather.py", 
         "src/share/domogik/stats/online_service/sensor.basic-yweather.xml"

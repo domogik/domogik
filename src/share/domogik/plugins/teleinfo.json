@@ -166,7 +166,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/teleinfo/icon.png", 
-        "src/share/domogik/plugins/teleinfo.xml", 
+        "src/share/domogik/plugins/teleinfo.json", 
         "src/share/domogik/stats/teleinfo/teleinfo.basic-teleinfo.xml", 
         "src/share/domogik/stats/teleinfo/teleinfo.short-teleinfo.xml", 
         "src/domogik/xpl/bin/teleinfo.py", 

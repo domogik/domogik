@@ -46,7 +46,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/mirror/icon.png", 
-        "src/share/domogik/plugins/mirror.xml", 
+        "src/share/domogik/plugins/mirror.json", 
         "src/share/domogik/stats/rfid/sensor.basic-mirror.xml", 
         "src/domogik/xpl/bin/mirror.py", 
         "src/domogik/xpl/lib/mirror.py"

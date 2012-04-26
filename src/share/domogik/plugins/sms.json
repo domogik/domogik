@@ -66,7 +66,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/sms/icon.png", 
-        "src/share/domogik/plugins/sms.xml", 
+        "src/share/domogik/plugins/sms.json", 
         "src/share/domogik/url2xpl/communication/send_sms.xml", 
         "src/domogik/xpl/bin/sms.py", 
         "src/domogik/xpl/lib/sms_orange.py", 

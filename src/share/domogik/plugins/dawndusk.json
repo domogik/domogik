@@ -136,7 +136,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/dawndusk/icon.png", 
-        "src/share/domogik/plugins/dawndusk.xml", 
+        "src/share/domogik/plugins/dawndusk.json", 
         "src/share/domogik/stats/dawndusk/dawndusk.basic.xml", 
         "src/share/domogik/url2xpl/dawndusk/daynight.xml", 
         "src/domogik/xpl/bin/dawndusk.py", 

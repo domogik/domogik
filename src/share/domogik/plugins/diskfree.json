@@ -76,7 +76,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/diskfree/icon.png", 
-        "src/share/domogik/plugins/diskfree.xml", 
+        "src/share/domogik/plugins/diskfree.json", 
         "src/share/domogik/stats/computer/sensor.basic-diskfree.xml", 
         "src/domogik/xpl/bin/diskfree.py", 
         "src/domogik/xpl/lib/diskfree.py"

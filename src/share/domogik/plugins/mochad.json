@@ -96,7 +96,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/mochad/icon.png", 
-        "src/share/domogik/plugins/mochad.xml", 
+        "src/share/domogik/plugins/mochad.json", 
         "src/share/domogik/stats/x10/x10.basic-mochad.xml", 
         "src/share/domogik/url2xpl/x10/bright.xml", 
         "src/share/domogik/url2xpl/x10/dim.xml", 

@@ -36,7 +36,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/tts/icon.png", 
-        "src/share/domogik/plugins/tts.xml", 
+        "src/share/domogik/plugins/tts.json", 
         "src/share/domogik/url2xpl/communication/tts.xml", 
         "src/domogik/xpl/bin/tts.py", 
         "src/domogik/xpl/lib/tts.py"

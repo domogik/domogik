@@ -86,7 +86,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/wol_ping/icon.png", 
-        "src/share/domogik/plugins/wol_ping.xml", 
+        "src/share/domogik/plugins/wol_ping.json", 
         "src/share/domogik/stats/computer/sensor.basic-wol_ping.xml", 
         "src/share/domogik/url2xpl/computer/wol.xml", 
         "src/domogik/xpl/bin/wol_ping.py", 

@@ -45,7 +45,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/karotz/icon.png", 
-        "src/share/domogik/plugins/karotz.xml", 
+        "src/share/domogik/plugins/karotz.json", 
         "src/share/domogik/url2xpl/karotz/tts.xml", 
         "src/share/domogik/url2xpl/karotz/led.xml", 
         "src/share/domogik/url2xpl/karotz/ears.xml", 

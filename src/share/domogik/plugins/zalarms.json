@@ -205,7 +205,7 @@
     "device_types": [], 
     "files": [
         "src/share/domogik/design/plugin/zalarms/icon.png", 
-        "src/share/domogik/plugins/zalarms.xml", 
+        "src/share/domogik/plugins/zalarms.json", 
         "src/domogik/xpl/bin/zalarms.py", 
         "src/domogik/xpl/lib/zalarms.py"
     ], 
