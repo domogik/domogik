@@ -38,7 +38,7 @@ from domogik.xpl.common.xplconnector import Listener, XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.zibase import APIZiBase, get_ip_address, ServerZiBase
+from domogik_plugins.xpl.lib.zibase import APIZiBase, get_ip_address, ServerZiBase
 import threading
 import traceback
 

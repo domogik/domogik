@@ -39,8 +39,8 @@ from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.yweather import YWeather
-from domogik.xpl.lib.yweather import YWeatherException
+from domogik_plugins.xpl.lib.yweather import YWeather
+from domogik_plugins.xpl.lib.yweather import YWeatherException
 import threading
 import datetime
 

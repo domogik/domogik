@@ -38,7 +38,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.lib.nbz_tts import NBZNotification
+from domogik_plugins.xpl.lib.nbz_tts import NBZNotification
 from domogik.xpl.common.queryconfig import Query
 
 

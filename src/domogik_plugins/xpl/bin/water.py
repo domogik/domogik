@@ -39,8 +39,8 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.xplconnector import Listener
-#from domogik.xpl.lib.mirror import Water
-#from domogik.xpl.lib.mirror import WaterException
+#from domogik_plugins.xpl.lib.mirror import Water
+#from domogik_plugins.xpl.lib.mirror import WaterException
 import re
 
 

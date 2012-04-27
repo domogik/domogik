@@ -42,8 +42,8 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.xpl2ser import XplBridge
-from domogik.xpl.lib.xpl2ser import XplBridgeException
+from domogik_plugins.xpl.lib.xpl2ser import XplBridge
+from domogik_plugins.xpl.lib.xpl2ser import XplBridgeException
 import threading
 import traceback
 

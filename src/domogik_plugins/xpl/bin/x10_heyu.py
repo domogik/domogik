@@ -41,9 +41,9 @@ import os
 import traceback
 
 if os.name == 'nt':
-    from domogik.xpl.lib.win_x10_heyu import X10API
+    from domogik_plugins.xpl.lib.win_x10_heyu import X10API
 else:
-    from domogik.xpl.lib.x10_heyu import X10API, HeyuManager
+    from domogik_plugins.xpl.lib.x10_heyu import X10API, HeyuManager
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin

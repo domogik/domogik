@@ -41,7 +41,7 @@ Implements
 
 import traceback
 
-from domogik.xpl.lib.mochad import *
+from domogik_plugins.xpl.lib.mochad import *
 import os.path
 
 class mochad(Mochad):

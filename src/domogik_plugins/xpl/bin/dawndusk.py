@@ -45,8 +45,8 @@ from domogik.xpl.common.plugin import XplPlugin
 import datetime
 #from datetime import timedelta
 #from datetime import datetime
-from domogik.xpl.lib.dawndusk import DawnduskAPI
-from domogik.xpl.lib.dawndusk import DawnduskException
+from domogik_plugins.xpl.lib.dawndusk import DawnduskAPI
+from domogik_plugins.xpl.lib.dawndusk import DawnduskException
 import traceback
 #import logging
 #logging.basicConfig()

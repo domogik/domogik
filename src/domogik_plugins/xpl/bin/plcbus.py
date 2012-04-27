@@ -40,7 +40,7 @@ Implements
 from domogik.xpl.common.xplconnector import Listener, XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.plcbus import PLCBUSAPI
+from domogik_plugins.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
 import threading
 import time

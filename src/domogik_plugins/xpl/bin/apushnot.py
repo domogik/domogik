@@ -40,7 +40,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.lib.apushnot import APushNotification
+from domogik_plugins.xpl.lib.apushnot import APushNotification
 from domogik.xpl.common.queryconfig import Query
 
 

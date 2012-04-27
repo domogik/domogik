@@ -38,12 +38,12 @@ TODO
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.onewire import OneWireException
-from domogik.xpl.lib.onewire import OneWireNetwork
-from domogik.xpl.lib.onewire import ComponentDs18b20
-from domogik.xpl.lib.onewire import ComponentDs18s20
-from domogik.xpl.lib.onewire import ComponentDs2401
-from domogik.xpl.lib.onewire import ComponentDs2438
+from domogik_plugins.xpl.lib.onewire import OneWireException
+from domogik_plugins.xpl.lib.onewire import OneWireNetwork
+from domogik_plugins.xpl.lib.onewire import ComponentDs18b20
+from domogik_plugins.xpl.lib.onewire import ComponentDs18s20
+from domogik_plugins.xpl.lib.onewire import ComponentDs2401
+from domogik_plugins.xpl.lib.onewire import ComponentDs2438
 import ow
 import traceback
 import time

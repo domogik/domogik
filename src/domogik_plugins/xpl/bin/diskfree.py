@@ -38,7 +38,7 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.diskfree import Disk
+from domogik_plugins.xpl.lib.diskfree import Disk
 import threading
 import traceback
 

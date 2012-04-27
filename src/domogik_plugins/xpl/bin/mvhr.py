@@ -35,8 +35,8 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.helperplugin import XplHlpPlugin
-from domogik.xpl.lib.mvhr import HvacMvhr
+from domogik_plugins.xpl.lib.helperplugin import XplHlpPlugin
+from domogik_plugins.xpl.lib.mvhr import HvacMvhr
 import traceback
 #import logging
 #logging.basicConfig()

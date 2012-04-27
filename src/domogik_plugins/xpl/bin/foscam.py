@@ -30,7 +30,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin 
 from domogik.xpl.common.xplmessage import XplMessage 
 from domogik.xpl.common.queryconfig import Query 
-from domogik.xpl.lib.foscam import RELAY 
+from domogik_plugins.xpl.lib.foscam import RELAY 
 
 class foscam(XplPlugin):
     """ Implements a listener for Foscam relay messages on xPL network

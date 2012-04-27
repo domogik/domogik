@@ -38,8 +38,8 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.mirror import Mirror
-from domogik.xpl.lib.mirror import MirrorException
+from domogik_plugins.xpl.lib.mirror import Mirror
+from domogik_plugins.xpl.lib.mirror import MirrorException
 import threading
 
 

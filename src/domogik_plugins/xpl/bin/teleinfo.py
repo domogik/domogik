@@ -38,8 +38,8 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.lib.teleinfo import Teleinfo
-from domogik.xpl.lib.teleinfo import TeleinfoException
+from domogik_plugins.xpl.lib.teleinfo import Teleinfo
+from domogik_plugins.xpl.lib.teleinfo import TeleinfoException
 from domogik.xpl.common.queryconfig import Query
 import threading
 import re

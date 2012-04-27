@@ -41,7 +41,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.zwave import ZWave
+from domogik_plugins.xpl.lib.zwave import ZWave
 from time import sleep
 
 class Zwave(XplPlugin):

@@ -93,9 +93,9 @@ request :
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.cron import CronAPI
-from domogik.xpl.lib.cron import CronException
-from domogik.xpl.lib.helperplugin import XplHlpPlugin
+from domogik_plugins.xpl.lib.cron import CronAPI
+from domogik_plugins.xpl.lib.cron import CronException
+from domogik_plugins.xpl.lib.helperplugin import XplHlpPlugin
 import traceback
 #import logging
 

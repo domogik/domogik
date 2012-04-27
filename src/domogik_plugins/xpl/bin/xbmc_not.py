@@ -37,7 +37,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.lib.xbmc_not import XBMCNotification
+from domogik_plugins.xpl.lib.xbmc_not import XBMCNotification
 from domogik.xpl.common.queryconfig import Query
 
 

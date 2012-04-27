@@ -38,7 +38,7 @@ from domogik.xpl.common.xplconnector import Listener, XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.karotz import Karotz
+from domogik_plugins.xpl.lib.karotz import Karotz
 import traceback
 
 

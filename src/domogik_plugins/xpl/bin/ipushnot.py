@@ -40,7 +40,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.lib.ipushnot import IPushNotification
+from domogik_plugins.xpl.lib.ipushnot import IPushNotification
 
 
 class IPushNotificationListener(XplPlugin):

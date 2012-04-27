@@ -40,8 +40,8 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.knx import KNXException
-from domogik.xpl.lib.knx import KNX
+from domogik_plugins.xpl.lib.knx import KNXException
+from domogik_plugins.xpl.lib.knx import KNX
 from domogik.common.configloader import *
 from struct import * 
 import threading

@@ -61,11 +61,11 @@ class SmsManager(XplPlugin):
 	operator = operator.lower()
 
         if (operator == "orange"):
-		from domogik.xpl.lib.sms_orange import Sms
+		from domogik_plugins.xpl.lib.sms_orange import Sms
 	if (operator == "sfr"):
-		from domogik.xpl.lib.sms_sfr import Sms
+		from domogik_plugins.xpl.lib.sms_sfr import Sms
 	if (operator == "bouygues"):
-		from domogik.xpl.lib.sms_bouygues import Sms		
+		from domogik_plugins.xpl.lib.sms_bouygues import Sms		
         self.log.debug("Init info for sms created")
         ### Create Sms objects
         self.my_sms = Sms(self.log,login,password,phone)

@@ -43,7 +43,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.x10cm15a import X10API
+from domogik_plugins.xpl.lib.x10cm15a import X10API
 import os.path
 
 class X10Main(XplPlugin):

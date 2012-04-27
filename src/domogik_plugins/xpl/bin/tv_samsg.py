@@ -39,7 +39,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.tv_samsg import SamsungTV, SamsungTVException
+from domogik_plugins.xpl.lib.tv_samsg import SamsungTV, SamsungTVException
 
 
 class SamsungTVManager(XplPlugin):

@@ -38,7 +38,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.plugin import XplPlugin
 import datetime
-from domogik.xpl.lib.zalarms import zalarmsAPI
+from domogik_plugins.xpl.lib.zalarms import zalarmsAPI
 import traceback
 import logging
 
