@@ -79,12 +79,12 @@ class PackageJson():
 
                 if pkg_type == "plugin":
                     if conf.has_key('package_path'):
-                        json_directory = "%s/packages/plugins/" % (conf['package_path'])
+                        json_directory = "%s/domogik_packages/plugins/" % (conf['package_path'])
                     else:
                         json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/plugins/")
                 elif pkg_type == "external":
                     if conf.has_key('package_path'):
-                        json_directory = "%s/packages/externals/" % (conf['package_path'])
+                        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
                     else:
                         json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
@@ -96,7 +96,7 @@ class PackageJson():
 
                 # icon file
                 if conf.has_key('package_path'):
-                    self.icon_file = "%s/packages/design/%s/%s/icon.png" % (conf['package_path'], pkg_type, id)
+                    self.icon_file = "%s/domogik_packages/design/%s/%s/icon.png" % (conf['package_path'], pkg_type, id)
                 else:
                     self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['src_prefix'], "share/domogik/design/", pkg_type, id)
     

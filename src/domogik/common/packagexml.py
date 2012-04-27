@@ -80,12 +80,12 @@ class PackageXml():
 
                 if pkg_type == "plugin":
                     if conf.has_key('package_path'):
-                        xml_directory = "%s/packages/plugins/" % (conf['package_path'])
+                        xml_directory = "%s/domogik_packages/plugins/" % (conf['package_path'])
                     else:
                         xml_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/plugins/")
                 elif pkg_type == "external":
                     if conf.has_key('package_path'):
-                        xml_directory = "%s/packages/externals/" % (conf['package_path'])
+                        xml_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
                     else:
                         xml_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
@@ -97,7 +97,7 @@ class PackageXml():
 
                 # icon file
                 if conf.has_key('package_path'):
-                    xml_directory = "%s/packages/design/" % (conf['package_path'])
+                    xml_directory = "%s/domogik_packages/design/" % (conf['package_path'])
                 else:
                     self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['src_prefix'], "share/domogik/design/", pkg_type, id)
     

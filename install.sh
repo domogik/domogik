@@ -158,7 +158,7 @@ function copy_sample_files {
         fi
     done
     # create folders for packages management
-    for pkg_rep in packages packages/plugins packages/externals packages/stats packages/url2xpl packages/design packages/data
+    for pkg_rep in domogik_packages domogik_packages/plugins domogik_packages/externals domogik_packages/stats domogik_packages/url2xpl domogik_packages/design domogik_packages/data
       do
         if [ ! -d $DMG_LIB/$pkg_rep ];then
             mkdir $DMG_LIB/$pkg_rep
@@ -397,9 +397,11 @@ function install_plugins {
     if [ "$MODE" = "develop" ];then
         chmod +x src/tools/packages/insert_data.py 
         for file in src/share/domogik/plugins/*.json;do
-            echo "** Parse $file"
-            su -c "src/tools/packages/insert_data.py $file" $d_user
-            echo "** File $file parsed"
+            if [[ $file != "src/share/domogik/plugins/*.json" ]] ; then
+                echo "** Parse $file"
+                su -c "src/tools/packages/insert_data.py $file" $d_user
+                echo "** File $file parsed"
+            fi
         done
         for file in src/share/domogik/externals/*.json;do
             if [[ $file != "src/share/domogik/externals/*.json" ]] ; then

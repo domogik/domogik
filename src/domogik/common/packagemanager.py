@@ -82,8 +82,8 @@ config = cfg.load()
 conf = dict(config[1])
 REST_URL = "http://%s:%s" % (conf["rest_server_ip"], conf ["rest_server_port"])
 
-PLUGIN_JSON_PATH = "%s/packages/plugins" % INSTALL_PATH
-EXTERNAL_JSON_PATH = "%s/packages/externals" % INSTALL_PATH
+PLUGIN_JSON_PATH = "%s/domogik_packages/plugins" % INSTALL_PATH
+EXTERNAL_JSON_PATH = "%s/domogik_packages/externals" % INSTALL_PATH
 
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
@@ -440,9 +440,9 @@ class PackageManager():
 
         try:
             if pkg_type in ('plugin'):
-                os.unlink("%s/packages/plugins/%s.json" %(INSTALL_PATH, id))
+                os.unlink("%s/domogik_packages/plugins/%s.json" %(INSTALL_PATH, id))
             elif pkg_type in ('external'):
-                os.unlink("%s/packages/externals/%s.json" %(INSTALL_PATH, id))
+                os.unlink("%s/domogik_packages/externals/%s.json" %(INSTALL_PATH, id))
             else:
                 raise PackageException("Package type '%s' not uninstallable" % pkg_type)
         except:
@@ -483,7 +483,7 @@ class PackageManager():
         ### create needed directories
         # create install directory
         self.log("Creating directories for %s..." % pkg_type)
-        plg_path = "%s/packages/" % (install_path)
+        plg_path = "%s/domogik_packages/" % (install_path)
         self._create_folder(plg_path)
 
         ### copy files

@@ -170,10 +170,10 @@ class SysManager(XplPlugin):
             self._package_path = conf['package_path']
             self.log.info("Set package path to '%s' " % self._package_path)
             print("Set package path to '%s' " % self._package_path)
-            # TODO : move the sys.path.append near the __import__ and add a test if already appended
+            # TODO : move the sys.path.append near the __import__ and add a test if already appended ?
             sys.path.append(self._package_path)
-            self._json_plugin_directory = os.path.join(self._package_path, "packages/plugins/")
-            self._json_external_directory = os.path.join(self._package_path, "packages/externals/")
+            self._json_plugin_directory = os.path.join(self._package_path, "domogik_packages/plugins/")
+            self._json_external_directory = os.path.join(self._package_path, "domogik_packages/externals/")
             self.package_mode = True
         else:
             self.log.info("No package path defined in config file")
@@ -674,10 +674,10 @@ class SysManager(XplPlugin):
         """
         self.log.info("Start the component %s" % name)
         print("Start %s" % name)
-        if name == "dbmgr" or name == "rest" or self._package_path == None:
+        if name == "dbmgr" or name == "rest":
             plg_path = "domogik.xpl.bin." + name
         else:
-            plg_path = "packages.xpl.bin." + name
+            plg_path = "domogik_packages.xpl.bin." + name
         __import__(plg_path)
         plugin = sys.modules[plg_path]
         self.log.debug("Component path : %s" % plugin.__file__)
