@@ -54,7 +54,7 @@ import datetime
 import os
 import glob
 import random
-import domogik.xpl.helpers
+#import domogik_packages.xpl.helpers
 import pkgutil
 import uuid
 import stat
@@ -183,6 +183,11 @@ class ProcessRequest():
         self.jsonp = False
         self.jsonp_cb = ""
         self.csv_export = False
+
+        # package path
+        if self._package_path != None:  # package mode
+            self._package_path = conf['package_path']
+            sys.path.append(self._package_path)
 
         # url processing
         #self.path = self.fixurl(self.path)
@@ -3548,7 +3553,7 @@ target=*
             return
 
 
-        package = domogik.xpl.helpers
+        package = domogik_packages.xpl.helpers
         if command == "help":
             output = ["List of available helpers :"]
             for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
@@ -3568,7 +3573,7 @@ target=*
             try:
                 for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
                     if plgname == command:
-                        helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
+                        helper = __import__('domogik_packages.xpl.helpers.%s' % plgname, fromlist="dummy")
                         try:
                             helper_object = helper.MY_CLASS["cb"]()
                             if len(self.rest_request) == 2:
