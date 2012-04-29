@@ -31,10 +31,7 @@ function generate_pkg() {
     -X .coverage  \
     -X .hgignore  \
     -X src/domogik/ui/  \
-    -X src/domogik/xpl/bin/ \
-    -X src/domogik/xpl/lib/ \
-    -X src/domogik/xpl/helpers/ \
-    -X src/domogik/xpl/mocks/  \
+    -X src/domogik_packages/ \
     -X src/external/ \
     -X src/mpris/ \
     -X src/share/ \
@@ -42,18 +39,6 @@ function generate_pkg() {
     -X src/tools/drm/ \
     -X src/tools/drm-yii/ \
     -X src/tools/ipx800/ \
-    -I src/domogik/xpl/__init__.py \
-    -I src/domogik/xpl/bin/__init__.py \
-    -I src/domogik/xpl/bin/dbmgr.py \
-    -I src/domogik/xpl/bin/dump_xpl.py \
-    -I src/domogik/xpl/bin/manager.py \
-    -I src/domogik/xpl/bin/pkgmgr.py \
-    -I src/domogik/xpl/bin/rest.py \
-    -I src/domogik/xpl/bin/send.py \
-    -I src/domogik/xpl/bin/version.py \
-    -I src/domogik/xpl/helpers/__init__.py \
-    -I src/domogik/xpl/lib/__init__.py \
-    -I src/domogik/xpl/lib/rest \
     -t tgz $ARCHIVE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
