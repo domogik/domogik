@@ -1080,7 +1080,7 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
 
         msg = {"device" : address, 
                "command" : cmnd}
-        msg.update(options))
+        msg.update(options)
         self._callback("x10.security", msg)
 
         self._callback("sensor.basic",
