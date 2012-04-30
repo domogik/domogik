@@ -446,7 +446,7 @@ class PackageXml():
         my_json["technology"] = self.technology
 
         # type
-        my_json["device_types"] = self.device_types = []
+        my_json["device_types"] = self.device_types 
 
         # features
         my_json["device_feature_models"] = self.device_feature_models 

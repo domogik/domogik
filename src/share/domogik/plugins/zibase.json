@@ -293,10 +293,66 @@
             "value_type": "number"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "zibase.switch", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer", 
+            "id": "zibase.dimmer", 
+            "name": "Dimmer"
+        }, 
+        {
+            "description": "Oregon-THR128, Oregon-THR138, Oregon-THC138, Oregon-THC238/268, Oregon-THN122N/132N, Oregon-THWR288A, Oregon-THRN122N, Oregon-AW129, Oregon-AW131, Oregon-THWR800, Oregon-RTHN318", 
+            "id": "zibase.temp", 
+            "name": "Oregon Temperature"
+        }, 
+        {
+            "description": "Oregon-THGN122N/123N, Oregon-THGR122NX, Oregon-THGR228N, Oregon-THGR238/268, Oregon-THGR810, Oregon-RTGR328N, Oregon-THGR328N, Oregon-WTGR800, Oregon-THGR918, Oregon-THGRN228NX, Oregon-THGN500", 
+            "id": "zibase.th", 
+            "name": "Oregon Temp-Hygro"
+        }, 
+        {
+            "description": "Oregon-WTGR800, Oregon-WGR800, Huger-STR918, Oregon-WGR918", 
+            "id": "zibase.wind", 
+            "name": "Anemometer"
+        }, 
+        {
+            "description": "Oregon-UVN128, Oregon-UV138, Oregon-UVN800", 
+            "id": "zibase.uv", 
+            "name": "UV sensor"
+        }, 
+        {
+            "description": "Oregon-RGR126, Oregon-RGR682, Oregon-RGR918, Oregon-PCR800", 
+            "id": "zibase.rain", 
+            "name": "Rain Gauge"
+        }, 
+        {
+            "description": "OWL CM119 / OWL CM130", 
+            "id": "zibase.elec", 
+            "name": "Power meter"
+        }, 
+        {
+            "description": "Digimax", 
+            "id": "zibase.digimax", 
+            "name": "Digimax"
+        }, 
+        {
+            "description": "motion sensors, door sensors ...", 
+            "id": "zibase.sensor", 
+            "name": "ON/OFF Sensor"
+        }, 
+        {
+            "description": "ZiBase Internal variables", 
+            "id": "zibase.intvar", 
+            "name": "Internal VARs"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/zibase/icon.png", 
-        "src/share/domogik/plugins/zibase.json", 
+        "src/share/domogik/plugins/zibase.xml", 
         "src/share/domogik/stats/zibase/zibase.basic-zibase.xml", 
         "src/share/domogik/stats/zibase/sensor.basic-zibase.xml", 
         "src/share/domogik/url2xpl/zibase/preset-dim.xml", 
