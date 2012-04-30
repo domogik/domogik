@@ -186,7 +186,6 @@ class ProcessRequest():
 
         # package path
         if self._package_path != None:  # package mode
-            self._package_path = conf['package_path']
             sys.path.append(self._package_path)
 
         # url processing
