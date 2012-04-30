@@ -54,7 +54,7 @@ import datetime
 import os
 import glob
 import random
-#import domogik_packages.xpl.helpers
+import domogik
 import pkgutil
 import uuid
 import stat
