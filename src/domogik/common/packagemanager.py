@@ -492,7 +492,7 @@ class PackageManager():
             # xpl/* and plugins/*.json are installed on target host 
             if package_part == PKG_PART_XPL:
                 if pkg_type == "plugin":
-                    copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
+                    copytree("%s/src/domogik_packages/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
                     self._create_init_py("%s/" % plg_path)
                     self._create_init_py("%s/xpl/" % plg_path)
                     self._create_init_py("%s/xpl/bin/" % plg_path)
