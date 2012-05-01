@@ -262,17 +262,20 @@ def test_version():
     assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
     ok("Python version is >= 2.6")
 
-def test_hostname_length():
-    info("Check hostname length")
+def test_hostname():
+    info("Check hostname")
     assert len(gethostname().split('.')[0]) < 16, "Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
             Please change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again."
     ok("Hostname length is < 16.")
+    if gethostname().count("-") > 0:
+        warning("Your hostname is '%s'. It shouldn't contain the character '-'." % gethostname())
+    else:
+        ok("Hostname characters are OK")
 
-     
 try:
     am_i_root()
     test_imports()
-    test_hostname_length()
+    test_hostname()
     test_config_files()
     test_init()
     test_version()
