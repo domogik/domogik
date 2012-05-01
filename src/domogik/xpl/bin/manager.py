@@ -780,6 +780,7 @@ class SysManager(XplPlugin):
         if vendor_id == "domogik":
             return
 
+        unknown = True
         for external_model in self._external_models:
             msg_vendor_device = "%s-%s" % (external_model["vendor_id"], 
                                            external_model["device_id"])
