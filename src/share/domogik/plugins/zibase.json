@@ -358,8 +358,8 @@
         "src/share/domogik/url2xpl/zibase/preset-dim.xml", 
         "src/share/domogik/url2xpl/zibase/on.xml", 
         "src/share/domogik/url2xpl/zibase/off.xml", 
-        "src/domogik/xpl/bin/zibase.py", 
-        "src/domogik/xpl/lib/zibase.py"
+        "src/domogik_packages/xpl/bin/zibase.py", 
+        "src/domogik_packages/xpl/lib/zibase.py"
     ], 
     "identity": {
         "author": "Cedric BOLLINI", 
