@@ -100,13 +100,12 @@ class Manager:
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
         @param port : port to listen to (default 0)
         @param plugin : The plugin associated with this xpl instance
-        @param nohub : if set the hub discovery will be skipped
         """
         if ip == None:
             ip = self.get_sanitized_hostname()
@@ -144,10 +143,7 @@ class Manager:
         self._lock_status = threading.Semaphore()
         # hbeat detected
         self._foundhub = threading.Event()
-        if nohub == True:
-            self._foundhub.set()
-        else:
-            self._foundhub.clear()
+        self._foundhub.clear()
 
         # Try and bind to the base port
         try:

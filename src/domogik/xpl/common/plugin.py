@@ -55,7 +55,7 @@ class XplPlugin(BasePlugin):
     This class is a Singleton
     '''
     def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                 daemonize = True, nohub = False):
+                 daemonize = True):
         '''
         Create XplPlugin instance, which defines system handlers
         @param name : The name of the current plugin
@@ -71,7 +71,6 @@ class XplPlugin(BasePlugin):
         Your options/params will then be available on self.options and self.args
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
-        @param nohub : if set to true, the hub discovery will be skipped
         '''
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
         Watcher(self)
@@ -98,9 +97,9 @@ class XplPlugin(BasePlugin):
         else:
             broadcast = "255.255.255.255"
         if 'bind_interface' in config:
-            self.myxpl = Manager(config['bind_interface'], broadcast = broadcast, plugin = self, nohub = nohub)
+            self.myxpl = Manager(config['bind_interface'], broadcast = broadcast, plugin = self)
         else:
-            self.myxpl = Manager(broadcast = broadcast, plugin = self, nohub = nohub)
+            self.myxpl = Manager(broadcast = broadcast, plugin = self)
         self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
                                                                'xpltype':'xpl-cmnd'})
         self._reload_cb = reload_cb
@@ -118,21 +117,21 @@ class XplPlugin(BasePlugin):
         self.log.debug("end single xpl plugin")
 
     def get_config_files(self):
-        """ Return list of config files
-        """
-        return self._config_files
+       """ Return list of config files
+       """
+       return self._config_files
 
     def get_data_files_directory(self):
-        """ Return the directory where a plugin developper can store data files
-        """
-        cfg = Loader('domogik')
-        my_conf = cfg.load()
-        config = dict(my_conf[1])
-        if config.has_key('package_path'):
-            path = "%s/data/%s" % (config['package_path'], self._name)
-        else:
-            path = "%s/share/domogik/data/%s" % (config['src_prefix'], self._name)
-        return path
+       """ Return the directory where a plugin developper can store data files
+       """
+       cfg = Loader('domogik')
+       my_conf = cfg.load()
+       config = dict(my_conf[1])
+       if config.has_key('package_path'):
+           path = "%s/data/%s" % (config['package_path'], self._name)
+       else:
+           path = "%s/share/domogik/data/%s" % (config['src_prefix'], self._name)
+       return path
 
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()
