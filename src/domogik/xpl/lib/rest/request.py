@@ -2790,8 +2790,8 @@ target=*
                 except:
                     loop_again = False
 
-        ### configuration for type = hardware
-        if my_type == "hardware":
+        ### configuration for type = external
+        if my_type == "external":
             while loop_again:
                 try:
                     key = message.data["cfg"+str(idx)+"-key"]
