@@ -830,6 +830,7 @@ class SysManager(XplPlugin):
                     external["last_seen"] = time.time()
                     # interval converted from minutes to seconds : *60
                     external["interval"] = int(message.data["interval"])*60
+                    external["configuration"] = self._get_external_configuration(message)
                     found = True
                     self.log.info("Set unknown external member status ON : %s on %s" % \
                                                (vendor_device, instance))
@@ -844,7 +845,7 @@ class SysManager(XplPlugin):
                           "documentation" : "#",
                           "vendor_id" : vendor_id,
                           "device_id" : device_id,
-                          "configuration" : {},
+                          "configuration" :  self._get_external_configuration(message),
                           "interval" : int(message.data["interval"]) * 60,
                           "last_seen" : time.time()})
                 self.log.info("Add unknown external : %s on %s" % \
