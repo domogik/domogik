@@ -3552,10 +3552,11 @@ target=*
             return
 
 
-        package = domogik_packages.xpl.helpers
+        #package = domogik_packages.xpl.helpers
         if command == "help":
             output = ["List of available helpers :"]
-            for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+            #for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+            for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
                 output.append(" - %s" % plgname)
             output.append("Type 'foo help' to get help on foo helper")
 
@@ -3570,7 +3571,8 @@ target=*
 
             ### load helper and create object
             try:
-                for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+                #for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+                for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
                     if plgname == command:
                         helper = __import__('domogik_packages.xpl.helpers.%s' % plgname, fromlist="dummy")
                         try:
