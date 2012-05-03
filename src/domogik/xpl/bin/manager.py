@@ -66,6 +66,7 @@ import re
 import tempfile
 import domogik.xpl.bin
 import math
+import os
 
 
 KILL_TIMEOUT = 2

@@ -62,7 +62,7 @@ function start_xpl {
         echo "ERROR : $XPLHUB not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
         exit 1
     fi
-    echo -n "* Starting XPL..."
+    echo -n " * Starting XPL..."
     /bin/su - ${DOMOGIK_USER} -c "$(which $XPLHUB) -interface ${HUB_IFACE} >/dev/null "
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
@@ -83,8 +83,8 @@ function start_manager {
 }
 
 function start_daemon {
-    echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS"
+    echo -n " * Starting Manager (with $MANAGER_PARAMS)..."
+    /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:$PATH && dmg_manager $MANAGER_PARAMS"
     if [ $? -gt 0 ]; then
         echo " "
         echo " An error occured during manager startup."
