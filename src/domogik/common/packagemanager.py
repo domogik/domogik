@@ -239,7 +239,7 @@ class PackageManager():
         shutil.copyfile(pkg_json["identity"]["info_file"], json_tmp_file)
         
         # Update info.json with generation date
-        pkg_json.set_generated(json_tmp_file)
+        pkg_obj.set_generated(json_tmp_file)
 
         # Create .tgz
         self._create_tar_gz("external-%s-%s" % (pkg_json["identity"]["id"], pkg_json["identity"]["version"]), 
