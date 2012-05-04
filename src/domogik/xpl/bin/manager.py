@@ -681,7 +681,10 @@ class SysManager(XplPlugin):
         __import__(plg_path)
         plugin = sys.modules[plg_path]
         self.log.debug("Component path : %s" % plugin.__file__)
-        subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
+        # TODO : remove -f and print
+        subp = Popen("/usr/bin/python %s -f" % plugin.__file__, stdout=PIPE, stderr=PIPE, shell=True)
+        print("STDOUT=%s" % subp.stdout.read())
+        print("STDERR=%s" % subp.stderr.read())
         pid = subp.pid
         subp.communicate()
         return pid
