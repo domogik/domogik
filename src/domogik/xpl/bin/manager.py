@@ -682,10 +682,12 @@ class SysManager(XplPlugin):
         plugin = sys.modules[plg_path]
         self.log.debug("Component path : %s" % plugin.__file__)
         # TODO : remove -f and print
-        subp = Popen("export PYTHONPATH=%s && /usr/bin/python %s -f" % (self._package_path, plugin.__file__), \
+        subp = Popen("export PYTHONPATH=%s && /usr/bin/python %s" % (self._package_path, plugin.__file__), \
                      shell=True)
         pid = subp.pid
         subp.communicate()
+        print "Going to return!!!!!!"
+        self.log.info("Going to return!!!!!!")
         return pid
 
     def _delete_pid_file(self, plg):
