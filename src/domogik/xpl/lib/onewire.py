@@ -207,28 +207,28 @@ class ComponentDs2401:
                 my_id = comp.id
       
                 if my_id in self.all_ds2401:
-                    actual_ds2401[my_id] = "HIGH"
-                    if self.all_ds2401[my_id] != "HIGH":
-                        print("id=%s, status=HIGH" % my_id)
-                        self.all_ds2401[my_id] = "HIGH"
+                    actual_ds2401[my_id] = "high"
+                    if self.all_ds2401[my_id] != "high":
+                        print("id=%s, status=high" % my_id)
+                        self.all_ds2401[my_id] = "high"
                         self.callback("xpl-trig", {"device" : my_id,
                                              "type" : "input",
-                                             "current" : "HIGH"})
+                                             "current" : "high"})
                 else:
-                    print("id=%s, status=HIGH" % my_id)
-                    self.all_ds2401[my_id] = "HIGH"
-                    actual_ds2401[my_id] = "HIGH"
+                    print("id=%s, status=high" % my_id)
+                    self.all_ds2401[my_id] = "high"
+                    actual_ds2401[my_id] = "high"
                     self.callback("xpl-trig", {"device" : my_id,
                                          "type" : "input",
-                                         "current" : "HIGH"})
+                                         "current" : "high"})
 
             for comp_id in self.all_ds2401:
-                if comp_id not in actual_ds2401 and self.all_ds2401[comp_id] == "HIGH":
-                    print("id=%s, status=LOW component disappeared)" % (comp_id))
-                    self.all_ds2401[my_id] = "LOW"
+                if comp_id not in actual_ds2401 and self.all_ds2401[comp_id] == "high":
+                    print("id=%s, status=low component disappeared)" % (comp_id))
+                    self.all_ds2401[my_id] = "low"
                     self.callback("xpl-trig", {"device" : comp_id,
                                          "type" : "input",
-                                         "current" : "LOW"})
+                                         "current" : "low"})
                     
             self._stop.wait(self.interval)
  
