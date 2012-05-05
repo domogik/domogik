@@ -69,16 +69,16 @@ class TelldusMoveAPI:
             mess.add_data({"device" : device})
             if device!=None:
                 if state==TELLDUS_OFF:
-                    mess.add_data({"current" :  "LOW"})
-                    self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "LOW")
+                    mess.add_data({"current" :  "low"})
+                    self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "low")
                     sendit=True
                 elif state==TELLDUS_ON:
-                    mess.add_data({"current" :  "HIGH"})
-                    self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "HIGH")
+                    mess.add_data({"current" :  "high"})
+                    self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "high")
                     sendit=True
                 elif state==TELLDUS_UNKNOWN:
-                    mess.add_data({"current" :  "LOW"})
-                    self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "LOW")
+                    mess.add_data({"current" :  "low"})
+                    self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "low")
                     sendit=True
         if sendit:
             self._plugin.myxpl.send(mess)
@@ -98,12 +98,12 @@ class TelldusMoveAPI:
         mess.add_data({"device" : self._plugin.getDeviceAddress(deviceId)})
         sendit=False
         if state==TELLDUS_OFF:
-            mess.add_data({"current" :  "LOW"})
-            self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "LOW")
+            mess.add_data({"current" :  "low"})
+            self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "low")
             sendit=True
         elif state==TELLDUS_ON:
-            mess.add_data({"current" :  "HIGH"})
-            self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "HIGH")
+            mess.add_data({"current" :  "high"})
+            self._plugin.log.info("telldusMoveAPI : Send sensor message over XPL with current= %s" % "high")
             sendit=True
         if sendit:
             self._plugin.myxpl.send(mess)
