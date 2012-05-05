@@ -139,11 +139,11 @@ class Ping:
             if ret == 0:
                 self._log.debug("%s: is alive" % computer)
                 print("%s: is alive" % computer)
-                status = "HIGH"
+                status = "high"
             else:
                 self._log.debug("%s: did not respond" % computer)
                 print("%s: did not respond" % computer)
-                status = "LOW"
+                status = "low"
 
             if status != old_status:
                 type = "xpl-trig"
