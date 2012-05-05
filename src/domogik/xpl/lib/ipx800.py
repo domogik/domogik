@@ -207,8 +207,8 @@ class IPX:
         self.get_status()
         actual = self.ipx_led[num]
         # do we need to change status ?
-        if actual == IPX_LED_HIGH and state == "HIGH" or \
-           actual == IPX_LED_LOW and state == "LOW":
+        if actual == IPX_LED_HIGH and state == "high" or \
+           actual == IPX_LED_LOW and state == "low":
             # no need to change status
             self._log.debug("No need to change 'led%s' status to '%s'" % 
                             (num, state))
@@ -266,9 +266,9 @@ class IPX:
             raise IPXException(error)
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
-            self._log.error("Error while changing 'led%s' to 'PULSE'" % num)
+            self._log.error("Error while changing 'led%s' to 'pulse'" % num)
         else:
-            print("Changing 'led%s' to 'PULSE' successfully" % num)
+            print("Changing 'led%s' to 'pulse' successfully" % num)
             # send change of status
             self.get_status()
 
@@ -314,13 +314,13 @@ class IPX:
 
         # translate values
         if data['elt'] == "led" and data['value'] == IPX_LED_HIGH:
-            current = "HIGH"
+            current = "high"
         elif data['elt'] == "led" and data['value'] == IPX_LED_LOW:
-            current = "LOW"
+            current = "low"
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_HIGH:
-            current = "HIGH"
+            current = "high"
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_LOW:
-            current = "LOW"
+            current = "low"
         else:
             current = data['value']
 
