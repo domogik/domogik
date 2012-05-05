@@ -40,7 +40,7 @@
       <name>level</name>
       <type>string</type>
       <description>IPX800 relay address level (HIGH or LOW)</description>
-      <default-value>HIGH</default-value>
+      <default-value>high</default-value>
     </key>
   </configuration-keys>
   <files/>
