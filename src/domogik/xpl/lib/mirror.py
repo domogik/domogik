@@ -119,10 +119,10 @@ class Mirror:
                                  data[13]+data[14]+data[15])
                 if data[1] == '\x01':
                     self._log.debug("ztamp near from mir:ror : "+ ztamp_id)
-                    return ztamp_id, "present", "HIGH"
+                    return ztamp_id, "present", "high"
                 if data[1] == '\x02':
                     self._log.debug("ztamp far from mir:ror : "+ ztamp_id)
-                    return ztamp_id, "present", "LOW"
+                    return ztamp_id, "present", "low"
 
             if data[0] == '\x01':
                 ### action on mir:ror
@@ -131,11 +131,11 @@ class Mirror:
                 if data[1] == '\x04':
                     self._log.debug("Action on : mir:ror")
                     self._log.debug("mir:ror faced up")
-                    return "mirror", "activated", "HIGH"
+                    return "mirror", "activated", "high"
                 if data[1] == '\x05':
                     self._log.debug("Action on : mir:ror")
                     self._log.debug("mir:ror faced down")
-                    return "mirror", "activated", "LOW"
+                    return "mirror", "activated", "low"
         return None, None, None
 
 
