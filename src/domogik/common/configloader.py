@@ -28,13 +28,11 @@ Implements
 
 - Loader
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
+@author: Maxence Dunnewind <maxence@dunnewind.net>, Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
-
-global config_path
 
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
@@ -44,9 +42,11 @@ import pwd
 import ConfigParser
 import threading
 import time
-from threading import Semaphore
+import fcntl
 
-MAIN_CONFIG_FILE_NAME = "domogik.cfg"
+
+CONFIG_FILE = "/etc/domogik/domogik.cfg"
+LOCK_FILE = "/var/lock/domogik/config.lock"
 
 class Loader():
     '''
@@ -55,83 +55,55 @@ class Loader():
 
     config = None 
 
-    def __init__(self, plugin_name=None):
+    def __init__(self, part_name=None):
         '''
         Load the configuration for a part of the Domogik system
-        @param plugin_name name of the plugin to load config from
+        @param part_name name of the part to load config from
         '''
-        # Semaphore init
-        self.__class__.sema_load = Semaphore(value=1)
+        #if hasattr(self.__class__, "config") == False:
+        #    self.__class__.config = None
+        self.config = None
+        self.part_name = part_name
 
-        if hasattr(self.__class__, "config") == False:
-            self.__class__.config = None
-        self.__class__.valid_files = []
-        self.plugin_name = plugin_name
-
-        config_dir = self.get_config_dir()
-
-        self.config_file = config_dir + MAIN_CONFIG_FILE_NAME
-
-    def get_config_dir(self):
-        ''' Get homedir 
-        '''
-        sys_file = ''
-        #if os.path.isfile('/etc/default/domogik'):
-        #    sys_file = '/etc/default/domogik'
-        #elif os.path.isfile('/etc/conf.d/domogik'):
-        #    sys_file = '/etc/conf.d/domogik'
-        #else:
-        #    raise RuntimeError("No /etc/default/domogik of /etc/conf.d/domogik exists")
-
-        #f = open(sys_file)
-        #data = f.readlines()
-        #data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
-        #configdir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
-        #return configdir + "/.domogik/"
-        return "/etc/domogik/"
-
-    def get_config_files_path(self):
-        '''
-        Return config file path
-        '''
-        return self.__class__.valid_files
-
-    def load(self, refresh = False):
+    def load(self):
         '''
         Parse the config
-        @param refresh : force refreshing config
         @return pair (main_config, plugin_config)
         '''
-        self.__class__.sema_load.acquire()
-
-        # need to reread or not ?
-        if self.__class__.config == None or refresh == True:
-            do_read = True
-        else:
-            do_read = False
+        # lock the file
+        print "ACQUIRE"
+        if not os.path.exists(LOCK_FILE):
+            file = open(LOCK_FILE, "w")
+            file.write("")
+            file.close()
+        file = open(LOCK_FILE, "r+")
+        fcntl.flock(file.fileno(), fcntl.LOCK_EX)
 
         # read config file
-        if do_read == True:
-            self.__class__.config = ConfigParser.ConfigParser()
-            files = self.__class__.config.read([self.config_file])
-            self.__class__.valid_files = files
+        self.config = ConfigParser.ConfigParser()
+        print "CFG > open"
+        cfg_file = open(CONFIG_FILE)
+        self.config.readfp(cfg_file)
 
         # get 'domogik' config part
-        result = self.__class__.config.items('domogik')
+        result = self.config.items('domogik')
         domogik_part = {}
         for k, v in result:
             domogik_part[k] = v
 
         # no other config part requested
-        if self.plugin_name == None:
-            self.__class__.sema_load.release()
-            return (domogik_part, None)
+        if self.part_name == None:
+            result = (domogik_part, None)
 
         # Get requested (if so) config part
-        if self.plugin_name:
-            ret =  (domogik_part, self.__class__.config.items(self.plugin_name))
-            self.__class__.sema_load.release()
-            return ret
+        if self.part_name:
+            result =  (domogik_part, self.config.items(self.part_name))
+
+        print "CFG > close"
+        cfg_file.close()
+        print "RELEASE"
+        file.close()
+        return result
 
     def set(self, section, key, value):
         """ Set a key value for a section in config file and write it
@@ -142,6 +114,9 @@ class Loader():
             @param key : key
             @param value : value
         """
-        self.__class__.config.set(section, key, value)
-        with open(self.config_file, "wb") as configfile:
-            self.__class__.config.write(configfile)
+        # Check load is called before this function
+        if self.config == None:
+            raise Exception, "ConfigLoader : you must use load() before set() function"
+        self.config.set(section, key, value)
+        with open(CONFIG_FILE, "wb") as configfile:
+            self.config.write(configfile)

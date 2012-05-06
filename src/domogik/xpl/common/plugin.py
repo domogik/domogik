@@ -41,7 +41,7 @@ import os
 import sys
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
-from domogik.common.configloader import Loader
+from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 
 # time between each read of cpu/memory usage for process
@@ -101,7 +101,7 @@ class XplPlugin(BasePlugin):
         self._name = name
         cfg = Loader('domogik')
         my_conf = cfg.load()
-        self._config_files = cfg.get_config_files_path()
+        self._config_files = CONFIG_FILE
         config = dict(my_conf[1])
 
         # Get pid and write it in a file
@@ -136,11 +136,6 @@ class XplPlugin(BasePlugin):
         #self._process_info.start()
 
         self.log.debug("end single xpl plugin")
-
-    def get_config_files(self):
-       """ Return list of config files
-       """
-       return self._config_files
 
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()

@@ -681,13 +681,10 @@ class SysManager(XplPlugin):
         __import__(plg_path)
         plugin = sys.modules[plg_path]
         self.log.debug("Component path : %s" % plugin.__file__)
-        # TODO : remove -f and print
         subp = Popen("export PYTHONPATH=%s && /usr/bin/python %s" % (self._package_path, plugin.__file__), \
                      shell=True)
         pid = subp.pid
         subp.communicate()
-        print "Going to return!!!!!!"
-        self.log.info("Going to return!!!!!!")
         return pid
 
     def _delete_pid_file(self, plg):
@@ -899,7 +896,7 @@ class SysManager(XplPlugin):
         self._plugins = []
 
         # Getplugin list
-        cfg_plugins = self.loader_plugins.load(refresh = True)[1]
+        cfg_plugins = self.loader_plugins.load()[1]
         plugin_list = dict(cfg_plugins)
         for plugin in plugin_list:
             self.log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
@@ -1144,7 +1141,7 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.package')
         mess.add_data({'command' : 'installed-packages-list'})
         mess.add_data({'host' : self.get_sanitized_hostname()})
-        cfg_plugin_list = dict(self.loader_plugins.load(refresh = True)[1])
+        cfg_plugin_list = dict(self.loader_plugins.load()[1])
         idx = 0
         for package in self.pkg_mgr.get_installed_packages_list():
             # I guess all plugins are naturally activated except for plugins
@@ -1375,7 +1372,7 @@ class SysManager(XplPlugin):
 
         # check if plugin (for a plugin) is enabled
         if pkg_type == "plugin":
-            cfg_plugins = self.loader_plugins.load(refresh = True)[1]
+            cfg_plugins = self.loader_plugins.load()[1]
             plugin_list = dict(cfg_plugins)
             try:
                 if plugin_list[id] == "enabled":

@@ -71,6 +71,7 @@ DMG_HOME=
 DMG_ETC=/etc/domogik
 DMG_CACHE=/var/cache/domogik
 DMG_LIB=/var/lib/domogik
+DMG_LOCK=/var/lock/domogik
 
 function stop_domogik {
     if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
@@ -148,6 +149,11 @@ function copy_sample_files {
     if [ ! -d $DMG_LIB ];then
         mkdir $DMG_LIB
         chown $d_user:root $DMG_LIB
+    fi
+    # create /var/lock/domogik
+    if [ ! -d $DMG_LOCK ];then
+        mkdir $DMG_LOCK
+        chown $d_user:root $DMG_LOCK
     fi
     # create folders for packages management
     for pkg_rep in pkg-cache cache 
