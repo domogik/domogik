@@ -2,11 +2,11 @@
 
 ### BEGIN INIT INFO
 # Provides:          domogik
-# Required-Start:    $local_fs $network
-# Required-Stop:     $local_fs $network
+# Required-Start:    $local_fs $network xplhub
+# Required-Stop:     $local_fs $network xplhub
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start Domogik daemons
+# Short-Description: Start xpl hub
 ### END INIT INFO
 
 #This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -36,11 +36,13 @@ XPLHUB=xPL_Hub
 DAEMON=$(which $NAME)
 DIETIME=2
 STARTTIME=5
-PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
-PIDFILE="$PIDDIR/manager.pid"
+#PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
+PIDDIR="/var/run/domogik"
+PIDFILE="$PIDDIR/manager.pid" 
+LOCKDIR="/var/lock/domogik"
 
-[ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-[ -f /etc/default/domogik ] && . /etc/default/domogik
+[ -f /etc/conf.d/xplhub ] && . /etc/conf.d/xplhub
+[ -f /etc/default/xplhub ] && . /etc/default/xplhub
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH:
 if [ $UID != 0 ];then
@@ -48,22 +50,13 @@ if [ $UID != 0 ];then
     exit 1;
 fi
 
-function start {
-    if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
-        start_xpl
-    else
-        echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
-    fi
-    start_daemon
-}
-
 function start_xpl {
-    if [ -z "$(which $XPLHUB)" ];then
-        echo "ERROR : $XPLHUB not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
+    if [ -z "$(which $NAME)" ];then
+        echo "ERROR : $NAME not in path, please install it somewhere in the path, or add CUSTOM_PATH to default file."
         exit 1
     fi
     echo -n " * Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which $XPLHUB) -interface ${HUB_IFACE} >/dev/null "
+    /bin/su - ${DOMOGIK_USER} -c "$(which $NAME) -interface ${HUB_IFACE} >/dev/null "
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
@@ -126,12 +119,12 @@ function status_manager {
 
 function status_xpl {
     set +e
-    RUNNING=$(/usr/bin/pgrep -c $XPLHUB)
+    RUNNING=$(/usr/bin/pgrep -c $NAME)
     set -e
     if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ] ; then
-        echo " * $XPLHUB is running"
+        echo " * $NAME is running"
     else
-        echo " * $XPLHUB is not running"
+        echo " * $NAME is not running"
     fi
 }
 
@@ -222,12 +215,12 @@ function update_cache {
 
 # Check if the directory for lock exists
 function check_lock_dir {
-    USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    if [ ! -d $PIDDIR ];then
-        mkdir $PIDDIR
-    fi
+    #USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
+    [ ! -d $PIDDIR ] && mkdir $PIDDIR
     [ -p $PIDDIR/dmg-manager-state ] && rm -f $PIDDIR/dmg-manager-state
     chown ${DOMOGIK_USER}: $PIDDIR
+    [ ! -d $LOCKDIR ] && mkdir $LOCKDIR
+    chown ${DOMOGIK_USER}: $LOCKDIR
 }
 
 case "$1" in
