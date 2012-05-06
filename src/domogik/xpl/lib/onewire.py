@@ -404,6 +404,19 @@ class OneWireNetwork:
         return self._root 
 
     def write(self,device,pio,value):
-        s = ow.Sensor( '/'+device)
-        setattr(s,"PIO_"+pio, value)
-	return getattr(s,"PIO_"+pio)
+        map = ["A","B"]                   # Used to map PIO_0/1 to  PIO_A/B for other devices 
+        ret = 0                           # Ensure we will return a value
+        s = ow.Sensor( '/'+device) 
+        fam = device[:2]                  # Extract familly code
+        if fam == "12":                   # Fam = 12 - DS2406
+            pio = map[pio]                # Rename PIO et A & B
+        try:
+            if fam == "05":               # DS2405 - Only one PIO named "PIO"
+                setattr(s,"PIO", value)
+                ret = getattr(s,"PIO")
+            else:                         # All other cases
+                setattr(s,"PIO_"+pio, value)
+                ret = getattr(s,"PIO_"+pio)
+        except:
+            raise OneWireException("Can't access given PIO %s" % pio)
+        return ret
