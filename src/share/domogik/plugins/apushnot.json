@@ -59,7 +59,6 @@
         "documentation": "http://wiki.domogik.org/plugin_apushnot", 
         "domogik_min_version": "0.1.0", 
         "id": "apushnot", 
-        "name": "apushnot", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

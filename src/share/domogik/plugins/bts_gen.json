@@ -54,7 +54,6 @@
         "documentation": "http://wiki.domogik.org/#", 
         "domogik_min_version": "0.1.0", 
         "id": "bts_gen", 
-        "name": "bts_gen", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

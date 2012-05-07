@@ -126,7 +126,6 @@
         "documentation": "http://wiki.domogik.org/plugin_mochad", 
         "domogik_min_version": "0.2.0", 
         "id": "mochad", 
-        "name": "mochad", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

@@ -57,7 +57,6 @@
         "documentation": "http://wiki.domogik.org/plugin_tts", 
         "domogik_min_version": "0.2.0", 
         "id": "tts", 
-        "name": "tts", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

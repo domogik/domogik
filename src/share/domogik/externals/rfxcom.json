@@ -398,7 +398,6 @@
         "documentation": "#TODO", 
         "domogik_min_version": "0.2.0", 
         "id": "rfxcom", 
-        "name": "rfxcom", 
         "type": "external", 
         "version": "0.1a0"
     }, 

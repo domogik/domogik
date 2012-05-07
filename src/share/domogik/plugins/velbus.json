@@ -116,7 +116,6 @@
         "documentation": "http://wiki.domogik.org/plugin_velbus", 
         "domogik_min_version": "0.2.0", 
         "id": "velbus", 
-        "name": "velbus", 
         "type": "plugin", 
         "version": "0.4.1"
     }, 

@@ -193,7 +193,6 @@
         "documentation": "http://wiki.domogik.org/plugin_teleinfo", 
         "domogik_min_version": "0.2.0", 
         "id": "teleinfo", 
-        "name": "teleinfo", 
         "type": "plugin", 
         "version": "0.2a0"
     }, 

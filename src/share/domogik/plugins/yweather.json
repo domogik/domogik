@@ -217,7 +217,6 @@
         "documentation": "http://wiki.domogik.org/plugin_yweather", 
         "domogik_min_version": "0.2.0", 
         "id": "yweather", 
-        "name": "yweather", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

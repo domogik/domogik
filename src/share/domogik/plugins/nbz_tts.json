@@ -69,7 +69,6 @@
         "documentation": "http://wiki.domogik.org/plugin_nbz_tts", 
         "domogik_min_version": "0.2.0", 
         "id": "nbz_tts", 
-        "name": "nbz_tts", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

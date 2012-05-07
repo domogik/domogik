@@ -214,7 +214,6 @@
         "documentation": "http://wiki.domogik.org/plugin_zalarms", 
         "domogik_min_version": "0.2.0", 
         "id": "zalarms", 
-        "name": "zalarms", 
         "type": "plugin", 
         "version": "0.2a0"
     }, 

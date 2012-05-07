@@ -694,7 +694,6 @@
         "documentation": "http://wiki.domogik.org/plugin_rfxcom", 
         "domogik_min_version": "0.2.0", 
         "id": "rfxcom", 
-        "name": "rfxcom", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

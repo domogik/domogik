@@ -94,7 +94,6 @@
         "documentation": "http://wiki.domogik.org/plugin_sms", 
         "domogik_min_version": "0.1.0", 
         "id": "sms", 
-        "name": "sms", 
         "type": "plugin", 
         "version": "0.1.0"
     }, 

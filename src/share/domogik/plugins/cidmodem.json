@@ -72,7 +72,6 @@
         "documentation": "http://wiki.domogik.org/plugin_cidmodem", 
         "domogik_min_version": "0.2.0", 
         "id": "cidmodem", 
-        "name": "cidmodem", 
         "type": "plugin", 
         "version": "0.2a0"
     }, 

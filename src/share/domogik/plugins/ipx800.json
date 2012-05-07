@@ -170,7 +170,6 @@
         "documentation": "http://wiki.domogik.org/plugin_ipx800", 
         "domogik_min_version": "0.2.0", 
         "id": "ipx800", 
-        "name": "ipx800", 
         "type": "plugin", 
         "version": "0.2a1"
     }, 

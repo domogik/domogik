@@ -108,7 +108,6 @@
         "documentation": "http://wiki.domogik.org/plugin_wol_ping", 
         "domogik_min_version": "0.2.0", 
         "id": "wol_ping", 
-        "name": "wol_ping", 
         "type": "plugin", 
         "version": "0.2"
     }, 

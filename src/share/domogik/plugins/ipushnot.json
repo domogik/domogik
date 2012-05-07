@@ -29,7 +29,6 @@
         "documentation": "http://wiki.domogik.org/plugin_ipushnot", 
         "domogik_min_version": "0.2.0", 
         "id": "ipushnot", 
-        "name": "ipushnot", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

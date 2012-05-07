@@ -96,7 +96,6 @@
         "documentation": "http://wiki.domogik.org/plugin_x10cm15a", 
         "domogik_min_version": "0.2.0", 
         "id": "x10cm15a", 
-        "name": "x10cm15a", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 

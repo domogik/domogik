@@ -48,7 +48,6 @@
         "documentation": "http://wiki.domogik.org/external_ar_tank", 
         "domogik_min_version": "0.2.0", 
         "id": "ar_tank", 
-        "name": "ar_tank", 
         "type": "external", 
         "version": "0.1a0"
     }, 

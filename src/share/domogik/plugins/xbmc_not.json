@@ -54,7 +54,6 @@
         "documentation": "http://wiki.domogik.org/plugin_xbmc_not", 
         "domogik_min_version": "0.1.0", 
         "id": "xbmc_not", 
-        "name": "xbmc_not", 
         "type": "plugin", 
         "version": "0.1"
     }, 

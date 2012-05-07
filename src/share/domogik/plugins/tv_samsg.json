@@ -95,7 +95,6 @@
         "documentation": "http://wiki.domogik.org/plugin_tv_samsg", 
         "domogik_min_version": "0.2.0", 
         "id": "tv_samsg", 
-        "name": "tv_samsg", 
         "type": "plugin", 
         "version": "0.1a0"
     }, 
