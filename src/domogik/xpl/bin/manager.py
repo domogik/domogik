@@ -373,9 +373,6 @@ class SysManager(XplPlugin):
         print("Reloading plugin and external members model lists")
         self.log.info("Reloading plugin and external members model lists")
         self._list_plugins()
-        #self._list_external_models()  # still usefull ? TODO :check
-        #                              # externals are automatically loaded by
-        #                              # manager now...
 
     def _write_fifo(self, level, message):
         """ Write the message into _state_fifo fifo, with ansi color
@@ -664,7 +661,12 @@ class SysManager(XplPlugin):
         """ Set the component to off in the list
         """
         print "HBEAT.END : %s" % message.source
-        # TODO : finish
+        vendor_device = message.source.split(".")[0]
+        vendor_id = vendor_device.split("-")[0].lower()
+        device_id = vendor_device.split("-")[1].lower()
+        instance = message.source.split(".")[1]
+        if self.get_sanitized_hostname() == instance:
+            self._set_status(device_id, "OFF")
 
     def _exec_plugin(self, name):
         """ Internal method
