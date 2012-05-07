@@ -53,7 +53,6 @@
         "description": "When receiving an incoming xpl message from hub, this plugin forward this message to a serial device and vice versa.", 
         "documentation": "#", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-xpl2ser", 
         "id": "xpl2ser", 
         "name": "xpl2ser", 
         "type": "plugin", 

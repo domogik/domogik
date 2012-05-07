@@ -169,7 +169,6 @@
         "description": "IPX800 relayboard support.\nSupported  models :\n- IPX 800\n- IPX 800 pro\n- IPX 800 v2\n- IPX 800 v3\nSupported features :\n- Relay : set and get state\n- Digital input \n- Analog input", 
         "documentation": "http://wiki.domogik.org/plugin_ipx800", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-ipx800", 
         "id": "ipx800", 
         "name": "ipx800", 
         "type": "plugin", 

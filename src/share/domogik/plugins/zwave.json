@@ -97,7 +97,6 @@
         "description": "Z-wave is a radio based protocol to control lights, appliances and others things in your house", 
         "documentation": "http://wiki.domogik.org/tiki-index.php?page=plugin_zwave", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-zwave", 
         "id": "zwave", 
         "name": "zwave", 
         "type": "plugin", 

@@ -27,7 +27,6 @@
         "description": "This plugin sends date and time on the xPL network every minute", 
         "documentation": "http://wiki.domogik.org/plugin_xpl_time", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-xpl_time", 
         "id": "xpl_time", 
         "name": "xpl_time", 
         "type": "plugin", 

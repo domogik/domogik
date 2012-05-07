@@ -211,7 +211,6 @@
         "description": "Manage many devices through TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n  they will appear automatically in Domogik", 
         "documentation": "http://wiki.domogik.org/plugin_telldus", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-telldus", 
         "id": "telldus", 
         "name": "telldus", 
         "type": "plugin", 

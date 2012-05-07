@@ -115,7 +115,6 @@
         "description": "velbus interface", 
         "documentation": "http://wiki.domogik.org/plugin_velbus", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-velbus", 
         "id": "velbus", 
         "name": "velbus", 
         "type": "plugin", 

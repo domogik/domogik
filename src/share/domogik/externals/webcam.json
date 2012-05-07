@@ -51,7 +51,6 @@
         "description": "Generic Webcam support", 
         "documentation": "#TODO", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "external-webcam", 
         "id": "webcam", 
         "name": "webcam", 
         "type": "external", 

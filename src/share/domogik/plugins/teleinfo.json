@@ -192,7 +192,6 @@
         "description": "Teleinfo is a french method to get power related informations.", 
         "documentation": "http://wiki.domogik.org/plugin_teleinfo", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-teleinfo", 
         "id": "teleinfo", 
         "name": "teleinfo", 
         "type": "plugin", 

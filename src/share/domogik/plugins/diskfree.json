@@ -96,7 +96,6 @@
         "description": "Send over xPL disk usage", 
         "documentation": "http://wiki.domogik.org/plugin_diskfree", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-diskfree", 
         "id": "diskfree", 
         "name": "diskfree", 
         "type": "plugin", 

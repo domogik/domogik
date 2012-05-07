@@ -94,7 +94,6 @@
         "description": "Control Samsung televisions :\n- Channel up/down\n- Volume up/down\n- 16/9, 4/3\n- Select input\n- ...", 
         "documentation": "http://wiki.domogik.org/plugin_tv_samsg", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-tv_samsg", 
         "id": "tv_samsg", 
         "name": "tv_samsg", 
         "type": "plugin", 

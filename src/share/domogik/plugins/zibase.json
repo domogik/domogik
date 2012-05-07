@@ -370,7 +370,6 @@
         "description": "ZiBase support (zodianet)", 
         "documentation": "http://wiki.domogik.org/plugin_zibase", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-zibase", 
         "id": "zibase", 
         "name": "zibase", 
         "type": "plugin", 

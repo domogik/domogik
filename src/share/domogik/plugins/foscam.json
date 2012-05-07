@@ -119,7 +119,6 @@
         "description": "Allows to open an close foscam relay, your device must be plug on pin 1 and 2", 
         "documentation": "http://wiki.domogik.org/plugin_foscam_relay", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-foscam", 
         "id": "foscam", 
         "name": "foscam", 
         "type": "plugin", 

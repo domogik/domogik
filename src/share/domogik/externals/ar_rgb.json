@@ -48,7 +48,6 @@
         "description": "Control RGB leds with an arduino and an ethernet shield\nThis external plugin is a xPL program for arduino which manage RGB led strips.\n\nIt requires : \n- Arduino Uno or similar\n- Official ethernet shield \n\nOpen the following files as a sketchbook with the Arduino Java IDE :\n- ar_rgb.pde\n- rgb.pde\n- time.pde\n- xpl.pde\n- memoryfree.cpp\n- memoryfree.h\n\nConfigure parameters in ar_rgb.pde\n- network \n- used pins\n\nUpload project to Arduino with the IDE\n\nTest it with the manual controllers (push button and potentiometer) and then create a device and test it with Domogik", 
         "documentation": "http://wiki.domogik.org/external_ar_rgb", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "external-ar_rgb", 
         "id": "ar_rgb", 
         "name": "ar_rgb", 
         "type": "external", 

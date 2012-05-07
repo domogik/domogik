@@ -53,7 +53,6 @@
         "description": "Connect to a google agenda to get events agenda", 
         "documentation": "http://wiki.domogik.org/plugin_gagenda", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-gagenda", 
         "id": "gagenda", 
         "name": "gagenda", 
         "type": "plugin", 

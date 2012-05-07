@@ -693,7 +693,6 @@
         "description": "RFXCOM Usb 433.92MHz receiver and transmitter", 
         "documentation": "http://wiki.domogik.org/plugin_rfxcom", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-rfxcom", 
         "id": "rfxcom", 
         "name": "rfxcom", 
         "type": "plugin", 

@@ -397,7 +397,6 @@
         "description": "RFXCOM with xPL support LAN 433.92MHz receiver transmitter", 
         "documentation": "#TODO", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "external-rfxcom", 
         "id": "rfxcom", 
         "name": "rfxcom", 
         "type": "external", 

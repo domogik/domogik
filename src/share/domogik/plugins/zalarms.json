@@ -213,7 +213,6 @@
         "description": "A light interface to the cron plugin.\n  You can only create an alarm or an dawnalarm message.\n  Read the wiki for documentation.", 
         "documentation": "http://wiki.domogik.org/plugin_zalarms", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-zalarms", 
         "id": "zalarms", 
         "name": "zalarms", 
         "type": "plugin", 

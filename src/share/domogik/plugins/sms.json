@@ -93,7 +93,6 @@
         "description": "Send SMS with french telephony providers : Orange, SFR, Bouygues", 
         "documentation": "http://wiki.domogik.org/plugin_sms", 
         "domogik_min_version": "0.1.0", 
-        "fullname": "plugin-sms", 
         "id": "sms", 
         "name": "sms", 
         "type": "plugin", 

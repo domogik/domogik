@@ -76,7 +76,6 @@
         "description": "Mir:ror device allow to detect RFID devices", 
         "documentation": "http://wiki.domogik.org/plugin_mirror", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-mirror", 
         "id": "mirror", 
         "name": "mirror", 
         "type": "plugin", 

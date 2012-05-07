@@ -53,7 +53,6 @@
         "description": "bts_gen", 
         "documentation": "http://wiki.domogik.org/#", 
         "domogik_min_version": "0.1.0", 
-        "fullname": "plugin-bts_gen", 
         "id": "bts_gen", 
         "name": "bts_gen", 
         "type": "plugin", 

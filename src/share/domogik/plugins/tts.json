@@ -56,7 +56,6 @@
         "description": "Text to speech", 
         "documentation": "http://wiki.domogik.org/plugin_tts", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-tts", 
         "id": "tts", 
         "name": "tts", 
         "type": "plugin", 

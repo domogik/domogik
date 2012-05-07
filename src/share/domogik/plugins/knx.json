@@ -229,7 +229,6 @@
         "description": "KNX management with Eibd", 
         "documentation": "http://wiki.domogik.org/plugin_knx", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-knx", 
         "id": "knx", 
         "name": "knx", 
         "type": "plugin", 

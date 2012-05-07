@@ -28,7 +28,6 @@
         "description": "Iphone/Ipad notification system base on external service provide by pushme.to", 
         "documentation": "http://wiki.domogik.org/plugin_ipushnot", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-ipushnot", 
         "id": "ipushnot", 
         "name": "ipushnot", 
         "type": "plugin", 

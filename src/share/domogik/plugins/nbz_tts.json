@@ -68,7 +68,6 @@
         "description": "Nabaztag text_to_speech management is an external service provide by Wizz.cc and an OpenJabNab Server", 
         "documentation": "http://wiki.domogik.org/plugin_nbz_tts", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-nbz_tts", 
         "id": "nbz_tts", 
         "name": "nbz_tts", 
         "type": "plugin", 

@@ -124,7 +124,6 @@
         "description": "Plcbus is a CPL based protocol to control lights, appliances and others things in your house", 
         "documentation": "http://wiki.domogik.org/plugin_plcbus", 
         "domogik_min_version": "0.2.0", 
-        "fullname": "plugin-plcbus", 
         "id": "plcbus", 
         "name": "plcbus", 
         "type": "plugin", 
