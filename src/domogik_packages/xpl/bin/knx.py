@@ -42,6 +42,8 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.knx import KNXException
 from domogik_packages.xpl.lib.knx import KNX
+from domogik_packages.xpl.lib.knx import decodeKNX
+from domogik_packages.xpl.lib.knx import encodeKNX
 from domogik.common.configloader import *
 from struct import * 
 import threading
