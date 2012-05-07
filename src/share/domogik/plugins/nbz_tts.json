@@ -56,8 +56,8 @@
     "files": [
         "src/share/domogik/design/plugin/nbz_tts/icon.png", 
         "src/share/domogik/plugins/nbz_tts.json", 
-        "src/domogik/xpl/bin/nbz_tts.py", 
-        "src/domogik/xpl/lib/nbz_tts.py"
+        "src/domogik_packages/xpl/bin/nbz_tts.py", 
+        "src/domogik_packages/xpl/lib/nbz_tts.py"
     ], 
     "identity": {
         "author": "Kriss", 

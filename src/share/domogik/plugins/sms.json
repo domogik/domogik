@@ -63,15 +63,21 @@
             "value_type": "trigger"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Short Message Service", 
+            "id": "communication.sms", 
+            "name": "Sms"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/sms/icon.png", 
         "src/share/domogik/plugins/sms.json", 
         "src/share/domogik/url2xpl/communication/send_sms.xml", 
-        "src/domogik/xpl/bin/sms.py", 
-        "src/domogik/xpl/lib/sms_orange.py", 
-        "src/domogik/xpl/lib/sms_sfr.py", 
-        "src/domogik/xpl/lib/sms_bouygues.py"
+        "src/domogik_packages/xpl/bin/sms.py", 
+        "src/domogik_packages/xpl/lib/sms_orange.py", 
+        "src/domogik_packages/xpl/lib/sms_sfr.py", 
+        "src/domogik_packages/xpl/lib/sms_bouygues.py"
     ], 
     "identity": {
         "author": "Gizmo - Guillaume MORLET", 

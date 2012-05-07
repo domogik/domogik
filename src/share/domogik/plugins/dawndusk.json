@@ -127,20 +127,25 @@
             "feature_type": "sensor", 
             "id": "dawndusk.status.status", 
             "name": "Status", 
-            "parameters": "{&quot;status&quot;:&quot;&quot;,&quot;value0&quot;:&quot;dusk&quot;, &quot;value1&quot;:&quot;dawn&quot;}", 
+            "parameters": "{}", 
             "return_confirmation": "0", 
             "stat_key": "status", 
             "value_type": "string"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "View the day/night status using dawn/dusk triggers", 
+            "id": "dawndusk.status", 
+            "name": "Status"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/dawndusk/icon.png", 
         "src/share/domogik/plugins/dawndusk.json", 
         "src/share/domogik/stats/dawndusk/dawndusk.basic.xml", 
-        "src/share/domogik/url2xpl/dawndusk/daynight.xml", 
-        "src/domogik/xpl/bin/dawndusk.py", 
-        "src/domogik/xpl/lib/dawndusk.py"
+        "src/domogik_packages/xpl/bin/dawndusk.py", 
+        "src/domogik_packages/xpl/lib/dawndusk.py"
     ], 
     "identity": {
         "author": "Sebastien GALLET, Maxence Dunnewind", 

@@ -73,13 +73,19 @@
             "value_type": "number"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Disk usage", 
+            "id": "computer.disk_usage", 
+            "name": "Disk usage"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/diskfree/icon.png", 
         "src/share/domogik/plugins/diskfree.json", 
         "src/share/domogik/stats/computer/sensor.basic-diskfree.xml", 
-        "src/domogik/xpl/bin/diskfree.py", 
-        "src/domogik/xpl/lib/diskfree.py"
+        "src/domogik_packages/xpl/bin/diskfree.py", 
+        "src/domogik_packages/xpl/lib/diskfree.py"
     ], 
     "identity": {
         "author": "Fritz", 

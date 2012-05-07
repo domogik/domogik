@@ -163,12 +163,33 @@
             "value_type": "number"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Exchanger efficiency", 
+            "id": "mvhr.exchanger_efficiency", 
+            "name": "Exchanger eff."
+        }, 
+        {
+            "description": "Indoor temperature", 
+            "id": "mvhr.indoor_temperature", 
+            "name": "Indoor temp."
+        }, 
+        {
+            "description": "Outdoor temperature", 
+            "id": "mvhr.outdoor_temperature", 
+            "name": "Outdoor temp."
+        }, 
+        {
+            "description": "Insufflation temperature", 
+            "id": "mvhr.insuffl_temperature", 
+            "name": "Insufflation temp."
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/mvhr/icon.png", 
         "src/share/domogik/plugins/mvhr.json", 
-        "src/domogik/xpl/bin/mvhr.py", 
-        "src/domogik/xpl/lib/mvhr.py", 
+        "src/domogik_packages/xpl/bin/mvhr.py", 
+        "src/domogik_packages/xpl/lib/mvhr.py", 
         "src/share/domogik/stats/mvhr/mvhr.basic.xml"
     ], 
     "identity": {

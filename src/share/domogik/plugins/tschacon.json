@@ -23,15 +23,21 @@
             "value_type": "binary"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "tschacon.switch", 
+            "name": "Switch"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/tschacon/icon.png", 
         "src/share/domogik/plugins/tschacon.json", 
         "src/share/domogik/stats/tschacon/arctech.tschacon.xml", 
         "src/share/domogik/url2xpl/tschacon/on.xml", 
         "src/share/domogik/url2xpl/tschacon/off.xml", 
-        "src/domogik/xpl/bin/tschacon.py", 
-        "src/domogik/xpl/lib/TellStick.py"
+        "src/domogik_packages/xpl/bin/tschacon.py", 
+        "src/domogik_packages/xpl/lib/TellStick.py"
     ], 
     "identity": {
         "author": "Julien Garet", 

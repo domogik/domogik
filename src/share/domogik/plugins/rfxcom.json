@@ -553,10 +553,136 @@
             "value_type": "string"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Lighting1 x10 Dimmer", 
+            "id": "rfxcom.lighting1_x10_dimmer", 
+            "name": "Lighting1 x10 Dimmer"
+        }, 
+        {
+            "description": "Lighting1 ARC Switch", 
+            "id": "rfxcom.lighting1_arc_switch", 
+            "name": "Lighting1 ARC Switch"
+        }, 
+        {
+            "description": "Lighting1 ELRO AB400D Switch", 
+            "id": "rfxcom.lighting1_elro_switch", 
+            "name": "Lighting1 ELRO AB400D Switch"
+        }, 
+        {
+            "description": "Lighting1 Waveman Switch", 
+            "id": "rfxcom.lighting1_waveman_switch", 
+            "name": "Lighting1 Waveman Switch"
+        }, 
+        {
+            "description": "Lighting1 Chacon EMW200 Switch", 
+            "id": "rfxcom.lighting1_chacon_switch", 
+            "name": "Lighting1 Chacon EMW200 Switch"
+        }, 
+        {
+            "description": "Lighting1 IMPULS Switch", 
+            "id": "rfxcom.lighting1_impuls_switch", 
+            "name": "Lighting1 IMPULS Switch"
+        }, 
+        {
+            "description": "Lighting2 AC Dimmer", 
+            "id": "rfxcom.lighting2_ac_dimmer", 
+            "name": "Lighting2 AC Dimmer"
+        }, 
+        {
+            "description": "Lighting2 Homeeasy EU Dimmer", 
+            "id": "rfxcom.lighting2_homeeasy_eu_dimmer", 
+            "name": "Lighting2 Homeeasy EU Dimmer"
+        }, 
+        {
+            "description": "Lighting3 Koppla Dimmer", 
+            "id": "rfxcom.lighting3_koppla_dimmer", 
+            "name": "Lighting3 Koppla Dimmer"
+        }, 
+        {
+            "description": "Curtain1 Harrison command", 
+            "id": "rfxcom.curtain1_harrison", 
+            "name": "Curtain1 Harrison command"
+        }, 
+        {
+            "description": "Security devices (alarms, smoke detectors, ...)", 
+            "id": "rfxcom.security1", 
+            "name": "Security"
+        }, 
+        {
+            "description": "Oregon THR128/138, THC138, THC238/268, THN132, THWR288, THRN122, THN122, AW129/131, THWR800, RTHN318. La Crosse TX3, TX4, TX17 (not for RFXCOM xPL).", 
+            "id": "rfxcom.temp", 
+            "name": "Oregon and La Crosse Inside/Outside/Water Temperature"
+        }, 
+        {
+            "description": "LaCrosse TX3", 
+            "id": "rfxcom.humidity", 
+            "name": "La Crosse Inside/Outside Hygro"
+        }, 
+        {
+            "description": "Oregon THGN122/123, THGN132, THGR122/228/238/268 THGR810, RTGR328, THGR328, WTGR800, THGR918, THGRN228, THGN500. TFA. TS34C.", 
+            "id": "rfxcom.th", 
+            "name": "Oregon and other Inside/Outside Temp-Hygro-Baro"
+        }, 
+        {
+            "description": "Huger BTHR918. Oregon BTHR918N, BTHR968", 
+            "id": "rfxcom.thb", 
+            "name": "Oregon and Huger Inside Temp-Hygro-Baro"
+        }, 
+        {
+            "description": "Oregon RGR126, RGR682, RGR918, PCR800. TFA.", 
+            "id": "rfxcom.rain", 
+            "name": "Rain Gauge"
+        }, 
+        {
+            "description": "Oregon WTGR800, WGR800, WGR918. Huger-STR918. TFA.", 
+            "id": "rfxcom.wind", 
+            "name": "Anemometer"
+        }, 
+        {
+            "description": "Oregon-UVN128, Oregon-UV138, Oregon-UVN800", 
+            "id": "rfxcom.uv", 
+            "name": "UV sensor"
+        }, 
+        {
+            "description": "Oregon-BWR102, Oregon-GR101", 
+            "id": "rfxcom.weight", 
+            "name": "Body Weight Monitor"
+        }, 
+        {
+            "description": "cent-a-meter, Electrisave, OWL CM113", 
+            "id": "rfxcom.elec1", 
+            "name": "Ampere meter"
+        }, 
+        {
+            "description": "OWL CM119", 
+            "id": "rfxcom.elec2", 
+            "name": "Power meter"
+        }, 
+        {
+            "description": "RFXSensor", 
+            "id": "rfxcom.rfxsensor", 
+            "name": "RFXSensor"
+        }, 
+        {
+            "description": "RFXMeter", 
+            "id": "rfxcom.rfxmeter", 
+            "name": "RFXMeter"
+        }, 
+        {
+            "description": "Digimax", 
+            "id": "rfxcom.digimax", 
+            "name": "Digimax"
+        }, 
+        {
+            "description": "Received X10 RF Remote, Medion remote, ATI Remote or ATI Remote Plus", 
+            "id": "rfxcom.remote", 
+            "name": "Remote"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/rfxcom/icon.png", 
-        "src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"
+        "src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.json"
     ], 
     "identity": {
         "author": "Fritz", 

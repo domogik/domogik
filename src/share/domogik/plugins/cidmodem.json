@@ -43,13 +43,19 @@
             "value_type": "string"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Caller id", 
+            "id": "communication.caller_id", 
+            "name": "Caller id"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/cidmodem/icon.png", 
         "src/share/domogik/plugins/cidmodem.json", 
         "src/share/domogik/stats/communication/cid.basic-cidmodem.xml", 
-        "src/domogik/xpl/bin/cidmodem.py", 
-        "src/domogik/xpl/lib/cidmodem.py"
+        "src/domogik_packages/xpl/bin/cidmodem.py", 
+        "src/domogik_packages/xpl/lib/cidmodem.py"
     ], 
     "identity": {
         "author": "Fritz", 

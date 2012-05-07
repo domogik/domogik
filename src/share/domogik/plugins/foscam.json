@@ -93,7 +93,13 @@
             "value_type": "trigger"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Relay", 
+            "id": "foscam.relay", 
+            "name": "Relay"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/foscam/icon.png", 
         "src/share/domogik/plugins/foscam.json", 
@@ -101,8 +107,8 @@
         "src/share/domogik/url2xpl/foscam/high.xml", 
         "src/share/domogik/url2xpl/foscam/low.xml", 
         "src/share/domogik/url2xpl/foscam/pulse.xml", 
-        "src/domogik/xpl/bin/foscam.py", 
-        "src/domogik/xpl/lib/foscam.py"
+        "src/domogik_packages/xpl/bin/foscam.py", 
+        "src/domogik_packages/xpl/lib/foscam.py"
     ], 
     "identity": {
         "author": "Capof", 

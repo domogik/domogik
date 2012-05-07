@@ -63,14 +63,25 @@
             "value_type": "range"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "zwave.switch", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer", 
+            "id": "zwave.dimmer", 
+            "name": "Dimmer"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/zwave/icon.png", 
         "src/share/domogik/plugins/zwave.json", 
         "src/share/domogik/stats/zwave/zwave.basic-zwave.xml", 
         "src/share/domogik/url2xpl/zwave/level.xml", 
-        "src/domogik/xpl/bin/zwave.py", 
-        "src/domogik/xpl/lib/zwave.py"
+        "src/domogik_packages/xpl/bin/zwave.py", 
+        "src/domogik_packages/xpl/lib/zwave.py"
     ], 
     "identity": {
         "author": "Michael Ricart", 

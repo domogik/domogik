@@ -63,7 +63,18 @@
             "value_type": "number"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "x10.switch", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer", 
+            "id": "x10.dimmer", 
+            "name": "Dimmer"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/x10_heyu/icon.png", 
         "src/share/domogik/plugins/x10_heyu.json", 
@@ -72,8 +83,8 @@
         "src/share/domogik/url2xpl/x10/dim.xml", 
         "src/share/domogik/url2xpl/x10/on.xml", 
         "src/share/domogik/url2xpl/x10/off.xml", 
-        "src/domogik/xpl/bin/x10_heyu.py", 
-        "src/domogik/xpl/lib/x10_heyu.py"
+        "src/domogik_packages/xpl/bin/x10_heyu.py", 
+        "src/domogik_packages/xpl/lib/x10_heyu.py"
     ], 
     "identity": {
         "author": "Maxence Dunnewind, Mirelsol", 

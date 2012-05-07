@@ -49,8 +49,8 @@
         "src/share/domogik/url2xpl/karotz/tts.xml", 
         "src/share/domogik/url2xpl/karotz/led.xml", 
         "src/share/domogik/url2xpl/karotz/ears.xml", 
-        "src/domogik/xpl/bin/karotz.py", 
-        "src/domogik/xpl/lib/karotz.py"
+        "src/domogik_packages/xpl/bin/karotz.py", 
+        "src/domogik_packages/xpl/lib/karotz.py"
     ], 
     "identity": {
         "author": "Cedric BOLLINI", 

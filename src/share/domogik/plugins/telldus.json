@@ -163,7 +163,23 @@
             "value_type": "range"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "telldus.switch", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer", 
+            "id": "telldus.dimmer", 
+            "name": "Dimmer"
+        }, 
+        {
+            "description": "Shutter", 
+            "id": "telldus.shutter", 
+            "name": "Shutter"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/telldus/icon.png", 
         "src/share/domogik/plugins/telldus.json", 
@@ -179,12 +195,12 @@
         "src/share/domogik/url2xpl/telldus/shut.xml", 
         "src/share/domogik/url2xpl/telldus/stop.xml", 
         "src/share/domogik/url2xpl/telldus/up.xml", 
-        "src/domogik/xpl/bin/telldus.py", 
-        "src/domogik/xpl/helpers/telldus.py", 
-        "src/domogik/xpl/lib/telldus.py", 
-        "src/domogik/xpl/lib/telldus_dawndusk.py", 
-        "src/domogik/xpl/lib/telldus_windoor.py", 
-        "src/domogik/xpl/lib/telldus_move.py"
+        "src/domogik_packages/xpl/bin/telldus.py", 
+        "src/domogik_packages/xpl/helpers/telldus.py", 
+        "src/domogik_packages/xpl/lib/telldus.py", 
+        "src/domogik_packages/xpl/lib/telldus_dawndusk.py", 
+        "src/domogik_packages/xpl/lib/telldus_windoor.py", 
+        "src/domogik_packages/xpl/lib/telldus_move.py"
     ], 
     "identity": {
         "author": "Sebastien GALLET", 

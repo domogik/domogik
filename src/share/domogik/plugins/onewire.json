@@ -119,6 +119,26 @@
             "optionnal": "no", 
             "options": [], 
             "type": "number"
+        }, 
+        {
+            "default": "False", 
+            "desc": "Enable DS2408. EXPERIMENTAL ", 
+            "id": "12", 
+            "interface": "no", 
+            "key": "ds2408-en", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "60", 
+            "desc": "Interval. EXPERIMENTAL ", 
+            "id": "13", 
+            "interface": "no", 
+            "key": "ds2408-int", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "number"
         }
     ], 
     "device_feature_models": [
@@ -161,35 +181,146 @@
             "return_confirmation": "0", 
             "stat_key": "present", 
             "value_type": "boolean"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "sensor", 
+            "id": "onewire.gpio.status", 
+            "name": "Status", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "data", 
+            "value_type": "boolean"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io0", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch0&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data0", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io1", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch1&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data1", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io2", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch2&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data2", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io3", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch3&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data3", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io4", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch4&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data4", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io5", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch5&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data5", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io6", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch6&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data6", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "onewire.gpio", 
+            "feature_type": "actuator", 
+            "id": "onewire.gpio.io7", 
+            "name": "Status", 
+            "parameters": "{&quot;command&quot;:&quot;switch7&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "data7", 
+            "value_type": "binary"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Thermometer", 
+            "id": "onewire.thermometer", 
+            "name": "Thermometer"
+        }, 
+        {
+            "description": "Temperature and Humidity", 
+            "id": "onewire.temperature_and_humidity", 
+            "name": "Temperature and Humidity"
+        }, 
+        {
+            "description": "Serial number", 
+            "id": "onewire.serial_number", 
+            "name": "Serial number"
+        }, 
+        {
+            "description": "Onewire GPIO Chipset", 
+            "id": "onewire.gpio", 
+            "name": "General purpose IO"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/onewire/icon.png", 
         "src/share/domogik/plugins/onewire.json", 
         "src/share/domogik/stats/1wire/sensor.basic-onewire.xml", 
-        "src/domogik/xpl/bin/onewire.py", 
-        "src/domogik/xpl/lib/onewire.py"
+        "src/domogik_packages/xpl/bin/onewire.py", 
+        "src/domogik_packages/xpl/lib/onewire.py"
     ], 
     "identity": {
         "author": "Fritz", 
         "author_email": "fritz.smh at gmail.com", 
         "category": "onewire", 
-        "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "changelog": "0.3.a\n- Add DS2408 support\n\n0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
         "dependencies": [
             {
                 "id": "owfs (>=2.8.4)", 
                 "type": "other"
             }
         ], 
-        "description": "Manage 1-wire devices.\nList of supported devices :\n- DS18B20\n- DS18S20\n- DS2401\n- DS2438", 
+        "description": "Manage 1-wire devices.\nList of supported devices : \n- DS18B20\n- DS18S20\n- DS2401\n- DS2438\n- DS2408", 
         "documentation": "http://wiki.domogik.org/plugin_onewire", 
         "domogik_min_version": "0.2.0", 
         "fullname": "plugin-onewire", 
         "id": "onewire", 
         "name": "onewire", 
         "type": "plugin", 
-        "version": "0.2a0"
+        "version": "0.3.a"
     }, 
     "json_version": 1, 
     "technology": {

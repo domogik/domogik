@@ -63,16 +63,22 @@
             "value_type": "trigger"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Television", 
+            "id": "multimedia.television", 
+            "name": "Television"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/tv_samsg/icon.png", 
         "src/share/domogik/plugins/tv_samsg.json", 
         "src/share/domogik/url2xpl/multimedia/power_on.xml", 
         "src/share/domogik/url2xpl/multimedia/power_standby.xml", 
         "src/share/domogik/url2xpl/multimedia/channel_up.xml", 
-        "src/domogik/xpl/bin/tv_samsg.py", 
-        "src/domogik/xpl/lib/tv_samsg.py", 
-        "src/domogik/xpl/lib/tv_samsg_led.py"
+        "src/domogik_packages/xpl/bin/tv_samsg.py", 
+        "src/domogik_packages/xpl/lib/tv_samsg.py", 
+        "src/domogik_packages/xpl/lib/tv_samsg_led.py"
     ], 
     "identity": {
         "author": "Fritz", 

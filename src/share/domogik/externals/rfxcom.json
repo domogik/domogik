@@ -385,7 +385,7 @@
     }, 
     "files": [
         "src/share/domogik/design/external/rfxcom/icon.png", 
-        "src/share/domogik/externals/rfxcom.xml", 
+        "src/share/domogik/externals/rfxcom.json", 
         "src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml"
     ], 
     "identity": {

@@ -1,19 +1,9 @@
 {
     "configuration": [
         {
-            "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
-            "id": "0", 
-            "interface": "no", 
-            "key": "startup-plugin", 
-            "optionnal": "no", 
-            "options": [], 
-            "type": "boolean"
-        }, 
-        {
             "default": null, 
             "desc": "The name of the alarm", 
-            "id": "1", 
+            "id": "0", 
             "interface": "yes", 
             "key": "device", 
             "optionnal": "no", 
@@ -23,7 +13,7 @@
         {
             "default": null, 
             "desc": "alarm or dawnalarm", 
-            "id": "2", 
+            "id": "1", 
             "interface": "yes", 
             "key": "alarmtype", 
             "optionnal": "no", 
@@ -33,7 +23,7 @@
         {
             "default": null, 
             "desc": "A string like MoTuWeThFr,09:30", 
-            "id": "3", 
+            "id": "2", 
             "interface": "yes", 
             "key": "alarm1", 
             "optionnal": "no", 
@@ -43,7 +33,7 @@
         {
             "default": null, 
             "desc": "Or like MoTuWeThFrSaSu,07:00-08:00,17:00-21:00", 
-            "id": "4", 
+            "id": "3", 
             "interface": "yes", 
             "key": "alarm2", 
             "optionnal": "no", 
@@ -53,7 +43,7 @@
         {
             "default": null, 
             "desc": "Or for a dawnalarm like SaSu,08:00-09:00", 
-            "id": "5", 
+            "id": "4", 
             "interface": "yes", 
             "key": "alarm3", 
             "optionnal": "no", 
@@ -63,7 +53,7 @@
         {
             "default": null, 
             "desc": "The schema of the message to send", 
-            "id": "6", 
+            "id": "5", 
             "interface": "yes", 
             "key": "nstschema", 
             "optionnal": "no", 
@@ -73,7 +63,7 @@
         {
             "default": null, 
             "desc": "The type of the message to send", 
-            "id": "7", 
+            "id": "6", 
             "interface": "yes", 
             "key": "nsttype", 
             "optionnal": "no", 
@@ -83,7 +73,7 @@
         {
             "default": null, 
             "desc": "The name of the parameter 0 to send (ie command)", 
-            "id": "8", 
+            "id": "7", 
             "interface": "yes", 
             "key": "parameter0", 
             "optionnal": "no", 
@@ -93,7 +83,7 @@
         {
             "default": null, 
             "desc": "The on value of the parameter 0 to send (ie on)", 
-            "id": "9", 
+            "id": "8", 
             "interface": "yes", 
             "key": "valueon0", 
             "optionnal": "no", 
@@ -103,7 +93,7 @@
         {
             "default": null, 
             "desc": "The off value of the parameter 0 to send (ie off)", 
-            "id": "10", 
+            "id": "9", 
             "interface": "yes", 
             "key": "valueoff0", 
             "optionnal": "no", 
@@ -113,7 +103,7 @@
         {
             "default": null, 
             "desc": "The name of the parameter 1 to send", 
-            "id": "11", 
+            "id": "10", 
             "interface": "yes", 
             "key": "parameter1", 
             "optionnal": "no", 
@@ -123,7 +113,7 @@
         {
             "default": null, 
             "desc": "The on value of the parameter 1 to send", 
-            "id": "12", 
+            "id": "11", 
             "interface": "yes", 
             "key": "valueon1", 
             "optionnal": "no", 
@@ -133,7 +123,7 @@
         {
             "default": null, 
             "desc": "The off value of the parameter 1 to send", 
-            "id": "13", 
+            "id": "12", 
             "interface": "yes", 
             "key": "valueoff1", 
             "optionnal": "no", 
@@ -143,7 +133,7 @@
         {
             "default": null, 
             "desc": "The nested field 1 to send", 
-            "id": "14", 
+            "id": "13", 
             "interface": "yes", 
             "key": "nstfield1", 
             "optionnal": "no", 
@@ -153,7 +143,7 @@
         {
             "default": null, 
             "desc": "The value of the nested field to send", 
-            "id": "15", 
+            "id": "14", 
             "interface": "yes", 
             "key": "nstvalue1", 
             "optionnal": "no", 
@@ -163,7 +153,7 @@
         {
             "default": null, 
             "desc": "The nested the field 2 to send", 
-            "id": "16", 
+            "id": "15", 
             "interface": "yes", 
             "key": "nstfield2", 
             "optionnal": "no", 
@@ -173,7 +163,7 @@
         {
             "default": null, 
             "desc": "The value of the nested field to send", 
-            "id": "17", 
+            "id": "16", 
             "interface": "yes", 
             "key": "nstvalue2", 
             "optionnal": "no", 
@@ -183,7 +173,7 @@
         {
             "default": null, 
             "desc": "The nested the field 3 to send", 
-            "id": "18", 
+            "id": "17", 
             "interface": "yes", 
             "key": "nstfield3", 
             "optionnal": "no", 
@@ -193,7 +183,7 @@
         {
             "default": null, 
             "desc": "The value of the nested field to send", 
-            "id": "19", 
+            "id": "18", 
             "interface": "yes", 
             "key": "nstvalue3", 
             "optionnal": "no", 
@@ -206,16 +196,21 @@
     "files": [
         "src/share/domogik/design/plugin/zalarms/icon.png", 
         "src/share/domogik/plugins/zalarms.json", 
-        "src/domogik/xpl/bin/zalarms.py", 
-        "src/domogik/xpl/lib/zalarms.py"
+        "src/domogik_packages/xpl/bin/zalarms.py", 
+        "src/domogik_packages/xpl/lib/zalarms.py"
     ], 
     "identity": {
         "author": "Sebastien GALLET", 
         "author_email": "sgallet at gmail dot com", 
         "category": "cron", 
         "changelog": "0.2\n- #TO DEFINE#\n0.1\n- Initial release", 
-        "dependencies": [], 
-        "description": "A poor interface to the cron plugin.\n  You can only create an alarm message.\n  Read the wiki for documentation.", 
+        "dependencies": [
+            {
+                "id": "cron", 
+                "type": "plugin"
+            }
+        ], 
+        "description": "A light interface to the cron plugin.\n  You can only create an alarm or an dawnalarm message.\n  Read the wiki for documentation.", 
         "documentation": "http://wiki.domogik.org/plugin_zalarms", 
         "domogik_min_version": "0.2.0", 
         "fullname": "plugin-zalarms", 

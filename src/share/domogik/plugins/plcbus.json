@@ -83,7 +83,18 @@
             "value_type": "range"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "plcbus.switch", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer", 
+            "id": "plcbus.dimmer", 
+            "name": "Dimmer"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/plcbus/icon.png", 
         "src/share/domogik/plugins/plcbus.json", 
@@ -95,9 +106,9 @@
         "src/share/domogik/url2xpl/plcbus/on.xml", 
         "src/share/domogik/url2xpl/plcbus/off.xml", 
         "src/share/domogik/url2xpl/plcbus/preset_dim.xml", 
-        "src/domogik/xpl/bin/plcbus.py", 
-        "src/domogik/xpl/lib/plcbus.py", 
-        "src/domogik/xpl/lib/PLCBusSerialHandler.py"
+        "src/domogik_packages/xpl/bin/plcbus.py", 
+        "src/domogik_packages/xpl/lib/plcbus.py", 
+        "src/domogik_packages/xpl/lib/PLCBusSerialHandler.py"
     ], 
     "identity": {
         "author": "Francois Pinet, Maxence Dunnewind", 

@@ -16,7 +16,7 @@
     "files": [
         "src/share/domogik/design/plugin/xpl_time/icon.png", 
         "src/share/domogik/plugins/xpl_time.json", 
-        "src/domogik/xpl/bin/xpl_time.py"
+        "src/domogik_packages/xpl/bin/xpl_time.py"
     ], 
     "identity": {
         "author": "Maxence Dunnewind", 

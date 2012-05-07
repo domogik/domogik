@@ -31,7 +31,7 @@
             "type": "string"
         }, 
         {
-            "default": "HIGH", 
+            "default": "high", 
             "desc": "IPX800 relay address level (HIGH or LOW)", 
             "id": "3", 
             "interface": "yes", 

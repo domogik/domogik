@@ -93,7 +93,18 @@
             "value_type": "number"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Switch", 
+            "id": "x10.switch", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer", 
+            "id": "x10.dimmer", 
+            "name": "Dimmer"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/mochad/icon.png", 
         "src/share/domogik/plugins/mochad.json", 
@@ -102,8 +113,8 @@
         "src/share/domogik/url2xpl/x10/dim.xml", 
         "src/share/domogik/url2xpl/x10/on.xml", 
         "src/share/domogik/url2xpl/x10/off.xml", 
-        "src/domogik/xpl/bin/mochad.py", 
-        "src/domogik/xpl/lib/mochad.py"
+        "src/domogik_packages/xpl/bin/mochad.py", 
+        "src/domogik_packages/xpl/lib/mochad.py"
     ], 
     "identity": {
         "author": "Julien Garet, jgaret", 

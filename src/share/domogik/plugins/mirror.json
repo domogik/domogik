@@ -43,13 +43,24 @@
             "value_type": "boolean"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Mirror base", 
+            "id": "rfid.mirror_base", 
+            "name": "Mirror base"
+        }, 
+        {
+            "description": "Mirror tag", 
+            "id": "rfid.mirror_tag", 
+            "name": "Mirror tag"
+        }
+    ], 
     "files": [
         "src/share/domogik/design/plugin/mirror/icon.png", 
         "src/share/domogik/plugins/mirror.json", 
         "src/share/domogik/stats/rfid/sensor.basic-mirror.xml", 
-        "src/domogik/xpl/bin/mirror.py", 
-        "src/domogik/xpl/lib/mirror.py"
+        "src/domogik_packages/xpl/bin/mirror.py", 
+        "src/domogik_packages/xpl/lib/mirror.py"
     ], 
     "identity": {
         "author": "Fritz", 

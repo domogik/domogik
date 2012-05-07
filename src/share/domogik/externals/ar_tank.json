@@ -35,7 +35,7 @@
     }, 
     "files": [
         "src/share/domogik/design/external/ar_tank/icon.png", 
-        "src/share/domogik/externals/ar_tank.xml", 
+        "src/share/domogik/externals/ar_tank.json", 
         "src/share/domogik/stats/arduino/sensor.basic-ar_tank.xml"
     ], 
     "identity": {
