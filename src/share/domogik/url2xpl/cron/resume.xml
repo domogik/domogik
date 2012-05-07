@@ -1,0 +1,17 @@
+<technology id="cron">
+  <command name="resume">
+    <schema>timer.basic</schema>
+    <command-key>action</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>resume</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>timer.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="current" value="started" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

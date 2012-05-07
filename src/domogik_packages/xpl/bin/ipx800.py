@@ -30,7 +30,7 @@ Implements
 - IPXManager
 
 @author: Fritz <fritz.smh@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -179,7 +179,7 @@ class IPXManager(XplPlugin):
             return
 
         # check data
-        if elt == 'led' and msg_current not in ['HIGH', 'LOW', 'PULSE'] \
+        if elt == 'led' and msg_current not in ['high', 'low', 'pulse'] \
            and msg_type != 'output':
             self.log.warning("Bad data : %s" % data)
             return
@@ -187,9 +187,9 @@ class IPXManager(XplPlugin):
         # TODO in a next release : other checks : counter
   
         # action in function of type
-        if elt == 'led' and msg_type == 'output' and msg_current in ['HIGH', 'LOW']:
+        if elt == 'led' and msg_type == 'output' and msg_current in ['high', 'low']:
             self.ipx_list[ipx_name]['obj'].set_relay(num, msg_current)
-        elif elt == 'led' and msg_type == 'output' and msg_current == 'PULSE':
+        elif elt == 'led' and msg_type == 'output' and msg_current == 'pulse':
             self.ipx_list[ipx_name]['obj'].pulse_relay(num)
 
         # TODO in a next release : other actions : counter reset

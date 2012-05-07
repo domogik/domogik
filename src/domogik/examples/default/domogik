@@ -30,3 +30,19 @@ CUSTOM_PATH=
 
 # Interface where the xpl hub is supposed to listen for
 HUB_IFACE="lo"
+
+# Time to wait for the server to die, in seconds
+# If this value is set too low you might not
+# let some servers to die gracefully and
+# 'restart' will not work
+DIETIME=2
+
+# Time to wait for the server to start, in seconds
+# If this value is set each time the server is
+# started (on start or restart) the script will
+# stall to try to determine if it is running
+# If it is not set and the server takes time
+# to setup a pid file the log message might
+# be a false positive (says it did not start
+# when it actually did)
+STARTTIME=6

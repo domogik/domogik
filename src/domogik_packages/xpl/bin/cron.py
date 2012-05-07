@@ -86,7 +86,7 @@ request :
 ./send.py xpl-cmnd timer.request "device=timer1"
 
 @author: Sébastien Gallet <sgallet@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -108,19 +108,20 @@ class Cron(XplHlpPlugin):
         Create the cron class
         """
         XplHlpPlugin.__init__(self, name = 'cron')
-        self.log.info("cron.__init__ : Start ...")
+        self.log.info("__init__ : Start ...")
         self.config = Query(self.myxpl, self.log)
 
-        self.log.debug("cron.__init__ : Try to start the cron API")
+        self.log.debug("__init__ : Try to start the cron API")
         try:
-            self._cron = CronAPI(self.log, self.config, self.myxpl)
+            self._cron = CronAPI(self.log, self.config, self.myxpl, \
+                self.get_data_files_directory())
         except:
             error = "Something went wrong during cronAPI init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("cron.__init__ : "+error)
+            self.log.exception("__init__ : "+error)
             raise CronException(error)
 
-        self.log.debug("cron.__init__ : Try to create listeners")
+        self.log.debug("__init__ : Try to create listeners")
         Listener(self.request_cmnd_cb, self.myxpl,
                  {'schema': 'timer.request', 'xpltype': 'xpl-cmnd'})
         Listener(self.basic_cmnd_cb, self.myxpl,
@@ -129,7 +130,7 @@ class Cron(XplHlpPlugin):
         self.helpers =   \
            { "list" :
               {
-                "cb" : self._cron.jobs.helper_list,
+                "cb" : self._cron.helpers.helper_list,
                 "desc" : "List devices (cron jobs)",
                 "usage" : "list all (all the devices)|aps(jobs in APScheduler)",
                 "param-list" : "which",
@@ -137,7 +138,7 @@ class Cron(XplHlpPlugin):
               },
              "ls" :
               {
-                "cb" : self._cron.jobs.helper_list,
+                "cb" : self._cron.helpers.helper_list,
                 "desc" : "List devices (cron jobs)",
                 "usage" : "list all the devices",
                 "return-list" : "array1",
@@ -145,7 +146,7 @@ class Cron(XplHlpPlugin):
               },
              "test" :
               {
-                "cb" : self._cron.jobs.helper_list,
+                "cb" : self._cron.helpers.helper_list,
                 "desc" : "Test return transfert",
                 "usage" : "test",
                 "param-list" : "device",
@@ -155,7 +156,7 @@ class Cron(XplHlpPlugin):
               },
              "info" :
               {
-                "cb" : self._cron.jobs.helper_info,
+                "cb" : self._cron.helpers.helper_info,
                 "desc" : "Display device information",
                 "usage" : "info <device>",
                 "param-list" : "device",
@@ -163,7 +164,7 @@ class Cron(XplHlpPlugin):
               },
              "stop" :
               {
-                "cb" : self._cron.jobs.helper_stop,
+                "cb" : self._cron.helpers.helper_stop,
                 "desc" : "Stop a device",
                 "usage" : "stop <device>",
                 "param-list" : "device",
@@ -171,7 +172,7 @@ class Cron(XplHlpPlugin):
               },
              "halt" :
               {
-                "cb" : self._cron.jobs.helper_halt,
+                "cb" : self._cron.helpers.helper_halt,
                 "desc" : "Halt a device",
                 "usage" : "halt <device>",
                 "param-list" : "device",
@@ -179,7 +180,7 @@ class Cron(XplHlpPlugin):
               },
              "resume" :
               {
-                "cb" : self._cron.jobs.helper_resume,
+                "cb" : self._cron.helpers.helper_resume,
                 "desc" : "Resume a device",
                 "usage" : "resume <device>",
                 "param-list" : "device",
@@ -196,18 +197,18 @@ class Cron(XplHlpPlugin):
         General callback for timer.request messages
         @param message : an XplMessage object
         """
-        self.log.debug("cron.request_cmnd_cb() : Start ...")
+        self.log.debug("request_cmnd_cb() : Start ...")
         self._cron.request_listener(message)
-        self.log.debug("cron.request_cmnd_cb() : Done :)")
+        self.log.debug("request_cmnd_cb() : Done :)")
 
     def basic_cmnd_cb(self, message):
         """
         General callback for timer.basic messages
         @param message : an XplMessage object
         """
-        self.log.debug("cron.basic_cmnd_cb() : Start ...")
+        self.log.debug("basic_cmnd_cb() : Start ...")
         self._cron.basic_listener(message)
-        self.log.debug("cron.basic_cmnd_cb() : Done :)")
+        self.log.debug("basic_cmnd_cb() : Done :)")
 
 if __name__ == "__main__":
     Cron()

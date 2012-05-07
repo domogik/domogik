@@ -66,7 +66,7 @@ Implements
 - XplTimer.run(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -99,12 +99,13 @@ class Manager:
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
         @param port : port to listen to (default 0)
         @param plugin : The plugin associated with this xpl instance
+        @param nohub : Don't start the hub discovery
         """
         if ip == None:
             ip = self.get_sanitized_hostname()
@@ -142,7 +143,10 @@ class Manager:
         self._lock_status = threading.Semaphore()
         # hbeat detected
         self._foundhub = threading.Event()
-        self._foundhub.clear()
+        if nohub == True:
+            self._foundhub.set()
+        else:
+            self._foundhub.clear()
 
         # Try and bind to the base port
         try:

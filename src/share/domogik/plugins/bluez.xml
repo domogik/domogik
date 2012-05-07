@@ -1,0 +1,127 @@
+<package type="plugin">
+  <id>bluez</id>
+  <technology>bluez</technology>
+  <description>
+  A blue tooth dectector. Send an XPL message when a friend device is found.
+  </description>
+  <changelog>
+0.1
+- plugin creation
+</changelog>
+  <version>0.1a0</version>
+  <documentation>http://wiki.domogik.org/plugin_bluez</documentation>
+  <author>Sebastien GALLET</author>
+  <author-email>sgallet at gmail dot com</author-email>
+  <domogik-min-version>0.2.0</domogik-min-version>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device-name</name>
+      <type>string</type>
+      <description>The device name of the bluez plugin "instance".</description>
+      <default-value>bluez</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>scan-delay</name>
+      <type>int</type>
+      <description>The delay between 2 bluetooth scans.</description>
+      <default-value>30</default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>error-delay</name>
+      <type>int</type>
+      <description>The delay to wait when an error occurs with the bluetooth adaptator.</description>
+      <default-value>120</default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>listen-method</name>
+      <type>string</type>
+      <description>The listen method to use : discovery,lookup</description>
+      <default-value>lookup</default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>5</order-id>
+      <name>bt-name</name>
+      <type>string</type>
+      <description>XPL name of the device to scan. It will be used as device address in domogik.</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <order-id>6</order-id>
+      <name>bt-addr</name>
+      <type>string</type>
+      <description>Bluetooth address of the device to scan (01:23:45:67:89:AB).</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/design/plugin/bluez/icon.png"/>
+    <file path="src/share/domogik/plugins/bluez.xml"/>
+    <file path="src/share/domogik/stats/bluez/sensor.basic-bluez.xml"/>
+    <file path="src/share/domogik/url2xpl/bluez/start.xml"/>
+    <file path="src/share/domogik/url2xpl/bluez/stop.xml"/>
+    <file path="src/domogik/xpl/bin/bluez.py"/>
+    <file path="src/domogik/xpl/lib/bluez.py"/>
+  </files>
+  <dependencies>
+    <dep type="python" id="pybluez (>=0.18)"/>
+  </dependencies>
+  <udev-rules/>
+  <device_technology>
+      <id>bluez</id>
+      <name>Bluez</name>
+      <description>Bluetooth detection</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>bluez.switch</id>
+          <name>Switch</name>
+          <description>Start/stop scanning bluetooth materials</description>
+          <device_technology_id>bluez</device_technology_id>
+      </device_type>
+      <device_type>
+          <id>bluez.status</id>
+          <name>Status</name>
+          <description>Status of a bluetooth material</description>
+          <device_technology_id>bluez</device_technology_id>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+     <device_feature_model>
+          <id>bluez.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>bluez.switch</device_type_id>
+          <parameters>
+              {&quot;action&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;start&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>status</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+     <device_feature_model>
+          <id>bluez.status.status</id>
+          <name>Status</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>bluez.status</device_type_id>
+          <parameters>
+              {&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>ping</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+  </device_feature_models>
+</package>

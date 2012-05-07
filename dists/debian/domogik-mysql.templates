@@ -1,0 +1,37 @@
+Template: domogik/db_host
+Type: string
+Description: The database host to use with Domogik
+ If you have a dedicated mysql server on your network, you should use it.
+ Otherwise, you must install mysql and use localhost.
+Default: localhost
+
+Template: domogik/db_name
+Type: string
+Description: The database name (domogik by default)
+Default: domogik
+
+Template: domogik/db_user
+Type: string
+Description: The user to use to connect to the database
+Default: domogik
+
+Template: domogik/db_password
+Type: password
+Description: The database user password
+
+Template: domogik/db_root
+Type: string
+Description: The administrator of the mysql server
+Default: root
+
+Template: domogik/db_root_pwd
+Type: password
+Description: The password of the admin database
+
+Template: domogik/auto_start
+Type: boolean
+Default: true
+Description: Should we start Domogik on startup.
+ Your connection to the database must be effective to says yes.
+ Otherwise, you must say no and manualy install/update your database
+ and enable automatic startup in /etc/default/domogik.

@@ -2,11 +2,11 @@
 
 ### BEGIN INIT INFO
 # Provides:          domogik
-# Required-Start:    $local_fs $network
-# Required-Stop:     $local_fs $network
+# Required-Start:    $local_fs $network xplhub
+# Required-Stop:     $local_fs $network xplhub
 # Default-Start:     2 3 4 5
-# Default-Stop:      1
-# Short-Description: Start Domogik daemons
+# Default-Stop:      0 1 6
+# Short-Description: Start xpl hub
 ### END INIT INFO
 
 #This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -31,9 +31,18 @@
 CUSTOM_PATH=""
 HUB_IFACE="lo"
 LAUNCH_DOMOGIK_XPL_HUB="true"
+NAME=dmg_manager
+XPLHUB=xPL_Hub
+DAEMON=$(which $NAME)
+DIETIME=2
+STARTTIME=5
+#PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
+PIDDIR="/var/run/domogik"
+PIDFILE="$PIDDIR/manager.pid" 
+LOCKDIR="/var/lock/domogik"
 
-[ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-[ -f /etc/default/domogik ] && . /etc/default/domogik
+[ -f /etc/conf.d/xplhub ] && . /etc/conf.d/xplhub
+[ -f /etc/default/xplhub ] && . /etc/default/xplhub
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH:
 if [ $UID != 0 ];then
@@ -42,12 +51,12 @@ if [ $UID != 0 ];then
 fi
 
 function start_xpl {
-    if [ -z "$(which xPL_Hub)" ];then
-        echo "ERROR : xPL_Hub not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
+    if [ -z "$(which $NAME)" ];then
+        echo "ERROR : $NAME not in path, please install it somewhere in the path, or add CUSTOM_PATH to default file."
         exit 1
     fi
-    echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which xPL_Hub) -interface ${HUB_IFACE} >/dev/null "
+    echo -n " * Starting XPL..."
+    /bin/su - ${DOMOGIK_USER} -c "$(which $NAME) -interface ${HUB_IFACE} >/dev/null "
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
@@ -57,18 +66,140 @@ function start_xpl {
 }
 
 function start_manager {
-    [ -p /var/run/domogik/dmg-manager-state ] && rm -f /var/run/domogik/dmg-manager-state
-    mkfifo /var/run/domogik/dmg-manager-state
-    chown ${DOMOGIK_USER}: /var/run/domogik/dmg-manager-state
-    echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS"
+    [ -p $PIDDIR/dmg-manager-state ] && rm -f $PIDDIR/dmg-manager-state
+    mkfifo $PIDDIR/dmg-manager-state
+    chown ${DOMOGIK_USER}: $PIDDIR/dmg-manager-state
+    start_daemon
+    #Get the startup status
+    cat < $PIDDIR/dmg-manager-state
+    rm -f $PIDDIR/dmg-manager-state
+}
+
+function start_daemon {
+    echo -n " * Starting Manager (with $MANAGER_PARAMS)..."
+    /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:$PATH && dmg_manager $MANAGER_PARAMS"
     if [ $? -gt 0 ]; then
+        echo " "
         echo " An error occured during manager startup."
         exit 1
     fi
-    #Get the startup status
-    cat < /var/run/domogik/dmg-manager-state
-    rm -f /var/run/domogik/dmg-manager-state
+    sleep $STARTTIME
+    echo " Done."
+}
+
+function status {
+    [ ! -f $PIDFILE ] && \
+        echo " * Domogik is not running (can't find pid file)" &&
+        exit 0
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
+        echo " * Domogik is running"
+    else
+        echo " * Domogik is not running"
+    fi
+}
+
+function status_manager {
+    if [ -f $PIDFILE ] && [ $(/bin/ps `cat $PIDFILE 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
+        echo " * manager is running"
+    else
+        echo " * manager is not running"
+    fi
+    if [ -f $PIDDIR/dbmgr.pid ] && [ $(/bin/ps `cat $PIDDIR/dbmgr.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
+        echo " * dbmgr is running"
+    else
+        echo " * dbmgr is not running"
+    fi
+    if [ -f $PIDDIR/rest.pid ] && [ $(/bin/ps `cat $PIDDIR/rest.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
+        echo " * rest is running"
+    else
+        echo " * rest is not running"
+    fi
+}
+
+function status_xpl {
+    set +e
+    RUNNING=$(/usr/bin/pgrep -c $NAME)
+    set -e
+    if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ] ; then
+        echo " * $NAME is running"
+    else
+        echo " * $NAME is not running"
+    fi
+}
+
+function stop {
+    stop_plugins
+    if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
+        stop_xpl
+    else
+        echo "Domogik xPL hub disabled : no need to stop Domogik xPL hub"
+    fi
+    stop_manager
+    kill_all
+}
+
+function stop_xpl {
+    echo -n " * Stopping XPL..."
+    for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+        sleep $DIETIME
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    echo " Done."
+}
+
+function stop_manager {
+    echo -n " * Stopping Manager..."
+    kill $(cat $PIDFILE 2>/dev/null) >/dev/null 2>&1
+    sleep $DIETIME
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
+        kill $(cat $PIDFILE 2>/dev/null) >/dev/null 2>&1
+        sleep $DIETIME
+    fi
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
+        kill -9 $(cat $PIDFILE 2>/dev/null) >/dev/null 2>&1
+        sleep $DIETIME
+    fi
+    RUNNING=$(pgrep "$NAME" | grep -c $(cat $PIDFILE 2>/dev/null) 2>/dev/null)
+    if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ]; then
+        echo " Can't stop domogik."
+    else
+        rm -f $PIDFILE 2>/dev/null
+        echo " Done."
+    fi
+}
+
+function stop_plugins {
+    echo -n " * Stopping Plugins..."
+    [ -z $HOSTNAME ] && HOSTNAME=$(/bin/cat /etc/hostname)
+    [ -f $PIDFILE ] && \
+        su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'" && \
+        sleep $DIETIME
+#    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
+#        kill -15 $pid 2>/dev/null 1>&2
+#    done
+#    sleep 2
+#    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
+#        kill -9 $pid 2>/dev/null 1>&2
+#    done
+    echo " Done."
+}
+
+kill_all() {
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        kill $(cat $f 2>/dev/null) >/dev/null 2>&1
+    done
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        kill $(cat $f 2>/dev/null) >/dev/null 2>&1
+    done
+    sleep $DIETIME
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        kill -9 $(cat $f 2>/dev/null) >/dev/null 2>&1
+        rm -f $f 2>/dev/null
+    done
 }
 
 function update_cache {
@@ -82,100 +213,104 @@ function update_cache {
     fi
 }
 
-function stop_xpl {
-    echo -n " * Stopping XPL..."
-    for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-        kill -9 $pid 2>/dev/null 1>&2
-    done
-    echo " Done."
-}
-
-function stop_manager {
-    echo -n " * Stopping Manager..."
-    for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-    done
-    echo " Done."
-}
-
-function stop_plugins {
-    echo -n " * Stopping Plugins..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
-    sleep 2
-    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-    done
-#    sleep 2
-#    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
-#        kill -9 $pid 2>/dev/null 1>&2
-#    done
-    echo " Done."
-}
-
 # Check if the directory for lock exists
 function check_lock_dir {
-    USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DIRECTORY=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
-    if [ ! -d $DIRECTORY ];then
-        mkdir $DIRECTORY
-    fi
-    chown ${DOMOGIK_USER}: $DIRECTORY
+    #USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
+    [ ! -d $PIDDIR ] && mkdir $PIDDIR
+    [ -p $PIDDIR/dmg-manager-state ] && rm -f $PIDDIR/dmg-manager-state
+    chown ${DOMOGIK_USER}: $PIDDIR
+    [ ! -d $LOCKDIR ] && mkdir $LOCKDIR
+    chown ${DOMOGIK_USER}: $LOCKDIR
 }
 
 case "$1" in
     start)
-    check_lock_dir
-    if [ $# -eq 1 ];then
-        if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
-            start_xpl
+        check_lock_dir
+        if [ $# -eq 1 ];then
+			[ -f $PIDFILE ] && echo "Domogik seems to be running. Please stop it." && exit 0
+            start
+            sleep $STARTTIME
+            sleep $STARTTIME
+            update_cache
         else
-            echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
+            case "$2" in
+                xpl)
+                    start_xpl
+                ;;
+                manager)
+                    start_manager
+                    ;;
+                *)
+                    echo "usage: $0 start [manager|xpl]"
+                ;;
+            esac
         fi
-        start_manager
-        update_cache
-    else
-        case "$2" in
-            xpl)
-            start_xpl
-            ;;
-            manager)
-            start_manager
-            ;;
-        esac
-    fi
-
-    ;;
+        ;;
     stop)
-    if [ $# -eq 1 ];then
-        stop_plugins
-        if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
-            stop_xpl
+        if [ $# -eq 1 ];then
+            stop
         else
-            echo "Domogik xPL hub disabled : no need to stop Domogik xPL hub"
+            case "$2" in
+                xpl)
+                    stop_xpl
+                ;;
+                manager)
+                    stop_plugins
+                    sleep $DIETIME
+                    stop_manager
+                ;;
+                *)
+                    echo "usage: $0 stop [manager|xpl]"
+                ;;
+            esac
         fi
-        stop_manager
-    else
-        case "$2" in
-            xpl)
-            stop_xpl
-            ;;
-            manager)
-            stop_manager
-            ;;
-            plugins)
-            stop_plugins
-            ;;
-        esac
-    fi
-
-    ;;
+        ;;
     restart)
-    $0 stop $2
-    sleep 5
-    $0 start $2
-    ;;
+        check_lock_dir
+        if [ $# -eq 1 ];then
+            stop
+            sleep $DIETIME
+            sleep $DIETIME
+            start
+            sleep $STARTTIME
+        else
+            case "$2" in
+                xpl)
+                    stop_xpl
+                    sleep $DIETIME
+                    start_xpl
+                ;;
+                manager)
+                    stop
+                    sleep $DIETIME
+                    sleep $DIETIME
+                    start_manager
+                    ;;
+                *)
+                    echo "usage: $0 restart [manager|xpl]"
+                ;;
+            esac
+        fi
+        ;;
+    status)
+        if [ $# -eq 1 ];then
+            status
+        else
+            case "$2" in
+                manager)
+                    status_manager
+                ;;
+                xpl)
+                    status_xpl
+                ;;
+                *)
+                    echo "usage: $0 status [manager|xpl]"
+                ;;
+            esac
+        fi
+        ;;
     *)
-    echo "usage: $0 {start|stop|restart} [(xpl|manager|plugins)]"
+    echo "usage: $0 {start|stop|restart|status} [(xpl|manager|plugins)]"
+    echo "More help : $0 command help"
 esac
 exit 0

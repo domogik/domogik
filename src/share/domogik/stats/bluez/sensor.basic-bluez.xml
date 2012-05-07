@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="bluez">
+    <schema name="sensor.basic">
+        <xpltype type="*">
+            <listener>
+                <filter>
+                    <key name="type" value="ping"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" history_size="0" new_name="ping"
+                       filter_key="type" filter_value="ping" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

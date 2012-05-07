@@ -1,0 +1,91 @@
+Source: domogik
+Section: misc
+Priority: optional
+Maintainer: Sébastien GALLET <sgallet@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), python (>= 2.6.6-3~), python-setuptools,
+ python2.7-dev, gcc, libssl-dev, libmysqlclient-dev, libpq-dev
+Standards-Version: 3.9.1
+Homepage: http://www.domogik.org/
+
+Package: domogik
+Architecture: all
+Depends: domogik-primary (= ${source:Version})
+Description: Domogik is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the installation package for a standard installation.
+
+Package: domogik-primary
+Architecture: all
+Depends: domogik-mysql (= ${source:Version}) | domogik-postgresql (= ${source:Version})
+Conflicts: domogik-secondary
+Description: Domogik is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the installation package for a primary host.
+
+Package: domogik-secondary
+Architecture: all
+Conflicts: domogik-primary, domogik-mysql, domogik-postgresql
+Depends: domogik-common (= ${source:Version})
+Description: Domogik is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the installation package for a secondary host.
+
+Package: domogik-common
+Architecture: all
+Depends: python-setuptools, python-simplejson (>= 1.9.2~), python-openssl,
+ python-httplib2 (>= 0.6.0~), python-psutil (>= 0.1.3~), python-mimeparse,
+ python-pyinotify (>= 0.8.9~), python-pip (>= 1.0~),
+ python-distutils2, python-serial (>= 2.5~), xplhub
+Description: Domogik is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the common installation package.
+
+Package: domogik-full
+Architecture: all
+Depends: domogik (= ${source:Version}), domoweb
+Description: Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the complete installation package : domogik and domoweb.
+
+Package: domogik-mysql
+Architecture: all
+Conflicts: domogik-postgresql, domogik-secondary
+Depends: domogik-common (= ${source:Version}),
+ mysql-client, python-mysqldb,
+ python-sqlalchemy (>= 0.7.5~), python-sqlalchemy (<< 0.7.6),
+ python-sqlalchemy-migrate (>= 0.7.2~), python-sqlalchemy-migrate (<< 0.7.3)
+Description: Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the database interface to mysql.
+
+Package: domogik-postgresql
+Architecture: all
+Conflicts: domogik-mysql, domogik-secondary
+Depends: domogik-common (= ${source:Version}),
+ postgresql-client, python-psycopg2,
+ python-sqlalchemy (>= 0.7.5~), python-sqlalchemy (<< 0.7.6),
+ python-sqlalchemy-migrate (>= 0.7.2~), python-sqlalchemy-migrate (<< 0.7.3)
+Description: Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This is the database interface to postgresql.

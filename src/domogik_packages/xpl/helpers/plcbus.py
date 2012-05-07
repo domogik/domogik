@@ -23,7 +23,7 @@ Plugin purpose
 Get informations about plcbus
 
 @author: Capof <capof@wanadoo.fr> and Sp4rKy help
-@copyright:(C) 2007-2009 Domogik project
+@copyright:(C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

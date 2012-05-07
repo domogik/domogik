@@ -1,0 +1,9 @@
+Template: domogik/rest_ip
+Type: string
+Description: The IP address of the main rest server
+Default: 192.168.1.1
+
+Template: domogik/rest_port
+Type: string
+Description: The rest port of the main rest server
+Default: 40405

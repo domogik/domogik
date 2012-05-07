@@ -32,7 +32,7 @@ Implements
 - tsChacon.chacon_monitor_cb(self, house, unit, order)
 
 @author: Julien Garet <julien@garet.info>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

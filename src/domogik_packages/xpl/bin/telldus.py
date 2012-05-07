@@ -40,45 +40,47 @@ Thanks to :
 Julien Garet <julien@garet.info>
 @author: Sebastien GALLET <sgallet@gmail.com>
 @license: GPL(v3)
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 """
-
-import traceback
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik_packages.xpl.lib.telldus import *
+from domogik_packages.xpl.lib.telldus import TelldusAPI
 import os.path
-import sys
 import traceback
-import logging
-logging.basicConfig()
+#import logging
+#logging.basicConfig()
 
-class telldus(XplPlugin):
+class Telldus(XplPlugin):
     '''
     Manage chacon devices through the TellStick device
     '''
     def __init__(self):
         """
         Create the telldus class
-        This class is used to connect devices (through telldus) to the xPL Network
+        This class is used to connect devices (through telldus) to
+        the xPL Network
         """
-        XplPlugin.__init__(self, name = 'telldus',reload_cb = self.telldus_reload_config_cb)
+        XplPlugin.__init__(self, name = 'telldus',
+            reload_cb = self.telldus_reload_config_cb)
         self.log.info("telldus.__init__ : Start ...")
         self.log.debug("telldus.__init__ : Try to start the telldus librairy")
         self._device = "/dev/tellstick"
         #Check if the device exists
         if not os.path.exists(self._device):
-            self.log.warning(self._device + " is not present but Tellstick Duo don't use it.")
+            self.log.warning(self._device +
+                " is not present but Tellstick Duo don't use it.")
         else:
             self.log.debug("Device present as "+self._device)
         self._config = Query(self.myxpl, self.log)
         try:
-            self._mytelldus = telldusAPI(self.send_xpl,self.log,self._config,self.myxpl)
+            self._mytelldus = TelldusAPI(self.send_xpl, self.log,
+                self._config,self.myxpl)
         except Exception:
-            self.log.exception("Something went wrong during telldus init, check logs")
+            self.log.exception("Something went wrong during telldus "+
+                "init, check logs")
             exit(1)
         #Create listeners
         self.log.debug("telldus.__init__ : Create listeners")
@@ -120,8 +122,8 @@ class telldus(XplPlugin):
                            (cmd, device,level))
             commands[cmd](device, level)
             self.telldus_monitor_cb(device, cmd)
-        except:
-            self.log.error("action _ %s _ unknown."%(request))
+        except Exception:
+            self.log.error("action _ %s _ unknown."%(cmd))
             error = "Exception : %s" %  \
                      (traceback.format_exc())
             self.log.info("TelldusException : "+error)
@@ -149,7 +151,7 @@ class telldus(XplPlugin):
         @param message : xpl message
         """
         self.log.debug("Telldus reload config received")
-        self._mytelldus.reload()
+        self._mytelldus.reloadConfig()
 
     def send_xpl(self, add, order, args = None):
         """
@@ -168,4 +170,4 @@ class telldus(XplPlugin):
         self.myxpl.send(mess)
 
 if __name__ == "__main__":
-    telldus()
+    Telldus()

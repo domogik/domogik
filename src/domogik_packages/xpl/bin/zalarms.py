@@ -28,7 +28,7 @@ Implements
 ==========
 
 @author: Sébastien Gallet <sgallet@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -61,13 +61,6 @@ class zalarms(XplPlugin):
             error = "Something went wrong during API init : %s" %  \
                      (traceback.format_exc())
             self.log.exception(error)
-
-    def __del__(self):
-        """
-        Remove the zalarms class
-        """
-        del(self._myapy)
-        XplPlugin.__del__(self)
 
     def request_cmnd_cb(self, message):
         """

@@ -1,0 +1,5 @@
+etc/default
+etc/domogik
+usr/bin/dmg* /usr/sbin/
+usr/lib
+usr/sbin/dmg* /usr/sbin/

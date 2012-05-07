@@ -1,0 +1,48 @@
+#!/bin/sh -e
+#
+# summary of how this script can be called:
+#        * <new-preinst> install
+#        * <new-preinst> install <old-version>
+#        * <new-preinst> upgrade <old-version>
+#        * <old-preinst> abort-upgrade <new-version>
+#
+
+export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
+
+################################ main() ##########################
+
+# to be sure
+#stop_server
+
+# If we use NIS then errors should be tolerated. It's up to the
+# user to ensure that the mysql user is correctly setup.
+# Beware that there are two ypwhich one of them needs the 2>/dev/null!
+if test -n "`which ypwhich 2>/dev/null`"  &&  ypwhich >/dev/null 2>&1; then
+  set +e
+fi
+
+# creating domoweb user if he isn't already there
+if ! getent passwd domogik >/dev/null; then
+	# Adding system user: domoweb.
+	#  --no-create-home
+	adduser \
+	  --system \
+	  --disabled-password \
+	  --group \
+	  --home /var/lib/domogik \
+	  --gecos "Domogik Server" \
+	  --shell /bin/bash \
+	  domogik  >/dev/null
+	  set +e
+	  /bin/cp /etc/skel/* /var/lib/domogik/ >/dev/null 2>&1
+	  /bin/cp /etc/skel/.* /var/lib/domogik/ >/dev/null 2>&1
+	  echo PATH=\"\/usr/sbin:\$PATH\" >> /var/lib/domogik/.profile
+	  set -e
+fi
+
+set -e
+# end of NIS tolerance zone
+
+#DEBHELPER#
+
+exit 0

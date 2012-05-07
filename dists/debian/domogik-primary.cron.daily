@@ -1,0 +1,16 @@
+#!/bin/sh
+    echo -n "* Updating packages cache..."
+    echo -n $(/bin/date +%F-%R) >>/var/log/domogik/cron_pkmgr.log
+    echo " - Start updating packages cache " >>/var/log/domogik/cron_pkmgr.log
+    /bin/chown domogik:domogik /var/log/domogik/cron_pkmgr.log
+    /bin/su -c "/usr/sbin/dmg_pkgmgr -u 2>>/var/log/domogik/cron_pkmgr.log 1>&2" domogik
+    if [ $? -gt 0 ]; then
+        echo " An error occured during packages cache update."
+		echo -n $(/bin/date +%F-%R) >>/var/log/domogik/cron_pkmgr.log
+        echo " - An error occured during packages cache update." >>/var/log/domogik/cron_pkmgr.log
+       exit 1
+    else
+        echo " Done"
+		echo -n $(/bin/date +%F-%R) >>/var/log/domogik/cron_pkmgr.log
+		echo " - End updating packages cache " >>/var/log/domogik/cron_pkmgr.log
+    fi

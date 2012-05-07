@@ -46,7 +46,7 @@ Implements
 - class SystemConfig
 
 @author: Marc SCHNEIDER <marc@domogik.org>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -55,7 +55,7 @@ import time, sys
 from exceptions import AssertionError
 
 from sqlalchemy import (
-        types, create_engine, Table, Column, Integer, Float, String, Enum,
+        types, create_engine, Table, Column, Index, Integer, Float, String, Enum,
         MetaData, ForeignKey, Boolean, DateTime, Date, Text,
         Unicode, UnicodeText, UniqueConstraint
 )
@@ -505,6 +505,7 @@ class DeviceStats(Base):
     # character value only 'value' field is filled in.
     __value_num = Column('value_num', Float)
     value = Column('value_str', Unicode(255))
+    __table_args__ = (Index('ix_core_device_stats_date_skey_device_id', "date", "skey", "device_id"), )
 
     def __init__(self, date, timestamp, skey, device_id, value):
         """Class constructor

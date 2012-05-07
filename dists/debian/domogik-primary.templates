@@ -1,0 +1,5 @@
+Template: domogik/interface
+Type: string
+Description: The interface which Domogik should listen to
+Default: eth0
+

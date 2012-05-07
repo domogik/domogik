@@ -32,7 +32,7 @@ Implements
 - x10Main.x10_monitor_cb(self, unit, order, args = None)
 
 @author: Matthieu Bollot <mattboll@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

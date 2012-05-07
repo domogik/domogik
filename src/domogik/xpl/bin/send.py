@@ -33,7 +33,7 @@ Implements
 - Sender.usage(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -59,11 +59,9 @@ class Sender(XplPlugin):
                 dest="target", default=None)
         parser.add_option("-s", "--source", type="string",
                 dest="source", default=None)
-        XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser)
-        print "foo"
+        XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser. nohub = True)
         mess = self.forge_message()
         self.log.debug("Send message : %s" % mess)
-        print("Send message : %s" % mess)
         self.myxpl.send(mess)
         self.force_leave()
 

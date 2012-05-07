@@ -31,10 +31,11 @@ class ComponentDs18b20
 class ComponentDs18s20
 class ComponentDs2401
 class ComponentDs2438
+class ComponentDs2408
 class OneWireNetwork
 
 @author: Fritz SMH <fritz.smh@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -205,28 +206,28 @@ class ComponentDs2401:
                 my_id = comp.id
       
                 if my_id in self.all_ds2401:
-                    actual_ds2401[my_id] = "HIGH"
-                    if self.all_ds2401[my_id] != "HIGH":
-                        print("id=%s, status=HIGH" % my_id)
-                        self.all_ds2401[my_id] = "HIGH"
+                    actual_ds2401[my_id] = "high"
+                    if self.all_ds2401[my_id] != "high":
+                        print("id=%s, status=high" % my_id)
+                        self.all_ds2401[my_id] = "high"
                         self.callback("xpl-trig", {"device" : my_id,
                                              "type" : "input",
-                                             "current" : "HIGH"})
+                                             "current" : "high"})
                 else:
-                    print("id=%s, status=HIGH" % my_id)
-                    self.all_ds2401[my_id] = "HIGH"
-                    actual_ds2401[my_id] = "HIGH"
+                    print("id=%s, status=high" % my_id)
+                    self.all_ds2401[my_id] = "high"
+                    actual_ds2401[my_id] = "high"
                     self.callback("xpl-trig", {"device" : my_id,
                                          "type" : "input",
-                                         "current" : "HIGH"})
+                                         "current" : "high"})
 
             for comp_id in self.all_ds2401:
-                if comp_id not in actual_ds2401 and self.all_ds2401[comp_id] == "HIGH":
-                    print("id=%s, status=LOW component disappeared)" % (comp_id))
-                    self.all_ds2401[my_id] = "LOW"
+                if comp_id not in actual_ds2401 and self.all_ds2401[comp_id] == "high":
+                    print("id=%s, status=low component disappeared)" % (comp_id))
+                    self.all_ds2401[my_id] = "low"
                     self.callback("xpl-trig", {"device" : comp_id,
                                          "type" : "input",
-                                         "current" : "LOW"})
+                                         "current" : "low"})
                     
             self._stop.wait(self.interval)
  
@@ -304,6 +305,74 @@ class ComponentDs2438:
 
 
 
+
+class ComponentDs2408:
+    """
+    DS2408 support
+    """
+
+    def __init__(self, log, onewire, interval, callback, stop):
+        """
+        Return PIO state each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_PIO_ALL = {}
+        self._stop = stop
+        self.start_listening()
+
+    def start_listening(self):
+        """
+        Start listening for onewire ds2408
+        """
+        while not self._stop.isSet():
+            for comp in self.root.find(type = "DS2408"):
+                my_id = comp.family+"."+comp.id
+                try:
+                    PIO_ALL = comp.PIO_ALL
+                    print("PIO.ALL=%s" % PIO_ALL)
+
+                except AttributeError:
+                    error = "DS2408 : error while reading value"
+                    self._log.error(error)
+                    print(error)
+
+                else:
+
+                    # ALL switchs status
+                    if my_id in self.old_PIO_ALL:
+                        if PIO_ALL != self.old_PIO_ALL[my_id]:
+                            my_type = "xpl-trig"
+                        else:
+                            my_type = "xpl-stat"
+                    else:
+                        my_type = "xpl-trig"
+                    self.old_PIO_ALL[my_id] = PIO_ALL
+                    print("type=%s, id=%s, PIO_ALL=%s" % (my_type, my_id, PIO_ALL))
+                    self.callback(my_type, {"device" : my_id,
+                                         "type" : "PIO_ALL",
+                                         "data0" : comp.PIO_0,
+                                         "data1" : comp.PIO_1,
+                                         "data2" : comp.PIO_2,
+                                         "data3" : comp.PIO_3,
+                                         "data4" : comp.PIO_4,
+                                         "data5" : comp.PIO_5,
+                                         "data6" : comp.PIO_6,
+                                         "data7" : comp.PIO_7,
+                                         "current" : PIO_ALL})
+
+            self._stop.wait(self.interval)
+
+
+
+
 class OneWireNetwork:
     """
     Get informations about 1wire network
@@ -333,3 +402,20 @@ class OneWireNetwork:
         """
         return self._root 
 
+    def write(self,device,pio,value):
+        map = ["A","B"]                   # Used to map PIO_0/1 to  PIO_A/B for other devices 
+        ret = 0                           # Ensure we will return a value
+        s = ow.Sensor( '/'+device) 
+        fam = device[:2]                  # Extract familly code
+        if fam == "12":                   # Fam = 12 - DS2406
+            pio = map[pio]                # Rename PIO et A & B
+        try:
+            if fam == "05":               # DS2405 - Only one PIO named "PIO"
+                setattr(s,"PIO", value)
+                ret = getattr(s,"PIO")
+            else:                         # All other cases
+                setattr(s,"PIO_"+pio, value)
+                ret = getattr(s,"PIO_"+pio)
+        except:
+            raise OneWireException("Can't access given PIO %s" % pio)
+        return ret

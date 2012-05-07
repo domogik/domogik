@@ -30,7 +30,7 @@ Implements
 - WOL.wake_up
 
 @author: Fritz <fritz.smh@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -138,11 +138,11 @@ class Ping:
             if ret == 0:
                 self._log.debug("%s: is alive" % computer)
                 print("%s: is alive" % computer)
-                status = "HIGH"
+                status = "high"
             else:
                 self._log.debug("%s: did not respond" % computer)
                 print("%s: did not respond" % computer)
-                status = "LOW"
+                status = "low"
 
             if status != old_status:
                 type = "xpl-trig"

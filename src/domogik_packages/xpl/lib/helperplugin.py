@@ -131,7 +131,7 @@ bin/cron.py to see the helpers declaration
 lib/cron.py to see the helpers functions
 
 @author: Sébastien Gallet <sgallet@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -141,54 +141,30 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 import traceback
 
-class pluginHelper():
-    def __init__(self,parent):
+class PluginHelper():
+    """
+    """
+    def __init__(self, parent):
         """
         """
-        self._parent=parent
-        self._params=["usage","desc","param-list"]
+        self._parent = parent
+        self._params = ["usage", "desc", "param-list"]
 
-    def isActive(self):
+    def is_active(self):
         """
         """
         try:
-            titi=self._parent.helpers
+            titi = self._parent.helpers
             return True
         except:
             return False
         return True
 
-    def cmndName(self,callback):
+    def is_valid_cmnd(self, command):
         """
         """
-        return str(callback)
+        return command != None and command in self._parent.helpers
 
-    def isValidCmnd(self,command):
-        """
-        """
-        return command!=None and command in self._parent.helpers
-
-#    def registerAll(self):
-#        """
-#        deprecated
-#        """
-#        params=["help","param-list"]
-#
-#    def register(self,command,callback,conf):
-#        """
-#        deprecated
-#        """
-#        params=["usage","desc","param-list"]
-#        if self.isValidCmnd(command):
-#            return False
-#        else:
-#            self._cmnds[command]={"cb" : lambda p : callback}
-#            for p in params:
-#                self._cmnds[command][p]=conf[p]
-#            for p2 in self._cmnds[command]["param-list"].split(","):
-#                self._cmnds[command][p2]=conf[p2]
-#        return True
-#
 #    def fragment(self,value):
 #        """
 #        Fragment a value to a size beetween 100 an 128
@@ -204,12 +180,12 @@ class pluginHelper():
     def status(self):
         """
         """
-        if self.isActive():
+        if self.is_active():
             return "ok"
         else :
             return "not-found"
 
-    def reqGateinfo(self,myxpl,message,request):
+    def req_gateinfo(self, myxpl, message, request):
         """
         """
         mess = XplMessage()
@@ -217,24 +193,24 @@ class pluginHelper():
         mess.set_schema("helper.gateinfo")
         mess.add_data({"status" : self.status()})
         mess.add_data({"plugin" : self._parent._name})
-        if self.isActive():
-            l=""
+        if self.is_active():
+            l = ""
             for cmnd in self._parent.helpers:
-                if l=="":
-                    l=cmnd
+                if l == "":
+                    l = cmnd
                 else:
-                    l=l+","+cmnd
-            if l!="":
+                    l = l+","+cmnd
+            if l != "":
                 mess.add_data({"cmnd-list" : l})
         myxpl.send(mess)
 
-    def reqCmndinfo(self,myxpl,message,request):
+    def req_cmndinfo(self, myxpl, message, request):
         """
         """
-        plugin=None
+        plugin = None
         if 'plugin' in message.data:
             plugin = message.data['plugin']
-        if plugin!=self._parent._name:
+        if plugin != self._parent._name:
             return False
         mess = XplMessage()
         mess.set_type("xpl-stat")
@@ -243,51 +219,50 @@ class pluginHelper():
         try:
             cmnd = None
             if 'command' in message.data:
-                    cmnd = message.data['command']
-            if not self.isValidCmnd(cmnd):
+                cmnd = message.data['command']
+            if not self.is_valid_cmnd(cmnd):
                 mess.add_data({"command" : cmnd})
                 mess.add_data({"status" : "not-found"})
             else:
                 mess.add_data({"command" : cmnd})
-                if self._parent.helpers[cmnd]["param-list"]!="":
-                    mess.add_data({"param-list" : self._parent.helpers[cmnd]["param-list"]})
+                if self._parent.helpers[cmnd]["param-list"] != "":
+                    mess.add_data({"param-list" : \
+                        self._parent.helpers[cmnd]["param-list"]})
                 for p in self._parent.helpers[cmnd]["param-list"].split(","):
                     mess.add_data({p : self._parent.helpers[cmnd][p]})
                 mess.add_data({"status" : "ok"})
         except:
             mess.add_data({"status" : "error"})
-            self._parent.log.error(""+traceback.format_exc())
+            self._parent.log.error("" + traceback.format_exc())
         myxpl.send(mess)
 
-    def requestCmndListener(self,message):
+    def request_cmnd_listener(self, message):
         """
         Listen to plugin.request messages
         @param message : The XPL message
         @param myxpl : The XPL sender
         """
         requests = {
-            'gateinfo': lambda x,m,r: self.reqGateinfo(x,m,r),
-            'cmndinfo': lambda x,m,r: self.reqCmndinfo(x,m,r),
+            'gateinfo': lambda x,m,r: self.req_gateinfo(x, m, r),
+            'cmndinfo': lambda x,m,r: self.req_cmndinfo(x, m, r),
         }
         try:
             request = None
             if 'request' in message.data:
                 request = message.data['request']
-            self._parent.log.debug("pluginHelper.requestDeviceListener : request %s received" % (request))
-            requests[request](self._parent.myxpl,message,request)
+            requests[request](self._parent.myxpl, message, request)
         except:
-            error = "Exception : %s" %  \
-                     (traceback.format_exc())
-            self._parent.log.error("pluginHelper.requestDeviceListener : "+error)
+            error = "Exception : %s" % (traceback.format_exc())
+            self._parent.log.error("pluginHelper.requestDeviceListener \
+                : " + error)
 
-    def basicCmndListener(self,message):
+    def basic_cmnd_listener(self, message):
         """
         """
-        self._parent.log.debug("pluginHelper.basicDeviceListener : Start ...")
         plugin = None
         if 'plugin' in message.data:
             plugin = message.data['plugin']
-        if plugin!=self._parent._name:
+        if plugin != self._parent._name:
             return False
         mess = XplMessage()
         mess.set_type("xpl-trig")
@@ -298,18 +273,17 @@ class pluginHelper():
             if 'command' in message.data:
                 command = message.data['command']
             mess.add_data({"command" : command})
-            self._parent.log.debug("pluginHelper : command %s received" % (command))
-            if command!=None:
-                params={}
-                if self.isValidCmnd(command):
+            if command != None:
+                params = {}
+                if self.is_valid_cmnd(command):
                     for p in self._parent.helpers[command]["param-list"].split(","):
                         if p in message.data:
-                            params[p]=message.data[p]
-                    ret=self._parent.helpers[command]["cb"](params)
-                    i=1
+                            params[p] = message.data[p]
+                    ret = self._parent.helpers[command]["cb"](params)
+                    i = 1
                     for l in ret:
-                        mess.add_data({"screen%s"%i : l})
-                        i=i+1
+                        mess.add_data({"screen%s" % i : l})
+                        i = i+1
                     mess.add_data({"screen-count" : i-1})
                     mess.add_data({"status" : "ok"})
                 else:
@@ -317,30 +291,33 @@ class pluginHelper():
             else:
                 mess.add_data({"status" : "not-found"})
         except:
-            error = "Exception : %s" %  \
-                     (traceback.format_exc())
-            self._parent.log.error("pluginHelper.basicDeviceListener : "+error)
+            error = "Exception : %s" % (traceback.format_exc())
+            self._parent.log.error("pluginHelper.basicDeviceListener : " \
+                + error)
             mess.add_data({"status" : "error"})
         self._parent.myxpl.send(mess)
 
 class XplHlpPlugin(XplPlugin):
-    def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                 daemonize = True):
+    """
+    """
+    def __init__(self, name, stop_cb=None, is_manager=False, reload_cb=None, \
+        dump_cb=None, parser=None, daemonize = True):
         """
         Create the telldus class
         This class is used to connect devices (through telldus) to the xPL Network
         """
-        XplPlugin.__init__(self, name, stop_cb, is_manager, reload_cb, dump_cb, parser, daemonize)
-        self._helper=pluginHelper(self)
-        #Create listeners
-        print "active=%s"%self._helper.isActive()
+        XplPlugin.__init__(self, name, stop_cb, is_manager, reload_cb, \
+            dump_cb, parser, daemonize)
+        self.__helper = PluginHelper(self)
 
     def enable_helper(self):
-        print "active=%s"%self._helper.isActive()
-        if self._helper.isActive():
-            Listener(self._helper.requestCmndListener, self.myxpl,
+        """
+        """
+        #print "active=%s" % self._helper.isActive()
+        if self.__helper.is_active():
+            Listener(self.__helper.request_cmnd_listener, self.myxpl,
                     {'schema': 'helper.request', 'xpltype': 'xpl-cmnd'})
-            Listener(self._helper.basicCmndListener, self.myxpl,
+            Listener(self.__helper.basic_cmnd_listener, self.myxpl,
                     {'schema': 'helper.basic', 'xpltype': 'xpl-cmnd'})
 
 

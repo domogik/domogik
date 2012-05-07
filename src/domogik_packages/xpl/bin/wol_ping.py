@@ -30,7 +30,7 @@ Implements
 - WOLListener
 
 @author: Fritz <fritz.smh@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -80,7 +80,7 @@ class WolPing(XplPlugin):
         self._wolmanager = WOL(self.log)
         # Create listeners
         Listener(self.wol_cb, self.myxpl, {'schema': 'control.basic',
-                'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'HIGH'})
+                'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'high'})
         self.log.debug("Listener for wake on lan created")
 
         ### Create Ping object
@@ -118,7 +118,7 @@ class WolPing(XplPlugin):
             mess.set_schema('sensor.basic')
             mess.add_data({'device' :  device})
             mess.add_data({'type' :  'wakeonlan'})
-            mess.add_data({'current' :  'HIGH'})
+            mess.add_data({'current' :  'high'})
             self.myxpl.send(mess)
 
 

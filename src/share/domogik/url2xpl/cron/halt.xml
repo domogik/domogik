@@ -1,0 +1,17 @@
+<technology id="cron">
+  <command name="halt">
+    <schema>timer.basic</schema>
+    <command-key>action</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>halt</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>timer.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="current" value="halted" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

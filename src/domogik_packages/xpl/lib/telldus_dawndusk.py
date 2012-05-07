@@ -20,7 +20,7 @@ TELLDUS_UNKNOWN=0
 TELLDUS_ON=1
 TELLDUS_OFF=2
 
-class telldusDawnduskAPI:
+class TelldusDawnduskAPI:
     '''
     Dawndusk extension to telldus pugin
     '''
@@ -81,7 +81,7 @@ class telldusDawnduskAPI:
             self._plugin.myxpl.send(mess)
         self._plugin.log.debug("telldusDawnduskAPI.dawndusk_cmnd_cb() : Done :)")
 
-    def sendDawnDusk(self,deviceid,state):
+    def send_dawndusk(self,deviceid,state):
         """
         Send a xPL message of the type DAWNDUSK.BASIC when the sun goes down or up
         @param state : DAWN or DUSK

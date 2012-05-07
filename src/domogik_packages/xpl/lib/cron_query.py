@@ -23,39 +23,24 @@ Plugin purpose
 
 A client librairy to speak with the cron plugin, via xpl language
 
+Implements
+==========
+class CronQuery
 
 @author: Sebastien GALLET <sgallet@gmail.com>
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2011 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
 from threading import Event
-#from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-#from domogik.common.configloader import Loader
 import traceback
-import datetime
+from domogik.xpl.lib.cron_tools import CronTools
+from domogik.xpl.lib.cron_tools import ERROR_PARAMETER
 
-ERROR_NO = 0
-ERROR_PARAMETER = 1
-ERROR_DEVICE_EXIST = 10
-ERROR_DEVICE_NOT_EXIST = 11
-ERROR_DEVICE_NOT_STARTED = 12
-ERROR_DEVICE_NOT_STOPPED = 13
-ERROR_SCHEDULER = 20
-ERROR_NOT_IMPLEMENTED = 30
-
-CRONERRORS = { ERROR_NO: 'No error',
-               ERROR_PARAMETER: 'Missing or wrong parameter',
-               ERROR_DEVICE_EXIST: 'Device already exist',
-               ERROR_DEVICE_NOT_EXIST: 'Device does not exist',
-               ERROR_DEVICE_NOT_STARTED: "Device is not started",
-               ERROR_DEVICE_NOT_STOPPED: "Device is not stopped",
-               ERROR_SCHEDULER: 'Error with the scheduler',
-               }
 
 class CronQuery():
     '''
@@ -72,6 +57,7 @@ class CronQuery():
         self.log.debug("Init config query instance")
         self._keys = {}
         self._listens = {}
+        self._tools = CronTools()
         self._result = None
         self.parameters = ["parameter0", "parameter1"]
         self.values = ["valueon", "valueoff"]
@@ -204,7 +190,7 @@ class CronQuery():
         configmess.add_data({"devicetype" : "date"})
         configmess.add_data({"device" : device})
         configmess.add_data({"action" : "start"})
-        configmess.add_data({"date" : self.date_to_xpl(sdate)})
+        configmess.add_data({"date" : self._tools.date_to_xpl(sdate)})
         return self.start_job(device, configmess, nstmess)
 
     def start_interval_job( self, device, nstmess, weeks=0, days=0, hours=0,
@@ -244,7 +230,7 @@ class CronQuery():
             configmess.add_data({"seconds" : seconds})
             cont = True
         if startdate != None:
-            configmess.add_data({"startdate" : self.date_to_xpl(startdate)})
+            configmess.add_data({"startdate" : self._tools.date_to_xpl(startdate)})
         if cont == False:
             return ERROR_PARAMETER
         return self.start_job(device, configmess, nstmess)
@@ -299,7 +285,7 @@ class CronQuery():
             configmess.add_data({"second" : second})
             cont = True
         if startdate != None:
-            configmess.add_data({"startdate" : self.date_to_xpl(startdate)})
+            configmess.add_data({"startdate" : self._tools.date_to_xpl(startdate)})
         if cont == False:
             return ERROR_PARAMETER
         return self.start_job(device, configmess, nstmess)
@@ -478,31 +464,4 @@ class CronQuery():
         except:
             self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
-
-    def date_from_xpl(self, xpldate):
-        """
-        Tranform an XPL date "yyyymmddhhmmss" to datetime
-        form
-        """
-        yy = int(xpldate[0:4])
-        mo = int(xpldate[4:6])
-        dd = int(xpldate[6:8])
-        hh = int(xpldate[8:10])
-        mm = int(xpldate[10:12])
-        ss = int(xpldate[12:14])
-        return datetime.datetime(yy, mo, dd, hh, mm, ss)
-
-    def date_to_xpl(self, sdate):
-        """
-        Tranform an datetime date to an xpl one "yyyymmddhhmmss"
-        form
-        """
-        hh = "%.2i" % sdate.hour
-        mm = "%.2i" % sdate.minute
-        ss = "%.2i" % sdate.second
-        yy = sdate.year
-        mo = "%.2i" % sdate.month
-        dd = "%.2i" % sdate.day
-        xpldate = "%s%s%s%s%s%s" % (yy, mo, dd, hh, mm, ss)
-        return xpldate
 

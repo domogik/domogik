@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>  
 <statistic technology="onewire">
     <schema name="sensor.basic">
-        <xpltype type="*">
+        <xpltype type="xpl-trig">
             <listener>
                 <filter>
+                    <key name="type" value="PIO_ALL"/>
                     <key name="type" value="temp"/>
                     <key name="type" value="input"/>
                     <key name="type" value="humidity"/>
@@ -11,6 +12,41 @@
             </listener>
             <mapping>
                 <device field="device"/>
+                <value field="data0"/>
+                <value field="data1"/>
+                <value field="data2"/>
+                <value field="data3"/>
+                <value field="data4"/>
+                <value field="data5"/>
+                <value field="data6"/>
+                <value field="data7"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="present" 
+                       filter_key="type" filter_value="input" />
+                <value field="current" new_name="humidity" 
+                       filter_key="type" filter_value="humidity" />
+            </mapping>
+        </xpltype>
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter>
+                    <key name="type" value="PIO_ALL"/>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="input"/>
+                    <key name="type" value="humidity"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="data0"/>
+                <value field="data1"/>
+                <value field="data2"/>
+                <value field="data3"/>
+                <value field="data4"/>
+                <value field="data5"/>
+                <value field="data6"/>
+                <value field="data7"/>
                 <value field="current" new_name="temperature" 
                        filter_key="type" filter_value="temp" />
                 <value field="current" new_name="present" 

@@ -3,7 +3,7 @@
     <schema>control.basic</schema>
     <command-key>current</command-key>    
     <address-key>device</address-key>    
-    <command-xpl-value>HIGH</command-xpl-value>
+    <command-xpl-value>high</command-xpl-value>
     <parameters>
       <parameter key="type" value="output"/>          
     </parameters>
@@ -13,7 +13,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="type" value="output" />
-      <key name="current" value="HIGH" />
+      <key name="current" value="high" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>

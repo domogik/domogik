@@ -28,7 +28,7 @@ Implements
 ==========
 
 @author: Marc Schneider <marc@mirelsol.org>
-@copyright: (C) 2007-2010 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -54,6 +54,11 @@ def upgrade(migrate_engine):
     #1061
     core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
     Index('ix_core_device_stats_skey', core_device_stats.c.skey).create()
+    
+    #1274
+    core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
+    Index('ix_core_device_stats_date_skey_device_id', core_device_stats.c.date, core_device_stats.c.skey, 
+                                                      core_device_stats.c.device_id).create()
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
@@ -73,3 +78,8 @@ def downgrade(migrate_engine):
     #1061
     core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
     Index('ix_core_device_stats_skey', core_device_stats.c.skey).drop()
+
+    #1274
+    core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
+    Index('ix_core_device_stats_date_skey_device_id', core_device_stats.c.date, core_device_stats.c.skey, 
+                                                      core_device_stats.c.device_id).drop()

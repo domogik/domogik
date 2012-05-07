@@ -32,7 +32,7 @@ Implements
 - RfxcomUsb
 
 @author: Fritz <fritz.smh@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -1068,6 +1068,8 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         if status[-8:] == "-delayed":
             cmnd = status[0:-8]
             options["delay"] = "max"
+        else:
+            cmnd = status
         if status == "battery-low":
             cmnd = "alert"
             options["low-battery"] = "true"
@@ -1088,7 +1090,7 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
                         "type" : "battery", 
                         "current" : battery})
         self._callback("sensor.basic",
-                       {"device" : device, 
+                       {"device" : address, 
                         "type" : "rssi", 
                         "current" : rssi})
 

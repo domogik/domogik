@@ -29,7 +29,7 @@ Implements
 - APIZiBase
 
 @author: Cedric BOLLINI <cb.dev@sfr.fr>
-@copyright: (C) 2007-2011 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 
 This library based on ZiBase SDK 1.6 by bgarel and modify by Cedric BOLLINI

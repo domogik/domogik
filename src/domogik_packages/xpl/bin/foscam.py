@@ -94,54 +94,54 @@ class foscam(XplPlugin):
         except KeyError:
             self.log.warning("Camera named '%s' is not defined" % device)
             return
-        if msg_type == 'output' and msg_current in ['HIGH']:
-             #print "HIGH recu"
-             self.log.debug("HIGH command receive on relay '%s'" % device)
-             # Our listener catch a Message with LOW output command
+        if msg_type == 'output' and msg_current in ['high']:
+             #print "high recu"
+             self.log.debug("high command receive on relay '%s'" % device)
+             # Our listener catch a Message with low output command
              status = self._foscammanager.close_relay(ip, port, user, password, device)
-             # Send xpl-trig to say plugin whell receive HIGH command
+             # Send xpl-trig to say plugin whell receive high command
              if status == True:
-                  #print "HIGH ACKed"
-                  self.log.debug("HIGH command Ack on relay '%s'" % device)
+                  #print "high ACKed"
+                  self.log.debug("high command Ack on relay '%s'" % device)
                   mess = XplMessage()
                   mess.set_type('xpl-trig')
                   mess.set_schema('sensor.basic')
                   mess.add_data({'device' : device})
                   mess.add_data({'type' : 'output'})
-                  mess.add_data({'current' : 'HIGH'})
+                  mess.add_data({'current' : 'high'})
                   self.myxpl.send(mess)
-        if msg_type == 'output' and msg_current in ['LOW']:
-             #print "LOW recu"
-             self.log.debug("LOW command receive on relay '%s'" % device)
-             # Our listener catch a Message with LOW output command
+        if msg_type == 'output' and msg_current in ['low']:
+             #print "low recu"
+             self.log.debug("low command receive on relay '%s'" % device)
+             # Our listener catch a Message with low output command
              status = self._foscammanager.open_relay(ip, port, user, password, device)
-             # Send xpl-trig to say plugin whell receive LOW command
+             # Send xpl-trig to say plugin whell receive low command
              if status == True:
-                  #print "LOW ACKed"
-                  self.log.debug("LOW command Ack on relay '%s'" % device)
+                  #print "low ACKed"
+                  self.log.debug("low command Ack on relay '%s'" % device)
                   mess = XplMessage()
                   mess.set_type('xpl-trig')
                   mess.set_schema('sensor.basic')
                   mess.add_data({'device' : device})
                   mess.add_data({'type' : 'output'})
-                  mess.add_data({'current' : 'LOW'})
+                  mess.add_data({'current' : 'low'})
                   self.myxpl.send(mess)
 
-        if msg_type == 'output' and msg_current in ['PULSE']:
-             #print "PULSE recu"
-             self.log.debug("PULSE command receive on relay '%s'" % device)
-             # Our listener catch a Message with output PULSE output command
+        if msg_type == 'output' and msg_current in ['pulse']:
+             #print "pulse recu"
+             self.log.debug("pulse command receive on relay '%s'" % device)
+             # Our listener catch a Message with output pulse output command
              status = self._foscammanager.pulse_relay(ip, port, user, password, delay, device)
-             # Send xpl-trig to say plugin whell receive PULSE command
+             # Send xpl-trig to say plugin whell receive pulse command
              if status == True:
-                  #print "PULSE ACKed"
-                  self.log.debug("PULSE command Ack on relay '%s'" % device)
+                  #print "pulse ACKed"
+                  self.log.debug("pulse command Ack on relay '%s'" % device)
                   mess = XplMessage()
                   mess.set_type('xpl-trig')
                   mess.set_schema('sensor.basic')
                   mess.add_data({'device' : device})
                   mess.add_data({'type' : 'output'})
-                  mess.add_data({'current' : 'PULSE'})
+                  mess.add_data({'current' : 'pulse'})
                   self.myxpl.send(mess)
 		                   
 if __name__ == "__main__":

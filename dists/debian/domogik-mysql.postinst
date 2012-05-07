@@ -1,0 +1,67 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+case "$1" in
+  configure|upgrade)
+        /bin/chown -Rf domogik:root /var/cache/domogik
+		db_get "domogik/db_host"
+		DBHOST="$RET"
+		db_get "domogik/db_name"
+		DBNAME="$RET"
+		db_get "domogik/db_user"
+		DBUSER="$RET"
+		db_get "domogik/db_password"
+		DBPASSWORD="$RET"
+		db_get "domogik/db_root"
+		DBROOT="$RET"
+		db_get "domogik/db_root_pwd"
+		DBROOTPWD="$RET"
+		set +e
+		echo "CONNECT $DBNAME;" | \
+			/usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD  --host=$DBHOST
+		RES=$?
+		set -e
+		if [ "$RES" = "0" ]
+		then
+			echo "Database already exists"
+		else
+			echo "Database don't exists. Try to create it."
+			echo "CREATE DATABASE $DBNAME;" | \
+				/usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
+    		RES=$?
+    		if [ "$RES" = "0" ]
+				then
+					echo "GRANT ALL PRIVILEGES ON $DBNAME.* to $DBUSER@$DBHOST IDENTIFIED BY '$DBPASSWORD';" | \
+						/usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
+					sed -i "s;^db_type.*$;db_type = mysql;" /etc/domogik/domogik.cfg
+					sed -i "s;^db_user.*$;db_user = $DBUSER;" /etc/domogik/domogik.cfg
+					sed -i "s;^db_password.*$;db_password = $DBPASSWORD;" /etc/domogik/domogik.cfg
+					sed -i "s;^db_port.*$;db_port = 3306;" /etc/domogik/domogik.cfg
+					sed -i "s;^db_name.*$;db_name = $DBNAME;" /etc/domogik/domogik.cfg
+					sed -i "s;^db_host.*$;db_host = $DBHOST;" /etc/domogik/domogik.cfg
+					echo "Done."
+				else
+					echo "Can't connect to database host."
+					exit 20
+			fi
+		fi
+  ;;
+
+  abort-upgrade|abort-remove|abort-configure)
+  ;;
+
+  *)
+		echo "postinst called with unknown argument '$1'" 1>&2
+		exit 1
+  ;;
+esac
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

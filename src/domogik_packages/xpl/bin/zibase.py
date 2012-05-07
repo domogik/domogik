@@ -30,7 +30,7 @@ Implements
 - ZiBaseMain
 
 @author: Cedric BOLLINI <cb.dev@sfr.fr>
-@copyright: (C) 2007-2011 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 """
 

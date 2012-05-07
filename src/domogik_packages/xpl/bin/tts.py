@@ -30,7 +30,7 @@ Implements
 - TTS
 
 @author: Gizmo - Guillaume MORLET <contact@gizmo-network.fr>
-@copyright: (C) 2007-2011 Domogik project
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

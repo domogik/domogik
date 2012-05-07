@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -28,8 +29,8 @@ Implements
 
 - Loader
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>, Fritz <fritz.smh@gmail.com>
-@copyright: (C) 2007-2009 Domogik project
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """

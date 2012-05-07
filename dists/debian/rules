@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with bash-completion --with python2
+
+override_dh_auto_install:
+	#dh_auto_install
+	set -ex; for python in $(shell pyversions -r); do \
+		$$python setup.py install --root=$(CURDIR)/debian/tmp --install-layout=deb; \
+	done;
+
+override_dh_install:
+	/bin/mkdir -p debian/tmp/etc/domogik/
+	/usr/bin/install -c -p -m 640 src/domogik/examples/config/domogik.cfg debian/tmp/etc/domogik/
+	/usr/bin/install -c -p -m 640 src/domogik/examples/packages/sources.list debian/tmp/etc/domogik/
+	/bin/mkdir -p debian/tmp/etc/default/
+	/usr/bin/install -c -p -m 640 src/domogik/examples/default/domogik debian/tmp/etc/default/
+	/bin/mkdir -p debian/tmp/usr/lib/domogik
+	/bin/cp -Rf install debian/tmp/usr/lib/domogik
+	/bin/cp -Rf src/tools debian/tmp/usr/lib/domogik
+	dh_install --sourcedir=debian/tmp
+	#dh_python2 -p zeitgeist-core usr/share/zeitgeist/fts-python
+
+override_dh_installinit:
+	dh_installinit --init-script=domogik
+

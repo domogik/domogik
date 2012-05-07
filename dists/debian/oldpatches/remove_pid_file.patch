@@ -1,0 +1,52 @@
+diff -Nru domogik-0.1.99.orig/src/domogik/xpl/common/plugin.py domogik-0.1.99/src/domogik/xpl/common/plugin.py
+--- domogik-0.1.99.orig/src/domogik/xpl/common/plugin.py	2012-03-23 00:00:35.000000000 +0100
++++ domogik-0.1.99/src/domogik/xpl/common/plugin.py	2012-03-23 00:03:02.000000000 +0100
+@@ -40,6 +40,7 @@
+ import threading
+ import os
+ import sys
++import traceback
+ from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
+ from domogik.xpl.common.baseplugin import BasePlugin
+ from domogik.common.configloader import Loader
+@@ -86,7 +87,7 @@
+         # Get pid and write it in a file
+         self._pid_dir_path = config['pid_dir_path']
+         self._get_pid()
+-       
++
+         if len(self.get_sanitized_hostname()) > 16:
+             self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
+             self.force_leave()
+@@ -146,13 +147,22 @@
+         """ Get current pid and write it to a file
+         """
+         pid = os.getpid()
+-        pid_file = os.path.join(self._pid_dir_path, 
++        pid_file = os.path.join(self._pid_dir_path,
+                                 self._name + ".pid")
+         self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+         fil = open(pid_file, "w")
+         fil.write(str(pid))
+         fil.close()
+ 
++    def _remove_pid(self):
++        self.log.debug("Remove PID for plugin %s" % self.get_plugin_name())
++        try:
++             os.remove(os.path.join(self._pid_dir_path, self.get_plugin_name() + ".pid"))
++        except:
++             self.log.error("Can't remove PID file for %s" % self.get_plugin_name())
++             self.log.error("Exception : %s" %  \
++                     (traceback.format_exc()))
++
+     def _system_handler(self, message):
+         """ Handler for domogik system messages
+         """
+@@ -197,6 +207,7 @@
+     def __del__(self):
+         self.log.debug("__del__ Single xpl plugin")
+         self.force_leave()
++        self._remove_pid()
+ 
+     def _answer_stop(self):
+         """ Ack a stop request

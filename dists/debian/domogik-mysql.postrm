@@ -1,0 +1,48 @@
+#!/bin/sh -e
+set -e
+
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+case "$1" in
+  upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    echo "Do nothing"
+  ;;
+  remove)
+    echo "Do nothing"
+  ;;
+  purge)
+	/bin/rm -Rf /var/lib/domogik/backup
+	echo "Start postinst configure"
+	db_get "domogik/db_host"
+	DBHOST="$RET"
+	db_get "domogik/db_name"
+	DBNAME="$RET"
+	db_get "domogik/db_user"
+	DBUSER="$RET"
+	db_get "domogik/db_password"
+	DBPASSWORD="$RET"
+	db_get "domogik/db_root"
+	DBROOT="$RET"
+	db_get "domogik/db_root_pwd"
+	DBROOTPWD="$RET"
+	echo "Try to revoque privileges" $DBUSER
+	set +e
+	echo "REVOKE ALL PRIVILEGES ON $DBNAME.* FROM  $DBUSER@$DBHOST;" | \
+		/usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
+	echo "Try to drop database" $DBNAME
+	echo "DROP DATABASE $DBNAME;" | \
+		/usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
+	set -e
+	db_purge
+	echo "Done" $DBUSER
+  ;;
+  *)
+    echo "postrm called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+db_stop
+
+exit 0

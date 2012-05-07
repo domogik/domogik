@@ -29,14 +29,17 @@
     <file path="src/share/domogik/design/plugin/cron/icon.png"/>
     <file path="src/share/domogik/plugins/cron.xml"/>
     <file path="src/share/domogik/stats/cron/cron.xml"/>
+    <file path="src/share/domogik/url2xpl/cron/resume.xml"/>
+    <file path="src/share/domogik/url2xpl/cron/stop.xml"/>
+    <file path="src/share/domogik/url2xpl/cron/halt.xml"/>
     <file path="src/domogik/xpl/bin/cron.py"/>
     <file path="src/domogik/xpl/lib/cron.py"/>
     <file path="src/domogik/xpl/lib/cron_query.py"/>
+    <file path="src/domogik/xpl/lib/cron_tools.py"/>
+    <file path="src/domogik/xpl/lib/cron_helpers.py"/>
   </files>
   <dependencies>
     <dep type="python" id="apscheduler (>=2.0.2)"/>
-    <dep type="python" id="pyserial (>=2.5)"/>
-    <dep type="plugin" id="xpl_time"/>
   </dependencies>
   <udev-rules/>
   <device_technology>
@@ -46,36 +49,48 @@
   </device_technology>
   <device_types>
       <device_type>
-          <id>cron.toggle</id>
-          <name>Toggle</name>
-          <description>Turn on/off cron devices</description>
+          <id>cron.job</id>
+          <name>Job</name>
+          <description>A cron device (job))</description>
           <device_technology_id>cron</device_technology_id>
       </device_type>
   </device_types>
   <device_feature_models>
      <device_feature_model>
-          <id>cron.toggle.switch</id>
-          <name>Toggle</name>
+          <id>cron.job.switch</id>
+          <name>Switch</name>
           <feature_type>actuator</feature_type>
-          <device_type_id>cron.toggle</device_type_id>
+          <device_type_id>cron.job</device_type_id>
           <parameters>
               {&quot;action&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;resume&quot;}
           </parameters>
           <value_type>binary</value_type>
           <stat_key>current</stat_key>
           <return_confirmation>0</return_confirmation>
-      </device_feature_model>
+     </device_feature_model>
      <device_feature_model>
-          <id>cron.toggle.status</id>
+          <id>cron.job.halt</id>
+          <name>Halt</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>cron.job</device_type_id>
+          <parameters>
+              {&quot;action&quot;:&quot;&quot;,&quot;value0&quot;:&quot;halt&quot;, &quot;value1&quot;:&quot;resume&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>current</stat_key>
+          <return_confirmation>0</return_confirmation>
+     </device_feature_model>
+     <device_feature_model>
+          <id>cron.job.status</id>
           <name>Status</name>
           <feature_type>sensor</feature_type>
-          <device_type_id>cron.toggle</device_type_id>
+          <device_type_id>cron.job</device_type_id>
           <parameters>
               {}
           </parameters>
           <value_type>string</value_type>
           <stat_key>current</stat_key>
           <return_confirmation>0</return_confirmation>
-      </device_feature_model>
+     </device_feature_model>
   </device_feature_models>
 </package>
