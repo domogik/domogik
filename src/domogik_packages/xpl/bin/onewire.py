@@ -45,6 +45,7 @@ from domogik_packages.xpl.lib.onewire import ComponentDs18b20
 from domogik_packages.xpl.lib.onewire import ComponentDs18s20
 from domogik_packages.xpl.lib.onewire import ComponentDs2401
 from domogik_packages.xpl.lib.onewire import ComponentDs2438
+from domogik_packages.xpl.lib.onewire import ComponentDs2408
 import ow
 import traceback
 import time
