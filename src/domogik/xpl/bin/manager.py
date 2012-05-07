@@ -739,7 +739,7 @@ class SysManager(XplPlugin):
                 return 
 
             for external in external_list:
-                external = external[0:-4]
+                external = external[0:-5]
                 print(external)
                 self.log.info("==> %s" % (external))
                 # try open json file
