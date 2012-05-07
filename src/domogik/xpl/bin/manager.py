@@ -370,8 +370,8 @@ class SysManager(XplPlugin):
     def _reload_configuration_file(self):
         """ reload all plugins and external list
         """
-        print("Reloading plugin and external members model lists")
-        self.log.info("Reloading plugin and external members model lists")
+        print("Reloading plugin list")
+        self.log.info("Reloading plugin list")
         self._list_plugins()
 
     def _write_fifo(self, level, message):
@@ -725,6 +725,7 @@ class SysManager(XplPlugin):
     def _list_external_models(self):
         """ List domogik external models
         """
+        print("Start listing available external members models")
         self.log.debug("Start listing available external members models")
 
         self._external_models = []
@@ -870,6 +871,25 @@ class SysManager(XplPlugin):
                                 "value" : message.data[conf]})
                 idx += 1
         return config
+
+    def _clean_external_list(self, id):
+        """ Clean external members
+            @param id : id of the external to remove from the list
+        """
+        tmp_externals = []
+        for external in self._externals:
+            if external["name"]!= id:
+                tmp_externals.append(external)
+        self._externals = tmp_externals
+
+    def _clean_unknow_from_external_list(self):
+        """ Clean unknown external members
+        """
+        tmp_externals = []
+        for external in self._externals:
+            if external["technology"].lower() != "unknown":
+                tmp_externals.append(external)
+        self._externals = tmp_externals
 
     def _check_external_status(self):
         """ Check if externals are always present
@@ -1343,6 +1363,11 @@ class SysManager(XplPlugin):
             status = self.pkg_mgr.install_package(package, package_part = package_part)
             if status != True:
                 mess.add_data({'error' : status})
+
+            # for an external member, reload all json files
+            if pkg_type == "external":
+                self._clean_unknow_from_external_list()
+                self._list_external_models()
         except:
             mess.add_data({'error' : 'Error while installing package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while installing package '%s' : %s" % (package, traceback.format_exc()))
@@ -1403,9 +1428,13 @@ class SysManager(XplPlugin):
             status = self.pkg_mgr.uninstall_package(pkg_type, pkg_id)
             if status != True:
                 mess.add_data({'error' : status})
-            # if this is a plugin, disable it
+            # if this is a plugin, disable it (this is a security as a plugin shouldn't be enabled when installing it)
             if pkg_type == "plugin":
                 self._disable_plugin(pkg_id)
+            # for an external member, reload all json files
+            if pkg_type == "external":
+                self._list_external_models()
+                self._clean_external_list(pkg_id)
         except:
             mess.add_data({'error' : 'Error while uninstalling package. Check log file : packagemanager.log and manager.log'})
             self.log.error("Error while uninstalling package '%s-%s' : %s" % (pkg_type, pkg_id, traceback.format_exc()))
