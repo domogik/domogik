@@ -512,9 +512,6 @@ class RfxcomUsb:
             @param data : data read
         """
         type = data[0] + data[1]
-        # TEMPORARY OFF FOR DEV
-        if type == "52":
-            return
         print "TYPE = %s" % type
         try:
             eval("self._process_%s('%s')" % (type, data))
