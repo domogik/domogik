@@ -71,7 +71,6 @@ class Loader():
         @return pair (main_config, plugin_config)
         '''
         # lock the file
-        print "ACQUIRE"
         if not os.path.exists(LOCK_FILE):
             file = open(LOCK_FILE, "w")
             file.write("")
@@ -81,7 +80,6 @@ class Loader():
 
         # read config file
         self.config = ConfigParser.ConfigParser()
-        print "CFG > open"
         cfg_file = open(CONFIG_FILE)
         self.config.readfp(cfg_file)
 
@@ -99,9 +97,7 @@ class Loader():
         if self.part_name:
             result =  (domogik_part, self.config.items(self.part_name))
 
-        print "CFG > close"
         cfg_file.close()
-        print "RELEASE"
         file.close()
         return result
 

@@ -1,6 +1,5 @@
 {
     "configuration": [], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "rfxcom.temp", 
@@ -313,7 +312,73 @@
             "value_type": "string"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "Oregon-THR128, Oregon-THR138, Oregon-THC138, Oregon-THC238/268, Oregon-THN122N/132N, Oregon-THWR288A, Oregon-THRN122N, Oregon-AW129, Oregon-AW131, Oregon-THWR800, Oregon-RTHN318", 
+            "id": "rfxcom.temp", 
+            "name": "Oregon Inside/Outside/Water Temperature"
+        }, 
+        {
+            "description": "Oregon-THGN122N/123N, Oregon-THGR122NX, Oregon-THGR228N, Oregon-THGR238/268, Oregon-THGR810, Oregon-RTGR328N, Oregon-THGR328N, Oregon-WTGR800, Oregon-THGR918, Oregon-THGRN228NX, Oregon-THGN500", 
+            "id": "rfxcom.th", 
+            "name": "Oregon Inside/Outside Temp-Hygro"
+        }, 
+        {
+            "description": "Huger-BTHR918, Oregon-BTHR918N, Oregon-BTHR968", 
+            "id": "rfxcom.thb", 
+            "name": "Oregon Inside Temp-Hygro-Baro"
+        }, 
+        {
+            "description": "Oregon-WTGR800, Oregon-WGR800, Huger-STR918, Oregon-WGR918", 
+            "id": "rfxcom.wind", 
+            "name": "Anemometer"
+        }, 
+        {
+            "description": "Oregon-UVN128, Oregon-UV138, Oregon-UVN800", 
+            "id": "rfxcom.uv", 
+            "name": "UV sensor"
+        }, 
+        {
+            "description": "Oregon-RGR126, Oregon-RGR682, Oregon-RGR918, Oregon-PCR800", 
+            "id": "rfxcom.rain", 
+            "name": "Rain Gauge"
+        }, 
+        {
+            "description": "Oregon-BWR102, Oregon-GR101", 
+            "id": "rfxcom.weight", 
+            "name": "Body Weight Monitor"
+        }, 
+        {
+            "description": "cent-a-meter, Electrisave, OWL CM113", 
+            "id": "rfxcom.elec1", 
+            "name": "Ampere meter"
+        }, 
+        {
+            "description": "OWL CM119", 
+            "id": "rfxcom.elec2", 
+            "name": "Power meter"
+        }, 
+        {
+            "description": "RFXSensor", 
+            "id": "rfxcom.rfxsensor", 
+            "name": "RFXSensor"
+        }, 
+        {
+            "description": "RFXMeter", 
+            "id": "rfxcom.rfxmeter", 
+            "name": "RFXMeter"
+        }, 
+        {
+            "description": "Digimax", 
+            "id": "rfxcom.digimax", 
+            "name": "Digimax"
+        }, 
+        {
+            "description": "Received X10 RF Remote, Medion remote, ATI Remote or ATI Remote Plus", 
+            "id": "rfxcom.remote", 
+            "name": "Remote"
+        }
+    ], 
     "external": {
         "device_id": "lan", 
         "vendor_id": "rfxcom"
@@ -328,6 +393,7 @@
         "author_email": "ferllings at gmail.com", 
         "category": "rfxcom", 
         "changelog": "0.1\n- create", 
+        "dependencies": [], 
         "description": "RFXCOM with xPL support LAN 433.92MHz receiver transmitter", 
         "documentation": "#TODO", 
         "domogik_min_version": "0.2.0", 

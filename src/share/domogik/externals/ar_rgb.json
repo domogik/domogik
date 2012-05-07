@@ -1,6 +1,5 @@
 {
     "configuration": [], 
-    "dependencies": [], 
     "device_feature_models": [
         {
             "device_type_id": "arduino.rgb_leds", 
@@ -23,14 +22,20 @@
             "value_type": "binary"
         }
     ], 
-    "device_types": [], 
+    "device_types": [
+        {
+            "description": "RGB leds controller", 
+            "id": "arduino.rgb_leds", 
+            "name": "RGB leds controller"
+        }
+    ], 
     "external": {
         "device_id": "rgb", 
         "vendor_id": "arduino"
     }, 
     "files": [
         "src/share/domogik/design/external/ar_rgb/icon.png", 
-        "src/share/domogik/externals/ar_rgb.xml", 
+        "src/share/domogik/externals/ar_rgb.json", 
         "src/share/domogik/url2xpl/arduino/setcolor.xml", 
         "src/share/domogik/stats/arduino/arduino.rgb-ar_rgb.xml"
     ], 
@@ -39,6 +44,7 @@
         "author_email": "fritz.smh at gmail.com", 
         "category": "arduino", 
         "changelog": "0.1\n- create", 
+        "dependencies": [], 
         "description": "Control RGB leds with an arduino and an ethernet shield\nThis external plugin is a xPL program for arduino which manage RGB led strips.\n\nIt requires : \n- Arduino Uno or similar\n- Official ethernet shield \n\nOpen the following files as a sketchbook with the Arduino Java IDE :\n- ar_rgb.pde\n- rgb.pde\n- time.pde\n- xpl.pde\n- memoryfree.cpp\n- memoryfree.h\n\nConfigure parameters in ar_rgb.pde\n- network \n- used pins\n\nUpload project to Arduino with the IDE\n\nTest it with the manual controllers (push button and potentiometer) and then create a device and test it with Domogik", 
         "documentation": "http://wiki.domogik.org/external_ar_rgb", 
         "domogik_min_version": "0.2.0", 
