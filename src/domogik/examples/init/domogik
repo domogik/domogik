@@ -2,11 +2,11 @@
 
 ### BEGIN INIT INFO
 # Provides:          domogik
-# Required-Start:    $local_fs $network xplhub
-# Required-Stop:     $local_fs $network xplhub
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start xpl hub
+# Short-Description: Start Domogik daemons
 ### END INIT INFO
 
 #This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -31,7 +31,7 @@
 CUSTOM_PATH=""
 HUB_IFACE="lo"
 LAUNCH_DOMOGIK_XPL_HUB="true"
-MANAGER=dmg_manager
+NAME=dmg_manager
 XPLHUB=xPL_Hub
 DIETIME=2
 STARTTIME=5
@@ -39,7 +39,7 @@ STARTTIME=5
 PIDDIR="/var/run/domogik"
 PIDFILE="$PIDDIR/manager.pid" 
 LOCKDIR="/var/lock/domogik"
-
+    
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
 
@@ -49,9 +49,18 @@ if [ ${UID} != 0 ];then
     exit 1;
 fi
 
+function start {
+    if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
+        start_xpl
+    else
+        echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
+    fi
+    start_daemon
+}
+
 function start_xpl {
     if [ -z "$(which ${XPLHUB})" ];then
-        echo "ERROR : ${XPLHUB} not in path, please install it somewhere in the path, or add CUSTOM_PATH to default file."
+        echo "ERROR : ${XPLHUB} not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
         exit 1
     fi
     echo -n " * Starting XPL..."
@@ -68,15 +77,15 @@ function start_manager {
     [ -p ${PIDDIR}/dmg-manager-state ] && rm -f ${PIDDIR}/dmg-manager-state
     mkfifo ${PIDDIR}/dmg-manager-state
     chown ${DOMOGIK_USER}: ${PIDDIR}/dmg-manager-state
-    start_manager
+    start_daemon
     #Get the startup status
     cat < ${PIDDIR}/dmg-manager-state
     rm -f ${PIDDIR}/dmg-manager-state
 }
 
-function start_manager {
+function start_daemon {
     echo -n " * Starting Manager (with ${MANAGER_PARAMS})..."
-    /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:${PATH} && ${MANAGER} ${MANAGER_PARAMS}"
+    /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:${PATH} && ${NAME} ${MANAGER_PARAMS}"
     if [ $? -gt 0 ]; then
         echo " "
         echo " An error occured during manager startup."
@@ -90,8 +99,12 @@ function status {
     [ ! -f ${PIDFILE} ] && \
         echo " * Domogik is not running (can't find pid file)" &&
         exit 0
-    status_xpl
-    status_manager
+    RUNNING=$(pgrep "${NAME}" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -eq 1 ]; then
+        echo " * Domogik is running"
+    else
+        echo " * Domogik is not running"
+    fi
 }
 
 function status_manager {
@@ -100,12 +113,12 @@ function status_manager {
     else
         echo " * manager is not running"
     fi
-    if [ -f $PIDDIR/dbmgr.pid ] && [ $(/bin/ps `cat $PIDDIR/dbmgr.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
+    if [ -f ${PIDDIR}/dbmgr.pid ] && [ $(/bin/ps `cat ${PIDDIR}/dbmgr.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
         echo " * dbmgr is running"
     else
         echo " * dbmgr is not running"
     fi
-    if [ -f $PIDDIR/rest.pid ] && [ $(/bin/ps `cat $PIDDIR/rest.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
+    if [ -f ${PIDDIR}/rest.pid ] && [ $(/bin/ps `cat ${PIDDIR}/rest.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
         echo " * rest is running"
     else
         echo " * rest is not running"
@@ -116,21 +129,11 @@ function status_xpl {
     set +e
     RUNNING=$(/usr/bin/pgrep -c ${XPLHUB})
     set -e
-    if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ] ; then
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
         echo " * ${XPLHUB} is running"
     else
         echo " * ${XPLHUB} is not running"
     fi
-}
-
-function start {
-    if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
-        start_xpl
-    else
-        echo "Domogik xPL hub disabled. If Domogik failed to 
-start, make sure you have a running hub"
-    fi
-    start_manager
 }
 
 function stop {
@@ -158,18 +161,18 @@ function stop_manager {
     echo -n " * Stopping Manager..."
     kill $(cat ${PIDFILE} 2>/dev/null) >/dev/null 2>&1
     sleep ${DIETIME}
-    RUNNING=$(pgrep "$MANAGER" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
-    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
+    RUNNING=$(pgrep "${NAME}" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -eq 1 ]; then
         kill $(cat ${PIDFILE} 2>/dev/null) >/dev/null 2>&1
         sleep ${DIETIME}
     fi
-    RUNNING=$(pgrep "$MANAGER" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
-    if [ ! -z $RUNNING ] && [ $RUNNING -eq 1 ]; then
+    RUNNING=$(pgrep "${NAME}" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -eq 1 ]; then
         kill -9 $(cat ${PIDFILE} 2>/dev/null) >/dev/null 2>&1
         sleep ${DIETIME}
     fi
-    RUNNING=$(pgrep "$MANAGER" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
-    if [ ! -z $RUNNING ] && [ $RUNNING -gt 0 ]; then
+    RUNNING=$(pgrep "${NAME}" | grep -c $(cat ${PIDFILE} 2>/dev/null) 2>/dev/null)
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ]; then
         echo " Can't stop domogik."
     else
         rm -f ${PIDFILE} 2>/dev/null
@@ -179,7 +182,7 @@ function stop_manager {
 
 function stop_plugins {
     echo -n " * Stopping Plugins..."
-    [ -z ${HOSTNAME} ] && HOSTNAME=$(/bin/cat /etc/hostname)
+    [ -z ${HOSTNAME} ] && HOSTNAME=$(cat /etc/hostname)
     [ -f ${PIDFILE} ] && \
         su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=${HOSTNAME}'" && \
         sleep ${DIETIME}
@@ -194,16 +197,19 @@ function stop_plugins {
 }
 
 kill_all() {
-    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+    for f in $(find ${PIDDIR}/*.pid 2>/dev/null); do
         kill $(cat $f 2>/dev/null) >/dev/null 2>&1
     done
-    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+    for f in $(find ${PIDDIR}/*.pid 2>/dev/null); do
         kill $(cat $f 2>/dev/null) >/dev/null 2>&1
     done
     sleep ${DIETIME}
-    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+    for f in $(find ${PIDDIR}/*.pid 2>/dev/null); do
         kill -9 $(cat $f 2>/dev/null) >/dev/null 2>&1
         rm -f $f 2>/dev/null
+    done
+    for p in $(pgrep "${NAME}" 2>/dev/null); do
+        kill -9 $p >/dev/null 2>&1
     done
 }
 
@@ -221,9 +227,11 @@ function update_cache {
 # Check if the directory for lock exists
 function check_lock_dir {
     #USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    [ ! -d $PIDDIR ] && mkdir $PIDDIR
-    [ -p $PIDDIR/dmg-manager-state ] && rm -f $PIDDIR/dmg-manager-state
-    chown ${DOMOGIK_USER}: $PIDDIR
+    if [ ! -d ${PIDDIR} ];then
+        mkdir ${PIDDIR}
+    fi
+    [ -p ${PIDDIR}/dmg-manager-state ] && rm -f ${PIDDIR}/dmg-manager-state
+    chown ${DOMOGIK_USER}: ${PIDDIR}
     [ ! -d ${LOCKDIR} ] && mkdir ${LOCKDIR}
     chown ${DOMOGIK_USER}: ${LOCKDIR}
 }
@@ -231,8 +239,8 @@ function check_lock_dir {
 case "$1" in
     start)
         check_lock_dir
+		[ -f ${PIDFILE} ] && echo "Domogik seems to be running. Please stop it." && exit 0
         if [ $# -eq 1 ];then
-			[ -f ${PIDFILE} ] && echo "Domogik seems to be running. Please stop it." && exit 0
             start
             sleep ${STARTTIME}
             sleep ${STARTTIME}
@@ -286,7 +294,10 @@ case "$1" in
                     start_xpl
                 ;;
                 manager)
-                    stop
+                    stop_plugins
+                    stop_manager
+					kill_all
+                    sleep ${DIETIME}
                     sleep ${DIETIME}
                     start_manager
                     ;;

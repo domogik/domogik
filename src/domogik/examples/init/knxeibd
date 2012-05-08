@@ -1,11 +1,11 @@
 #! /bin/bash
 ### BEGIN INIT INFO
-# Provides:          linknx through eibd connection 
+# Provides:          eibd
 # Required-Start:    $networking
 # Required-Stop:     $networking
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: linknx
+# Short-Description: eib (knx) daemon 
 # Description:       Daemon for communication with the KNX bus.
 ### END INIT INFO
 
@@ -15,6 +15,10 @@ EIBD_PIDFILE=/var/run/$EIBD_NAME.pid
 EIBD_DAEMON=/usr/bin/$EIBD_NAME
 EIBD_LOG=/var/log/eibd.log
 EIBD_DAEMON_OPTS="--pid-file=$EIBD_PIDFILE -i -d -D ipt:192.168.0.148"
+EIBD_USER=nobody
+
+[ -f /etc/conf.d/xplhub ] && . /etc/conf.d/xplhub
+[ -f /etc/default/xplhub ] && . /etc/default/xplhub
 
 SCRIPTNAME=/etc/init.d/dmg_knx
 
@@ -24,7 +28,7 @@ SCRIPTNAME=/etc/init.d/dmg_knx
 #	Function that starts the daemon/service.
 #
 d_start() {
-	start_daemon $EIBD_PIDFILE $EIBD_NAME $EIBD_DAEMON "$EIBD_DAEMON_OPTS" $EIBD_LOG domogik
+	start_daemon $EIBD_PIDFILE $EIBD_NAME $EIBD_DAEMON "$EIBD_DAEMON_OPTS" $EIBD_LOG $EIBD_USER
 }
 
 d_stop() {
@@ -102,7 +106,7 @@ restart|force-reload)
 	status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {start|stop|restart|restart-admin|force-reload|status}" >&2
+	echo "Usage: $O {start|stop|restart|restart-admin|force-reload|status}" >&2
 	exit 1
 	;;
 esac
