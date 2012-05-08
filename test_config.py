@@ -114,6 +114,7 @@ def test_config_files():
     manager_params = ''
     custom_path = ''
     hub_iface = ''
+    launch_domogik_xpl_hub = ''
     for line in lines:
         item,value = line.strip().split("=")
         if item.strip() == "DOMOGIK_USER":
