@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/dev/teleinfo", 
-            "desc": "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)", 
+            "description": "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)", 
             "id": "1", 
             "interface": "no", 
             "key": "device", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "60", 
-            "desc": "Interval between each request (seconds)", 
+            "description": "Interval between each request (seconds)", 
             "id": "2", 
             "interface": "no", 
             "key": "interval", 
@@ -204,13 +204,13 @@
     }, 
     "udev-rules": [
         {
-            "desc": "Dauguet Usb assembly", 
+            "description": "Dauguet Usb assembly", 
             "filename": "teleinfo.rules", 
             "model": "Dauguet Usb", 
             "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYMLINK+=\"teleinfo\", MODE=\"0666\""
         }, 
         {
-            "desc": "Dauguet serial assembly with a modchip usb to serial adapter", 
+            "description": "Dauguet serial assembly with a modchip usb to serial adapter", 
             "filename": "teleinfo.rules", 
             "model": "Modchip usb to serial adapter", 
             "rule": "KERNEL==\"ttyUSB*\", ATTRS{port_number}==\"0\", DRIVERS==\"moschip7720\", SYMLINK+=\"teleinfo\", MODE=\"0666\""

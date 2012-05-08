@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Path of KNX configuration file", 
+            "description": "Path of KNX configuration file", 
             "id": "2", 
             "interface": "no", 
             "key": "file", 

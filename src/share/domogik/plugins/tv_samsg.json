@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Television 1 : name", 
+            "description": "Television 1 : name", 
             "id": "1", 
             "interface": "no", 
             "key": "tv-1-name", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Television 1 : device (serial port for EX-link)", 
+            "description": "Television 1 : device (serial port for EX-link)", 
             "id": "2", 
             "interface": "no", 
             "key": "tv-1-device", 

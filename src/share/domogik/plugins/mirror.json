@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/dev/mirror", 
-            "desc": "Mir:ror device", 
+            "description": "Mir:ror device", 
             "id": "1", 
             "interface": "no", 
             "key": "device", 
@@ -88,7 +88,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "Mir:ror usb device", 
+            "description": "Mir:ror usb device", 
             "filename": "mirror.rules", 
             "model": "Mir:ror", 
             "rule": "KERNEL==\"hidraw*\", ATTRS{idVendor}==\"1da8\", ATTRS{idProduct}==\"1301\", SYMLINK+=\"mirror\", MODE=\"0666\""

@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "5.043", 
-            "desc": "The longitude of the house", 
+            "description": "The longitude of the house", 
             "id": "1", 
             "interface": "no", 
             "key": "longitude", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "47.352", 
-            "desc": "The latitude of the house", 
+            "description": "The latitude of the house", 
             "id": "2", 
             "interface": "no", 
             "key": "latitude", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Use external cron like the cron plugin to schedule events", 
+            "description": "Use external cron like the cron plugin to schedule events", 
             "id": "3", 
             "interface": "no", 
             "key": "cron", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "For test. Will send a dawn (a dusk) message 1min (6mins) after plugin starts", 
+            "description": "For test. Will send a dawn (a dusk) message 1min (6mins) after plugin starts", 
             "id": "4", 
             "interface": "no", 
             "key": "test", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": "xpl-cmnd", 
-            "desc": "Xpltype to use in the message", 
+            "description": "Xpltype to use in the message", 
             "id": "5", 
             "interface": "yes", 
             "key": "xpltype", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": "telldus.basic", 
-            "desc": "Schema to use to send command", 
+            "description": "Schema to use to send command", 
             "id": "6", 
             "interface": "yes", 
             "key": "schema", 
@@ -72,7 +72,7 @@
         }, 
         {
             "default": "device", 
-            "desc": "Address field name (device)", 
+            "description": "Address field name (device)", 
             "id": "7", 
             "interface": "yes", 
             "key": "addname", 
@@ -82,7 +82,7 @@
         }, 
         {
             "default": "TS3", 
-            "desc": "Device address", 
+            "description": "Device address", 
             "id": "8", 
             "interface": "yes", 
             "key": "add", 
@@ -92,7 +92,7 @@
         }, 
         {
             "default": "command", 
-            "desc": "Command to send to the device", 
+            "description": "Command to send to the device", 
             "id": "9", 
             "interface": "yes", 
             "key": "command", 
@@ -102,7 +102,7 @@
         }, 
         {
             "default": "on", 
-            "desc": "Value of command when dawn event", 
+            "description": "Value of command when dawn event", 
             "id": "10", 
             "interface": "yes", 
             "key": "dawn", 
@@ -112,7 +112,7 @@
         }, 
         {
             "default": "off", 
-            "desc": "Value of command when dusk event", 
+            "description": "Value of command when dusk event", 
             "id": "11", 
             "interface": "yes", 
             "key": "dusk", 

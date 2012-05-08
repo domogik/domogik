@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "Camera1", 
-            "desc": "To report on widget address", 
+            "description": "To report on widget address", 
             "id": "1", 
             "interface": "yes", 
             "key": "name", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "192.168.1.32", 
-            "desc": "Camera Ip address", 
+            "description": "Camera Ip address", 
             "id": "2", 
             "interface": "yes", 
             "key": "ip", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": null, 
-            "desc": "http port", 
+            "description": "http port", 
             "id": "3", 
             "interface": "yes", 
             "key": "port", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "admin", 
-            "desc": "User allowed to connect the camera", 
+            "description": "User allowed to connect the camera", 
             "id": "4", 
             "interface": "yes", 
             "key": "user", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": null, 
-            "desc": "User Password", 
+            "description": "User Password", 
             "id": "5", 
             "interface": "yes", 
             "key": "password", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": "5", 
-            "desc": "pulse delay", 
+            "description": "pulse delay", 
             "id": "6", 
             "interface": "yes", 
             "key": "delay", 

@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "Nabaztag", 
-            "desc": "Name of your Nabaztag.", 
+            "description": "Name of your Nabaztag.", 
             "id": "1", 
             "interface": "yes", 
             "key": "name", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "0000000000", 
-            "desc": "Serial of your Nabaztag to control it with Wizz.cc's API.", 
+            "description": "Serial of your Nabaztag to control it with Wizz.cc's API.", 
             "id": "2", 
             "interface": "yes", 
             "key": "serial", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "0000000000", 
-            "desc": "Token of your Nabaztag to control it with Wizz.cc's API.", 
+            "description": "Token of your Nabaztag to control it with Wizz.cc's API.", 
             "id": "3", 
             "interface": "yes", 
             "key": "token", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "voice=fr", 
-            "desc": "Nabaztag voice. Can be voice=xx or ws_kajedo=xxxx or ws_acapela=xxxx", 
+            "description": "Nabaztag voice. Can be voice=xx or ws_kajedo=xxxx or ws_acapela=xxxx", 
             "id": "4", 
             "interface": "yes", 
             "key": "voice", 

@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Send dawn/dusk messages using an obscurity detector", 
+            "description": "Send dawn/dusk messages using an obscurity detector", 
             "id": "1", 
             "interface": "no", 
             "key": "dawndusk", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Send sensor.basic messages using a door detector", 
+            "description": "Send sensor.basic messages using a door detector", 
             "id": "2", 
             "interface": "no", 
             "key": "windoor", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Send sensor.basic messages using a move detector", 
+            "description": "Send sensor.basic messages using a move detector", 
             "id": "3", 
             "interface": "no", 
             "key": "move", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "400", 
-            "desc": "Delay between 2 RF orders (default 400ms)", 
+            "description": "Delay between 2 RF orders (default 400ms)", 
             "id": "4", 
             "interface": "no", 
             "key": "delayrf", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Address of the device (TSxx)", 
+            "description": "Address of the device (TSxx)", 
             "id": "5", 
             "interface": "yes", 
             "key": "name", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Type of the device (DAWNDUSK,WINDOOR,MOVE)", 
+            "description": "Type of the device (DAWNDUSK,WINDOOR,MOVE)", 
             "id": "6", 
             "interface": "yes", 
             "key": "devicetype", 
@@ -72,7 +72,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Parameter 1", 
+            "description": "Parameter 1", 
             "id": "7", 
             "interface": "yes", 
             "key": "param1", 
@@ -82,7 +82,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Parameter 2", 
+            "description": "Parameter 2", 
             "id": "8", 
             "interface": "yes", 
             "key": "param2", 

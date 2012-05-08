@@ -1014,7 +1014,7 @@ class SysManager(XplPlugin):
                 for conf in plugin["configuration"]:
                     mess.add_data({'cfg'+str(conf["id"])+'-key' : conf["key"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-type' : conf["type"]})
-                    mess.add_data({'cfg'+str(conf["id"])+'-desc' : conf["desc"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-desc' : conf["description"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-default' : conf["default"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-int' : conf["interface"]})
                     if conf["type"] == "enum":
@@ -1234,7 +1234,7 @@ class SysManager(XplPlugin):
         idx = 0
         for rule in pkg_json["udev-rules"]:
             mess.add_data({"rule%s-model" % idx : rule["model"]})
-            mess.add_data({"rule%s-desc" % idx : rule["desc"]})
+            mess.add_data({"rule%s-desc" % idx : rule["description"]})
             mess.add_data({"rule%s-filename" % idx : rule["filename"]})
             mess.add_data({"rule%s-rule" % idx : rule["rule"]})
             idx += 1

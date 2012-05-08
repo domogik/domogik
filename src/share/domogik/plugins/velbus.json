@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "0", 
-            "desc": "define the connection type to velbus", 
+            "description": "define the connection type to velbus", 
             "id": "1", 
             "interface": "no", 
             "key": "connection-type", 
@@ -25,7 +25,7 @@
         }, 
         {
             "default": "/dev/ttyACM0", 
-            "desc": "velbus device (/dev/ttyACM0 for serial, or ip:port for socket", 
+            "description": "velbus device (/dev/ttyACM0 for serial, or ip:port for socket", 
             "id": "2", 
             "interface": "no", 
             "key": "device", 
@@ -127,7 +127,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "Velbus USB interface", 
+            "description": "Velbus USB interface", 
             "filename": "velbus.rules", 
             "model": "VMB1USB", 
             "rule": "SUBSYSTEM==\"tty\" ATTRS(manufacturer)==\"Velleman Projects\" ATTRS{product}==\"VMB1USB Velbus USB interface\" SYMLINK+=\"velbus\" MODE=\"0666\""

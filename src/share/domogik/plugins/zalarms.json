@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": null, 
-            "desc": "The name of the alarm", 
+            "description": "The name of the alarm", 
             "id": "0", 
             "interface": "yes", 
             "key": "device", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": null, 
-            "desc": "alarm or dawnalarm", 
+            "description": "alarm or dawnalarm", 
             "id": "1", 
             "interface": "yes", 
             "key": "alarmtype", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": null, 
-            "desc": "A string like MoTuWeThFr,09:30", 
+            "description": "A string like MoTuWeThFr,09:30", 
             "id": "2", 
             "interface": "yes", 
             "key": "alarm1", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Or like MoTuWeThFrSaSu,07:00-08:00,17:00-21:00", 
+            "description": "Or like MoTuWeThFrSaSu,07:00-08:00,17:00-21:00", 
             "id": "3", 
             "interface": "yes", 
             "key": "alarm2", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Or for a dawnalarm like SaSu,08:00-09:00", 
+            "description": "Or for a dawnalarm like SaSu,08:00-09:00", 
             "id": "4", 
             "interface": "yes", 
             "key": "alarm3", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The schema of the message to send", 
+            "description": "The schema of the message to send", 
             "id": "5", 
             "interface": "yes", 
             "key": "nstschema", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The type of the message to send", 
+            "description": "The type of the message to send", 
             "id": "6", 
             "interface": "yes", 
             "key": "nsttype", 
@@ -72,7 +72,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The name of the parameter 0 to send (ie command)", 
+            "description": "The name of the parameter 0 to send (ie command)", 
             "id": "7", 
             "interface": "yes", 
             "key": "parameter0", 
@@ -82,7 +82,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The on value of the parameter 0 to send (ie on)", 
+            "description": "The on value of the parameter 0 to send (ie on)", 
             "id": "8", 
             "interface": "yes", 
             "key": "valueon0", 
@@ -92,7 +92,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The off value of the parameter 0 to send (ie off)", 
+            "description": "The off value of the parameter 0 to send (ie off)", 
             "id": "9", 
             "interface": "yes", 
             "key": "valueoff0", 
@@ -102,7 +102,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The name of the parameter 1 to send", 
+            "description": "The name of the parameter 1 to send", 
             "id": "10", 
             "interface": "yes", 
             "key": "parameter1", 
@@ -112,7 +112,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The on value of the parameter 1 to send", 
+            "description": "The on value of the parameter 1 to send", 
             "id": "11", 
             "interface": "yes", 
             "key": "valueon1", 
@@ -122,7 +122,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The off value of the parameter 1 to send", 
+            "description": "The off value of the parameter 1 to send", 
             "id": "12", 
             "interface": "yes", 
             "key": "valueoff1", 
@@ -132,7 +132,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The nested field 1 to send", 
+            "description": "The nested field 1 to send", 
             "id": "13", 
             "interface": "yes", 
             "key": "nstfield1", 
@@ -142,7 +142,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The value of the nested field to send", 
+            "description": "The value of the nested field to send", 
             "id": "14", 
             "interface": "yes", 
             "key": "nstvalue1", 
@@ -152,7 +152,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The nested the field 2 to send", 
+            "description": "The nested the field 2 to send", 
             "id": "15", 
             "interface": "yes", 
             "key": "nstfield2", 
@@ -162,7 +162,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The value of the nested field to send", 
+            "description": "The value of the nested field to send", 
             "id": "16", 
             "interface": "yes", 
             "key": "nstvalue2", 
@@ -172,7 +172,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The nested the field 3 to send", 
+            "description": "The nested the field 3 to send", 
             "id": "17", 
             "interface": "yes", 
             "key": "nstfield3", 
@@ -182,7 +182,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The value of the nested field to send", 
+            "description": "The value of the nested field to send", 
             "id": "18", 
             "interface": "yes", 
             "key": "nstvalue3", 

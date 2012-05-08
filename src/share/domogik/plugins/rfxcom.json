@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/dev/rfxcom", 
-            "desc": "Rfxcom device", 
+            "description": "Rfxcom device", 
             "id": "1", 
             "interface": "no", 
             "key": "device", 
@@ -245,11 +245,11 @@
         {
             "device_type_id": "rfxcom.humidity", 
             "feature_type": "sensor", 
-            "id": "rfxcom.humidity.humidity-desc", 
+            "id": "rfxcom.humidity.humidity-description", 
             "name": "Humidity Description", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "humidity-desc", 
+            "stat_key": "humidity-description", 
             "value_type": "string"
         }, 
         {
@@ -285,11 +285,11 @@
         {
             "device_type_id": "rfxcom.th", 
             "feature_type": "sensor", 
-            "id": "rfxcom.th.humidity-desc", 
+            "id": "rfxcom.th.humidity-description", 
             "name": "Humidity Description", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "humidity-desc", 
+            "stat_key": "humidity-description", 
             "value_type": "string"
         }, 
         {
@@ -325,11 +325,11 @@
         {
             "device_type_id": "rfxcom.thb", 
             "feature_type": "sensor", 
-            "id": "rfxcom.thb.humidity-desc", 
+            "id": "rfxcom.thb.humidity-description", 
             "name": "Humidity Description", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "humidity-desc", 
+            "stat_key": "humidity-description", 
             "value_type": "string"
         }, 
         {
@@ -705,7 +705,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "RFXCOM Usb transceiver and receiver", 
+            "description": "RFXCOM Usb transceiver and receiver", 
             "filename": "rfxcom.rules", 
             "model": "RFXCOM Usb", 
             "rule": "SUBSYSTEM==\"tty\" ATTRS{product}==\"RFXCOM USB 438.92MHz transceiver\" SYMLINK+=\"rfxcom\" MODE=\"0666\""

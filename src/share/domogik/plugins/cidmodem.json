@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/dev/modem", 
-            "desc": "Modem device (ex: /dev/ttyUSB0 for an usb modem)", 
+            "description": "Modem device (ex: /dev/ttyUSB0 for an usb modem)", 
             "id": "1", 
             "interface": "no", 
             "key": "device", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "AT#CID=1", 
-            "desc": "AT CID command to be used by plugin to activate Caller Id mode on modem.", 
+            "description": "AT CID command to be used by plugin to activate Caller Id mode on modem.", 
             "id": "2", 
             "interface": "no", 
             "key": "cid-command", 
@@ -83,7 +83,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "Example for a common modem", 
+            "description": "Example for a common modem", 
             "filename": "modem.rules", 
             "model": "modem", 
             "rule": "UBSYSTEMS==\"usb\", ATTRS{idVendor}==\"067b\", ATTRS{idProduct}==\"2303\", SYMLINK+=\"modem\", MODE=\"0666\""

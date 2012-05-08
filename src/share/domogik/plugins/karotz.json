@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Karotz Name", 
+            "description": "Karotz Name", 
             "id": "1", 
             "interface": "no", 
             "key": "Name", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Domogik installID into Kartoz", 
+            "description": "Domogik installID into Kartoz", 
             "id": "2", 
             "interface": "no", 
             "key": "installid", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "EN", 
-            "desc": "Language spoken by the Karotz (EN, FR, DE, ES)", 
+            "description": "Language spoken by the Karotz (EN, FR, DE, ES)", 
             "id": "3", 
             "interface": "no", 
             "key": "language", 

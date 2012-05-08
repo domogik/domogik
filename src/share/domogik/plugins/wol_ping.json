@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "60", 
-            "desc": "Interval between each ping", 
+            "description": "Interval between each ping", 
             "id": "1", 
             "interface": "no", 
             "key": "ping-interval", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Name", 
+            "description": "Name", 
             "id": "2", 
             "interface": "yes", 
             "key": "name", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Ip or dns", 
+            "description": "Ip or dns", 
             "id": "3", 
             "interface": "yes", 
             "key": "ip", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Mac address", 
+            "description": "Mac address", 
             "id": "4", 
             "interface": "yes", 
             "key": "mac", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Port used for WOL", 
+            "description": "Port used for WOL", 
             "id": "5", 
             "interface": "yes", 
             "key": "wol-port", 

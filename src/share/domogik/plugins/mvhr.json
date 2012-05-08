@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "mvhr1", 
-            "desc": "Name of the MVHR", 
+            "description": "Name of the MVHR", 
             "id": "1", 
             "interface": "no", 
             "key": "name", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "10", 
-            "desc": "The timeout (in minutes) of the sensors before sending an alert", 
+            "description": "The timeout (in minutes) of the sensors before sending an alert", 
             "id": "2", 
             "interface": "no", 
             "key": "timeout", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "5", 
-            "desc": "The delay (in minutes) between two status messages", 
+            "description": "The delay (in minutes) between two status messages", 
             "id": "3", 
             "interface": "no", 
             "key": "delay", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "SENSOR1", 
-            "desc": "The indoor sensor of the mvhr", 
+            "description": "The indoor sensor of the mvhr", 
             "id": "4", 
             "interface": "no", 
             "key": "mvhr-indoor", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": "SENSOR2", 
-            "desc": "The outdoor sensor of the mvhr", 
+            "description": "The outdoor sensor of the mvhr", 
             "id": "5", 
             "interface": "no", 
             "key": "mvhr-outdoor", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": "SENSOR3", 
-            "desc": "The insufflation sensor of the mvhr", 
+            "description": "The insufflation sensor of the mvhr", 
             "id": "6", 
             "interface": "no", 
             "key": "mvhr-insuffl", 
@@ -72,7 +72,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The reject sensor of the mvhr", 
+            "description": "The reject sensor of the mvhr", 
             "id": "7", 
             "interface": "no", 
             "key": "mvhr-reject", 
@@ -82,7 +82,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The electric power sensor of the mvhr", 
+            "description": "The electric power sensor of the mvhr", 
             "id": "8", 
             "interface": "no", 
             "key": "mvhr-power", 
@@ -92,7 +92,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Sould we manage a ECT (Earth Cooling Tube)", 
+            "description": "Sould we manage a ECT (Earth Cooling Tube)", 
             "id": "9", 
             "interface": "no", 
             "key": "ect", 
@@ -102,7 +102,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The tube sensor of the ect", 
+            "description": "The tube sensor of the ect", 
             "id": "10", 
             "interface": "no", 
             "key": "ect-tube", 
@@ -112,7 +112,7 @@
         }, 
         {
             "default": null, 
-            "desc": "The outdoor sensor of the ect", 
+            "description": "The outdoor sensor of the ect", 
             "id": "11", 
             "interface": "no", 
             "key": "ect-outdoor", 

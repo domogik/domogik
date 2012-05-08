@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "espeak -v fr %s", 
-            "desc": "Command Line : espeak -v fr %s", 
+            "description": "Command Line : espeak -v fr %s", 
             "id": "1", 
             "interface": "no", 
             "key": "TTS software", 

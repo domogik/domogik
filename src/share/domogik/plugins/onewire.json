@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "u", 
-            "desc": "1-Wire adapter device (usb : 'u')", 
+            "description": "1-Wire adapter device (usb : 'u')", 
             "id": "1", 
             "interface": "no", 
             "key": "device", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Use of cache", 
+            "description": "Use of cache", 
             "id": "2", 
             "interface": "no", 
             "key": "cache", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Enable DS18B20", 
+            "description": "Enable DS18B20", 
             "id": "3", 
             "interface": "no", 
             "key": "ds18b20-en", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "60", 
-            "desc": "Interval", 
+            "description": "Interval", 
             "id": "4", 
             "interface": "no", 
             "key": "ds18b20-int", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": "12", 
-            "desc": "Temperature resolution", 
+            "description": "Temperature resolution", 
             "id": "5", 
             "interface": "no", 
             "key": "ds18b20-res", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Enable DS18S20", 
+            "description": "Enable DS18S20", 
             "id": "6", 
             "interface": "no", 
             "key": "ds18s20-en", 
@@ -72,7 +72,7 @@
         }, 
         {
             "default": "60", 
-            "desc": "Interval", 
+            "description": "Interval", 
             "id": "7", 
             "interface": "no", 
             "key": "ds18s20-int", 
@@ -82,7 +82,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Enable DS2401", 
+            "description": "Enable DS2401", 
             "id": "8", 
             "interface": "no", 
             "key": "ds2401-en", 
@@ -92,7 +92,7 @@
         }, 
         {
             "default": "5", 
-            "desc": "Interval", 
+            "description": "Interval", 
             "id": "9", 
             "interface": "no", 
             "key": "ds2401-int", 
@@ -102,7 +102,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Enable DS2438", 
+            "description": "Enable DS2438", 
             "id": "10", 
             "interface": "no", 
             "key": "ds2438-en", 
@@ -112,7 +112,7 @@
         }, 
         {
             "default": "60", 
-            "desc": "Interval", 
+            "description": "Interval", 
             "id": "11", 
             "interface": "no", 
             "key": "ds2438-int", 
@@ -122,7 +122,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "Enable DS2408. EXPERIMENTAL ", 
+            "description": "Enable DS2408. EXPERIMENTAL ", 
             "id": "12", 
             "interface": "no", 
             "key": "ds2408-en", 
@@ -132,7 +132,7 @@
         }, 
         {
             "default": "60", 
-            "desc": "Interval. EXPERIMENTAL ", 
+            "description": "Interval. EXPERIMENTAL ", 
             "id": "13", 
             "interface": "no", 
             "key": "ds2408-int", 
@@ -328,7 +328,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "Usb DS9490R adaptator", 
+            "description": "Usb DS9490R adaptator", 
             "filename": "onewire.rules", 
             "model": "DS9490R", 
             "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"04fa\", ATTRS{idProduct}==\"2490\", SYMLINK+=\"onewire\", MODE=\"0666\""

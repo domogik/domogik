@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "john.doc@gmail.com", 
-            "desc": "Google email account", 
+            "description": "Google email account", 
             "id": "1", 
             "interface": "no", 
             "key": "email", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "password", 
-            "desc": "Password for email account", 
+            "description": "Password for email account", 
             "id": "2", 
             "interface": "no", 
             "key": "password", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "john.doe@gmail.com", 
-            "desc": "Calendar name (default : your email)", 
+            "description": "Calendar name (default : your email)", 
             "id": "3", 
             "interface": "no", 
             "key": "calendarname", 

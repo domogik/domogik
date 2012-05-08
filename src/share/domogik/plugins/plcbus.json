@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/dev/plcbus", 
-            "desc": "Plcbus device", 
+            "description": "Plcbus device", 
             "id": "1", 
             "interface": "no", 
             "key": "device", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "FF", 
-            "desc": "Usercode value (between 00 and FF), defaults to FF", 
+            "description": "Usercode value (between 00 and FF), defaults to FF", 
             "id": "2", 
             "interface": "no", 
             "key": "usercode", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "30", 
-            "desc": "Interval between 2 probes to discover devices and check their state (0 = don't do probing).", 
+            "description": "Interval between 2 probes to discover devices and check their state (0 = don't do probing).", 
             "id": "3", 
             "interface": "no", 
             "key": "probe-interval", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "ABCDEFGHIJKLMNOP", 
-            "desc": "List of housecode to probe. If you know you don't use an house code remove it from the list.", 
+            "description": "List of housecode to probe. If you know you don't use an house code remove it from the list.", 
             "id": "4", 
             "interface": "no", 
             "key": "probe-list", 
@@ -136,7 +136,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "Plcbus 1141U Usb adaptator", 
+            "description": "Plcbus 1141U Usb adaptator", 
             "filename": "plcbus.rules", 
             "model": "Plcbus 1141U", 
             "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"067b\", ATTRS{idProduct}==\"2303\", SYMLINK+=\"plcbus\", MODE=\"0666\""

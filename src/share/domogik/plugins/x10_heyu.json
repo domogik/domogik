@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/etc/heyu/x10.conf", 
-            "desc": "Heyu configuration path", 
+            "description": "Heyu configuration path", 
             "id": "1", 
             "interface": "no", 
             "key": "heyu-cfg-path", 

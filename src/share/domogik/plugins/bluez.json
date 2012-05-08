@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "bluez", 
-            "desc": "The device name of the bluez plugin \"instance\".", 
+            "description": "The device name of the bluez plugin \"instance\".", 
             "id": "1", 
             "interface": "no", 
             "key": "device-name", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "30", 
-            "desc": "The delay between 2 bluetooth scans.", 
+            "description": "The delay between 2 bluetooth scans.", 
             "id": "2", 
             "interface": "no", 
             "key": "scan-delay", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "120", 
-            "desc": "The delay to wait when an error occurs with the bluetooth adaptator.", 
+            "description": "The delay to wait when an error occurs with the bluetooth adaptator.", 
             "id": "3", 
             "interface": "no", 
             "key": "error-delay", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "lookup", 
-            "desc": "The listen method to use : discovery,lookup", 
+            "description": "The listen method to use : discovery,lookup", 
             "id": "4", 
             "interface": "no", 
             "key": "listen-method", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": null, 
-            "desc": "XPL name of the device to scan. It will be used as device address in domogik.", 
+            "description": "XPL name of the device to scan. It will be used as device address in domogik.", 
             "id": "5", 
             "interface": "yes", 
             "key": "bt-name", 
@@ -62,7 +62,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Bluetooth address of the device to scan (01:23:45:67:89:AB).", 
+            "description": "Bluetooth address of the device to scan (01:23:45:67:89:AB).", 
             "id": "6", 
             "interface": "yes", 
             "key": "bt-addr", 

@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Ipx800 model", 
+            "description": "Ipx800 model", 
             "id": "1", 
             "interface": "yes", 
             "key": "model", 
@@ -27,7 +27,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Name", 
+            "description": "Name", 
             "id": "2", 
             "interface": "yes", 
             "key": "name", 
@@ -37,7 +37,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Ip", 
+            "description": "Ip", 
             "id": "3", 
             "interface": "yes", 
             "key": "ip", 
@@ -47,7 +47,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Interval between each poll", 
+            "description": "Interval between each poll", 
             "id": "4", 
             "interface": "yes", 
             "key": "int", 
@@ -57,7 +57,7 @@
         }, 
         {
             "default": null, 
-            "desc": "HTTP Login", 
+            "description": "HTTP Login", 
             "id": "5", 
             "interface": "yes", 
             "key": "login", 
@@ -67,7 +67,7 @@
         }, 
         {
             "default": null, 
-            "desc": "HTTP Password", 
+            "description": "HTTP Password", 
             "id": "6", 
             "interface": "yes", 
             "key": "password", 

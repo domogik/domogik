@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "True", 
-            "desc": "Enable current weather data", 
+            "description": "Enable current weather data", 
             "id": "1", 
             "interface": "no", 
             "key": "en-current", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "True", 
-            "desc": "Enable previsionnal weather data", 
+            "description": "Enable previsionnal weather data", 
             "id": "2", 
             "interface": "no", 
             "key": "en-prev", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "c", 
-            "desc": "'c' : Celcius ; 'f' : Farenheit", 
+            "description": "'c' : Celcius ; 'f' : Farenheit", 
             "id": "3", 
             "interface": "no", 
             "key": "unit", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": null, 
-            "desc": "City code. See http://weather.yahoo.com to find code", 
+            "description": "City code. See http://weather.yahoo.com to find code", 
             "id": "4", 
             "interface": "yes", 
             "key": "city", 
@@ -52,7 +52,7 @@
         }, 
         {
             "default": null, 
-            "desc": "Device address for this city (ex : weather_home)", 
+            "description": "Device address for this city (ex : weather_home)", 
             "id": "5", 
             "interface": "yes", 
             "key": "device", 

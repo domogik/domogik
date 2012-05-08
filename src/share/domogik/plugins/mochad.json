@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "127.0.0.1", 
-            "desc": "mochad host address", 
+            "description": "mochad host address", 
             "id": "1", 
             "interface": "no", 
             "key": "mochad-host", 
@@ -22,7 +22,7 @@
         }, 
         {
             "default": "1099", 
-            "desc": "mochad port address", 
+            "description": "mochad port address", 
             "id": "2", 
             "interface": "no", 
             "key": "mochad-port", 
@@ -32,7 +32,7 @@
         }, 
         {
             "default": "True", 
-            "desc": "If you use a cm15 with communication to devices via PL", 
+            "description": "If you use a cm15 with communication to devices via PL", 
             "id": "3", 
             "interface": "no", 
             "key": "cm15", 
@@ -42,7 +42,7 @@
         }, 
         {
             "default": "False", 
-            "desc": "if you use a cm19 with communication to devices via RF", 
+            "description": "if you use a cm19 with communication to devices via RF", 
             "id": "4", 
             "interface": "no", 
             "key": "cm19", 

@@ -2,7 +2,7 @@
     "configuration": [
         {
             "default": "False", 
-            "desc": "Automatically start plugin at Domogik startup", 
+            "description": "Automatically start plugin at Domogik startup", 
             "id": "0", 
             "interface": "no", 
             "key": "startup-plugin", 
@@ -12,7 +12,7 @@
         }, 
         {
             "default": "/dev/cm15a0", 
-            "desc": "cma15 device path", 
+            "description": "cma15 device path", 
             "id": "1", 
             "interface": "no", 
             "key": "cm15a-path", 
@@ -107,7 +107,7 @@
     }, 
     "udev-rules": [
         {
-            "desc": "X10 CM15A interface", 
+            "description": "X10 CM15A interface", 
             "filename": "cm15a.rules", 
             "model": "CM15A", 
             "rule": "KERNEL==\"cm15a0\", BUS==\"usb\", SYSFS{idVendor}==\"0bc7\", SYSFS{idProduct}==\"0001\", NAME=\"cm15a0\", MODE=\"0666\""
