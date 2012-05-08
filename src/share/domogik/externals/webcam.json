@@ -9,7 +9,7 @@
             "parameters": "{}", 
             "return_confirmation": "0", 
             "stat_key": "none", 
-            "value_type": "camera"
+            "value_type": "string"
         }, 
         {
             "device_type_id": "camera.foscam", 
@@ -19,7 +19,7 @@
             "parameters": "{}", 
             "return_confirmation": "0", 
             "stat_key": "none", 
-            "value_type": "camera"
+            "value_type": "string"
         }
     ], 
     "device_types": [
