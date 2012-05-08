@@ -73,7 +73,7 @@ function start_xpl {
     fi
 }
 
-function start_manager {
+function start_daemon {
     [ -p ${PIDDIR}/dmg-manager-state ] && rm -f ${PIDDIR}/dmg-manager-state
     mkfifo ${PIDDIR}/dmg-manager-state
     chown ${DOMOGIK_USER}: ${PIDDIR}/dmg-manager-state
@@ -251,7 +251,7 @@ case "$1" in
                     start_xpl
                 ;;
                 manager)
-                    start_manager
+                    start_daemon
                     ;;
                 *)
                     echo "usage: $0 start [manager|xpl]"
