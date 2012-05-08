@@ -39,7 +39,7 @@
         "vendor_id": "none"
     }, 
     "files": [
-        "src/share/domogik/design/external/webcam/icon.png"
+        "src/share/domogik/design/external/webcam/icon.png",
         "src/share/domogik/externals/webcam.json"
     ], 
     "identity": {
