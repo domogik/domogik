@@ -735,7 +735,11 @@ class SysManager(XplPlugin):
         try:
             # list json files
             try:
-                external_list = os.listdir(self._json_external_directory)
+                external_list = []
+                for root, dirs, files in os.walk(self._json_external_directory):
+                    for fic in files:
+                        if fic[-5:] == ".json":
+                            external_list.append(fic)
             except:
                 msg = "Error accessing external directory : %s. You should create it" % str(traceback.format_exc())
                 print(msg)
