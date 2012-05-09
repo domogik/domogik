@@ -32,7 +32,7 @@ class CronHelpers
 @organization: Domogik
 """
 
-from domogik.xpl.lib.cron_tools import CRONERRORS
+from domogik_packages.xpl.lib.cron_tools import CRONERRORS
 
 class CronHelpers():
     """

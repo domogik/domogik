@@ -61,7 +61,8 @@
         "src/domogik_packages/xpl/lib/cron.py", 
         "src/domogik_packages/xpl/lib/cron_query.py", 
         "src/domogik_packages/xpl/lib/cron_tools.py", 
-        "src/domogik_packages/xpl/lib/cron_helpers.py"
+        "src/domogik_packages/xpl/lib/cron_helpers.py",
+        "src/domogik_packages/xpl/lib/helperplugin.py"
     ], 
     "identity": {
         "author": "Sebastien GALLET", 
