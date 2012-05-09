@@ -249,13 +249,10 @@ class XplPlugin(BasePlugin):
         """ Send the hbeat.end message
         """
         if hasattr(self, "myxpl"):
-            print "Send HBEAT.END"
             mess = XplMessage()
             mess.set_type("xpl-stat")
             mess.set_schema("hbeat.end")
             self.myxpl.send(mess)
-        else:
-            print "Can't send HBEAT.END"
 
     def _manager_handler(self, message):
         """ Handle domogik system request for the Domogik manager
