@@ -245,6 +245,18 @@ class XplPlugin(BasePlugin):
             "host": self.get_sanitized_hostname()})
         self.myxpl.send(mess)
 
+    def _send_hbeat_end(self):
+        """ Send the hbeat.end message
+        """
+        if hasattr(self, "myxpl"):
+            print "Send HBEAT.END"
+            mess = XplMessage()
+            mess.set_type("xpl-stat")
+            mess.set_schema("hbeat.end")
+            self.myxpl.send(mess)
+        else:
+            print "Can't send HBEAT.END"
+
     def _manager_handler(self, message):
         """ Handle domogik system request for the Domogik manager
         @param message : the Xpl message received
@@ -261,6 +273,8 @@ class XplPlugin(BasePlugin):
         '''
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
+        # send hbeat.end message
+        self._send_hbeat_end()
         self.get_stop().set()
         for t in self._timers:
             if hasattr(self, "log"):
