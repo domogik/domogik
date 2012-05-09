@@ -140,6 +140,7 @@ class ProcessRequest():
         self.log = self.handler_params[0].log
         self.log_dm = self.handler_params[0].log_dm
         self._package_path = self.handler_params[0]._package_path
+        self._src_prefix = self.handler_params[0]._src_prefix
         self._design_dir = self.handler_params[0]._design_dir
         self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
         self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
@@ -3552,12 +3553,17 @@ target=*
             return
 
 
-        #package = domogik_packages.xpl.helpers
         if command == "help":
             output = ["List of available helpers :"]
-            #for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-            for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
-                output.append(" - %s" % plgname)
+            if self._package_path == None:
+                helper_path = self._src_prefix
+            else:
+                helper_path = self._package_path
+            helper_path += "/domogik_packages/xpl/helpers/"
+            for root, dirs, files in os.walk(helper_path):
+                for fic in files:
+                    if fic[-3:] == ".py" and fic[0:2] != "__":
+                        output.append(" - %s" % fic[0:-3])
             output.append("Type 'foo help' to get help on foo helper")
 
 

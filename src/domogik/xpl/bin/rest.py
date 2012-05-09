@@ -182,6 +182,7 @@ class Rest(XplPlugin):
             # plugin installation path
             if conf.has_key('package_path'):
                 self._package_path = conf['package_path']
+                self._src_prefix = None
                 self.log.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
                 self._design_dir = "%s/domogik_packages/design/" % self._package_path
@@ -191,6 +192,7 @@ class Rest(XplPlugin):
             else:
                 self.log.info("No package path defined in config file")
                 self._package_path = None
+                self._src_prefix = conf['src_prefix']
                 self._design_dir = "%s/share/domogik/design/" % conf['src_prefix']
                 self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['src_prefix']
                 self._xml_stat_dir = "%s/share/domogik/stats/" % conf['src_prefix']
