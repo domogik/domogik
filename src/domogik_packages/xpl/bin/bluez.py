@@ -36,13 +36,14 @@ Class bluetooth
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.bluez import BluezAPI
-#from domogik.xpl.lib.bluez import BluezException
-from domogik.xpl.lib.helperplugin import XplHlpPlugin
+from domogik_packages.xpl.lib.bluez import BluezAPI
+#from domogik_packages.xpl.lib.bluez import BluezException
+from domogik.xpl.common.plugin import XplPlugin
+#from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
 import traceback
 #import logging
 
-class Bluez(XplHlpPlugin):
+class Bluez(XplPlugin):
     '''
     Manage
     '''
@@ -50,7 +51,7 @@ class Bluez(XplHlpPlugin):
         """
         Create the bluez plugin.
         """
-        XplHlpPlugin.__init__(self, name = 'bluez')
+        XplPlugin.__init__(self, name = 'bluez')
         self.log.info("__init__ : Start ...")
         self.config = Query(self.myxpl, self.log)
 
