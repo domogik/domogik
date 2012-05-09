@@ -1,5 +1,49 @@
-# This file defines config parameters for eibd
+# This file defines config parameters for domogik
 
-#Start eibd daemon under this user
-EIBD_USER=nobody
+#Start domogik daemon under this user
+DOMOGIK_USER=domogik
+
+# This variable can take 6 parameters :
+# -d to start the database manager (launch only on master host)
+# -r to start the rest component (launch only on master host)
+# -E to manage external members (launch only on master host)
+# -p to regulary ping plugins 
+# -t <ping duration> to customize ping duration
+# -w <wait time between 2 ping> to customize ping delay
+# Remember : Your domogik installation must have *one* and *only one*
+# instance of each manager running.
+# Your domogik installation won't start on this computer if :
+#  - The database manager is not already running elsewhere on the network
+#  - You do not pass -d parameter to the manager
+MANAGER_PARAMS="-d -r -p -E"
+
+# You may want to use a xPL hub which is not the one given with Domogik
+# If so, set this option to 'false'
+LAUNCH_DOMOGIK_XPL_HUB=true
+
+# You can define one or many extra path(s) for Domogik startup scripts.
+# This should only be useful if you use Domogik in developement mode (with setup.py develop)
+# or if you have a custom path install.
+# PATH is needed to locate 1 application :
+#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop
+CUSTOM_PATH=
+
+# Interface where the xpl hub is supposed to listen for
+HUB_IFACE="lo"
+
+# Time to wait for the server to die, in seconds
+# If this value is set too low you might not
+# let some servers to die gracefully and
+# 'restart' will not work
+DIETIME=2
+
+# Time to wait for the server to start, in seconds
+# If this value is set each time the server is
+# started (on start or restart) the script will
+# stall to try to determine if it is running
+# If it is not set and the server takes time
+# to setup a pid file the log message might
+# be a false positive (says it did not start
+# when it actually did)
+STARTTIME=6
 
