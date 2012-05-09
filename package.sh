@@ -1,8 +1,10 @@
 #!/bin/bash
 
 if [[ $# -eq 0 ]] ; then
-    REVISION=a32a4824492a
-    SHORT_RELEASE=0.1.0-alpha3
+    #REVISION=a32a4824492a
+    #SHORT_RELEASE=0.1.0-alpha3
+    REVISION=5fa3c9ec5a29
+    SHORT_RELEASE=0.1.99-alpha3
 else
     case $1 in
         "tip")
@@ -10,8 +12,17 @@ else
             SHORT_RELEASE=tip-$REVISION
             ;;
         *)
-            echo "Bad usage. Exiting..."
-            exit 1
+			set +e
+            OK=$(hg log -r $1 >/dev/null 2>&1; echo $?)
+            set -e
+            #echo $OK
+			if [[ $OK -eq 0 ]] ; then
+				REVISION=$1
+				SHORT_RELEASE=tip-$REVISION
+			else
+				echo "Bad usage. C'ant find revision $1"
+				exit 1
+			fi
     esac
 fi
 
