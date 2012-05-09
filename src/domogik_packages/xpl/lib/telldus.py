@@ -44,9 +44,9 @@ import threading
 from datetime import datetime
 from datetime import timedelta
 from collections import deque
-from domogik.xpl.lib.telldus_dawndusk import TelldusDawnduskAPI
-from domogik.xpl.lib.telldus_windoor import TelldusWindoorAPI
-from domogik.xpl.lib.telldus_move import TelldusMoveAPI
+from domogik_packages.xpl.lib.telldus_dawndusk import TelldusDawnduskAPI
+from domogik_packages.xpl.lib.telldus_windoor import TelldusWindoorAPI
+from domogik_packages.xpl.lib.telldus_move import TelldusMoveAPI
 
 #platform specific imports:
 if (platform.system() == 'Windows'):

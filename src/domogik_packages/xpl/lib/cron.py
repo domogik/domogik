@@ -38,8 +38,8 @@ import traceback
 import datetime
 from domogik.xpl.common.xplmessage import XplMessage
 from apscheduler.scheduler import Scheduler
-from domogik.xpl.lib.cron_tools import *
-from domogik.xpl.lib.cron_helpers import CronHelpers
+from domogik_packages.xpl.lib.cron_tools import *
+from domogik_packages.xpl.lib.cron_helpers import CronHelpers
 #import logging
 #logging.basicConfig()
 

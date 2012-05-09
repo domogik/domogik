@@ -44,7 +44,10 @@ import ephem
 import datetime
 from apscheduler.scheduler import Scheduler
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.cron_query import CronQuery
+try:
+    from domogik_packages.xpl.lib.cron_query import CronQuery
+except ImportError:
+    pass
 
 class DawnduskException(Exception):
     """

@@ -61,7 +61,8 @@
         "src/domogik_packages/xpl/lib/cron.py", 
         "src/domogik_packages/xpl/lib/cron_query.py", 
         "src/domogik_packages/xpl/lib/cron_tools.py", 
-        "src/domogik_packages/xpl/lib/cron_helpers.py"
+        "src/domogik_packages/xpl/lib/cron_helpers.py",
+        "src/domogik_packages/xpl/lib/helperplugin.py"
     ], 
     "identity": {
         "author": "Sebastien GALLET", 
@@ -79,7 +80,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "cron", 
         "type": "plugin", 
-        "version": "0.1a0"
+        "version": "0.1a1"
     }, 
     "json_version": 1, 
     "technology": {
