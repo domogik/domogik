@@ -53,7 +53,7 @@ from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceFeatureAssociation, DeviceConfig, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Room, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, SystemInfo, Trigger
+        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, SystemInfo, Trigger, Page
 )
 
 
@@ -177,6 +177,59 @@ class DbHelper():
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()
+####
+# Pages
+####
+    def list_pages(self):
+        """Return all areas
+
+        @return a list of Area objects
+
+        """
+        ret = self.__session.query(Page).all()
+        return ret
+
+    def add_page(self, name, parent, descr=None, icon=None):
+        """Add a page
+
+        @param name : page name
+        @param parent : the parent page id (to define the new lft/right values
+        @param desc : page description
+        @param icon : page icon
+        @return a Page object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        # TODO update lft/rgt for whole tree
+        # TODO insert
+        self.__session.add(p)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return p
+     
+    def del_page(self, id):
+        """Delete a page record
+
+        @param area_id : id of the page to delete
+        @return the deleted Page object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        if p:
+            # TODO udpate lft/rgt
+            # self.__session.delete(p)
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return area
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % area_del_id)
 
 ####
 # Areas

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
 License
@@ -1211,7 +1209,49 @@ target=*
                 self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
                                                   self.jsonp, self.jsonp_cb)
                 return
-
+        elif self.rest_request[0] == "page":
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_page_list()
+                elif len(self.rest_request) == 3:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-id":
+                        # TODO
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+             ### add
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_page_add()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_page_update()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
+	    ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_del(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+             
         ### room #####################################
         elif self.rest_request[0] == "room":
 
@@ -1705,7 +1745,63 @@ target=*
         return my_date
 
 
+######
+# /base/page processing
+######
+    def _rest_base_page_list(self, page_id = None):
+        """ list pages
+            @param page_id : id of the page to get, if empty list all pages
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        for p in self._db.list_pages():
+	    json_data.add_data(p)
+        self.send_http_response_ok(json_data.get())
 
+    def _rest_base_page_del(self, page_id=None):
+        """ delete a area
+            @param page_id : id of page
+            tree handling is done in the dbhelper
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        try:
+            p = self._db.del_page(page_id)
+            json_data.add_data(p)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_page_add(self):
+        """ add a new page
+            tree handling is done in the dbhelper
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        try:
+            p = self._db.add_page(self.get_parameters("name"), self.get_parameters("description"), \
+                   self.get_parameters("icon"), self.get_parameters("parent") )
+            json_data.add_data(p)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_page_update(self):
+        """ update areas
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        try:
+            area = self._db.update_page(self.get_parameters("id"), self.get_parameters("name"), \
+                                        self.get_parameters("description"), self.get_parameters("icon"), self.get_parameters("parent") )
+            json_data.add_data(area)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
 
 ######
 # /base/area processing

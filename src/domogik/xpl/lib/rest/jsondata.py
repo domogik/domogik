@@ -160,7 +160,7 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel", "Page") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
