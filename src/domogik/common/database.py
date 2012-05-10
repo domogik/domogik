@@ -221,15 +221,19 @@ class DbHelper():
         self.__session.expire_all()
         p = self.__session.query(Page).filter_by(id=id).first()
         if p:
-            # TODO udpate lft/rgt
-            # self.__session.delete(p)
-            try:
-                self.__session.commit()
-            except Exception, sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return area
+            # chek if there are no children
+            if p.lft + 1 != p.rgt:
+                self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
+            else:
+                # TODO udpate lft/rgt
+                self.__session.delete(p)
+                try:
+                    self.__session.commit()
+                except Exception, sql_exception:
+                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                return p
         else:
-            self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % area_del_id)
+            self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % id)
 
 ####
 # Areas

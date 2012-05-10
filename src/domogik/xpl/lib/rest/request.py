@@ -1218,10 +1218,7 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-id":
-                        # TODO
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
              ### add
             elif self.rest_request[1] == "add":
