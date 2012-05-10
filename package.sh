@@ -39,6 +39,7 @@ function generate_pkg() {
     -X .hg_archival.txt  \
     -X .coverage  \
     -X .hgignore  \
+    -X dists/  \
     -X src/domogik/ui/  \
     -X src/domogik_packages/ \
     -X src/external/ \
