@@ -93,10 +93,10 @@ class Page(Base):
     lft = Column(Integer, primary_key=True)
     rgt = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    description = Column(UnicodeText())
+    description = Column(UnicodeText(), nullable=True)
     icon = Column(Unicode(30), nullable=True)
 
-    def __init__(self, lft, rgt, name, description=None, icon=None):
+    def __init__(self, name, description=None, icon=None):
         """Class constructor
         @param lft : left value
         @param rgt : rgt value
@@ -104,8 +104,6 @@ class Page(Base):
         @param description : extended description, optional
         @param icon : the icon to display
         """
-        self.lft = lft
-        self.rgt = rgt
         self.name = ucode(name)
         self.description = ucode(description)
         self.icon = ucode(icon)

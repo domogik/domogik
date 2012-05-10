@@ -201,15 +201,47 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        p = Page(name=name, description=descr, icon=icon)
         # TODO update lft/rgt for whole tree
-        # TODO insert
         self.__session.add(p)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return p
-     
+    
+    def update_page(self, id, name=None, parent=0, descr=None, icon=None):
+        """Update an page
+
+        @param id : page id to be updated
+        @param name : page name (optional)
+        @param parent : page parent (optional)
+        @param descr : page detailed description (optional)
+        @param parent : page icon (optional)
+        @return an Page object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        if p is None:
+            self.__raise_dbhelper_exception("Page with id %s couldn't be found" % id)
+        if name is not None:
+            p.name = ucode(name)
+        if icon is not None:
+            p.icon = ucode(icon)
+        if descr is not None:
+            if descr == '': descr = None
+            p.descr = ucode(descr)
+        self.__session.add(area)
+        #if parent != 0:
+            # TODO UPDATE lft and rgt
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return p
+
     def del_page(self, id):
         """Delete a page record
 
