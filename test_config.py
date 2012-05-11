@@ -127,6 +127,10 @@ def test_config_files():
             hub_iface = value
         elif item.strip() == "LAUNCH_DOMOGIK_XPL_HUB":
             launch_domogik_xpl_hub = value
+        elif item.strip() == "DIETIME":
+            pass
+        elif item.strip() == "STARTTIME":
+            pass
         else:
             warning("Unknown config value in the main config file : %s" % item)
     ok("Global config file exists and contains right stuff")
