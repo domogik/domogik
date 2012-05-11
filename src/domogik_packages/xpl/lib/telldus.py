@@ -674,7 +674,7 @@ class TelldusAPI:
                 #print self.isDevicetype(deviceid,self._dawndusk.devicetype)
                 self.send_xpl_extensions(deviceid, method, value, \
                     callbackid, eventdate)
-                self._call_xpl_callback(deviceid, method)
+                self._call_xpl_callback(deviceid, method, value)
         self.log.debug("telldusAPI.send_xpl : Done")
 
     def send_xpl_extensions(self, deviceid, method, value, callbackid, \
@@ -702,15 +702,17 @@ class TelldusAPI:
             self._move.send_move(deviceid, method)
         self.log.debug("telldusAPI.send_xpl_extensions : Done")
 
-    def _call_xpl_callback(self, deviceid, method):
+    def _call_xpl_callback(self, deviceid, method, value):
         """
         Call the xplCallback function
         @param deviceid : the id of the transceiver
         @param method : the command sent
         """
         self.log.debug("telldusAPI._call_xplCallback : Start ...")
+        if self._commands[method]['cmd'] == "dim" :
+			value = int(float(value)/2.55)
         self._xpl_callback(self._devices.get_address(deviceid), \
-            self._commands[method]['cmd'])
+            self._commands[method]['cmd'], value)
         self.log.debug("telldusAPI._call_xplCallback : Done")
 
     def __del__(self):

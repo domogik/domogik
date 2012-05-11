@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <statistic technology="telldus">
     <schema name="telldus.basic">
-        <xpltype type="xpl-trig">
+        <xpltype type="*">
             <listener>
                 <filter/>
             </listener>
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-            </mapping>
+                <value field="level"/>
+           </mapping>
         </xpltype>
-        <xpltype type="xpl-stat">
-            <listener>
-                <filter/>
-            </listener>
-            <mapping>
-                <device field="device"/>
-                <value field="command"/>
-            </mapping>
-        </xpltype>
-    </schema>
 </statistic>
