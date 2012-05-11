@@ -802,6 +802,8 @@ class TelldusAPI:
         @param level : level of light (0..100)
         '''
         #print "dim level=%s"%type(level)
+        if level == None or level == "None":
+            level = "0"
         level = int(level)
         #print "dim level=%s"%type(level)
         if level <= 0:

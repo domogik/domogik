@@ -114,7 +114,7 @@ class Telldus(XplPlugin):
             device = None
             if 'device' in message.data:
                 device = message.data['device']
-            level = None
+            level = "0"
             if 'level' in message.data:
                 level = message.data['level']
 
