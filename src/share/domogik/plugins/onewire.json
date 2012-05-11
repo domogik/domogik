@@ -318,7 +318,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "onewire", 
         "type": "plugin", 
-        "version": "0.3.a"
+        "version": "0.3a0"
     }, 
     "json_version": 1, 
     "technology": {
