@@ -158,7 +158,8 @@
         "src/share/domogik/url2xpl/relayboard/low.xml", 
         "src/share/domogik/url2xpl/relayboard/pulse.xml", 
         "src/domogik_packages/xpl/bin/ipx800.py", 
-        "src/domogik_packages/xpl/lib/ipx800.py"
+        "src/domogik_packages/xpl/lib/ipx800.py",
+        "src/domogik_packages/xpl/helpers/ipx800.py"
     ], 
     "identity": {
         "author": "Fritz", 
