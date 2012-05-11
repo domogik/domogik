@@ -38,7 +38,7 @@ Implements
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
 from domogik.common import logger
-from domogik.xpl.lib.zwave import *
+from domogik_packages.xpl.lib.zwave import *
 from time import sleep
 from threading import Event
 

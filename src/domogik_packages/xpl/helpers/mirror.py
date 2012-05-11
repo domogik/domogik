@@ -36,8 +36,8 @@ class Mirror(Helper)
 
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.mirror import Mirror
-from domogik.xpl.lib.mirror import MirrorException
+from domogik_packages.xpl.lib.mirror import Mirror
+from domogik_packages.xpl.lib.mirror import MirrorException
 from domogik.common import logger
 
 

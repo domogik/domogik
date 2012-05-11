@@ -36,8 +36,8 @@ class cidmodem(Helper)
 
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.cidmodem import CallerIdModem 
-from domogik.xpl.lib.cidmodem import CallerIdModemException
+from domogik_packages.xpl.lib.cidmodem import CallerIdModem 
+from domogik_packages.xpl.lib.cidmodem import CallerIdModemException
 from domogik.common import logger
 
 

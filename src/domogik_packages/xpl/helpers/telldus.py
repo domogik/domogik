@@ -38,8 +38,8 @@ class telldusTool(Helper)
 """
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.telldus import telldusException
-from domogik.xpl.lib.telldus import telldusAPI
+from domogik_packages.xpl.lib.telldus import telldusException
+from domogik_packages.xpl.lib.telldus import telldusAPI
 from domogik.common import logger
 from domogik.xpl.common.queryconfig import Query
 

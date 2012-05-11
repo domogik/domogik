@@ -34,9 +34,9 @@ import time
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
 from domogik.common import logger
-from domogik.xpl.lib.plcbus import PLCBUSException
-from domogik.xpl.lib.plcbus import PLCBUSAPI
-from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
+from domogik_packages.xpl.lib.plcbus import PLCBUSException
+from domogik_packages.xpl.lib.plcbus import PLCBUSAPI
+from domogik_packages.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
 ACCESS_ERROR = "Access to PLCBUS device is not possible. Does your user have the good permissions ? "

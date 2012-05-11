@@ -36,8 +36,8 @@ TODO
 
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.knx import KNXException
-from domogik.xpl.lib.knx import KNX
+from domogik_packages.xpl.lib.knx import KNXException
+from domogik_packages.xpl.lib.knx import KNX
 from domogik.common.configloader import *
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
