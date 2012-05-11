@@ -98,14 +98,14 @@ class Telldus(XplPlugin):
         @param message : an XplMessage object
         """
         commands = {
-            'on': lambda hu, l: self._mytelldus.sendOn(hu),
-            'off': lambda hu, l: self._mytelldus.sendOff(hu),
-            'dim': lambda hu, l: self._mytelldus.sendDim(hu,l),
-            'bright': lambda hu, l: self._mytelldus.sendBright(hu,l),
-            'up': lambda hu, l: self._mytelldus.sendUp(hu),
-            'down': lambda hu, l: self._mytelldus.sendDown(hu),
-            'stop': lambda hu, l: self._mytelldus.sendStop(hu),
-            'shut': lambda hu, l: self._mytelldus.sendShut(hu,l),
+            'on': lambda hu, l: self._mytelldus.send_on(hu),
+            'off': lambda hu, l: self._mytelldus.send_off(hu),
+            'dim': lambda hu, l: self._mytelldus.send_dim(hu,l),
+            'bright': lambda hu, l: self._mytelldus.send_bright(hu,l),
+            'up': lambda hu, l: self._mytelldus.send_up(hu),
+            'down': lambda hu, l: self._mytelldus.send_down(hu),
+            'stop': lambda hu, l: self._mytelldus.send_stop(hu),
+            'shut': lambda hu, l: self._mytelldus.send_shut(hu,l),
         }
         try :
             cmd = None
