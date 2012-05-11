@@ -300,7 +300,8 @@
         "src/share/domogik/plugins/onewire.json", 
         "src/share/domogik/stats/1wire/sensor.basic-onewire.xml", 
         "src/domogik_packages/xpl/bin/onewire.py", 
-        "src/domogik_packages/xpl/lib/onewire.py"
+        "src/domogik_packages/xpl/lib/onewire.py",
+        "src/domogik_packages/xpl/helpers/onewire.py"
     ], 
     "identity": {
         "author": "Fritz", 
