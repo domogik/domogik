@@ -112,6 +112,7 @@
         "src/share/domogik/url2xpl/bluez/start.xml", 
         "src/share/domogik/url2xpl/bluez/stop.xml", 
         "src/domogik_packages/xpl/bin/bluez.py", 
+        "src/domogik_packages/xpl/helpers/bluez.py", 
         "src/domogik_packages/xpl/lib/bluez.py"
     ], 
     "identity": {
@@ -130,7 +131,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "bluez", 
         "type": "plugin", 
-        "version": "0.1a1"
+        "version": "0.1a2"
     }, 
     "json_version": 1, 
     "technology": {
