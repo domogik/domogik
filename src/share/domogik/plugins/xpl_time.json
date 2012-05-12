@@ -22,14 +22,14 @@
         "author": "Maxence Dunnewind", 
         "author_email": "maxence at dunnewind.net", 
         "category": "domogik", 
-        "changelog": "0.1\n- plugin creation", 
+        "changelog": "0.1a1\n- add icon\n0.1\n- plugin creation", 
         "dependencies": [], 
         "description": "This plugin sends date and time on the xPL network every minute", 
         "documentation": "http://wiki.domogik.org/plugin_xpl_time", 
         "domogik_min_version": "0.2.0", 
         "id": "xpl_time", 
         "type": "plugin", 
-        "version": "0.1a0"
+        "version": "0.1a1"
     }, 
     "json_version": 1, 
     "technology": {
