@@ -213,7 +213,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "telldus", 
         "type": "plugin", 
-        "version": "0.2a2"
+        "version": "0.2.1a3"
     }, 
     "json_version": 1, 
     "technology": {
