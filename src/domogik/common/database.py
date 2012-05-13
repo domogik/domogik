@@ -189,11 +189,11 @@ class DbHelper():
         ret = self.__session.query(Page).all()
         return ret
 
-    def add_page(self, name, parent, descr=None, icon=None):
+    def add_page(self, name, parentId, descr=None, icon=None):
         """Add a page
 
         @param name : page name
-        @param parent : the parent page id (to define the new lft/right values
+        @param parentId : the parent page id (to define the new lft/right values
         @param desc : page description
         @param icon : page icon
         @return a Page object
@@ -202,7 +202,11 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         p = Page(name=name, description=descr, icon=icon)
-        # TODO update lft/rgt for whole tree
+        parent = self.__session.query(Page).filter_by(id=parentId).first()
+	p.lft = int(parent.lft) + 1
+        p.rgt = int(parent.lft) + 2
+	self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET rgt=rgt+2 WHERE rgt > ' + str(parent.lft) )
+	self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET lft=lft+2 WHERE lft > ' + str(parent.lft) )
         self.__session.add(p)
         try:
             self.__session.commit()
@@ -257,7 +261,9 @@ class DbHelper():
             if p.lft + 1 != p.rgt:
                 self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
             else:
-                # TODO udpate lft/rgt
+                dl = p.rgt - p.lft + 1
+		self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET rgt=rgt-' + str(dl) + ' WHERE rgt > ' + str(p.rgt) )
+		self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET lft=lft-' + str(dl) + ' WHERE lft > ' + str(p.rgt) )
                 self.__session.delete(p)
                 try:
                     self.__session.commit()

@@ -1779,8 +1779,8 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("page")
         try:
-            p = self._db.add_page(self.get_parameters("name"), self.get_parameters("description"), \
-                   self.get_parameters("icon"), self.get_parameters("parent") )
+            p = self._db.add_page(self.get_parameters("name"), self.get_parameters("parent"), self.get_parameters("description"), \
+                   self.get_parameters("icon") )
             json_data.add_data(p)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
