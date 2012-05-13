@@ -49,7 +49,12 @@
         "author_email": "fritz.smh at gmail.com", 
         "category": "communication", 
         "changelog": "0.1\n- plugin creation", 
-        "dependencies": [], 
+        "dependencies": [
+            {
+                "id": "gdata (>= 2.0.14)", 
+                "type": "python"
+            }
+        ], 
         "description": "Connect to a google agenda to get events agenda", 
         "documentation": "http://wiki.domogik.org/plugin_gagenda", 
         "domogik_min_version": "0.2.0", 
