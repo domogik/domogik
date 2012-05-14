@@ -121,7 +121,7 @@ class Telldus(XplPlugin):
             self.log.debug("%s received : device= %s, level=%s" %
                            (cmd, device,level))
             commands[cmd](device, level)
-            self.telldus_monitor_cb(device, cmd)
+            #self.telldus_monitor_cb(device, cmd)
         except Exception:
             self.log.error("action _ %s _ unknown."%(cmd))
             error = "Exception : %s" %  \
