@@ -11,4 +11,5 @@
                 <value field="level"/>
            </mapping>
         </xpltype>
+    </schema>
 </statistic>
