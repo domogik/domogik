@@ -205,8 +205,8 @@ class DbHelper():
         parent = self.__session.query(Page).filter_by(id=parentId).first()
 	p.lft = int(parent.lft) + 1
         p.rgt = int(parent.lft) + 2
-	self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET rgt=rgt+2 WHERE rgt > ' + str(parent.lft) )
-	self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET lft=lft+2 WHERE lft > ' + str(parent.lft) )
+	self.__session.query(Page).filter(Page.rgt > parent.lft).update({Page.rgt: Page.rgt + 2})
+	self.__session.query(Page).filter(Page.lft > parent.lft).update({Page.lft: Page.lft + 2})
         self.__session.add(p)
         try:
             self.__session.commit()
@@ -262,8 +262,8 @@ class DbHelper():
                 self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
             else:
                 dl = p.rgt - p.lft + 1
-		self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET rgt=rgt-' + str(dl) + ' WHERE rgt > ' + str(p.rgt) )
-		self.__session.execute('UPDATE ' + Page.__tablename__ + ' SET lft=lft-' + str(dl) + ' WHERE lft > ' + str(p.rgt) )
+		self.__session.query(Page).filter(Page.rgt > p.rgt).update({Page.rgt: Page.rgt - dl})
+		self.__session.query(Page).filter(Page.lft > p.rgt).update({Page.lft: Page.lft - dl})
                 self.__session.delete(p)
                 try:
                     self.__session.commit()
