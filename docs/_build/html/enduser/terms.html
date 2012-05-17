@@ -1,0 +1,160 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Terms to know before using Domogik &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Domogik 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="terms-to-know-before-using-domogik">
+<h1>Terms to know before using Domogik<a class="headerlink" href="#terms-to-know-before-using-domogik" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please note that following definitions are short definitions. To get more information about these terms, feel free to search the wiki :)</p>
+</div>
+<div class="section" id="house-organisation">
+<h2>House organisation<a class="headerlink" href="#house-organisation" title="Permalink to this headline">¶</a></h2>
+<dl class="glossary docutils">
+<dt id="term-house">House</dt>
+<dd>The house or flat for which you install a home automation solution.</dd>
+<dt id="term-area">Area</dt>
+<dd>A floor, the garage, the cellar, etc.</dd>
+<dt id="term-room">Room</dt>
+<dd>Kitchen, living room, bedroom, etc</dd>
+</dl>
+</div>
+<div class="section" id="plugins-devices-features-and-widgets">
+<h2>Plugins, devices, features and widgets<a class="headerlink" href="#plugins-devices-features-and-widgets" title="Permalink to this headline">¶</a></h2>
+<dl class="glossary docutils">
+<dt id="term-plugin">Plugin</dt>
+<dd>A plugin is a xPL daemon which handle a technology (or a part of a technology).</dd>
+<dt id="term-device">Device</dt>
+<dd>A device is a hardware or software element. For example : a &#8216;&#8217;onewire DS18B20&#8217;&#8217; component is a device, a computer to control is a device, a &#8216;&#8217;X10 LM12&#8217;&#8217; module is a device. For software elements the &#8216;&#8217;Yahoo weather&#8217;&#8217; service is also considered as a device.</dd>
+<dt id="term-reference-of-a-device">Reference (of a device)</dt>
+<dd>A reference is the model of a hardware or software component. For example, a onewire DS18B20 component has &#8220;DS18B20&#8221; as reference. Actually it is a useless information for Domogik but it may be useful for you.</dd>
+<dt id="term-address-of-a-device">Address (of a device)</dt>
+<dd>The  address of a device is used by the device technology to identify it on the network. For example it could be &#8216;A1&#8217; for a X10 device.</dd>
+<dt id="term-feature">Feature</dt>
+<dd>A feature is what a device provides. For example a lamp device could have both the switch and dimmer features. For a 1-wire component it can be the temperature, the humidity or the serial number.</dd>
+<dt id="term-usage">Usage</dt>
+<dd>The usage describes what the device is used for : light, appliance, heating...</dd>
+<dt id="term-widget">Widget</dt>
+<dd>A widget is a graphic part of the User Interface which controls a feature.</dd>
+</dl>
+</div>
+<div class="section" id="accounts">
+<h2>Accounts<a class="headerlink" href="#accounts" title="Permalink to this headline">¶</a></h2>
+<dl class="glossary docutils">
+<dt id="term-user">User</dt>
+<dd>A user account to connect to Domogik application.</dd>
+<dt id="term-person">Person</dt>
+<dd>Physical person you want to register. A person can have several accounts (users) or none.</dd>
+</dl>
+</div>
+<div class="section" id="domogik-components">
+<h2>Domogik components<a class="headerlink" href="#domogik-components" title="Permalink to this headline">¶</a></h2>
+<dl class="glossary docutils">
+<dt id="term-xpl">xPL</dt>
+<dd>xPL is the network protocol used to allow plugins to communicate with each other.</dd>
+<dt id="term-ui">UI</dt>
+<dd>A User Interface.</dd>
+<dt id="term-django">Django</dt>
+<dd>Django is the (Python) framework used for the web UI.</dd>
+<dt id="term-rest-rinor">REST/RINOR</dt>
+<dd>&#8216;&#8217;REST is a software architecture for distributed hypermedia systems such as the World Wide Web (extract from Wikipedia)&#8217;&#8216;. Because it uses this architecture the &#8220;REST&#8221; component of Domogik has this name.
+REST is the component which makes the link between the database and the xPL network on one side and all available user interfaces on the other side.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Terms to know before using Domogik</a><ul>
+<li><a class="reference internal" href="#house-organisation">House organisation</a></li>
+<li><a class="reference internal" href="#plugins-devices-features-and-widgets">Plugins, devices, features and widgets</a></li>
+<li><a class="reference internal" href="#accounts">Accounts</a></li>
+<li><a class="reference internal" href="#domogik-components">Domogik components</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/enduser/terms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Domogik 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Domogik team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
