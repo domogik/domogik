@@ -1,21 +1,16 @@
 .. _index:
 
-====================
+=====================
 Domogik documentation
-====================
-
-Contents:
-
-.. toctree::
-   :maxdepth: 2
-
-
-
+=====================
+    
 End User Documentation
-==================
+======================
 
 * :doc:`Domogik requirements <enduser/requirements>`
 * **Installation:**
   :doc:`Standard Installation <enduser/installation/index>` |
   :doc:`Configure external access to Domogik (from internet) <enduser/installation/external>`
+* **Configuration:**
+  :doc:`First Use <enduser/configuration/index>`
 

@@ -23,34 +23,34 @@ Check your Python version with: ::
 
 If you don't already have Python 2.6/2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
 
-    # apt-get install python2.6
-    # ln -sf /usr/bin/python2.6 /usr/bin/python
+    $ apt-get install python2.6
+    $ ln -sf /usr/bin/python2.6 /usr/bin/python
 
 Even if you have python2.6 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
 
-    # apt-get install python2.X-dev gcc
+    $ apt-get install python2.X-dev gcc
 
 Install SSL librairies: ::
 
-    # apt-get install libssl-dev 
+    $ apt-get install libssl-dev 
 
 Install librairies for mysql access and command line client: ::
 
-    # apt-get install libmysqlclient-dev mysql-client
+    $ apt-get install libmysqlclient-dev mysql-client
 
 Mysql server
 ------------
 
-.. info::
+.. note::
     If you have already a Mysql server installed, you will only have to create the Domogik database.
 
 Install packages for mysql server: ::
 
-    # apt-get install mysql-server-5.0
+    $ apt-get install mysql-server-5.0
 
 Or if mysql 5.1 is available on your Linux system: ::
     
-    # apt-get install mysql-server-5.1
+    $ apt-get install mysql-server-5.1
 
 Log on the mysql database as root user: ::
 
@@ -72,8 +72,9 @@ Create the user "domogik" to use the new database: ::
 Download Domogik
 ----------------
 
-Go on the `Download`_ to get Domogik.
+Go on 'Download' to get Domogik.
 You will get a file named **domogik-<release>.tgz**. Download it and extract it: ::
+
     $ wget http://repo.domogik.org/...
     $ tar xvzf domogik-<release>.tgz
     $ cd domogik-<release>
@@ -85,11 +86,12 @@ From **domogik-<release>** folder, run the install: ::
 
     $ sudo ./install.sh
 
-.. info:: During installation, a new user will be created if necessary.
+.. note:: During installation, a new user will be created if necessary.
 
 You will be asked for the following questions: ::
 
     If you want to use a proxy, please set it now. It will only be used during the installation. (ex: http://1.2.3.4:8080)
+
 During the installation, some python librairies could be downloaded. If you use a proxy, you must set it here.
 
 .. code-block:: bash

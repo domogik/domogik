@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Table Of Content &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="index.html" />
+    <link rel="next" title="Domogik documentation" href="index.html" />
+ 
+<script type="text/javascript" src="templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="index.html">Home</a>  |
+        <a title="Table of contents" href="#">Table of contents</a>  |
+        <a title="Global index" href="genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    <a title="Domogik 0.1 documentation" href="index.html" accesskey="U">up</a>
+   |
+    <a href="index.html" title="Domogik documentation">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="contents">
+            
+  <div class="section" id="table-of-content">
+<span id="toc"></span><h1>Table Of Content<a class="headerlink" href="#table-of-content" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Domogik documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#end-user-documentation">End User Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="enduser/requirements.html">Domogik requirements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="enduser/requirements.html#what-do-you-need-to-use-domogik">What do you need to use Domogik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/requirements.html#i-am-a-newbie-in-linux-world-what-do-i-need-to-know">I am a newbie in Linux world, what do I need to know ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/requirements.html#what-next">What next?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="enduser/terms.html">Terms to know before using Domogik</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="enduser/terms.html#house-organisation">House organisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/terms.html#plugins-devices-features-and-widgets">Plugins, devices, features and widgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/terms.html#accounts">Accounts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/terms.html#domogik-components">Domogik components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="enduser/installation/index.html">Standard installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="enduser/installation/index.html#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#mysql-server">Mysql server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#download-domogik">Download Domogik</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#install-domogik">Install Domogik</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#optional-postgresql-instead-of-mysql">Optional : postgresql (instead of mysql)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#make-domogik-start-with-your-computer">Make Domogik start with your computer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#start-domogik">Start domogik</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/installation/index.html#it-doesn-t-work">It doesn&#8217;t work?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/installation/index.html#what-next">What next?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="enduser/installation/external.html">Configure external access to Domogik (from internet)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enduser/configuration/index.html">First use of Domogik</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="enduser/configuration/index.html#purpose">Purpose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/configuration/index.html#accessing-to-the-domogik-web-ui">Accessing to the Domogik web UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/configuration/index.html#screens-description">Screens description</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="enduser/configuration/index.html#home-screen-description">Home screen description</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="enduser/configuration/index.html#menu">Menu</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="enduser/configuration/index.html#visualization-screen">Visualization screen</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="enduser/configuration/index.html#for-house-and-areas">For house and areas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enduser/configuration/index.html#for-rooms">For rooms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="enduser/configuration/index.html#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>Browse</h3>
+  <ul>
+    
+    
+      <li>Next: <a href="index.html">Domogik documentation</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Table Of Content</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/contents.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    <a title="Domogik 0.1 documentation" href="index.html" accesskey="U">up</a>
+   |
+    <a href="index.html" title="Domogik documentation">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

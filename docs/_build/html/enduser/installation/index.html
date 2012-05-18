@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -25,23 +24,68 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" /> 
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Configure external access to Domogik (from internet)" href="external.html" />
+    <link rel="prev" title="Terms to know before using Domogik" href="../terms.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="../../index.html">Domogik 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
 
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../terms.html" title="Terms to know before using Domogik">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="external.html" title="Configure external access to Domogik (from internet)">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-installation-index">
             
   <div class="section" id="standard-installation">
 <h1>Standard installation<a class="headerlink" href="#standard-installation" title="Permalink to this headline">¶</a></h1>
@@ -65,32 +109,30 @@
 <p class="last">Right now Domogik <strong>requires Python 2.6/2.7</strong>. Python 3 is not (yet) supported.</p>
 </div>
 <p>If you don&#8217;t already have Python 2.6/2.7 or above (you have it if you are running a recent Linux system), then you can run for example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install python2.6</span>
-<span class="c"># ln -sf /usr/bin/python2.6 /usr/bin/python</span>
-</pre></div>
+<div class="highlight-python"><pre>$ apt-get install python2.6
+$ ln -sf /usr/bin/python2.6 /usr/bin/python</pre>
 </div>
 <p>Even if you have python2.6 or higher installed, check that the development package is also installed, or do (<strong>replace 2.X with your version</strong>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install python2.X-dev gcc</span>
-</pre></div>
+<div class="highlight-python"><pre>$ apt-get install python2.X-dev gcc</pre>
 </div>
 <p>Install SSL librairies:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install libssl-dev</span>
-</pre></div>
+<div class="highlight-python"><pre>$ apt-get install libssl-dev</pre>
 </div>
 <p>Install librairies for mysql access and command line client:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install libmysqlclient-dev mysql-client</span>
-</pre></div>
+<div class="highlight-python"><pre>$ apt-get install libmysqlclient-dev mysql-client</pre>
 </div>
 </div>
 <div class="section" id="mysql-server">
 <h3>Mysql server<a class="headerlink" href="#mysql-server" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you have already a Mysql server installed, you will only have to create the Domogik database.</p>
+</div>
 <p>Install packages for mysql server:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install mysql-server-5.0</span>
-</pre></div>
+<div class="highlight-python"><pre>$ apt-get install mysql-server-5.0</pre>
 </div>
 <p>Or if mysql 5.1 is available on your Linux system:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install mysql-server-5.1</span>
-</pre></div>
+<div class="highlight-python"><pre>$ apt-get install mysql-server-5.1</pre>
 </div>
 <p>Log on the mysql database as root user:</p>
 <div class="highlight-python"><pre>$ mysql -u root -p
@@ -109,7 +151,7 @@ mysql&gt;exit</pre>
 </div>
 <div class="section" id="download-domogik">
 <h3>Download Domogik<a class="headerlink" href="#download-domogik" title="Permalink to this headline">¶</a></h3>
-<p>Go on the <a href="#id1"><span class="problematic" id="id2">`Download`_</span></a> to get Domogik.
+<p>Go on &#8216;Download&#8217; to get Domogik.
 You will get a file named <strong>domogik-&lt;release&gt;.tgz</strong>. Download it and extract it:</p>
 <div class="highlight-python"><pre>$ wget http://repo.domogik.org/...
 $ tar xvzf domogik-&lt;release&gt;.tgz
@@ -120,6 +162,10 @@ $ cd domogik-&lt;release&gt;</pre>
 <h3>Install Domogik<a class="headerlink" href="#install-domogik" title="Permalink to this headline">¶</a></h3>
 <p>From <strong>domogik-&lt;release&gt;</strong> folder, run the install:</p>
 <div class="highlight-python"><pre>$ sudo ./install.sh</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">During installation, a new user will be created if necessary.</p>
 </div>
 <p>You will be asked for the following questions:</p>
 <div class="highlight-python"><pre>If you want to use a proxy, please set it now. It will only be used during the installation. (ex: http://1.2.3.4:8080)</pre>
@@ -255,12 +301,16 @@ Add <em>&#64;domogik</em> at the very end of the line starting with <em>DAEMON</
 </div>
 
 
-          </div>
+          </div>         
         </div>
       </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Standard installation</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a><ul>
@@ -278,6 +328,25 @@ Add <em>&#64;domogik</em> at the very end of the line starting with <em>DAEMON</
 </ul>
 </li>
 </ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../terms.html">Terms to know before using Domogik</a></li>
+    
+    
+      <li>Next: <a href="external.html">Configure external access to Domogik (from internet)</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Standard installation</li></ul>
+        
+      </li>
+  </ul>  
 
   <h3>This Page</h3>
   <ul class="this-page-menu">
@@ -299,20 +368,22 @@ Add <em>&#64;domogik</em> at the very end of the line starting with <em>DAEMON</
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../terms.html" title="Terms to know before using Domogik">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="external.html" title="Configure external access to Domogik (from internet)">next</a> &raquo;</div>
+    </div>
+  </div>
+
       <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="../../index.html">Domogik 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2012, Domogik team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

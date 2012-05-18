@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -25,23 +24,68 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" /> 
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Standard installation" href="installation/index.html" />
+    <link rel="prev" title="Domogik requirements" href="requirements.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="../index.html">Domogik 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
 
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="requirements.html" title="Domogik requirements">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="installation/index.html" title="Standard installation">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-terms">
             
   <div class="section" id="terms-to-know-before-using-domogik">
 <h1>Terms to know before using Domogik<a class="headerlink" href="#terms-to-know-before-using-domogik" title="Permalink to this headline">¶</a></h1>
@@ -105,12 +149,16 @@ REST is the component which makes the link between the database and the xPL netw
 </div>
 
 
-          </div>
+          </div>         
         </div>
       </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Terms to know before using Domogik</a><ul>
 <li><a class="reference internal" href="#house-organisation">House organisation</a></li>
@@ -120,6 +168,25 @@ REST is the component which makes the link between the database and the xPL netw
 </ul>
 </li>
 </ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="requirements.html">Domogik requirements</a></li>
+    
+    
+      <li>Next: <a href="installation/index.html">Standard installation</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Terms to know before using Domogik</li></ul>
+        
+      </li>
+  </ul>  
 
   <h3>This Page</h3>
   <ul class="this-page-menu">
@@ -141,20 +208,22 @@ REST is the component which makes the link between the database and the xPL netw
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="requirements.html" title="Domogik requirements">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="installation/index.html" title="Standard installation">next</a> &raquo;</div>
+    </div>
+  </div>
+
       <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="../index.html">Domogik 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2012, Domogik team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
