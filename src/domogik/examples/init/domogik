@@ -239,7 +239,7 @@ function check_lock_dir {
 case "$1" in
     start)
         check_lock_dir
-        [ -f ${PIDFILE} ] && echo "Domogik seems to be running or have been crashed. Please use stop to kill all remainings tasks." && exit 0
+        [ -f ${PIDFILE} ] && echo "Domogik seems to be running or is crashed. Please use stop to kill all remainings tasks." && exit 0
         if [ $# -eq 1 ];then
             start
             sleep ${STARTTIME}
