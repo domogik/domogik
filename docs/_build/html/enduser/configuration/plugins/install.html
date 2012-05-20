@@ -1,0 +1,260 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation and configuration of plugins &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../../index.html" />
+    <link rel="next" title="Plugin helpers" href="helpers.html" />
+    <link rel="prev" title="Plugins overview" href="index.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Plugins overview">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../../index.html" accesskey="U">up</a>
+   |
+    <a href="helpers.html" title="Plugin helpers">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-configuration-plugins-install">
+            
+  <div class="section" id="installation-and-configuration-of-plugins">
+<h1>Installation and configuration of plugins<a class="headerlink" href="#installation-and-configuration-of-plugins" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="install-a-plugin">
+<h2>Install a plugin<a class="headerlink" href="#install-a-plugin" title="Permalink to this headline">¶</a></h2>
+<p>As we said in <a class="reference internal" href="index.html"><em>Plugins overview</em></a>, in this release there is no need to install plugins because we provide them all already installed.</p>
+</div>
+<div class="section" id="configure-a-plugin">
+<h2>Configure a plugin<a class="headerlink" href="#configure-a-plugin" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="no-plugin-enabled">
+<h3>No plugin enabled<a class="headerlink" href="#no-plugin-enabled" title="Permalink to this headline">¶</a></h3>
+<p>If no plugin are enabled,you will have the following message in the Domogik administration panel:</p>
+<img alt="../../../_images/no_plugin.png" src="../../../_images/no_plugin.png" />
+</div>
+<div class="section" id="enable-or-disable-an-installed-plugin">
+<h3>Enable or disable an installed plugin<a class="headerlink" href="#enable-or-disable-an-installed-plugin" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="the-best-method">
+<h4>The best method<a class="headerlink" href="#the-best-method" title="Permalink to this headline">¶</a></h4>
+<p>To enable the plugin named <em>yourplugin</em>, simply run this command:</p>
+<div class="highlight-python"><pre>$ dmgenplug yourplugin</pre>
+</div>
+<p>To disable it:</p>
+<div class="highlight-python"><pre>$ dmgdisplug yourplugin</pre>
+</div>
+<p>There is no need to restart anything : just reload administration page to see (or not) the plugin in the plugins list.</p>
+</div>
+<div class="section" id="another-method">
+<h4>Another method<a class="headerlink" href="#another-method" title="Permalink to this headline">¶</a></h4>
+<p>This method does exactly what above commands do, so please, use the previous method if you can ;).
+In &lt;domogik_user_home&gt;/.domogik.cfg, in the section [plugins], add (or replace) a line with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">yourplugin</span> <span class="o">=</span> <span class="n">enabled</span>
+</pre></div>
+</div>
+<p>There is no need to restart anything : just reload administration page to see the plugin in the plugin&#8217;s list.</p>
+</div>
+<div class="section" id="access-to-the-plugin-configuration-page">
+<h4>Access to the plugin configuration page<a class="headerlink" href="#access-to-the-plugin-configuration-page" title="Permalink to this headline">¶</a></h4>
+<p>You should now be able to access the plugin configuration page : go to Administration, and in the left menu, in &#8220;Plugins&#8221; section, you should see an entry for your plugin.</p>
+<img alt="../../../_images/plugin_menu.png" src="../../../_images/plugin_menu.png" />
+<p>By clicking on this entry, you will access to the plugin configuration page.</p>
+<img alt="../../../_images/config_plugin_teleinfo.png" src="../../../_images/config_plugin_teleinfo.png" />
+</div>
+</div>
+<div class="section" id="configure-options-for-a-plugin">
+<h3>Configure options for a plugin<a class="headerlink" href="#configure-options-for-a-plugin" title="Permalink to this headline">¶</a></h3>
+<p>Each plugin has its own configuration page. This page is accessible in the Domogik administration panel in the menu called <strong>plugin</strong>.</p>
+<p>There is only an option which is common to all plugins : <strong>startup-plugin</strong>. If you check this option, the plugin will be started at Domogik startup.</p>
+<p>The other options depend on the plugins used, so feel free to read the associated plugin documentation page.</p>
+<p><a class="reference external" href="http://wiki.domogik.org/Plugins_in_Domogik">Page with links on each plugin documentation page</a></p>
+</div>
+<div class="section" id="start-stop-plugin">
+<h3>Start / stop plugin<a class="headerlink" href="#start-stop-plugin" title="Permalink to this headline">¶</a></h3>
+<p>To start a plugin you have to configure it. If the plugin is not configured, the &#8220;Start plugin&#8221; button will remain inactive :</p>
+<img alt="../../../_images/plugin_start_inactive.png" src="../../../_images/plugin_start_inactive.png" />
+<div class="section" id="start">
+<h4>Start<a class="headerlink" href="#start" title="Permalink to this headline">¶</a></h4>
+<p>If a problem occurs while starting the plugin, you will get a notification error like this :</p>
+<img alt="../../../_images/plugin_start_error.png" src="../../../_images/plugin_start_error.png" />
+<p>If no problem occurs, you will get this notification :</p>
+<img alt="../../../_images/plugin_start_ok.png" src="../../../_images/plugin_start_ok.png" />
+</div>
+<div class="section" id="stop">
+<h4>Stop<a class="headerlink" href="#stop" title="Permalink to this headline">¶</a></h4>
+<p>If a problem occurs while stopping plugin, you will get a notification error like this :</p>
+<img alt="../../../_images/plugin_stop_error.png" src="../../../_images/plugin_stop_error.png" />
+<p>If no problem occurs, you will get this notification :</p>
+<img alt="../../../_images/plugin_stop_ok.png" src="../../../_images/plugin_stop_ok.png" />
+</div>
+</div>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="helpers.html"><em>Use Helpers</em></a> to find out information about plugin hardware</li>
+<li><a class="reference internal" href="../devices.html"><em>Set up your devices</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation and configuration of plugins</a><ul>
+<li><a class="reference internal" href="#install-a-plugin">Install a plugin</a></li>
+<li><a class="reference internal" href="#configure-a-plugin">Configure a plugin</a><ul>
+<li><a class="reference internal" href="#no-plugin-enabled">No plugin enabled</a></li>
+<li><a class="reference internal" href="#enable-or-disable-an-installed-plugin">Enable or disable an installed plugin</a><ul>
+<li><a class="reference internal" href="#the-best-method">The best method</a></li>
+<li><a class="reference internal" href="#another-method">Another method</a></li>
+<li><a class="reference internal" href="#access-to-the-plugin-configuration-page">Access to the plugin configuration page</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-options-for-a-plugin">Configure options for a plugin</a></li>
+<li><a class="reference internal" href="#start-stop-plugin">Start / stop plugin</a><ul>
+<li><a class="reference internal" href="#start">Start</a></li>
+<li><a class="reference internal" href="#stop">Stop</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Plugins overview</a></li>
+    
+    
+      <li>Next: <a href="helpers.html">Plugin helpers</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Installation and configuration of plugins</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/enduser/configuration/plugins/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Plugins overview">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../../index.html" accesskey="U">up</a>
+   |
+    <a href="helpers.html" title="Plugin helpers">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

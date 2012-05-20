@@ -1,0 +1,219 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Create and configure your house &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Plugins overview" href="plugins/index.html" />
+    <link rel="prev" title="First use of Domogik" href="index.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="First use of Domogik">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="plugins/index.html" title="Plugins overview">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-configuration-house">
+            
+  <div class="section" id="create-and-configure-your-house">
+<h1>Create and configure your house<a class="headerlink" href="#create-and-configure-your-house" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="your-house">
+<h2>Your house<a class="headerlink" href="#your-house" title="Permalink to this headline">¶</a></h2>
+<p>The first thing to do in Domogik is to configure your house or your flat.
+In this documentation we will use the <strong>house</strong> term to design a house a flat or whatever place you could live in.</p>
+<p>Here is the architecture choosen in Domogik to separate your house in several areas:</p>
+<div class="highlight-python"><pre>| House | =&gt; | Areas* | =&gt; | Rooms |</pre>
+</div>
+<p>optionnal*</p>
+<div class="section" id="example-of-a-house-with-several-areas">
+<h3>Example of a house with several areas<a class="headerlink" href="#example-of-a-house-with-several-areas" title="Permalink to this headline">¶</a></h3>
+<p>A house is often made of several <strong>areas</strong>.
+An area can be a floor, a &#8220;day&#8221; zone (with kitchen, living room, etc), a &#8220;night&#8221; zone with all bedrooms, the garden, the garage, the cellar, a swimming pool area, etc.
+Often you won&#8217;t have the same needs in automation for theses different areas so separating them is a good idea to get a better access to automation commands and data.
+In an area you will have <strong>rooms</strong>. Sometimes it could be not exactly rooms (in your swimming pool area you could have the swimming pool and a deck).</p>
+<p>A typical house example with basement, groundfloor and one floor :</p>
+<img alt="../../_images/dmg-house-organisation-01.png" src="../../_images/dmg-house-organisation-01.png" />
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">review this picture with final icons</p>
+</div>
+</div>
+<div class="section" id="example-of-a-house-with-no-area">
+<h3>Example of a house with no area<a class="headerlink" href="#example-of-a-house-with-no-area" title="Permalink to this headline">¶</a></h3>
+<p>If you live in a small flat or if you don&#8217;t want to separate your house in several areas, you could obtain this architecture :</p>
+<img alt="../../_images/dmg-house-organisation-02.png" src="../../_images/dmg-house-organisation-02.png" />
+</div>
+</div>
+<div class="section" id="configure-your-house">
+<h2>Configure your house<a class="headerlink" href="#configure-your-house" title="Permalink to this headline">¶</a></h2>
+<p>To configure your house you will have to go to the <strong>administration</strong> panel and follow the following steps.</p>
+<ol class="arabic simple">
+<li>Go to <strong>Organisation &gt; House</strong> section to <a class="reference internal" href="../administration/house.html"><em>define your house name</em></a>.</li>
+<li>Go to <strong>Organisation &gt; Area</strong> section to <a class="reference internal" href="../administration/area.html"><em>create your different Areas</em></a> (If you don&#8217;t want/need any area, go to the next step).</li>
+<li>Go to <strong>Organisation &gt; Room</strong> section to <a class="reference internal" href="../administration/room.html"><em>create your different Rooms</em></a>. In this section you will also be able to put your rooms into areas.</li>
+</ol>
+<p>Right now if you go back to the <strong>Visualisation</strong> mode, you should see your house.</p>
+<img alt="../../_images/show_without_devices.png" src="../../_images/show_without_devices.png" />
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="plugins/index.html"><em>Plugins Overview</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Create and configure your house</a><ul>
+<li><a class="reference internal" href="#your-house">Your house</a><ul>
+<li><a class="reference internal" href="#example-of-a-house-with-several-areas">Example of a house with several areas</a></li>
+<li><a class="reference internal" href="#example-of-a-house-with-no-area">Example of a house with no area</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-your-house">Configure your house</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">First use of Domogik</a></li>
+    
+    
+      <li>Next: <a href="plugins/index.html">Plugins overview</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Create and configure your house</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/configuration/house.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="First use of Domogik">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="plugins/index.html" title="Plugins overview">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

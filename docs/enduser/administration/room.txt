@@ -1,0 +1,90 @@
+================
+Rooms management
+================
+
+Go to the room organization page
+================================
+In administration menu, click on **Room** from the **Organization** menu.
+
+Screen description
+==================
+There are two parts in this screen:
+
+* Rooms list
+* Rooms associations
+
+Rooms list
+----------
+.. image:: room_list.png
+
+On the left top of the page, there is the **Add** button:
+
+.. image:: button_add.png
+
+On its right you can see all existing rooms. By clicking on a room on this list you will see it below and will be allowed to edit it.
+
+On the left there are **Delete** area and **Modify** room buttons:
+
+.. image:: button_delete.png
+.. image:: button_update.png
+
+In the main zone, you can see room title, description and icon.
+
+Rooms organization
+------------------
+
+.. image:: room_organisation.png
+
+For the house and each area, there is a zone in which you can drag and drop rooms to associate them to areas or to the house.
+
+Add a room
+==========
+Click on the **Add** button to create a new room. The following window will open:
+
+.. image:: room_creation.png
+
+Give a name, optionally a description and then validate. The room is created and you will see it in the list.
+
+Change title and desription
+===========================
+Click on the **Modify** button to modify selected room. The following window will open:
+
+.. image:: room_update.png
+
+Change the name, optionally the description and then validate. The room is updated.
+
+Change the icon of a room
+=========================
+.. image:: icon_room_01.png
+
+Go with the cursor to the current icon. A button appears on the icon:
+
+.. image:: icon_room_02.png
+
+Click on it. Four buttons appear:
+
+.. image:: icon_room_03.png
+
+* the top left button will validate the choosen icon.
+* the top right button will cancel the action.
+* the bottom left and bottom right buttons will allow you to browse among available icons.
+
+Delete a room
+=============
+Click on the **Delete** button to delete the selected room. The following window will open:
+
+.. image:: room_delete.png
+
+Confirm suppression. The room doesn't appear anymore in list.
+
+All devices features associations with this room are now deleted.
+
+Attach rooms to areas
+=====================
+.. image:: room_organisation.png
+
+You just have to drag and drop rooms to the place (the house or the area) you want to.
+
+What next?
+==========
+* :doc:`Devices management </enduser/administration/device>`

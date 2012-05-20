@@ -1,0 +1,274 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>First use of Domogik &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Create and configure your house" href="house.html" />
+    <link rel="prev" title="Configure external access to Domogik" href="../installation/external.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../installation/external.html" title="Configure external access to Domogik">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="house.html" title="Create and configure your house">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-configuration-index">
+            
+  <div class="section" id="first-use-of-domogik">
+<h1>First use of Domogik<a class="headerlink" href="#first-use-of-domogik" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>In this page we will present you the different screens and sections of Domogik. If you already use Domogik you can directly go to ((Create_and_configure_your_house|the next page)).</p>
+</div>
+<div class="section" id="accessing-to-the-domogik-web-ui">
+<h2>Accessing to the Domogik web UI<a class="headerlink" href="#accessing-to-the-domogik-web-ui" title="Permalink to this headline">¶</a></h2>
+<p>At the end of the installation the installer script should have displayed this information :</p>
+<ul class="simple">
+<li>Administrator login</li>
+<li>Administrator password</li>
+<li>Domogik web UI url</li>
+</ul>
+<p>So you should be now able to access to the Domogik web UI :)</p>
+</div>
+<div class="section" id="screens-description">
+<h2>Screens description<a class="headerlink" href="#screens-description" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="home-screen-description">
+<h3>Home screen description<a class="headerlink" href="#home-screen-description" title="Permalink to this headline">¶</a></h3>
+<p>The first time you access Domogik you should see an information notification which tells you that there is no area or room yet created :</p>
+<img alt="../../_images/no_area_or_room.png" src="../../_images/no_area_or_room.png" />
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">screenshot with no data</p>
+</div>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">screenshot with data</p>
+</div>
+<p>On the top of the screen you will get :</p>
+<ul class="simple">
+<li><strong>Domogik banner</strong>.</li>
+<li><strong>Main menu</strong>.</li>
+</ul>
+<p>Under the main menu there are :</p>
+<ul class="simple">
+<li>On the left, the <strong>widgets zone</strong> of the house.</li>
+<li>On the right, the <strong>different places</strong> of your house ordered by areas. If you get rooms directly linked to your house they will appear before areas.</li>
+</ul>
+<div class="section" id="menu">
+<h4>Menu<a class="headerlink" href="#menu" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Visualization : go to visualization screen.</li>
+<li>Administration : go to administration section.</li>
+<li>Help : direct link to this Domogik online documentation.</li>
+<li>Connect/Disconnect : Login or logout from Domogik. Currently (in ((Release0.1.0|release 0.1.0))), login is needed only to access the administration part.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="visualization-screen">
+<h3>Visualization screen<a class="headerlink" href="#visualization-screen" title="Permalink to this headline">¶</a></h3>
+<p>On the top there will always be a <strong>navigation menu</strong>.</p>
+<img alt="../../_images/navbar.png" src="../../_images/navbar.png" />
+<p>On the left you will see where you are in your house : <em>House &gt; Area &gt; Room</em>.
+Clicking on one of them will get you to the associated Visualization screen. Clicking on the Domogik logo will get you to the Home screen.</p>
+<p>On the right there are two buttons :</p>
+<ul class="simple">
+<li>Customize : allows you to choose widgets and arrange them on the current screen.</li>
+<li>Menu : it will display the menu bar (the same than for the Home screen).</li>
+</ul>
+<div class="section" id="for-house-and-areas">
+<h4>For house and areas<a class="headerlink" href="#for-house-and-areas" title="Permalink to this headline">¶</a></h4>
+<p>Under the navigation menu there are :</p>
+<ul class="simple">
+<li>On the left the <strong>widgets zone</strong> of the places (room, area).</li>
+<li>On the right the places and their <strong>main widgets</strong>.</li>
+</ul>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">screenshots and light explanations about widget places (title, main, others)</p>
+</div>
+</div>
+<div class="section" id="for-rooms">
+<h4>For rooms<a class="headerlink" href="#for-rooms" title="Permalink to this headline">¶</a></h4>
+<p>Under the navigation menu there are :</p>
+<ul class="simple">
+<li>On the top the title of the room and at the right the main widgets zone.</li>
+<li>On the bottom other widgets zone.</li>
+</ul>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">screenshots and light explanations about widget places (title, main, others)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="house.html"><em>Create and configure your house</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">First use of Domogik</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#accessing-to-the-domogik-web-ui">Accessing to the Domogik web UI</a></li>
+<li><a class="reference internal" href="#screens-description">Screens description</a><ul>
+<li><a class="reference internal" href="#home-screen-description">Home screen description</a><ul>
+<li><a class="reference internal" href="#menu">Menu</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#visualization-screen">Visualization screen</a><ul>
+<li><a class="reference internal" href="#for-house-and-areas">For house and areas</a></li>
+<li><a class="reference internal" href="#for-rooms">For rooms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../installation/external.html">Configure external access to Domogik</a></li>
+    
+    
+      <li>Next: <a href="house.html">Create and configure your house</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>First use of Domogik</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/configuration/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../installation/external.html" title="Configure external access to Domogik">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="house.html" title="Create and configure your house">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

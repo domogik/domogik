@@ -1,0 +1,37 @@
+.. _index:
+
+=====================
+Domogik documentation
+=====================
+
+* **Overview:**
+  :doc:`Quick </overview/index>` |
+  :doc:`Detailed </overview/detailed>`
+
+    
+End User Documentation
+======================
+
+* :doc:`Domogik requirements </enduser/requirements>`
+* **Installation:**
+  :doc:`Standard Installation </enduser/installation/index>` |
+  :doc:`Configure external access to Domogik </enduser/installation/external>`
+* **Configuration:**
+  :doc:`First Use </enduser/configuration/index>` |
+  :doc:`Create and configure your house </enduser/configuration/house>`
+    
+    * **Plugins:**
+      :doc:`Overview </enduser/configuration/plugins/index>` |
+      :doc:`Installation and configuration </enduser/configuration/plugins/install>` |
+      :doc:`Helpers </enduser/configuration/plugins/helpers>`
+        
+* :doc:`Set up your devices </enduser/configuration/devices>` |
+  :doc:`Common usage of widgets </enduser/configuration/widgets>`
+
+* **Management:**
+  :doc:`House management </enduser/administration/house>` |
+  :doc:`Areas management </enduser/administration/area>` |
+  :doc:`Rooms management </enduser/administration/room>` |
+  :doc:`Devices management </enduser/administration/device>` |
+  :doc:`Plugins management </enduser/administration/plugin>` |
+  :doc:`Accounts management </enduser/administration/account>`

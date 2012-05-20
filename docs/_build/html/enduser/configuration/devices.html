@@ -1,0 +1,235 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Set up your devices &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Common usage of widgets" href="widgets.html" />
+    <link rel="prev" title="Plugin helpers" href="plugins/helpers.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="plugins/helpers.html" title="Plugin helpers">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="widgets.html" title="Common usage of widgets">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-configuration-devices">
+            
+  <div class="section" id="set-up-your-devices">
+<h1>Set up your devices<a class="headerlink" href="#set-up-your-devices" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>Now that you have configured your plugin(s), you can link devices to this (these) plugin(s) and put them to a place in your house.</p>
+</div>
+<div class="section" id="creating-a-device">
+<h2>Creating a device<a class="headerlink" href="#creating-a-device" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Detailed insctructions about creating, updating and deleting devices can be found on the <a class="reference internal" href="../administration/device.html"><em>Devices management page</em></a>.</p>
+</div>
+<p>First, create your device in the administration panel : <strong>Organization &gt; Devices</strong>. Be careful to indicate a valid <strong>device address</strong> and the corresponding <strong>feature</strong>.</p>
+<img alt="../../_images/onewire_create_serial.png" src="../../_images/onewire_create_serial.png" />
+<p>Right now there is no auto discovery feature in Domogik to help you to find out a device address.
+In some plugins there are helpers which can display available modules and their addresses. Feel free using them.</p>
+</div>
+<div class="section" id="set-devices-to-a-place">
+<h2>Set devices to a place<a class="headerlink" href="#set-devices-to-a-place" title="Permalink to this headline">¶</a></h2>
+<p>To set devices to a place, you must be on the visualisation screen. From <strong>Home Screen</strong>, click on <strong>Visualisation</strong> to go to your house&#8217;s visualisation screen.
+For each area and room, it will be the same process to set devices.</p>
+<div class="section" id="go-to-the-edition-mode">
+<h3>Go to the edition mode<a class="headerlink" href="#go-to-the-edition-mode" title="Permalink to this headline">¶</a></h3>
+<p>On the <strong>Visualisation menu</strong>, there is a <strong>Customize</strong> button. Clicking on it will open the <strong>edition mode</strong> which will allow you to set devices to places.</p>
+<img alt="../../_images/visu_customize.png" src="../../_images/visu_customize.png" />
+<p>You may also access edition mode from the <strong>Administration</strong> panel : go to <strong>Organization &gt; Widgets</strong> menu and you will see the list of all available places.
+Just click on one place to go to the edition mode.</p>
+<img alt="../../_images/widgets_choose_place.png" src="../../_images/widgets_choose_place.png" />
+</div>
+<div class="section" id="screen-description">
+<h3>Screen description<a class="headerlink" href="#screen-description" title="Permalink to this headline">¶</a></h3>
+<p>When clicking on a feature you will see black squares reprensenting the widget. In this mode you won&#8217;t see the widget appearance but only the size it takes on the screen.
+A place area is separated in 3 sub-areas:</p>
+<ul class="simple">
+<li><strong>Title widget zone</strong> (1) : here you can put only one 1x1 widget. It is commonly use to put a sensor device.</li>
+<li><strong>Main widgets zone</strong> (2) : here, you can put up to four 1x1 widgets (only 1x1 widgets are allowed here for the moment). In visualisation mode, this zone will be seen from higher zone visualisation screen.</li>
+<li><strong>Other widgets zone</strong> (3) : here you can put widgets you want to use/see for this place but that are less important.</li>
+</ul>
+<img alt="../../_images/customize_place_detail.png" src="../../_images/customize_place_detail.png" />
+<p>A window named <strong>Place your widgets</strong> has been opened. In the first column, you will have to choose a device.
+Then in the second column all features related to this device appear.
+Select one feature : on the third column, available widgets for this device/feature are displayed.
+Select one widget. Then, in the fourth column, you see a preview/description of the widget.
+Juste drag on the <strong>black representation</strong> of the widget (window disappears) and drop it to the place you want to put it on.</p>
+<img alt="../../_images/widgets_choose_place_on_screen.png" src="../../_images/widgets_choose_place_on_screen.png" />
+<p>If you close this window, you can reopen it by cliking on <strong>Widgets</strong> in the menubar :</p>
+<img alt="../../_images/edit_menubar.png" src="../../_images/edit_menubar.png" />
+<p>To delete a widget, just click on the red cross of the widget :</p>
+<img alt="../../_images/edit_delete.png" src="../../_images/edit_delete.png" />
+<p>When you have finished to set your widgets, click on <strong>Finish</strong> button (top right of the window) to validate your choice.</p>
+<img alt="../../_images/visu_finish.png" src="../../_images/visu_finish.png" />
+<p>You come back to the visualisation mode : your widgets are now ready to use.</p>
+</div>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="widgets.html"><em>Common usage of widgets</em></a></li>
+<li><a class="reference internal" href="../administration/house.html"><em>House management</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Set up your devices</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#creating-a-device">Creating a device</a></li>
+<li><a class="reference internal" href="#set-devices-to-a-place">Set devices to a place</a><ul>
+<li><a class="reference internal" href="#go-to-the-edition-mode">Go to the edition mode</a></li>
+<li><a class="reference internal" href="#screen-description">Screen description</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="plugins/helpers.html">Plugin helpers</a></li>
+    
+    
+      <li>Next: <a href="widgets.html">Common usage of widgets</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Set up your devices</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/configuration/devices.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="plugins/helpers.html" title="Plugin helpers">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="widgets.html" title="Common usage of widgets">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

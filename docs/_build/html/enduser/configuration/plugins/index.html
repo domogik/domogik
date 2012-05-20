@@ -1,0 +1,228 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugins overview &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../../index.html" />
+    <link rel="next" title="Installation and configuration of plugins" href="install.html" />
+    <link rel="prev" title="Create and configure your house" href="../house.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../house.html" title="Create and configure your house">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../../index.html" accesskey="U">up</a>
+   |
+    <a href="install.html" title="Installation and configuration of plugins">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-configuration-plugins-index">
+            
+  <div class="section" id="plugins-overview">
+<h1>Plugins overview<a class="headerlink" href="#plugins-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-a-plugin">
+<h2>What is a plugin ?<a class="headerlink" href="#what-is-a-plugin" title="Permalink to this headline">¶</a></h2>
+<p>A plugin is a set of software that adds new functionnalities to Domogik.
+A plugin can add functionnalities for a home automation technology (ex: X10, Plcbus, etc) or other stuff (e.g. interaction with a media center).
+A plugin works in background (it is a daemon).</p>
+<div class="section" id="choosing-and-installing-plugins">
+<h3>Choosing and installing plugins<a class="headerlink" href="#choosing-and-installing-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Right now in <a class="reference internal" href="../../../releases/0.1.0.html"><em>Release 0.1.0</em></a>, there is no way to choose which plugin are installed in Domogik :
+we give you with this version a set of already installed plugins. See <a class="reference internal" href="install.html"><em>plugin configuration section</em></a> to enable / disable them.
+In future releases we will add the possibility to install plugins manually.
+We are also looking for an easy way to centralize plugins (with repositories like you have in Linux distributions to install third-party softwares.</p>
+</div>
+<div class="section" id="plugin-list">
+<h3>Plugin list<a class="headerlink" href="#plugin-list" title="Permalink to this headline">¶</a></h3>
+<p>All plugins are listed on the <a class="reference external" href="http://wiki.domogik.org/Plugins_in_Domogik">plugins page</a>.</p>
+</div>
+</div>
+<div class="section" id="what-is-a-widget">
+<h2>What is a widget<a class="headerlink" href="#what-is-a-widget" title="Permalink to this headline">¶</a></h2>
+<p>A widget is a graphic element that allows you to control or get the status of a device feature.</p>
+</div>
+<div class="section" id="links-between-plugins-and-widgets">
+<h2>Links between plugins and widgets<a class="headerlink" href="#links-between-plugins-and-widgets" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Reading this chapter is not really important to use Domogik.
+But if you want to understand the link between plugins and widgets, you should read it ;)</p>
+</div>
+<p>A plugin itself provides no graphic item. Graphic items used in the web UI to control functionnalities provided by the plugin are not directly linked to a plugin.
+We call these control <strong>widgets</strong>. Let&#8217;s see how a widget can be linked to a plugin.</p>
+<div class="figure">
+<img alt="../../../_images/link_plugin_widget.png" src="../../../_images/link_plugin_widget.png" />
+<p class="caption">Illustrated example for plugins X10, Plcbus and Ipx800</p>
+</div>
+<p>A widget is linked to a <strong>feature type</strong> (binary, trigger, number, string, etc).
+A plugin provides one or more <strong>features</strong>. Example : x10.Switch, Plcbus.Switch, Plcbus.Dimmer, 1wire.Temperature, 1wire.ID, RelayBoard.Relay, RelayBoard.Digital_Input, etc.
+A same feature (same name) can be different between two technologies (e.g. feedback or not).
+If you want, you can read the <a class="reference internal" href="../../../technical/actuator.html"><em>Actuators</em></a> and <a class="reference internal" href="../../../technical/sensor.html"><em>Sensors</em></a> pages to get more information about this.
+And each feature of a technology is linked to a feature type.</p>
+<p>When you create a device, you choose a <strong>Feature</strong> for your device, for example &#8220;Plcbus.Switch&#8221;.
+This feature implies a feature type (&#8220;binary&#8221; in this example).
+So the web UI will be able to get this feature type and allow you to use all widgets linked to this feature type.</p>
+<img alt="../../../_images/onewire_create_serial1.png" src="../../../_images/onewire_create_serial1.png" />
+<p>When creating a device you also choose a <strong>usage</strong> (Light, Appliance, Heating, etc).
+Widgets will use the choosen usage to display the corresponding icons on the widget.</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="install.html"><em>Plugin Installation and configuration</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugins overview</a><ul>
+<li><a class="reference internal" href="#what-is-a-plugin">What is a plugin ?</a><ul>
+<li><a class="reference internal" href="#choosing-and-installing-plugins">Choosing and installing plugins</a></li>
+<li><a class="reference internal" href="#plugin-list">Plugin list</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-is-a-widget">What is a widget</a></li>
+<li><a class="reference internal" href="#links-between-plugins-and-widgets">Links between plugins and widgets</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../house.html">Create and configure your house</a></li>
+    
+    
+      <li>Next: <a href="install.html">Installation and configuration of plugins</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Plugins overview</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/enduser/configuration/plugins/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../house.html" title="Create and configure your house">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../../index.html" accesskey="U">up</a>
+   |
+    <a href="install.html" title="Installation and configuration of plugins">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,251 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rooms management &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Devices management" href="device.html" />
+    <link rel="prev" title="Areas management" href="area.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="area.html" title="Areas management">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="device.html" title="Devices management">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-administration-room">
+            
+  <div class="section" id="rooms-management">
+<h1>Rooms management<a class="headerlink" href="#rooms-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="go-to-the-room-organization-page">
+<h2>Go to the room organization page<a class="headerlink" href="#go-to-the-room-organization-page" title="Permalink to this headline">¶</a></h2>
+<p>In administration menu, click on <strong>Room</strong> from the <strong>Organization</strong> menu.</p>
+</div>
+<div class="section" id="screen-description">
+<h2>Screen description<a class="headerlink" href="#screen-description" title="Permalink to this headline">¶</a></h2>
+<p>There are two parts in this screen:</p>
+<ul class="simple">
+<li>Rooms list</li>
+<li>Rooms associations</li>
+</ul>
+<div class="section" id="rooms-list">
+<h3>Rooms list<a class="headerlink" href="#rooms-list" title="Permalink to this headline">¶</a></h3>
+<img alt="../../_images/room_list.png" src="../../_images/room_list.png" />
+<p>On the left top of the page, there is the <strong>Add</strong> button:</p>
+<img alt="../../_images/button_add.png" src="../../_images/button_add.png" />
+<p>On its right you can see all existing rooms. By clicking on a room on this list you will see it below and will be allowed to edit it.</p>
+<p>On the left there are <strong>Delete</strong> area and <strong>Modify</strong> room buttons:</p>
+<img alt="../../_images/button_delete.png" src="../../_images/button_delete.png" />
+<img alt="../../_images/button_update.png" src="../../_images/button_update.png" />
+<p>In the main zone, you can see room title, description and icon.</p>
+</div>
+<div class="section" id="rooms-organization">
+<h3>Rooms organization<a class="headerlink" href="#rooms-organization" title="Permalink to this headline">¶</a></h3>
+<img alt="../../_images/room_organisation.png" src="../../_images/room_organisation.png" />
+<p>For the house and each area, there is a zone in which you can drag and drop rooms to associate them to areas or to the house.</p>
+</div>
+</div>
+<div class="section" id="add-a-room">
+<h2>Add a room<a class="headerlink" href="#add-a-room" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Add</strong> button to create a new room. The following window will open:</p>
+<img alt="../../_images/room_creation.png" src="../../_images/room_creation.png" />
+<p>Give a name, optionally a description and then validate. The room is created and you will see it in the list.</p>
+</div>
+<div class="section" id="change-title-and-desription">
+<h2>Change title and desription<a class="headerlink" href="#change-title-and-desription" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Modify</strong> button to modify selected room. The following window will open:</p>
+<img alt="../../_images/room_update.png" src="../../_images/room_update.png" />
+<p>Change the name, optionally the description and then validate. The room is updated.</p>
+</div>
+<div class="section" id="change-the-icon-of-a-room">
+<h2>Change the icon of a room<a class="headerlink" href="#change-the-icon-of-a-room" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/icon_room_01.png" src="../../_images/icon_room_01.png" />
+<p>Go with the cursor to the current icon. A button appears on the icon:</p>
+<img alt="../../_images/icon_room_02.png" src="../../_images/icon_room_02.png" />
+<p>Click on it. Four buttons appear:</p>
+<img alt="../../_images/icon_room_03.png" src="../../_images/icon_room_03.png" />
+<ul class="simple">
+<li>the top left button will validate the choosen icon.</li>
+<li>the top right button will cancel the action.</li>
+<li>the bottom left and bottom right buttons will allow you to browse among available icons.</li>
+</ul>
+</div>
+<div class="section" id="delete-a-room">
+<h2>Delete a room<a class="headerlink" href="#delete-a-room" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Delete</strong> button to delete the selected room. The following window will open:</p>
+<img alt="../../_images/room_delete.png" src="../../_images/room_delete.png" />
+<p>Confirm suppression. The room doesn&#8217;t appear anymore in list.</p>
+<p>All devices features associations with this room are now deleted.</p>
+</div>
+<div class="section" id="attach-rooms-to-areas">
+<h2>Attach rooms to areas<a class="headerlink" href="#attach-rooms-to-areas" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/room_organisation.png" src="../../_images/room_organisation.png" />
+<p>You just have to drag and drop rooms to the place (the house or the area) you want to.</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="device.html"><em>Devices management</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Rooms management</a><ul>
+<li><a class="reference internal" href="#go-to-the-room-organization-page">Go to the room organization page</a></li>
+<li><a class="reference internal" href="#screen-description">Screen description</a><ul>
+<li><a class="reference internal" href="#rooms-list">Rooms list</a></li>
+<li><a class="reference internal" href="#rooms-organization">Rooms organization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#add-a-room">Add a room</a></li>
+<li><a class="reference internal" href="#change-title-and-desription">Change title and desription</a></li>
+<li><a class="reference internal" href="#change-the-icon-of-a-room">Change the icon of a room</a></li>
+<li><a class="reference internal" href="#delete-a-room">Delete a room</a></li>
+<li><a class="reference internal" href="#attach-rooms-to-areas">Attach rooms to areas</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="area.html">Areas management</a></li>
+    
+    
+      <li>Next: <a href="device.html">Devices management</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Rooms management</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/administration/room.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="area.html" title="Areas management">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="device.html" title="Devices management">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

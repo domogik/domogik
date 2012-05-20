@@ -1,0 +1,271 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configure external access to Domogik &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="First use of Domogik" href="../configuration/index.html" />
+    <link rel="prev" title="Standard installation" href="index.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Standard installation">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../configuration/index.html" title="First use of Domogik">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-installation-external">
+            
+  <div class="section" id="configure-external-access-to-domogik">
+<h1>Configure external access to Domogik<a class="headerlink" href="#configure-external-access-to-domogik" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Security features in Domogik will be managed in a futur release.
+So external access to Domogik is not a good idea for security issues.
+You should do this only for test or demonstration purposes.</p>
+</div>
+<div class="section" id="first-method-apache-configuration-for-web-access-using-wsgi-optional">
+<h2>First method : Apache configuration for web access using wsgi (optional)<a class="headerlink" href="#first-method-apache-configuration-for-web-access-using-wsgi-optional" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Following instructions are Debian/Ubuntu ones. Feel free to complete for your distribution.</p>
+</div>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Add schema to understand</p>
+</div>
+<p>Deploying Django with Apache and <a class="reference external" href="http://code.google.com/p/modwsgi">mod_wsgi</a> is the recommended way to get Django working in production mode.
+<em>mod_wsgi</em> is an Apache module which can be used to host any Python application which supports the Python WSGI interface, including Django.</p>
+<p>See here for an <a class="reference external" href="http://docs.djangoproject.com/en/dev/howto/deployment/modwsgi">exhaustive description about mod_wsgi</a>.</p>
+<div class="section" id="configure-mod-wsgi">
+<h3>Configure mod_wsgi<a class="headerlink" href="#configure-mod-wsgi" title="Permalink to this headline">¶</a></h3>
+<div class="code bash highlight-python"><pre>$ apt-get install libapache2-mod-wsgi</pre>
+</div>
+<p>Then check your <em>/usr/lib/apache2/modules</em> directory and make sure the file <em>mod_wsgi.so</em> is pointing to <em>mod_wsgi.so-2.6</em>. If it&#8217;s not the case just do:</p>
+<div class="highlight-python"><pre>$ ln -sf /usr/lib/apache2/modules/mod_wsgi.so-2.6 /usr/lib/apache2/modules/mod_wsgi.so</pre>
+</div>
+</div>
+<div class="section" id="create-your-wsgi-file">
+<h3>Create your wsgi file<a class="headerlink" href="#create-your-wsgi-file" title="Permalink to this headline">¶</a></h3>
+<p>At the top of the django directory (ie where <em>settings.py</em> lives) create a subdirectory named <em>apache</em>.
+Create in this directory a file named <em>django.wsgi</em> with this content (eventually adapt the python path to your needs):</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python2.6</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="s">&#39;/usr/local/lib/python2.6/dist-packages&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;DJANGO_SETTINGS_MODULE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;domogik.ui.djangodomo.settings&#39;</span>
+
+<span class="kn">import</span> <span class="nn">django.core.handlers.wsgi</span>
+<span class="n">application</span> <span class="o">=</span> <span class="n">django</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">wsgi</span><span class="o">.</span><span class="n">WSGIHandler</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="add-an-entry-to-your-apache-configuration-file">
+<h3>Add an entry to your Apache configuration file<a class="headerlink" href="#add-an-entry-to-your-apache-configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>First enable the rewrite module:</p>
+<div class="highlight-python"><pre>a2enmod rewrite</pre>
+</div>
+<p>Add for example a virtual host like this:</p>
+<div class="highlight-python"><pre>&lt;VirtualHost *:80&gt;
+    ServerName domogik.myserver.org
+    RewriteEngine on
+    RewriteRule ^/$ http://domogik.myserver.org/domogik/ [R=301,L]
+
+    WSGIDaemonProcess domogik user=domogik group=domogik processes=5 threads=1
+    WSGIProcessGroup domogik
+    WSGIScriptAlias / /home/domogik/dmg/src/domogik/ui/djangodomo/apache/django.wsgi
+
+    &lt;Directory /home/domogik/dmg/src/domogik/ui/djangodomo/apache&gt;
+        Order deny,allow
+        Allow from all
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;</pre>
+</div>
+<p>Please note a few things :</p>
+<ul class="simple">
+<li>For <em>WSGIDaemonProcess</em>, <em>user</em> and <em>group</em> should be the ones you are using to run your domogik installation (see <em>/etc/default/domogik</em>).</li>
+<li>Adapt path for both <em>WSGIScriptAlias</em> and <em>Directory</em> directive to your needs.</li>
+</ul>
+<p>Finally, restart Apache:</p>
+<div class="highlight-python"><pre>$ /etc/init.d/apache2 restart</pre>
+</div>
+</div>
+</div>
+<div class="section" id="second-method-port-binding">
+<h2>Second method : port binding<a class="headerlink" href="#second-method-port-binding" title="Permalink to this headline">¶</a></h2>
+<p>Before doing this, don&#8217;t forget that django is not made to be directly accessible over the internet :</p>
+<blockquote class="epigraph">
+<div><p>Now&#8217;s a good time to note: DON&#8217;T use this server in anything resembling a production environment.
+It&#8217;s intended only for use while developing.</p>
+<p class="attribution">&mdash;source : <a class="reference external" href="http://docs.djangoproject.com/en/1.2/intro/tutorial01/#intro-tutorial01">http://docs.djangoproject.com/en/1.2/intro/tutorial01/#intro-tutorial01</a></p>
+</div></blockquote>
+<ul class="simple">
+<li>bind Django port on your box.</li>
+<li>bind REST port on your box.</li>
+<li>configure ~/.domogik.cfg file to use your public internet IP.</li>
+</ul>
+<p>Notice that doing this will make all your local Domogik use go through the internet.</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="index.html"><em>Standard Installation</em></a></li>
+<li><a class="reference internal" href="../configuration/index.html"><em>First Use</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configure external access to Domogik</a><ul>
+<li><a class="reference internal" href="#first-method-apache-configuration-for-web-access-using-wsgi-optional">First method : Apache configuration for web access using wsgi (optional)</a><ul>
+<li><a class="reference internal" href="#configure-mod-wsgi">Configure mod_wsgi</a></li>
+<li><a class="reference internal" href="#create-your-wsgi-file">Create your wsgi file</a></li>
+<li><a class="reference internal" href="#add-an-entry-to-your-apache-configuration-file">Add an entry to your Apache configuration file</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#second-method-port-binding">Second method : port binding</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Standard installation</a></li>
+    
+    
+      <li>Next: <a href="../configuration/index.html">First use of Domogik</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Configure external access to Domogik</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/installation/external.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Standard installation">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../configuration/index.html" title="First use of Domogik">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

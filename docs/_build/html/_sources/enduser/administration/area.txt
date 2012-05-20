@@ -1,0 +1,70 @@
+================
+Areas management
+================
+
+Go to the area organization page
+================================
+
+In the administration menu, click on **Area** from the **Organization** menu.
+
+.. image:: area_list.png
+
+On the left top of the page, there is the **Add** button:
+
+.. image:: button_add.png
+
+On its right you can see all existing areas. By clicking on an area on this list you will see it below and will be allowed to edit it.
+
+On the left there are **Delete** area and **Modify** area buttons :
+
+.. image:: button_delete.png
+.. image:: button_update.png
+
+In the main zone you can see the Area title, description and icon.
+
+Add an area
+===========
+Click on the **Add** button to create a new area. The following window will open :
+
+.. image:: area_creation.png
+
+Give a name, optionally a description and then validate. The area is created and you will see it in the list.
+
+Change title and description
+============================
+Click on the **Modify** button to change the selected area. The following window will open :
+
+.. image:: area_update.png
+
+Change the name, optionally the description and then validate. The area is updated.
+
+Change the icon of an area
+==========================
+.. image:: icon_01.png
+
+Go with the cursor to the current icon. A button appears on the icon : 
+
+.. image:: icon_02.png
+
+Click on it. Four buttons appears :
+
+.. image:: icon_03.png
+
+* the top left button will validate the choosen icon
+* the top right button will cancel the current action
+* the bottom left and bottom right buttons will allow you to browse among available icons.
+
+Delete an area
+==============
+
+Click on **Delete** button to delete the selected area. The following window will open :
+
+.. image:: area_delete.png
+
+Confirm suppression. The area doesn't appear any more in the list.
+
+All rooms related to this area are now related to the **House** (see :doc:`Rooms management </enduser/administration/room>`). 
+
+What next?
+==========
+* :doc:`Rooms management </enduser/administration/room>`

@@ -1,0 +1,6 @@
+=======================
+Common usage of widgets
+=======================
+
+.. todo::
+    Add documentation here.

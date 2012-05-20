@@ -1,0 +1,686 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sensors &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="prev" title="Actuators" href="actuator.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="actuator.html" title="Actuators">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a></div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-sensor">
+            
+  <div class="section" id="sensors">
+<h1>Sensors<a class="headerlink" href="#sensors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="type-of-returned-values">
+<h2>Type of returned values<a class="headerlink" href="#type-of-returned-values" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">boolean</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : &#8216;true&#8217; or &#8216;false&#8217;</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">number</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : integer or float</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">string</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : char string</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">complex</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : json structure</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wire-temperature">
+<h3>1Wire.Temperature<a class="headerlink" href="#wire-temperature" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="first docutils">
+<dt>DS18B20</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="27%" />
+<col width="15%" />
+<col width="32%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">name</p>
+</th>
+<th class="head"><p class="first last">value</p>
+</th>
+<th class="head"><p class="first last">parameter</p>
+</th>
+<th class="head"><p class="first last">stat key</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">Temperature</p>
+</td>
+<td><p class="first last">number</p>
+</td>
+<td><p class="first last">{&#8220;unit&#8221;:&#8221;°C&#8221;}</p>
+</td>
+<td><p class="first last">temperature</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="wire-id">
+<h3>1Wire.ID<a class="headerlink" href="#wire-id" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="first docutils">
+<dt>DS2401</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">name</p>
+</th>
+<th class="head"><p class="first last">value</p>
+</th>
+<th class="head"><p class="first last">parameter</p>
+</th>
+<th class="head"><p class="first last">stat key</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">Present</p>
+</td>
+<td><p class="first last">boolean</p>
+</td>
+<td>&nbsp;</td>
+<td><p class="first last">present</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="service-teleinfo">
+<h3>Service.Teleinfo<a class="headerlink" href="#service-teleinfo" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="first docutils">
+<dt>Dauguet</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="59%" />
+<col width="9%" />
+<col width="19%" />
+<col width="14%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">name</p>
+</th>
+<th class="head"><p class="first last">value</p>
+</th>
+<th class="head"><p class="first last">parameter</p>
+</th>
+<th class="head"><p class="first last">stat key</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">Instantaneous intensity (Intensité instantanée)</p>
+</td>
+<td><p class="first last">number</p>
+</td>
+<td><p class="first last">{&#8220;unit&#8221;:&#8221;A&#8221;}</p>
+</td>
+<td><p class="first last">iinst</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">Off Peak (Heures creuses)</p>
+</td>
+<td><p class="first last">number</p>
+</td>
+<td><p class="first last">{&#8220;unit&#8221;:&#8221;Wh&#8221;}</p>
+</td>
+<td><p class="first last">hchc</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last">Maximum intensity (Intensité maximale)</p>
+</td>
+<td><p class="first last">number</p>
+</td>
+<td><p class="first last">{&#8220;unit&#8221;:&#8221;A&#8221;}</p>
+</td>
+<td><p class="first last">imax</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">Tariff Period (Période tarifaire)</p>
+</td>
+<td><p class="first last">string</p>
+</td>
+<td>&nbsp;</td>
+<td><p class="first last">ptec</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last">Power (Puissance apparente)</p>
+</td>
+<td><p class="first last">number</p>
+</td>
+<td><p class="first last">{&#8220;unit&#8221;:&#8221;Va&#8221;}</p>
+</td>
+<td><p class="first last">papp</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">Group schedule (Groupe horaire)</p>
+</td>
+<td><p class="first last">string</p>
+</td>
+<td>&nbsp;</td>
+<td><p class="first last">hhphc</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last">On Peak (Heures pleines)</p>
+</td>
+<td><p class="first last">number</p>
+</td>
+<td><p class="first last">{&#8220;unit&#8221;:&#8221;Wh&#8221;}</p>
+</td>
+<td><p class="first last">hchp</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="communication-caller-id">
+<h3>Communication.caller_id<a class="headerlink" href="#communication-caller-id" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="25%" />
+<col width="25%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameter</th>
+<th class="head">stat key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Caller</td>
+<td>id|string</td>
+<td>&nbsp;</td>
+<td>phone</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="computer-control">
+<h3>Computer.Control<a class="headerlink" href="#computer-control" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameter</th>
+<th class="head">stat key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Ping</td>
+<td>boolean</td>
+<td>&nbsp;</td>
+<td>ping</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="relayboard-digital-input">
+<h3>Relayboard.Digital_Input<a class="headerlink" href="#relayboard-digital-input" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameter</th>
+<th class="head">stat key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Digital</td>
+<td>Input</td>
+<td>boolean</td>
+<td>input</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="relayboard-analog-input">
+<h3>Relayboard.Analog_Input<a class="headerlink" href="#relayboard-analog-input" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameter</th>
+<th class="head">stat key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Analog</td>
+<td>Input</td>
+<td>number</td>
+<td>voltage</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="relayboard-counter">
+<h3>Relayboard.Counter<a class="headerlink" href="#relayboard-counter" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameter</th>
+<th class="head">stat key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Counter</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>count</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="rfid-mirror-base">
+<h3>rfid.Mirror_Base<a class="headerlink" href="#rfid-mirror-base" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="first docutils">
+<dt>Mir:ror</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="25%" />
+<col width="19%" />
+<col width="25%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">name</p>
+</th>
+<th class="head"><p class="first last">value</p>
+</th>
+<th class="head"><p class="first last">parameter</p>
+</th>
+<th class="head"><p class="first last">stat key</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">Activated</p>
+</td>
+<td><p class="first last">boolean</p>
+</td>
+<td>&nbsp;</td>
+<td><p class="first last">activated</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="rfid-mirror-tag">
+<h3>rfid.Mirror_Tag<a class="headerlink" href="#rfid-mirror-tag" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="first docutils">
+<dt>Mir:ror Tag</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">name</p>
+</th>
+<th class="head"><p class="first last">value</p>
+</th>
+<th class="head"><p class="first last">parameter</p>
+</th>
+<th class="head"><p class="first last">stat key</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">Present</p>
+</td>
+<td><p class="first last">boolean</p>
+</td>
+<td>&nbsp;</td>
+<td><p class="first last">present</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="online-services-weather">
+<h3>Online_Services.Weather<a class="headerlink" href="#online-services-weather" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Units are to be defined</p>
+</div>
+<div class="section" id="current-data">
+<h4>Current data<a class="headerlink" href="#current-data" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="32%" />
+<col width="16%" />
+<col width="20%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameter</th>
+<th class="head">stat key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Temperature</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>temperature</td>
+</tr>
+<tr class="row-odd"><td>Pressure</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>pressure</td>
+</tr>
+<tr class="row-even"><td>Humidity</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>humidity</td>
+</tr>
+<tr class="row-odd"><td>Visibility</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>visibility</td>
+</tr>
+<tr class="row-even"><td>Rising</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>rising</td>
+</tr>
+<tr class="row-odd"><td>Chill</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>chill</td>
+</tr>
+<tr class="row-even"><td>Direction</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>direction</td>
+</tr>
+<tr class="row-odd"><td>Speed</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>speed</td>
+</tr>
+<tr class="row-even"><td>UV index</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>uv</td>
+</tr>
+<tr class="row-odd"><td>Rain fall</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>rainfall</td>
+</tr>
+<tr class="row-even"><td>Drew point</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>drewpoint</td>
+</tr>
+<tr class="row-odd"><td>Condition code</td>
+<td>number</td>
+<td>&nbsp;</td>
+<td>condition-code</td>
+</tr>
+<tr class="row-even"><td>Condition text</td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>condition-text</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="previsionnal-data">
+<h4>Previsionnal data<a class="headerlink" href="#previsionnal-data" title="Permalink to this headline">¶</a></h4>
+<p><em>Data linked to ticket #586 are missing for the moment</em></p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Sensors</a><ul>
+<li><a class="reference internal" href="#type-of-returned-values">Type of returned values</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#wire-temperature">1Wire.Temperature</a></li>
+<li><a class="reference internal" href="#wire-id">1Wire.ID</a></li>
+<li><a class="reference internal" href="#service-teleinfo">Service.Teleinfo</a></li>
+<li><a class="reference internal" href="#communication-caller-id">Communication.caller_id</a></li>
+<li><a class="reference internal" href="#computer-control">Computer.Control</a></li>
+<li><a class="reference internal" href="#relayboard-digital-input">Relayboard.Digital_Input</a></li>
+<li><a class="reference internal" href="#relayboard-analog-input">Relayboard.Analog_Input</a></li>
+<li><a class="reference internal" href="#relayboard-counter">Relayboard.Counter</a></li>
+<li><a class="reference internal" href="#rfid-mirror-base">rfid.Mirror_Base</a></li>
+<li><a class="reference internal" href="#rfid-mirror-tag">rfid.Mirror_Tag</a></li>
+<li><a class="reference internal" href="#online-services-weather">Online_Services.Weather</a><ul>
+<li><a class="reference internal" href="#current-data">Current data</a></li>
+<li><a class="reference internal" href="#previsionnal-data">Previsionnal data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="actuator.html">Actuators</a></li>
+    
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Sensors</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/technical/sensor.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="actuator.html" title="Actuators">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a></div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,224 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Areas management &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Rooms management" href="room.html" />
+    <link rel="prev" title="House management" href="house.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="house.html" title="House management">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="room.html" title="Rooms management">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-administration-area">
+            
+  <div class="section" id="areas-management">
+<h1>Areas management<a class="headerlink" href="#areas-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="go-to-the-area-organization-page">
+<h2>Go to the area organization page<a class="headerlink" href="#go-to-the-area-organization-page" title="Permalink to this headline">¶</a></h2>
+<p>In the administration menu, click on <strong>Area</strong> from the <strong>Organization</strong> menu.</p>
+<img alt="../../_images/area_list.png" src="../../_images/area_list.png" />
+<p>On the left top of the page, there is the <strong>Add</strong> button:</p>
+<img alt="../../_images/button_add.png" src="../../_images/button_add.png" />
+<p>On its right you can see all existing areas. By clicking on an area on this list you will see it below and will be allowed to edit it.</p>
+<p>On the left there are <strong>Delete</strong> area and <strong>Modify</strong> area buttons :</p>
+<img alt="../../_images/button_delete.png" src="../../_images/button_delete.png" />
+<img alt="../../_images/button_update.png" src="../../_images/button_update.png" />
+<p>In the main zone you can see the Area title, description and icon.</p>
+</div>
+<div class="section" id="add-an-area">
+<h2>Add an area<a class="headerlink" href="#add-an-area" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Add</strong> button to create a new area. The following window will open :</p>
+<img alt="../../_images/area_creation.png" src="../../_images/area_creation.png" />
+<p>Give a name, optionally a description and then validate. The area is created and you will see it in the list.</p>
+</div>
+<div class="section" id="change-title-and-description">
+<h2>Change title and description<a class="headerlink" href="#change-title-and-description" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Modify</strong> button to change the selected area. The following window will open :</p>
+<img alt="../../_images/area_update.png" src="../../_images/area_update.png" />
+<p>Change the name, optionally the description and then validate. The area is updated.</p>
+</div>
+<div class="section" id="change-the-icon-of-an-area">
+<h2>Change the icon of an area<a class="headerlink" href="#change-the-icon-of-an-area" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/icon_01.png" src="../../_images/icon_01.png" />
+<p>Go with the cursor to the current icon. A button appears on the icon :</p>
+<img alt="../../_images/icon_02.png" src="../../_images/icon_02.png" />
+<p>Click on it. Four buttons appears :</p>
+<img alt="../../_images/icon_03.png" src="../../_images/icon_03.png" />
+<ul class="simple">
+<li>the top left button will validate the choosen icon</li>
+<li>the top right button will cancel the current action</li>
+<li>the bottom left and bottom right buttons will allow you to browse among available icons.</li>
+</ul>
+</div>
+<div class="section" id="delete-an-area">
+<h2>Delete an area<a class="headerlink" href="#delete-an-area" title="Permalink to this headline">¶</a></h2>
+<p>Click on <strong>Delete</strong> button to delete the selected area. The following window will open :</p>
+<img alt="../../_images/area_delete.png" src="../../_images/area_delete.png" />
+<p>Confirm suppression. The area doesn&#8217;t appear any more in the list.</p>
+<p>All rooms related to this area are now related to the <strong>House</strong> (see <a class="reference internal" href="room.html"><em>Rooms management</em></a>).</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="room.html"><em>Rooms management</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Areas management</a><ul>
+<li><a class="reference internal" href="#go-to-the-area-organization-page">Go to the area organization page</a></li>
+<li><a class="reference internal" href="#add-an-area">Add an area</a></li>
+<li><a class="reference internal" href="#change-title-and-description">Change title and description</a></li>
+<li><a class="reference internal" href="#change-the-icon-of-an-area">Change the icon of an area</a></li>
+<li><a class="reference internal" href="#delete-an-area">Delete an area</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="house.html">House management</a></li>
+    
+    
+      <li>Next: <a href="room.html">Rooms management</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Areas management</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/administration/area.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="house.html" title="House management">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="room.html" title="Rooms management">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

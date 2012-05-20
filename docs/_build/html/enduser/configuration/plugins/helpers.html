@@ -1,0 +1,282 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugin helpers &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../../index.html" />
+    <link rel="next" title="Set up your devices" href="../devices.html" />
+    <link rel="prev" title="Installation and configuration of plugins" href="install.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="install.html" title="Installation and configuration of plugins">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../../index.html" accesskey="U">up</a>
+   |
+    <a href="../devices.html" title="Set up your devices">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-configuration-plugins-helpers">
+            
+  <div class="section" id="plugin-helpers">
+<h1>Plugin helpers<a class="headerlink" href="#plugin-helpers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>In Domogik a helper is a little tool linked to a plugin that helps users to get information about hardware linked to a plugin.
+For example helpers can help you to find your &#8216;&#8217;IPX800 relayboard&#8217;&#8217; on the network, display its status (which relay is on, etc), list all 1wire components...
+But helpers are right now restricted : you can&#8217;t use at the same time a plugin and its helper.
+Keep in mind that actual helpers format will totally change in following releases.</p>
+</div>
+<div class="section" id="using-helpers">
+<h2>Using helpers<a class="headerlink" href="#using-helpers" title="Permalink to this headline">¶</a></h2>
+<p>Helpers page is a command line tool which is used from web UI. So right now all helpers are a command with optional parameters.</p>
+<p>To access this command line tool, go to <strong>Administration &gt; Tools &gt; Helpers</strong>. You should see the command line interface:</p>
+<img alt="../../../_images/helper.png" src="../../../_images/helper.png" />
+<div class="section" id="screen-description">
+<h3>Screen description<a class="headerlink" href="#screen-description" title="Permalink to this headline">¶</a></h3>
+<p>On the top, there is the <strong>command line entry</strong>. On the right of this entry, you will find 2 buttons :</p>
+<ul class="simple">
+<li><strong>Send</strong> which will send the helper command (you can also directly hit <strong>enter</strong>).</li>
+<li><strong>Clear</strong> which will clean the output zone.</li>
+</ul>
+<p>On the bottom, there is the <strong>output zone</strong> in which will display the output of the helper.</p>
+</div>
+<div class="section" id="which-helpers-are-available">
+<h3>Which helpers are available?<a class="headerlink" href="#which-helpers-are-available" title="Permalink to this headline">¶</a></h3>
+<p>See the corresponding plugin page to get available helpers (if no helper is mentionned, it is because there is no helper for this plugin).</p>
+<p>You can also use the <strong>help</strong> command:</p>
+<div class="highlight-python"><pre>$ help
+List of available helpers :
+- cidmodem
+- ipx800
+- mirror
+- onewire
+- plcbus
+- teleinfo
+Type 'foo help' to get help on foo helper</pre>
+</div>
+<p>This command list all available helpers.</p>
+<p>In addition to know which commands are available for one of these plugins, you can again use <strong>help</strong> like this:</p>
+<div class="highlight-python"><pre>$ onewire help
+ds18s20 : Show detail for all DS18S20 devices
+  Usage : ds18s20 &lt;adaptator device&gt;
+all : Show all devices found on onewire network
+ Usage : all &lt;adaptator device&gt;
+detail : Show detail for a device.
+  Usage : detail &lt;adaptator device&gt; &lt;device id&gt;
+ds2401 : Show detail for all DS2401 devices
+  Usage : ds2401 &lt;adaptator device&gt;
+ds18b20 : Show detail for all DS18B20 devices
+  Usage : ds18b20 &lt;adaptator device&gt;</pre>
+</div>
+</div>
+<div class="section" id="use-a-helper">
+<h3>Use a helper<a class="headerlink" href="#use-a-helper" title="Permalink to this headline">¶</a></h3>
+<p>Example:</p>
+<ul class="simple">
+<li>helper : ipx800</li>
+<li>command : find</li>
+</ul>
+<p>First, shut down the associated plugin : <strong>Administration &gt; Plugins &gt; ipx800</strong>. Click on <strong>Stop plugin</strong> button. Wait for plugin shutdown.</p>
+<p>Next, launch the helper:</p>
+<div class="highlight-python"><pre>$ ipx800 find
+List of all IPX800 boards found :
+192.168.0.150 : IPX800</pre>
+</div>
+<p>Then, restart the associated plugin : <strong>Administration &gt; Plugins &gt; ipx800</strong>. Click on <strong>Start plugin</strong> button.</p>
+</div>
+<div class="section" id="helpers-errors">
+<h3>Helpers errors<a class="headerlink" href="#helpers-errors" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="plugin-not-shut-down">
+<h4>Plugin not shut down<a class="headerlink" href="#plugin-not-shut-down" title="Permalink to this headline">¶</a></h4>
+<p>Example:</p>
+<div class="highlight-python"><pre>$ ipx800 find</pre>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Plugin &#8216;ipx800&#8217; is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use the helper.
+In next releases, helpers will be implemented in a different way, so that they can be used while associated plugin is running</p>
+</div>
+</div>
+<div class="section" id="missing-parameter-s">
+<h4>Missing parameter(s)<a class="headerlink" href="#missing-parameter-s" title="Permalink to this headline">¶</a></h4>
+<div class="code bash highlight-python"><pre>$ onewire all
+Missing parameters.
+Usage : all &lt;adaptator device&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="helpers-in-future">
+<h2>Helpers in future<a class="headerlink" href="#helpers-in-future" title="Permalink to this headline">¶</a></h2>
+<p>Following things should change in next releases :
+* Helpers will really be included in plugins (no need anymore to shut down the plugin in order to use associated helper).
+* We want to implement auto discovery for most plugins and integrate this feature in the web UI.</p>
+<p>There are also other ideas :) ...</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../devices.html"><em>Set up your devices</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin helpers</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#using-helpers">Using helpers</a><ul>
+<li><a class="reference internal" href="#screen-description">Screen description</a></li>
+<li><a class="reference internal" href="#which-helpers-are-available">Which helpers are available?</a></li>
+<li><a class="reference internal" href="#use-a-helper">Use a helper</a></li>
+<li><a class="reference internal" href="#helpers-errors">Helpers errors</a><ul>
+<li><a class="reference internal" href="#plugin-not-shut-down">Plugin not shut down</a></li>
+<li><a class="reference internal" href="#missing-parameter-s">Missing parameter(s)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers-in-future">Helpers in future</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="install.html">Installation and configuration of plugins</a></li>
+    
+    
+      <li>Next: <a href="../devices.html">Set up your devices</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Plugin helpers</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/enduser/configuration/plugins/helpers.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="install.html" title="Installation and configuration of plugins">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../../index.html" accesskey="U">up</a>
+   |
+    <a href="../devices.html" title="Set up your devices">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

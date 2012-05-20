@@ -1,0 +1,237 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Devices management &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Plugins management" href="plugin.html" />
+    <link rel="prev" title="Rooms management" href="room.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="room.html" title="Rooms management">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="plugin.html" title="Plugins management">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="enduser-administration-device">
+            
+  <div class="section" id="devices-management">
+<h1>Devices management<a class="headerlink" href="#devices-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="go-to-the-device-organization-page">
+<h2>Go to the device organization page<a class="headerlink" href="#go-to-the-device-organization-page" title="Permalink to this headline">¶</a></h2>
+<p>In the administration menu, click on <strong>Device</strong> from the <strong>Organization</strong> menu.</p>
+</div>
+<div class="section" id="screen-description">
+<h2>Screen description<a class="headerlink" href="#screen-description" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/device_list.png" src="../../_images/device_list.png" />
+<p>On the left top of the page, there is the <strong>Add</strong> device button:</p>
+<img alt="../../_images/button_add.png" src="../../_images/button_add.png" />
+<p>On its right you can see all usages for which a device has already been created. By clicking on one usage, you will make appear a list of associated devices.</p>
+<p>For each device in the list, there are on the right the <strong>Delete</strong> and <strong>Modify</strong> buttons :</p>
+<img alt="../../_images/button_delete.png" src="../../_images/button_delete.png" />
+<img alt="../../_images/button_update.png" src="../../_images/button_update.png" />
+<p>You will also see all other information about the device.</p>
+</div>
+<div class="section" id="add-a-device">
+<h2>Add a device<a class="headerlink" href="#add-a-device" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Add</strong> button to create a new device. The following window will open:</p>
+<img alt="../../_images/device_add.png" src="../../_images/device_add.png" />
+<ul>
+<li><p class="first">Name : name of the device. It will be displayed in visualization mode and used when you will set your device features.</p>
+</li>
+<li><p class="first">Address : address of device. Examples:</p>
+<blockquote>
+<div><ul class="simple">
+<li>x10 : A1, A2, B1, B2....</li>
+<li>1wire : C57B2E020000</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Feature : for your device technology, select the appropriate feature.</p>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You won&#8217;t be able to modify this after the device creation (if you make a mistake, you will have to delete the device to recreate it).</p>
+</div>
+<ul class="simple">
+<li>Usage : what does your device act on? Light, appliance, temperature, etc.</li>
+<li>Description : a short description about the device. It will appear on some widgets.</li>
+<li>Reference : if you wish, you can indicate your device reference (just for information, not really used by Domogik). For an x10 module it could be <em>LM12</em> for example.</li>
+</ul>
+<p>Click on <strong>Add</strong> to validate. The device is now created..</p>
+</div>
+<div class="section" id="modify-a-device">
+<h2>Modify a device<a class="headerlink" href="#modify-a-device" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Modify</strong> button to change a device. The following window will open:</p>
+<img alt="../../_images/device_update.png" src="../../_images/device_update.png" />
+<p>Update what you need and validate.</p>
+</div>
+<div class="section" id="delete-a-device">
+<h2>Delete a device<a class="headerlink" href="#delete-a-device" title="Permalink to this headline">¶</a></h2>
+<p>Click on the <strong>Delete</strong> button to delete a device. The following window will open:</p>
+<img alt="../../_images/device_delete.png" src="../../_images/device_delete.png" />
+<p>Confirm suppression. The device doesn&#8217;t appear anymore in the list.</p>
+<p>All the device features that were set disappear.</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="plugin.html"><em>Plugins management</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Devices management</a><ul>
+<li><a class="reference internal" href="#go-to-the-device-organization-page">Go to the device organization page</a></li>
+<li><a class="reference internal" href="#screen-description">Screen description</a></li>
+<li><a class="reference internal" href="#add-a-device">Add a device</a></li>
+<li><a class="reference internal" href="#modify-a-device">Modify a device</a></li>
+<li><a class="reference internal" href="#delete-a-device">Delete a device</a></li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="room.html">Rooms management</a></li>
+    
+    
+      <li>Next: <a href="plugin.html">Plugins management</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Devices management</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/enduser/administration/device.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="room.html" title="Rooms management">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="plugin.html" title="Plugins management">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

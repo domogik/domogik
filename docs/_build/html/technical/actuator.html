@@ -1,0 +1,432 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Actuators &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Sensors" href="sensor.html" />
+    <link rel="prev" title="Release 0.1.0" href="../releases/0.1.0.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../releases/0.1.0.html" title="Release 0.1.0">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="sensor.html" title="Sensors">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-actuator">
+            
+  <div class="section" id="actuators">
+<h1>Actuators<a class="headerlink" href="#actuators" title="Permalink to this headline">¶</a></h1>
+<p>An actuator is an item to which a command can be sent (this is the opposite of a <a class="reference internal" href="sensor.html"><em>Sensors</em></a>).
+Note that some items can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).</p>
+<div class="section" id="command-values">
+<h2>Command values<a class="headerlink" href="#command-values" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">binary</p>
+<blockquote>
+<div><ul class="simple">
+<li>parameters : ~np~{command, value0, value1}~/np~ (ex. ~np~{&#8220;command&#8221;:&#8221;&#8221;, &#8220;value0&#8221;:&#8221;off&#8221;, &#8220;value1&#8221;:&#8221;on&#8221;}~/np~)</li>
+<li>value : one of the 2 values</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">range</p>
+<blockquote>
+<div><ul class="simple">
+<li>parameters : ~np~{command, valueMin, valueMax}~/np~ (ex. ~np~{&#8220;command&#8221;: &#8220;dim&#8221;, &#8220;valueMin&#8221;:0, &#8220;valueMax&#8221;:100}~/np~)</li>
+<li>value : value between valueMin and valueMax</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">list</p>
+<blockquote>
+<div><ul class="simple">
+<li>parameters : ~np~{command , [value0, value1, ..., valueN] }~/np~ (ex. ~np~{ &#8220;command&#8221;:&#8221;update&#8221; , &#8220;commandValues&#8221;: [&#8220;off&#8221;, &#8220;eco&#8221;, &#8220;confort&#8221;] }~/np~)</li>
+<li>value : one of the configured states</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">trigger</p>
+<blockquote>
+<div><ul class="simple">
+<li>parameters : ~np~{command, value}~/np~ (ex. ~np~{&#8220;command&#8221;:&#8221;wol&#8221;,  &#8220;value&#8221;:&#8221;X&#8221;}~/np~)</li>
+<li>value : unique value</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">number</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : integer or float</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">string</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : char string</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">complex</p>
+<blockquote>
+<div><ul class="simple">
+<li>value : json structure</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="x10-switch">
+<h3>x10.Switch<a class="headerlink" href="#x10-switch" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>AM12 - Appliance Plug-in Module</li>
+<li>LM15 - Lamp holder Module</li>
+<li>AD10 - DIN Rail Switch</li>
+<li>AW12 - Appliance Micro-Module</li>
+<li>AM12 - Appliance Plug-in Module</li>
+<li>AD10 - DIN Rail Switch</li>
+<li>AW12 - Appliance Micro-Module</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="57%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameters</th>
+<th class="head">confirmation feedback</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Switch</td>
+<td>binary</td>
+<td>{&#8220;command&#8221;:&#8221;&#8221;, &#8220;value0&#8221;:&#8221;off&#8221;, &#8220;value1&#8221;:&#8221;on&#8221;}</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="x10-dimmer">
+<h3>x10.Dimmer<a class="headerlink" href="#x10-dimmer" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>LM12 - Lamp Dimming Plug-in Module</li>
+<li>LD11 - DIN Rail Dimmer</li>
+<li>LW12 - Lamp Dimming Micro-Module</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="8%" />
+<col width="58%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameters</th>
+<th class="head">confirmation feedback</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Dimmer</td>
+<td>range</td>
+<td>{&#8220;command&#8221;: &#8220;dim&#8221;, &#8220;valueMin&#8221;:0, &#8220;valueMax&#8221;:100}</td>
+<td>no</td>
+</tr>
+<tr class="row-odd"><td>Switch</td>
+<td>binary</td>
+<td>{&#8220;command&#8221;:&#8221;&#8221;, &#8220;value0&#8221;:&#8221;off&#8221;, &#8220;value1&#8221;:&#8221;on&#8221;}</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="plcbus-switch">
+<h3>PLCBus.Switch<a class="headerlink" href="#plcbus-switch" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>PLCBUS-2026 - Lamp Plug-in Module</li>
+<li>PLCBUS-2263 - One-Load Lamp Micro-Module</li>
+<li>PLCBUS-2264 - Two-Load Lamp Micro-Module</li>
+<li>PLCBUS-2027 - Appliance Plug-in Module</li>
+<li>PLCBUS-2267 - One-Load Appliance Micro-Module</li>
+<li>PLCBUS-2268 - Two-Load Appliance Micro-Module</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="57%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameters</th>
+<th class="head">confirmation feedback</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Switch</td>
+<td>binary</td>
+<td>{&#8220;command&#8221;:&#8221;&#8221;, &#8220;value0&#8221;:&#8221;off&#8221;, &#8220;value1&#8221;:&#8221;on&#8221;}</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="plcbus-dimmer">
+<h3>PLCBus.Dimmer<a class="headerlink" href="#plcbus-dimmer" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>PLCBUS-2263D - One-Load Lamp Dimming Micro-Module</li>
+<li>PLCBUS-2264D - Two-Load Lamp Dimming Micro-Module</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="8%" />
+<col width="58%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameters</th>
+<th class="head">confirmation feedback</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Dimmer</td>
+<td>range</td>
+<td>{&#8220;command&#8221;: &#8220;dim&#8221;, &#8220;valueMin&#8221;:0, &#8220;valueMax&#8221;:100}</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>Switch</td>
+<td>binary</td>
+<td>{&#8220;command&#8221;:&#8221;&#8221;, &#8220;value0&#8221;:&#8221;off&#8221;, &#8220;value1&#8221;:&#8221;on&#8221;}</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="computer-control">
+<h3>Computer.Control<a class="headerlink" href="#computer-control" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="57%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameters</th>
+<th class="head">confirmation feedback</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>WOL</td>
+<td>trigger</td>
+<td>{&#8220;command&#8221;:&#8221;wol&#8221;}</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="relayboard-relay">
+<h3>RelayBoard.Relay<a class="headerlink" href="#relayboard-relay" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="57%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">value</th>
+<th class="head">parameters</th>
+<th class="head">confirmation feedback</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Switch</td>
+<td>binary</td>
+<td>{&#8220;command&#8221;:&#8221;&#8221;, &#8220;value0&#8221;:&#8221;off&#8221;, &#8220;value1&#8221;:&#8221;on&#8221;}</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>Trigger</td>
+<td>trigger</td>
+<td>{&#8220;command&#8221;:&#8221;pulse&#8221;}</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Actuators</a><ul>
+<li><a class="reference internal" href="#command-values">Command values</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#x10-switch">x10.Switch</a></li>
+<li><a class="reference internal" href="#x10-dimmer">x10.Dimmer</a></li>
+<li><a class="reference internal" href="#plcbus-switch">PLCBus.Switch</a></li>
+<li><a class="reference internal" href="#plcbus-dimmer">PLCBus.Dimmer</a></li>
+<li><a class="reference internal" href="#computer-control">Computer.Control</a></li>
+<li><a class="reference internal" href="#relayboard-relay">RelayBoard.Relay</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../releases/0.1.0.html">Release 0.1.0</a></li>
+    
+    
+      <li>Next: <a href="sensor.html">Sensors</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Actuators</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/technical/actuator.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../releases/0.1.0.html" title="Release 0.1.0">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="sensor.html" title="Sensors">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

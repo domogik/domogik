@@ -1,0 +1,242 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick overview &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Detailed architecture" href="detailed.html" />
+    <link rel="prev" title="Domogik documentation" href="../index.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../index.html" title="Domogik documentation">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="detailed.html" title="Detailed architecture">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="overview-index">
+            
+  <div class="section" id="quick-overview">
+<h1>Quick overview<a class="headerlink" href="#quick-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-domogik-in-several-words">
+<h2>What is Domogik in several words ?<a class="headerlink" href="#what-is-domogik-in-several-words" title="Permalink to this headline">¶</a></h2>
+<p>Domogik is a free home automation solution. It allows to use several User Interfaces (you can even create your own interface if you are willing to).
+It is modular : you can add and remove plugins easily and create your own plugins. A plugin is based on a technology (or part of a technology).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In <a class="reference internal" href="../releases/0.1.0.html"><em>Release 0.1.0</em></a>, the plugin format is not fixed. So we provide existing plugins already installed (x10, PLCBus, 1-wire...).
+Domogik will really be fully modular in following releases.</p>
+</div>
+</div>
+<div class="section" id="how-does-it-work">
+<h2>How does it work ?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
+<img alt="../_images/domogik_overview_schema.png" src="../_images/domogik_overview_schema.png" />
+<div class="section" id="rinor">
+<h3>RINOR<a class="headerlink" href="#rinor" title="Permalink to this headline">¶</a></h3>
+<p>RINOR is a kind of gateway server between User Interfaces, database and xPL world. It allows to :</p>
+<ul class="simple">
+<li>read and write data from / to the database</li>
+<li>listen to xPL network and send xPL commands</li>
+<li>record statistics</li>
+<li>start, stop and configure plugins</li>
+<li>provide the REST API server for UIs</li>
+</ul>
+</div>
+<div class="section" id="user-interface">
+<h3>User Interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h3>
+<p>As an end user, you will only use one of the available User Interfaces (at the moment there are a Web UI and an Android app).
+All UIs will need to access the REST API server to communicate with the Domogik core. REST is the &#8216;&#8217;ONLY&#8217;&#8217; entry point for all UI interactions (for database access, xPL communication or everything else an UI needs and REST allows).</p>
+</div>
+<div class="section" id="xpl">
+<h3>xPL<a class="headerlink" href="#xpl" title="Permalink to this headline">¶</a></h3>
+<blockquote class="epigraph">
+<div><p>xPL is an open protocol intended to allow the control and monitoring of home automation devices. The primary design goal of xPL is to provide a rich set of features and functionalities, whilst maintaining an elegant, uncomplicated message structure. The protocol includes complete discovery and auto-configuration capabilities which support a fully &#8216;plug and play&#8217; architecture essential to ensure a good end-user experience.
+xPL benefits from a strongly-specified message structure, required to ensure that xPL-enabled devices from different vendors are able to communicate without the risk of incompatibilities.</p>
+<p class="attribution">&mdash;From <a class="reference external" href="http://xplproject.org.uk/">xPL official website</a></p>
+</div></blockquote>
+</div>
+<div class="section" id="database">
+<h3>Database<a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h3>
+<p>The database is used in two ways :</p>
+<ul class="simple">
+<li>directly by RINOR (request of room list, devices...)</li>
+<li>when plugins ask for their configuration. The configuration is stored in the database but plugins do not have a direct access to it (this is required for modularity purposes). So the database can provide the configuration to plugins by communicating over the xPL network (in fact RINOR asks the database to retrieve this information).</li>
+</ul>
+</div>
+<div class="section" id="plugins">
+<h3>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h3>
+<p>Plugins (X10, 1wire, Plcbus, etc) are standalone and can only communicate over the xPL network. This is the key of modularity.</p>
+</div>
+<div class="section" id="web-ui">
+<h3>Web UI<a class="headerlink" href="#web-ui" title="Permalink to this headline">¶</a></h3>
+<p>Domogik&#8217;s Web UI supports the latest HTML5 and CSS features. We decided to comply with this in order to give customers the best experience possible with a Web UI. But this choice implies that you won&#8217;t be able to use Domogik Web UI with older browsers.</p>
+<p>If your browser doesn&#8217;t support all HTML5 features used by Domogik, you will get this kind of notification :</p>
+<img alt="../_images/firefox_html5_warning.png" src="../_images/firefox_html5_warning.png" />
+<p>We recommend you to use browsers like Firefox, Chrome (Chromium) or any other that respects the latest web standards.</p>
+</div>
+</div>
+<div class="section" id="what-next">
+<h2>What next?<a class="headerlink" href="#what-next" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../enduser/requirements.html"><em>Domogik requirements</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick overview</a><ul>
+<li><a class="reference internal" href="#what-is-domogik-in-several-words">What is Domogik in several words ?</a></li>
+<li><a class="reference internal" href="#how-does-it-work">How does it work ?</a><ul>
+<li><a class="reference internal" href="#rinor">RINOR</a></li>
+<li><a class="reference internal" href="#user-interface">User Interface</a></li>
+<li><a class="reference internal" href="#xpl">xPL</a></li>
+<li><a class="reference internal" href="#database">Database</a></li>
+<li><a class="reference internal" href="#plugins">Plugins</a></li>
+<li><a class="reference internal" href="#web-ui">Web UI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-next">What next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../index.html">Domogik documentation</a></li>
+    
+    
+      <li>Next: <a href="detailed.html">Detailed architecture</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Quick overview</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/overview/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../index.html" title="Domogik documentation">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="detailed.html" title="Detailed architecture">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
