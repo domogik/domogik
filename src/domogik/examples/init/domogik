@@ -37,9 +37,9 @@ DIETIME=2
 STARTTIME=5
 #PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
 PIDDIR="/var/run/domogik"
-PIDFILE="$PIDDIR/manager.pid" 
+PIDFILE="$PIDDIR/manager.pid"
 LOCKDIR="/var/lock/domogik"
-    
+
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
 
@@ -239,7 +239,7 @@ function check_lock_dir {
 case "$1" in
     start)
         check_lock_dir
-		[ -f ${PIDFILE} ] && echo "Domogik seems to be running. Please stop it." && exit 0
+        [ -f ${PIDFILE} ] && echo "Domogik seems to be running or had been crashed. Please use stop to kill all remainings tasks." && exit 0
         if [ $# -eq 1 ];then
             start
             sleep ${STARTTIME}
@@ -296,7 +296,7 @@ case "$1" in
                 manager)
                     stop_plugins
                     stop_manager
-					kill_all
+                    kill_all
                     sleep ${DIETIME}
                     sleep ${DIETIME}
                     start_manager
