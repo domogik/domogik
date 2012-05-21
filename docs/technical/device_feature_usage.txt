@@ -1,0 +1,102 @@
+=================================
+Device types, features and usages 
+=================================
+
+Device types 
+============
+
+Actuators only 
+--------------
+* x10.Switch
+* x10.Dimmer
+* PLCBus.Switch
+* PLCBus.Dimmer
+
+Sensors only 
+------------
+* 1wire.ID
+* 1wire.Temperature
+* 1wire.Voltmeter
+* communication.caller_id
+* service.Teleinfo
+* rfid.Mirror_Base
+* rfid.Mirror_Tag
+
+With Actuators & Sensors 
+------------------------
+* Computer.Control
+* relayboard.Switch
+* relayboard.Voltmeter
+* relayboard.Logical_Input
+* relayboard.Counter
+
+Device features
+===============
+A device type can have one or many features. For example an x10 button (device type) can have only one feature (switch).
+But an x10 dimmer has two features : dimmer of course and switch (when the dimmer is set to 0 or 100).
+
+Device usages 
+=============
+
+Common
+------
+#. Light
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Socket
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Shutter
+
+    * default_options: { "actuator": { "binary": {"state0":"Down", "state1":"Up"}, "range": {"step":10, "unit":"%"}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Air conditioning
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":1, "unit":"&deg;C"}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Ventilation
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Heating
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {"step":1, "unit":"&deg;C"}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Appliance
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Desktop Computer
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Server
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Phone
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. TV
+
+    * default_options: { "actuator": { "binary": {"state0":"Off", "state1":"On"}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Water
+
+    * default_options: { "actuator": { "binary": {}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Gas
+
+    * default_options: { "actuator": { "binary": {}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+#. Electricity
+
+    * default_options: { "actuator": { "binary": {}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
+
+Special
+-------
+* Squeezebox
+* Mir:ror

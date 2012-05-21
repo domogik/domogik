@@ -1,0 +1,292 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /events &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /stats" href="rest_stats.html" />
+    <link rel="prev" title="REST /command" href="rest_command.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="rest_command.html" title="REST /command">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_stats.html" title="REST /stats">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_events">
+            
+  <div class="section" id="rest-events">
+<h1>REST /events<a class="headerlink" href="#rest-events" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-an-event">
+<h2>What is an event ?<a class="headerlink" href="#what-is-an-event" title="Permalink to this headline">¶</a></h2>
+<p>An event occurs when a xPL message we are waiting for is received. Events feature in REST are used by User Interfaces to get instant events on xPL network.
+Example : you manually switch on a light on Plcbus network, the icon light on User Interface will immediatly change to state &#8220;on&#8221;.</p>
+</div>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p>First, you create a new event request for one or more device id. This request will give you :</p>
+<ul class="simple">
+<li>a ticket id (which you will have to use in following requests)</li>
+<li>data of event</li>
+</ul>
+<p>After this event creation you can make a request for this event as often as you want. On REST side, data are put in queue, so no data will be loose between 2 requests.</p>
+<p>When you don&#8217;t need anymore the request, please free him with the appropriate request.</p>
+<p>When there is no data in queue, REST will keep connection open until it can give you data or until timeout occurs (cf <strong>q-evt-timeout</strong> configuration key).</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>evt-timeout : timeout for an event&#8217;s ticket. If no operation is made on this ticket during this time, ticket is deleted.</li>
+<li>q-evt-size : Queue size for events : maximum number of events that could be stored</li>
+<li>q-evt-life-exp : life expectancy for events in queue</li>
+<li>q-evt-timeout : timeout for a /event new or get request.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Each event has his own queue</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Don&#8217;t change these values if you don&#8217;t know what you are doing.</p>
+</div>
+</div>
+<div class="section" id="domogik-events-events-domogik">
+<h2>Domogik Events: /events/domogik/<a class="headerlink" href="#domogik-events-events-domogik" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="create-a-new-event-request">
+<h4>Create a new event request<a class="headerlink" href="#create-a-new-event-request" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><pre>/events/domogik/new</pre>
+</div>
+<div class="section" id="plugin-list-updated-event">
+<h5>Plugin list updated event<a class="headerlink" href="#plugin-list-updated-event" title="Permalink to this headline">¶</a></h5>
+<p>You will get:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;event&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1285330784</span><span class="p">,</span>
+            <span class="s">&quot;data&quot;</span> <span class="p">:</span> <span class="s">&quot;plugin-list-updated&quot;</span><span class="p">,</span>
+            <span class="s">&quot;ticket_id&quot;</span> <span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="make-a-request-for-an-event">
+<h4>Make a request for an event<a class="headerlink" href="#make-a-request-for-an-event" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><pre>/events/domogik/get/&lt;ticket id&gt;</pre>
+</div>
+<p>The response format is like /new response.</p>
+</div>
+<div class="section" id="free-request-for-an-event">
+<h4>Free request for an event<a class="headerlink" href="#free-request-for-an-event" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><pre>/events/domogik/free/&lt;ticket id&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="events-requests-for-devices-events-request">
+<h2>Events requests (for devices) : /events/request/<a class="headerlink" href="#events-requests-for-devices-events-request" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>API<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Create a new event request<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><pre>/events/request/new/&lt;device id 0&gt;/&lt;device id 1&gt;/&lt;device id 2&gt;/....</pre>
+</div>
+<p>Example of response for a device with 2 keys stored in database (command and level):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;event&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1285330784</span><span class="p">,</span>
+            <span class="s">&quot;data&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;preset_dim&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;command&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;50&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;level&quot;</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s">&quot;ticket_id&quot;</span> <span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h4>Make a request for an event<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><pre>/events/request/get/&lt;ticket id&gt;</pre>
+</div>
+<p>The response format is like /new response.</p>
+</div>
+<div class="section" id="id4">
+<h4>Free request for an event<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><pre>/events/request/free/&lt;ticket id&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="flow-for-devices-events">
+<h2>Flow for devices events<a class="headerlink" href="#flow-for-devices-events" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/rest-event-stat.png" src="../../_images/rest-event-stat.png" />
+</div>
+<div class="section" id="debug-feature">
+<h2>Debug feature<a class="headerlink" href="#debug-feature" title="Permalink to this headline">¶</a></h2>
+<p>In REST status (&#8220;/&#8221; path), there are several informations about events requests :</p>
+<ul class="simple">
+<li>Number of event requests</li>
+<li>Max queue size for event requests</li>
+<li>Information about each event request (creation date, actual size, ticket id)</li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /events</a><ul>
+<li><a class="reference internal" href="#what-is-an-event">What is an event ?</a></li>
+<li><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#domogik-events-events-domogik">Domogik Events: /events/domogik/</a><ul>
+<li><a class="reference internal" href="#api">API</a><ul>
+<li><a class="reference internal" href="#create-a-new-event-request">Create a new event request</a><ul>
+<li><a class="reference internal" href="#plugin-list-updated-event">Plugin list updated event</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#make-a-request-for-an-event">Make a request for an event</a></li>
+<li><a class="reference internal" href="#free-request-for-an-event">Free request for an event</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#events-requests-for-devices-events-request">Events requests (for devices) : /events/request/</a><ul>
+<li><a class="reference internal" href="#id1">API</a><ul>
+<li><a class="reference internal" href="#id2">Create a new event request</a></li>
+<li><a class="reference internal" href="#id3">Make a request for an event</a></li>
+<li><a class="reference internal" href="#id4">Free request for an event</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flow-for-devices-events">Flow for devices events</a></li>
+<li><a class="reference internal" href="#debug-feature">Debug feature</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="rest_command.html">REST /command</a></li>
+    
+    
+      <li>Next: <a href="rest_stats.html">REST /stats</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /events</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_events.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="rest_command.html" title="REST /command">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_stats.html" title="REST /stats">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

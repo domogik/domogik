@@ -1,0 +1,361 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /stats &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /account" href="rest_account.html" />
+    <link rel="prev" title="REST /events" href="rest_events.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="rest_events.html" title="REST /events">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_account.html" title="REST /account">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_stats">
+            
+  <div class="section" id="rest-stats">
+<h1>REST /stats<a class="headerlink" href="#rest-stats" title="Permalink to this headline">¶</a></h1>
+<p><strong>/stats</strong> entry allows to get statistics stored in database (table device_stats).</p>
+<div class="section" id="getting-data-with-stats">
+<h2>Getting data with /stats<a class="headerlink" href="#getting-data-with-stats" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="parameters-description">
+<h3>Parameters description<a class="headerlink" href="#parameters-description" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>device id : a device id</li>
+<li>key : key name for data in table __device_stats__. Could be &#8216;*&#8217; to return all keys.</li>
+<li>start time (optionnal)</li>
+<li>end time (optionnal : none = now)</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Usage is not yet implemented</p>
+</div>
+</div>
+<div class="section" id="stats-device-id-key-all">
+<h3>/stats/&lt;device id&gt;/&lt;key&gt;/all<a class="headerlink" href="#stats-device-id-key-all" title="Permalink to this headline">¶</a></h3>
+<p>Get all values. You may avoid to use this entry : there could be several thousands values in database!</p>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;stats&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1286226868</span><span class="p">,</span>
+            <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;HIGH&quot;</span><span class="p">,</span>
+            <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;ping&quot;</span><span class="p">,</span>
+            <span class="s">&quot;date&quot;</span> <span class="p">:</span> <span class="s">&quot;2010-07-21 16:02:14&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">3</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="stats-device-id-key-latest">
+<h3>/stats/&lt;device id&gt;/&lt;key&gt;/latest<a class="headerlink" href="#stats-device-id-key-latest" title="Permalink to this headline">¶</a></h3>
+<p>Get latest value</p>
+<p>Result : same than /all but with only one value</p>
+</div>
+<div class="section" id="stats-device-id-key-last-number-of-item-to-get">
+<h3>/stats/&lt;device id&gt;/&lt;key&gt;/last/&lt;number of item to get&gt;<a class="headerlink" href="#stats-device-id-key-last-number-of-item-to-get" title="Permalink to this headline">¶</a></h3>
+<p>Get the N last values</p>
+<p>Result : same than /all but with only N values</p>
+</div>
+<div class="section" id="stats-device-id-key-from-start-time-to-end-time">
+<h3>/stats/&lt;device id&gt;/&lt;key&gt;/from/&lt;start time&gt; {/to/&lt;end time&gt;}<a class="headerlink" href="#stats-device-id-key-from-start-time-to-end-time" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">CSV export allowed</p>
+</div>
+<p>Get values from &lt;start time&gt; to ...
+&lt;start time&gt; and &lt;end time&gt; need to be timestamps</p>
+<p>Result : same than /all but with values between start and end time</p>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<p><strong>/stats/4/temperature/from/1286226613/to/1286500000</strong></p>
+<div class="code highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;stats&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;device_stats&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1286226868</span><span class="p">,</span>
+                    <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;22.6875&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;temperature&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;date&quot;</span> <span class="p">:</span> <span class="s">&quot;2010-10-04 23:14:28&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">4</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1286226884</span><span class="p">,</span>
+                    <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;22.6875&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;temperature&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;date&quot;</span> <span class="p">:</span> <span class="s">&quot;2010-10-04 23:14:44&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">4</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1286226899</span><span class="p">,</span>
+                    <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;22.6875&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;temperature&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;date&quot;</span> <span class="p">:</span> <span class="s">&quot;2010-10-04 23:14:59&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">4</span>
+                <span class="p">},</span>
+                <span class="o">...</span>
+            <span class="p">],</span>
+            <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;temperature&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="s">&quot;4&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="stats-device-id-key-from-start-time-to-end-time-interval-year-month-week-day-hour-minute-second-selector-min-number-only-max-number-only-avg-number-only-first-last-x">
+<h3>/stats/&lt;device id&gt;/&lt;key&gt;/from/&lt;start time&gt; {/to/&lt;end time&gt;}/interval/&lt;year, month, week, day, hour, minute, second&gt;/selector/&lt;min(number only), max(number only), avg(number only), first, last, x&gt;<a class="headerlink" href="#stats-device-id-key-from-start-time-to-end-time-interval-year-month-week-day-hour-minute-second-selector-min-number-only-max-number-only-avg-number-only-first-last-x" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">CSV export allowed</p>
+</div>
+<p>Result : for performance issue, the return format is different from /all. Following data are returned:</p>
+<ul class="simple">
+<li>key</li>
+<li>device_id</li>
+<li>values : a list of tuples</li>
+</ul>
+<div class="section" id="tuples-format">
+<h4>Tuples format<a class="headerlink" href="#tuples-format" title="Permalink to this headline">¶</a></h4>
+<div class="code highlight-python"><div class="highlight"><pre><span class="c"># Minutes</span>
+<span class="c"># Format : (year, month, week, day, hour, min, value)</span>
+<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mf">56.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mf">62.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mf">68.5</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">74.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">80.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">86.5</span><span class="p">)]</span>
+
+<span class="c"># Hours</span>
+<span class="c"># Format : (year, month, week, day, hour, value)</span>
+<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mf">38.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mf">41.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">45.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">)]</span>
+
+<span class="c"># Days</span>
+<span class="c"># Format : (year, month, week, day, value)</span>
+<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">)]</span>
+
+<span class="c"># Weeks</span>
+<span class="c"># Format : (year, month, week, value)</span>
+<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">35.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mf">49.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mf">63.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mf">77.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mf">88.0</span><span class="p">)]</span>
+<span class="p">{</span><span class="n">CODE</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h4>Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p><strong>/stats/4/temperature/from/1286226613/to/1286500000/interval/hour/selector/avg</strong></p>
+<div class="code highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;stats&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;values&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                <span class="p">[</span>
+                    <span class="mi">2010</span><span class="p">,</span>
+                    <span class="mi">10</span><span class="p">,</span>
+                    <span class="mi">40</span><span class="p">,</span>
+                    <span class="mi">4</span><span class="p">,</span>
+                    <span class="mi">23</span><span class="p">,</span>
+                    <span class="mf">22.753251445086704</span>
+                <span class="p">],</span>
+                <span class="p">[</span>
+                    <span class="mi">2010</span><span class="p">,</span>
+                    <span class="mi">10</span><span class="p">,</span>
+                    <span class="mi">40</span><span class="p">,</span>
+                    <span class="mi">5</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="mf">22.559444444444445</span>
+                <span class="p">],</span>
+                <span class="p">[</span>
+                    <span class="mi">2010</span><span class="p">,</span>
+                    <span class="mi">10</span><span class="p">,</span>
+                    <span class="mi">40</span><span class="p">,</span>
+                    <span class="mi">5</span><span class="p">,</span>
+                    <span class="mi">1</span><span class="p">,</span>
+                    <span class="mf">22.12887168141593</span>
+                <span class="p">],</span>
+                <span class="o">...</span>
+            <span class="p">],</span>
+            <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;temperature&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="s">&quot;4&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="stats-multi-id1-key1-id2-key2">
+<h3>/stats/multi/&lt;id1&gt;/&lt;key1&gt;/&lt;id2&gt;/&lt;key2&gt;<a class="headerlink" href="#stats-multi-id1-key1-id2-key2" title="Permalink to this headline">¶</a></h3>
+<p>Get last values for multiple id/keys in one request</p>
+<p>Example json response:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;stats&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1286226868</span><span class="p">,</span>
+            <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;HIGH&quot;</span><span class="p">,</span>
+            <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;ping&quot;</span><span class="p">,</span>
+            <span class="s">&quot;date&quot;</span> <span class="p">:</span> <span class="s">&quot;2010-07-21 16:02:14&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">3</span>
+        <span class="p">},</span>        <span class="p">{</span>
+            <span class="s">&quot;timestamp&quot;</span> <span class="p">:</span> <span class="mi">1286566868</span><span class="p">,</span>
+            <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;LOG&quot;</span><span class="p">,</span>
+            <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;command&quot;</span><span class="p">,</span>
+            <span class="s">&quot;date&quot;</span> <span class="p">:</span> <span class="s">&quot;2010-07-22 16:02:14&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">5</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /stats</a><ul>
+<li><a class="reference internal" href="#getting-data-with-stats">Getting data with /stats</a><ul>
+<li><a class="reference internal" href="#parameters-description">Parameters description</a></li>
+<li><a class="reference internal" href="#stats-device-id-key-all">/stats/&lt;device id&gt;/&lt;key&gt;/all</a></li>
+<li><a class="reference internal" href="#stats-device-id-key-latest">/stats/&lt;device id&gt;/&lt;key&gt;/latest</a></li>
+<li><a class="reference internal" href="#stats-device-id-key-last-number-of-item-to-get">/stats/&lt;device id&gt;/&lt;key&gt;/last/&lt;number of item to get&gt;</a></li>
+<li><a class="reference internal" href="#stats-device-id-key-from-start-time-to-end-time">/stats/&lt;device id&gt;/&lt;key&gt;/from/&lt;start time&gt; {/to/&lt;end time&gt;}</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stats-device-id-key-from-start-time-to-end-time-interval-year-month-week-day-hour-minute-second-selector-min-number-only-max-number-only-avg-number-only-first-last-x">/stats/&lt;device id&gt;/&lt;key&gt;/from/&lt;start time&gt; {/to/&lt;end time&gt;}/interval/&lt;year, month, week, day, hour, minute, second&gt;/selector/&lt;min(number only), max(number only), avg(number only), first, last, x&gt;</a><ul>
+<li><a class="reference internal" href="#tuples-format">Tuples format</a></li>
+<li><a class="reference internal" href="#id1">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stats-multi-id1-key1-id2-key2">/stats/multi/&lt;id1&gt;/&lt;key1&gt;/&lt;id2&gt;/&lt;key2&gt;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="rest_events.html">REST /events</a></li>
+    
+    
+      <li>Next: <a href="rest_account.html">REST /account</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /stats</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_stats.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="rest_events.html" title="REST /events">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_account.html" title="REST /account">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

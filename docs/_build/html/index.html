@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Domogik documentation &mdash; Domogik 0.1 documentation</title>
+    <title>Domogik &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,42 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="#" />
     <link rel="next" title="Quick overview" href="overview/index.html" />
-    <link rel="prev" title="Table Of Content" href="contents.html" />
- 
-<script type="text/javascript" src="templatebuiltins.js"></script>
-<script type="text/javascript">
-(function($) {
-    if (!django_template_builtins) {
-       // templatebuiltins.js missing, do nothing.
-       return;
-    }
-    $(document).ready(function() {
-        // Hyperlink Django template tags and filters
-        var base = "ref/templates/builtins.html";
-        if (base == "#") {
-            // Special case for builtins.html itself
-            base = "";
-        }
-        // Tags are keywords, class '.k'
-        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
-             var tagname = $(elem).text();
-             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
-                 var fragment = tagname.replace(/_/, '-');
-                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
-             }
-        });
-        // Filters are functions, class '.nf'
-        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
-             var filtername = $(elem).text();
-             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
-                 var fragment = filtername.replace(/_/, '-');
-                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
-             }
-        });
-    });
-})(jQuery);
-</script>
-
+    <link rel="prev" title="Table Of Content" href="contents.html" /> 
   </head>
   <body>
 
@@ -87,8 +52,8 @@
         <div class="yui-b">
           <div class="yui-g" id="index">
             
-  <div class="section" id="domogik-documentation">
-<span id="index"></span><h1>Domogik documentation<a class="headerlink" href="#domogik-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="domogik">
+<h1>Domogik<a class="headerlink" href="#domogik" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><strong>Overview:</strong>
 <a class="reference internal" href="overview/index.html"><em>Quick</em></a> |
@@ -125,6 +90,40 @@
 <a class="reference internal" href="enduser/administration/device.html"><em>Devices management</em></a> |
 <a class="reference internal" href="enduser/administration/plugin.html"><em>Plugins management</em></a> |
 <a class="reference internal" href="enduser/administration/account.html"><em>Accounts management</em></a></p>
+</li>
+</ul>
+</div>
+<div class="section" id="technical-documentation">
+<h2>Technical Documentation<a class="headerlink" href="#technical-documentation" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><a class="reference internal" href="technical/actuator.html"><em>Actuators</em></a></p>
+</li>
+<li><p class="first"><a class="reference internal" href="technical/sensor.html"><em>Sensors</em></a></p>
+</li>
+<li><p class="first"><a class="reference internal" href="technical/device_feature_usage.html"><em>Device types, features and usages</em></a></p>
+</li>
+<li><p class="first"><strong>Database:</strong>
+<a class="reference internal" href="technical/database.html"><em>Model</em></a></p>
+</li>
+<li><p class="first"><strong>UI:</strong>
+<a class="reference internal" href="technical/ui_add_icons.html"><em>Model</em></a></p>
+</li>
+<li><p class="first"><strong>RINOR:</strong>
+<a class="reference internal" href="technical/rinor/index.html"><em>Overview</em></a> |
+<a class="reference internal" href="technical/rinor/statmgr.html"><em>Statistics Manager</em></a>: Store into the database the xPL activity on Network</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="technical/rinor/rest_base.html"><em>REST /base</em></a>: Get data from the database (area, rooms, devices, events, etc)</li>
+<li><a class="reference internal" href="technical/rinor/rest_command.html"><em>REST /command</em></a>: Send commands to devices</li>
+<li><a class="reference internal" href="technical/rinor/rest_events.html"><em>REST /events</em></a>: Get events</li>
+<li><a class="reference internal" href="technical/rinor/rest_stats.html"><em>REST /stats</em></a>: Get stats from the database</li>
+<li><a class="reference internal" href="technical/rinor/rest_account.html"><em>REST /account</em></a>: List accounts, login, etc</li>
+<li><a class="reference internal" href="technical/rinor/rest_plugin.html"><em>REST /plugin</em></a>: Start, stop xPL plugins</li>
+<li><a class="reference internal" href="technical/rinor/rest_xplcmnd.html"><em>REST /xpl-cmnd</em></a>: Directly send a xPL message</li>
+<li><a class="reference internal" href="technical/rinor/rest_repository.html"><em>REST /repo</em></a>: Store files</li>
+<li><a class="reference internal" href="technical/rinor/rest_helper.html"><em>REST /helper</em></a>: Helpers</li>
+</ul>
+</div></blockquote>
 </li>
 </ul>
 </div>

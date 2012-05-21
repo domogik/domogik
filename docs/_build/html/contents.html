@@ -25,42 +25,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="index.html" />
-    <link rel="next" title="Domogik documentation" href="index.html" />
- 
-<script type="text/javascript" src="templatebuiltins.js"></script>
-<script type="text/javascript">
-(function($) {
-    if (!django_template_builtins) {
-       // templatebuiltins.js missing, do nothing.
-       return;
-    }
-    $(document).ready(function() {
-        // Hyperlink Django template tags and filters
-        var base = "ref/templates/builtins.html";
-        if (base == "#") {
-            // Special case for builtins.html itself
-            base = "";
-        }
-        // Tags are keywords, class '.k'
-        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
-             var tagname = $(elem).text();
-             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
-                 var fragment = tagname.replace(/_/, '-');
-                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
-             }
-        });
-        // Filters are functions, class '.nf'
-        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
-             var filtername = $(elem).text();
-             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
-                 var fragment = filtername.replace(/_/, '-');
-                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
-             }
-        });
-    });
-})(jQuery);
-</script>
-
+    <link rel="next" title="Domogik" href="index.html" /> 
   </head>
   <body>
 
@@ -76,7 +41,7 @@
       <div class="nav">
     <a title="Domogik 0.1 documentation" href="index.html" accesskey="U">up</a>
    |
-    <a href="index.html" title="Domogik documentation">next</a> &raquo;</div>
+    <a href="index.html" title="Domogik">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -88,8 +53,9 @@
 <span id="toc"></span><h1>Table Of Content<a class="headerlink" href="#table-of-content" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html">Domogik documentation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Domogik</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="index.html#end-user-documentation">End User Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#technical-documentation">Technical Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="overview/index.html">Quick overview</a><ul>
@@ -341,6 +307,273 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="technical/device_feature_usage.html">Device types, features and usages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/device_feature_usage.html#device-types">Device types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/device_feature_usage.html#actuators-only">Actuators only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/device_feature_usage.html#sensors-only">Sensors only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/device_feature_usage.html#with-actuators-sensors">With Actuators &amp; Sensors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/device_feature_usage.html#device-features">Device features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/device_feature_usage.html#device-usages">Device usages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/device_feature_usage.html#common">Common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/device_feature_usage.html#special">Special</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/database.html">Database model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical/ui_add_icons.html">How to add your own room/area icons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/ui_add_icons.html#add-your-icon-s-in-django-s-folder">1. Add your icon(s) in Django&#8217;s folder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/ui_add_icons.html#configure-the-icon-path">2. Configure the icon path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/ui_add_icons.html#declare-the-new-icon">3. Declare the new icon</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/index.html">RINOR Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#use-rest-for-test">Use REST for test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#configuration-section-in-domogik-cfg">Configuration section in ~/.domogik.cfg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#configuration-in-database">Configuration in database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#how-to-use-rest-with-ssl">How to use REST with SSL?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/index.html#generate-certificate">Generate certificate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/index.html#configure-rest">Configure REST</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/index.html#test-it">Test it</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#status">Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#options">Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/index.html#callback-name">callback=name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/index.html#export-csv">export=csv</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#debug-options">Debug options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#test-long-polling">Test long polling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#view-queues-content">View queues content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#tinywebdb">TinyWebDb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#how-rest-interacts-with-other-domogik-parts">How REST interacts with other Domogik parts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#how-rest-starts">How REST starts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/index.html#how-rest-process-an-url">How REST process an Url</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/statmgr.html">Statistics Manager</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/statmgr.html#adding-new-statistics-in-database">Adding new statistics in database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/statmgr.html#xml-files">XML files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/statmgr.html#folder-hierarchy-for-xml-files">Folder hierarchy for XML files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/statmgr.html#adding-a-new-xml-file">Adding a new xml file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/statmgr.html#xml-file-description">Xml file description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/statmgr.html#flow">Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/statmgr.html#developper-notes">Developper notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_base.html">REST /base</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_base.html#house-management">House management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#areas">Areas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#reading-operations">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#writing-operations">Writing operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#rooms">Rooms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id1">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id2">Writing operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_base.html#user-interface-configuration">User Interface configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#ui-config">UI config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#paramters-description">Paramters description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id3">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id4">Writing operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_base.html#devices-and-features-management">Devices and features management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#device-usage">Device usage</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id5">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id6">Writing operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#device-type">Device type</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id7">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id8">Writing operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#feature">Feature</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id9">Reading operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#device-technology">Device technology</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#parameters-description">Parameters description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id10">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id11">Writing operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#device">Device</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id12">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id13">Writing operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_base.html#feature-associations">Feature Associations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id14">Reading operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_base.html#id15">Writing operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_command.html">REST /command</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_command.html#flow">Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_command.html#developper-notes">Developper notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_command.html#url-description">Url description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_command.html#xml-description">Xml description</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_command.html#adding-a-new-xml-file">Adding a new xml file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_command.html#xml-file-description">Xml file description</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="technical/rinor/rest_command.html#notice-about-parameter-value-attribute">Notice about parameter &gt; value attribute</a></li>
+<li class="toctree-l5"><a class="reference internal" href="technical/rinor/rest_command.html#notice-about-parameter-mode-attribute">Notice about parameter &gt; mode attribute</a></li>
+<li class="toctree-l5"><a class="reference internal" href="technical/rinor/rest_command.html#example-for-http-ip-port-command-plcbus-a3-on">Example for http://ip:port/command/plcbus/A3/on</a></li>
+<li class="toctree-l5"><a class="reference internal" href="technical/rinor/rest_command.html#example-for-http-ip-port-command-plcbus-a4-dim-55">Example for http://ip:port/command/plcbus/A4/dim/55</a></li>
+<li class="toctree-l5"><a class="reference internal" href="technical/rinor/rest_command.html#example-for-http-ip-port-command-computer-computer-name-wol">Example for http://ip:port/command/computer/&lt;computer name&gt;/wol</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_command.html#how-rest-gets-xpl-trig-for-a-command">How REST gets xpl-trig for a /command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_command.html#how-ui-will-get-status-of-device">How UI will get status of device ?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_events.html">REST /events</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#what-is-an-event">What is an event ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#domogik-events-events-domogik">Domogik Events: /events/domogik/</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_events.html#api">API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_events.html#create-a-new-event-request">Create a new event request</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="technical/rinor/rest_events.html#plugin-list-updated-event">Plugin list updated event</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_events.html#make-a-request-for-an-event">Make a request for an event</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_events.html#free-request-for-an-event">Free request for an event</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#events-requests-for-devices-events-request">Events requests (for devices) : /events/request/</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_events.html#id1">API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_events.html#id2">Create a new event request</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_events.html#id3">Make a request for an event</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_events.html#id4">Free request for an event</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#flow-for-devices-events">Flow for devices events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_events.html#debug-feature">Debug feature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_stats.html">REST /stats</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_stats.html#getting-data-with-stats">Getting data with /stats</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#parameters-description">Parameters description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#stats-device-id-key-all">/stats/&lt;device id&gt;/&lt;key&gt;/all</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#stats-device-id-key-latest">/stats/&lt;device id&gt;/&lt;key&gt;/latest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#stats-device-id-key-last-number-of-item-to-get">/stats/&lt;device id&gt;/&lt;key&gt;/last/&lt;number of item to get&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#stats-device-id-key-from-start-time-to-end-time">/stats/&lt;device id&gt;/&lt;key&gt;/from/&lt;start time&gt; {/to/&lt;end time&gt;}</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_stats.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#stats-device-id-key-from-start-time-to-end-time-interval-year-month-week-day-hour-minute-second-selector-min-number-only-max-number-only-avg-number-only-first-last-x">/stats/&lt;device id&gt;/&lt;key&gt;/from/&lt;start time&gt; {/to/&lt;end time&gt;}/interval/&lt;year, month, week, day, hour, minute, second&gt;/selector/&lt;min(number only), max(number only), avg(number only), first, last, x&gt;</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_stats.html#tuples-format">Tuples format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="technical/rinor/rest_stats.html#id1">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_stats.html#stats-multi-id1-key1-id2-key2">/stats/multi/&lt;id1&gt;/&lt;key1&gt;/&lt;id2&gt;/&lt;key2&gt;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_account.html">REST /account</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_account.html#authenticate">Authenticate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-auth-login-password">/account/auth/&lt;login&gt;/&lt;password&gt;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_account.html#users">Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-password-id-id-old-old-password-new-new-password">/account/user/password/id/&lt;id&gt;/old/&lt;old password&gt;/new/&lt;new password&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-list">/account/user/list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-list-by-id-id">/account/user/list/by-id/&lt;id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-user-del-id">/account/user/del/&lt;id&gt;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_account.html#persons">Persons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-person-list">/account/person/list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-person-list-by-id-id">/account/person/list/by-id/&lt;id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-person-add-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/person/add/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-person-update-id-id-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/person/update/id/&lt;id&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_account.html#account-person-del-id">/account/person/del/&lt;id&gt;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_plugin.html">REST /plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_plugin.html#authenticate">Authenticate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-auth-login-password">/account/auth/&lt;login&gt;/&lt;password&gt;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_plugin.html#users">Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-password-id-id-old-old-password-new-new-password">/account/user/password/id/&lt;id&gt;/old/&lt;old password&gt;/new/&lt;new password&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-list">/account/user/list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-list-by-id-id">/account/user/list/by-id/&lt;id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-user-del-id">/account/user/del/&lt;id&gt;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_plugin.html#persons">Persons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-person-list">/account/person/list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-person-list-by-id-id">/account/person/list/by-id/&lt;id&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-person-add-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/person/add/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-person-update-id-id-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/person/update/id/&lt;id&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_plugin.html#account-person-del-id">/account/person/del/&lt;id&gt;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_xplcmnd.html">REST /xpl-cmnd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_xplcmnd.html#when-can-we-use-xpl-cmnd-in-an-ui">When can we use <em>/xpl-cmnd</em> in an UI ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_xplcmnd.html#uri-format">URI format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_xplcmnd.html#response">Response</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_repository.html">REST /repo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_repository.html#exemple">Exemple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_repository.html#why-a-repository">Why a repository ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_repository.html#how-can-a-plugin-find-repository">How can a plugin find repository ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_repository.html#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_repository.html#repo-put-filename-foo-wav">/repo/put?filename=foo.wav</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technical/rinor/rest_repository.html#repo-get-foo-wav">/repo/get/foo.wav</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="technical/rinor/rest_helper.html">REST /helper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_helper.html#helper-help">/helper/help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_helper.html#helper-plugin-name-help">/helper/&lt;plugin name&gt;/help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical/rinor/rest_helper.html#helper-plugin-name-command-param-1">/helper/&lt;plugin name/&lt;command&gt;/&lt;param 1&gt;/...</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -359,7 +592,7 @@
   <ul>
     
     
-      <li>Next: <a href="index.html">Domogik documentation</a></li>
+      <li>Next: <a href="index.html">Domogik</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -401,7 +634,7 @@
       <div class="nav">
     <a title="Domogik 0.1 documentation" href="index.html" accesskey="U">up</a>
    |
-    <a href="index.html" title="Domogik documentation">next</a> &raquo;</div>
+    <a href="index.html" title="Domogik">next</a> &raquo;</div>
     </div>
   </div>
 

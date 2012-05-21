@@ -1,0 +1,179 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /repo &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /helper" href="rest_helper.html" />
+    <link rel="prev" title="REST /xpl-cmnd" href="rest_xplcmnd.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="rest_xplcmnd.html" title="REST /xpl-cmnd">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_helper.html" title="REST /helper">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_repository">
+            
+  <div class="section" id="rest-repo">
+<h1>REST /repo<a class="headerlink" href="#rest-repo" title="Permalink to this headline">¶</a></h1>
+<p>Rest repository allow to upload files to REST server. This files are given an unique id and are downloadable with this id.</p>
+<div class="section" id="exemple">
+<h2>Exemple<a class="headerlink" href="#exemple" title="Permalink to this headline">¶</a></h2>
+<p>Send a file to REST server:</p>
+<div class="highlight-python"><pre>$ curl --request PUT --data-binary @foo.jpg http://192.168.0.10:40405/repo/put?filename=foo.jpg
+{"status" : "OK", "code" : 0, "description" : "None", "repository" : [{"file" : "c624fd17-704c-4ed3-a905-12312c2bd29f.jpg"}]}</pre>
+</div>
+<p>Here, your file will be accessible as <strong>http://192.168.0.10:40405/repo/get/c624fd17-704c-4ed3-a905-12312c2bd29f.jpg</strong>.</p>
+</div>
+<div class="section" id="why-a-repository">
+<h2>Why a repository ?<a class="headerlink" href="#why-a-repository" title="Permalink to this headline">¶</a></h2>
+<p>This repository exists for plugins that need to give a file (picture, sound) to user itnerfaces. For example, a vocal message or a text to speech audio file.</p>
+</div>
+<div class="section" id="how-can-a-plugin-find-repository">
+<h2>How can a plugin find repository ?<a class="headerlink" href="#how-can-a-plugin-find-repository" title="Permalink to this headline">¶</a></h2>
+<p>A plugin doesn&#8217;t know where is REST. So, it will have to read ~/.domogik.cfg file to get REST ip and port.</p>
+</div>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="repo-put-filename-foo-wav">
+<h3>/repo/put?filename=foo.wav<a class="headerlink" href="#repo-put-filename-foo-wav" title="Permalink to this headline">¶</a></h3>
+<p>This url is te be called with <strong>PUT</strong> method. <strong>filename</strong> value could be different of real filename, only the extension is important and will be kept. Complete filename is used in log files to keep a trace.</p>
+<p>REST will answer a Json structure:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span> <span class="s">&quot;repository&quot;</span> <span class="p">:</span> <span class="p">[{</span><span class="s">&quot;file&quot;</span> <span class="p">:</span> <span class="s">&quot;c624fd17-704c-4ed3-a905-12312c2bd29f.jpg&quot;</span><span class="p">}]}</span>
+</pre></div>
+</div>
+<p><strong>file</strong> is the file id (file name on server and name to use with /repo/get to download file).</p>
+</div>
+<div class="section" id="repo-get-foo-wav">
+<h3>/repo/get/foo.wav<a class="headerlink" href="#repo-get-foo-wav" title="Permalink to this headline">¶</a></h3>
+<p>This url could be called with GET/OPTIONS or POST method. It will give you the file.
+In case of error, it will return you a typical REST Json error structure. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">999</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;You must give a file name : ?filename=foo.txt&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>So, you should test mimetype of the data you get before using it ;)</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /repo</a><ul>
+<li><a class="reference internal" href="#exemple">Exemple</a></li>
+<li><a class="reference internal" href="#why-a-repository">Why a repository ?</a></li>
+<li><a class="reference internal" href="#how-can-a-plugin-find-repository">How can a plugin find repository ?</a></li>
+<li><a class="reference internal" href="#api">API</a><ul>
+<li><a class="reference internal" href="#repo-put-filename-foo-wav">/repo/put?filename=foo.wav</a></li>
+<li><a class="reference internal" href="#repo-get-foo-wav">/repo/get/foo.wav</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="rest_xplcmnd.html">REST /xpl-cmnd</a></li>
+    
+    
+      <li>Next: <a href="rest_helper.html">REST /helper</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /repo</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_repository.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="rest_xplcmnd.html" title="REST /xpl-cmnd">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_helper.html" title="REST /helper">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

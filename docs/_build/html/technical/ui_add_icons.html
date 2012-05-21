@@ -1,0 +1,170 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to add your own room/area icons &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="next" title="RINOR Overview" href="rinor/index.html" />
+    <link rel="prev" title="Database model" href="database.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="database.html" title="Database model">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="rinor/index.html" title="RINOR Overview">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-ui_add_icons">
+            
+  <div class="section" id="how-to-add-your-own-room-area-icons">
+<h1>How to add your own room/area icons<a class="headerlink" href="#how-to-add-your-own-room-area-icons" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="add-your-icon-s-in-django-s-folder">
+<h2>1. Add your icon(s) in Django&#8217;s folder<a class="headerlink" href="#add-your-icon-s-in-django-s-folder" title="Permalink to this headline">¶</a></h2>
+<p>Put you icon somewhere in Django design folder. Usually in the <em>images</em> folder of the current skin theme.
+Your icon has to be declined in three differents size: 16x16, 32x32 and 64x64:</p>
+<p><strong>src/domogik/ui/djangodomo/core/templates/design/skins/default/images/room</strong></p>
+<div class="highlight-python"><pre>bathroom_16.png  bedroom_16.png  garage_16.png  kidsroom_16.png  kitchen_16.png  office_16.png  tvlounge_16.png
+bathroom_32.png  bedroom_32.png  garage_32.png  kidsroom_32.png  kitchen_32.png  office_32.png  tvlounge_32.png
+bathroom_64.png  bedroom_64.png  garage_64.png  kidsroom_64.png  kitchen_64.png  office_64.png  tvlounge_64.png</pre>
+</div>
+</div>
+<div class="section" id="configure-the-icon-path">
+<h2>2. Configure the icon path<a class="headerlink" href="#configure-the-icon-path" title="Permalink to this headline">¶</a></h2>
+<p>Open the icon css file:
+<strong>src/domogik/ui/djangodomo/core/templates/design/skins/default/css/ui-icon.css</strong></p>
+<p>Add css class for each icon format, prefixed by <tt class="code docutils literal"><span class="pre">icon64-room-*,</span> <span class="pre">icon32-room-*</span> <span class="pre">or</span> <span class="pre">icon16-room-*</span> <span class="pre">(same</span> <span class="pre">for</span> <span class="pre">icon64-area-*)</span></tt></p>
+<p>For example:</p>
+<div class="highlight-python"><pre>.icon64-room-myicon { background-image:url(../images/room/myicon_64.png);}
+.icon32-room-myicon { background-image:url(../images/room/myicon_32.png);}
+.icon16-room-myicon { background-image:url(../images/room/myicon_16.png);}</pre>
+</div>
+</div>
+<div class="section" id="declare-the-new-icon">
+<h2>3. Declare the new icon<a class="headerlink" href="#declare-the-new-icon" title="Permalink to this headline">¶</a></h2>
+<p>Open the icon js file:
+<strong>src/domogik/ui/djangodomo/core/templates/design/js/dmg.icons.js</strong></p>
+<p>Add the icon id (should mach the id used in the css classes), in one of the 2 icons lists:</p>
+<div class="highlight-python"><pre>var area_icons = ["grndfloor", "firstfloor", "basement"];
+var room_icons = ["kitchen", "bedroom", `"tvlounge", "bathroom", "office", 'kidsroom', 'garage'];</pre>
+</div>
+<p>For example:</p>
+<div class="highlight-python"><pre>var room_icons = ["kitchen", "bedroom", "tvlounge", "bathroom", "office", 'kidsroom', 'garage', 'myicon'];</pre>
+</div>
+<p>Don&#8217;t forget to refresh your browser (ie: <tt class="kbd docutils literal"><span class="pre">ctrl+F5</span></tt> for firefox).</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How to add your own room/area icons</a><ul>
+<li><a class="reference internal" href="#add-your-icon-s-in-django-s-folder">1. Add your icon(s) in Django&#8217;s folder</a></li>
+<li><a class="reference internal" href="#configure-the-icon-path">2. Configure the icon path</a></li>
+<li><a class="reference internal" href="#declare-the-new-icon">3. Declare the new icon</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="database.html">Database model</a></li>
+    
+    
+      <li>Next: <a href="rinor/index.html">RINOR Overview</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>How to add your own room/area icons</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/technical/ui_add_icons.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="database.html" title="Database model">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="rinor/index.html" title="RINOR Overview">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,278 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /account &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /plugin" href="rest_plugin.html" />
+    <link rel="prev" title="REST /stats" href="rest_stats.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="rest_stats.html" title="REST /stats">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_plugin.html" title="REST /plugin">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_account">
+            
+  <div class="section" id="rest-account">
+<h1>REST /account<a class="headerlink" href="#rest-account" title="Permalink to this headline">¶</a></h1>
+<p><strong>/account</strong> entry allow to manage all account-linked features : login, password updating, user and persons management.
+A user is a logical account wich allows to acces to Domogik features. A person is a physical people. A user can be linked to a person.</p>
+<div class="section" id="authenticate">
+<h2>Authenticate<a class="headerlink" href="#authenticate" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="account-auth-login-password">
+<h3>/account/auth/&lt;login&gt;/&lt;password&gt;<a class="headerlink" href="#account-auth-login-password" title="Permalink to this headline">¶</a></h3>
+<p>Try to login as &lt;login&gt; with password &lt;password&gt;
+When authentication is ok reply is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Access granted&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Else, if wrong login or password:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">999</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Access refused&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="users">
+<h2>Users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="account-user-password-id-id-old-old-password-new-new-password">
+<h3>/account/user/password/id/&lt;id&gt;/old/&lt;old password&gt;/new/&lt;new password&gt;<a class="headerlink" href="#account-user-password-id-id-old-old-password-new-new-password" title="Permalink to this headline">¶</a></h3>
+<p>Change the password from &lt;old_password&gt; to &lt;new_password&gt; for user id &lt;id&gt;</p>
+</div>
+<div class="section" id="account-user-list">
+<h3>/account/user/list<a class="headerlink" href="#account-user-list" title="Permalink to this headline">¶</a></h3>
+<p>List all user accounts</p>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;account&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;skin_used&quot;</span> <span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+            <span class="s">&quot;person&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;last_name&quot;</span> <span class="p">:</span> <span class="s">&quot;Admin&quot;</span><span class="p">,</span>
+                <span class="s">&quot;first_name&quot;</span> <span class="p">:</span> <span class="s">&quot;Admin&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;birthdate&quot;</span> <span class="p">:</span> <span class="s">&quot;1900-01-01&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;is_admin&quot;</span> <span class="p">:</span> <span class="s">&quot;True&quot;</span><span class="p">,</span>
+            <span class="s">&quot;person_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;login&quot;</span> <span class="p">:</span> <span class="s">&quot;admin&quot;</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="account-user-list-by-id-id">
+<h3>/account/user/list/by-id/&lt;id&gt;<a class="headerlink" href="#account-user-list-by-id-id" title="Permalink to this headline">¶</a></h3>
+<p>Result : same as /list with only the user associated to the id</p>
+</div>
+<div class="section" id="account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">
+<h3>/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;<a class="headerlink" href="#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional" title="Permalink to this headline">¶</a></h3>
+<p>Add user account + person</p>
+<p>Result : same as /list with only the user added</p>
+</div>
+<div class="section" id="account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">
+<h3>/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;<a class="headerlink" href="#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id" title="Permalink to this headline">¶</a></h3>
+<p>Add user account for an existing person</p>
+<p>Result : same as /list with only the user added</p>
+</div>
+<div class="section" id="account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">
+<h3>/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;<a class="headerlink" href="#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional" title="Permalink to this headline">¶</a></h3>
+<p>Update account + person</p>
+<p>Result : same as /list with only the user updated</p>
+</div>
+<div class="section" id="account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">
+<h3>/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;<a class="headerlink" href="#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id" title="Permalink to this headline">¶</a></h3>
+<p>Update account for an existing person</p>
+<p>Result : same as /list with only the user updated</p>
+</div>
+<div class="section" id="account-user-del-id">
+<h3>/account/user/del/&lt;id&gt;<a class="headerlink" href="#account-user-del-id" title="Permalink to this headline">¶</a></h3>
+<p>Del account (user account only)</p>
+<p>Result : same as /list with only the user deleted</p>
+</div>
+</div>
+<div class="section" id="persons">
+<h2>Persons<a class="headerlink" href="#persons" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="account-person-list">
+<h3>/account/person/list<a class="headerlink" href="#account-person-list" title="Permalink to this headline">¶</a></h3>
+<p>List all persons</p>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;person&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;last_name&quot;</span> <span class="p">:</span> <span class="s">&quot;Admin&quot;</span><span class="p">,</span>
+            <span class="s">&quot;first_name&quot;</span> <span class="p">:</span> <span class="s">&quot;Admin&quot;</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;birthdate&quot;</span> <span class="p">:</span> <span class="s">&quot;1900-01-01&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="account-person-list-by-id-id">
+<h3>/account/person/list/by-id/&lt;id&gt;<a class="headerlink" href="#account-person-list-by-id-id" title="Permalink to this headline">¶</a></h3>
+<p>Result : same as /list with only the person filtered</p>
+</div>
+<div class="section" id="account-person-add-first-name-first-name-last-name-last-name-birthday-birth-day-optional">
+<h3>/account/person/add/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;<a class="headerlink" href="#account-person-add-first-name-first-name-last-name-last-name-birthday-birth-day-optional" title="Permalink to this headline">¶</a></h3>
+<p>Add a person</p>
+<p>Result : same as /list with only the person added</p>
+</div>
+<div class="section" id="account-person-update-id-id-first-name-first-name-last-name-last-name-birthday-birth-day-optional">
+<h3>/account/person/update/id/&lt;id&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;<a class="headerlink" href="#account-person-update-id-id-first-name-first-name-last-name-last-name-birthday-birth-day-optional" title="Permalink to this headline">¶</a></h3>
+<p>Update person</p>
+<p>Result : same as /list with only the person updated</p>
+</div>
+<div class="section" id="account-person-del-id">
+<h3>/account/person/del/&lt;id&gt;<a class="headerlink" href="#account-person-del-id" title="Permalink to this headline">¶</a></h3>
+<p>Del person (and user account linked if it exists)</p>
+<p>Result : same as /list with only the person deleted</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /account</a><ul>
+<li><a class="reference internal" href="#authenticate">Authenticate</a><ul>
+<li><a class="reference internal" href="#account-auth-login-password">/account/auth/&lt;login&gt;/&lt;password&gt;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#users">Users</a><ul>
+<li><a class="reference internal" href="#account-user-password-id-id-old-old-password-new-new-password">/account/user/password/id/&lt;id&gt;/old/&lt;old password&gt;/new/&lt;new password&gt;</a></li>
+<li><a class="reference internal" href="#account-user-list">/account/user/list</a></li>
+<li><a class="reference internal" href="#account-user-list-by-id-id">/account/user/list/by-id/&lt;id&gt;</a></li>
+<li><a class="reference internal" href="#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li><a class="reference internal" href="#account-user-add-login-login-password-password-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">/account/user/add/login/&lt;login&gt;/password/&lt;password&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;</a></li>
+<li><a class="reference internal" href="#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li><a class="reference internal" href="#account-user-update-id-id-login-login-is-admin-true-false-skin-used-skin-to-use-optional-person-id-person-id">/account/user/update/id/&lt;id&gt;/login/&lt;login&gt;/is_admin/&lt;True,False&gt;/skin_used/&lt;skin to use (optional)&gt;/person_id/&lt;person id&gt;</a></li>
+<li><a class="reference internal" href="#account-user-del-id">/account/user/del/&lt;id&gt;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#persons">Persons</a><ul>
+<li><a class="reference internal" href="#account-person-list">/account/person/list</a></li>
+<li><a class="reference internal" href="#account-person-list-by-id-id">/account/person/list/by-id/&lt;id&gt;</a></li>
+<li><a class="reference internal" href="#account-person-add-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/person/add/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li><a class="reference internal" href="#account-person-update-id-id-first-name-first-name-last-name-last-name-birthday-birth-day-optional">/account/person/update/id/&lt;id&gt;/first_name/&lt;first name&gt;/last_name/&lt;last name&gt;/birthday/&lt;birth day (optional)&gt;</a></li>
+<li><a class="reference internal" href="#account-person-del-id">/account/person/del/&lt;id&gt;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="rest_stats.html">REST /stats</a></li>
+    
+    
+      <li>Next: <a href="rest_plugin.html">REST /plugin</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /account</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_account.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="rest_stats.html" title="REST /stats">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_plugin.html" title="REST /plugin">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

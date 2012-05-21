@@ -1,0 +1,305 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>RINOR Overview &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Statistics Manager" href="statmgr.html" />
+    <link rel="prev" title="How to add your own room/area icons" href="../ui_add_icons.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../ui_add_icons.html" title="How to add your own room/area icons">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="statmgr.html" title="Statistics Manager">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-index">
+            
+  <div class="section" id="rinor-overview">
+<h1>RINOR Overview<a class="headerlink" href="#rinor-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="use-rest-for-test">
+<h2>Use REST for test<a class="headerlink" href="#use-rest-for-test" title="Permalink to this headline">¶</a></h2>
+<p>You can execute a REST request from a console using the <em>wget</em> command.
+For example you can run:</p>
+<div class="highlight-python"><pre>$ wget -qO- http://127.0.0.1:40405/account/user/list</pre>
+</div>
+<p>This will run the request and show you the results (thanks to the <em>-qO-</em> parameter).</p>
+</div>
+<div class="section" id="configuration-section-in-domogik-cfg">
+<h2>Configuration section in ~/.domogik.cfg<a class="headerlink" href="#configuration-section-in-domogik-cfg" title="Permalink to this headline">¶</a></h2>
+<p>In Domogik configuration file, there are several options about REST in <strong>[rest]</strong> section:</p>
+<ul class="simple">
+<li>rest_server_ip (default : 127.0.0.1) : ip of REST HTTP server</li>
+<li>rest_server_port (default : 40405) : port of REST HTTP server</li>
+<li>rest_use_ssl (default : False) : use (True) or not (False) HTTPS instead of HTTP</li>
+<li>rest_ssl_certificate (default : empty) : path of certificate file (.pem)</li>
+</ul>
+</div>
+<div class="section" id="configuration-in-database">
+<h2>Configuration in database<a class="headerlink" href="#configuration-in-database" title="Permalink to this headline">¶</a></h2>
+<p>With the User Interface administration, you can configure Rest parameters :</p>
+<ul class="simple">
+<li>q-timeout : Maximum wait time for getting data froma queue</li>
+<li>q-size : Size for &#8216;classic&#8217; queues. You should not have to change this value</li>
+<li>q-cmd-size : Size for /command queue</li>
+<li>q-life-exp : Life expectancy for a xpl message in queues. You sould not have to change this value</li>
+<li>q-sleep : Time between each unsuccessfull look for a xpl data in a queue</li>
+<li>q-evt-timeout : Maximum wait time for getting event from queue</li>
+<li>q-evt-size : Size for /event queue</li>
+<li>q-evt-life-exp : Life expectancy for an event in event queues</li>
+</ul>
+<p>If you don&#8217;t know what you are doing, you shouldn&#8217;t set these parameters. Changing these parameters implies to restart REST server.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These parameters may be moved in ~/.domogik.cfg file in a following release.</p>
+</div>
+</div>
+<div class="section" id="how-to-use-rest-with-ssl">
+<h2>How to use REST with SSL?<a class="headerlink" href="#how-to-use-rest-with-ssl" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="generate-certificate">
+<h3>Generate certificate<a class="headerlink" href="#generate-certificate" title="Permalink to this headline">¶</a></h3>
+<p>First, generate a self-signed certificate compounded of a certificate and a private key for your REST server with the following command (both certificate and key are put in a single file : domogik.pem):</p>
+<div class="highlight-python"><pre>$ openssl req -new -x509 -keyout domogik.pem -out domogik.pem -days 365 -nodes</pre>
+</div>
+<p>This certificate is valid for one year. Adapt the <em>days</em> parameter (-days 365) to change this.</p>
+</div>
+<div class="section" id="configure-rest">
+<h3>Configure REST<a class="headerlink" href="#configure-rest" title="Permalink to this headline">¶</a></h3>
+<p>Then, set <strong>rest_use_ssl</strong> parameter to True and <strong>rest_ssl_certificate</strong> with the path to your certificate file.</p>
+<p>Restart REST server.</p>
+</div>
+<div class="section" id="test-it">
+<h3>Test it<a class="headerlink" href="#test-it" title="Permalink to this headline">¶</a></h3>
+<p>If REST is on 127.0.0.1:40405, try a request on <a class="reference external" href="https://127.0.0.1:40405/">https://127.0.0.1:40405/</a> with your favorite browser. You should obtain something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;rest&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;Version&quot;</span> <span class="p">:</span> <span class="s">&quot;0.1&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;Description&quot;</span> <span class="p">:</span> <span class="s">&quot;REST module is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;SSL&quot;</span> <span class="p">:</span> <span class="s">&quot;True&quot;</span><span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If this is OK with <strong>&#8220;SSL&#8221; : &#8220;True&#8221;</strong>, it works :)</p>
+</div>
+</div>
+<div class="section" id="status">
+<h2>Status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
+<p>Json response status:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="n">status</span> <span class="p">:</span> <span class="s">&#39;OK/ERROR&#39;</span><span class="p">,</span> <span class="n">code</span> <span class="p">:</span> <span class="s">&#39;408&#39;</span><span class="p">,</span> <span class="n">description</span> <span class="p">:</span> <span class="s">&#39;bla bla bla...&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Code is a number in order to get cleaner error types
+* OK : code = 0, description = &#8220;&#8221;
+* ERROR : code = 999 (default), description = &#8220;Error description&#8221;</p>
+<p>This status is sent for each REST request.</p>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<p>After a REST url, you can pass optional parameters. Here is the list :</p>
+<div class="section" id="callback-name">
+<h3>callback=name<a class="headerlink" href="#callback-name" title="Permalink to this headline">¶</a></h3>
+<p>This forces the response to be a Jsonp response. This is needed for calling REST from jQuery.</p>
+<p>Example response without callback:</p>
+<div class="highlight-python"><pre>/base/area/list
+{"status" : "OK", "code" : 0, "description" : "" "area: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]}</pre>
+</div>
+<p>And the result with callback=foo:</p>
+<div class="highlight-python"><pre>/base/area/list?callback=foo
+foo ({"status" : "OK", "code" : 0, "description" : "" "area: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]})</pre>
+</div>
+</div>
+<div class="section" id="export-csv">
+<h3>export=csv<a class="headerlink" href="#export-csv" title="Permalink to this headline">¶</a></h3>
+<p>With <strong>export=csv</strong> option, if available, REST will give you data in CSV format instead of Json format. Entries that allows it are indicated.</p>
+</div>
+</div>
+<div class="section" id="debug-options">
+<h2>Debug options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
+<p>After a REST url, you can pass optionnal debug parameters. Here is the list :</p>
+<ul class="simple">
+<li>debug-sleep=N : make REST waiting N seconds seconds before answering to the request.</li>
+</ul>
+</div>
+<div class="section" id="test-long-polling">
+<h2>Test long polling<a class="headerlink" href="#test-long-polling" title="Permalink to this headline">¶</a></h2>
+<p>If you want to test longpolling features in your UI, you can try to access : <strong>http://ip:port/testlongpoll</strong></p>
+<p>This will return you a simple json structure like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;number&#39;</span> <span class="p">:</span> <span class="mi">7</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The number indicatte the time REST took to answer (a random time between 1 and 15 seconds)</p>
+</div>
+<div class="section" id="view-queues-content">
+<h2>View queues content<a class="headerlink" href="#view-queues-content" title="Permalink to this headline">¶</a></h2>
+<p>For debugging some stuff, you could need to see what is present in REST queues. You can access to this with <strong>http://ip:port/queuecontent/&lt;queue name&gt;</strong>
+Queues names:</p>
+<ul class="simple">
+<li>system_list</li>
+<li>system_detail</li>
+<li>system_start</li>
+<li>system_stop</li>
+<li>command</li>
+<li>event</li>
+</ul>
+</div>
+<div class="section" id="tinywebdb">
+<h2>TinyWebDb<a class="headerlink" href="#tinywebdb" title="Permalink to this headline">¶</a></h2>
+<p>To allow users to create small apps with google Appinventor, we add a /getvalue entry to REST.
+You just have to POST the url you want REST to process with /getvalue entry. This will return you a json formated data.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">On jan 2011, json result is too complex for Appinventor for analysis. You should use /getvalue only for sending commands without any check.</p>
+</div>
+</div>
+<div class="section" id="how-rest-interacts-with-other-domogik-parts">
+<h2>How REST interacts with other Domogik parts<a class="headerlink" href="#how-rest-interacts-with-other-domogik-parts" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/interactions-EN.png" src="../../_images/interactions-EN.png" />
+</div>
+<div class="section" id="how-rest-starts">
+<h2>How REST starts<a class="headerlink" href="#how-rest-starts" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/startup-EN.png" src="../../_images/startup-EN.png" />
+</div>
+<div class="section" id="how-rest-process-an-url">
+<h2>How REST process an Url<a class="headerlink" href="#how-rest-process-an-url" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/process-url-EN.png" src="../../_images/process-url-EN.png" />
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">RINOR Overview</a><ul>
+<li><a class="reference internal" href="#use-rest-for-test">Use REST for test</a></li>
+<li><a class="reference internal" href="#configuration-section-in-domogik-cfg">Configuration section in ~/.domogik.cfg</a></li>
+<li><a class="reference internal" href="#configuration-in-database">Configuration in database</a></li>
+<li><a class="reference internal" href="#how-to-use-rest-with-ssl">How to use REST with SSL?</a><ul>
+<li><a class="reference internal" href="#generate-certificate">Generate certificate</a></li>
+<li><a class="reference internal" href="#configure-rest">Configure REST</a></li>
+<li><a class="reference internal" href="#test-it">Test it</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#status">Status</a></li>
+<li><a class="reference internal" href="#options">Options</a><ul>
+<li><a class="reference internal" href="#callback-name">callback=name</a></li>
+<li><a class="reference internal" href="#export-csv">export=csv</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#debug-options">Debug options</a></li>
+<li><a class="reference internal" href="#test-long-polling">Test long polling</a></li>
+<li><a class="reference internal" href="#view-queues-content">View queues content</a></li>
+<li><a class="reference internal" href="#tinywebdb">TinyWebDb</a></li>
+<li><a class="reference internal" href="#how-rest-interacts-with-other-domogik-parts">How REST interacts with other Domogik parts</a></li>
+<li><a class="reference internal" href="#how-rest-starts">How REST starts</a></li>
+<li><a class="reference internal" href="#how-rest-process-an-url">How REST process an Url</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../ui_add_icons.html">How to add your own room/area icons</a></li>
+    
+    
+      <li>Next: <a href="statmgr.html">Statistics Manager</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>RINOR Overview</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../ui_add_icons.html" title="How to add your own room/area icons">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="statmgr.html" title="Statistics Manager">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,155 @@
+==============
+RINOR Overview
+==============
+
+Use REST for test
+=================
+You can execute a REST request from a console using the *wget* command. 
+For example you can run: ::
+
+    $ wget -qO- http://127.0.0.1:40405/account/user/list
+
+This will run the request and show you the results (thanks to the *-qO-* parameter).
+
+Configuration section in ~/.domogik.cfg 
+=======================================
+In Domogik configuration file, there are several options about REST in **[rest]** section:
+
+* rest_server_ip (default : 127.0.0.1) : ip of REST HTTP server 
+* rest_server_port (default : 40405) : port of REST HTTP server
+* rest_use_ssl (default : False) : use (True) or not (False) HTTPS instead of HTTP
+* rest_ssl_certificate (default : empty) : path of certificate file (.pem)
+
+Configuration in database
+=========================
+With the User Interface administration, you can configure Rest parameters :
+
+* q-timeout : Maximum wait time for getting data froma queue
+* q-size : Size for 'classic' queues. You should not have to change this value
+* q-cmd-size : Size for /command queue
+* q-life-exp : Life expectancy for a xpl message in queues. You sould not have to change this value
+* q-sleep : Time between each unsuccessfull look for a xpl data in a queue
+* q-evt-timeout : Maximum wait time for getting event from queue
+* q-evt-size : Size for /event queue
+* q-evt-life-exp : Life expectancy for an event in event queues
+
+If you don't know what you are doing, you shouldn't set these parameters. Changing these parameters implies to restart REST server.
+
+.. note::
+    These parameters may be moved in ~/.domogik.cfg file in a following release.
+
+How to use REST with SSL?
+=========================
+Generate certificate 
+--------------------
+First, generate a self-signed certificate compounded of a certificate and a private key for your REST server with the following command (both certificate and key are put in a single file : domogik.pem): ::
+
+    $ openssl req -new -x509 -keyout domogik.pem -out domogik.pem -days 365 -nodes
+
+This certificate is valid for one year. Adapt the *days* parameter (-days 365) to change this.
+
+Configure REST
+--------------
+Then, set **rest_use_ssl** parameter to True and **rest_ssl_certificate** with the path to your certificate file.
+
+Restart REST server.
+
+Test it 
+-------
+If REST is on 127.0.0.1:40405, try a request on https://127.0.0.1:40405/ with your favorite browser. You should obtain something like: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "rest" : [
+            {"Version" : "0.1"},
+            {"Description" : "REST module is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"},
+            {"SSL" : "True"}
+        ]
+    }
+
+
+If this is OK with **"SSL" : "True"**, it works :)
+
+Status 
+======
+Json response status: ::
+
+    {status : 'OK/ERROR', code : '408', description : 'bla bla bla...'}
+
+Code is a number in order to get cleaner error types
+* OK : code = 0, description = ""
+* ERROR : code = 999 (default), description = "Error description"
+
+This status is sent for each REST request.
+
+Options
+=======
+After a REST url, you can pass optional parameters. Here is the list :
+
+callback=name
+-------------
+This forces the response to be a Jsonp response. This is needed for calling REST from jQuery.
+
+Example response without callback: ::
+
+    /base/area/list
+    {"status" : "OK", "code" : 0, "description" : "" "area: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]}
+
+And the result with callback=foo: ::
+
+    /base/area/list?callback=foo
+    foo ({"status" : "OK", "code" : 0, "description" : "" "area: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]})
+
+export=csv
+----------
+With **export=csv** option, if available, REST will give you data in CSV format instead of Json format. Entries that allows it are indicated.
+
+Debug options 
+=============
+After a REST url, you can pass optionnal debug parameters. Here is the list :
+
+* debug-sleep=N : make REST waiting N seconds seconds before answering to the request.
+
+Test long polling
+=================
+If you want to test longpolling features in your UI, you can try to access : **http://ip:port/testlongpoll**
+
+This will return you a simple json structure like this: ::
+    
+    {'number' : 7}
+
+The number indicatte the time REST took to answer (a random time between 1 and 15 seconds)
+
+View queues content
+===================
+For debugging some stuff, you could need to see what is present in REST queues. You can access to this with **http://ip:port/queuecontent/<queue name>**
+Queues names:
+
+* system_list
+* system_detail
+* system_start
+* system_stop
+* command
+* event
+
+TinyWebDb
+=========
+To allow users to create small apps with google Appinventor, we add a /getvalue entry to REST.
+You just have to POST the url you want REST to process with /getvalue entry. This will return you a json formated data.
+
+.. warning::
+    On jan 2011, json result is too complex for Appinventor for analysis. You should use /getvalue only for sending commands without any check.
+
+How REST interacts with other Domogik parts
+===========================================
+.. image:: interactions-EN.png
+
+How REST starts
+===============
+.. image:: startup-EN.png
+
+How REST process an Url
+=======================
+.. image:: process-url-EN.png

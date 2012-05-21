@@ -1,0 +1,431 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /command &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /events" href="rest_events.html" />
+    <link rel="prev" title="REST /base" href="rest_base.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="rest_base.html" title="REST /base">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_events.html" title="REST /events">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_command">
+            
+  <div class="section" id="rest-command">
+<h1>REST /command<a class="headerlink" href="#rest-command" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>/command</strong> entry in REST is used by User Interfaces to send commands to devices. The URL is translated in a xPL message (see Developper notes for details).</p>
+<p>For example :
+<strong>/command/x10/A3/on</strong> will act as sending this xPL message:</p>
+<div class="highlight-python"><pre>xml-cmnd
+{
+...
+}
+x10.basic
+{
+command=on
+device=A3
+}</pre>
+</div>
+<p>This translation is made by RINOR, which uses a xml file to convert URL to xPL.</p>
+<div class="section" id="flow">
+<h2>Flow<a class="headerlink" href="#flow" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/rest-command.png" src="../../_images/rest-command.png" />
+</div>
+<div class="section" id="developper-notes">
+<h2>Developper notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="url-description">
+<h3>Url description<a class="headerlink" href="#url-description" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-python"><pre>http://ip:port/command/&lt;technology&gt;/&lt;address&gt;/&lt;command&gt;/command [/...]</pre>
+</div>
+<p>The goal is to be able to generate a xpl message based on a simple url.</p>
+<p>The url must use one of these layouts:</p>
+<ul class="simple">
+<li>/command/&lt;technology&gt;/&lt;address&gt;/&lt;command&gt;</li>
+<li>/command/&lt;technology&gt;/&lt;address&gt;/&lt;command&gt;/&lt;mandatory_param1&gt;/.../&lt;mandatory_paramN&gt;</li>
+<li>/command/&lt;technology&gt;/&lt;address&gt;/&lt;command&gt;/&lt;mandatory_param1&gt;/&lt;optional_param1_name&gt;/&lt;optional_param1_value&gt;/.../&lt;optional_paramN_name&gt;/&lt;optional_paramN_value&gt;</li>
+</ul>
+<p>The url is formatted like this :</p>
+<ul class="simple">
+<li>first section is command, it is always the same to send a command</li>
+<li>second section is technology/address</li>
+<li>for a given technology/address, one or many commands are defined</li>
+<li>for each command, one or many mandatory parameters are defined, each one has a position (first param always represents the same thing). This command will always be called with all these parameters.</li>
+<li>for each command, one or more optional parameters are defined. They can be added, or not, at the end of the &#8220;/command/technology/address/&lt;mandatory_params&gt;/&#8221; url, without command.</li>
+</ul>
+<p>An xpl message is:</p>
+<div class="highlight-python"><pre>xpl-cmnd
+{
+...
+}
+&lt;schema_name&gt;.&lt;schema_type&gt;
+{
+[key_command=command]
+[mandatory_param1=value1]
+[mandatory_param2=value2]
+[optional_param1=optional_value1]
+}</pre>
+</div>
+<p>The mandatory_param keys will be found in the xml mapping definition, only the value (identified by its position) will be added in the url.</p>
+<p>Optional_param keys will be found in the xml mapping and identified by optional_param_name in the url. The value will be the one passed as optional_param_value in the url.</p>
+</div>
+<div class="section" id="xml-description">
+<h3>Xml description<a class="headerlink" href="#xml-description" title="Permalink to this headline">¶</a></h3>
+<p>Note:</p>
+<ul>
+<li><p class="first">technology should match the name used in the xml schema, and the id from the database (x10, plcbus, 1wire...)</p>
+</li>
+<li><p class="first">&#8220;address&#8221; can be either :</p>
+<blockquote>
+<div><ul class="simple">
+<li>the device &#8220;physical&#8221; address, ie a unique identifier for the device in the technology</li>
+<li>any string of your choice if the device has no address.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">mandatory parameters are always at the same place, in the same command</p>
+</li>
+<li><p class="first">optional parameters are always __after__ the mandatory ones, and always in the form &lt;param_name&gt;/&lt;param_value&gt;</p>
+</li>
+</ul>
+<p>Each plugin will provide several xml files (one by command).
+Two plugins of the same technology (example : several x10 plugins for several interfaces like CM11, CM15) can provide the same commands and so, the same xml files. So, check if there is not already another plugin which provide the xml file ;)</p>
+<p>Files will be put in a dedicated folder like this : &lt;technology&gt;/&lt;command&gt;.xml</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">computer</span><span class="o">/</span><span class="n">wol</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">plcbus</span><span class="o">/</span><span class="n">on</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">plcbus</span><span class="o">/</span><span class="n">off</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">plcbus</span><span class="o">/</span><span class="n">dim</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">x10</span><span class="o">/</span><span class="n">on</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">x10</span><span class="o">/</span><span class="n">off</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">x10</span><span class="o">/</span><span class="n">dim</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+<div class="section" id="adding-a-new-xml-file">
+<h4>Adding a new xml file<a class="headerlink" href="#adding-a-new-xml-file" title="Permalink to this headline">¶</a></h4>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Actually (release 0.1), plugins are given with Domogik so there is no need (and no way) to install a plugin with an existing tool.
+The following lines explain what will be done when plugin&#8217;s installation will be available.</p>
+</div>
+<p>Xml files are provided by plugins. A plugin has to provide a file for each command of the technology it uses.
+So, several plugins can provide the same xml files. This problem is solved at plugin installation :</p>
+<ul>
+<li><p class="first">plugin installation lists plugin&#8217;s xml files provided</p>
+</li>
+<li><p class="first">plugin installation lists statmgr&#8217;s xml files already installed</p>
+</li>
+<li><p class="first">if there is a conflict (xml files already exists) :</p>
+<blockquote>
+<div><ul class="simple">
+<li>tell user that there is a conflict</li>
+<li>display a diff of the 2 (or more) conflicted files</li>
+<li>ask user to choose one file (default : the file already installed)</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">plugin installation installs xml files and continue his installation</p>
+</li>
+</ul>
+</div>
+<div class="section" id="xml-file-description">
+<h4>Xml file description<a class="headerlink" href="#xml-file-description" title="Permalink to this headline">¶</a></h4>
+<div class="code xml highlight-python"><pre>&lt;technology id="Technology given in URL"&gt;
+  &lt;command name="Command given in URL"&gt;
+    &lt;schema&gt;xPL schema that will be used&lt;/schema&gt;
+    &lt;command-key&gt;(optionnal) key in xPL schema which will contains the command given in URL&lt;/command-key&gt;
+    &lt;command-xpl-value&gt;(if command-key) The real value of the command key in xPL schema (ex : preset_dim =&gt; dim)&lt;/command-xpl-value&gt;
+    &lt;adress-key&gt;(optionnal) key in xPL schema which will contain the device address given in URL&lt;/adress-key&gt;
+    &lt;parameters&gt; &lt;!-- optionnal if you have parameters --&gt;
+      &lt;parameter key="The key of a couple key=value added to the xPL message with the param value"
+                 location="#param in the url (1 is the first param, not the first part of url"
+                 value="value of a key"  &lt;!-- optionnal --&gt;
+                 mode="append||prepend"  &lt;!-- optionnal --&gt;
+             /&gt;
+      &lt;parameter key="param2" location="2"/&gt;
+      ...
+    &lt;/parameters&gt;
+    &lt;listener&gt;
+      &lt;!-- define the listener to create in command to wait for plugin response to /command --&gt;
+      &lt;schema&gt;xPL schema that will be listen for&lt;/schema&gt;
+      &lt;xpltype&gt;xPL schema type : xpl-stat, xpl-trig&lt;/xpltype&gt;
+      &lt;filter&gt;
+        &lt;!-- list of 'key' nodes.
+             each node must have 2 parameters :
+                  - name : the "key" of the pair
+                  - command : the "value" of the pair
+                  A message will be loggued only if schema and xpltype are corrects,
+                  and only if for all "key" nodes specified, there is a name=value pair in the message.
+        --&gt;
+        &lt;!-- the 2 following key/values should be set if command-key/command-value and address-key are defines in previous part of xml --&gt;
+        &lt;key name="command" value="command name given in &lt;value&gt;...&lt;/value&gt; in &lt;command/&gt; bloc" /&gt;
+        &lt;key name="device" value="@address@"/&gt; &lt;!-- the value @address@ is the only one to use! It will be replaced by the good address in REST processing --&gt;
+        &lt;!-- other filters on static values (optionnal) --&gt;
+        &lt;key name="somekey" value="somevalue"/&gt;
+      &lt;/filters&gt;
+    &lt;/listener&gt;
+  &lt;/command&gt;
+&lt;/technology&gt;</pre>
+</div>
+<div class="section" id="notice-about-parameter-value-attribute">
+<h5>Notice about parameter &gt; value attribute<a class="headerlink" href="#notice-about-parameter-value-attribute" title="Permalink to this headline">¶</a></h5>
+<p>If &#8216;value&#8217; is specified, key attribute has to be specified. the usage is to define static &#8216;key=value&#8217; to xpl schema.
+This is useful for schemas needing sone information not given in command (example : /command/computer/&lt;address&gt;/wol and &#8216;type=wakeonlan&#8217; in xpl command.basic schema</p>
+</div>
+<div class="section" id="notice-about-parameter-mode-attribute">
+<h5>Notice about parameter &gt; mode attribute<a class="headerlink" href="#notice-about-parameter-mode-attribute" title="Permalink to this headline">¶</a></h5>
+<p>If &#8216;mode&#8217; is specified and key attribute equals an existing key in the message (no matter if this key is defined after in xml specification), then the value of the param will be appended/prepended to the value of the existing key.
+ex : let&#8217;s say you have an url &#8216;/command/yourtechno/address/yourcommand/foo1/foo2&#8217; and :
+- a pair &#8220;param1=foo1&#8221; is defined by &#8216;&lt;parameter key=&#8221;param1&#8221; location=&#8221;1&#8221;/&gt;&#8217;
+if you define in the xml a section &#8216;&lt;parameter key=&#8221;param1&#8221; location=&#8221;2&#8221; mode=&#8221;prepend&#8221;/&gt;&#8217;, then the value of the second parameter will be prepended to the &#8220;foo1&#8221; value,
+so your pair will become : &#8220;param1=foo2 foo1&#8221;
+This is useful for nasty schemas which defines &#8220;command=command_name command_attr&#8221; such as audio.slimserv</p>
+</div>
+<div class="section" id="example-for-http-ip-port-command-plcbus-a3-on">
+<h5>Example for <a class="reference external" href="http://ip:port/command/plcbus/A3/on">http://ip:port/command/plcbus/A3/on</a><a class="headerlink" href="#example-for-http-ip-port-command-plcbus-a3-on" title="Permalink to this headline">¶</a></h5>
+<div class="code xml highlight-python"><pre>&lt;technology id="plcbus"&gt;
+  &lt;command name="on"&gt;
+    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
+    &lt;command-key&gt;command&lt;/command-key&gt;
+    &lt;adress-key&gt;device&lt;/adress-key&gt;
+    &lt;command-xpl-value&gt;on&lt;/command-xpl-value&gt;
+    &lt;parameters/&gt;
+  &lt;/command&gt;
+  &lt;listener&gt;
+    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
+    &lt;xpltype&gt;xpl-trig&lt;/xpltype&gt;
+    &lt;filter&gt;
+      &lt;key name="command" value="on" /&gt;
+      &lt;key name="device" value="@address@"/&gt;
+    &lt;/filter&gt;
+  &lt;/listener&gt;
+&lt;/technology&gt;</pre>
+</div>
+</div>
+<div class="section" id="example-for-http-ip-port-command-plcbus-a4-dim-55">
+<h5>Example for <a class="reference external" href="http://ip:port/command/plcbus/A4/dim/55">http://ip:port/command/plcbus/A4/dim/55</a><a class="headerlink" href="#example-for-http-ip-port-command-plcbus-a4-dim-55" title="Permalink to this headline">¶</a></h5>
+<div class="code xml highlight-python"><pre>&lt;technology id="plcbus"&gt;
+  &lt;command name="dim"&gt;
+    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
+    &lt;command-key&gt;command&lt;/command-key&gt;
+    &lt;adress-key&gt;device&lt;/adress-key&gt;
+    &lt;command-xpl-value&gt;dim&lt;/command-xpl-value&gt;
+    &lt;parameters&gt;
+      &lt;parameter key="value" location="1"/&gt;
+    &lt;/parameters&gt;
+  &lt;/command&gt;
+  &lt;listener&gt;
+    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
+    &lt;xpltype&gt;xpl-trig&lt;/xpltype&gt;
+    &lt;filter&gt;
+      &lt;key name="command" value="dim" /&gt;
+      &lt;key name="device" value="@address@"/&gt;
+    &lt;/filter&gt;
+  &lt;/listener&gt;
+&lt;/technology&gt;</pre>
+</div>
+</div>
+<div class="section" id="example-for-http-ip-port-command-computer-computer-name-wol">
+<h5>Example for <a class="reference external" href="http://ip:port/command/computer">http://ip:port/command/computer</a>/&lt;computer name&gt;/wol<a class="headerlink" href="#example-for-http-ip-port-command-computer-computer-name-wol" title="Permalink to this headline">¶</a></h5>
+<div class="code xml highlight-python"><pre>&lt;technology id="computer"&gt;
+  &lt;command name="wol"&gt;
+    &lt;schema&gt;command.basic&lt;/schema&gt;
+    &lt;command-key&gt;current&lt;/command-key&gt;
+    &lt;adress-key&gt;device&lt;/adress-key&gt;
+    &lt;command-xpl-value&gt;on&lt;/command-xpl-value&gt;
+    &lt;parameters&gt;
+      &lt;parameter key="type" value="wakeonlan"/&gt;
+    &lt;/parameters&gt;
+  &lt;/command&gt;
+  &lt;listener&gt;
+    &lt;schema&gt;sensor.basic&lt;/schema&gt;
+    &lt;xpltype&gt;xpl-trig&lt;/xpltype&gt;
+    &lt;filter&gt;
+      &lt;key name="type" value="wakeonlan" /&gt;
+      &lt;key name="current" value="on" /&gt;
+      &lt;key name="device" value="@address@"/&gt;
+    &lt;/filter&gt;
+  &lt;/listener&gt;
+&lt;/technology&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="how-rest-gets-xpl-trig-for-a-command">
+<h2>How REST gets xpl-trig for a /command<a class="headerlink" href="#how-rest-gets-xpl-trig-for-a-command" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">REST start</p>
+</li>
+<li><p class="first">REST do some init stuff</p>
+</li>
+<li><p class="first">REST try to get QUEUE_COMMAND_* values from database. If not get default values</p>
+</li>
+<li><p class="first">REST loads all xml files availables for /command</p>
+</li>
+<li><p class="first">REST create a queue for /command</p>
+</li>
+<li><p class="first">REST get a /command call</p>
+</li>
+<li><p class="first">REST create a thread for /command (like all others /foo)</p>
+</li>
+<li><p class="first">REST create and send XPL message</p>
+</li>
+<li><p class="first">REST start counting for timeout (see QUEUE_COMMAND_TIMEOUT)</p>
+</li>
+<li><p class="first">while timeout not reached, REST read queue to get xpl-trig</p>
+</li>
+<li><p class="first">if timeout reached, REST send timeout message</p>
+</li>
+<li><dl class="first docutils">
+<dt>else :</dt>
+<dd><ul class="first last simple">
+<li>REST transform xpl-trig in json data</li>
+<li>REST send data</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="how-ui-will-get-status-of-device">
+<h2>How UI will get status of device ?<a class="headerlink" href="#how-ui-will-get-status-of-device" title="Permalink to this headline">¶</a></h2>
+<p>REST only send a OK/KO response with the xpl-trig xPL message received when a /command is successfull.
+To get (for example), the level of a dimmable device after a &#8220;+10&#8221; increasing command, UI will use <strong>/stats</strong> or <strong>/events</strong> REST feature to get info from this device.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /command</a><ul>
+<li><a class="reference internal" href="#flow">Flow</a></li>
+<li><a class="reference internal" href="#developper-notes">Developper notes</a><ul>
+<li><a class="reference internal" href="#url-description">Url description</a></li>
+<li><a class="reference internal" href="#xml-description">Xml description</a><ul>
+<li><a class="reference internal" href="#adding-a-new-xml-file">Adding a new xml file</a></li>
+<li><a class="reference internal" href="#xml-file-description">Xml file description</a><ul>
+<li><a class="reference internal" href="#notice-about-parameter-value-attribute">Notice about parameter &gt; value attribute</a></li>
+<li><a class="reference internal" href="#notice-about-parameter-mode-attribute">Notice about parameter &gt; mode attribute</a></li>
+<li><a class="reference internal" href="#example-for-http-ip-port-command-plcbus-a3-on">Example for http://ip:port/command/plcbus/A3/on</a></li>
+<li><a class="reference internal" href="#example-for-http-ip-port-command-plcbus-a4-dim-55">Example for http://ip:port/command/plcbus/A4/dim/55</a></li>
+<li><a class="reference internal" href="#example-for-http-ip-port-command-computer-computer-name-wol">Example for http://ip:port/command/computer/&lt;computer name&gt;/wol</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-rest-gets-xpl-trig-for-a-command">How REST gets xpl-trig for a /command</a></li>
+<li><a class="reference internal" href="#how-ui-will-get-status-of-device">How UI will get status of device ?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="rest_base.html">REST /base</a></li>
+    
+    
+      <li>Next: <a href="rest_events.html">REST /events</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /command</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_command.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="rest_base.html" title="REST /base">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_events.html" title="REST /events">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

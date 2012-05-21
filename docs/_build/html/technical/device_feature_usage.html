@@ -1,0 +1,297 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Device types, features and usages &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Database model" href="database.html" />
+    <link rel="prev" title="Sensors" href="sensor.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="sensor.html" title="Sensors">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="database.html" title="Database model">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-device_feature_usage">
+            
+  <div class="section" id="device-types-features-and-usages">
+<h1>Device types, features and usages<a class="headerlink" href="#device-types-features-and-usages" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="device-types">
+<h2>Device types<a class="headerlink" href="#device-types" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="actuators-only">
+<h3>Actuators only<a class="headerlink" href="#actuators-only" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>x10.Switch</li>
+<li>x10.Dimmer</li>
+<li>PLCBus.Switch</li>
+<li>PLCBus.Dimmer</li>
+</ul>
+</div>
+<div class="section" id="sensors-only">
+<h3>Sensors only<a class="headerlink" href="#sensors-only" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>1wire.ID</li>
+<li>1wire.Temperature</li>
+<li>1wire.Voltmeter</li>
+<li>communication.caller_id</li>
+<li>service.Teleinfo</li>
+<li>rfid.Mirror_Base</li>
+<li>rfid.Mirror_Tag</li>
+</ul>
+</div>
+<div class="section" id="with-actuators-sensors">
+<h3>With Actuators &amp; Sensors<a class="headerlink" href="#with-actuators-sensors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Computer.Control</li>
+<li>relayboard.Switch</li>
+<li>relayboard.Voltmeter</li>
+<li>relayboard.Logical_Input</li>
+<li>relayboard.Counter</li>
+</ul>
+</div>
+</div>
+<div class="section" id="device-features">
+<h2>Device features<a class="headerlink" href="#device-features" title="Permalink to this headline">¶</a></h2>
+<p>A device type can have one or many features. For example an x10 button (device type) can have only one feature (switch).
+But an x10 dimmer has two features : dimmer of course and switch (when the dimmer is set to 0 or 100).</p>
+</div>
+<div class="section" id="device-usages">
+<h2>Device usages<a class="headerlink" href="#device-usages" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="common">
+<h3>Common<a class="headerlink" href="#common" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Light</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {&#8220;step&#8221;:10, &#8220;unit&#8221;:&#8221;%&#8221;}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Socket</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {&#8220;step&#8221;:10, &#8220;unit&#8221;:&#8221;%&#8221;}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Shutter</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Down&#8221;, &#8220;state1&#8221;:&#8221;Up&#8221;}, &#8220;range&#8221;: {&#8220;step&#8221;:10, &#8220;unit&#8221;:&#8221;%&#8221;}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Air conditioning</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {&#8220;step&#8221;:1, &#8220;unit&#8221;:&#8221;&amp;deg;C&#8221;}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Ventilation</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {&#8220;step&#8221;:10, &#8220;unit&#8221;:&#8221;%&#8221;}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Heating</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {&#8220;step&#8221;:1, &#8220;unit&#8221;:&#8221;&amp;deg;C&#8221;}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Appliance</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Desktop Computer</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Server</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Phone</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">TV</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {&#8220;state0&#8221;:&#8221;Off&#8221;, &#8220;state1&#8221;:&#8221;On&#8221;}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Water</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Gas</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Electricity</p>
+<blockquote>
+<div><ul class="simple">
+<li>default_options: { &#8220;actuator&#8221;: { &#8220;binary&#8221;: {}, &#8220;range&#8221;: {}, &#8220;trigger&#8221;: {} }, &#8220;sensor&#8221;: {&#8220;boolean&#8221;: {}, &#8220;number&#8221;: {}, &#8220;string&#8221;: {} } }</li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="special">
+<h3>Special<a class="headerlink" href="#special" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Squeezebox</li>
+<li>Mir:ror</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Device types, features and usages</a><ul>
+<li><a class="reference internal" href="#device-types">Device types</a><ul>
+<li><a class="reference internal" href="#actuators-only">Actuators only</a></li>
+<li><a class="reference internal" href="#sensors-only">Sensors only</a></li>
+<li><a class="reference internal" href="#with-actuators-sensors">With Actuators &amp; Sensors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#device-features">Device features</a></li>
+<li><a class="reference internal" href="#device-usages">Device usages</a><ul>
+<li><a class="reference internal" href="#common">Common</a></li>
+<li><a class="reference internal" href="#special">Special</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="sensor.html">Sensors</a></li>
+    
+    
+      <li>Next: <a href="database.html">Database model</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Device types, features and usages</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/technical/device_feature_usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="sensor.html" title="Sensors">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="database.html" title="Database model">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

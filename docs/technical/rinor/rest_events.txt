@@ -1,0 +1,140 @@
+============
+REST /events
+============
+
+What is an event ?
+==================
+An event occurs when a xPL message we are waiting for is received. Events feature in REST are used by User Interfaces to get instant events on xPL network.
+Example : you manually switch on a light on Plcbus network, the icon light on User Interface will immediatly change to state "on".
+
+How it works
+============
+First, you create a new event request for one or more device id. This request will give you :
+
+* a ticket id (which you will have to use in following requests)
+* data of event
+
+After this event creation you can make a request for this event as often as you want. On REST side, data are put in queue, so no data will be loose between 2 requests.
+
+When you don't need anymore the request, please free him with the appropriate request.
+
+When there is no data in queue, REST will keep connection open until it can give you data or until timeout occurs (cf **q-evt-timeout** configuration key).
+
+Configuration
+=============
+* evt-timeout : timeout for an event's ticket. If no operation is made on this ticket during this time, ticket is deleted.
+* q-evt-size : Queue size for events : maximum number of events that could be stored
+* q-evt-life-exp : life expectancy for events in queue
+* q-evt-timeout : timeout for a /event new or get request.
+
+.. note::
+    Each event has his own queue
+
+.. warning::
+    Don't change these values if you don't know what you are doing.
+
+Domogik Events: /events/domogik/
+================================
+
+API
+---
+
+Create a new event request
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code::
+
+    /events/domogik/new
+
+Plugin list updated event
+*************************
+You will get: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "event" : [
+            {
+                "timestamp" : 1285330784,
+                "data" : "plugin-list-updated",
+                "ticket_id" : "1",
+            } 
+        ]
+    }
+
+Make a request for an event
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code::
+
+    /events/domogik/get/<ticket id>
+
+The response format is like /new response.
+
+Free request for an event
+^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code::
+
+    /events/domogik/free/<ticket id>
+
+Events requests (for devices) : /events/request/
+================================================
+
+API
+---
+
+Create a new event request
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code::
+
+    /events/request/new/<device id 0>/<device id 1>/<device id 2>/....
+
+Example of response for a device with 2 keys stored in database (command and level): ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "event" : [
+            {
+                "timestamp" : 1285330784,
+                "data" : [
+                    {
+                        "value" : "preset_dim",
+                        "key" : "command" 
+                    },
+                    {
+                        "value" : "50",
+                        "key" : "level" 
+                    } 
+                ],
+                "ticket_id" : "1",
+                "device_id" : 1 
+            } 
+        ]
+    }
+
+Make a request for an event
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code::
+
+    /events/request/get/<ticket id>
+
+The response format is like /new response.
+
+Free request for an event
+^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code::
+
+    /events/request/free/<ticket id>
+
+Flow for devices events
+=======================
+.. image:: rest-event-stat.png
+
+Debug feature
+=============
+In REST status ("/" path), there are several informations about events requests :
+
+* Number of event requests
+* Max queue size for event requests
+* Information about each event request (creation date, actual size, ticket id)

@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Statistics Manager &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /base" href="rest_base.html" />
+    <link rel="prev" title="RINOR Overview" href="index.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="RINOR Overview">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_base.html" title="REST /base">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-statmgr">
+            
+  <div class="section" id="statistics-manager">
+<h1>Statistics Manager<a class="headerlink" href="#statistics-manager" title="Permalink to this headline">¶</a></h1>
+<p>Stats manager&#8217;s goal is to store in database interesting data he can read on xPL network. To know which data should be stored, some XML files are used.</p>
+<div class="section" id="adding-new-statistics-in-database">
+<h2>Adding new statistics in database<a class="headerlink" href="#adding-new-statistics-in-database" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="xml-files">
+<h3>XML files<a class="headerlink" href="#xml-files" title="Permalink to this headline">¶</a></h3>
+<p>In order Stats Manager to know which data from xPL network to store in database and how to store it, XML files are used.
+These files are read by statmgr and define which xPL messages to listen and which data in these messages have to be store</p>
+<div class="section" id="folder-hierarchy-for-xml-files">
+<h4>Folder hierarchy for XML files<a class="headerlink" href="#folder-hierarchy-for-xml-files" title="Permalink to this headline">¶</a></h4>
+<p>Here is the structure choosen to store xml files : &lt;xml folder for statmgr&gt;/&lt;Technology&gt;/&lt;xplSchema&gt;.xml</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">x10</span><span class="o">/</span><span class="n">x10</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">computer</span><span class="o">/</span><span class="n">sensor</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-new-xml-file">
+<h4>Adding a new xml file<a class="headerlink" href="#adding-a-new-xml-file" title="Permalink to this headline">¶</a></h4>
+<p>Xml files are provided by plugins. A plugin has to provide a file for each xpl message type. ^
+So, several plugins can provide the same xml files. This problem is solved at plugin installation :</p>
+<ul>
+<li><p class="first">plugin installation lists plugin&#8217;s xml files provided</p>
+</li>
+<li><p class="first">plugin installation lists statmgr&#8217;s xml files already installed</p>
+</li>
+<li><p class="first">if there is a conflict (xml files already exists) :</p>
+<blockquote>
+<div><ul class="simple">
+<li>tell user that there is a conflict</li>
+<li>display a diff of the 2 (or more) conflicted files</li>
+<li>ask user to choose one file (default : the file already installed)</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">plugin installation installs xml files and continue his installation</p>
+</li>
+</ul>
+</div>
+<div class="section" id="xml-file-description">
+<h4>Xml file description<a class="headerlink" href="#xml-file-description" title="Permalink to this headline">¶</a></h4>
+<p>A xml file for statmgr defines :</p>
+<ul class="simple">
+<li>a listener for the xpl schema</li>
+<li>a mapping for the listener between xpl schema elements and database</li>
+</ul>
+<div class="code xml highlight-python"><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!-- All xml definition files must be in &lt;domogik.cfg_path&gt;/xml directory,
+    one mapping definintion per file.
+--&gt;
+&lt;!-- statistic : root element
+attribute technology is mandatory
+It specifies the technology for which this mapping is used.
+--&gt;
+&lt;statistic technology="plcbus"&gt;
+    &lt;schema name="control.basic"&gt;
+        &lt;xpltype type="xpl-trig"&gt;
+            &lt;listener&gt;
+                &lt;filter&gt;
+                    &lt;!-- list of 'key' nodes.
+                    each node must have 2 parameters :
+                        - name : the "key" of the pair
+                        - command : the "value" of the pair
+                        A message will be loggued only if schema and xpltype are corrects,
+                        and only if for all "key" nodes specified, there is a name=value pair in the message.
+                    --&gt;
+                    &lt;key name="type" value="plcbus" /&gt;
+                    &lt;key name="command" value="on" /&gt;
+                &lt;/filter&gt;
+            &lt;/listener&gt;
+            &lt;mapping&gt; &lt;!-- define the mapping between message keys and the database --&gt;
+                &lt;device field="device"/&gt;
+                &lt;!-- define the field containing device name/address
+                     If there is no field containing device addres, you can use 'static_name' attribute to define a name. Use with caution and only when there is no other choice :
+                     &lt;device static_name="foo"/&gt;
+                     If it is a notification message, use this :
+                     &lt;device type="notification"/&gt;
+                --&gt;
+                &lt;!-- The "value" node can have 2 attributes :
+                    - field : mandatory ! define the key of the pair key=value to get in the Xpl message
+                    - new_name: optionnal, if it's define, the 'name' of this value entry will be the value defined,
+                            else it will be the filed name.
+                    - filter_key : define one key to read for adding a filter on renaming name in new_name
+                    - filter_value : the value for the filter
+                    - history_size : optionnal, indicate number of values to keep in database for a device key
+                --&gt;
+                &lt;value field="command"/&gt;
+                &lt;value field="command" history_size="5"/&gt;
+                &lt;value field="command" new_name="bar" /&gt;
+                &lt;value field="command" new_name="foo" filter_key="type" filter_value="plcbus" /&gt;
+            &lt;/mapping&gt;
+        &lt;/xpltype&gt;
+        &lt;xpltype type="xpl-stat"&gt;
+            &lt;listener&gt;
+                &lt;filter&gt;
+                    &lt;key name="type" value="plcbus" /&gt;
+                    &lt;key name="command" value="off" /&gt;
+                &lt;/filter&gt;
+            &lt;/listener&gt;
+            &lt;mapping&gt; &lt;!-- define the mapping between message keys and the database --&gt;
+                &lt;device field="device"/&gt; &lt;!-- define the device name --&gt;
+                &lt;value field="command"/&gt;
+                &lt;value field="command" name="bar" /&gt;
+            &lt;/mapping&gt;
+        &lt;/xpltype&gt;
+    &lt;/schema&gt;
+&lt;/statistic&gt;</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If xpl-trig and xpl-stat parts are identical, you can use <strong>type=&#8221;*&#8221;</strong></p>
+</div>
+<p>Example for x10/x10.basic:</p>
+<div class="highlight-python"><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;statistic technology="x10"&gt;
+    &lt;schema name="x10.basic"&gt;
+        &lt;xpltype type="xpl-trig"&gt;
+            &lt;listener&gt;
+                &lt;filter/&gt;
+            &lt;/listener&gt;
+            &lt;mapping&gt;
+                &lt;device field="device"/&gt;
+                &lt;value field="command"/&gt;
+                &lt;value field="level" /&gt;
+            &lt;/mapping&gt;
+        &lt;/xpltype&gt;
+    &lt;/schema&gt;
+&lt;/statistic&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="flow">
+<h2>Flow<a class="headerlink" href="#flow" title="Permalink to this headline">¶</a></h2>
+<p>To see flow about statistics and events, see <a class="reference internal" href="rest_events.html"><em>events page</em></a>.</p>
+</div>
+<div class="section" id="developper-notes">
+<h2>Developper notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
+<p>Stats manager read all xml files. for each files, it create listeners. Each listener will call a callback function that put data in database with good format.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Statistics Manager</a><ul>
+<li><a class="reference internal" href="#adding-new-statistics-in-database">Adding new statistics in database</a><ul>
+<li><a class="reference internal" href="#xml-files">XML files</a><ul>
+<li><a class="reference internal" href="#folder-hierarchy-for-xml-files">Folder hierarchy for XML files</a></li>
+<li><a class="reference internal" href="#adding-a-new-xml-file">Adding a new xml file</a></li>
+<li><a class="reference internal" href="#xml-file-description">Xml file description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flow">Flow</a></li>
+<li><a class="reference internal" href="#developper-notes">Developper notes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">RINOR Overview</a></li>
+    
+    
+      <li>Next: <a href="rest_base.html">REST /base</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Statistics Manager</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/statmgr.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="RINOR Overview">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_base.html" title="REST /base">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

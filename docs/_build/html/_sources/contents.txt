@@ -29,3 +29,17 @@ Table Of Content
     /releases/0.1.0
     /technical/actuator
     /technical/sensor
+    /technical/device_feature_usage
+    /technical/database
+    /technical/ui_add_icons
+    /technical/rinor/index
+    /technical/rinor/statmgr
+    /technical/rinor/rest_base
+    /technical/rinor/rest_command
+    /technical/rinor/rest_events
+    /technical/rinor/rest_stats
+    /technical/rinor/rest_account
+    /technical/rinor/rest_plugin
+    /technical/rinor/rest_xplcmnd
+    /technical/rinor/rest_repository
+    /technical/rinor/rest_helper

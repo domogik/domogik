@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /xpl-cmnd &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /repo" href="rest_repository.html" />
+    <link rel="prev" title="REST /plugin" href="rest_plugin.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="rest_plugin.html" title="REST /plugin">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_repository.html" title="REST /repo">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_xplcmnd">
+            
+  <div class="section" id="rest-xpl-cmnd">
+<h1>REST /xpl-cmnd<a class="headerlink" href="#rest-xpl-cmnd" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>/xpl-cmnd</strong> url is used to send directly an xPL message over the xPL network.</p>
+<p>This usage must be avoided as often as possible. See <a class="reference internal" href="rest_command.html"><em>REST-command|/command</em></a> for sending orders to specific plugins.</p>
+<div class="section" id="when-can-we-use-xpl-cmnd-in-an-ui">
+<h2>When can we use <em>/xpl-cmnd</em> in an UI ?<a class="headerlink" href="#when-can-we-use-xpl-cmnd-in-an-ui" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The UI has to interact with an xPL software or hardware that is not part of the Domogik project.</li>
+<li>You want to test a specific plugin by sending an xPL message.</li>
+</ul>
+<p>So, don&#8217;t forget to ask yourself &#8220;Do I really need to send directly a command without using facilities offered by <a class="reference internal" href="rest_command.html"><em>REST-command|/command</em></a> and others REST method given by Domogik project ?&#8221;.</p>
+<p>For example, official User Interface doesn&#8217;t use this feature.</p>
+</div>
+<div class="section" id="uri-format">
+<h2>URI format<a class="headerlink" href="#uri-format" title="Permalink to this headline">¶</a></h2>
+<p>Here is the URI format (replace REST by ip:port of REST server):</p>
+<div class="highlight-python"><pre>http://REST/xpl-cmnd/&lt;schema&gt;/&lt;key1&gt;/&lt;value1&gt;/&lt;key2&gt;/&lt;value2&gt;/...</pre>
+</div>
+<ul class="simple">
+<li>schema : name of xPL schema. Example : <em>x10.basic</em></li>
+<li>key1/value1 : couple key/value of a schema. Example : <em>command/ON</em></li>
+</ul>
+<p>The schema type will always be <strong>xpl-cmnd</strong>.</p>
+<div class="section" id="response">
+<h3>Response<a class="headerlink" href="#response" title="Permalink to this headline">¶</a></h3>
+<p>When OK:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>When there is a problem in URI format:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">999</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Schema not given&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">999</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;No parameters specified&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">999</span><span class="p">,</span> <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Value missing for last parameter&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /xpl-cmnd</a><ul>
+<li><a class="reference internal" href="#when-can-we-use-xpl-cmnd-in-an-ui">When can we use <em>/xpl-cmnd</em> in an UI ?</a></li>
+<li><a class="reference internal" href="#uri-format">URI format</a><ul>
+<li><a class="reference internal" href="#response">Response</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="rest_plugin.html">REST /plugin</a></li>
+    
+    
+      <li>Next: <a href="rest_repository.html">REST /repo</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /xpl-cmnd</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_xplcmnd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="rest_plugin.html" title="REST /plugin">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_repository.html" title="REST /repo">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

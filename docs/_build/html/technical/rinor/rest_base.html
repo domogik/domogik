@@ -1,0 +1,686 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>REST /base &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="REST /command" href="rest_command.html" />
+    <link rel="prev" title="Statistics Manager" href="statmgr.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="statmgr.html" title="Statistics Manager">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_command.html" title="REST /command">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-rinor-rest_base">
+            
+  <div class="section" id="rest-base">
+<h1>REST /base<a class="headerlink" href="#rest-base" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="house-management">
+<h2>House management<a class="headerlink" href="#house-management" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="areas">
+<h3>Areas<a class="headerlink" href="#areas" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="reading-operations">
+<h4>Reading operations<a class="headerlink" href="#reading-operations" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/area/list/</li>
+</ul>
+<p>Return:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;area&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Rez de chausse&quot;</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;RDC&quot;</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/base/area/list/by-id/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only one item in table</p>
+</div>
+<div class="section" id="writing-operations">
+<h4>Writing operations<a class="headerlink" href="#writing-operations" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/area/add/name/&lt;name&gt;/description/&lt;description&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/area/update/id/&lt;id&gt;/name/&lt;name&gt;/description/&lt;description&gt;</li>
+</ul>
+<p>Return: like /list but with only the item updated</p>
+<ul class="simple">
+<li>/base/area/del/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+<div class="section" id="rooms">
+<h3>Rooms<a class="headerlink" href="#rooms" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h4>Reading operations<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/room/list</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;room&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;area_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;la cuisine&quot;</span><span class="p">,</span>
+            <span class="s">&quot;area&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Rez de chausse&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;RDC&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;Cuisine&quot;</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/base/room/list/by-id/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only one item</p>
+<ul class="simple">
+<li>/base/room/list/by-area/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only items linked to an area</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If using <strong>/base/room/list/by-area//</strong>, return all rooms that are not related to an area</p>
+</div>
+</div>
+<div class="section" id="id2">
+<h4>Writing operations<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/room/add/name/&lt;name&gt;/area_id/&lt;area_id&gt;/description/&lt;description&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/room/update/id/&lt;id&gt;/name/&lt;name&gt;/area_id/&lt;area_id&gt;/description/&lt;description&gt;</li>
+</ul>
+<p>Return: like /list but with only the item updated</p>
+<ul class="simple">
+<li>/base/room/del/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+</div>
+<div class="section" id="user-interface-configuration">
+<h2>User Interface configuration<a class="headerlink" href="#user-interface-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ui-config">
+<h3>UI config<a class="headerlink" href="#ui-config" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="paramters-description">
+<h4>Paramters description<a class="headerlink" href="#paramters-description" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>name : name of UI, type of item (area, room, etc), category, a mix of all these datas, etc. Everything you could need to parameter your UI</li>
+<li>reference : id of an area/room/etc, etc</li>
+<li>key : the key for an UI parameter (icon, size, position, what you need)</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>Reading operations<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/ui_config/list</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;ui_config&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;key&quot;</span> <span class="p">:</span> <span class="s">&quot;icon&quot;</span><span class="p">,</span>
+            <span class="s">&quot;value&quot;</span> <span class="p">:</span> <span class="s">&quot;grndfloor&quot;</span><span class="p">,</span>
+            <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;area&quot;</span><span class="p">,</span>
+            <span class="s">&quot;reference&quot;</span> <span class="p">:</span> <span class="s">&quot;1&quot;</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/base/ui_config/list/by-element/&lt;name&gt;/&lt;reference&gt;/&lt;key&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+<ul class="simple">
+<li>/base/ui_config/list/by-key/&lt;name&gt;/&lt;key&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+<ul class="simple">
+<li>/base/ui_config/list/by-reference/&lt;name&gt;/&lt;reference&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+</div>
+<div class="section" id="id4">
+<h4>Writing operations<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/ui_config/set/name/&lt;name&gt;/reference/&lt;reference&gt;/key/&lt;key&gt;/value/&lt;value&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added or updated</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <strong>set</strong> operation act as an add operation when there is no configuration yet and as an update operation when configuration already exists.
+This is done to simplify the UI developper work.</p>
+</div>
+<ul class="simple">
+<li>/base/ui_config/del/by-key/&lt;name&gt;/&lt;key&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added or updated</p>
+<ul class="simple">
+<li>/base/ui_config/del/by-reference/&lt;name&gt;/&lt;reference&gt;</li>
+</ul>
+<p>Return: like /list but with only the items deleted</p>
+<ul class="simple">
+<li>/base/ui_config/del/by-element/&lt;name&gt;/&lt;reference&gt;/&lt;key&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+</div>
+<div class="section" id="devices-and-features-management">
+<h2>Devices and features management<a class="headerlink" href="#devices-and-features-management" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="device-usage">
+<h3>Device usage<a class="headerlink" href="#device-usage" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>Reading operations<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device_usage/list/</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><pre>{
+    "status" : "OK",
+    "code" : 0,
+    "description" : "None",
+    "device_usage" : [
+        {
+            "description" : "Lamp, light usage",
+            "default_options" : "{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }",
+            "id" : "light",
+            "name" : "Light"
+        },
+        ...
+    ]
+}</pre>
+</div>
+<ul class="simple">
+<li>/base/device_usage/list/by-name/&lt;name&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+</div>
+<div class="section" id="id6">
+<h4>Writing operations<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device_usage/add/id/&lt;id&gt;/name/&lt;name&gt;/description/&lt;description&gt;/default_options/&lt;default_options&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/device_usage/update/id/&lt;id&gt;/name/&lt;name&gt;/description/&lt;description&gt;/default_options/&lt;default_options&gt;</li>
+</ul>
+<p>Return: like /list but with only the item updated</p>
+<ul class="simple">
+<li>/base/device_usage/del/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+<div class="section" id="device-type">
+<h3>Device type<a class="headerlink" href="#device-type" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h4>Reading operations<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device_type/list/</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;device_type&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_technology_id&quot;</span> <span class="p">:</span> <span class="s">&quot;x10&quot;</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="s">&quot;x10.switch.switch&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_technology&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="s">&quot;x10&quot;</span><span class="p">,</span>
+                <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;X10&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;Switch&quot;</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id8">
+<h4>Writing operations<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device_type/add/id/&lt;id&gt;/name/&lt;name&gt;/description/&lt;description&gt;/technology_id/&lt;technology_id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/device_type/update/id/&lt;id&gt;/name/&lt;name&gt;/description/&lt;description&gt;/technology_id/&lt;technology_id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item updated</p>
+<ul class="simple">
+<li>/base/device_type/del/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+<div class="section" id="feature">
+<h3>Feature<a class="headerlink" href="#feature" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h4>Reading operations<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/feature/list/by-id/&lt;id&gt;</li>
+</ul>
+<p>Return:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span><span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span><span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;feature&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;device_feature_model_id&quot;</span><span class="p">:</span> <span class="s">&quot;plcbus.dimmer.switch&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;description&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+                <span class="s">&quot;reference&quot;</span><span class="p">:</span> <span class="s">&quot;2263D&quot;</span><span class="p">,</span>
+                <span class="s">&quot;device_usage_id&quot;</span><span class="p">:</span> <span class="s">&quot;light&quot;</span><span class="p">,</span>
+                <span class="s">&quot;address&quot;</span><span class="p">:</span> <span class="s">&quot;A2&quot;</span><span class="p">,</span>
+                <span class="s">&quot;device_type_id&quot;</span><span class="p">:</span> <span class="s">&quot;plcbus.dimmer&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;Lampe&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;device_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;device_feature_model&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;return_confirmation&quot;</span><span class="p">:</span> <span class="s">&quot;True&quot;</span><span class="p">,</span>
+                <span class="s">&quot;feature_type&quot;</span><span class="p">:</span> <span class="s">&quot;actuator&quot;</span><span class="p">,</span>
+                <span class="s">&quot;parameters&quot;</span><span class="p">:</span> <span class="s">&quot;{&amp;quot;command&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;value0&amp;quot;:&amp;quot;off&amp;quot;, &amp;quot;value1&amp;quot;:&amp;quot;on&amp;quot;}&quot;</span><span class="p">,</span>
+                <span class="s">&quot;stat_key&quot;</span><span class="p">:</span> <span class="s">&quot;command&quot;</span><span class="p">,</span>
+                <span class="s">&quot;value_type&quot;</span><span class="p">:</span> <span class="s">&quot;binary&quot;</span><span class="p">,</span>
+                <span class="s">&quot;device_type_id&quot;</span><span class="p">:</span> <span class="s">&quot;plcbus.dimmer&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;plcbus.dimmer.switch&quot;</span><span class="p">,</span>
+                <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;Dimmer&quot;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/base/feature/list/by-device_id/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with the item filtered</p>
+</div>
+</div>
+<div class="section" id="device-technology">
+<h3>Device technology<a class="headerlink" href="#device-technology" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="parameters-description">
+<h4>Parameters description<a class="headerlink" href="#parameters-description" title="Permalink to this headline">¶</a></h4>
+<p>Here the id is not numeric. The format is <strong>[a-z0-9]</strong>. This id is used for doing an explicit reference to technology : in xml stats and commands files.</p>
+</div>
+<div class="section" id="id10">
+<h4>Reading operations<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device_technology/list</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;device_technology&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Telephony, videophone, mails, messaging&quot;</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="s">&quot;communication&quot;</span><span class="p">,</span>
+            <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;Communication&quot;</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/base/device_technology/list/by-id/&lt;name&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+</div>
+<div class="section" id="id11">
+<h4>Writing operations<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device_technology/add/id/&lt;id&gt;name/&lt;name&gt;/description/&lt;description&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/device_technology/update/id/&lt;id&gt;/name/&lt;name&gt;/description/&lt;description&gt;</li>
+</ul>
+<p>Return: like /list but with only the item updated</p>
+<ul class="simple">
+<li>/base/device_technology/del/id/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+<div class="section" id="device">
+<h3>Device<a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id12">
+<h4>Reading operations<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device/list</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;device&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Lampe murale&quot;</span><span class="p">,</span>
+            <span class="s">&quot;reference&quot;</span> <span class="p">:</span> <span class="s">&quot;AM12&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_usage_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;device_type&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;Switch&quot;</span><span class="p">,</span>
+                <span class="s">&quot;device_technology_id&quot;</span> <span class="p">:</span> <span class="s">&quot;x10&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;address&quot;</span> <span class="p">:</span> <span class="s">&quot;A1&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_type_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;device_usage&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;Lamp, light usage&quot;</span><span class="p">,</span>
+                <span class="s">&quot;default_options&quot;</span> <span class="p">:</span> <span class="s">&quot;{ &amp;quot;binary&amp;quot;: {&amp;quot;state0&amp;quot;:&amp;quot;Off&amp;quot;, &amp;quot;state1&amp;quot;:&amp;quot;On&amp;quot;}, &amp;quot;range&amp;quot;: {&amp;quot;step&amp;quot;:10, &amp;quot;unit&amp;quot;:&amp;quot;%&amp;quot;} }&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;Light&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;name&quot;</span> <span class="p">:</span> <span class="s">&quot;Lampe&quot;</span>
+        <span class="p">},</span>
+        <span class="o">...</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h4>Writing operations<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/device/add/name/&lt;name&gt;/address/&lt;address&gt;/type_id/&lt;type_id&gt;/usage_id/&lt;usage_id&gt;/description/&lt;description&gt;/reference/&lt;reference&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/device/update/id/&lt;id&gt;/name/&lt;name&gt;/address/&lt;address&gt;/usage_id/&lt;usage_id&gt;/description/&lt;description&gt;/reference/&lt;reference&gt;</li>
+</ul>
+<p>Return: like /list but with only the item updated</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">type_id is not updatable</p>
+</div>
+<ul class="simple">
+<li>/base/device/del/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+<div class="section" id="feature-associations">
+<h3>Feature Associations<a class="headerlink" href="#feature-associations" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h4>Reading operations<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/feature_association/list</li>
+</ul>
+<p>Result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
+    <span class="s">&quot;feature_association&quot;</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;place_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;place_type&quot;</span> <span class="p">:</span> <span class="s">&quot;room&quot;</span><span class="p">,</span>
+            <span class="s">&quot;device_feature_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s">&quot;device_feature&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;device_feature_model_id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;device_id&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/base/feature_association/list/by-house</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+<ul class="simple">
+<li>/base/feature_association/listdeep/by-house</li>
+</ul>
+<p>Return: like /listdeep/by-house but with data of house, areas and rooms</p>
+<ul class="simple">
+<li>/base/feature_association/list/by-area/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+<ul class="simple">
+<li>/base/feature_association/listdeep/by-area/&lt;id&gt;</li>
+</ul>
+<p>Return: like /listdeep/by-area but with data of area and rooms</p>
+<ul class="simple">
+<li>/base/feature_association/list/by-room/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+<ul class="simple">
+<li>/base/feature_association/list/by-feature/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item filtered</p>
+</div>
+<div class="section" id="id15">
+<h4>Writing operations<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>/base/feature_association/add/feature_id/&lt;feature_id&gt;/association_type/&lt;house, area, room&gt;/association_id/&lt;None, area_id, room_id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item added</p>
+<ul class="simple">
+<li>/base/feature_association/del/id/&lt;id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+<ul class="simple">
+<li>/base/feature_association/del/feature_id/&lt;feature_id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+<ul class="simple">
+<li>/base/feature_association/del/association_type/&lt;house, area, room&gt;/association_id/&lt;None, area_id, room_id&gt;</li>
+</ul>
+<p>Return: like /list but with only the item deleted</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">REST /base</a><ul>
+<li><a class="reference internal" href="#house-management">House management</a><ul>
+<li><a class="reference internal" href="#areas">Areas</a><ul>
+<li><a class="reference internal" href="#reading-operations">Reading operations</a></li>
+<li><a class="reference internal" href="#writing-operations">Writing operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rooms">Rooms</a><ul>
+<li><a class="reference internal" href="#id1">Reading operations</a></li>
+<li><a class="reference internal" href="#id2">Writing operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-interface-configuration">User Interface configuration</a><ul>
+<li><a class="reference internal" href="#ui-config">UI config</a><ul>
+<li><a class="reference internal" href="#paramters-description">Paramters description</a></li>
+<li><a class="reference internal" href="#id3">Reading operations</a></li>
+<li><a class="reference internal" href="#id4">Writing operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#devices-and-features-management">Devices and features management</a><ul>
+<li><a class="reference internal" href="#device-usage">Device usage</a><ul>
+<li><a class="reference internal" href="#id5">Reading operations</a></li>
+<li><a class="reference internal" href="#id6">Writing operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#device-type">Device type</a><ul>
+<li><a class="reference internal" href="#id7">Reading operations</a></li>
+<li><a class="reference internal" href="#id8">Writing operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#feature">Feature</a><ul>
+<li><a class="reference internal" href="#id9">Reading operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#device-technology">Device technology</a><ul>
+<li><a class="reference internal" href="#parameters-description">Parameters description</a></li>
+<li><a class="reference internal" href="#id10">Reading operations</a></li>
+<li><a class="reference internal" href="#id11">Writing operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#device">Device</a><ul>
+<li><a class="reference internal" href="#id12">Reading operations</a></li>
+<li><a class="reference internal" href="#id13">Writing operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#feature-associations">Feature Associations</a><ul>
+<li><a class="reference internal" href="#id14">Reading operations</a></li>
+<li><a class="reference internal" href="#id15">Writing operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="statmgr.html">Statistics Manager</a></li>
+    
+    
+      <li>Next: <a href="rest_command.html">REST /command</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>REST /base</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/rinor/rest_base.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="statmgr.html" title="Statistics Manager">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="rest_command.html" title="REST /command">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

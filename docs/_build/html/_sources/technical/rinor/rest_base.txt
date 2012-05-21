@@ -1,0 +1,486 @@
+==========
+REST /base
+==========
+ 
+House management
+================
+
+Areas 
+-----
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/area/list/
+
+Return: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "area" : [
+            {
+                "description" : "Rez de chausse",
+                "id" : 1,
+                "name" : "RDC"
+            },
+            ...
+        ]
+    }
+
+* /base/area/list/by-id/<id>
+
+Return: like /list but with only one item in table
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+* /base/area/add/name/<name>/description/<description>
+
+Return: like /list but with only the item added
+
+* /base/area/update/id/<id>/name/<name>/description/<description>
+
+Return: like /list but with only the item updated
+
+* /base/area/del/<id>
+
+Return: like /list but with only the item deleted
+
+Rooms
+-----
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/room/list
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "room" : [
+            {
+                "area_id" : 1,
+                "description" : "la cuisine",
+                "area" : {
+                    "description" : "Rez de chausse",
+                    "id" : 1,
+                    "name" : "RDC"
+                },
+                "id" : 1,
+                "name" : "Cuisine"
+            },
+            ...
+        ]
+    }
+
+* /base/room/list/by-id/<id>
+
+Return: like /list but with only one item 
+
+* /base/room/list/by-area/<id>
+
+Return: like /list but with only items linked to an area
+
+.. note::
+    If using **/base/room/list/by-area//**, return all rooms that are not related to an area
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+* /base/room/add/name/<name>/area_id/<area_id>/description/<description>
+
+Return: like /list but with only the item added
+
+* /base/room/update/id/<id>/name/<name>/area_id/<area_id>/description/<description>
+
+Return: like /list but with only the item updated
+
+* /base/room/del/<id>
+
+Return: like /list but with only the item deleted
+
+User Interface configuration
+============================
+
+UI config
+---------
+
+Paramters description
+^^^^^^^^^^^^^^^^^^^^^
+* name : name of UI, type of item (area, room, etc), category, a mix of all these datas, etc. Everything you could need to parameter your UI
+* reference : id of an area/room/etc, etc
+* key : the key for an UI parameter (icon, size, position, what you need)
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/ui_config/list
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "ui_config" : [
+            {
+                "key" : "icon",
+                "value" : "grndfloor",
+                "name" : "area",
+                "reference" : "1"
+            },
+            ...
+        ]
+    }
+
+* /base/ui_config/list/by-element/<name>/<reference>/<key>
+
+Return: like /list but with only the item filtered
+
+* /base/ui_config/list/by-key/<name>/<key>
+
+Return: like /list but with only the item filtered
+
+* /base/ui_config/list/by-reference/<name>/<reference>
+
+Return: like /list but with only the item filtered
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/ui_config/set/name/<name>/reference/<reference>/key/<key>/value/<value>
+
+Return: like /list but with only the item added or updated
+
+.. note::
+    The **set** operation act as an add operation when there is no configuration yet and as an update operation when configuration already exists.
+    This is done to simplify the UI developper work.
+
+* /base/ui_config/del/by-key/<name>/<key>
+
+Return: like /list but with only the item added or updated
+
+* /base/ui_config/del/by-reference/<name>/<reference>
+
+Return: like /list but with only the items deleted
+
+* /base/ui_config/del/by-element/<name>/<reference>/<key>
+
+Return: like /list but with only the item deleted
+
+Devices and features management
+===============================
+
+Device usage
+------------
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device_usage/list/
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "device_usage" : [
+            {
+                "description" : "Lamp, light usage",
+                "default_options" : "{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }",
+                "id" : "light",
+                "name" : "Light"
+            },
+            ...
+        ]
+    }
+
+* /base/device_usage/list/by-name/<name>
+
+Return: like /list but with only the item filtered
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device_usage/add/id/<id>/name/<name>/description/<description>/default_options/<default_options>
+
+Return: like /list but with only the item added
+
+* /base/device_usage/update/id/<id>/name/<name>/description/<description>/default_options/<default_options>
+
+Return: like /list but with only the item updated
+
+* /base/device_usage/del/<id>
+
+Return: like /list but with only the item deleted
+
+Device type
+-----------
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device_type/list/
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "device_type" : [
+            {
+                "description" : "None",
+                "device_technology_id" : "x10",
+                "id" : "x10.switch.switch",
+                "device_technology" : {
+                    "description" : "",
+                    "id" : "x10",
+                    "name" : "X10"
+                },
+                "name" : "Switch"
+            },
+        ]
+    }
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device_type/add/id/<id>/name/<name>/description/<description>/technology_id/<technology_id>
+
+Return: like /list but with only the item added
+
+* /base/device_type/update/id/<id>/name/<name>/description/<description>/technology_id/<technology_id>
+
+Return: like /list but with only the item updated
+
+* /base/device_type/del/<id>
+
+Return: like /list but with only the item deleted
+
+Feature
+-------
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/feature/list/by-id/<id>
+
+Return: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "feature": [
+            {
+                "device_feature_model_id": "plcbus.dimmer.switch",
+                "device": {
+                    "description": "",
+                    "reference": "2263D",
+                    "device_usage_id": "light",
+                    "address": "A2",
+                    "device_type_id": "plcbus.dimmer",
+                    "id": 1,
+                    "name": "Lampe"
+                },
+                "device_id": 1,
+                "id": 1,
+                "device_feature_model": {
+                    "return_confirmation": "True",
+                    "feature_type": "actuator",
+                    "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
+                    "stat_key": "command",
+                    "value_type": "binary",
+                    "device_type_id": "plcbus.dimmer",
+                    "id": "plcbus.dimmer.switch",
+                    "name": "Dimmer"
+                }
+            }
+        ]
+    }
+
+* /base/feature/list/by-device_id/<id>
+
+Return: like /list but with the item filtered
+
+Device technology
+-----------------
+
+Parameters description
+^^^^^^^^^^^^^^^^^^^^^^
+Here the id is not numeric. The format is **[a-z0-9]**. This id is used for doing an explicit reference to technology : in xml stats and commands files.
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device_technology/list
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "device_technology" : [
+            {
+                "description" : "Telephony, videophone, mails, messaging",
+                "id" : "communication",
+                "name" : "Communication"
+            },
+            ...
+        ]
+    }
+
+* /base/device_technology/list/by-id/<name>
+
+Return: like /list but with only the item filtered
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device_technology/add/id/<id>name/<name>/description/<description>
+
+Return: like /list but with only the item added
+
+* /base/device_technology/update/id/<id>/name/<name>/description/<description>
+
+Return: like /list but with only the item updated
+
+* /base/device_technology/del/id/<id>
+
+Return: like /list but with only the item deleted
+
+Device
+------
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device/list
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "device" : [
+            {
+                "description" : "Lampe murale",
+                "reference" : "AM12",
+                "device_usage_id" : 1,
+                "device_type" : {
+                    "description" : "None",
+                    "id" : 1,
+                    "name" : "Switch",
+                    "device_technology_id" : "x10"
+                },
+                "address" : "A1",
+                "device_type_id" : 1,
+                "device_usage" : {
+                    "description" : "Lamp, light usage",
+                    "default_options" : "{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }",
+                    "id" : 1,
+                    "name" : "Light"
+                },
+                "id" : 1,
+                "name" : "Lampe"
+            },
+            ...
+        ]
+    }
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/device/add/name/<name>/address/<address>/type_id/<type_id>/usage_id/<usage_id>/description/<description>/reference/<reference>
+
+Return: like /list but with only the item added
+
+* /base/device/update/id/<id>/name/<name>/address/<address>/usage_id/<usage_id>/description/<description>/reference/<reference>
+
+Return: like /list but with only the item updated
+
+.. note::
+    type_id is not updatable
+
+* /base/device/del/<id>
+
+Return: like /list but with only the item deleted
+
+Feature Associations
+--------------------
+
+Reading operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/feature_association/list
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "feature_association" : [
+            {
+                "place_id" : 1,
+                "place_type" : "room",
+                "device_feature_id" : 1,
+                "id" : 3,
+                "device_feature" : {
+                    "device_feature_model_id" : 1,
+                    "id" : 1,
+                    "device_id" : 1
+                }
+            }
+        ]
+    }
+
+* /base/feature_association/list/by-house
+
+Return: like /list but with only the item filtered
+
+* /base/feature_association/listdeep/by-house
+
+Return: like /listdeep/by-house but with data of house, areas and rooms
+
+* /base/feature_association/list/by-area/<id>
+
+Return: like /list but with only the item filtered
+
+* /base/feature_association/listdeep/by-area/<id>
+
+Return: like /listdeep/by-area but with data of area and rooms
+
+* /base/feature_association/list/by-room/<id>
+
+Return: like /list but with only the item filtered
+
+* /base/feature_association/list/by-feature/<id>
+
+Return: like /list but with only the item filtered
+
+Writing operations
+^^^^^^^^^^^^^^^^^^
+
+* /base/feature_association/add/feature_id/<feature_id>/association_type/<house, area, room>/association_id/<None, area_id, room_id>
+
+Return: like /list but with only the item added
+
+* /base/feature_association/del/id/<id>
+
+Return: like /list but with only the item deleted
+
+* /base/feature_association/del/feature_id/<feature_id>
+
+Return: like /list but with only the item deleted
+
+* /base/feature_association/del/association_type/<house, area, room>/association_id/<None, area_id, room_id>
+
+Return: like /list but with only the item deleted

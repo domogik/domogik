@@ -1,0 +1,7 @@
+==============
+Database model
+==============
+
+.. image:: domogik_db_structure.png
+
+Download :download:`Mysql WorkBench file <domogik.mwb>`.
