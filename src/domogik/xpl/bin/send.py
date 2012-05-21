@@ -86,7 +86,7 @@ class Sender(XplPlugin):
                 self.usage()
                 exit(4)
             else:
-                message.add_data({data.split("=")[0] :  data.split("=")[1]})
+                message.add_data({data.split("=")[0].strip() :  data.split("=")[1].strip()})
         return message
 
     def usage(self):
