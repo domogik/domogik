@@ -109,7 +109,7 @@ class DbHelper():
     __engine = None
     __session_object = None
 
-    def __init__(self, echo_output=False, use_test_db=False, engine=None):
+    def __init__(self, echo_output=True, use_test_db=False, engine=None):
         """Class constructor
 
         @param echo_output : if True displays sqlAlchemy queries (optional, default False)
