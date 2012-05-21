@@ -105,7 +105,7 @@ $RM $CONFIG_FOLDER
 echo "Delete $GLOBAL_CONFIG"
 $RM $GLOBAL_CONFIG
 
-for fic in dmgenplug dmgdisplug dmg_manager dmg_send
+for fic in dmgenplug dmgdisplug dmg_manager dmg_send dmg_pkgmgr dmg_version dmg_dump  
   do
     TO_DEL=$(which $fic)
     echo "Delete $TO_DEL"
