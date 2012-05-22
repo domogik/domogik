@@ -497,6 +497,7 @@ class PackageManager():
                     self._create_init_py("%s/xpl/" % plg_path)
                     self._create_init_py("%s/xpl/bin/" % plg_path)
                     self._create_init_py("%s/xpl/lib/" % plg_path)
+                    self._create_init_py("%s/xpl/helpers/" % plg_path)
                     type_path = "plugins"
                 if pkg_type == "external":
                     type_path = "externals"

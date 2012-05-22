@@ -1,7 +1,9 @@
 #!/bin/bash
 
-if [[ $# -ne 1 ]] ; then
-    echo "Usage : "$(basename $0)" <'tip' or revision number>"
+if [[ $# -lt 1 ]] ; then
+    echo "Usage : "$(basename $0)" <'tip' or revision number> [version name]"
+    echo "Example :"
+    echo "$(basename $0) tip 0.2.0-alpha1"
     exit 1
 else
     case $1 in
@@ -22,6 +24,9 @@ else
                 exit 1
             fi
     esac
+    if [[ $# -eq 2 ]] ; then
+        SHORT_RELEASE=$2
+    fi
 fi
 
 ARCHIVE_NAME=domogik-temp

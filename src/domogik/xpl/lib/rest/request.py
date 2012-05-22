@@ -187,7 +187,7 @@ class ProcessRequest():
 
         # package path
         if self._package_path != None:  # package mode
-            sys.path.append(self._package_path)
+            sys.path = [self._package_path] + sys.path
 
         # url processing
         #self.path = self.fixurl(self.path)
@@ -3553,13 +3553,15 @@ target=*
             return
 
 
+        # get helper lib path
+        if self._package_path == None:
+            helper_path = self._src_prefix
+        else:
+            helper_path = self._package_path
+        helper_path += "/domogik_packages/xpl/helpers/"
+
         if command == "help":
             output = ["List of available helpers :"]
-            if self._package_path == None:
-                helper_path = self._src_prefix
-            else:
-                helper_path = self._package_path
-            helper_path += "/domogik_packages/xpl/helpers/"
             for root, dirs, files in os.walk(helper_path):
                 for fic in files:
                     if fic[-3:] == ".py" and fic[0:2] != "__":
@@ -3578,21 +3580,24 @@ target=*
             ### load helper and create object
             try:
                 #for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-                for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
-                    if plgname == command:
-                        helper = __import__('domogik_packages.xpl.helpers.%s' % plgname, fromlist="dummy")
-                        try:
-                            helper_object = helper.MY_CLASS["cb"]()
-                            if len(self.rest_request) == 2:
-                                output = helper_object.command(self.rest_request[1])
-                            else:
-                                output = helper_object.command(self.rest_request[1], \
+                #for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
+                for root, dirs, files in os.walk(helper_path):
+                    for fic in files:
+                        if fic[-3:] == ".py" and fic[0:2] != "__":
+                            if fic[0:-3] == command:
+                                helper = __import__('domogik_packages.xpl.helpers.%s' % command, fromlist="dummy")
+                                try:
+                                    helper_object = helper.MY_CLASS["cb"]()
+                                    if len(self.rest_request) == 2:
+                                        output = helper_object.command(self.rest_request[1])
+                                    else:
+                                        output = helper_object.command(self.rest_request[1], \
                                                                self.rest_request[2:])
-                        except HelperError as err:
-                            self.send_http_response_error(999, 
+                                except HelperError as err:
+                                    self.send_http_response_error(999, 
                                                       "Error : %s" % err.value,
                                                       self.jsonp, self.jsonp_cb)
-                            return
+                                    return
                     
                         
 
