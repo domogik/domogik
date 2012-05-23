@@ -395,9 +395,11 @@ class TelldusAPI:
         @param level : level of light. 0 to say OFF and 100 to say ON
         @param faderate : the duration of the scene
         '''
+        level = int(level)
+        faderate = int(faderate)
         if level == 0 :
             self.send_off(device)
-        elif level == 100 :
+        elif level > 100 :
             self.send_on(device)
         else :
             if faderate == 0:
