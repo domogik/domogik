@@ -1,9 +1,9 @@
 <technology id="telldus">
-  <command name="shine">
+  <command name="change">
     <schema>telldus.basic</schema>
     <command-key>command</command-key>
     <address-key>device</address-key>
-    <command-xpl-value>shine</command-xpl-value>
+    <command-xpl-value>change</command-xpl-value>
     <parameters>
       <parameter key="level" location="1"/>
     </parameters>
@@ -12,7 +12,7 @@
     <schema>telldus.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="command" value="shine" />
+      <key name="command" value="change" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>
