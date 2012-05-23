@@ -213,6 +213,8 @@ class LightingExtension():
         @param message : The XPL message
         @param myxpl : The XPL sender
         """
+        badcommands = ['gateinfo', 'scnlist', 'scnadd', 'scndel', \
+             'scnadddev', 'scndeldev' ]
         configs = {
             'scninfo': lambda x,m: self.stat_scninfo(x, m),
         }
@@ -220,7 +222,8 @@ class LightingExtension():
             command = None
             if 'command' in message.data:
                 command = message.data['command']
-            configs[command](self._plugin.myxpl, message)
+            if command not in badcommands :
+                configs[command](self._plugin.myxpl, message)
         except:
             error = "Exception : %s" % (traceback.format_exc())
             self._plugin.log.error("LightingExtension.config_trig_listener \

@@ -142,7 +142,8 @@ class LightingAPI():
         """
         """
         self.log.debug("basic_trig_listener : Start ...")
-        badcommands = ["activate", "deactivate"]
+        badcommands = ["activate", "deactivate", 'scninfo', 'scnlist', \
+            'scnadd', 'scndel', 'scnadddev', 'scndeldev', 'gateinfo' ]
         try:
             sensor = None
             if "device" in message.data:
