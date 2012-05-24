@@ -60,11 +60,11 @@ def main():
                       dest = "force",
                       default = False,
                       help = "Script won't ask user to continue or not")
-    parser.add_option("-i", "--install",
-                      action = "store_true", 
-                      dest = "action_install",
-                      default = False,
-                      help = "Install a package (<package> [version])")
+    #parser.add_option("-i", "--install",
+    #                  action = "store_true", 
+    #                  dest = "action_install",
+    #                  default = False,
+    #                  help = "Install a package (<package> [version])")
     parser.add_option("-u", "--update",
                       action = "store_true", 
                       dest = "action_update",
@@ -75,11 +75,11 @@ def main():
                       dest = "action_list",
                       default = False,
                       help = "Display cache's package list")
-    parser.add_option("-s", "--show",
-                      action = "store_true", 
-                      dest = "action_show",
-                      default = False,
-                      help = "Display cache's package list")
+    #parser.add_option("-s", "--show",
+    #                  action = "store_true", 
+    #                  dest = "action_show",
+    #                  default = False,
+    #                  help = "Display cache's package list")
     parser.add_option("-t", "--type",
                       action = "store", 
                       dest = "package_type",
@@ -135,11 +135,11 @@ def main():
             mgr._create_package_for_external(args[0], options.output_dir, options.force)
     
     # package installation
-    if options.action_install == True:
-        if len(args) == 1:
-            mgr.install_package(args[0])
-        if len(args) == 2:
-            mgr.install_package(args[0], args[1])
+    #if options.action_install == True:
+    #    if len(args) == 1:
+    #        mgr.install_package(args[0])
+    #    if len(args) == 2:
+    #        mgr.install_package(args[0], args[1])
     
     # packages list update
     if options.action_update == True:
@@ -150,11 +150,11 @@ def main():
         mgr.list_packages()
     
     # show packages in cache
-    if options.action_show == True:
-        if len(args) == 1:
-            mgr.show_packages(args[0])
-        if len(args) == 2:
-            mgr.show_packages(args[0], args[1])
+    #if options.action_show == True:
+    #    if len(args) == 1:
+    #        mgr.show_packages(args[0])
+    #    if len(args) == 2:
+    #        mgr.show_packages(args[0], args[1])
 
     if options.action_json == True:
         if options.package_type not in PACKAGE_TYPES:
