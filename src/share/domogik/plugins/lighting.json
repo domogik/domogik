@@ -61,15 +61,19 @@
         }
     ],
     "files": [
+        "src/share/domogik/design/plugin/lighting/icon.png",
         "src/share/domogik/plugins/lighting.json",
         "src/share/domogik/stats/lighting/lighting.scene.xml",
         "src/share/domogik/url2xpl/lighting/activate.xml",
         "src/share/domogik/url2xpl/lighting/deactivate.xml",
-        "src/domogik/xpl/bin/lighting.py",
-        "src/domogik/xpl/lib/lighting.py",
-        "src/domogik/xpl/lib/light_scene.py"
+        "src/domogik_packages/xpl/bin/lighting.py",
+        "src/domogik_packages/xpl/lib/lighting.py",
+        "src/domogik_packages/xpl/lib/lightplugin.py",
+        "src/domogik_packages/xpl/lib/light_scene.py"
     ],
     "identity": {
+        "id": "lighting",
+        "type": "plugin",
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "lighting",
@@ -78,11 +82,7 @@
         "description": "For plugin developpers only. Allows scene management and can distribute scene configuration ever over xpl. There is no interface to create scenes.",
         "documentation": "http://wiki.domogik.org/plugin_lighting",
         "domogik_min_version": "0.2.0",
-        "fullname": "plugin-lighting",
-        "id": "lighting",
-        "name": "lighting",
-        "type": "plugin",
-        "version": "0.1.0a0"
+        "version": "0.1.0a1"
     },
     "json_version": 1,
     "technology": {
