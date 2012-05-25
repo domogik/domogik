@@ -226,8 +226,7 @@ class PluginHelper():
             else:
                 mess.add_data({"command" : cmnd})
                 if self._parent.helpers[cmnd]["param-list"] != "":
-                    mess.add_data({"param-list" : \
-                        self._parent.helpers[cmnd]["param-list"]})
+                    mess.add_data({"param-list" : self._parent.helpers[cmnd]["param-list"]})
                 for p in self._parent.helpers[cmnd]["param-list"].split(","):
                     mess.add_data({p : self._parent.helpers[cmnd][p]})
                 mess.add_data({"status" : "ok"})
@@ -253,8 +252,7 @@ class PluginHelper():
             requests[request](self._parent.myxpl, message, request)
         except:
             error = "Exception : %s" % (traceback.format_exc())
-            self._parent.log.error("pluginHelper.requestDeviceListener \
-                : " + error)
+            self._parent.log.error("pluginHelper.requestDeviceListener : " + error)
 
     def basic_cmnd_listener(self, message):
         """
@@ -274,26 +272,31 @@ class PluginHelper():
                 command = message.data['command']
             mess.add_data({"command" : command})
             if command != None:
-                params = {}
                 if self.is_valid_cmnd(command):
-                    for p in self._parent.helpers[command]["param-list"].split(","):
-                        if p in message.data:
-                            params[p] = message.data[p]
-                    ret = self._parent.helpers[command]["cb"](params)
-                    i = 1
-                    for l in ret:
-                        mess.add_data({"screen%s" % i : l})
-                        i = i+1
-                    mess.add_data({"screen-count" : i-1})
-                    mess.add_data({"status" : "ok"})
+                    nbparams = 0
+                    params = {}
+                    if self._parent.helpers[command]["param-list"] != "" :
+                        for p in self._parent.helpers[command]["param-list"].split(","):
+                            if p in message.data:
+                                params[p] = message.data[p]
+                                nbparams = nbparams +1
+                    if nbparams >= self._parent.helpers[command]["min_args"] :
+                        ret = self._parent.helpers[command]["cb"](params)
+                        i = 1
+                        for l in ret:
+                            mess.add_data({"screen%s" % i : l})
+                            i = i+1
+                        mess.add_data({"screen-count" : i-1})
+                        mess.add_data({"status" : "ok"})
+                    else :
+                        mess.add_data({"status" : "missing argument"})
                 else:
                     mess.add_data({"status" : "not-found"})
             else:
                 mess.add_data({"status" : "not-found"})
         except:
             error = "Exception : %s" % (traceback.format_exc())
-            self._parent.log.error("pluginHelper.basicDeviceListener : " \
-                + error)
+            self._parent.log.error("pluginHelper.basicDeviceListener : " + error)
             mess.add_data({"status" : "error"})
         self._parent.myxpl.send(mess)
 
@@ -303,8 +306,7 @@ class XplHlpPlugin(XplPlugin):
     def __init__(self, name, stop_cb=None, is_manager=False, reload_cb=None, \
         dump_cb=None, parser=None, daemonize = True):
         """
-        Create the telldus class
-        This class is used to connect devices (through telldus) to the xPL Network
+        Initialize the class
         """
         XplPlugin.__init__(self, name, stop_cb, is_manager, reload_cb, \
             dump_cb, parser, daemonize)
@@ -319,7 +321,3 @@ class XplHlpPlugin(XplPlugin):
                     {'schema': 'helper.request', 'xpltype': 'xpl-cmnd'})
             Listener(self.__helper.basic_cmnd_listener, self.myxpl,
                     {'schema': 'helper.basic', 'xpltype': 'xpl-cmnd'})
-
-
-if __name__ == "__main__":
-    XplHlpPlugin()

@@ -85,6 +85,9 @@ echo "Domogik installation found for user : $DOMOGIK_USER"
 #RM="ls -l "  # for simulation
 RM="rm -Rf "
 
+echo "Delete /etc/logrotate.d/domogik"
+$RM /etc/logrotate.d/domogik
+
 echo "Delete /etc/default/domogik"
 $RM /etc/default/domogik
 
