@@ -364,7 +364,7 @@ class VelbusDev:
            Process a 251 Message
            Dimmer status => send out when the dimmer status is changed
         """
-        device = str(ord(data[2])) + "-" + str(ord(data[5]))
+        device = str(ord(data[2])) + "-" + str(ord(data[5]) - 1)
         level = -1
         level = ord(data[7])
         if level != -1:
