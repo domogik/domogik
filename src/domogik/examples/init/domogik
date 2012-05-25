@@ -39,6 +39,7 @@ STARTTIME=5
 PIDDIR="/var/run/domogik"
 PIDFILE="$PIDDIR/manager.pid"
 LOCKDIR="/var/lock/domogik"
+LOGDIR="/var/log/domogik"
 
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
@@ -234,6 +235,8 @@ function check_lock_dir {
     chown ${DOMOGIK_USER}: ${PIDDIR}
     [ ! -d ${LOCKDIR} ] && mkdir ${LOCKDIR}
     chown ${DOMOGIK_USER}: ${LOCKDIR}
+    [ ! -d ${LOGDIR} ] && mkdir ${LOGDIR}
+    chown ${DOMOGIK_USER}: ${LOGDIR}
 }
 
 case "$1" in
@@ -270,6 +273,7 @@ case "$1" in
                     stop_xpl
                 ;;
                 manager)
+                    check_lock_dir
                     stop_plugins
                     sleep ${DIETIME}
                     stop_manager
@@ -281,8 +285,8 @@ case "$1" in
         fi
         ;;
     restart)
-        check_lock_dir
         if [ $# -eq 1 ];then
+            check_lock_dir
             stop
             sleep ${DIETIME}
             sleep ${DIETIME}
@@ -296,6 +300,7 @@ case "$1" in
                     start_xpl
                 ;;
                 manager)
+                    check_lock_dir
                     stop_plugins
                     stop_manager
                     kill_all
