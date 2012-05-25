@@ -3649,11 +3649,11 @@ target=*
     def _rest_repo_put(self):
         """ Put a file on rest repository
         """
-        status, data = self._upload_file()
+        status, data1, data2 = self._upload_file()
         if status:
             json_data = JSonHelper("OK")
             json_data.set_data_type("repository")
-            json_data.add_data({"file" : data})
+            json_data.add_data({"file" : data1})
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
         else:
@@ -3663,6 +3663,7 @@ target=*
 
     def _upload_file(self):
         """ Put a file on rest repository
+            @Return : status (True/False), filename, file path
         """
         self.headers.getheader('Content-type')
         print(self.headers)
@@ -3670,7 +3671,7 @@ target=*
 
         if hasattr(self, "_put_filename") == False or self._put_filename == None:
             print("No file name given!!!")
-            return False, "You must give a file name : ?filename=foo.txt"
+            return False, "You must give a file name : ?filename=foo.txt", ""
         self.log.info("PUT : uploading %s" % self._put_filename)
 
         # TODO : check filename value (extension, etc)
@@ -3688,10 +3689,10 @@ target=*
         except IOError:
             self.log.error("PUT : failed to upload '%s' : %s" % (self._put_filename, traceback.format_exc()))
             print(traceback.format_exc())
-            return False, "Error while writing '%s' : %s" % (file, traceback.format_exc())
+            return False, "Error while writing '%s' : %s" % (file, traceback.format_exc()), ""
 
         self.log.info("PUT : uploaded as %s" % (file_path))
-        return True, file_name
+        return True, file_name, file_path
 
 
     def _rest_repo_get(self, file_name):
@@ -4381,32 +4382,33 @@ target=*
         self.log.debug("Package : ask for installing an uploaded package")
 
         #### upload the file
-        status, data = self._upload_file()
+        status, data1, data2 = self._upload_file()
         if not status:
-            self.send_http_response_error(999, data, self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, data1, self.jsonp, self.jsonp_cb)
             return
-        print data
+        print data1
         #json_data = JSonHelper("OK")
         #json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         #json_data.set_data_type("install_from_path")
         #self.send_http_response_ok(json_data.get())
 
-        print data[-4:]
-        if data[-4:] != ".tgz":
+        if data1[-4:] != ".tgz":
             self.send_http_response_error(999, "Bad filename provided. It must be a .tgz file", self.jsonp, self.jsonp_cb)
             return
         try:
-            buf = data[:-4].split("-")
-            package = "%s/%s/%s" % (buf[0], buf[1], buf[3])
+            buf = data1[:-4].split("-")
+            pkg_type = buf[0]
+            pkg_id = buf[1]
+            pkg_version = buf[2]
+            package = "%s/%s/%s" % (pkg_type, pkg_id, pkg_version)
         except:
             self.send_http_response_error(999, "Bad filename provided.", self.jsonp, self.jsonp_cb)
             return
 
         print package
-        return
 
         pkg_mgr = PackageManager()
-        res = pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, version)
+        res = pkg_mgr.cache_package(PKG_CACHE_DIR, pkg_type, pkg_id, pkg_version, data2)
         # if package not cachable (doesn't exists, ...)
         if res == False:
             self.send_http_response_error(999, "Error on putting package in cache", self.jsonp, self.jsonp_cb)
@@ -4418,9 +4420,9 @@ target=*
         message.add_data({"command" : "install"})
         message.add_data({"host" : self.get_sanitized_hostname()})
         message.add_data({"source" : "cache"})
-        message.add_data({"type" : type})
-        message.add_data({"id" : id})
-        message.add_data({"version" : version})
+        message.add_data({"type" : pkg_type})
+        message.add_data({"id" : pkg_id})
+        message.add_data({"version" : pkg_version})
         message.add_data({"part" : PKG_PART_RINOR})
         self.myxpl.send(message)
         
@@ -4434,9 +4436,9 @@ target=*
                                            "domogik.package", 
                                            filter_data = {"command" : "install",
                                                           "source" : "cache",
-                                                          "type" : type,
-                                                          "id" : id,
-                                                          "version" : version,
+                                                          "type" : pkg_type,
+                                                          "id" : pkg_id,
+                                                          "version" : pkg_version,
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
@@ -4459,9 +4461,9 @@ target=*
         message.add_data({"command" : "install"})
         message.add_data({"host" : host})
         message.add_data({"source" : "cache"})
-        message.add_data({"type" : type})
-        message.add_data({"id" : id})
-        message.add_data({"version" : version})
+        message.add_data({"type" : pkg_type})
+        message.add_data({"id" : pkg_id})
+        message.add_data({"version" : pkg_version})
         message.add_data({"part" : PKG_PART_XPL})
         self.myxpl.send(message)
 
@@ -4475,9 +4477,9 @@ target=*
                                            "domogik.package", 
                                            filter_data = {"command" : "install",
                                                           "source" : "cache",
-                                                          "type" : type,
-                                                          "id" : id,
-                                                          "version" : version,
+                                                          "type" : pkg_type,
+                                                          "id" : pkg_id,
+                                                          "version" : pkg_version,
                                                           "host" : host},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
@@ -4500,6 +4502,7 @@ target=*
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("install")
             self.send_http_response_ok(json_data.get())
+
     def _rest_package_uninstall(self, host, type, id):
         """ Send xpl messages to install a package :
             - one to manager on target host for "bin" files

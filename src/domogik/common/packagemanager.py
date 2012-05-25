@@ -293,25 +293,32 @@ class PackageManager():
         self.log("OK")
     
 
-    def cache_package(self, cache_dir, pkg_type, id, version):
+    def cache_package(self, cache_dir, pkg_type, id, version, pkg_path = None):
         """ Download package to put it in cache
             @param cache_dir : folder in which we want to cache the file
             @param pkg_type : package type
             @param id : package id
             @param version : package version
+            @param pkg_path : path of the package to cache on local host
         """
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
-        package = "%s-%s" % (pkg_type, id)
-        pkg, status = self._find_package(package, version)
-        if status != True:
-            return False
-        # download package
-        path = pkg["archive_url"]
         dl_path = "%s/%s-%s-%s.tgz" % (cache_dir, pkg_type, id, version)
-        self.log("Caching package : '%s' to '%s'" % (path, dl_path))
-        urllib.urlretrieve(path, dl_path)
-        path = dl_path
+
+        ### cache from the web
+        if pkg_path == None:
+            package = "%s-%s" % (pkg_type, id)
+            pkg, status = self._find_package(package, version)
+            if status != True:
+                return False
+            # download package
+            path = pkg["archive_url"]
+            self.log("Caching package : '%s' to '%s'" % (path, dl_path))
+            urllib.urlretrieve(path, dl_path)
+        ### cache from a local file
+        else:
+            self.log("Caching package : '%s' to '%s'" % (pkg_path, dl_path))
+            shutil.copyfile(pkg_path, dl_path)
         self.log("OK")
         return True
 
