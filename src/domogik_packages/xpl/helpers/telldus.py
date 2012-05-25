@@ -36,10 +36,11 @@ class telldusTool(Helper)
 @license: GPL(v3)
 @copyright: (C) 2007-2012 Domogik project
 """
+
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik_packages.xpl.lib.telldus import telldusException
-from domogik_packages.xpl.lib.telldus import telldusAPI
+from domogik_packages.xpl.lib.telldus import TelldusException
+from domogik_packages.xpl.lib.telldus import Telldusd
 from domogik.common import logger
 from domogik.xpl.common.queryconfig import Query
 
@@ -58,14 +59,14 @@ class telldus(Helper):
                   {
                     "cb" : self.list,
                     "desc" : "List devices referenced by the telldus",
-                    "min_args" : 1,
-                    "usage" : "list all|devicetype"
+                    "min_args" : 0,
+                    "usage" : "list [devicetype]"
                   },
                  "info" :
                   {
                     "cb" : self.info,
                     "desc" : "Display device information",
-                    "min_args" : 1,
+                    "min_args" : 2,
                     "usage" : "info <id>"
                   }
                 }
@@ -73,7 +74,8 @@ class telldus(Helper):
         log = logger.Logger('telldus-helper')
         self._log = log.get_logger('telldus-helper')
        # self._config = Query(self.myxpl, self._log)
-        self.tdapi  = telldusAPI(None,self._log,None,None)
+        self._log.info("telldusHelper.init : done")
+        self._telldusd = Telldusd()
 
     def list(self, args = None):
         """
@@ -81,27 +83,18 @@ class telldus(Helper):
         """
         self._log.info("telldusHelper.list : Start ...")
         data = []
-        if  args[0]=="all":
+        if  args[0] == "all":
             data.append("List all devices :")
             data.append("id : XPL id : Name")
 
             # List devices
-            for key in self.tdapi.getDevices().iterkeys():
-                add=self.tdapi.getDeviceAddress(key)
-                name=self.tdapi.getDeviceName(key)
-                data.append("%s  :  %s  : %s" % (str(key),add,name.encode("ascii", "ignore")))
+            devices = self._telldusd.get_devices()
+            for key in devices:
+                data.append("%s  :  %s  : %s" % (str(key), self._telldusd.get_device(key), devices[key]["name"]))
         else:
             data.append("List all devices of type %s :" % args[0])
             data.append("id : XPL id : Name")
             self._log.debug("telldusHelper.list devicetype=%s" % args[0])
-
-            # List devices
-            for key in self.tdapi.getDevices().iterkeys():
-                add=self.tdapi.getDeviceAddress(key)
-                name=self.tdapi.getDeviceName(key)
-                self._log.debug("telldusHelper.list for device= %s if devicetype==%s : '%s'" % (key,args[0],self.tdapi.isDevicetype(key,str(args[0]))))
-                if self.tdapi.isDevicetype(key,str(args[0])):
-                    data.append("%s  :  %s  : %s" % (str(key),add,name.encode("ascii", "ignore")))
         self._log.debug("telldusHelper.list : Done")
         return data
 
@@ -113,7 +106,7 @@ class telldus(Helper):
         data = []
         data.append("Information for device %s" % args[0])
         if len(args) == 1:
-            data.extend(self.tdapi.getInfo(int(args[0])))
+            data.extend(self._telldusd.get_info(int(args[0])))
         else:
             return ["Bad usage of this helper. "]
         self._log.debug("telldusHelper.info : Done")

@@ -3649,44 +3649,49 @@ target=*
     def _rest_repo_put(self):
         """ Put a file on rest repository
         """
+        status, data = self._upload_file()
+        if status:
+            json_data = JSonHelper("OK")
+            json_data.set_data_type("repository")
+            json_data.add_data({"file" : data})
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+        else:
+            self.send_http_response_error(999, data, self.jsonp, self.jsonp_cb)
+
+
+
+    def _upload_file(self):
+        """ Put a file on rest repository
+        """
         self.headers.getheader('Content-type')
         print(self.headers)
         content_length = int(self.headers['Content-Length'])
 
-        if hasattr(self, "_put_filename") == False:
+        if hasattr(self, "_put_filename") == False or self._put_filename == None:
             print("No file name given!!!")
-            self.send_http_response_error(999, "You must give a file name : ?filename=foo.txt",
-                                          self.jsonp, self.jsonp_cb)
-            return
+            return False, "You must give a file name : ?filename=foo.txt"
         self.log.info("PUT : uploading %s" % self._put_filename)
 
         # TODO : check filename value (extension, etc)
 
         # replace name (without extension) with an unique id
-        basename, extension = os.path.splitext(self._put_filename)
-        file_id = str(uuid.uuid4())
-        file_name = "%s/%s%s" % (self.repo_dir, 
-                             file_id,
-                             extension)
+        #basename, extension = os.path.splitext(self._put_filename)
+        #file_id = str(uuid.uuid4())
+        file_name = self._put_filename
+        file_path = "%s/%s" % (self.repo_dir, file_name)
 
         try:
-            up_file = open(file_name, "w")
+            up_file = open(file_path, "w")
             up_file.write(self.rfile.read(content_length))
             up_file.close()
         except IOError:
             self.log.error("PUT : failed to upload '%s' : %s" % (self._put_filename, traceback.format_exc()))
             print(traceback.format_exc())
-            self.send_http_response_error(999, "Error while writing '%s' : %s" % (file, traceback.format_exc()),
-                                          self.jsonp, self.jsonp_cb)
-            return
+            return False, "Error while writing '%s' : %s" % (file, traceback.format_exc())
 
-        self.log.info("PUT : %s uploaded as %s%s" % (self._put_filename,
-                                                   file_id, extension))
-        json_data = JSonHelper("OK")
-        json_data.set_data_type("repository")
-        json_data.add_data({"file" : "%s%s" % (file_id, extension)})
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        self.send_http_response_ok(json_data.get())
+        self.log.info("PUT : uploaded as %s" % (file_path))
+        return True, file_name
 
 
     def _rest_repo_get(self, file_name):
@@ -3942,6 +3947,15 @@ target=*
                                            self.rest_request[2],
                                            self.rest_request[3],
                                            self.rest_request[4])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### install_from_path ########################
+        elif self.rest_request[0] == "install_from_path":
+            if len(self.rest_request) == 2:
+                self._rest_package_install_from_path(self.rest_request[1])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -4359,6 +4373,133 @@ target=*
             json_data.set_data_type("install")
             self.send_http_response_ok(json_data.get())
 
+    def _rest_package_install_from_path(self, host):
+        """ Upload a local package file (from UI host) and install it
+            @param host : host targetted
+            Return ok/ko as json
+        """
+        self.log.debug("Package : ask for installing an uploaded package")
+
+        #### upload the file
+        status, data = self._upload_file()
+        if not status:
+            self.send_http_response_error(999, data, self.jsonp, self.jsonp_cb)
+            return
+        print data
+        #json_data = JSonHelper("OK")
+        #json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        #json_data.set_data_type("install_from_path")
+        #self.send_http_response_ok(json_data.get())
+
+        print data[-4:]
+        if data[-4:] != ".tgz":
+            self.send_http_response_error(999, "Bad filename provided. It must be a .tgz file", self.jsonp, self.jsonp_cb)
+            return
+        try:
+            buf = data[:-4].split("-")
+            package = "%s/%s/%s" % (buf[0], buf[1], buf[3])
+        except:
+            self.send_http_response_error(999, "Bad filename provided.", self.jsonp, self.jsonp_cb)
+            return
+
+        print package
+        return
+
+        pkg_mgr = PackageManager()
+        res = pkg_mgr.cache_package(PKG_CACHE_DIR, type, id, version)
+        # if package not cachable (doesn't exists, ...)
+        if res == False:
+            self.send_http_response_error(999, "Error on putting package in cache", self.jsonp, self.jsonp_cb)
+
+        #### Send xpl message to install package's rinor part
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : self.get_sanitized_hostname()})
+        message.add_data({"source" : "cache"})
+        message.add_data({"type" : type})
+        message.add_data({"id" : id})
+        message.add_data({"version" : version})
+        message.add_data({"part" : PKG_PART_RINOR})
+        self.myxpl.send(message)
+        
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install",
+                                                          "source" : "cache",
+                                                          "type" : type,
+                                                          "id" : id,
+                                                          "version" : version,
+                                                         "host" : self.get_sanitized_hostname()},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
+        except Empty:
+           self.log.debug("Package install : no answer")
+           self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
+           return
+        
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
+        
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_RINOR, message.data['error']), self.jsonp, self.jsonp_cb)
+
+
+        ### Send xpl message to install package bin part
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : host})
+        message.add_data({"source" : "cache"})
+        message.add_data({"type" : type})
+        message.add_data({"id" : id})
+        message.add_data({"version" : version})
+        message.add_data({"part" : PKG_PART_XPL})
+        self.myxpl.send(message)
+
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install",
+                                                          "source" : "cache",
+                                                          "type" : type,
+                                                          "id" : id,
+                                                          "version" : version,
+                                                          "host" : host},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
+        except Empty:
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_XPL, str(message)))
+        
+
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_XPL, message.data['error']), self.jsonp, self.jsonp_cb)
+            return
+
+
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("install")
+            self.send_http_response_ok(json_data.get())
     def _rest_package_uninstall(self, host, type, id):
         """ Send xpl messages to install a package :
             - one to manager on target host for "bin" files

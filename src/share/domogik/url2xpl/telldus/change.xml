@@ -1,0 +1,19 @@
+<technology id="telldus">
+  <command name="change">
+    <schema>telldus.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>change</command-xpl-value>
+    <parameters>
+      <parameter key="level" location="1"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>telldus.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="change" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

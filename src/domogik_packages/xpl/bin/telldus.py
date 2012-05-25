@@ -44,16 +44,18 @@ Julien Garet <julien@garet.info>
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.xplmessage import XplMessage
+#from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.telldus import TelldusAPI
+from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
+from domogik_packages.xpl.lib.lightplugin import LightingExtension
 import os.path
 import traceback
 #import logging
 #logging.basicConfig()
 
-class Telldus(XplPlugin):
+class Telldus(XplHlpPlugin):
     '''
     Manage chacon devices through the TellStick device
     '''
@@ -63,10 +65,10 @@ class Telldus(XplPlugin):
         This class is used to connect devices (through telldus) to
         the xPL Network
         """
-        XplPlugin.__init__(self, name = 'telldus',
+        XplHlpPlugin.__init__(self, name = 'telldus',
             reload_cb = self.telldus_reload_config_cb)
         self.log.info("telldus.__init__ : Start ...")
-        self.log.debug("telldus.__init__ : Try to start the telldus librairy")
+        self.log.debug("telldus.__init__ : Try to start the telldus library")
         self._device = "/dev/tellstick"
         #Check if the device exists
         if not os.path.exists(self._device):
@@ -77,7 +79,7 @@ class Telldus(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         try:
             self._mytelldus = TelldusAPI(self.send_xpl, self.log,
-                self._config,self.myxpl)
+                self._config)
         except Exception:
             self.log.exception("Something went wrong during telldus "+
                 "init, check logs")
@@ -90,6 +92,38 @@ class Telldus(XplPlugin):
                  {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
                   'command': 'reload', 'plugin': 'telldus'})
         self.enable_hbeat()
+        try:
+            boo = self._config.query('telldus', 'lighting')
+            if boo == None:
+                boo = "False"
+            self._lighting = eval(boo)
+        except:
+            self.log.warning("Can't get delay RF configuration from XPL. Use default one.")
+        if self._lighting == True:
+            self._lighting = LightingExtension(self)
+            self._lighting.enable_lighting(self._mytelldus.lighting_activate_device,
+                self._mytelldus.lighting_deactivate_device, self._mytelldus.lighting_valid_device)
+        self.helpers =   \
+           { "list" :
+              {
+                "cb" : self._mytelldus.helpers.helper_list,
+                "desc" : "List devices in telldus daemon.",
+                "usage" : "list [devicetype]",
+                "param-list" : "devicetype",
+                "min_args" : 0,
+                "devicetype" : "devicetype : the type of device to find",
+              },
+             "info" :
+              {
+                "cb" : self._mytelldus.helpers.helper_info,
+                "desc" : "Display device information",
+                "usage" : "info <device>",
+                "param-list" : "device",
+                "min_args" : 1,
+                "device" : "device address",
+              },
+            }
+        self.enable_helper()
         self.log.info("Telldus plugin correctly started")
 
     def telldus_cmnd_cb(self, message):
@@ -98,14 +132,16 @@ class Telldus(XplPlugin):
         @param message : an XplMessage object
         """
         commands = {
-            'on': lambda hu, l: self._mytelldus.send_on(hu),
-            'off': lambda hu, l: self._mytelldus.send_off(hu),
-            'dim': lambda hu, l: self._mytelldus.send_dim(hu,l),
-            'bright': lambda hu, l: self._mytelldus.send_bright(hu,l),
-            'up': lambda hu, l: self._mytelldus.send_up(hu),
-            'down': lambda hu, l: self._mytelldus.send_down(hu),
-            'stop': lambda hu, l: self._mytelldus.send_stop(hu),
-            'shut': lambda hu, l: self._mytelldus.send_shut(hu,l),
+            'on': lambda hu, l, f: self._mytelldus.send_on(hu),
+            'off': lambda hu, l, f: self._mytelldus.send_off(hu),
+            'dim': lambda hu, l, f: self._mytelldus.send_dim(hu, l),
+            'bright': lambda hu, l, f: self._mytelldus.send_bright(hu, l, f),
+            'shine': lambda hu, l, f: self._mytelldus.send_shine(hu, l, f),
+            'change': lambda hu, l, f: self._mytelldus.send_change(hu, l, f),
+            'up': lambda hu, l, f: self._mytelldus.send_up(hu),
+            'down': lambda hu, l, f: self._mytelldus.send_down(hu),
+            'stop': lambda hu, l, f: self._mytelldus.send_stop(hu),
+            'shut': lambda hu, l, f: self._mytelldus.send_shut(hu, l),
         }
         try :
             cmd = None
@@ -117,33 +153,17 @@ class Telldus(XplPlugin):
             level = "0"
             if 'level' in message.data:
                 level = message.data['level']
-
+            faderate = "0"
+            if 'faderate' in message.data:
+                faderate = message.data['faderate']
             self.log.debug("%s received : device= %s, level=%s" %
-                           (cmd, device,level))
-            commands[cmd](device, level)
-            #self.telldus_monitor_cb(device, cmd)
+                           (cmd, device, level))
+            commands[cmd](device, level, faderate)
         except Exception:
             self.log.error("action _ %s _ unknown."%(cmd))
             error = "Exception : %s" %  \
                      (traceback.format_exc())
             self.log.info("TelldusException : "+error)
-
-    def telldus_monitor_cb(self, add, order, args = None):
-        """
-        Callback for telldus monitoring
-        @param add : address ot the module
-        @param order : the order sent to the unit
-        """
-        self.log.debug("Telldus Callback YEDfor %s" % add)
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("telldus.basic")
-        mess.add_data({"device" :  add})
-        mess.add_data({"command" :  order})
-        if args:
-            mess.add_data({"level" : args})
-        self.myxpl.send(mess)
-
 
     def telldus_reload_config_cb(self):
         """
@@ -151,23 +171,16 @@ class Telldus(XplPlugin):
         @param message : xpl message
         """
         self.log.debug("Telldus reload config received")
-        self._mytelldus.reloadConfig()
+        self._mytelldus.reload_config()
 
-    def send_xpl(self, add, order, args = None):
+    def send_xpl(self, message):
         """
         Callback for sending xpl
         @param add : address of the module
         @param order : the order sent to the unit
         """
-        self.log.debug("Telldus send_xpl for %s" % add)
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("telldus.basic")
-        mess.add_data({"device" :  add})
-        mess.add_data({"command" :  order})
-        if args:
-            mess.add_data({"level" : args})
-        self.myxpl.send(mess)
+        self.log.debug("Telldus send_xpl")
+        self.myxpl.send(message)
 
 if __name__ == "__main__":
     Telldus()
