@@ -399,7 +399,7 @@ class TelldusAPI:
         faderate = int(faderate)
         if level == 0 :
             self.send_off(device)
-        elif level > 100 :
+        elif level >= 100 :
             self.send_on(device)
         else :
             if faderate == 0:
@@ -1232,7 +1232,7 @@ class Telldusd:
         ret = {}
         for i in range(self._tdlib.tdGetNumberOfDevices()):
             iid = self._tdlib.tdGetDeviceId(c_int(i))
-            ret[i] = { "name" : c_char_p(self._tdlib.tdGetName(c_int(iid))).value,
+            ret[iid] = { "name" : c_char_p(self._tdlib.tdGetName(c_int(iid))).value,
                        "house" : c_char_p(self._tdlib.tdGetDeviceParameter(c_int(iid), c_char_p("house"), "")).value,
                        "unit" : c_char_p(self._tdlib.tdGetDeviceParameter(c_int(iid), c_char_p("unit"), "")).value,
                        "model" : "%s" % c_char_p(self._tdlib.tdGetModel(c_int(iid))).value,

@@ -66,7 +66,7 @@ class telldus(Helper):
                   {
                     "cb" : self.info,
                     "desc" : "Display device information",
-                    "min_args" : 2,
+                    "min_args" : 1,
                     "usage" : "info <id>"
                   }
                 }
@@ -81,9 +81,9 @@ class telldus(Helper):
         """
         List all devices
         """
-        self._log.info("telldusHelper.list : Start ...")
+        self._log.info("list : Start ...")
         data = []
-        if  args[0] == "all":
+        if  len(args) == 0:
             data.append("List all devices :")
             data.append("id : XPL id : Name")
 
@@ -95,21 +95,21 @@ class telldus(Helper):
             data.append("List all devices of type %s :" % args[0])
             data.append("id : XPL id : Name")
             self._log.debug("telldusHelper.list devicetype=%s" % args[0])
-        self._log.debug("telldusHelper.list : Done")
+        self._log.debug("list : Done")
         return data
 
     def info(self, args = None):
         """
         Get information for device
         """
-        self._log.info("telldusHelper.info : Start ...")
+        self._log.info("info : Start ...")
         data = []
         data.append("Information for device %s" % args[0])
         if len(args) == 1:
             data.extend(self._telldusd.get_info(int(args[0])))
         else:
             return ["Bad usage of this helper. "]
-        self._log.debug("telldusHelper.info : Done")
+        self._log.debug("info : Done")
         return data
 
 MY_CLASS = {"cb" : telldus}
