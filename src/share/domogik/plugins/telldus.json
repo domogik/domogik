@@ -210,7 +210,7 @@
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "telldus",
-        "changelog": "0.3 - Completely rewriting code to improve batch commands.\n0.2 - Update XML description.",
+        "changelog": "0.3\n - Completely rewriting code to improve batch commands.\n0.2\n - Update XML description.",
         "dependencies": [
             {
                 "id": "pympler (>=0.2.1)",

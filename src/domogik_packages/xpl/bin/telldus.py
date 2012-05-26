@@ -45,11 +45,20 @@ Julien Garet <julien@garet.info>
 
 from domogik.xpl.common.xplconnector import Listener
 #from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin
+#from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.telldus import TelldusAPI
-from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
-from domogik_packages.xpl.lib.lightplugin import LightingExtension
+import traceback
+try :
+    from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
+except :
+    print "Cant load helper plugin : "
+    print traceback.format_exc()
+try :
+    from domogik_packages.xpl.lib.lightplugin import LightingExtension
+except :
+    print "Cant load lighting extension (not a problem if you don't use it) : "
+    print traceback.format_exc()
 import os.path
 import traceback
 #import logging
@@ -81,8 +90,9 @@ class Telldus(XplHlpPlugin):
             self._mytelldus = TelldusAPI(self.send_xpl, self.log,
                 self._config)
         except Exception:
-            self.log.exception("Something went wrong during telldus "+
+            self.log.error("Something went wrong during telldus "+
                 "init, check logs")
+            self.force_leave()
             exit(1)
         #Create listeners
         self.log.debug("telldus.__init__ : Create listeners")
@@ -91,7 +101,6 @@ class Telldus(XplHlpPlugin):
         Listener(self.telldus_reload_config_cb, self.myxpl,
                  {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
                   'command': 'reload', 'plugin': 'telldus'})
-        self.enable_hbeat()
         try:
             boo = self._config.query('telldus', 'lightext')
             if boo == None:
@@ -100,7 +109,7 @@ class Telldus(XplHlpPlugin):
         except:
             self.log.warning("Can't get delay RF configuration from XPL. Use default one.")
         if self._lighting == True:
-            self._lighting = LightingExtension(self)
+            self._lighting = LightingExtension(self, self._name)
             self._lighting.enable_lighting(self._mytelldus.lighting_activate_device,
                 self._mytelldus.lighting_deactivate_device, self._mytelldus.lighting_valid_device)
         self.helpers =   \
@@ -124,6 +133,7 @@ class Telldus(XplHlpPlugin):
               },
             }
         self.enable_helper()
+        self.enable_hbeat()
         self.log.info("Telldus plugin correctly started")
 
     def telldus_cmnd_cb(self, message):
