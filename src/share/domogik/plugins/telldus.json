@@ -25,7 +25,7 @@
             "description": "Use lighting extensions. Need the lighting plugin to be installed and running.",
             "id": "2",
             "interface": "no",
-            "key": "lighting",
+            "key": "lightext",
             "optionnal": "no",
             "options": [],
             "type": "boolean"
@@ -42,7 +42,7 @@
         },
         {
             "default": null,
-            "description": "Type of the device (shutter,sensor,dawndusk). May be a list separated by spaces.",
+            "description": "Type of the device (shutter,sensor,dawndusk).",
             "id": "4",
             "interface": "yes",
             "key": "devicetype",

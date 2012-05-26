@@ -93,7 +93,7 @@ class Telldus(XplHlpPlugin):
                   'command': 'reload', 'plugin': 'telldus'})
         self.enable_hbeat()
         try:
-            boo = self._config.query('telldus', 'lighting')
+            boo = self._config.query('telldus', 'lightext')
             if boo == None:
                 boo = "False"
             self._lighting = eval(boo)
