@@ -56,12 +56,16 @@ class Lighting(XplPlugin):
 
         self.log.debug("lighting.__init__ : Try to get configuration from XPL")
         try:
+            #self.use_cron = bool(self._config.query('lighting', 'usecron'))
             self.broadcast = bool(self._config.query('lighting', 'broadcast'))
+            #self.presence = bool(self._config.query('lighting', 'presence'))
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.exception("lighting.__init__ : " + error)
+            #self.use_cron = True
             self.broadcast = True
+            #self.presence = True
             raise LightingException(error)
 
         self.log.debug("lighting.__init__ : Try to start the lighting librairy")
