@@ -12,30 +12,10 @@
         },
         {
             "default": "True",
-            "desc": "Use the cron plugin. You must let it to True",
+            "desc": "Allow the gateway to accept messages from unknow networks. You should let it to True",
             "id": "1",
             "interface": "no",
-            "key": "usecron",
-            "optionnal": "no",
-            "options": [],
-            "type": "boolean"
-        },
-        {
-            "default": "True",
-            "desc": "Allow the gateway to accept messages from unknow networks. You should let it to True",
-            "id": "2",
-            "interface": "no",
             "key": "broadcast",
-            "optionnal": "no",
-            "options": [],
-            "type": "boolean"
-        },
-        {
-            "default": "True",
-            "desc": "Auto start a scene with the help of the presence plugin and an obscurity detector. You should let it to True",
-            "id": "3",
-            "interface": "no",
-            "key": "presence",
             "optionnal": "no",
             "options": [],
             "type": "boolean"

@@ -52,7 +52,7 @@ class LightingAPI():
     lighting API
     """
 
-    def __init__(self, broadcast, use_cron, myxpl, log, data_dir):
+    def __init__(self, broadcast, myxpl, log, data_dir):
         """
         Init the lighting API
         @param use_cron : use of an external cron
@@ -60,7 +60,6 @@ class LightingAPI():
         @param log : the log facility
         """
         self.log = log
-        self.use_cron = use_cron
         self.broadcast = broadcast
         self.myxpl = myxpl
         self.data_files_dir = data_dir
