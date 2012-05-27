@@ -190,6 +190,7 @@ class Cron(XplHlpPlugin):
 
         self.enable_helper()
         self.enable_hbeat()
+        self.add_stop_cb(self._cron.jobs.stop_scheduler)
         self.log.info("cron plugin correctly started")
 
     def request_cmnd_cb(self, message):
