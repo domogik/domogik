@@ -39,7 +39,8 @@ class LightingExtension():
     """
     Add support for lighting to plugin
     """
-    def __init__(self, plugin, name):
+    def __init__(self, plugin, name, cb_activate_device, cb_deactivate_device,
+        cb_valid_device):
         """
         """
         self._plugin = plugin
@@ -54,11 +55,57 @@ class LightingExtension():
         #The lighting extension is started and confgured
         self._active = False
         #The callbaks methods
-        self.cb_activate_device = None
-        self.cb_deactivate_device = None
-        self.cb_valid_device = None
+        self.cb_activate_device = cb_activate_device
+        self.cb_deactivate_device = cb_deactivate_device
+        self.cb_valid_device = cb_valid_device
+        #The listeners
+        self._listeners = []
 
-    def enable_lighting(self, cb_activate_device, cb_deactivate_device,
+    def enable_lighting(self):
+        """
+        Enable the lighting listeners
+        @param name : the name of the client
+        @param cb_activate_device : the callback method to activate a device
+        @param cb_deactivate_device : the callback method to deactivate a device
+        @param cb_valid_device : the callback method to validate a device
+
+        """
+        if self._started == True or self.cb_activate_device == None \
+          or self.cb_deactivate_device == None or self.cb_valid_device == None :
+            return False
+        else :
+            continu = True
+            if self._started == False and continu == True:
+                try :
+                    #print "load configuration"
+                    self._listeners.append( Listener(self.activate_cmnd_listener, self._plugin.myxpl,
+                        {'schema': 'lighting.basic', 'xpltype': 'xpl-cmnd', 'command': 'activate'}))
+                    self._listeners.append( Listener(self.deactivate_cmnd_listener, self._plugin.myxpl,
+                        {'schema': 'lighting.basic', 'xpltype': 'xpl-cmnd', 'command': 'deactivate'}))
+            #       Listener(self.basic_cmnd_listener, self._plugin.myxpl,
+            #           {'schema': 'lighting.basic', 'xpltype': 'xpl-cmnd'})
+                    self._listeners.append( Listener(self.config_stat_listener, self._plugin.myxpl,
+                        {'schema': 'lighting.config', 'xpltype': 'xpl-stat'}))
+                    self._listeners.append( Listener(self.config_trig_listener, self._plugin.myxpl,
+                        {'schema': 'lighting.config', 'xpltype': 'xpl-trig'}))
+                    self._started = True
+                except :
+                    error = "Exception : %s" % (traceback.format_exc())
+                    self._plugin.log.error("LightingExtension.enable_lighting \: " + error)
+                    continu = False
+            if self._started == True and continu == True:
+                try :
+                    #request the configuration from the lighting gateway.
+                    #print "load configuration"
+                    self.load_configuration()
+                    continu = True
+                except :
+                    error = "Exception : %s" % (traceback.format_exc())
+                    self._plugin.log.error("LightingExtension.enable_lighting \: " + error)
+                    continu = False
+            return continu
+
+    def stop_lighting(self, cb_activate_device, cb_deactivate_device,
         cb_valid_device):
         """
         Enable the lighting listeners
@@ -68,38 +115,8 @@ class LightingExtension():
         @param cb_valid_device : the callback method to validate a device
 
         """
-        if self._started == True or self._active == True or \
-          cb_activate_device == None or cb_deactivate_device == None or \
-          cb_valid_device == None :
-            return False
-        else :
-            continu = True
-            if self._started == False:
-                try :
-                    self.cb_activate_device = cb_activate_device
-                    self.cb_deactivate_device = cb_deactivate_device
-                    self.cb_valid_device = cb_valid_device
-                    Listener(self.activate_cmnd_listener, self._plugin.myxpl,
-                        {'schema': 'lighting.basic', 'xpltype': 'xpl-cmnd', 'command': 'activate'})
-                    Listener(self.deactivate_cmnd_listener, self._plugin.myxpl,
-                        {'schema': 'lighting.basic', 'xpltype': 'xpl-cmnd', 'command': 'deactivate'})
-#                    Listener(self.basic_cmnd_listener, self._plugin.myxpl,
-#                        {'schema': 'lighting.basic', 'xpltype': 'xpl-cmnd'})
-                    Listener(self.config_stat_listener, self._plugin.myxpl,
-                        {'schema': 'lighting.config', 'xpltype': 'xpl-stat'})
-                    Listener(self.config_trig_listener, self._plugin.myxpl,
-                        {'schema': 'lighting.config', 'xpltype': 'xpl-trig'})
-                    continu = True
-                except :
-                    continu = False
-            if self._started == False and continu == True:
-                try :
-                    #request the configuration from the lighting gateway.
-                    self.load_configuration()
-                    continu = True
-                except :
-                    continu = False
-            return continu
+        for lis in self._liteners:
+            del(lis)
 
     def add_device(self, scene, device, channel, level, faderate):
         """
@@ -206,6 +223,24 @@ class LightingExtension():
             error = "Exception : %s" % (traceback.format_exc())
             self._plugin.log.error("LightingExtension.activate_cmnd_listener : " + error)
 
+    def deactivate_cmnd_listener(self, message):
+        """
+        Listen to lighting.basic messages
+        @param message : The XPL message
+        @param myxpl : The XPL sender
+        """
+        try:
+            scene = None
+            if 'scene' in message.data:
+                scene = message.data['scene']
+            if self.valid_scene(scene):
+                self.cmd_deactivate(self._plugin.myxpl, message, scene)
+            else :
+                self._plugin.log.debug("LightingExtension.deactivate_cmnd_listener : not a valid scene")
+        except:
+            error = "Exception : %s" % (traceback.format_exc())
+            self._plugin.log.error("LightingExtension.deactivate_cmnd_listener : " + error)
+
     def config_stat_listener(self, message):
         """
         Listen to lighting.basic messages
@@ -309,7 +344,7 @@ class LightingExtension():
                 mess.add_data({"command" : "scninfo"})
                 mess.add_data({"scene" : scene})
                 myxpl.send(mess)
-                time.sleep(1)
+                #time.sleep(1)
 
     def stat_scninfo(self, myxpl, message):
         """
@@ -357,4 +392,4 @@ class LightingExtension():
                         #print "dfaderate=%s" % dfaderate
                         if self.valid_device(ddevice, dchannel):
                             self.add_device(scene, ddevice, dchannel, dlevel, dfaderate)
-        print "scenes = %s" % (self._scenes)
+        #print "scenes = %s" % (self._scenes)

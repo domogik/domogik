@@ -600,7 +600,7 @@ class TelldusAPI:
             start = 100
         else:
             start = int(old["value"])
-        print " start = %s" % start
+        #print " start = %s" % start
         tdlevel = level * 2.55
         tdstart = start * 2.55
         steps = faderate / self._delaybatch

@@ -109,9 +109,12 @@ class Telldus(XplHlpPlugin):
         except:
             self.log.warning("Can't get delay RF configuration from XPL. Use default one.")
         if self._lighting == True:
+            self._lighting = LightingExtension(self, self._name, self._mytelldus.lighting_activate_device,
             self._lighting = LightingExtension(self, self._name)
             self._lighting.enable_lighting(self._mytelldus.lighting_activate_device,
-                self._mytelldus.lighting_deactivate_device, self._mytelldus.lighting_valid_device)
+                self._mytelldus.lighting_deactivate_device,
+                self._mytelldus.lighting_valid_device)
+            self._lighting.enable_lighting()
         self.helpers =   \
            { "list" :
               {
