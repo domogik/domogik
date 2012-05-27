@@ -105,16 +105,16 @@ class Telldus(XplHlpPlugin):
             boo = self._config.query('telldus', 'lightext')
             if boo == None:
                 boo = "False"
-            self._lighting = eval(boo)
+            self._lightext = eval(boo)
         except:
-            self.log.warning("Can't get delay RF configuration from XPL. Use default one.")
-        if self._lighting == True:
-            self._lighting = LightingExtension(self, self._name, self._mytelldus.lighting_activate_device,
-            self._lighting = LightingExtension(self, self._name)
-            self._lighting.enable_lighting(self._mytelldus.lighting_activate_device,
-                self._mytelldus.lighting_deactivate_device,
+            self.log.warning("Can't get delay configuration from XPL. Disable lighting extensions.")
+            self._lightext = False
+        if self._lightext == True:
+            self._lighting = LightingExtension(self, self._name, \
+                self._mytelldus.lighting_activate_device, \
+                self._mytelldus.lighting_deactivate_device, \
                 self._mytelldus.lighting_valid_device)
-            self._lighting.enable_lighting()
+
         self.helpers =   \
            { "list" :
               {
@@ -135,6 +135,8 @@ class Telldus(XplHlpPlugin):
                 "device" : "device address",
               },
             }
+        if self._lightext == True:
+            self._lighting.enable_lighting()
         self.enable_helper()
         self.enable_hbeat()
         self.log.info("Telldus plugin correctly started")

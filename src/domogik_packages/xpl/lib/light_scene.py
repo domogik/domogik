@@ -95,8 +95,11 @@ class LightingScene():
         self._scenes = {}
         self._store.load_all(self.new, self.add_device)
         self.fields = ["name", "room", "floor", "comment"]
+        i = 0
         for scene in self._scenes:
+            i = i + 1
             self.trig_scninfo(scene)
+        self._gateway.log.info("Loaded %s scene from store." % i)
 #        self.new("cuiamb", name="Ambiance", room="Cuisine")
 #        self.add_device("cuiamb", "TS26")
 #        self.add_device("cuiamb", "TS30")
