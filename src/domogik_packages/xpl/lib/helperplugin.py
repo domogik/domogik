@@ -139,6 +139,8 @@ lib/cron.py to see the helpers functions
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
+import tailer
+import os
 import traceback
 
 class PluginHelper():
@@ -254,6 +256,39 @@ class PluginHelper():
             error = "Exception : %s" % (traceback.format_exc())
             self._parent.log.error("pluginHelper.requestDeviceListener : " + error)
 
+    def basic_cmnd_log(self, message):
+        """
+        """
+        plugin = None
+        if 'plugin' in message.data:
+            plugin = message.data['plugin']
+        if plugin != self._parent._name:
+            return False
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("helper.basic")
+        mess.add_data({"plugin" : self._parent._name})
+        mess.add_data({"command" : "log"})
+        try:
+            lines = 10
+            if 'lines' in message.data:
+                lines = int(message.data['lines'])
+            #Todo : retrieve filepath fron logger
+            filename = os.path.join("/var/log/domogik", self._parent._name + ".log")
+            result = tailer.tail(open(filename), lines)
+            i = 1
+            for line in result:
+                if line != "":
+                    mess.add_data({"log%s" % (i) : "%s" % (line)})
+                    i = i+1
+            mess.add_data({"log-count" : i-1})
+            mess.add_data({"status" : "ok"})
+        except:
+            error = "Exception : %s" % (traceback.format_exc())
+            self._parent.log.error("pluginHelper.basicDeviceListener : " + error)
+            mess.add_data({"status" : "error"})
+        self._parent.myxpl.send(mess)
+
     def basic_cmnd_listener(self, message):
         """
         """
@@ -290,6 +325,9 @@ class PluginHelper():
                         mess.add_data({"status" : "ok"})
                     else :
                         mess.add_data({"status" : "missing argument"})
+                elif command == "log":
+                    self.basic_cmnd_log(message)
+                    mess.add_data({"status" : "ok"})
                 else:
                     mess.add_data({"status" : "not-found"})
             else:

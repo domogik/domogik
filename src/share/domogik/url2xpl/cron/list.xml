@@ -1,0 +1,17 @@
+<technology id="cron">
+  <command name="list">
+    <schema>timer.basic</schema>
+    <command-key>command</command-key>
+    <address-key>caller</address-key>
+    <command-xpl-value>list</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>timer.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="list" />
+      <key name="caller" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
