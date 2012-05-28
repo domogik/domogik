@@ -115,29 +115,35 @@ MEMORY_RTIMER = 6
 MEMORY_STIMER = 7
 MEMORY_ACK = 8
 MEMORY_LAST = 9
+MEMORY_LIGHTING = 10
 
 DEVICEEVENTLOCK = threading.Lock()
+SENSOREVENTLOCK = threading.Lock()
 QUEUELOCK = threading.Lock()
 
 MULTI_SHUTTER_DOWN = 1.2
 MULTI_SHUTTER_UP = 1.5
 
-#def sensor_event_callback(protocol, model, deviceid, datatype, \
-#    '''
-#    Add Device to the dictionnary
-#    '''
-#    value, timestamp, callbackid, context):
-#    print "sensorEventCallback: id=%s, method=%s and data=%s" % \
-#        (deviceid, model, value)
+def sensor_event_callback(protocol, model, deviceid, datatype, value, timestamp, callbackid, context ):
+    '''
+    Callback procedure when a sensor event income.
+    '''
+    print "sensor_event_callback: id=%s, protocol=%s, value=%s and callbackid=%s" % (deviceid, protocol, value, callbackid)
+    if deviceid == 0 or datatype == 0 :
+        return
+    obj = cast(context, py_object).value
+    print("types %s, %s, %s, %s, %s, %s, %s: " % (protocol, model, deviceid, datatype, value, timestamp, callbackid))
+    obj.receive(c_char_p(protocol).value, c_char_p(model).value, deviceid, \
+                datatype, c_char_p(value).value, c_char_p(timestamp).value, callbackid)
 
 def device_event_callback(deviceid, method, value, callbackid, context):
     '''
     Callback procedure when a device event income.
     '''
+    print "device_event_callback: id=%s, method=%s, value=%s and callbackid=%s" % (deviceid, method, value, callbackid)
     if deviceid == 0 or method == 0 :
         return
     obj = cast(context, py_object).value
-    #print "deviceEventCallback: id=%s, method=%s and value=%s" % (deviceid, method, value)
     obj.receive(deviceid, method, c_char_p(value).value, callbackid)
 
 def device_change_event_callback(deviceid, changeevent,
@@ -191,6 +197,7 @@ class TelldusAPI:
         #The maximun batch items to create
         self._maxbatch = 10
         self._deviceeventq = None
+        self._sensoreventq = None
         self.log.info("telldusAPI.__init__ : Look for telldus-core")
         # Initialize tellDus API
         try:
@@ -198,7 +205,7 @@ class TelldusAPI:
         except:
             self.log.error("Error loading telldusd : %s" % (traceback.format_exc()))
         try:
-            self.helpers = Helpers(self._telldusd)
+            self.helper = Helpers(self, self._telldusd)
         except:
             self.log.error("Error loading helpers : %s" % (traceback.format_exc()))
         self.reload_config()
@@ -220,6 +227,11 @@ class TelldusAPI:
         except:
             self.log.error("Error creating the device event queue : %s" % \
                      (traceback.format_exc()))
+        #try:
+        #    self._sensoreventq = SensorEventQueue(self, self._delayrf, self._telldusd)
+        #except:
+        #    self.log.error("Error creating the sensor event queue : %s" % \
+        #             (traceback.format_exc()))
         self._config = {}
         num = 1
         loop = True
@@ -243,22 +255,23 @@ class TelldusAPI:
         '''
         self.log.debug("memory_usage : Start")
         if which == 0 :
-            print "Memory usage :"
-            print "api : %s octets" % asizeof(self)
-            print "config : %s octets" % asizeof(self._config)
-            print "device queue : %s octets" % self._deviceeventq.memory_usage(MEMORY_DEVICE_QUEUE)
-            print "fifo : %s octets" % self._deviceeventq.memory_usage(MEMORY_FIFO)
-            print "received timers : %s octets" % self._deviceeventq.memory_usage(MEMORY_RTIMER)
-            print "sent timers : %s octets" % self._deviceeventq.memory_usage(MEMORY_STIMER)
-            print "ACKs to send : %s octets" % self._deviceeventq.memory_usage(MEMORY_ACK)
-            print "last commands sent : %s octets" % self._deviceeventq.memory_usage(MEMORY_LAST)
+            data = []
+            data.append("api : %s items, %s bytes" % (1, asizeof(self)))
+            data.append("config : %s items, %s bytes" % (len(self._config), asizeof(self._config)))
+            data.append("device queue : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_DEVICE_QUEUE)))
+            data.append("fifo : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_FIFO)))
+            data.append("received timers : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_RTIMER)))
+            data.append("sent timers : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_STIMER)))
+            data.append("ACKs to send : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_ACK)))
+            data.append("last commands sent : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_LAST)))
+            return data
         else:
             if which == MEMORY_PLUGIN:
                 return 0
             elif which == MEMORY_API:
-                return asizeof(self)
+                return asizeof(self), 1
             elif which == MEMORY_CONFIG:
-                return asizeof(self._config)
+                return asizeof(self._config), len(self._config)
             elif which == MEMORY_DEVICE_QUEUE:
                 return self._deviceeventq.memory_usage(MEMORY_DEVICE_QUEUE)
             elif which == MEMORY_FIFO:
@@ -330,7 +343,7 @@ class TelldusAPI:
             mess.add_data({"level" : value})
         self._send_xpl_cmd(mess)
 
-    def send_xpl_sensor_basic(self, xpltype, deviceid, method, value):
+    def send_xpl_sensor_basic(self, xpltype, deviceid, method, value, datatype=0, timestamp=None):
         """
         Send an xpl message : ie an xpl-trig
         @param deviceid : the id of the device
@@ -341,11 +354,21 @@ class TelldusAPI:
         mess.set_type("xpl-trig")
         mess.set_schema("sensor.basic")
         mess.add_data({"device" :  self._telldusd.get_device(deviceid)})
-        mess.add_data({"type" :  "telldus"})
-        if method == TELLSTICK_TURNON :
-            mess.add_data({"current" : "high"})
-        elif method == TELLSTICK_TURNOFF :
-            mess.add_data({"current" : "low"})
+        if datatype == 0 :
+            #An unknown sensor
+            mess.add_data({"type" :  "telldus"})
+            if method == TELLSTICK_TURNON :
+                mess.add_data({"current" : "high"})
+            elif method == TELLSTICK_TURNOFF :
+                mess.add_data({"current" : "low"})
+        else :
+            mess.add_data({"protocol" :  method})
+            mess.add_data({"timestamp" :  timestamp})
+            mess.add_data({"current" : value})
+            if datatype == TELLSTICK_TEMPERATURE:
+                mess.add_data({"type" :  "temperature"})
+            elif datatype == TELLSTICK_HUMIDITY:
+                mess.add_data({"type" :  "humidity"})
         self._send_xpl_cmd(mess)
 
     def send_xpl_ack(self, deviceid, method, value):
@@ -369,6 +392,20 @@ class TelldusAPI:
         """
         self.log.debug("send_xpl_new : Start ...")
         self.send_xpl("xpl-cmnd", deviceid, method, value)
+        self.log.debug("send_xpl_new : Done")
+
+    def send_xpl_new_sensor(self, protocol, model, deviceid, datatype, value, timestamp):
+        """
+        Send a new xpl sensor message : ie an xpl-trig for temperature, humidity,
+        @param protocol : the protocol of the sensor
+        @param model : the model of the sensor
+        @param deviceid : the id of the sensor
+        @param datatype : the datatype
+        @param value : the value
+        @param timestamp : the timestamp of the event
+        """
+        self.log.debug("send_xpl_new : Start ...")
+        self.send_xpl_sensor_basic("xpl-trig", deviceid, protocol, value, datatype=datatype, timestamp=timestamp)
         self.log.debug("send_xpl_new : Done")
 
     def get_device_id(self, device):
@@ -760,7 +797,14 @@ class DeviceEventQueue:
         #The trig message to send when the cycle is complete.
         self._ackstosend = dict()
         #Register the device event procedure.
-        self._telldusd.register_device_event(self)
+        if (platform.system() == 'Windows'):
+            cmpfunc = WINFUNCTYPE(c_void_p, c_int, c_int, c_char_p,
+                c_int, c_void_p)
+        else:
+            cmpfunc = CFUNCTYPE(c_void_p, c_int, c_int, c_char_p,
+                c_int, c_void_p)
+        self._device_event_cb = cmpfunc(device_event_callback)
+        self._telldusd.register_device_event(self._device_event_cb, self)
 
     def __del__(self):
         '''
@@ -776,21 +820,22 @@ class DeviceEventQueue:
         Return the memory used by an object
         '''
         if which == MEMORY_DEVICE_QUEUE:
-            return asizeof(self)
+            return 1, asizeof(self)
         elif which == MEMORY_FIFO:
-            return asizeof(self._fifos)
+            return len(self._fifos), asizeof(self._fifos)
         elif which == MEMORY_RTIMER:
             #print "self._received_timers : %s" % self._received_timers
             #print "self._refused_timers : %s" % self._refused_timers
-            return asizeof(self._received_timers) + asizeof(self._refused_timers)
+            return len(self._received_timers)+len(self._refused_timers), \
+                asizeof(self._received_timers) + asizeof(self._refused_timers)
         elif which == MEMORY_STIMER:
-            return asizeof(self._sent_timers)
+            return len(self._sent_timers), asizeof(self._sent_timers)
         elif which == MEMORY_ACK:
-            return asizeof(self._ackstosend)
+            return len(self._ackstosend), asizeof(self._ackstosend)
         elif which == MEMORY_LAST:
-            return asizeof(self._lastsents)
+            return len(self._lastsents), asizeof(self._lastsents)
         else :
-            return 0
+            return 0, 0
 
     def _clean_batch(self, deviceid):
         '''
@@ -813,6 +858,7 @@ class DeviceEventQueue:
         '''
         Send command thru the tellstick, add a new entry to acktosend.
         '''
+        print "send_command deviceid=%s, method=%s, value=%s" % (deviceid, method, value)
         self._clean_batch(deviceid)
         self._lastsents[deviceid] = {'method': method,
                             'value' : value}
@@ -829,6 +875,7 @@ class DeviceEventQueue:
         '''
         if (active_batch == False) or \
           (active_batch == True and deviceid in self._fifos and len(self._fifos[deviceid]) > 0) :
+            print "resend_command deviceid=%s, method=%s, value=%s" % (deviceid, method, value)
             if deviceid in self._lastsents :
 #                print "resend"
                 self._clean_batch(deviceid)
@@ -866,6 +913,7 @@ class DeviceEventQueue:
         @param method : method of device of the ack to send
         @param value : id of device of the ack to send
         '''
+        print "_send_batch_timer deviceid=%s, method=%s, value=%s" % (deviceid, method, value)
         self._lastsents[deviceid] = {'method': method,
                             'value' : value}
         self._telldusd.commands[method](deviceid, value)
@@ -1030,9 +1078,13 @@ class DeviceEventQueue:
         try :
             #Try to cancel the timer
             #If it does not exist, th exception is catch silently
-            self._received_timers[deviceid][method][value].cancel()
+            if deviceid in self._received_timers and \
+              method in self._received_timers[deviceid] and \
+              value in self._received_timers[deviceid][method] :
+                self._received_timers[deviceid][method][value].cancel()
+                return True
             #self._received_timers[deviceid].cancel()
-            return True
+            return False
         except :
             #print "exception"
             return False
@@ -1085,22 +1137,28 @@ class DeviceEventQueue:
         '''
         Delete a refused timer if needed
         '''
-        if self._reset_receive_timer(deviceid, method, value) :
-            self._del_receive_timer(deviceid, method, value)
         try :
-            del(self._refused_timers[deviceid][method][value])
-        except :
-            pass
-        try :
-            if len(self._refused_timers[deviceid][method]) == 0:
-                del(self._refused_timers[deviceid][method])
-        except :
-            pass
-        try :
-            if len(self._refused_timers[deviceid]) == 0:
-                del(self._refused_timers[deviceid])
-        except :
-            pass
+            DEVICEEVENTLOCK.acquire()
+            if self._reset_receive_timer(deviceid, method, value) :
+                self._del_receive_timer(deviceid, method, value)
+            try :
+                del(self._refused_timers[deviceid][method][value])
+            except :
+                pass
+            try :
+                if len(self._refused_timers[deviceid][method]) == 0:
+                    del(self._refused_timers[deviceid][method])
+            except :
+                pass
+            try :
+                if len(self._refused_timers[deviceid]) == 0:
+                    del(self._refused_timers[deviceid])
+            except :
+                pass
+            DEVICEEVENTLOCK.release()
+        except:
+            print traceback.format_exc()
+            DEVICEEVENTLOCK.release()
         #print "refusetimer for %s:%s:%s deleted" % (deviceid, method, value)
 
     def _check_refuse_timer(self, deviceid, method, value):
@@ -1109,6 +1167,192 @@ class DeviceEventQueue:
         '''
         try :
             timer = self._refused_timers[deviceid][method][value]
+            return False
+        except :
+            return True
+
+class SensorEventQueue:
+    '''
+    This class is the interface for sensor to the tellsticK.
+    It receices sensor messages and sends them over xpl.
+    @param parent : the library used to sent the xpl message
+    @param delay_rf : the delay to filter RF messages
+    @param telldusd : the "daemon" used to communicate with the tellstick
+    '''
+    def __init__(self, parent, delayrf, telldusd):
+        '''
+        Init the class
+        '''
+        self._delayrf = delayrf
+        self._telldusd = telldusd
+        self._parent = parent
+        #The timers used to filter the incoming RF commands.
+        self._received_timers = dict()
+        self._refused_timers = dict()
+        #Register the device event procedure.
+        if (platform.system() == 'Windows'):
+            cmpfunc = WINFUNCTYPE(c_void_p, c_int, c_char_p, c_char_p,
+                c_int, c_int, c_char_p, c_char_p, c_int, c_void_p)
+        else:
+            cmpfunc = CFUNCTYPE(c_void_p, c_int, c_char_p, c_char_p,
+                c_int, c_int, c_char_p, c_char_p, c_int, c_void_p)
+        self._sensor_event_cb = cmpfunc(sensor_event_callback)
+        self._telldusd.register_sensor_event(self._sensor_event_cb, self)
+
+    def __del__(self):
+        '''
+        Destroy the class
+        '''
+        if self._telldusd:
+            self._telldusd.unregister_sensor_event()
+        #print "DeviceEventQueue.__del__ is called"
+
+
+    def memory_usage(self, which):
+        '''
+        Return the memory used by an object
+        '''
+        if which == MEMORY_RTIMER:
+            #print "self._received_timers : %s" % self._received_timers
+            #print "self._refused_timers : %s" % self._refused_timers
+            return len(self._received_timers) + len(self._refused_timers), \
+                asizeof(self._received_timers) + asizeof(self._refused_timers)
+        else :
+            return 0
+
+    def _receive(self, protocol, model, deviceid, datatype, value, timestamp, callbackid):
+        '''
+        Receive an event fron the callback procedure
+        '''
+        #print "_receive : deviceid=%s, method=%s, value=%s, callbackid=%s" % (deviceid, method, value, callbackid)
+        #print "type value=%s" % (type(value))
+        try :
+            #This is a new event.
+            #We need to send a cmnd message (for a ligthing controller)
+            #or a trig message for a sensor
+            #How can we make the difference ???
+            self._parent.send_xpl_sensor(protocol, model, deviceid, datatype, value, timestamp)
+            #if self._reset_receive_timer(deviceid, datatype, value) :
+            #    self._del_receive_timer(deviceid, datatype, value)
+            self._create_refuse_timer(protocol, model, deviceid, datatype, value, timestamp, callbackid)
+        except:
+            print traceback.format_exc()
+            SENSOREVENTLOCK.release()
+
+    def receive(self, protocol, model, deviceid, datatype, value, timestamp, callbackid):
+        '''
+        Receive an event fron the callback procedure
+        '''
+        #print "receive : deviceid=%s, datatype=%s, value=%s, callbackid=%s" % (deviceid, datatype, value, callbackid)
+        if value == "" or value == None or value == "None" :
+            value = 0
+        else :
+            value = int(value)
+        try :
+            if self._check_refuse_timer(deviceid, datatype, value):
+                self._reset_receive_timer(deviceid, datatype, value)
+                #start timer with 0.5 second delay (adjust the delay to suit your needs)
+                self._create_receive_timer(protocol, model, deviceid, datatype, value, timestamp, callbackid)
+        except :
+            print traceback.format_exc()
+            raise TelldusException("Error when receiving data.")
+
+    def _reset_receive_timer(self, deviceid, datatype, value):
+        '''
+        Reset a timer if needed
+        '''
+        try :
+            #Try to cancel the timer
+            #If it does not exist, th exception is catch silently
+            if deviceid in self._received_timers and \
+              datatype in self._received_timers[deviceid] and \
+              value in self._received_timers[deviceid][datatype] :
+                self._received_timers[deviceid][datatype][value].cancel()
+                return True
+            #self._received_timers[deviceid].cancel()
+            return False
+        except :
+            #print "exception"
+            return False
+
+    def _create_receive_timer(self, protocol, model, deviceid, datatype, value, timestamp, callbackid):
+        '''
+        Create a timer
+        '''
+        #start timer with a delay (adjust the delay to suit your needs)
+        timer = Timer(self._delayrf, self._receive, args=[protocol, model, deviceid, datatype, value, timestamp, callbackid])
+        timer.start()
+        self._received_timers[deviceid] = {datatype : { value : timer}}
+        #print "receive_timer for %s:%s:%s created" % (deviceid, datatype, value)
+        #self._received_timers[deviceid] = timer
+
+    def _del_receive_timer(self, deviceid, datatype, value):
+        '''
+        Delete a received timer if needed
+        '''
+        try :
+            self._reset_receive_timer(deviceid, datatype, value)
+            del(self._received_timers[deviceid][datatype][value])
+        except :
+            pass
+        try :
+            if len(self._received_timers[deviceid][datatype]) == 0:
+                del(self._received_timers[deviceid][datatype])
+        except :
+            pass
+        try :
+            if len(self._received_timers[deviceid]) == 0:
+                del(self._received_timers[deviceid])
+        except :
+            pass
+        #print "receivetimer for %s:%s:%s deleted" % (deviceid, datatype, value)
+
+    def _create_refuse_timer(self, protocol, model, deviceid, datatype, value, timestamp, callbackid):
+        '''
+        Create a refused timer. While this timer is active, we don't accept
+        any more message
+        '''
+        #start timer with a delay (adjust the delay to suit your needs)
+        timer = Timer(self._delayrf, self._del_refuse_timer, args=[deviceid, datatype, value])
+        timer.start()
+        self._refused_timers[deviceid] = {datatype : { value : timer}}
+        #print "refused timer for %s:%s:%s created" % (deviceid, datatype, value)
+        #self._received_timers[deviceid] = timer
+
+    def _del_refuse_timer(self, deviceid, datatype, value):
+        '''
+        Delete a refused timer if needed
+        '''
+        try :
+            SENSOREVENTLOCK.acquire()
+            if self._reset_receive_timer(deviceid, datatype, value) :
+                self._del_receive_timer(deviceid, datatype, value)
+            try :
+                del(self._refused_timers[deviceid][datatype][value])
+            except :
+                pass
+            try :
+                if len(self._refused_timers[deviceid][datatype]) == 0:
+                    del(self._refused_timers[deviceid][datatype])
+            except :
+                pass
+            try :
+                if len(self._refused_timers[deviceid]) == 0:
+                    del(self._refused_timers[deviceid])
+            except :
+                pass
+            SENSOREVENTLOCK.release()
+        except:
+            print traceback.format_exc()
+            SENSOREVENTLOCK.release()
+        #print "refusetimer for %s:%s:%s deleted" % (deviceid, datatype, value)
+
+    def _check_refuse_timer(self, deviceid, datatype, value):
+        '''
+        Check if the queue for this (deviceid,method,value) is opened or not
+        '''
+        try :
+            timer = self._refused_timers[deviceid][datatype][value]
             return False
         except :
             return True
@@ -1125,6 +1369,8 @@ class Telldusd:
         self._tdlib = None
         self._device_event_cb = None
         self._device_event_cb_id = None
+        self._sensor_event_cb = None
+        self._sensor_event_cb_id = None
         self._device_change_event_cb = None
         self._device_change_event_cb_id = None
         ret = find_library("telldus-core")
@@ -1170,21 +1416,32 @@ class Telldusd:
             TELLSTICK_STOP : lambda d, l: self.stop(d),
         }
 
-    def register_device_event(self, parent):
+#    def register_device_event(self, parent):
+#        '''
+#        Register the device event callback to telldusd
+#        '''
+#        try:
+#            if (platform.system() == 'Windows'):
+#                cmpfunc = WINFUNCTYPE(c_void_p, c_int, c_int, c_char_p,
+#                    c_int, c_void_p)
+#            else:
+#                cmpfunc = CFUNCTYPE(c_void_p, c_int, c_int, c_char_p,
+#                    c_int, c_void_p)
+#            self._device_event_cb = cmpfunc(device_event_callback)
+#            self._device_event_cb_id = \
+#                self._tdlib.tdRegisterDeviceEvent(
+#                    self._device_event_cb, py_object(parent))
+#        except:
+#            raise TelldusException("Could not register the device event callback.")
+
+    def register_device_event(self, callback, context):
         '''
         Register the device event callback to telldusd
         '''
         try:
-            if (platform.system() == 'Windows'):
-                cmpfunc = WINFUNCTYPE(c_void_p, c_int, c_int, c_char_p,
-                    c_int, c_void_p)
-            else:
-                cmpfunc = CFUNCTYPE(c_void_p, c_int, c_int, c_char_p,
-                    c_int, c_void_p)
-            self._device_event_cb = cmpfunc(device_event_callback)
             self._device_event_cb_id = \
-                self._tdlib.tdRegisterDeviceEvent(
-                    self._device_event_cb, py_object(parent))
+                self._tdlib.tdRegisterDeviceEvent(callback, py_object(context))
+            return self._device_event_cb_id
         except:
             raise TelldusException("Could not register the device event callback.")
 
@@ -1224,6 +1481,44 @@ class Telldusd:
             self._tdlib.UnregisterCallbak(self._device_change_event_cb_id)
         except:
             raise TelldusException("Could not unregister the device event change callback.")
+
+#    def register_sensor_event(self, callback, parent):
+#        '''
+#        Register the sensor event callback to telldusd
+#        '''
+#        try:
+#            if (platform.system() == 'Windows'):
+#                cmpfunc = WINFUNCTYPE(c_void_p, c_int, c_char_p, c_char_p,
+#                    c_int, c_int, c_char_p, c_char_p, c_int, c_void_p)
+#            else:
+#                cmpfunc = CFUNCTYPE(c_void_p, c_int, c_char_p, c_char_p,
+#                    c_int, c_int, c_char_p, c_char_p, c_int, c_void_p)
+#            self._sensor_event_cb = cmpfunc(sensor_event_callback)
+#            self._sensor_event_cb_id = \
+#                self._tdlib.tdRegisterSensorEvent(
+#                    self._sensor_event_cb, py_object(parent))
+#        except:
+#            raise TelldusException("Could not register the event event callback.")
+
+    def register_sensor_event(self, callback, context):
+        '''
+        Register the sensor event callback to telldusd
+        '''
+        try:
+            self._sensor_event_cb_id = \
+                self._tdlib.tdRegisterSensorEvent(callback, py_object(context))
+        except:
+            raise TelldusException("Could not register the sensor event callback.")
+
+
+    def unregister_sensor_event(self):
+        '''
+        Unregister the sensor event callback to telldusd
+        '''
+        try:
+            self._tdlib.UnregisterCallbak(self._sensor_event_cb_id)
+        except:
+            raise TelldusException("Could not unregister the sensor event callback.")
 
     def get_devices(self):
         '''
@@ -1410,10 +1705,11 @@ class Helpers():
     Encapsulate the helpers
     """
 
-    def __init__(self, telldusd):
+    def __init__(self, api, telldusd):
         """
         Initialise the helper class
         """
+        self._api = api
         self._telldusd = telldusd
 
     def helper_list(self, params = None):
@@ -1421,10 +1717,10 @@ class Helpers():
         List all devices
         """
         data = []
-        if "devicetype" in params :
+        if "devicetype" in params and params["devicetype"] != None and params["devicetype"] != "None":
 #            print "params=%s" % params
             data.append("List all devices of type %s :" % params["devicetype"])
-            data.append("id : XPL id : Name")
+            data.append("Not implemented.")
         else :
             data.append("List all devices : ")
             data.append("id : XPL id : Name")
@@ -1449,3 +1745,11 @@ class Helpers():
             data.append("Something get wrong. Check the device address.")
         return data
 
+    def helper_memory(self, params = None):
+        """
+        Memory use
+        """
+        data = []
+        data.append("Memory use : ")
+        data.extend(self._api.memory_usage(0))
+        return data

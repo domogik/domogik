@@ -90,8 +90,7 @@ class Telldus(XplHlpPlugin):
             self._mytelldus = TelldusAPI(self.send_xpl, self.log,
                 self._config)
         except Exception:
-            self.log.error("Something went wrong during telldus "+
-                "init, check logs")
+            self.log.error("Something went wrong during telldus init, check logs")
             self.force_leave()
             exit(1)
         #Create listeners
@@ -118,21 +117,29 @@ class Telldus(XplHlpPlugin):
         self.helpers =   \
            { "list" :
               {
-                "cb" : self._mytelldus.helpers.helper_list,
+                "cb" : self._mytelldus.helper.helper_list,
                 "desc" : "List devices in telldus daemon.",
                 "usage" : "list [devicetype]",
                 "param-list" : "devicetype",
                 "min_args" : 0,
-                "devicetype" : "devicetype : the type of device to find",
+                "devicetype" : "the type of device to find",
               },
              "info" :
               {
-                "cb" : self._mytelldus.helpers.helper_info,
+                "cb" : self._mytelldus.helper.helper_info,
                 "desc" : "Display device information",
                 "usage" : "info <device>",
                 "param-list" : "device",
                 "min_args" : 1,
                 "device" : "device address",
+              },
+             "memory" :
+              {
+                "cb" : self._mytelldus.helper.helper_memory,
+                "desc" : "Display memory information about variables",
+                "usage" : "memory",
+                "param-list" : "",
+                "min_args" : 0,
               },
             }
         if self._lightext == True:
