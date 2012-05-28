@@ -38,7 +38,7 @@ import time
 import threading
 
 SCENELOCK = threading.Lock()
-SLEEP = .5
+SLEEP = 0.1
 
 class LightingExtension():
     """

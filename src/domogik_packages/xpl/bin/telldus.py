@@ -121,25 +121,25 @@ class Telldus(XplHlpPlugin):
                 "desc" : "List devices in telldus daemon.",
                 "usage" : "list [devicetype]",
                 "param-list" : "devicetype",
-                "min_args" : 0,
+                "min-args" : 0,
                 "devicetype" : "the type of device to find",
               },
              "info" :
               {
                 "cb" : self._mytelldus.helper.helper_info,
-                "desc" : "Display device information",
+                "desc" : "Display device information.",
                 "usage" : "info <device>",
                 "param-list" : "device",
-                "min_args" : 1,
+                "min-args" : 1,
                 "device" : "device address",
               },
              "memory" :
               {
                 "cb" : self._mytelldus.helper.helper_memory,
-                "desc" : "Display memory information about variables",
+                "desc" : "Show memory usage of variables. Experimental.",
                 "usage" : "memory",
                 "param-list" : "",
-                "min_args" : 0,
+                "min-args" : 0,
               },
             }
         if self._lightext == True:

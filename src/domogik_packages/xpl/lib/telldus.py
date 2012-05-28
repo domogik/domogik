@@ -267,7 +267,7 @@ class TelldusAPI:
             return data
         else:
             if which == MEMORY_PLUGIN:
-                return 0
+                return 0, 0
             elif which == MEMORY_API:
                 return asizeof(self), 1
             elif which == MEMORY_CONFIG:

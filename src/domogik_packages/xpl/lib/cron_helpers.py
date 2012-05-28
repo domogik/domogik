@@ -54,7 +54,7 @@ class CronHelpers():
         self._log.debug("helper_list : Start ...")
         data = []
         if "which" in params:
-            if params["which"] == "all":
+            if params["which"] == "devices":
                 data.append("List all devices :")
                 data.extend(self._jobs.get_list(True))
             elif params["which"] == "aps":
@@ -64,6 +64,17 @@ class CronHelpers():
         else:
             data.append("No ""which"" parameter found")
         self._log.debug("helper_list : Done")
+        return data
+
+    def helper_memory(self, params={}):
+        """
+        Return memory usage.
+        """
+        self._log.debug("helper_memory : Start ...")
+        data = []
+        data.append("Memory use : ")
+        data.extend(self._jobs.memory_usage(0))
+        self._log.debug("helper_memory : Done ...")
         return data
 
     def helper_info(self, params={}):

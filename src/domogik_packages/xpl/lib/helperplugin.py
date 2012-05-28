@@ -226,10 +226,11 @@ class PluginHelper():
                 mess.add_data({"status" : "not-found"})
             else:
                 mess.add_data({"command" : cmnd})
-                if self._parent.helpers[cmnd]["param-list"] != "":
+                if "param-list" in self._parent.helpers[cmnd] \
+                  and self._parent.helpers[cmnd]["param-list"] != "":
                     mess.add_data({"param-list" : self._parent.helpers[cmnd]["param-list"]})
-                for p in self._parent.helpers[cmnd]["param-list"].split(","):
-                    mess.add_data({p : self._parent.helpers[cmnd][p]})
+                    for p in self._parent.helpers[cmnd]["param-list"].split(","):
+                        mess.add_data({p : self._parent.helpers[cmnd][p]})
                 mess.add_data({"status" : "ok"})
         except:
             mess.add_data({"status" : "error"})
@@ -347,12 +348,13 @@ class PluginHelper():
                 mess.add_data({"status" : "ok"})
             else :
                 mess.add_data({"scr1" : "<b>Help on command %s :</b>" % cmd})
-                mess.add_data({"scr2" : "&nbsp;"})
-                mess.add_data({"scr3" : "<b>Usage</b> : %s" % self._parent.helpers[cmd]["desc"]})
+                mess.add_data({"scr2" : "%s" % self._parent.helpers[cmd]["desc"]})
+                mess.add_data({"scr3" : "<b>Usage</b> : %s" % self._parent.helpers[cmd]["usage"]})
                 i = 4
-                for param in self._parent.helpers[cmd]["param-list"].split(','):
-                    mess.add_data({"scr%s" % i: "&nbsp;&nbsp;%s : %s" % (param, self._parent.helpers[cmd][param])})
-                    i = i + 1
+                if "param-list" in self._parent.helpers[cmd] :
+                    for param in self._parent.helpers[cmd]["param-list"].split(','):
+                        mess.add_data({"scr%s" % i: "&nbsp;&nbsp;%s : %s" % (param, self._parent.helpers[cmd][param])})
+                        i = i + 1
                 mess.add_data({"scr-count" : i-1})
                 mess.add_data({"status" : "ok"})
 
@@ -385,12 +387,16 @@ class PluginHelper():
                 if self.is_valid_cmnd(command):
                     nbparams = 0
                     params = {}
-                    if self._parent.helpers[command]["param-list"] != "" :
+                    if "param-list" in self._parent.helpers[command] and \
+                      self._parent.helpers[command]["param-list"] != "" :
                         for p in self._parent.helpers[command]["param-list"].split(","):
                             if p in message.data:
                                 params[p] = message.data[p]
                                 nbparams = nbparams +1
-                    if nbparams >= self._parent.helpers[command]["min_args"] :
+                    minargs = 0
+                    if "min-args" in self._parent.helpers[command]:
+                        minargs = self._parent.helpers[command]["min-args"]
+                    if nbparams >= minargs :
                         ret = self._parent.helpers[command]["cb"](params)
                         i = 1
                         for l in ret:
