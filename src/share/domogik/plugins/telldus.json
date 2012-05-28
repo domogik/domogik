@@ -220,6 +220,10 @@
             {
                 "id": "pympler (>=0.2.1)",
                 "type": "python"
+            },
+            {
+                "id": "tailer (>=0.3)",
+                "type": "python"
             }
         ],
         "description": "Manage many devices through TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n  they will appear automatically in Domogik",
