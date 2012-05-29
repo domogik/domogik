@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
-import datetime
 import sys
 
 class ZwaveException(Exception):
@@ -27,81 +25,50 @@ class ZWave:
         """initialisation serial port
         """
         self._cb = callback
-        pyozw_dir = str(pyozw_path) + "/examples"
+        pyozw_dir = str(pyozw_path)
         pyozw_conf = str(pyozw_path) + "/openzwave/config/"
         sys.path.insert(0,pyozw_dir)
-        from common.ozwWrapper import ZWaveWrapper, ZWaveNode, ZWaveValueNode
-        self.w = ZWaveWrapper.getInstance(device=serial_port, config=pyozw_conf)
-        print "\nPlease Wait during discover network..."
-        while bool(self.w.initialized) != True:
-            time.sleep(0.1)
-            sys.stdout.write("*")
-            sys.stdout.flush()
-        time.sleep(0.5)
-        while self.w.nodes[self.w.nodes.keys()[-1]].productType == '':
-            time.sleep(0.1)
-            sys.stdout.write("*")
-            sys.stdout.flush()
-        sys.stdout.write(" Initialised !\n")
-        print " "
-        print "Controller : " + str(self.w.controllerDescription) + " on " + str(serial_port )
-        print "Home ID : " + str(self.w.homeId)
-        print "Registered Nodes : " + str(self.w.nodeCount)
-        print "Library : " + str(self.w.libraryTypeName)
-        print "Version : " + str(self.w.libraryVersion)
-        print " "
-        print "list of nodes :"
-        ln = self.w.nodes
-        for n in ln:
-            lu = datetime.datetime.fromtimestamp(self.w.nodes[n].lastUpdate)
-            print "node ", self.w.nodes[n].id, " type ", self.w.nodes[n].productType, " last update", lu.ctime()
-            if self.w.nodes[n].productType != 'Static PC Controller':
-                for val in self.w.nodes[n].values:
-                    print "    ", self.w.nodes[n].values[val].valueData['label'], self.w.nodes[n].values[val].valueData['value'], self.w.nodes[n].values[val].valueData['units'] 
-        print "fin du listage des nodes."
+	import openzwave
+	from openzwave import PyManager
+	options = openzwave.PyOptions()
+	options.create(pyozw_conf,"","")
+	options.lock()
+	manager = openzwave.PyManager()
+	manager.create()
+	
+	# callback order: (notificationtype, homeid, nodeid, ValueID, groupidx, event)
+	def callback2(args):
+	    allowtype=['Battery Level','Relative Humidity','Temperature','Sensor']
+	    resp = {}
+	    if args:
+		MyHomeId = args['homeId']
+		resp['device'] = args['nodeId']
+	        v = args['valueId']
+		if v.has_key('label'): resp['type'] = v['label']
+	        if v.has_key('value'): resp['current'] = v['value']
+		if v.has_key('units'): resp['units'] = v['units']
+		if v['label'] in allowtype:
+		    print('\n-----------------------\nEnvoi du Message XPL:\n')
+		    print resp
+		    print('\n-----------------------\n')
+		    self._cb('xpl-stat', 'sensor.basic', resp)
+
+        manager.addWatcher(callback2)
+        manager.addDriver(serial_port)
+
+	
+	# crappy loop to keep this thread
+	try:
+	    while 1:
+	        pass
+	except KeyboardInterrupt:
+	    pass
+
 
     def sendOn(self, node):
+	#print "HomeId : " + MyHomeId
         print "node : " + node
         print "commande : On"
         self.node = int(node)
-        self.w.setNodeOn(self.w.nodes[self.node])
-    def sendOff(self, node):
-        print "node : " + node
-        print "commande : Off"
-        self.node = int(node)
-        self.w.setNodeOff(self.w.nodes[self.node])
-    def sendLevel(self, node, lvl):
-        print "node : " + node
-        print "commande : level " + lvl
-        self.node = int(node)
-        self.lvl = int(lvl)
-        self.w.setNodeLevel(self.w.nodes[self.node], self.lvl)
-    def sendInfo(self, node):
-        print "node : " + node
-        print "commande : Info"
-        self.node = int(node)
-        self.w.refresh(self.w.nodes[self.node])
-        nodeid = node
-        type = self.w.nodes[self.node].productType
-        if type.find('hermostat') >= 0:
-            commande = "on,off,level,mode,fan-mode,setpoint,info"
-        elif type.find('witch') >= 0:
-           if type.find('ultilevel') >= 0:
-               commande = "on,off,level,info"
-           else:
-               commande = "on,off,info"
-        else:
-           commande = "info"
-        print "node = " + node + " type = " + type + " commande = " + commande
-        resp = {}
-        resp['node'] = node
-        resp['type'] = type
-        resp['commands'] = commande
-        resp['modes'] = ' '
-        resp['fan-modes'] = ' '
-        resp['setpoints'] = ' '
-        resp['states'] = ' '
-        resp['fan-states'] = ' '
-        print resp
-        self._cb('xpl-stat', 'zwave.info', resp)
+	#manager.setNodeOn(self, MyHomeId, node)
 

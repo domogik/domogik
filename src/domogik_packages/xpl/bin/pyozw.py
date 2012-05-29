@@ -62,13 +62,17 @@ class Zwave(XplPlugin):
             node = message.data['node']
             if cmd == 'level':
                 lvl = message.data['level']
-                self.myzwave.sendLevel(node, lvl)
+		print "level"
+                #self.myzwave.sendLevel(node, lvl)
             elif cmd == 'on':
+		print "on"
                 self.myzwave.sendOn(node)
             elif cmd == 'off':
-                self.myzwave.sendOff(node) 
+		print "off"
+                #self.myzwave.sendOff(node) 
             elif cmd == 'info':
-                self.myzwave.sendInfo(node)
+		print "info"
+                #self.myzwave.sendInfo(node)
 
     def send_xpl(self, type, schema, resp):
         """ Send xPL message on network
