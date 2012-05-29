@@ -36,12 +36,11 @@ Implements
 """
 
 
-
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.pyozw import ZWave
+from domogik_packages.xpl.lib.pyozw import ZWave
 
 class Zwave(XplPlugin):
     def __init__(self):
