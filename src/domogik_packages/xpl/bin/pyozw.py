@@ -36,12 +36,11 @@ Implements
 """
 
 
-
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.pyozw import ZWave
+from domogik_packages.xpl.lib.pyozw import ZWave
 
 class Zwave(XplPlugin):
     def __init__(self):
@@ -62,13 +61,17 @@ class Zwave(XplPlugin):
             node = message.data['node']
             if cmd == 'level':
                 lvl = message.data['level']
-                self.myzwave.sendLevel(node, lvl)
+		print "level"
+                #self.myzwave.sendLevel(node, lvl)
             elif cmd == 'on':
+		print "on"
                 self.myzwave.sendOn(node)
             elif cmd == 'off':
-                self.myzwave.sendOff(node) 
+		print "off"
+                #self.myzwave.sendOff(node) 
             elif cmd == 'info':
-                self.myzwave.sendInfo(node)
+		print "info"
+                #self.myzwave.sendInfo(node)
 
     def send_xpl(self, type, schema, resp):
         """ Send xPL message on network

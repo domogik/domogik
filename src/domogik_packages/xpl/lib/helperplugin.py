@@ -160,7 +160,6 @@ class PluginHelper():
             return True
         except:
             return False
-        return True
 
     def is_valid_cmnd(self, command):
         """
@@ -227,10 +226,11 @@ class PluginHelper():
                 mess.add_data({"status" : "not-found"})
             else:
                 mess.add_data({"command" : cmnd})
-                if self._parent.helpers[cmnd]["param-list"] != "":
+                if "param-list" in self._parent.helpers[cmnd] \
+                  and self._parent.helpers[cmnd]["param-list"] != "":
                     mess.add_data({"param-list" : self._parent.helpers[cmnd]["param-list"]})
-                for p in self._parent.helpers[cmnd]["param-list"].split(","):
-                    mess.add_data({p : self._parent.helpers[cmnd][p]})
+                    for p in self._parent.helpers[cmnd]["param-list"].split(","):
+                        mess.add_data({p : self._parent.helpers[cmnd][p]})
                 mess.add_data({"status" : "ok"})
         except:
             mess.add_data({"status" : "error"})
@@ -254,7 +254,7 @@ class PluginHelper():
             requests[request](self._parent.myxpl, message, request)
         except:
             error = "Exception : %s" % (traceback.format_exc())
-            self._parent.log.error("pluginHelper.requestDeviceListener : " + error)
+            self._parent.log.error("pluginHelper.request_cmnd_listener : " + error)
 
     def basic_cmnd_log(self, message):
         """
@@ -270,23 +270,100 @@ class PluginHelper():
         mess.add_data({"plugin" : self._parent._name})
         mess.add_data({"command" : "log"})
         try:
-            lines = 10
-            if 'lines' in message.data:
-                lines = int(message.data['lines'])
+            try :
+                if 'lines' in message.data:
+                    lines = int(message.data['lines'])
+            except :
+                lines = 50
             #Todo : retrieve filepath fron logger
             filename = os.path.join("/var/log/domogik", self._parent._name + ".log")
             result = tailer.tail(open(filename), lines)
             i = 1
             for line in result:
                 if line != "":
-                    mess.add_data({"log%s" % (i) : "%s" % (line)})
+                    mess.add_data({"scr%s" % (i) : "%s" % (line)})
                     i = i+1
-            mess.add_data({"log-count" : i-1})
+            mess.add_data({"scr-count" : i-1})
             mess.add_data({"status" : "ok"})
         except:
             error = "Exception : %s" % (traceback.format_exc())
-            self._parent.log.error("pluginHelper.basicDeviceListener : " + error)
-            mess.add_data({"status" : "error"})
+            self._parent.log.error("pluginHelper.basic_cmnd_log : " + error)
+            mess.add_data({"scr1" : "An error has occured. Look at the log."})
+            mess.add_data({"scr-count" : 1})
+            mess.add_data({"status" : "ok"})
+        self._parent.myxpl.send(mess)
+
+    def basic_cmnd_help(self, message):
+        """
+        """
+        plugin = None
+        if 'plugin' in message.data:
+            plugin = message.data['plugin']
+        if plugin != self._parent._name:
+            return False
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("helper.basic")
+        mess.add_data({"plugin" : self._parent._name})
+        mess.add_data({"command" : "help"})
+        try:
+            cmd = None
+            if "cmd" in message.data:
+                cmd = message.data["cmd"]
+            if cmd == None or cmd == "None":
+                mess.add_data({"scr1" : "<b>Commands available :</b>"})
+                mess.add_data({"scr2" : "&nbsp;"})
+                mess.add_data({"scr3" : "<b>help</b> : Show help about this helper."})
+                mess.add_data({"scr4" : "&nbsp;&nbsp;&nbsp;&nbsp;usage : help [command]"})
+                mess.add_data({"scr5" : "&nbsp;"})
+                mess.add_data({"scr6" : "<b>log</b> : Show last lines in log file."})
+                mess.add_data({"scr7" : "&nbsp;&nbsp;&nbsp;&nbsp;usage : log [lines]"})
+                i = 8
+                for cmnd in self._parent.helpers:
+                    mess.add_data({"scr%s" % i : "&nbsp;"})
+                    i = i + 1
+                    mess.add_data({"scr%s" % i : "<b>" + cmnd + "</b> : " + self._parent.helpers[cmnd]["desc"]})
+                    i = i + 1
+                    mess.add_data({"scr%s" % i : "&nbsp;&nbsp;&nbsp;&nbsp;usage : %s" % self._parent.helpers[cmnd]["usage"]})
+                    i = i + 1
+                mess.add_data({"scr-count" : i-1})
+                mess.add_data({"status" : "ok"})
+            elif cmd == "help" :
+                mess.add_data({"scr1" : "<b>Help on command %s :</b>" % cmd})
+                mess.add_data({"scr2" : "Show help about this helper."})
+                mess.add_data({"scr3" : "<b>Usage</b> : help [command]"})
+                mess.add_data({"scr-count" : 3})
+                mess.add_data({"status" : "ok"})
+            elif cmd == "log" :
+                mess.add_data({"scr1" : "<b>Help on command %s :</b>" % cmd})
+                mess.add_data({"scr2" : "Show last lines in log file."})
+                mess.add_data({"scr3" : "<b>Usage</b> : log [lines]"})
+                mess.add_data({"scr4" : "&nbsp;&nbsp;lines : number of lines to show"})
+                mess.add_data({"scr-count" : 4})
+                mess.add_data({"status" : "ok"})
+            elif not self.is_valid_cmnd(cmd) :
+                mess.add_data({"scr1" : "<b>Help on command %s :</b>" % cmd})
+                mess.add_data({"scr2" : "Unknown command"})
+                mess.add_data({"scr-count" : 2})
+                mess.add_data({"status" : "ok"})
+            else :
+                mess.add_data({"scr1" : "<b>Help on command %s :</b>" % cmd})
+                mess.add_data({"scr2" : "%s" % self._parent.helpers[cmd]["desc"]})
+                mess.add_data({"scr3" : "<b>Usage</b> : %s" % self._parent.helpers[cmd]["usage"]})
+                i = 4
+                if "param-list" in self._parent.helpers[cmd] :
+                    for param in self._parent.helpers[cmd]["param-list"].split(','):
+                        mess.add_data({"scr%s" % i: "&nbsp;&nbsp;%s : %s" % (param, self._parent.helpers[cmd][param])})
+                        i = i + 1
+                mess.add_data({"scr-count" : i-1})
+                mess.add_data({"status" : "ok"})
+
+        except:
+            error = "Exception : %s" % (traceback.format_exc())
+            self._parent.log.error("pluginHelper.basic_cmnd_help : " + error)
+            mess.add_data({"scr1" : "An error has occured. Look at the log."})
+            mess.add_data({"scr-count" : 1})
+            mess.add_data({"status" : "ok"})
         self._parent.myxpl.send(mess)
 
     def basic_cmnd_listener(self, message):
@@ -310,32 +387,46 @@ class PluginHelper():
                 if self.is_valid_cmnd(command):
                     nbparams = 0
                     params = {}
-                    if self._parent.helpers[command]["param-list"] != "" :
+                    if "param-list" in self._parent.helpers[command] and \
+                      self._parent.helpers[command]["param-list"] != "" :
                         for p in self._parent.helpers[command]["param-list"].split(","):
                             if p in message.data:
                                 params[p] = message.data[p]
                                 nbparams = nbparams +1
-                    if nbparams >= self._parent.helpers[command]["min_args"] :
+                    minargs = 0
+                    if "min-args" in self._parent.helpers[command]:
+                        minargs = self._parent.helpers[command]["min-args"]
+                    if nbparams >= minargs :
                         ret = self._parent.helpers[command]["cb"](params)
                         i = 1
                         for l in ret:
-                            mess.add_data({"screen%s" % i : l})
+                            mess.add_data({"scr%s" % i : l})
                             i = i+1
-                        mess.add_data({"screen-count" : i-1})
+                        mess.add_data({"scr-count" : i-1})
                         mess.add_data({"status" : "ok"})
                     else :
-                        mess.add_data({"status" : "missing argument"})
+                        mess.add_data({"scr1" : "Missing argument"})
+                        mess.add_data({"status" : "ok"})
                 elif command == "log":
                     self.basic_cmnd_log(message)
                     mess.add_data({"status" : "ok"})
+                elif command == "help":
+                    self.basic_cmnd_help(message)
+                    mess.add_data({"status" : "ok"})
                 else:
-                    mess.add_data({"status" : "not-found"})
+                    mess.add_data({"scr1" : "Unknow command %s" % command})
+                    mess.add_data({"scr-count" : 1})
+                    mess.add_data({"status" : "ok"})
             else:
-                mess.add_data({"status" : "not-found"})
+                mess.add_data({"scr1" : "command not found in message."})
+                mess.add_data({"scr-count" : 1})
+                mess.add_data({"status" : "ok"})
         except:
             error = "Exception : %s" % (traceback.format_exc())
-            self._parent.log.error("pluginHelper.basicDeviceListener : " + error)
-            mess.add_data({"status" : "error"})
+            self._parent.log.error("pluginHelper.basic_cmnd_listener : " + error)
+            mess.add_data({"scr1" : "An error has occured. Look at the log."})
+            mess.add_data({"scr-count" : 1})
+            mess.add_data({"status" : "ok"})
         self._parent.myxpl.send(mess)
 
 class XplHlpPlugin(XplPlugin):

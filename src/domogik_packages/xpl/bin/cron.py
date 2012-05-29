@@ -128,64 +128,58 @@ class Cron(XplHlpPlugin):
                  {'schema': 'timer.basic', 'xpltype': 'xpl-cmnd'})
 
         self.helpers =   \
-           { "list" :
+           {
+#             "list" :
+#              {
+#                "cb" : self._cron.helpers.helper_list,
+#                "desc" : "List devices (cron jobs) or apschechuler jobs (for debugging).",
+#                "usage" : "list devices | aps]",
+#                "min-args" : 1,
+#                "param-list" : "which",
+#                "which" : "devices : show the plugin cron jobs | aps : show the APScheduler jobs (for debugging)",
+#              },
+             "memory" :
               {
-                "cb" : self._cron.helpers.helper_list,
-                "desc" : "List devices (cron jobs)",
-                "usage" : "list all (all the devices)|aps(jobs in APScheduler)",
-                "param-list" : "which",
-                "which" : "all|aps",
-              },
-             "ls" :
-              {
-                "cb" : self._cron.helpers.helper_list,
-                "desc" : "List devices (cron jobs)",
-                "usage" : "list all the devices",
-                "return-list" : "array1",
-                "array1" : "multi",
-              },
-             "test" :
-              {
-                "cb" : self._cron.helpers.helper_list,
-                "desc" : "Test return transfert",
-                "usage" : "test",
-                "param-list" : "device",
-                "device" : "<device>",
-                "return-list" : "array1,single",
-                "array1" : "multi",
+                "cb" : self._cron.helpers.helper_memory,
+                "desc" : "Show memory usage of variables. Experimental.",
+                "usage" : "memory",
               },
              "info" :
               {
                 "cb" : self._cron.helpers.helper_info,
                 "desc" : "Display device information",
-                "usage" : "info <device>",
+                "usage" : "info device",
                 "param-list" : "device",
-                "device" : "<device>",
+                "device" : "the device name (cron job)",
+                "min-args" : 1,
               },
-             "stop" :
-              {
-                "cb" : self._cron.helpers.helper_stop,
-                "desc" : "Stop a device",
-                "usage" : "stop <device>",
-                "param-list" : "device",
-                "device" : "<device>",
-              },
-             "halt" :
-              {
-                "cb" : self._cron.helpers.helper_halt,
-                "desc" : "Halt a device",
-                "usage" : "halt <device>",
-                "param-list" : "device",
-                "device" : "<device>",
-              },
-             "resume" :
-              {
-                "cb" : self._cron.helpers.helper_resume,
-                "desc" : "Resume a device",
-                "usage" : "resume <device>",
-                "param-list" : "device",
-                "device" : "<device>",
-              },
+#             "stop" :
+#              {
+#                "cb" : self._cron.helpers.helper_stop,
+#                "desc" : "Stop a device (a cron job). The device could be resumed.",
+#                "usage" : "stop device",
+#                "min-args" : 1,
+#                "param-list" : "device",
+#                "device" : "the device name (cron job)",
+#              },
+#             "halt" :
+#              {
+#                "cb" : self._cron.helpers.helper_halt,
+#                "desc" : "Halt a device (a cron job). The device is removed fron store.",
+#                "usage" : "halt device",
+#                "min-args" : 1,
+#                "param-list" : "device",
+#                "device" : "the device name (cron job)",
+#              },
+#             "resume" :
+#              {
+#                "cb" : self._cron.helpers.helper_resume,
+#                "desc" : "Resume a device (a cron job). Restart a previously stopped device.",
+#                "usage" : "resume device",
+#                "min-args" : 1,
+#                "param-list" : "device",
+#                "device" : "the device name (cron job)",
+#              },
             }
 
         self.enable_helper()

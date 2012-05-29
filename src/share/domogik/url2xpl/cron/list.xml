@@ -4,7 +4,9 @@
     <command-key>command</command-key>
     <address-key>caller</address-key>
     <command-xpl-value>list</command-xpl-value>
-    <parameters/>
+    <parameters>
+        <parameter key="which" location="1"/>
+    </parameters>
   </command>
   <listener>
     <schema>timer.basic</schema>

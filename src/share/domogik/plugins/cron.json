@@ -59,6 +59,9 @@
         "src/share/domogik/url2xpl/cron/halt.xml",
         "src/share/domogik/url2xpl/cron/list.xml",
         "src/share/domogik/url2xpl/cron/log.xml",
+        "src/share/domogik/url2xpl/cron/help.xml",
+        "src/share/domogik/url2xpl/cron/memory.xml",
+        "src/share/domogik/url2xpl/cron/info.xml",
         "src/domogik_packages/xpl/bin/cron.py",
         "src/domogik_packages/xpl/lib/cron.py",
         "src/domogik_packages/xpl/lib/cron_query.py",
@@ -78,6 +81,10 @@
             },
             {
                 "id": "tailer (>=0.3)",
+                "type": "python"
+            },
+            {
+                "id": "pympler (>=0.2.1)",
                 "type": "python"
             }
         ],

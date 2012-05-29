@@ -35,6 +35,10 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 import traceback
 import time
+import threading
+
+SCENELOCK = threading.Lock()
+SLEEP = 0.1
 
 class LightingExtension():
     """
@@ -354,7 +358,7 @@ class LightingExtension():
                 mess.add_data({"command" : "scninfo"})
                 mess.add_data({"scene" : scene})
                 myxpl.send(mess)
-                #time.sleep(1)
+                time.sleep(SLEEP)
 
     def stat_scninfo(self, myxpl, message):
         """
@@ -368,30 +372,13 @@ class LightingExtension():
         if scene == None:
             self._plugin.log.warning("LightingExtension.stat_scninfo : can't retrieve scene name from message.")
         else:
-            #self._plugin.log.info("Receive configuration for scene %s." % scene)
-            self.del_scene(scene)
-            if "device" in message.data:
-                if type(message.data['device']) == type(""):
-                    start, separator, end = str(message.data['device']).partition(",")
-                    ddevice = start
-                    #print "ddevice=%s" % ddevice
-                    start, separator, end = end.partition(",")
-                    dchannel = start
-                    #print "dchannel=%s" % dchannel
-                    start, separator, end = end.partition(",")
-                    dlevel = start
-                    #print "dlevel=%s" % dlevel
-                    start, separator, end = end.partition(",")
-                    dfaderate = start
-                    #print "dfaderate=%s" % dfaderate
-                    if self.valid_device(ddevice, dchannel):
-                        self.add_device(scene, ddevice, dchannel, dlevel, dfaderate)
-                    self._plugin.log.info("Add 1 device for scene %s." % scene)
-                else :
-                    i = 0
-                    for device in message.data['device']:
-                        #print "device=%s" % device
-                        start, separator, end = str(device).partition(",")
+            SCENELOCK.acquire()
+            try :
+                #self._plugin.log.info("Receive configuration for scene %s." % scene)
+                self.del_scene(scene)
+                if "device" in message.data:
+                    if type(message.data['device']) == type(""):
+                        start, separator, end = str(message.data['device']).partition(",")
                         ddevice = start
                         #print "ddevice=%s" % ddevice
                         start, separator, end = end.partition(",")
@@ -405,6 +392,30 @@ class LightingExtension():
                         #print "dfaderate=%s" % dfaderate
                         if self.valid_device(ddevice, dchannel):
                             self.add_device(scene, ddevice, dchannel, dlevel, dfaderate)
-                            i = i +1
-                    self._plugin.log.info("Add %s device(s) for scene %s." % (i,scene))
-        #print "scenes = %s" % (self._scenes)
+                        self._plugin.log.info("Add 1 device for scene %s." % scene)
+                    else :
+                        i = 0
+                        for device in message.data['device']:
+                            #print "device=%s" % device
+                            start, separator, end = str(device).partition(",")
+                            ddevice = start
+                            #print "ddevice=%s" % ddevice
+                            start, separator, end = end.partition(",")
+                            dchannel = start
+                            #print "dchannel=%s" % dchannel
+                            start, separator, end = end.partition(",")
+                            dlevel = start
+                            #print "dlevel=%s" % dlevel
+                            start, separator, end = end.partition(",")
+                            dfaderate = start
+                            #print "dfaderate=%s" % dfaderate
+                            if self.valid_device(ddevice, dchannel):
+                                self.add_device(scene, ddevice, dchannel, dlevel, dfaderate)
+                                i = i +1
+                        self._plugin.log.info("Add %s device(s) for scene %s." % (i, scene))
+                SCENELOCK.release()
+            except :
+                SCENELOCK.release()
+                error = "Exception : %s" % (traceback.format_exc())
+                self._plugin.log.error("LightingExtension.stat_scninfo : " + error)
+            #print "scenes = %s" % (self._scenes)

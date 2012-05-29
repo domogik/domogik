@@ -1,0 +1,18 @@
+<technology id="telldus">
+  <command name="memory">
+    <schema>helper.basic</schema>
+    <command-key>command</command-key>
+    <address-key>plugin</address-key>
+    <command-xpl-value>memory</command-xpl-value>
+    <parameters>
+    </parameters>
+  </command>
+  <listener>
+    <schema>helper.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="status" value="ok" />
+      <key name="plugin" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

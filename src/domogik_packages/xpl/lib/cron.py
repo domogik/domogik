@@ -40,8 +40,16 @@ from domogik.xpl.common.xplmessage import XplMessage
 from apscheduler.scheduler import Scheduler
 from domogik_packages.xpl.lib.cron_tools import *
 from domogik_packages.xpl.lib.cron_helpers import CronHelpers
+from pympler.asizeof import asizeof
 #import logging
 #logging.basicConfig()
+
+#MEMORY USAGE
+MEMORY_PLUGIN = 1
+MEMORY_API = 2
+MEMORY_SCHEDULER = 3
+MEMORY_DATA = 4
+MEMORY_STORE = 5
 
 class CronJobs():
     """
@@ -51,15 +59,38 @@ class CronJobs():
         """
         """
         self.data = dict()
-        # Start the scheduler
         self._api = api
         self._scheduler = Scheduler()
         self._store = CronStore(self._api.log, self._api.data_files_dir)
         self._scheduler.start()
         self._store.load_all(self.add_job)
 
+    def memory_usage(self, which):
+        '''
+        Return the memory used by an object
+        '''
+        if which == 0 :
+            data = []
+            data.append("api : %s items, %s bytes" % (1, asizeof(self)))
+            data.append("apscheduler : %s items, %s bytes" % (1, asizeof(self._scheduler)))
+            data.append("jobs dict : %s items, %s bytes" % (len(self.data), asizeof(self.data)))
+            data.append("store : %s items, %s bytes" % (1, asizeof(self._store)))
+            return data
+        else:
+            if which == MEMORY_PLUGIN:
+                return 0, 0
+            elif which == MEMORY_API:
+                return 1, asizeof(self)
+            elif which == MEMORY_SCHEDULER:
+                return 1, asizeof(self._scheduler)
+            elif which == MEMORY_DATA:
+                return len(self.data), asizeof(self.data)
+            elif which == MEMORY_STORE:
+                return 1, asizeof(self._store)
+
     def stop_scheduler(self):
         """
+        Stop the aps scheduler. Must be called before killing the plugin.
         """
         self._scheduler.shutdown()
 
