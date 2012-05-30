@@ -87,13 +87,14 @@ class Telldus(XplHlpPlugin):
         self._config = Query(self.myxpl, self.log)
         self.log.debug("telldus.__init__ : Try to load API")
         try:
-            self._mytelldus = TelldusAPI(self.send_xpl, self.log,
-                self._config,self.get_data_files_directory())
+            self._mytelldus = TelldusAPI(self, self.send_xpl, self.log,
+                self._config,self.get_data_files_directory(), self.myxpl)
         except Exception:
             self.log.error("Something went wrong during telldus API init.")
             self.log.error("%s" % (traceback.format_exc()))
             self.force_leave()
             exit(1)
+        self.add_stop_cb(self._mytelldus.unregister)
         self.log.debug("telldus.__init__ : Create listeners")
         Listener(self.telldus_cmnd_cb, self.myxpl,
                  {'schema': 'telldus.basic', 'xpltype': 'xpl-cmnd'})
@@ -104,13 +105,13 @@ class Telldus(XplHlpPlugin):
             boo = self._config.query('telldus', 'lightext')
             if boo == None:
                 boo = "False"
-            self._lightext = eval(boo)
+            self.lightext = eval(boo)
         except:
             self.log.warning("Can't get delay configuration from XPL. Disable lighting extensions.")
-            self._lightext = False
-        if self._lightext == True:
+            self.lightext = False
+        if self.lightext == True:
             self.log.debug("telldus.__init__ : Try to load the lighting extension.")
-            self._lighting = LightingExtension(self, self._name, \
+            self.lighting = LightingExtension(self, self._name, \
                 self._mytelldus.lighting_activate_device, \
                 self._mytelldus.lighting_deactivate_device, \
                 self._mytelldus.lighting_valid_device)
@@ -142,9 +143,9 @@ class Telldus(XplHlpPlugin):
                 "min-args" : 0,
               },
             }
-        if self._lightext == True:
+        if self.lightext == True:
             self.log.debug("telldus.__init__ : Try to enable the lighting extension.")
-            self._lighting.enable_lighting()
+            self.lighting.enable_lighting()
         self.log.debug("telldus.__init__ : Try to load the helpers.")
         self.enable_helper()
         self.enable_hbeat()

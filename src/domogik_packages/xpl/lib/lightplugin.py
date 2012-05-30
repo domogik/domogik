@@ -311,6 +311,8 @@ class LightingExtension():
         mess.set_type("xpl-trig")
         mess.set_schema("lighting.basic")
         mess.add_data({"command" : "activate"})
+        if scene == None and 'scene' in message.data:
+            scene = message.data['scene']
         mess.add_data({"scene" : scene})
         mess.add_data({"client" : self._name})
         for device in self._scenes[scene] :
@@ -330,6 +332,8 @@ class LightingExtension():
         mess.set_type("xpl-trig")
         mess.set_schema("lighting.basic")
         mess.add_data({"command" : "deactivate"})
+        if scene == None and 'scene' in message.data:
+            scene = message.data['scene']
         mess.add_data({"scene" : scene})
         mess.add_data({"client" : self._name})
         for device in self._scenes[scene] :
