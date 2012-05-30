@@ -671,7 +671,6 @@ class TelldusAPI:
         #print " SHINE : address: %s, level: %s" % (device, level)
         deviceid = self.get_device_id(device)
         old = self._deviceeventq.get_last_sent(deviceid)
-        downtime = 15
         if device in self._config:
             devicetype = self._config[device]['devicetype']
             if devicetype == TELLDUS_SHUTTER:
@@ -693,7 +692,6 @@ class TelldusAPI:
             start = int(old["value"])
         #print " start = %s" % start
         tdlevel = level * 2.55
-        tdstart = start * 2.55
         steps = faderate / self._delaybatch
         if steps > self._maxbatch:
             steps = self._maxbatch
@@ -742,7 +740,7 @@ class TelldusAPI:
         elif self._telldusd.methods(deviceid, TELLSTICK_TURNON) == TELLSTICK_TURNON:
             self._deviceeventq.create_batch(deviceid, TELLSTICK_UP, 0)
             self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, 0)
-            #self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, downtime*MULTI_SHUTTER_UP)
+            self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, downtime*MULTI_SHUTTER_UP)
             self._deviceeventq.start_batch(deviceid)
 
     def send_down(self, device):
@@ -762,7 +760,7 @@ class TelldusAPI:
         elif self._telldusd.methods(deviceid, TELLSTICK_TURNOFF) == TELLSTICK_TURNOFF:
             self._deviceeventq.create_batch(deviceid, TELLSTICK_DOWN, 0)
             self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNOFF, 0, 0)
-            #self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNOFF, 0, downtime*MULTI_SHUTTER_DOWN)
+            self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNOFF, 0, downtime*MULTI_SHUTTER_DOWN)
             self._deviceeventq.start_batch(deviceid)
 
     def send_shut(self, device, level):
@@ -1437,16 +1435,13 @@ class Telldusd:
                     #Linux
                     self._tdlib = cdll.LoadLibrary(ret)
             except:
-                self.log.error("Could not load the telldus-core library : %s" % (traceback.format_exc()))
-                raise TelldusException("Could not load the telldus-core library.")
+                raise TelldusException("Could not load the telldus-core library : %s" % (traceback.format_exc()))
         else:
-            raise TelldusException("Could not find the telldus-core library. Check if it is installed properly.")
-            self.log.error("Could not find the telldus-core library : %s" % (traceback.format_exc()))
+            raise TelldusException("Could not find the telldus-core library. Check if it is installed properly : %s" % (traceback.format_exc()))
         try:
             self._tdlib.tdInit()
         except:
-            raise TelldusException("Could not initialize telldus-core library.")
-            self.log.error("Could not initialize telldus-core library : %s" % (traceback.format_exc()))
+            raise TelldusException("Could not initialize telldus-core library : %s" % (traceback.format_exc()))
         self.xplcommands = {
             TELLSTICK_TURNON : {'cmd': "on"},
             TELLSTICK_TURNOFF : {'cmd': "off"},
@@ -1500,7 +1495,7 @@ class Telldusd:
                 self._tdlib.tdRegisterDeviceEvent(callback, py_object(context))
             return self._device_event_cb_id
         except:
-            raise TelldusException("Could not register the device event callback.")
+            raise TelldusException("Could not register the device event callback : %s" % (traceback.format_exc()))
 
     def unregister_device_event(self):
         '''
@@ -1509,7 +1504,7 @@ class Telldusd:
         try:
             self._tdlib.UnregisterCallbak(self._device_event_cb_id)
         except:
-            raise TelldusException("Could not unregister the device event callback.")
+            raise TelldusException("Could not unregister the device event callback : %s" % (traceback.format_exc()))
 
     def register_device_change_event(self, parent):
         '''
@@ -1528,7 +1523,7 @@ class Telldusd:
                 self._tdlib.tdRegisterDeviceChangeEvent(
                 self._device_change_event_cb, py_object(parent))
         except:
-            raise TelldusException("Could not register the device change event callback.")
+            raise TelldusException("Could not register the device change event callback : %s" % (traceback.format_exc()))
 
     def unregister_device_change_event(self):
         '''
@@ -1537,7 +1532,7 @@ class Telldusd:
         try:
             self._tdlib.UnregisterCallbak(self._device_change_event_cb_id)
         except:
-            raise TelldusException("Could not unregister the device event change callback.")
+            raise TelldusException("Could not unregister the device event change callback : %s" % (traceback.format_exc()))
 
 #    def register_sensor_event(self, callback, parent):
 #        '''
@@ -1565,7 +1560,7 @@ class Telldusd:
             self._sensor_event_cb_id = \
                 self._tdlib.tdRegisterSensorEvent(callback, py_object(context))
         except:
-            raise TelldusException("Could not register the sensor event callback.")
+            raise TelldusException("Could not register the sensor event callback : %s" % (traceback.format_exc()))
 
 
     def unregister_sensor_event(self):
@@ -1575,7 +1570,7 @@ class Telldusd:
         try:
             self._tdlib.UnregisterCallbak(self._sensor_event_cb_id)
         except:
-            raise TelldusException("Could not unregister the sensor event callback.")
+            raise TelldusException("Could not unregister the sensor event callback : %s" % (traceback.format_exc()))
 
     def get_devices(self):
         '''
