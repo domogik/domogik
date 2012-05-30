@@ -25,6 +25,7 @@ class ZWave:
         """initialisation serial port
         """
         self._cb = callback
+        self.old_val = {}
         pyozw_dir = str(pyozw_path)
         pyozw_conf = str(pyozw_path) + "/openzwave/config/"
         sys.path.insert(0,pyozw_dir)
@@ -43,6 +44,7 @@ class ZWave:
 	    if args:
 		MyHomeId = args['homeId']
 		resp['device'] = args['nodeId']
+                node_id = resp['device']
 	        v = args['valueId']
 		if v.has_key('label'): resp['type'] = v['label']
 	        if v.has_key('value'): resp['current'] = v['value']
@@ -51,7 +53,11 @@ class ZWave:
 		    print('\n-----------------------\nEnvoi du Message XPL:\n')
 		    print resp
 		    print('\n-----------------------\n')
-		    self._cb('xpl-stat', 'sensor.basic', resp)
+                    xpltyp = xpl-trig
+                    if self.old_val.has_key('node_id') and (self.old_val['node_id']['type'] == resp['type']) and (self.old_val['node_id']['valeur'] == resp['current']):
+                        xpltyp = xpl-stat
+		    self._cb(xpltyp, 'sensor.basic', resp)
+                    self.old_val = {node_id:{'type' : resp['type'], 'valeur' : resp['current']}}
 
         manager.addWatcher(callback2)
         manager.addDriver(serial_port)
