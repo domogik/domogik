@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Support Z-wave technology
+Support Z-wave technology with py-openzwave
 
 Implements
 ==========
@@ -44,7 +44,7 @@ from domogik_packages.xpl.lib.pyozw import ZWave
 
 class Zwave(XplPlugin):
     def __init__(self):
-        XplPlugin.__init__(self, name = 'zwave')
+        XplPlugin.__init__(self, name = 'pyozw')
         self.enable_hbeat()
         Listener(self.zwave_cmd_cb, self.myxpl,{'schema': 'zwave.basic',
                                                 'xpltype': 'xpl-cmnd'})

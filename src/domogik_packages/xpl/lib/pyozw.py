@@ -46,7 +46,7 @@ class ZWave:
 	        v = args['valueId']
 		if v.has_key('label'): resp['type'] = v['label']
 	        if v.has_key('value'): resp['current'] = v['value']
-		if v.has_key('units'): resp['units'] = v['units']
+		if v.has_key('units') and (len(v['units']) > 0): resp['units'] = v['units']
 		if v['label'] in allowtype:
 		    print('\n-----------------------\nEnvoi du Message XPL:\n')
 		    print resp
