@@ -43,16 +43,6 @@
             "value_type": "number"
         }, 
         {
-            "device_type_id": "pyozw.humidity",
-            "feature_type": "sensor",
-            "id": "pyozw.humidity.battery",
-            "name": "Battery",
-            "parameters": "{}",
-            "return_confirmation": "0",
-            "stat_key": "battery",
-            "value_type": "string"
-        },
-        {
             "device_type_id": "pyozw.thermometer", 
             "feature_type": "sensor", 
             "id": "pyozw.thermometer.temperature", 
@@ -113,6 +103,7 @@
     "files": [
         "src/share/domogik/design/plugin/zwave/icon.png", 
         "src/share/domogik/plugins/pyozw.json", 
+        "src/share/domogik/stats/pyozw/sensor.basic-pyozw.xml",
         "src/domogik_packages/xpl/bin/pyozw.py", 
         "src/domogik_packages/xpl/lib/pyozw.py", 
     ], 

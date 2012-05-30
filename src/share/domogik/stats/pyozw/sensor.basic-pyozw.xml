@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="pyozw">
+    <schema name="sensor.basic">
+        <xpltype type="*">
+            <listener>
+                <filter>
+                    <key name="type" value="Temperature"/>
+                    <key name="type" value="Relative Humidity"/>
+                    <key name="type" value="Battery Level"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="units"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="Temperature" />
+                <value field="current" new_name="humidity" 
+                       filter_key="type" filter_value="Relative Humidity" />
+                <value field="current" new_name="battery"
+                       filter_key="type" filter_value="Battery Level" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

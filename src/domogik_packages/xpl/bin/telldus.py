@@ -88,9 +88,10 @@ class Telldus(XplHlpPlugin):
         self._config = Query(self.myxpl, self.log)
         try:
             self._mytelldus = TelldusAPI(self.send_xpl, self.log,
-                self._config)
+                self._config,self.get_data_files_directory())
         except Exception:
-            self.log.error("Something went wrong during telldus init, check logs")
+            self.log.error("Something went wrong during telldus API init.")
+            self.log.error("%s" % (traceback.format_exc()))
             self.force_leave()
             exit(1)
         #Create listeners

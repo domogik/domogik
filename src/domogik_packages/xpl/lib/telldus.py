@@ -45,6 +45,9 @@ import traceback
 from threading import Timer
 from domogik.xpl.common.xplmessage import XplMessage
 from pympler.asizeof import asizeof
+import ConfigParser
+import os
+import glob
 
 #platform specific imports:
 if (platform.system() == 'Windows'):
@@ -104,6 +107,7 @@ TELLDUS_LIGHTING = "lighting"
 TELLDUS_SHUTTER = "shutter"
 TELLDUS_SENSOR = "sensor"
 TELLDUS_DAWNDUSK = "dawndusk"
+TELLDUS_BUTTON = "button"
 
 #MEMORY USAGE
 MEMORY_PLUGIN = 1
@@ -176,7 +180,7 @@ class TelldusAPI:
     '''
     Telldus plugin library
     '''
-    def __init__(self, send_xpl_cmd, log, config):
+    def __init__(self, send_xpl_cmd, log, config, data_dir):
         '''
         Constructor : Find telldus-core library and try to open it
         If success : initialize telldus API
@@ -189,6 +193,7 @@ class TelldusAPI:
         self.log.info("telldusAPI.__init__ : Start ...")
         self.config = config
         self._send_xpl_cmd = send_xpl_cmd
+        self._data_dir = data_dir
         self._config = {}
         #The delay to filter incoming messages from telldus
         self._delayrf = 0.4
@@ -196,6 +201,7 @@ class TelldusAPI:
         self._delaybatch = self._delayrf * 5
         #The maximun batch items to create
         self._maxbatch = 10
+        self._buttons = None
         self._deviceeventq = None
         self._sensoreventq = None
         self.log.info("telldusAPI.__init__ : Look for telldus-core")
@@ -247,6 +253,7 @@ class TelldusAPI:
             else:
                 loop = False
             num += 1
+        self._buttons = Button(self.log, self._data_dir, self._send_xpl_cmd)
         self.log.debug("reload_config : Done :-)")
 
     def memory_usage(self, which):
@@ -308,6 +315,9 @@ class TelldusAPI:
             elif devicetype == TELLDUS_SHUTTER :
                 self.log.info("TELLDUS_SHUTTER : Not implemented")
                 self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
+            elif devicetype == TELLDUS_BUTTON :
+                self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
+                self._buttons.act(self._telldusd.get_device(deviceid), method, value)
         else :
             self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
         self.log.debug("send_xpl : Done")
@@ -379,6 +389,50 @@ class TelldusAPI:
         @param value : the value
         """
         self.log.debug("send_xpl_ack : Start ...")
+        if method == TELLDUS_BRIGHT:
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, value)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, value)
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_DIM, value)
+            if value == 0:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNOFF, value)
+            elif value == 100:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNON, value)
+        elif method == TELLDUS_CHANGE:
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, value)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, value)
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_DIM, value)
+            if value == 0:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNOFF, value)
+            elif value == 100:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNON, value)
+        elif method == TELLDUS_SHINE:
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, value)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, value)
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_DIM, value)
+            if value == 0:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNOFF, value)
+            elif value == 100:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNON, value)
+        elif method == TELLSTICK_DIM:
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, value)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, value)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, value)
+            if value == 0:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNOFF, value)
+            elif value == 100:
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_TURNON, value)
+        elif method == TELLSTICK_TURNON and \
+          self._telldusd.methods(deviceid, TELLSTICK_DIM) == TELLSTICK_DIM :
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_DIM, 100)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, 100)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, 100)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, 100)
+        elif method == TELLSTICK_TURNOFF and \
+          self._telldusd.methods(deviceid, TELLSTICK_DIM) == TELLSTICK_DIM :
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_DIM, 0)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, 0)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, 0)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, 0)
         self.send_xpl("xpl-trig", deviceid, method, value)
         self.log.debug("send_xpl_ack : Done")
 
@@ -1383,13 +1437,16 @@ class Telldusd:
                     #Linux
                     self._tdlib = cdll.LoadLibrary(ret)
             except:
+                self.log.error("Could not load the telldus-core library : %s" % (traceback.format_exc()))
                 raise TelldusException("Could not load the telldus-core library.")
         else:
             raise TelldusException("Could not find the telldus-core library. Check if it is installed properly.")
+            self.log.error("Could not find the telldus-core library : %s" % (traceback.format_exc()))
         try:
             self._tdlib.tdInit()
         except:
             raise TelldusException("Could not initialize telldus-core library.")
+            self.log.error("Could not initialize telldus-core library : %s" % (traceback.format_exc()))
         self.xplcommands = {
             TELLSTICK_TURNON : {'cmd': "on"},
             TELLSTICK_TURNOFF : {'cmd': "off"},
@@ -1753,3 +1810,104 @@ class Helpers():
         data.append("Memory use : ")
         data.extend(self._api.memory_usage(0))
         return data
+
+class Button():
+    """
+    Button configuration.
+    """
+    def __init__(self, log, data_dir, xpl_cb):
+        """
+        Initialise the store engine. Create the directory if necessary.
+        """
+        self._xpl_cb = xpl_cb
+        self._log = log
+        self._data_files_dir = data_dir
+        self._store = ButtonStore(self._log, self._data_files_dir)
+        self.data = self._store.load_all()
+        print "data = %s" % self.data
+
+    def act(self, device, command, value):
+        """
+        Play actions associate to a button.
+        """
+        if device in self.data:
+            for action in self.data[device]:
+                mess = XplMessage()
+                for field in self.data[device][action]:
+                    if field == "xpltype" :
+                        mess.set_type(self.data[device][action][field])
+                    elif field == "xplschema" :
+                        mess.set_schema(self.data[device][action][field])
+                    elif field == "xplcommand" :
+                        xplcommand = self.data[device][action][field]
+                    elif field == "xplon" :
+                        xplon = self.data[device][action][field]
+                    elif field == "xploff" :
+                        xploff = self.data[device][action][field]
+                    else :
+                        mess.add_data({field :  self.data[device][action][field]})
+                if command == TELLSTICK_TURNON :
+                    mess.add_data({xplcommand :  xplon})
+                elif command == TELLSTICK_TURNOFF :
+                    mess.add_data({xplcommand :  xploff})
+                self._log.info("Actfor button %s" % device)
+                self._xpl_cb(mess)
+
+class ButtonStore():
+    """
+    Store the button configuration in the filesystem. We use a ConfigParser file per button.
+    Sections
+    [Button]
+        device=
+        actions=action1,action2,...
+    [action1]
+        xpltype=xpl-cmnd
+        xplschema=telldus.basic
+        xplcommand=shut
+        xplon=100
+        xploff=0
+        device=TS3
+    [action2]
+    [...]
+    """
+    def __init__(self, log, data_dir):
+        """
+        Initialise the store engine. Create the directory if necessary.
+        """
+        self._log = log
+        self._data_files_dir = data_dir
+        self._log.debug("ButtonStore.store_init : Use directory %s" % \
+                self._data_files_dir)
+        if not os.path.isdir(self._data_files_dir):
+            os.mkdir(self._data_files_dir, 0770)
+
+    def load_all(self):
+        """
+        Load all configurations from the filesystem. Parse all the *.btn files
+        in directory and call the callback ùethod to add it to the cron
+        jobs.
+        """
+        for jobfile in glob.iglob(self._data_files_dir+"/*.btn") :
+            config = ConfigParser.ConfigParser()
+            config.read(jobfile)
+            self._log.debug("ButtonStore.store_init : Load configuration from %s" % \
+                    jobfile)
+            data = dict()
+            device = config.get('Button', "device")
+            if device != None and device != "" :
+                actions = str(config.get('Button', "actions"))
+                if actions != None and actions != "" :
+                    data[device] = {}
+                    for action in actions.split(","):
+                        if config.has_section(action):
+                            data[device][action] = {}
+                            for option in config.options(action):
+                                data[device][action][option] = config.get(action, option)
+        return data
+
+    def _get_file(self, job):
+        """
+        Return the filename associated to a job.
+        """
+        return os.path.join(self._data_files_dir, job + ".btn")
+

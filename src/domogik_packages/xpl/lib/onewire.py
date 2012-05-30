@@ -168,7 +168,8 @@ class ComponentDs18s20:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
                     print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
-                    self.callback(my_type, {"device" : my_id,
+                    if temperature != 85: # Temp = 85 when read error occurs - Can safely be ignored
+                        self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
             self._stop.wait(self.interval)
@@ -358,20 +359,17 @@ class ComponentDs2408:
                     print("type=%s, id=%s, PIO_ALL=%s" % (my_type, my_id, PIO_ALL))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "PIO_ALL",
-                                         "data0" : comp.PIO_0,
-                                         "data1" : comp.PIO_1,
-                                         "data2" : comp.PIO_2,
-                                         "data3" : comp.PIO_3,
-                                         "data4" : comp.PIO_4,
-                                         "data5" : comp.PIO_5,
-                                         "data6" : comp.PIO_6,
-                                         "data7" : comp.PIO_7,
+                                         "data0" : self.onewire.pio_map(my_id,0),
+                                         "data1" : self.onewire.pio_map(my_id,1),
+                                         "data2" : self.onewire.pio_map(my_id,2),
+                                         "data3" : self.onewire.pio_map(my_id,3),
+                                         "data4" : self.onewire.pio_map(my_id,4),
+                                         "data5" : self.onewire.pio_map(my_id,5),
+                                         "data6" : self.onewire.pio_map(my_id,6),
+                                         "data7" : self.onewire.pio_map(my_id,7),
                                          "current" : PIO_ALL})
 
             self._stop.wait(self.interval)
-
-
-
 
 class OneWireNetwork:
     """
@@ -401,21 +399,25 @@ class OneWireNetwork:
         Getter for self._root
         """
         return self._root 
-
-    def write(self,device,pio,value):
+        
+    def pio_map(self,device,gpio):
+        
         map = ["A","B"]                   # Used to map PIO_0/1 to  PIO_A/B for other devices 
-        ret = 0                           # Ensure we will return a value
-        s = ow.Sensor( '/'+device) 
         fam = device[:2]                  # Extract familly code
         if fam == "12":                   # Fam = 12 - DS2406
-            pio = map[pio]                # Rename PIO et A & B
+            pio = "PIO_"+map[gpio]                # Rename PIO to A & B
+        elif fam == "05":                 # DS2405 - Only one PIO named "PIO"
+            pio = "PIO"
+        else:                             # All other cases
+            pio = "PIO_"+str(gpio)
+        print "Called for device "+device+" & PIO "+pio+" -> "+pio
+        return pio 
+
+    def write(self,device,pio,value):
+        ret = 0                           # Ensure we will return a value
+        s = ow.Sensor( '/'+device) 
         try:
-            if fam == "05":               # DS2405 - Only one PIO named "PIO"
-                setattr(s,"PIO", value)
-                ret = getattr(s,"PIO")
-            else:                         # All other cases
-                setattr(s,"PIO_"+pio, value)
-                ret = getattr(s,"PIO_"+pio)
+            ret = getattr(s,self.pio_map(device,pio))
         except:
             raise OneWireException("Can't access given PIO %s" % pio)
         return ret
