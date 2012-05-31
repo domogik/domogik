@@ -53,9 +53,9 @@ class ZWave:
 		    print('\n-----------------------\nEnvoi du Message XPL:\n')
 		    print resp
 		    print('\n-----------------------\n')
-                    xpltyp = xpl-trig
+                    xpltyp = 'xpl-trig'
                     if self.old_val.has_key('node_id') and (self.old_val['node_id']['type'] == resp['type']) and (self.old_val['node_id']['valeur'] == resp['current']):
-                        xpltyp = xpl-stat
+                        xpltyp = 'xpl-stat'
 		    self._cb(xpltyp, 'sensor.basic', resp)
                     self.old_val = {node_id:{'type' : resp['type'], 'valeur' : resp['current']}}
 
