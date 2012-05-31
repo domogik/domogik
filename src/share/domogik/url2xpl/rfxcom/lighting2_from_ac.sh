@@ -1,4 +1,4 @@
-for PROTO in homeasy_eu
+for PROTO in homeeasy_eu
   do
     for fic in lighting2_ac_on.xml lighting2_ac_off.xml lighting2_ac_preset.xml 
       do

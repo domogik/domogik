@@ -180,7 +180,7 @@ class TelldusAPI:
     '''
     Telldus plugin library
     '''
-    def __init__(self, send_xpl_cmd, log, config, data_dir):
+    def __init__(self, plugin, send_xpl_cmd, log, config, data_dir, myxpl):
         '''
         Constructor : Find telldus-core library and try to open it
         If success : initialize telldus API
@@ -192,6 +192,8 @@ class TelldusAPI:
         self.log = log
         self.log.info("telldusAPI.__init__ : Start ...")
         self.config = config
+        self._plugin = plugin
+        self._myxpl = myxpl
         self._send_xpl_cmd = send_xpl_cmd
         self._data_dir = data_dir
         self._config = {}
@@ -253,8 +255,20 @@ class TelldusAPI:
             else:
                 loop = False
             num += 1
-        self._buttons = Button(self.log, self._data_dir, self._send_xpl_cmd)
+        self._buttons = Button(self._plugin, self, self.log, self._data_dir, \
+            self._send_xpl_cmd, self._myxpl)
         self.log.debug("reload_config : Done :-)")
+
+    def unregister(self):
+        '''
+        Unregister the callbacks functions
+        '''
+        self.log.debug("unregister : Start ...")
+        if self._deviceeventq != None:
+            self._deviceeventq.unregister()
+        if self._sensoreventq != None:
+            self._sensoreventq.unregister()
+        self.log.debug("unregister : Done :-)")
 
     def memory_usage(self, which):
         '''
@@ -316,7 +330,7 @@ class TelldusAPI:
                 self.log.info("TELLDUS_SHUTTER : Not implemented")
                 self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
             elif devicetype == TELLDUS_BUTTON :
-                self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
+                self.send_xpl_telldus_basic(self, xpltype, deviceid, method, value)
                 self._buttons.act(self._telldusd.get_device(deviceid), method, value)
         else :
             self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
@@ -671,7 +685,6 @@ class TelldusAPI:
         #print " SHINE : address: %s, level: %s" % (device, level)
         deviceid = self.get_device_id(device)
         old = self._deviceeventq.get_last_sent(deviceid)
-        downtime = 15
         if device in self._config:
             devicetype = self._config[device]['devicetype']
             if devicetype == TELLDUS_SHUTTER:
@@ -693,7 +706,6 @@ class TelldusAPI:
             start = int(old["value"])
         #print " start = %s" % start
         tdlevel = level * 2.55
-        tdstart = start * 2.55
         steps = faderate / self._delaybatch
         if steps > self._maxbatch:
             steps = self._maxbatch
@@ -742,7 +754,7 @@ class TelldusAPI:
         elif self._telldusd.methods(deviceid, TELLSTICK_TURNON) == TELLSTICK_TURNON:
             self._deviceeventq.create_batch(deviceid, TELLSTICK_UP, 0)
             self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, 0)
-            #self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, downtime*MULTI_SHUTTER_UP)
+            self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, downtime*MULTI_SHUTTER_UP)
             self._deviceeventq.start_batch(deviceid)
 
     def send_down(self, device):
@@ -762,7 +774,7 @@ class TelldusAPI:
         elif self._telldusd.methods(deviceid, TELLSTICK_TURNOFF) == TELLSTICK_TURNOFF:
             self._deviceeventq.create_batch(deviceid, TELLSTICK_DOWN, 0)
             self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNOFF, 0, 0)
-            #self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNOFF, 0, downtime*MULTI_SHUTTER_DOWN)
+            self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNOFF, 0, downtime*MULTI_SHUTTER_DOWN)
             self._deviceeventq.start_batch(deviceid)
 
     def send_shut(self, device, level):
@@ -860,14 +872,12 @@ class DeviceEventQueue:
         self._device_event_cb = cmpfunc(device_event_callback)
         self._telldusd.register_device_event(self._device_event_cb, self)
 
-    def __del__(self):
+    def unregister(self):
         '''
-        Destroy the class
+        Unregister the callback function
         '''
         if self._telldusd:
             self._telldusd.unregister_device_event()
-        #print "DeviceEventQueue.__del__ is called"
-
 
     def memory_usage(self, which):
         '''
@@ -1253,9 +1263,9 @@ class SensorEventQueue:
         self._sensor_event_cb = cmpfunc(sensor_event_callback)
         self._telldusd.register_sensor_event(self._sensor_event_cb, self)
 
-    def __del__(self):
+    def unregister(self):
         '''
-        Destroy the class
+        Unregister the callback function
         '''
         if self._telldusd:
             self._telldusd.unregister_sensor_event()
@@ -1437,16 +1447,13 @@ class Telldusd:
                     #Linux
                     self._tdlib = cdll.LoadLibrary(ret)
             except:
-                self.log.error("Could not load the telldus-core library : %s" % (traceback.format_exc()))
-                raise TelldusException("Could not load the telldus-core library.")
+                raise TelldusException("Could not load the telldus-core library : %s" % (traceback.format_exc()))
         else:
-            raise TelldusException("Could not find the telldus-core library. Check if it is installed properly.")
-            self.log.error("Could not find the telldus-core library : %s" % (traceback.format_exc()))
+            raise TelldusException("Could not find the telldus-core library. Check if it is installed properly : %s" % (traceback.format_exc()))
         try:
             self._tdlib.tdInit()
         except:
-            raise TelldusException("Could not initialize telldus-core library.")
-            self.log.error("Could not initialize telldus-core library : %s" % (traceback.format_exc()))
+            raise TelldusException("Could not initialize telldus-core library : %s" % (traceback.format_exc()))
         self.xplcommands = {
             TELLSTICK_TURNON : {'cmd': "on"},
             TELLSTICK_TURNOFF : {'cmd': "off"},
@@ -1500,16 +1507,16 @@ class Telldusd:
                 self._tdlib.tdRegisterDeviceEvent(callback, py_object(context))
             return self._device_event_cb_id
         except:
-            raise TelldusException("Could not register the device event callback.")
+            raise TelldusException("Could not register the device event callback : %s" % (traceback.format_exc()))
 
     def unregister_device_event(self):
         '''
         Unregister the device event callback to telldusd
         '''
         try:
-            self._tdlib.UnregisterCallbak(self._device_event_cb_id)
+            self._tdlib.tdUnregisterCallback(self._device_event_cb_id)
         except:
-            raise TelldusException("Could not unregister the device event callback.")
+            raise TelldusException("Could not unregister the device event callback : %s" % (traceback.format_exc()))
 
     def register_device_change_event(self, parent):
         '''
@@ -1528,16 +1535,16 @@ class Telldusd:
                 self._tdlib.tdRegisterDeviceChangeEvent(
                 self._device_change_event_cb, py_object(parent))
         except:
-            raise TelldusException("Could not register the device change event callback.")
+            raise TelldusException("Could not register the device change event callback : %s" % (traceback.format_exc()))
 
     def unregister_device_change_event(self):
         '''
         Unregister the device change event callback to telldusd
         '''
         try:
-            self._tdlib.UnregisterCallbak(self._device_change_event_cb_id)
+            self._tdlib.tdUnregisterCallback(self._device_change_event_cb_id)
         except:
-            raise TelldusException("Could not unregister the device event change callback.")
+            raise TelldusException("Could not unregister the device event change callback : %s" % (traceback.format_exc()))
 
 #    def register_sensor_event(self, callback, parent):
 #        '''
@@ -1565,7 +1572,7 @@ class Telldusd:
             self._sensor_event_cb_id = \
                 self._tdlib.tdRegisterSensorEvent(callback, py_object(context))
         except:
-            raise TelldusException("Could not register the sensor event callback.")
+            raise TelldusException("Could not register the sensor event callback : %s" % (traceback.format_exc()))
 
 
     def unregister_sensor_event(self):
@@ -1573,9 +1580,9 @@ class Telldusd:
         Unregister the sensor event callback to telldusd
         '''
         try:
-            self._tdlib.UnregisterCallbak(self._sensor_event_cb_id)
+            self._tdlib.tdUnregisterCallback(self._sensor_event_cb_id)
         except:
-            raise TelldusException("Could not unregister the sensor event callback.")
+            raise TelldusException("Could not unregister the sensor event callback : %s" % (traceback.format_exc()))
 
     def get_devices(self):
         '''
@@ -1815,11 +1822,14 @@ class Button():
     """
     Button configuration.
     """
-    def __init__(self, log, data_dir, xpl_cb):
+    def __init__(self, plugin, api, log, data_dir, xpl_cb, myxpl):
         """
         Initialise the store engine. Create the directory if necessary.
         """
+        self._myxpl = myxpl
         self._xpl_cb = xpl_cb
+        self._plugin = plugin
+        self._api = api
         self._log = log
         self._data_files_dir = data_dir
         self._store = ButtonStore(self._log, self._data_files_dir)
@@ -1833,11 +1843,13 @@ class Button():
         if device in self.data:
             for action in self.data[device]:
                 mess = XplMessage()
+                schema = None
                 for field in self.data[device][action]:
                     if field == "xpltype" :
                         mess.set_type(self.data[device][action][field])
                     elif field == "xplschema" :
-                        mess.set_schema(self.data[device][action][field])
+                        schema = self.data[device][action][field]
+                        mess.set_schema(schema)
                     elif field == "xplcommand" :
                         xplcommand = self.data[device][action][field]
                     elif field == "xplon" :
@@ -1850,8 +1862,17 @@ class Button():
                     mess.add_data({xplcommand :  xplon})
                 elif command == TELLSTICK_TURNOFF :
                     mess.add_data({xplcommand :  xploff})
-                self._log.info("Actfor button %s" % device)
-                self._xpl_cb(mess)
+                self._log.info("Act for button %s" % device)
+                #Should we send it with xpl or is it for us
+                if schema == "telldus.basic" :
+                    self._plugin.telldus_cmnd_cb(mess)
+                elif schema == "lighting.basic" :
+                    if xplcommand == "activate" :
+                        self._plugin.lighting.cmd_activate(self._myxpl, mess, None)
+                    elif xplcommand == "deactivate" :
+                        self._plugin.lighting.cmd_deactivate(self._myxpl, mess, None)
+                else :
+                    self._xpl_cb(mess)
 
 class ButtonStore():
     """

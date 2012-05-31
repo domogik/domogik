@@ -77,7 +77,6 @@ class Telldus(XplHlpPlugin):
         XplHlpPlugin.__init__(self, name = 'telldus',
             reload_cb = self.telldus_reload_config_cb)
         self.log.info("telldus.__init__ : Start ...")
-        self.log.debug("telldus.__init__ : Try to start the telldus library")
         self._device = "/dev/tellstick"
         #Check if the device exists
         if not os.path.exists(self._device):
@@ -86,15 +85,16 @@ class Telldus(XplHlpPlugin):
         else:
             self.log.debug("Device present as "+self._device)
         self._config = Query(self.myxpl, self.log)
+        self.log.debug("telldus.__init__ : Try to load API")
         try:
-            self._mytelldus = TelldusAPI(self.send_xpl, self.log,
-                self._config,self.get_data_files_directory())
+            self._mytelldus = TelldusAPI(self, self.send_xpl, self.log,
+                self._config,self.get_data_files_directory(), self.myxpl)
         except Exception:
             self.log.error("Something went wrong during telldus API init.")
             self.log.error("%s" % (traceback.format_exc()))
             self.force_leave()
             exit(1)
-        #Create listeners
+        self.add_stop_cb(self._mytelldus.unregister)
         self.log.debug("telldus.__init__ : Create listeners")
         Listener(self.telldus_cmnd_cb, self.myxpl,
                  {'schema': 'telldus.basic', 'xpltype': 'xpl-cmnd'})
@@ -105,16 +105,16 @@ class Telldus(XplHlpPlugin):
             boo = self._config.query('telldus', 'lightext')
             if boo == None:
                 boo = "False"
-            self._lightext = eval(boo)
+            self.lightext = eval(boo)
         except:
             self.log.warning("Can't get delay configuration from XPL. Disable lighting extensions.")
-            self._lightext = False
-        if self._lightext == True:
-            self._lighting = LightingExtension(self, self._name, \
+            self.lightext = False
+        if self.lightext == True:
+            self.log.debug("telldus.__init__ : Try to load the lighting extension.")
+            self.lighting = LightingExtension(self, self._name, \
                 self._mytelldus.lighting_activate_device, \
                 self._mytelldus.lighting_deactivate_device, \
                 self._mytelldus.lighting_valid_device)
-
         self.helpers =   \
            { "list" :
               {
@@ -143,8 +143,10 @@ class Telldus(XplHlpPlugin):
                 "min-args" : 0,
               },
             }
-        if self._lightext == True:
-            self._lighting.enable_lighting()
+        if self.lightext == True:
+            self.log.debug("telldus.__init__ : Try to enable the lighting extension.")
+            self.lighting.enable_lighting()
+        self.log.debug("telldus.__init__ : Try to load the helpers.")
         self.enable_helper()
         self.enable_hbeat()
         self.log.info("Telldus plugin correctly started")
@@ -154,6 +156,7 @@ class Telldus(XplHlpPlugin):
         General callback for all command messages
         @param message : an XplMessage object
         """
+        self.log.debug("telldus.telldus_cmnd_cb : Receive message.")
         commands = {
             'on': lambda hu, l, f: self._mytelldus.send_on(hu),
             'off': lambda hu, l, f: self._mytelldus.send_off(hu),
@@ -179,13 +182,11 @@ class Telldus(XplHlpPlugin):
             faderate = "0"
             if 'faderate' in message.data:
                 faderate = message.data['faderate']
-            self.log.debug("%s received : device= %s, level=%s" %
-                           (cmd, device, level))
+            self.log.debug("%s received : device= %s, level=%s, faderate=%s" % (cmd, device, level, faderate))
             commands[cmd](device, level, faderate)
         except Exception:
-            self.log.error("action _ %s _ unknown."%(cmd))
-            error = "Exception : %s" %  \
-                     (traceback.format_exc())
+            self.log.error("action _ %s _ unknown." % (cmd))
+            error = "Exception : %s" % (traceback.format_exc())
             self.log.info("TelldusException : "+error)
 
     def telldus_reload_config_cb(self):
