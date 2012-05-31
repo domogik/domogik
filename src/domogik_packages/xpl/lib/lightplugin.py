@@ -39,6 +39,7 @@ import threading
 
 SCENELOCK = threading.Lock()
 SLEEP = 0.1
+MEMORY_LIGHTING_SCENE = 100
 
 class LightingExtension():
     """
@@ -117,6 +118,8 @@ class LightingExtension():
                     error = "Exception : %s" % (traceback.format_exc())
                     self._plugin.log.error("LightingExtension.enable_lighting : " + error)
                     continu = False
+            if continu :
+                self._plugin.log.info("Lighting extensions activated.")
             return continu
 
     def stop_lighting(self):
@@ -196,28 +199,17 @@ class LightingExtension():
         @param myxpl : The XPL sender
         """
         commands = {
-            'activate': lambda x,m,s: self.cmd_activate(x, m, s),
-            'deactivate': lambda x,m,s: self.cmd_deactivate(x, m, s),
-#            'on': lambda x,m,s: self.cmd_on(x, m),
-#            'off': lambda x,m,s: self.cmd_off(x, m),
-#            'dim': lambda x,m,S: self.cmd_dim(x, m),
+            'activate': lambda m: self.activate_cmnd_listener(m),
+            'deactivate': lambda m: self.deactivate_cmnd_listener(m),
         }
         try:
-            scene = None
-            if 'scene' in message.data:
-                scene = message.data['scene']
-            if self.valid_scene(scene):
-                command = None
-                if 'command' in message.data:
-                    command = message.data['command']
-                commands[command](self._plugin.myxpl, message, scene)
-            else :
-                self._plugin.log.debug("LightingExtension.basic_cmnd_listener \
-: not a valid scene")
+            command = None
+            if 'command' in message.data:
+                command = message.data['command']
+            commands[command](message)
         except:
             error = "Exception : %s" % (traceback.format_exc())
-            self._plugin.log.error("LightingExtension.basic_cmnd_listener \
-: " + error)
+            self._plugin.log.error("LightingExtension.basic_cmnd_listener : " + error)
 
     def activate_cmnd_listener(self, message):
         """
@@ -313,6 +305,7 @@ class LightingExtension():
         mess.add_data({"command" : "activate"})
         if scene == None and 'scene' in message.data:
             scene = message.data['scene']
+        #print " SCENE_ACTIVATE : scene: %s" % (scene)
         mess.add_data({"scene" : scene})
         mess.add_data({"client" : self._name})
         for device in self._scenes[scene] :
@@ -423,3 +416,19 @@ class LightingExtension():
                 error = "Exception : %s" % (traceback.format_exc())
                 self._plugin.log.error("LightingExtension.stat_scninfo : " + error)
             #print "scenes = %s" % (self._scenes)
+
+    def memory_usage(self, which):
+        '''
+        Return the memory used by an object
+        '''
+        self._plugin.log.debug("memory_usage : Start")
+        if which == 0 :
+            data = []
+            data.append("scenes : %s items, %s bytes" % (len(self._scenes), "Not implemented"))
+            return data
+        else:
+            if which == MEMORY_LIGHTING_SCENE:
+                return len(self._scenes), 0
+        return None
+        self._plugin.log.debug("memory_usage : Done :-)")
+

@@ -64,6 +64,7 @@ class CronJobs():
         self._store = CronStore(self._api.log, self._api.data_files_dir)
         self._scheduler.start()
         self._store.load_all(self.add_job)
+        self._api.log.info("Load %s jobs from store." % len(self.data))
 
     def memory_usage(self, which):
         '''
@@ -87,6 +88,7 @@ class CronJobs():
                 return len(self.data), asizeof(self.data)
             elif which == MEMORY_STORE:
                 return 1, asizeof(self._store)
+        return None
 
     def stop_scheduler(self):
         """
@@ -220,8 +222,7 @@ class CronJobs():
                     sdate, args=[device])
                 self.data[device]['apjob'] = job
                 self._job_started(device)
-                self._api.log.info("_start_jobDate : add job \
-                    at date %s" % xpldate)
+                self._api.log.info("Add job at date %s." % xpldate)
             except:
                 self._api.log.error("_start_jobDate : " + \
                     traceback.format_exc())
@@ -266,8 +267,7 @@ class CronJobs():
                     seconds=frequence, args=[device])
                 self.data[device]['apjob'] = job
                 self._job_started(device)
-                self._api.log.info("_start_jobTimer : add an \
-                    infinite timer every %s seconds" % frequence)
+                self._api.log.info("Add an infinite timer every %s seconds." % frequence)
             except:
                 self._api.log.error("_start_jobTimer : " + \
                     traceback.format_exc())
@@ -285,8 +285,7 @@ class CronJobs():
                     i = i-1
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobTimer : add a %s \
-                    beats timer every %s seconds" % (duration, frequence))
+                self._api.log.info("Add a %s beat timer every %s seconds." % (duration, frequence))
             except:
                 self._api.log.error("_start_jobTimer : " + \
                     traceback.format_exc())
@@ -354,8 +353,7 @@ class CronJobs():
                 seconds=seconds, start_date=startdate, args=[device])
             self._job_started(device)
             self.data[device]['apjob'] = job
-            self._api.log.info("_start_jobInterval : add an \
-                interval job %s" % str(job))
+            self._api.log.info("Add an interval job %s." % str(job))
         except:
             self._api.log.error("_start_jobInterval : " + \
                 traceback.format_exc())
@@ -439,8 +437,7 @@ class CronJobs():
                 second=second, start_date=startdate, args=[device])
             self.data[device]['apjob'] = job
             self._job_started(device)
-            self._api.log.info("_start_jobCron : add a cron \
-                job %s" % str(job))
+            self._api.log.info("Add a cron job %s." % str(job))
         except:
             self._api.log.error("_start_jobCron : " + \
                 traceback.format_exc())
@@ -630,8 +627,7 @@ class CronJobs():
                             args=[device, parameters, events[d][h]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobHvac : add a \
-                    hvac job %s" % str(jobs))
+                self._api.log.info("Add an hvac job %s." % str(jobs))
         except:
             self._api.log.error("_start_jobHvac : " + \
                 traceback.format_exc())
@@ -759,8 +755,7 @@ class CronJobs():
                                 args=[device, parameters, events[d][h]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobAlarm : add a \
-                    alarm job %s" % str(jobs))
+                self._api.log.info("Add an alarm job %s." % str(jobs))
         except:
             self._api.log.error("_start_jobAlarm : " + \
                 traceback.format_exc())
@@ -931,8 +926,12 @@ class CronJobs():
                         i = i+1
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobDawnAlarm : add a \
-                    dawnalarm job %s" % str(jobs))
+                talarms = ""
+                if type(self.data[device]["alarm"]) == type(""):
+                    self._api.log.info("Add a dawnalarm job %s." % str(self.data[device]["alarm"]))
+                else :
+                    for alar in self.data[device]["alarm"] :
+                        self._api.log.info("Add a dawnalarm job %s." % str(alar))
         except:
             self._api.log.error("_start_jobDawnAlarm : " + \
                 traceback.format_exc())
@@ -1402,6 +1401,7 @@ class CronAPI:
         self.log.debug("cronAPI._actionHalt : Start ...")
         self._send_xpl_trig(myxpl, device, "halted", \
             self.jobs.halt_job(device))
+        self.log.debug("Halt job :)")
         self.log.debug("cronAPI._actionHalt : Done :)")
 
     def _action_start(self, myxpl, device, message):
@@ -1456,7 +1456,7 @@ class CronAPI:
             mess.add_data({"elapsed" : self.jobs.get_up_time(device)})
             mess.add_data({"runtime" : self.jobs.get_run_time(device)})
             mess.add_data({"runs" : self.jobs.get_runs(device)})
-            self.log.info("cronAPI._send_xpl_trig : Send okk xpl-trig :)")
+            self.log.debug("cronAPI._send_xpl_trig : Send okk xpl-trig :)")
         else:
             if device in self.jobs.data:
                 mess.add_data({"current" : self.jobs.data[device]['current']})
@@ -1467,6 +1467,6 @@ class CronAPI:
                 mess.add_data({"elasped" :  0})
                 mess.add_data({"current" : "halted"})
             mess.add_data(self.tools.error(error))
-            self.log.info("cronAPI._send_xpl_trig : Send error xpl-trig :(")
+            self.log.debug("cronAPI._send_xpl_trig : Send error xpl-trig :(")
         myxpl.send(mess)
         self.log.debug("cronAPI._send_xpl_trig : Done :)")

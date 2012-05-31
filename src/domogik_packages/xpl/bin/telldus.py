@@ -76,7 +76,7 @@ class Telldus(XplHlpPlugin):
         """
         XplHlpPlugin.__init__(self, name = 'telldus',
             reload_cb = self.telldus_reload_config_cb)
-        self.log.info("telldus.__init__ : Start ...")
+        self.log.debug("telldus.__init__ : Start ...")
         self._device = "/dev/tellstick"
         #Check if the device exists
         if not os.path.exists(self._device):

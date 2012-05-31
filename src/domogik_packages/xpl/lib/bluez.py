@@ -35,7 +35,6 @@ class BluezAPI
 import traceback
 from domogik.xpl.common.xplmessage import XplMessage
 import bluetooth
-import datetime
 import threading
 #import logging
 #logging.basicConfig()
@@ -106,6 +105,7 @@ class BluezAPI:
                      (traceback.format_exc())
             self.log.error("reload_config : " + error)
         #self.log.debug("reload_config : _target=%s" % self._targets)
+        self.log.info("Found %s bluetooth devices in configuration." % (num-1))
         self.log.debug("reload_config : Done")
 
     def start_adaptator(self):
@@ -122,6 +122,7 @@ class BluezAPI:
                                             {})
             self._thread.start()
             self._state = "started"
+        self.log.info("Bluetooth detector activated.")
         self.log.debug("start_adaptator : Done :)")
 
     def stop_adaptator(self):
@@ -130,6 +131,7 @@ class BluezAPI:
         """
         self.log.debug("stop_adaptator : Start ...")
         if self._state != "stopped":
+            self.log.info("Bluetooth detector deactivated.")
             self._state = "stopped"
             self._thread = None
             for aaddr in self._targets:
@@ -268,7 +270,7 @@ for device %s" % (action, device))
                          (traceback.format_exc())
                 self.log.debug("basic_listener : "+error)
         else:
-                self.log.warning("basic_listener : action %s received \
+            self.log.warning("basic_listener : action %s received \
 for unknown device %s" % (action, device))
 
     def _action_status(self, myxpl, device):
