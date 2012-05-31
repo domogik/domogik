@@ -349,7 +349,7 @@ class TelldusAPI:
             elif devicetype == TELLDUS_SHUTTER :
                 self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
             elif devicetype == TELLDUS_BUTTON :
-                self.send_xpl_telldus_basic(self, xpltype, deviceid, method, value)
+                self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
                 self._buttons.act(self._telldusd.get_device(deviceid), method, value)
         else :
             self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
@@ -466,6 +466,15 @@ class TelldusAPI:
             self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, 0)
             self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, 0)
             self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, 0)
+        elif method == TELLDUS_SHUT  :
+            if value == 0 :
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_DOWN, 0)
+            elif value == 100 :
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_UP, 100)
+        elif method == TELLSTICK_UP  :
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_SHUT, 100)
+        elif method == TELLSTICK_DOWN  :
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_SHUT, 0)
         self.send_xpl("xpl-trig", deviceid, method, value)
         self.log.debug("send_xpl_ack : Done")
 
@@ -704,10 +713,6 @@ class TelldusAPI:
         #print " CHANGE : address: %s, level: %s" % (device, level)
         deviceid = self.get_device_id(device)
         old = self._deviceeventq.get_last_sent(deviceid)
-        if device in self._config:
-            devicetype = self._config[device]['devicetype']
-            if devicetype == TELLDUS_SHUTTER:
-                downtime = float(self._config[device]['param1'])
 #        print "old %s = %s" % (deviceid,old)
         if level == None or level == "None":
             level = "0"
@@ -1289,7 +1294,6 @@ class SensorEventQueue:
         if self._telldusd:
             self._telldusd.unregister_sensor_event()
         #print "DeviceEventQueue.__del__ is called"
-
 
     def memory_usage(self, which):
         '''
