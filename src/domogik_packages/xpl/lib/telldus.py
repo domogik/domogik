@@ -811,6 +811,8 @@ class TelldusAPI:
         #print " SHUT : address: %s, level: %s" % (device, level)
         deviceid = self.get_device_id(device)
         downtime = 15
+        if level == None or level == "None":
+            level = "0"
         level = int(level)
         if device in self._config:
             devicetype = self._config[device]['devicetype']
