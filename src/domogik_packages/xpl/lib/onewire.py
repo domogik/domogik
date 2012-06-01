@@ -342,7 +342,10 @@ class ComponentDs2408:
             for comp in self.chain(self.root.find(type = "DS2408"),self.root.find(type = "DS2406"),self.root.find(type = "DS2405")):
                 my_id = comp.family+"."+comp.id
                 try:
-                    PIO_ALL = comp.PIO_ALL
+                    if comp.family == "05":
+                        PIO_ALL = comp.PIO
+                    else:
+                        PIO_ALL = comp.PIO_ALL
                     print("PIO.ALL=%s" % PIO_ALL)
 
                 except AttributeError:
