@@ -39,7 +39,7 @@
             "name": "Humidity", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "data", 
+            "stat_key": "humidity", 
             "value_type": "number"
         }, 
         {
@@ -49,7 +49,7 @@
             "name": "Temperature", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "data", 
+            "stat_key": "temperature", 
             "value_type": "number"
         },
         {
