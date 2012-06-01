@@ -105,7 +105,7 @@
         "src/share/domogik/plugins/pyozw.json", 
         "src/share/domogik/stats/pyozw/sensor.basic-pyozw.xml",
         "src/domogik_packages/xpl/bin/pyozw.py", 
-        "src/domogik_packages/xpl/lib/pyozw.py", 
+        "src/domogik_packages/xpl/lib/pyozw.py"
     ], 
     "identity": {
         "author": "Kriss", 
