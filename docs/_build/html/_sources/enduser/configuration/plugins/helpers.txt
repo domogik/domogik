@@ -92,7 +92,7 @@ Example: ::
 Missing parameter(s)
 ^^^^^^^^^^^^^^^^^^^^
 
-.. code:: bash
+.. code-block:: bash
 
     $ onewire all
     Missing parameters.

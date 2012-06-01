@@ -75,7 +75,8 @@ You should do this only for test or demonstration purposes.</p>
 <p>See here for an <a class="reference external" href="http://docs.djangoproject.com/en/dev/howto/deployment/modwsgi">exhaustive description about mod_wsgi</a>.</p>
 <div class="section" id="configure-mod-wsgi">
 <h3>Configure mod_wsgi<a class="headerlink" href="#configure-mod-wsgi" title="Permalink to this headline">¶</a></h3>
-<div class="code bash highlight-python"><pre>$ apt-get install libapache2-mod-wsgi</pre>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>apt-get install libapache2-mod-wsgi
+</pre></div>
 </div>
 <p>Then check your <em>/usr/lib/apache2/modules</em> directory and make sure the file <em>mod_wsgi.so</em> is pointing to <em>mod_wsgi.so-2.6</em>. If it&#8217;s not the case just do:</p>
 <div class="highlight-python"><pre>$ ln -sf /usr/lib/apache2/modules/mod_wsgi.so-2.6 /usr/lib/apache2/modules/mod_wsgi.so</pre>
@@ -85,7 +86,7 @@ You should do this only for test or demonstration purposes.</p>
 <h3>Create your wsgi file<a class="headerlink" href="#create-your-wsgi-file" title="Permalink to this headline">¶</a></h3>
 <p>At the top of the django directory (ie where <em>settings.py</em> lives) create a subdirectory named <em>apache</em>.
 Create in this directory a file named <em>django.wsgi</em> with this content (eventually adapt the python path to your needs):</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python2.6</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python2.6</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">site</span>
 <span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="s">&#39;/usr/local/lib/python2.6/dist-packages&#39;</span><span class="p">)</span>

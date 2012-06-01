@@ -27,7 +27,7 @@ Developper notes
 ================
 Url description
 ---------------
-.. code::
+.. code-block:: none
 
     http://ip:port/command/<technology>/<address>/<command>/command [/...]
 
@@ -116,7 +116,7 @@ So, several plugins can provide the same xml files. This problem is solved at pl
 
 Xml file description
 ^^^^^^^^^^^^^^^^^^^^
-.. code:: xml
+.. code-block:: xml
 
     <technology id="Technology given in URL">
       <command name="Command given in URL">
@@ -171,7 +171,7 @@ This is useful for nasty schemas which defines "command=command_name command_att
 
 Example for http://ip:port/command/plcbus/A3/on
 """""""""""""""""""""""""""""""""""""""""""""""
-.. code:: xml
+.. code-block:: xml
 
     <technology id="plcbus">
       <command name="on">
@@ -193,7 +193,7 @@ Example for http://ip:port/command/plcbus/A3/on
 
 Example for http://ip:port/command/plcbus/A4/dim/55
 """""""""""""""""""""""""""""""""""""""""""""""""""
-.. code:: xml
+.. code-block:: xml
 
     <technology id="plcbus">
       <command name="dim">
@@ -217,7 +217,7 @@ Example for http://ip:port/command/plcbus/A4/dim/55
 
 Example for http://ip:port/command/computer/<computer name>/wol
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-.. code:: xml
+.. code-block:: xml
 
     <technology id="computer">
       <command name="wol">

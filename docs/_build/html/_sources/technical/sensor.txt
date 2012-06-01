@@ -60,11 +60,11 @@ Service.Teleinfo
 
 Communication.caller_id
 -----------------------
-======= ========= ========= ===========
-name    value     parameter stat key
-======= ========= ========= ===========
-Caller  id|string           phone
-======= ========= ========= ===========
+========= ========= ========= ===========
+name      value     parameter stat key
+========= ========= ========= ===========
+Caller id string              phone
+========= ========= ========= ===========
 
 Computer.Control 
 ----------------

@@ -41,7 +41,7 @@ API
 
 Create a new event request
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     /events/domogik/new
 
@@ -64,7 +64,7 @@ You will get: ::
 
 Make a request for an event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     /events/domogik/get/<ticket id>
 
@@ -72,7 +72,7 @@ The response format is like /new response.
 
 Free request for an event
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     /events/domogik/free/<ticket id>
 
@@ -84,7 +84,7 @@ API
 
 Create a new event request
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     /events/request/new/<device id 0>/<device id 1>/<device id 2>/....
 
@@ -115,7 +115,7 @@ Example of response for a device with 2 keys stored in database (command and lev
 
 Make a request for an event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     /events/request/get/<ticket id>
 
@@ -123,7 +123,7 @@ The response format is like /new response.
 
 Free request for an event
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     /events/request/free/<ticket id>
 

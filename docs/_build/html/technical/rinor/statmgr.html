@@ -99,67 +99,68 @@ So, several plugins can provide the same xml files. This problem is solved at pl
 <li>a listener for the xpl schema</li>
 <li>a mapping for the listener between xpl schema elements and database</li>
 </ul>
-<div class="code xml highlight-python"><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;!-- All xml definition files must be in &lt;domogik.cfg_path&gt;/xml directory,
-    one mapping definintion per file.
---&gt;
-&lt;!-- statistic : root element
-attribute technology is mandatory
-It specifies the technology for which this mapping is used.
---&gt;
-&lt;statistic technology="plcbus"&gt;
-    &lt;schema name="control.basic"&gt;
-        &lt;xpltype type="xpl-trig"&gt;
-            &lt;listener&gt;
-                &lt;filter&gt;
-                    &lt;!-- list of 'key' nodes.
-                    each node must have 2 parameters :
-                        - name : the "key" of the pair
-                        - command : the "value" of the pair
-                        A message will be loggued only if schema and xpltype are corrects,
-                        and only if for all "key" nodes specified, there is a name=value pair in the message.
-                    --&gt;
-                    &lt;key name="type" value="plcbus" /&gt;
-                    &lt;key name="command" value="on" /&gt;
-                &lt;/filter&gt;
-            &lt;/listener&gt;
-            &lt;mapping&gt; &lt;!-- define the mapping between message keys and the database --&gt;
-                &lt;device field="device"/&gt;
-                &lt;!-- define the field containing device name/address
-                     If there is no field containing device addres, you can use 'static_name' attribute to define a name. Use with caution and only when there is no other choice :
-                     &lt;device static_name="foo"/&gt;
-                     If it is a notification message, use this :
-                     &lt;device type="notification"/&gt;
-                --&gt;
-                &lt;!-- The "value" node can have 2 attributes :
-                    - field : mandatory ! define the key of the pair key=value to get in the Xpl message
-                    - new_name: optionnal, if it's define, the 'name' of this value entry will be the value defined,
-                            else it will be the filed name.
-                    - filter_key : define one key to read for adding a filter on renaming name in new_name
-                    - filter_value : the value for the filter
-                    - history_size : optionnal, indicate number of values to keep in database for a device key
-                --&gt;
-                &lt;value field="command"/&gt;
-                &lt;value field="command" history_size="5"/&gt;
-                &lt;value field="command" new_name="bar" /&gt;
-                &lt;value field="command" new_name="foo" filter_key="type" filter_value="plcbus" /&gt;
-            &lt;/mapping&gt;
-        &lt;/xpltype&gt;
-        &lt;xpltype type="xpl-stat"&gt;
-            &lt;listener&gt;
-                &lt;filter&gt;
-                    &lt;key name="type" value="plcbus" /&gt;
-                    &lt;key name="command" value="off" /&gt;
-                &lt;/filter&gt;
-            &lt;/listener&gt;
-            &lt;mapping&gt; &lt;!-- define the mapping between message keys and the database --&gt;
-                &lt;device field="device"/&gt; &lt;!-- define the device name --&gt;
-                &lt;value field="command"/&gt;
-                &lt;value field="command" name="bar" /&gt;
-            &lt;/mapping&gt;
-        &lt;/xpltype&gt;
-    &lt;/schema&gt;
-&lt;/statistic&gt;</pre>
+<div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="c">&lt;!-- All xml definition files must be in &lt;domogik.cfg_path&gt;/xml directory,</span>
+<span class="c">    one mapping definintion per file.</span>
+<span class="c">--&gt;</span>
+<span class="c">&lt;!-- statistic : root element</span>
+<span class="c">attribute technology is mandatory</span>
+<span class="c">It specifies the technology for which this mapping is used.</span>
+<span class="c">--&gt;</span>
+<span class="nt">&lt;statistic</span> <span class="na">technology=</span><span class="s">&quot;plcbus&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;schema</span> <span class="na">name=</span><span class="s">&quot;control.basic&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xpltype</span> <span class="na">type=</span><span class="s">&quot;xpl-trig&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;listener&gt;</span>
+                <span class="nt">&lt;filter&gt;</span>
+                    <span class="c">&lt;!-- list of &#39;key&#39; nodes.</span>
+<span class="c">                    each node must have 2 parameters :</span>
+<span class="c">                        - name : the &quot;key&quot; of the pair</span>
+<span class="c">                        - command : the &quot;value&quot; of the pair</span>
+<span class="c">                        A message will be loggued only if schema and xpltype are corrects,</span>
+<span class="c">                        and only if for all &quot;key&quot; nodes specified, there is a name=value pair in the message.</span>
+<span class="c">                    --&gt;</span>
+                    <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;type&quot;</span> <span class="na">value=</span><span class="s">&quot;plcbus&quot;</span> <span class="nt">/&gt;</span>
+                    <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;command&quot;</span> <span class="na">value=</span><span class="s">&quot;on&quot;</span> <span class="nt">/&gt;</span>
+                <span class="nt">&lt;/filter&gt;</span>
+            <span class="nt">&lt;/listener&gt;</span>
+            <span class="nt">&lt;mapping&gt;</span> <span class="c">&lt;!-- define the mapping between message keys and the database --&gt;</span>
+                <span class="nt">&lt;device</span> <span class="na">field=</span><span class="s">&quot;device&quot;</span><span class="nt">/&gt;</span>
+                <span class="c">&lt;!-- define the field containing device name/address</span>
+<span class="c">                     If there is no field containing device addres, you can use &#39;static_name&#39; attribute to define a name. Use with caution and only when there is no other choice :</span>
+<span class="c">                     &lt;device static_name=&quot;foo&quot;/&gt;</span>
+<span class="c">                     If it is a notification message, use this :</span>
+<span class="c">                     &lt;device type=&quot;notification&quot;/&gt;</span>
+<span class="c">                --&gt;</span>
+                <span class="c">&lt;!-- The &quot;value&quot; node can have 2 attributes :</span>
+<span class="c">                    - field : mandatory ! define the key of the pair key=value to get in the Xpl message</span>
+<span class="c">                    - new_name: optionnal, if it&#39;s define, the &#39;name&#39; of this value entry will be the value defined,</span>
+<span class="c">                            else it will be the filed name.</span>
+<span class="c">                    - filter_key : define one key to read for adding a filter on renaming name in new_name</span>
+<span class="c">                    - filter_value : the value for the filter</span>
+<span class="c">                    - history_size : optionnal, indicate number of values to keep in database for a device key</span>
+<span class="c">                --&gt;</span>
+                <span class="nt">&lt;value</span> <span class="na">field=</span><span class="s">&quot;command&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;value</span> <span class="na">field=</span><span class="s">&quot;command&quot;</span> <span class="na">history_size=</span><span class="s">&quot;5&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;value</span> <span class="na">field=</span><span class="s">&quot;command&quot;</span> <span class="na">new_name=</span><span class="s">&quot;bar&quot;</span> <span class="nt">/&gt;</span>
+                <span class="nt">&lt;value</span> <span class="na">field=</span><span class="s">&quot;command&quot;</span> <span class="na">new_name=</span><span class="s">&quot;foo&quot;</span> <span class="na">filter_key=</span><span class="s">&quot;type&quot;</span> <span class="na">filter_value=</span><span class="s">&quot;plcbus&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;/mapping&gt;</span>
+        <span class="nt">&lt;/xpltype&gt;</span>
+        <span class="nt">&lt;xpltype</span> <span class="na">type=</span><span class="s">&quot;xpl-stat&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;listener&gt;</span>
+                <span class="nt">&lt;filter&gt;</span>
+                    <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;type&quot;</span> <span class="na">value=</span><span class="s">&quot;plcbus&quot;</span> <span class="nt">/&gt;</span>
+                    <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;command&quot;</span> <span class="na">value=</span><span class="s">&quot;off&quot;</span> <span class="nt">/&gt;</span>
+                <span class="nt">&lt;/filter&gt;</span>
+            <span class="nt">&lt;/listener&gt;</span>
+            <span class="nt">&lt;mapping&gt;</span> <span class="c">&lt;!-- define the mapping between message keys and the database --&gt;</span>
+                <span class="nt">&lt;device</span> <span class="na">field=</span><span class="s">&quot;device&quot;</span><span class="nt">/&gt;</span> <span class="c">&lt;!-- define the device name --&gt;</span>
+                <span class="nt">&lt;value</span> <span class="na">field=</span><span class="s">&quot;command&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;value</span> <span class="na">field=</span><span class="s">&quot;command&quot;</span> <span class="na">name=</span><span class="s">&quot;bar&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;/mapping&gt;</span>
+        <span class="nt">&lt;/xpltype&gt;</span>
+    <span class="nt">&lt;/schema&gt;</span>
+<span class="nt">&lt;/statistic&gt;</span>
+</pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>

@@ -43,7 +43,7 @@ A xml file for statmgr defines :
 * a listener for the xpl schema
 * a mapping for the listener between xpl schema elements and database 
 
-.. code:: xml
+.. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8"?>
     <!-- All xml definition files must be in <domogik.cfg_path>/xml directory,

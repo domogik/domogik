@@ -66,7 +66,7 @@ Example
 ^^^^^^^
 **/stats/4/temperature/from/1286226613/to/1286500000**
 
-.. code::
+.. code-block:: python
 
     {
         "status" : "OK",
@@ -117,7 +117,7 @@ Result : for performance issue, the return format is different from /all. Follow
 
 Tuples format
 ^^^^^^^^^^^^^
-.. code::
+.. code-block:: none
 
     # Minutes
     # Format : (year, month, week, day, hour, min, value)
@@ -145,7 +145,7 @@ Example
 ^^^^^^^
 **/stats/4/temperature/from/1286226613/to/1286500000/interval/hour/selector/avg**
 
-.. code::
+.. code-block:: python
 
     {
         "status" : "OK",

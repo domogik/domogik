@@ -114,7 +114,7 @@
 <div class="section" id="example">
 <h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
 <p><strong>/stats/4/temperature/from/1286226613/to/1286500000</strong></p>
-<div class="code highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
     <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>
@@ -167,34 +167,34 @@
 </ul>
 <div class="section" id="tuples-format">
 <h4>Tuples format<a class="headerlink" href="#tuples-format" title="Permalink to this headline">¶</a></h4>
-<div class="code highlight-python"><div class="highlight"><pre><span class="c"># Minutes</span>
-<span class="c"># Format : (year, month, week, day, hour, min, value)</span>
-<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mf">56.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mf">62.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mf">68.5</span><span class="p">),</span>
-<span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">74.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">80.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">86.5</span><span class="p">)]</span>
+<div class="highlight-none"><div class="highlight"><pre># Minutes
+# Format : (year, month, week, day, hour, min, value)
+[(2010, 2, 7, 21, 15, 57, 56.5), (2010, 2, 7, 21, 15, 58, 62.5), (2010, 2, 7, 21, 15, 59, 68.5),
+(2010, 2, 7, 21, 16, 0, 74.5), (2010, 2, 7, 21, 16, 1, 80.5), (2010, 2, 7, 21, 16, 2, 86.5)]
 
-<span class="c"># Hours</span>
-<span class="c"># Format : (year, month, week, day, hour, value)</span>
-<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mf">38.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mf">41.5</span><span class="p">),</span>
- <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">45.5</span><span class="p">),</span>
- <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">)]</span>
+# Hours
+# Format : (year, month, week, day, hour, value)
+[(2010, 6, 25, 22, 19, 38.5), (2010, 6, 25, 22, 20, 40.0), (2010, 6, 25, 22, 21, 41.5),
+ (2010, 6, 25, 22, 22, 43.0), (2010, 6, 25, 22, 23, 44.0), (2010, 6, 25, 23, 0, 45.5),
+ (2010, 6, 25, 23, 1, 47.0), (2010, 6, 25, 23, 2, 48.0)]
 
-<span class="c"># Days</span>
-<span class="c"># Format : (year, month, week, day, value)</span>
-<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">),</span>
- <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">)]</span>
+# Days
+# Format : (year, month, week, day, value)
+[(2010, 6, 25, 22, 4.0), (2010, 6, 25, 23, 6.0), (2010, 6, 25, 24, 9.0), (2010, 6, 25, 25, 12.0),
+ (2010, 6, 25, 26, 15.0), (2010, 6, 25, 27, 18.0), (2010, 6, 26, 28, 21.0)]
 
-<span class="c"># Weeks</span>
-<span class="c"># Format : (year, month, week, value)</span>
-<span class="p">[(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">35.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mf">49.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mf">63.5</span><span class="p">),</span>
- <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mf">77.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mf">88.0</span><span class="p">)]</span>
-<span class="p">{</span><span class="n">CODE</span><span class="p">}</span>
+# Weeks
+# Format : (year, month, week, value)
+[(2010, 7, 29, 25.0), (2010, 7, 30, 35.5), (2010, 8, 31, 49.5), (2010, 8, 32, 63.5),
+ (2010, 8, 33, 77.5), (2010, 8, 34, 88.0)]
+{CODE}
 </pre></div>
 </div>
 </div>
 <div class="section" id="id1">
 <h4>Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <p><strong>/stats/4/temperature/from/1286226613/to/1286500000/interval/hour/selector/avg</strong></p>
-<div class="code highlight-python"><div class="highlight"><pre><span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;status&quot;</span> <span class="p">:</span> <span class="s">&quot;OK&quot;</span><span class="p">,</span>
     <span class="s">&quot;code&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="s">&quot;description&quot;</span> <span class="p">:</span> <span class="s">&quot;None&quot;</span><span class="p">,</span>

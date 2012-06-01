@@ -76,7 +76,8 @@ device=A3
 <h2>Developper notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="url-description">
 <h3>Url description<a class="headerlink" href="#url-description" title="Permalink to this headline">¶</a></h3>
-<div class="code highlight-python"><pre>http://ip:port/command/&lt;technology&gt;/&lt;address&gt;/&lt;command&gt;/command [/...]</pre>
+<div class="highlight-none"><div class="highlight"><pre>http://ip:port/command/&lt;technology&gt;/&lt;address&gt;/&lt;command&gt;/command [/...]
+</pre></div>
 </div>
 <p>The goal is to be able to generate a xpl message based on a simple url.</p>
 <p>The url must use one of these layouts:</p>
@@ -170,7 +171,7 @@ So, several plugins can provide the same xml files. This problem is solved at pl
 </div>
 <div class="section" id="xml-file-description">
 <h4>Xml file description<a class="headerlink" href="#xml-file-description" title="Permalink to this headline">¶</a></h4>
-<div class="code xml highlight-python"><pre>&lt;technology id="Technology given in URL"&gt;
+<div class="highlight-xml"><pre>&lt;technology id="Technology given in URL"&gt;
   &lt;command name="Command given in URL"&gt;
     &lt;schema&gt;xPL schema that will be used&lt;/schema&gt;
     &lt;command-key&gt;(optionnal) key in xPL schema which will contains the command given in URL&lt;/command-key&gt;
@@ -223,70 +224,73 @@ This is useful for nasty schemas which defines &#8220;command=command_name comma
 </div>
 <div class="section" id="example-for-http-ip-port-command-plcbus-a3-on">
 <h5>Example for <a class="reference external" href="http://ip:port/command/plcbus/A3/on">http://ip:port/command/plcbus/A3/on</a><a class="headerlink" href="#example-for-http-ip-port-command-plcbus-a3-on" title="Permalink to this headline">¶</a></h5>
-<div class="code xml highlight-python"><pre>&lt;technology id="plcbus"&gt;
-  &lt;command name="on"&gt;
-    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
-    &lt;command-key&gt;command&lt;/command-key&gt;
-    &lt;adress-key&gt;device&lt;/adress-key&gt;
-    &lt;command-xpl-value&gt;on&lt;/command-xpl-value&gt;
-    &lt;parameters/&gt;
-  &lt;/command&gt;
-  &lt;listener&gt;
-    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
-    &lt;xpltype&gt;xpl-trig&lt;/xpltype&gt;
-    &lt;filter&gt;
-      &lt;key name="command" value="on" /&gt;
-      &lt;key name="device" value="@address@"/&gt;
-    &lt;/filter&gt;
-  &lt;/listener&gt;
-&lt;/technology&gt;</pre>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;technology</span> <span class="na">id=</span><span class="s">&quot;plcbus&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;command</span> <span class="na">name=</span><span class="s">&quot;on&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;schema&gt;</span>plcbus.basic<span class="nt">&lt;/schema&gt;</span>
+    <span class="nt">&lt;command-key&gt;</span>command<span class="nt">&lt;/command-key&gt;</span>
+    <span class="nt">&lt;adress-key&gt;</span>device<span class="nt">&lt;/adress-key&gt;</span>
+    <span class="nt">&lt;command-xpl-value&gt;</span>on<span class="nt">&lt;/command-xpl-value&gt;</span>
+    <span class="nt">&lt;parameters/&gt;</span>
+  <span class="nt">&lt;/command&gt;</span>
+  <span class="nt">&lt;listener&gt;</span>
+    <span class="nt">&lt;schema&gt;</span>plcbus.basic<span class="nt">&lt;/schema&gt;</span>
+    <span class="nt">&lt;xpltype&gt;</span>xpl-trig<span class="nt">&lt;/xpltype&gt;</span>
+    <span class="nt">&lt;filter&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;command&quot;</span> <span class="na">value=</span><span class="s">&quot;on&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;device&quot;</span> <span class="na">value=</span><span class="s">&quot;@address@&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/filter&gt;</span>
+  <span class="nt">&lt;/listener&gt;</span>
+<span class="nt">&lt;/technology&gt;</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="example-for-http-ip-port-command-plcbus-a4-dim-55">
 <h5>Example for <a class="reference external" href="http://ip:port/command/plcbus/A4/dim/55">http://ip:port/command/plcbus/A4/dim/55</a><a class="headerlink" href="#example-for-http-ip-port-command-plcbus-a4-dim-55" title="Permalink to this headline">¶</a></h5>
-<div class="code xml highlight-python"><pre>&lt;technology id="plcbus"&gt;
-  &lt;command name="dim"&gt;
-    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
-    &lt;command-key&gt;command&lt;/command-key&gt;
-    &lt;adress-key&gt;device&lt;/adress-key&gt;
-    &lt;command-xpl-value&gt;dim&lt;/command-xpl-value&gt;
-    &lt;parameters&gt;
-      &lt;parameter key="value" location="1"/&gt;
-    &lt;/parameters&gt;
-  &lt;/command&gt;
-  &lt;listener&gt;
-    &lt;schema&gt;plcbus.basic&lt;/schema&gt;
-    &lt;xpltype&gt;xpl-trig&lt;/xpltype&gt;
-    &lt;filter&gt;
-      &lt;key name="command" value="dim" /&gt;
-      &lt;key name="device" value="@address@"/&gt;
-    &lt;/filter&gt;
-  &lt;/listener&gt;
-&lt;/technology&gt;</pre>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;technology</span> <span class="na">id=</span><span class="s">&quot;plcbus&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;command</span> <span class="na">name=</span><span class="s">&quot;dim&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;schema&gt;</span>plcbus.basic<span class="nt">&lt;/schema&gt;</span>
+    <span class="nt">&lt;command-key&gt;</span>command<span class="nt">&lt;/command-key&gt;</span>
+    <span class="nt">&lt;adress-key&gt;</span>device<span class="nt">&lt;/adress-key&gt;</span>
+    <span class="nt">&lt;command-xpl-value&gt;</span>dim<span class="nt">&lt;/command-xpl-value&gt;</span>
+    <span class="nt">&lt;parameters&gt;</span>
+      <span class="nt">&lt;parameter</span> <span class="na">key=</span><span class="s">&quot;value&quot;</span> <span class="na">location=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/parameters&gt;</span>
+  <span class="nt">&lt;/command&gt;</span>
+  <span class="nt">&lt;listener&gt;</span>
+    <span class="nt">&lt;schema&gt;</span>plcbus.basic<span class="nt">&lt;/schema&gt;</span>
+    <span class="nt">&lt;xpltype&gt;</span>xpl-trig<span class="nt">&lt;/xpltype&gt;</span>
+    <span class="nt">&lt;filter&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;command&quot;</span> <span class="na">value=</span><span class="s">&quot;dim&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;device&quot;</span> <span class="na">value=</span><span class="s">&quot;@address@&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/filter&gt;</span>
+  <span class="nt">&lt;/listener&gt;</span>
+<span class="nt">&lt;/technology&gt;</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="example-for-http-ip-port-command-computer-computer-name-wol">
 <h5>Example for <a class="reference external" href="http://ip:port/command/computer">http://ip:port/command/computer</a>/&lt;computer name&gt;/wol<a class="headerlink" href="#example-for-http-ip-port-command-computer-computer-name-wol" title="Permalink to this headline">¶</a></h5>
-<div class="code xml highlight-python"><pre>&lt;technology id="computer"&gt;
-  &lt;command name="wol"&gt;
-    &lt;schema&gt;command.basic&lt;/schema&gt;
-    &lt;command-key&gt;current&lt;/command-key&gt;
-    &lt;adress-key&gt;device&lt;/adress-key&gt;
-    &lt;command-xpl-value&gt;on&lt;/command-xpl-value&gt;
-    &lt;parameters&gt;
-      &lt;parameter key="type" value="wakeonlan"/&gt;
-    &lt;/parameters&gt;
-  &lt;/command&gt;
-  &lt;listener&gt;
-    &lt;schema&gt;sensor.basic&lt;/schema&gt;
-    &lt;xpltype&gt;xpl-trig&lt;/xpltype&gt;
-    &lt;filter&gt;
-      &lt;key name="type" value="wakeonlan" /&gt;
-      &lt;key name="current" value="on" /&gt;
-      &lt;key name="device" value="@address@"/&gt;
-    &lt;/filter&gt;
-  &lt;/listener&gt;
-&lt;/technology&gt;</pre>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;technology</span> <span class="na">id=</span><span class="s">&quot;computer&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;command</span> <span class="na">name=</span><span class="s">&quot;wol&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;schema&gt;</span>command.basic<span class="nt">&lt;/schema&gt;</span>
+    <span class="nt">&lt;command-key&gt;</span>current<span class="nt">&lt;/command-key&gt;</span>
+    <span class="nt">&lt;adress-key&gt;</span>device<span class="nt">&lt;/adress-key&gt;</span>
+    <span class="nt">&lt;command-xpl-value&gt;</span>on<span class="nt">&lt;/command-xpl-value&gt;</span>
+    <span class="nt">&lt;parameters&gt;</span>
+      <span class="nt">&lt;parameter</span> <span class="na">key=</span><span class="s">&quot;type&quot;</span> <span class="na">value=</span><span class="s">&quot;wakeonlan&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/parameters&gt;</span>
+  <span class="nt">&lt;/command&gt;</span>
+  <span class="nt">&lt;listener&gt;</span>
+    <span class="nt">&lt;schema&gt;</span>sensor.basic<span class="nt">&lt;/schema&gt;</span>
+    <span class="nt">&lt;xpltype&gt;</span>xpl-trig<span class="nt">&lt;/xpltype&gt;</span>
+    <span class="nt">&lt;filter&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;type&quot;</span> <span class="na">value=</span><span class="s">&quot;wakeonlan&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;current&quot;</span> <span class="na">value=</span><span class="s">&quot;on&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;key</span> <span class="na">name=</span><span class="s">&quot;device&quot;</span> <span class="na">value=</span><span class="s">&quot;@address@&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/filter&gt;</span>
+  <span class="nt">&lt;/listener&gt;</span>
+<span class="nt">&lt;/technology&gt;</span>
+</pre></div>
 </div>
 </div>
 </div>

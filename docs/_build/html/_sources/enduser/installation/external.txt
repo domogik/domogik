@@ -22,7 +22,7 @@ See here for an `exhaustive description about mod_wsgi <http://docs.djangoprojec
 
 Configure mod_wsgi
 ------------------
-.. code:: bash
+.. code-block:: bash
 
     $ apt-get install libapache2-mod-wsgi
 
@@ -35,7 +35,7 @@ Create your wsgi file
 At the top of the django directory (ie where *settings.py* lives) create a subdirectory named *apache*.
 Create in this directory a file named *django.wsgi* with this content (eventually adapt the python path to your needs):
 
-.. code:: python
+.. code-block:: python
 
     #!/usr/bin/python2.6
     import os
