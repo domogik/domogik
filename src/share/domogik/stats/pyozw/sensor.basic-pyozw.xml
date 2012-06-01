@@ -7,6 +7,7 @@
                     <key name="type" value="Temperature"/>
                     <key name="type" value="Relative Humidity"/>
                     <key name="type" value="Battery Level"/>
+                    <key name="type" value="Sensor"/>
                 </filter>
             </listener>
             <mapping>
@@ -18,6 +19,8 @@
                        filter_key="type" filter_value="Relative Humidity" />
                 <value field="current" new_name="battery"
                        filter_key="type" filter_value="Battery Level" />
+                <value field="current" new_name="status"
+                       filter_key="type" filter_value="Sensor" />
             </mapping>
         </xpltype>
     </schema>

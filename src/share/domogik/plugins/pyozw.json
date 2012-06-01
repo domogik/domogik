@@ -60,7 +60,7 @@
             "parameters": "{}",
             "return_confirmation": "0",
             "stat_key": "battery",
-            "value_type": "string"
+            "value_type": "number"
         },
         {
             "device_type_id": "pyozw.sensor",
@@ -80,7 +80,7 @@
             "parameters": "{}",
             "return_confirmation": "0",
             "stat_key": "battery",
-            "value_type": "string"
+            "value_type": "number"
         }
     ], 
     "device_types": [
