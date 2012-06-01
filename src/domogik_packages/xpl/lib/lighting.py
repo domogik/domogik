@@ -91,6 +91,7 @@ class LightingAPI():
             'scndel': lambda x,m: self._gateway.scenes.cmnd_scndel(x, m),
             'scnadddev': lambda x,m: self._gateway.scenes.cmnd_scnadddev(x, m),
             'scndeldev': lambda x,m: self._gateway.scenes.cmnd_scndeldev(x, m),
+            'devinfo': lambda x,m: self._gateway.scenes.cmnd_devinfo(x, m),
         }
         try:
             command = None

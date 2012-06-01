@@ -262,6 +262,22 @@ class LightingScene():
             ret.append(res)
         return ret
 
+    def device_info(self, device):
+        """
+        Return informations about a scene.
+        """
+        ret = list()
+        nbscene = 0
+        for scene in self._scenes:
+            nbscene = nbscene + 1
+            for cha in self._scenes[scene]["devices"][device]:
+                res = ""
+                res = scene + "," + str(cha)
+                res = res + "," + str(self._scenes[scene]["devices"][device][cha]["level"])
+                res = res+"," + str(self._scenes[scene]["devices"][device][cha]["fade-rate"])
+                ret.append(res)
+        return ret,nbscenes
+
     def device_scene_info(self, scene, device):
         """
         Return device configuration in a scene.
@@ -382,6 +398,85 @@ class LightingScene():
                 infs = self.device_info(scene, dev)
                 for d in infs:
                     mess.add_data({"device" :  d})
+        myxpl.send(mess)
+
+    def cmnd_devinfo(self, myxpl, message):
+        """
+        @param myxpl : The XPL sender
+        @param message : The XPL message
+
+        lighting.request
+
+        This allows a sender to learn about capabilities, networks, devices and scene that can be controlled and addressed
+
+         request=[gateinfo|netlist|netinfo|devlist|devinfo|devstate|scnlist|scninfo]
+         [network=ID]
+         [[device=ID]|[scene=ID]][channel=#]
+
+        lighting.devinfo
+
+        Provides detailed information about a specific device
+
+        "hop=1\n"
+        "source=domogik-lighting.satellitep100\n"
+        "target=*\n"
+        "}\n"
+        "lighting.devconf\n"
+        "{\n"
+        "status=ok\n"
+        "device=ARRGB1\n"
+        "name=Ar_Light RGB\n"
+        "report-on-manual=false\n"
+        "room=Salle a manger\n"
+        "scene-count=2\n"
+        "scene=samall,1,AA,0\n"
+        "scene=samall,2,OC,0\n"
+        "scene=samall,3,FF,0\n"
+        "scene=samamb,1,BB,0\n"
+        "scene=samamb,2,OC,0\n"
+        "scene=samamb,3,EE,0\n"
+        "scene=cuiall,0,CC,0\n"
+        "scene=cuibll,0,AA,0\n"
+        "scene=cuicll,0,BB,0\n"
+        "scene=cuidll,0,DD,0\n"
+        "}\n"
+
+         network=ID
+         device=ID
+         status=[ok|not-found]
+         name=[device name, if known]
+         report-on-manual=[true|false]
+         [room=room name]
+         [floor=floor name]
+         [comment=comments]
+         [manufacturer=id,name]
+         [product=id,name]
+         [firmware-version=x.y]
+         channel-count=#
+         primary-channel=#
+         channel=#,is-dimmable (true/false),default-fade-rate,level(0-100)
+         scene-count=#
+         scene=sceneID,channel,level,fade-rate
+        """
+        #print "scene info"
+        mess = XplMessage()
+        mess.set_type("xpl-stat")
+        mess.set_schema("lighting.config")
+        mess.add_data({"command" : "devinfo"})
+        device = None
+        if 'device' in message.data:
+            device = message.data['device']
+        if 'client' in message.data:
+            mess.add_data({"client" : message.data['client']})
+        if device == None:
+            mess.add_data({"device" : "None"})
+            mess.add_data({"status" : "not-found"})
+        else:
+            mess.add_data({"status" : "ok"})
+            devinfos,scenecount = self.device_info(device)
+            for dev in devinfos :
+                mess.add_data({"scene" :  dev})
+            mess.add_data({"scene-count" : scenecount})
         myxpl.send(mess)
 
     def cmnd_scnlist(self, myxpl, message):
