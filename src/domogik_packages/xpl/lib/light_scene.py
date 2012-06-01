@@ -37,6 +37,9 @@ import os
 import glob
 from domogik.xpl.common.xplmessage import XplMessage
 #import traceback
+from threading import Timer
+
+SLEEP = 3
 
 class LightingScene():
     """
@@ -95,66 +98,24 @@ class LightingScene():
         self._scenes = {}
         self._store.load_all(self.new, self.add_device)
         self.fields = ["name", "room", "floor", "comment"]
+
+    def reload_config(self):
+        '''
+        Load devices into the _devices dictionnary
+        '''
         i = 0
         for scene in self._scenes:
             i = i + 1
-            self.trig_scninfo(scene)
+            timer = Timer(SLEEP*i, self.trig_scninfo, args=[scene])
+            timer.start()
+            #self.trig_scninfo(scene)
         self._gateway.log.info("Loaded %s scene from store." % i)
-#        self.new("cuiamb", name="Ambiance", room="Cuisine")
-#        self.add_device("cuiamb", "TS26")
-#        self.add_device("cuiamb", "TS30")
-#        self.new("cuiall", name="Toutes", room="Cuisine")
-#        self.add_device("cuiall", "TS2")
-#        self.add_device("cuiall", "TS21")
-#        self.add_device("cuiall", "TS25")
-#        self.add_device("cuiall", "TS26")
-#        self.add_device("cuiall", "TS27")
-#        self.add_device("cuiall", "TS28")
-#        self.add_device("cuiall", "TS29")
-#        self.add_device("cuiall", "TS30")
-#        self.new("samtv", name="TV Scene", room="Salle à manger")
-#        self.add_device("samtv", "TS34", level="0")
-#        self.add_device("samtv", "TS17", level="20")
-#        self.add_device("samtv", "TS35", level="20")
-#        self.add_device("samtv", "ARRGB1", channel=1, level="11")
-#        self.add_device("samtv", "ARRGB1", channel=2, level="22")
-#        self.add_device("samtv", "ARRGB1", channel=3, level="33")
-#        self.new("samoff", name="Off Scene", room="Salle à manger")
-#        self.add_device("samoff", "TS34", level="0")
-#        self.add_device("samoff", "TS17", level="0")
-#        self.add_device("samoff", "TS35", level="0")
-#        self.add_device("samoff", "ARRGB1", channel=1, level="0")
-#        self.add_device("samoff", "ARRGB1", channel=2, level="0")
-#        self.add_device("samoff", "ARRGB1", channel=3, level="0")
-#        self.new("samon", name="On Scene", room="Salle à manger")
-#        self.add_device("samon", "TS34", level="100")
-#        self.add_device("samon", "TS17", level="100")
-#        self.add_device("samon", "TS35", level="100")
-#        self.add_device("samon", "ARRGB1", channel=1, level="100")
-#        self.add_device("samon", "ARRGB1", channel=2, level="100")
-#        self.add_device("samon", "ARRGB1", channel=3, level="100")
-#        self.new("chsex", name="Sex Scene", room="Chambre")
-#        self.add_device("chsex", "TS5", level=10)
-#        self.add_device("chsex", "TS31", level=0)
-#        self.new("chtv", name="TV Scene", room="Chambre")
-#        self.add_device("chtv", "TS5", level=20)
-#        self.add_device("chtv", "TS31", level=0)
-#        self.new("choff", name="Off Scene", room="Chambre")
-#        self.add_device("choff", "TS32", level=0)
-#        self.add_device("choff", "TS31", level=0)
-#        self.new("chon", name="On Scene", room="Chambre")
-#        self.add_device("chon", "TS32", level=100)
-#        self.add_device("chon", "TS31", level=100)
-        print "scenes"
-        for scene in self._scenes:
-            print self._scenes[scene]
 
     def _new(self, scene, name="unknown", status="not-found",
              room=None, floor=None, comment=None):
         """
         Create a new scene. Internal method.
         """
-        ok = True
         self._scenes[scene] = {
             "name" : name,
             "status" : status,
@@ -163,15 +124,14 @@ class LightingScene():
             "comment" : comment,
             "devices" : {}
             }
-        return ok
+        return True
 
     def _remove(self, scene):
         """
         Delete a scene. Internal method.
         """
-        ok = True
         del(self._scenes[scene])
-        return ok
+        return True
 
     def new(self, scene, name="unknown", status="ok", room=None,
              floor=None, comment=None):
@@ -249,7 +209,7 @@ class LightingScene():
                 count = count+1
         return count
 
-    def device_info(self, scene, device):
+    def scene_device_info(self, scene, device):
         """
         Return informations about a scene.
         """
@@ -276,7 +236,7 @@ class LightingScene():
                 res = res + "," + str(self._scenes[scene]["devices"][device][cha]["level"])
                 res = res+"," + str(self._scenes[scene]["devices"][device][cha]["fade-rate"])
                 ret.append(res)
-        return ret,nbscenes
+        return ret, nbscene
 
     def device_scene_info(self, scene, device):
         """
@@ -334,7 +294,7 @@ class LightingScene():
                     mess.add_data({field : self._scenes[scene][field]})
             mess.add_data({"device-count" :  self.device_count(scene)})
             for dev in self._scenes[scene]["devices"]:
-                infs = self.device_info(scene, dev)
+                infs = self.scene_device_info(scene, dev)
                 for d in infs:
                     mess.add_data({"device" :  d})
         self._gateway.myxpl.send(mess)
@@ -395,7 +355,7 @@ class LightingScene():
                     mess.add_data({field : self._scenes[scene][field]})
             mess.add_data({"device-count" :  self.device_count(scene)})
             for dev in self._scenes[scene]["devices"]:
-                infs = self.device_info(scene, dev)
+                infs = self.scene_device_info(scene, dev)
                 for d in infs:
                     mess.add_data({"device" :  d})
         myxpl.send(mess)
@@ -473,7 +433,7 @@ class LightingScene():
             mess.add_data({"status" : "not-found"})
         else:
             mess.add_data({"status" : "ok"})
-            devinfos,scenecount = self.device_info(device)
+            devinfos, scenecount = self.device_info(device)
             for dev in devinfos :
                 mess.add_data({"scene" :  dev})
             mess.add_data({"scene-count" : scenecount})
