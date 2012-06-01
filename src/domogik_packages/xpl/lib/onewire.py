@@ -364,14 +364,14 @@ class ComponentDs2408:
                     print("type=%s, id=%s, PIO_ALL=%s" % (my_type, my_id, PIO_ALL))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "PIO_ALL",
-                                         "data0" : self.onewire.pio_map(my_id,0),
-                                         "data1" : self.onewire.pio_map(my_id,1),
-                                         "data2" : self.onewire.pio_map(my_id,2),
-                                         "data3" : self.onewire.pio_map(my_id,3),
-                                         "data4" : self.onewire.pio_map(my_id,4),
-                                         "data5" : self.onewire.pio_map(my_id,5),
-                                         "data6" : self.onewire.pio_map(my_id,6),
-                                         "data7" : self.onewire.pio_map(my_id,7),
+                                         "data0" : getattr(comp,self.onewire.pio_map(my_id,0)),
+                                         "data1" : getattr(comp,self.onewire.pio_map(my_id,1)),
+                                         "data2" : getattr(comp,self.onewire.pio_map(my_id,2)),
+                                         "data3" : getattr(comp,self.onewire.pio_map(my_id,3)),
+                                         "data4" : getattr(comp,self.onewire.pio_map(my_id,4)),
+                                         "data5" : getattr(comp,self.onewire.pio_map(my_id,5)),
+                                         "data6" : getattr(comp,self.onewire.pio_map(my_id,6)),
+                                         "data7" : getattr(comp,self.onewire.pio_map(my_id,7)),
                                          "current" : PIO_ALL})
 
             self._stop.wait(self.interval)
