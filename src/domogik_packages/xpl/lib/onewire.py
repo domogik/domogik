@@ -328,13 +328,18 @@ class ComponentDs2408:
         self.old_PIO_ALL = {}
         self._stop = stop
         self.start_listening()
+    
+    def chain(self,*iterables):
+        for it in iterables:
+            for element in it:
+                yield element
 
     def start_listening(self):
         """
         Start listening for onewire ds2408
         """
         while not self._stop.isSet():
-            for comp in self.root.find(type = "DS2408"):
+            for comp in self.chain(self.root.find(type = "DS2408"),self.root.find(type = "DS2406"),self.root.find(type = "DS2405")):
                 my_id = comp.family+"."+comp.id
                 try:
                     PIO_ALL = comp.PIO_ALL
