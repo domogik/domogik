@@ -39,7 +39,7 @@
             "name": "Humidity", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "data", 
+            "stat_key": "humidity", 
             "value_type": "number"
         }, 
         {
@@ -49,7 +49,7 @@
             "name": "Temperature", 
             "parameters": "{}", 
             "return_confirmation": "0", 
-            "stat_key": "data", 
+            "stat_key": "temperature", 
             "value_type": "number"
         },
         {
@@ -60,7 +60,7 @@
             "parameters": "{}",
             "return_confirmation": "0",
             "stat_key": "battery",
-            "value_type": "string"
+            "value_type": "number"
         },
         {
             "device_type_id": "pyozw.sensor",
@@ -80,7 +80,7 @@
             "parameters": "{}",
             "return_confirmation": "0",
             "stat_key": "battery",
-            "value_type": "string"
+            "value_type": "number"
         }
     ], 
     "device_types": [
@@ -105,7 +105,7 @@
         "src/share/domogik/plugins/pyozw.json", 
         "src/share/domogik/stats/pyozw/sensor.basic-pyozw.xml",
         "src/domogik_packages/xpl/bin/pyozw.py", 
-        "src/domogik_packages/xpl/lib/pyozw.py", 
+        "src/domogik_packages/xpl/lib/pyozw.py"
     ], 
     "identity": {
         "author": "Kriss", 
