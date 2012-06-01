@@ -71,7 +71,7 @@ class Bluez(XplPlugin):
         #self.enable_helper()
         self.enable_hbeat()
         self._bluez.start_adaptator()
-        self.log.info("bluez plugin correctly started")
+        self.log.info("Plugin bluez correctly started.")
 
     def basic_cmnd_cb(self, message):
         """

@@ -108,7 +108,7 @@ class Cron(XplHlpPlugin):
         Create the cron class
         """
         XplHlpPlugin.__init__(self, name = 'cron')
-        self.log.info("__init__ : Start ...")
+        self.log.debug("__init__ : Start ...")
         self.config = Query(self.myxpl, self.log)
 
         self.log.debug("__init__ : Try to start the cron API")
@@ -118,7 +118,7 @@ class Cron(XplHlpPlugin):
         except:
             error = "Something went wrong during cronAPI init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("__init__ : "+error)
+            self.log.error("__init__ : "+error)
             raise CronException(error)
 
         self.log.debug("__init__ : Try to create listeners")
@@ -185,7 +185,7 @@ class Cron(XplHlpPlugin):
         self.enable_helper()
         self.enable_hbeat()
         self.add_stop_cb(self._cron.jobs.stop_scheduler)
-        self.log.info("cron plugin correctly started")
+        self.log.info("Plugin cron correctly started.")
 
     def request_cmnd_cb(self, message):
         """

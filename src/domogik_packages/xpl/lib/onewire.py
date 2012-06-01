@@ -402,22 +402,23 @@ class OneWireNetwork:
         
     def pio_map(self,device,gpio):
         
-        map = ["A","B"]                   # Used to map PIO_0/1 to  PIO_A/B for other devices 
+        map = ["A","B","A","B","A","B","A","B"]    # Used to map PIO_0/1 to  PIO_A/B for other devices 
         fam = device[:2]                  # Extract familly code
         if fam == "12":                   # Fam = 12 - DS2406
-            pio = "PIO_"+map[gpio]                # Rename PIO to A & B
+            pio = "PIO_"+map[int(gpio)]   # Rename PIO to A & B
         elif fam == "05":                 # DS2405 - Only one PIO named "PIO"
             pio = "PIO"
         else:                             # All other cases
             pio = "PIO_"+str(gpio)
-        print "Called for device "+device+" & PIO "+pio+" -> "+pio
         return pio 
 
     def write(self,device,pio,value):
-        ret = 0                           # Ensure we will return a value
-        s = ow.Sensor( '/'+device) 
         try:
-            ret = getattr(s,self.pio_map(device,pio))
+            ret = 0                           # Ensure we will return a value
+            s = ow.Sensor( '/'+device) 
+            gpio = self.pio_map(device,pio)
+            ret = setattr(s,gpio,value)
+            ret = getattr(s,gpio)
         except:
-            raise OneWireException("Can't access given PIO %s" % pio)
+            raise OneWireException("Can't access given PIO %s" % gpio)
         return ret

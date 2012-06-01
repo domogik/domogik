@@ -73,7 +73,7 @@
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "cron",
-        "changelog": "0.1a2\n - Store jobs to filesystem\n0.1\n - plugin creation",
+        "changelog": "0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
         "dependencies": [
             {
                 "id": "apscheduler (>=2.0.2)",

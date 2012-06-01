@@ -45,6 +45,7 @@ import traceback
 from threading import Timer
 from domogik.xpl.common.xplmessage import XplMessage
 from pympler.asizeof import asizeof
+from domogik_packages.xpl.lib.telldus import MEMORY_LIGHTING_SCENE
 import ConfigParser
 import os
 import glob
@@ -119,7 +120,6 @@ MEMORY_RTIMER = 6
 MEMORY_STIMER = 7
 MEMORY_ACK = 8
 MEMORY_LAST = 9
-MEMORY_LIGHTING = 10
 
 DEVICEEVENTLOCK = threading.Lock()
 SENSOREVENTLOCK = threading.Lock()
@@ -190,7 +190,7 @@ class TelldusAPI:
         the receiver.
         '''
         self.log = log
-        self.log.info("telldusAPI.__init__ : Start ...")
+        self.log.debug("telldusAPI.__init__ : Start ...")
         self.config = config
         self._plugin = plugin
         self._myxpl = myxpl
@@ -202,11 +202,11 @@ class TelldusAPI:
         #The delay to use when sending batch messages
         self._delaybatch = self._delayrf * 5
         #The maximun batch items to create
-        self._maxbatch = 10
+        self._maxbatch = 5
         self._buttons = None
         self._deviceeventq = None
         self._sensoreventq = None
-        self.log.info("telldusAPI.__init__ : Look for telldus-core")
+        self.log.debug("telldusAPI.__init__ : Look for telldus-core")
         # Initialize tellDus API
         try:
             self._telldusd = Telldusd()
@@ -231,10 +231,22 @@ class TelldusAPI:
         except:
             self.log.warning("Can't get delay RF configuration from XPL. Use default one.")
         try:
+            if self._deviceeventq != None:
+                self._deviceeventq.unregister()
+        except:
+            self.log.error("Error removing the previuos device event queue : %s" % \
+                     (traceback.format_exc()))
+        try:
             self._deviceeventq = DeviceEventQueue(self, self._delayrf, self._telldusd)
         except:
             self.log.error("Error creating the device event queue : %s" % \
                      (traceback.format_exc()))
+        #try:
+        #   if self._sensoreventq != None:
+        #       self._sensoreventq.unregister()
+        #except:
+        #    self.log.error("Error removing the previuos sensor event queue : %s" % \
+        #             (traceback.format_exc()))
         #try:
         #    self._sensoreventq = SensorEventQueue(self, self._delayrf, self._telldusd)
         #except:
@@ -257,6 +269,8 @@ class TelldusAPI:
             num += 1
         self._buttons = Button(self._plugin, self, self.log, self._data_dir, \
             self._send_xpl_cmd, self._myxpl)
+        self.log.info("Load %s item(s) from XPL configuration." % len(self._config))
+        self.log.info("Load %s buttons(s) configuration." % len(self._buttons.data))
         self.log.debug("reload_config : Done :-)")
 
     def unregister(self):
@@ -285,6 +299,8 @@ class TelldusAPI:
             data.append("sent timers : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_STIMER)))
             data.append("ACKs to send : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_ACK)))
             data.append("last commands sent : %s items, %s bytes" % (self._deviceeventq.memory_usage(MEMORY_LAST)))
+            if self._plugin.lightext == True:
+                data.append("scenes : %s items, %s bytes" % (self._plugin.lighting.memory_usage(MEMORY_LIGHTING_SCENE)))
             return data
         else:
             if which == MEMORY_PLUGIN:
@@ -305,6 +321,10 @@ class TelldusAPI:
                 return self._deviceeventq.memory_usage(MEMORY_ACK)
             elif which == MEMORY_LAST:
                 return self._deviceeventq.memory_usage(MEMORY_LAST)
+            elif which == MEMORY_LIGHTING_SCENE:
+                if self._plugin.lightext == True:
+                    return self._plugin.lighting.memory_usage(MEMORY_LIGHTING_SCENE)
+        return None
         self.log.debug("memory_usage : Done :-)")
 
     def send_xpl(self, xpltype, deviceid, method, value):
@@ -321,16 +341,15 @@ class TelldusAPI:
                 self.send_xpl_sensor_basic("xpl-trig", deviceid, method, value)
                 #self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
             elif devicetype == TELLDUS_DAWNDUSK :
-                self.log.info("TELLDUS_DAWNDUSK : Not implemented")
+                self.log.debug("TELLDUS_DAWNDUSK : Not implemented")
                 self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
             elif devicetype == TELLDUS_LIGHTING :
-                self.log.info("TELLDUS_LIGHTING : Not implemented")
+                self.log.debug("TELLDUS_LIGHTING : Not implemented")
                 self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
             elif devicetype == TELLDUS_SHUTTER :
-                self.log.info("TELLDUS_SHUTTER : Not implemented")
                 self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
             elif devicetype == TELLDUS_BUTTON :
-                self.send_xpl_telldus_basic(self, xpltype, deviceid, method, value)
+                self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
                 self._buttons.act(self._telldusd.get_device(deviceid), method, value)
         else :
             self.send_xpl_telldus_basic(xpltype, deviceid, method, value)
@@ -447,6 +466,15 @@ class TelldusAPI:
             self.send_xpl("xpl-trig", deviceid, TELLDUS_BRIGHT, 0)
             self.send_xpl("xpl-trig", deviceid, TELLDUS_SHINE, 0)
             self.send_xpl("xpl-trig", deviceid, TELLDUS_CHANGE, 0)
+        elif method == TELLDUS_SHUT  :
+            if value == 0 :
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_DOWN, 0)
+            elif value == 100 :
+                self.send_xpl("xpl-trig", deviceid, TELLSTICK_UP, 100)
+        elif method == TELLSTICK_UP  :
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_SHUT, 100)
+        elif method == TELLSTICK_DOWN  :
+            self.send_xpl("xpl-trig", deviceid, TELLSTICK_SHUT, 0)
         self.send_xpl("xpl-trig", deviceid, method, value)
         self.log.debug("send_xpl_ack : Done")
 
@@ -561,7 +589,7 @@ class TelldusAPI:
         TS14)
         @param level : level of light (0..100)
         '''
-        #print "dim level=%s"%type(level)
+        #print "DIM level=%s"%type(level)
         if level == None or level == "None":
             level = "0"
         level = int(level)
@@ -682,13 +710,9 @@ class TelldusAPI:
         @param level : level of light (0..255max)
         @param faderate : duration in seconds of th shine process
         '''
-        #print " SHINE : address: %s, level: %s" % (device, level)
+        #print " CHANGE : address: %s, level: %s" % (device, level)
         deviceid = self.get_device_id(device)
         old = self._deviceeventq.get_last_sent(deviceid)
-        if device in self._config:
-            devicetype = self._config[device]['devicetype']
-            if devicetype == TELLDUS_SHUTTER:
-                downtime = float(self._config[device]['param1'])
 #        print "old %s = %s" % (deviceid,old)
         if level == None or level == "None":
             level = "0"
@@ -787,6 +811,9 @@ class TelldusAPI:
         #print " SHUT : address: %s, level: %s" % (device, level)
         deviceid = self.get_device_id(device)
         downtime = 15
+        if level == None or level == "None":
+            level = "0"
+        level = int(level)
         if device in self._config:
             devicetype = self._config[device]['devicetype']
             if devicetype == TELLDUS_SHUTTER:
@@ -808,7 +835,6 @@ class TelldusAPI:
                 #self._deviceeventq.add_batch(deviceid, TELLSTICK_TURNON, 0, downtime*MULTI_SHUTTER_UP)
                 self._deviceeventq.start_batch(deviceid)
         else :
-            level = int(level)
             if self._telldusd.methods(deviceid, TELLSTICK_UP) == TELLSTICK_UP:
                 self._deviceeventq.create_batch(deviceid, TELLDUS_SHUT, level)
                 self._deviceeventq.add_batch(deviceid, TELLSTICK_UP, 0, 0)
@@ -1271,7 +1297,6 @@ class SensorEventQueue:
             self._telldusd.unregister_sensor_event()
         #print "DeviceEventQueue.__del__ is called"
 
-
     def memory_usage(self, which):
         '''
         Return the memory used by an object
@@ -1282,7 +1307,7 @@ class SensorEventQueue:
             return len(self._received_timers) + len(self._refused_timers), \
                 asizeof(self._received_timers) + asizeof(self._refused_timers)
         else :
-            return 0
+            return None
 
     def _receive(self, protocol, model, deviceid, datatype, value, timestamp, callbackid):
         '''
@@ -1834,7 +1859,8 @@ class Button():
         self._data_files_dir = data_dir
         self._store = ButtonStore(self._log, self._data_files_dir)
         self.data = self._store.load_all()
-        print "data = %s" % self.data
+        #print "data = %s" % self.data
+        self._log.info("Load %s button configuration(s)" % len(self.data))
 
     def act(self, device, command, value):
         """
@@ -1867,6 +1893,7 @@ class Button():
                 if schema == "telldus.basic" :
                     self._plugin.telldus_cmnd_cb(mess)
                 elif schema == "lighting.basic" :
+                    self._plugin.lighting.basic_cmnd_listener(mess)
                     if xplcommand == "activate" :
                         self._plugin.lighting.cmd_activate(self._myxpl, mess, None)
                     elif xplcommand == "deactivate" :
@@ -1908,12 +1935,12 @@ class ButtonStore():
         in directory and call the callback ùethod to add it to the cron
         jobs.
         """
+        data = dict()
         for jobfile in glob.iglob(self._data_files_dir+"/*.btn") :
             config = ConfigParser.ConfigParser()
             config.read(jobfile)
             self._log.debug("ButtonStore.store_init : Load configuration from %s" % \
                     jobfile)
-            data = dict()
             device = config.get('Button', "device")
             if device != None and device != "" :
                 actions = str(config.get('Button', "actions"))

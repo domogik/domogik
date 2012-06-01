@@ -42,7 +42,7 @@
         },
         {
             "default": null,
-            "description": "Type of the device (shutter,sensor,dawndusk).",
+            "description": "Type of the device (shutter,sensor,dawndusk,button).",
             "id": "4",
             "interface": "yes",
             "key": "devicetype",
@@ -226,16 +226,16 @@
                 "type": "python"
             }
         ],
-        "description": "Manage many devices through TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n  they will appear automatically in Domogik",
+        "description": "Manage many devices with TellStick and TellStick Duo.\n  Add your devices with telldus tools (tdtool or telldusCenter) and\n create devices inDomogik",
         "documentation": "http://wiki.domogik.org/plugin_telldus",
         "domogik_min_version": "0.2.0",
         "id": "telldus",
         "type": "plugin",
-        "version": "0.3.0a1"
+        "version": "0.3.0a2"
     },
     "json_version": 1,
     "technology": {
-        "description": "Manage many devices through TellStick (Chacon, Ikea, ...)",
+        "description": "Manage many devices through TellStick (Chacon, Ikea, DI-O, ...)",
         "id": "telldus",
         "name": "Telldus"
     },
