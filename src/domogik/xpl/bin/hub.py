@@ -17,12 +17,10 @@ from twisted.python import log
 from sys import stdout
 from threading import Thread, Event
 
-
-# TODO : 
-# - handle multi hosts
-# - log each invalid message in a file
-# - make stats for each client on number of each schema per hour
-# - bandwitch by client per minute
+# client status
+ALIVE = "alive"
+DEAD = "dead"
+STOPPED = "stopped"
 
 
 class Hub():
@@ -42,14 +40,20 @@ class Hub():
 
         ### Read hub options
         # TODO
+        file_clients = "/tmp/client_list.txt"
         do_log_bandwidth = True
+        file_bandwidth = "/tmp/bandwidth.csv"
         do_log_invalid_data = True
+        file_invalid_data = "/tmp/invalid_data.csv"
 
         ### Start listening to udp
         # We use listenMultiple=True so that we can run MulticastServer.py and
         # MulticastClient.py on same machine:
-        self.MPP = MulticastPingPong(do_log_bandwidth = do_log_bandwidth,
-                                     do_log_invalid_data = do_log_invalid_data)
+        self.MPP = MulticastPingPong(file_clients = file_clients,
+                                     do_log_bandwidth = do_log_bandwidth,
+                                     file_bandwidth = file_bandwidth,
+                                     do_log_invalid_data = do_log_invalid_data,
+                                     file_invalid_data = file_invalid_data)
         reactor.listenMulticast(3865, self.MPP,
                                 listenMultiple=True)
         reactor.addSystemEventTrigger('during', 'shutdown', self.stop_hub)
@@ -63,6 +67,7 @@ class Hub():
 class MulticastPingPong(DatagramProtocol):
     """
        _client_list : the list of all seen clients
+       _dead_client_list : the list of all dead clients
          List of dict : 
           [{'id' : '192.168.0.1_9999',                # client id
                                                       # used to check only 1 item insteas of checking both ip and port
@@ -71,11 +76,13 @@ class MulticastPingPong(DatagramProtocol):
             'source' : 'vendorid-deviceid.instance',  # xpl source
             'interval' : 5,                           # hbeat interval given by the client
             'last seen' : datetime obj                # last seen date/time
+            'alive' : ALIVE / DEAD / STOPPED          # status
             'nb_valid_messages' : 99                  # number of valid messages sent by a client
             'nb_invalid_messages' : 9                 # number of invalid messages sent by a client
            },...
           ]
-       bandwidth : bandwitdh stats
+
+       _bandwidth : bandwitdh stats
           [{'id' : '192.168.0.1_9999',                # client id
             'source' : 'vendorid-deviceid.instance',  # xpl source
             'schema' : 'sensor.basic',                # xpl schema
@@ -84,31 +91,81 @@ class MulticastPingPong(DatagramProtocol):
            }, ...
           ]
 
+       _invalid_data : list of invalid xpl messages
+          [{'id' : '192.168.0.1_9999',                # client id
+            'data' : '.....',                         # invalid data
+            'timestamp' : 1234567890,                 # timestamp
+           }, ...
+
     """
 
-    def __init__(self, do_log_bandwidth = False, do_log_invalid_data = False):
+    def __init__(self, file_clients, do_log_bandwidth, file_bandwidth, do_log_invalid_data, file_invalid_data):
         """ Init MulticastPingPong object
         """
         ### Client list
+        self._file_clients = file_clients
         self._client_list = []
+        self._dead_client_list = []
 
         ### Bandwidth
         self._do_log_bandwidth = do_log_bandwidth
+        self._file_bandwidth = file_bandwidth
+        self._bandwidth = []
 
         ### Invalid data
         self._do_log_invalid_data = do_log_invalid_data
+        self._file_invalid_data = file_invalid_data
+        self._invalid_data = []
 
         ### Check for dead clients each minute
         self._stop = Event()
-        self._timer = self.__InternalTimer(60, self._check_dead_clients, self._stop)
-        self._timer.start()
+
+        self._timer_dead_clients = self.__InternalTimer(60, self._check_dead_clients, self._stop)
+        self._timer_dead_clients.start()
+
+        ### Log data in files
+        self._timer_write_clients = self.__InternalTimer(30, self._write_clients, self._stop)
+        self._timer_write_clients.start()
+
+        # For debug only
+        #self._timer_display_bandwidth = self.__InternalTimer(30, self._display_bandwidth, self._stop)
+        #self._timer_display_bandwidth.start()
+
+        self._timer_append_bandwidth = self.__InternalTimer(30, self._append_bandwidth, self._stop)
+        self._timer_append_bandwidth.start()
+
+        # For debug only
+        #self._timer_display_invalid_data = self.__InternalTimer(30, self._display_invalid_data, self._stop)
+        #self._timer_display_invalid_data.start()
+
+        self._timer_append_invalid_data = self.__InternalTimer(30, self._append_invalid_data, self._stop)
+        self._timer_append_invalid_data.start()
 
     def stop_threads(self):
         """ Stop all threads
         """
         log.msg("Stopping timers...")
         self._stop.set()
-        self._timer.join()
+        self._timer_dead_clients.join()
+        self._timer_write_clients.join()
+        self._timer_append_bandwidth.join()
+        self._timer_append_invalid_data.join()
+
+    def _write_file(self, filename, data):
+        """ Write data to the file 'filename'
+            @param filename : file name
+            @param data : data to append
+        """
+        with open(filename, "w") as my_file:
+            my_file.write(data)
+
+    def _append_file(self, filename, data):
+        """ Append data to the file 'filename'
+            @param filename : file name
+            @param data : data to append
+        """
+        with open(filename, "a") as my_file:
+            my_file.write(data)
 
     def _check_dead_clients(self):
         """ Look for each client if it is still alive
@@ -118,13 +175,15 @@ class MulticastPingPong(DatagramProtocol):
         dead_clients = False
         for client in self._client_list:
             dead_time = now - 60 - 2*60*client['interval']
-            if client['alive'] and client['last_seen'] < dead_time:
-                client['alive'] = False
+            if client['alive'] == ALIVE and client['last_seen'] < dead_time:
+                client['alive'] = DEAD
                 msg += "Client %s died" % client['id']
+                self._dead_client_list.append(client)
+                self._client_list.remove(client)
                 dead_clients = True
         log.msg(msg)
         if dead_clients:
-            self._list_clients()
+            self._display_clients()
 
     def _get_client_id(self, ip, port):
         """ Create the client id from the client ip and port
@@ -190,7 +249,7 @@ class MulticastPingPong(DatagramProtocol):
                                  'source' : xpl.source,
                                  'interval' : int(xpl.data['interval']),
                                  'last_seen' : time(),
-                                 'alive' : True,
+                                 'alive' : ALIVE,
                                  'nb_valid_messages' : 1,  
                                  'nb_invalid_messages' : 0})
  
@@ -202,11 +261,11 @@ class MulticastPingPong(DatagramProtocol):
         found = False
         for client in self._client_list:
             if client['id'] == client_id:
-                if client['alive'] == False:
-                    log.err("Client %s was dead. Resurrect it.")
+                if client['alive'] != ALIVE:    # should not happen
+                    log.err("Client %s was not alive and still in alive clients list. Resurrect it.")
                 client['interval'] = int(xpl.data['interval'])
                 client['last_seen'] = time()
-                client['alive'] = True
+                client['alive'] = ALIVE
                 found = True
                 break
         if found == False:
@@ -219,10 +278,12 @@ class MulticastPingPong(DatagramProtocol):
         found = False
         for client in self._client_list:
             if client['id'] == client_id:
-                if client['alive'] == False:
-                    log.err("Client %s was already dead.")
+                if client['alive'] != ALIVE:   # should not happen
+                    log.err("Client %s was already not alive and still in alive clients list.")
                 client['last_seen'] = time()
-                client['alive'] = False
+                client['alive'] = STOPPED
+                self._dead_client_list.append(client)
+                self._client_list.remove(client)
                 found = True
                 break
         if found == False:
@@ -258,12 +319,12 @@ class MulticastPingPong(DatagramProtocol):
 
  
     def _list_clients(self):
-        """ List all the clients in the log file
+        """ List all the clients (alives and deads) in the log file
         """
-        msg =  "\n| Client id             | Client source                      | Interval | Last seen                  | Alive | Nb OK  | Nb KO  |"
-        msg += "\n|-----------------------+------------------------------------+----------+----------------------------+-------+--------+--------|"
+        msg =  "\n| Client id             | Client source                      | Interval | Last seen                  | Status  | Nb OK  | Nb KO  |"
+        msg += "\n|-----------------------+------------------------------------+----------+----------------------------+---------+--------+--------|"
         for client in self._client_list:
-            msg += "\n| %-21s | %-34s | %8s | %25s | %-5s | %6s | %6s |" \
+            msg += "\n| %-21s | %-34s | %8s | %25s | %-7s | %6s | %6s |" \
                            % (client['id'],
                               client['source'],
                               client['interval'],
@@ -271,7 +332,27 @@ class MulticastPingPong(DatagramProtocol):
                               client['alive'],
                               client['nb_valid_messages'],
                               client['nb_invalid_messages'])
-        log.msg(msg)
+        msg += "\n|-----------------------+------------------------------------+----------+----------------------------+---------+--------+--------|"
+        for client in self._dead_client_list:
+            msg += "\n| %-21s | %-34s | %8s | %25s | %-7s | %6s | %6s |" \
+                           % (client['id'],
+                              client['source'],
+                              client['interval'],
+                              datetime.fromtimestamp(client['last_seen']).isoformat(),
+                              client['alive'],
+                              client['nb_valid_messages'],
+                              client['nb_invalid_messages'])
+        return msg
+
+    def _display_clients(self):
+        """ List all the clients (alives and deads) in the log file
+        """
+        log.msg(self._list_clients())
+
+    def _write_clients(self):
+        """ Write the client list in a file
+        """
+        self._write_file(self._file_clients, self._list_clients() + "\n")
 
     def _inc_valid_counter(self, client_id):
         """ Increase the valid counter for a client (if it exists)
@@ -298,23 +379,78 @@ class MulticastPingPong(DatagramProtocol):
             @param client_id : client id
             @param xpl : xpl message
         """
-        #TODO
-        # put in memory
-        # create another function to call from a timer to flush
-        pass
+        self._bandwidth.append({'id' : client_id,
+                                'source' : xpl.source,
+                                'schema' : xpl.schema,
+                                'type' : xpl.type,
+                                'timestamp' : time()})
 
-    def _log_invalid_data(self, datagram):
+    # for debug only
+    def _display_bandwidth(self):
+        """ Display in log the bandwidth
+        """
+        msg =  "Bandwith data :"
+        msg += "\nbandwidth ; id                    ; timestamp       ; source                             ; schema           ; type"
+        for my_item in self._bandwidth:
+            msg += "\nbandwidth ; %-21s ; %15s ; %-34s ; %-17s ; %-8s" \
+                           % (my_item['id'],
+                              my_item['timestamp'],
+                              my_item['source'],
+                              my_item['schema'],
+                              my_item['type'])
+        log.msg(msg)
+
+    def _append_bandwidth(self):
+        """ Append bandwidth data to a file
+        """
+        # TODO : to add only if the file is empty
+        #msg = "bandwidth ; id                    ; timestamp       ; source                             ; schema           ; type\n"
+        msg = ""
+        # Generate data to write in the file
+        for my_item in self._bandwidth:
+            msg += "%-21s ; %15s ; %-34s ; %-17s ; %-8s\n" \
+                           % (my_item['id'],
+                              my_item['timestamp'],
+                              my_item['source'],
+                              my_item['schema'],
+                              my_item['type'])
+        # Clean data
+        self._bandwidth = []
+        self._append_file(self._file_bandwidth, msg)
+
+    def _log_invalid_data(self, client_id, datagram):
         """ Log invalid datagrams in memory
+            @param client_id : client id
             @param datagram : data
         """
-        #TODO
-        # put in momory
-        # create another function to call from a timer to flush in a file
-        pass
+        self._invalid_data.append({'id' : client_id,
+                                   'data' : datagram,
+                                   'timestamp' : time()})
 
- 
+    # for debug only
+    def _display_invalid_data(self):
+        """ Display in log the bandwidth
+        """
+        msg = "List of invalid data received :"
+        msg += "\ninvalid_data ;  id                   ; timestamp       ; data"
+        for my_item in self._invalid_data:
+            msg += "\ninvalid_data ; %-21s ; %15s ; %s" % (my_item['id'],
+                                                my_item['timestamp'],
+                                                my_item['data'].replace("\n", "\\n"))
+        log.msg(msg)
 
-
+    def _append_invalid_data(self):
+        """ Append invalid data to a file
+        """
+        # TODO : add only if the file is empty
+        #msg = "invalid_data ;  id                   ; timestamp       ; data\n"
+        msg = ""
+        for my_item in self._invalid_data:
+            msg += "%-21s ; %15s ; %s\n" % (my_item['id'],
+                                            my_item['timestamp'],
+                                            my_item['data'].replace("\n", "\\n"))
+        self._invalid_data = []
+        self._append_file(self._file_invalid_data, msg)
 
     def startProtocol(self):
         """
@@ -344,7 +480,7 @@ class MulticastPingPong(DatagramProtocol):
             # Assuming the client already exists, increase its invalid msg counter and then finish the processing
             self._inc_invalid_counter(client_id)
             if self._do_log_invalid_data:
-                self._log_invalid_data(datagram)
+                self._log_invalid_data(client_id, datagram)
             return
 
         # TODO : 
@@ -356,10 +492,10 @@ class MulticastPingPong(DatagramProtocol):
             # handle new clients
             if self._is_new_client(client_id):  
                 self._add_client(ip, port, xpl)
-                self._list_clients()
+                self._display_clients()
             else:
                 self._update_client(client_id, xpl)
-                self._list_clients()
+                self._display_clients()
 
         # send to the appropriate target
         # tODO
@@ -369,13 +505,11 @@ class MulticastPingPong(DatagramProtocol):
         # handle hbeat.end messages
         if self._is_hbeat_end(xpl):
             self._remove_client(client_id)
+            self._display_clients()
 
         # Stats features (we did them after sending the xpl messages for performance
         if self._do_log_bandwidth:
             self._log_bandwidth(client_id, xpl)
-
-    def sigInt(self):
-        print "ZZZ"
 
     class __InternalTimer(Thread):
         '''
