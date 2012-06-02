@@ -1,0 +1,799 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugin onewire &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Plugin CIDmodem" href="../cidmodem/index.html" />
+    <link rel="prev" title="Release 0.1.0" href="../../releases/0.1.0.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../../releases/0.1.0.html" title="Release 0.1.0">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../cidmodem/index.html" title="Plugin CIDmodem">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="plugins-onewire-index">
+            
+  <div class="section" id="plugin-onewire">
+<h1>Plugin onewire<a class="headerlink" href="#plugin-onewire" title="Permalink to this headline">¶</a></h1>
+<p>((plugin_onewire_dev|Go this plugin development information))</p>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>This plugin aims at communicating with 1-Wire devices.</p>
+<p>To work, this plugin needs <a class="reference external" href="http://www.owfs.org">OWFS</a>.</p>
+<p>List of actually supported devices:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="60%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Component</th>
+<th class="head">Datasheet</th>
+<th class="head">Target Domogik release</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>DS18B20</td>
+<td><a class="reference external" href="http://pdfserv.maxim-ic.com/en/ds/DS18B20.pdf">http://pdfserv.maxim-ic.com/en/ds/DS18B20.pdf</a></td>
+<td>0.1.0</td>
+</tr>
+<tr class="row-odd"><td>DS18S20</td>
+<td><a class="reference external" href="http://pdfserv.maxim-ic.com/en/ds/DS18S20.pdf">http://pdfserv.maxim-ic.com/en/ds/DS18S20.pdf</a></td>
+<td>0.1.0</td>
+</tr>
+<tr class="row-even"><td>DS2401</td>
+<td><a class="reference external" href="http://datasheets.maxim-ic.com/en/ds/DS2401.pdf">http://datasheets.maxim-ic.com/en/ds/DS2401.pdf</a></td>
+<td>0.1.0</td>
+</tr>
+<tr class="row-odd"><td>DS2438</td>
+<td><a class="reference external" href="http://datasheets.maxim-ic.com/en/ds/DS2438.pdf">http://datasheets.maxim-ic.com/en/ds/DS2438.pdf</a></td>
+<td>dev release</td>
+</tr>
+</tbody>
+</table>
+<p>In next releases, support for more devices will be included.</p>
+</div>
+<div class="section" id="known-features">
+<h2>Known features<a class="headerlink" href="#known-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="owfs-2-8p2-and-owfs-2-8p3-don-t-work-fine-with-python">
+<h3>Owfs 2.8p2 and owfs 2.8p3 don&#8217;t work fine with python<a class="headerlink" href="#owfs-2-8p2-and-owfs-2-8p3-don-t-work-fine-with-python" title="Permalink to this headline">¶</a></h3>
+<p>Please, use Owfs <strong>2.7p38</strong> or <strong>2.8p4</strong> (recommended) or a higher version.
+Owfs <strong>2.8p4</strong> fail with python2.7, use higher version or source code repository</p>
+</div>
+</div>
+<div class="section" id="prerequisite-install-owfs">
+<h2>Prerequisite : install OWFS<a class="headerlink" href="#prerequisite-install-owfs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ubuntu-debian-installation">
+<h3>Ubuntu/Debian installation<a class="headerlink" href="#ubuntu-debian-installation" title="Permalink to this headline">¶</a></h3>
+<p>On Ubuntu or Debian, existing packages on <a class="reference external" href="http://www.owfs.org">http://www.owfs.org</a> are old. So, we will get the last version of sources and compile them.</p>
+<div class="section" id="tools-needed-to-compile-owfs">
+<h4>Tools needed to compile OWFS<a class="headerlink" href="#tools-needed-to-compile-owfs" title="Permalink to this headline">¶</a></h4>
+<p>First, we will need a <strong>C compiler</strong> to install OWFS. We will use <strong>gcc</strong>.
+To see if gcc is available:</p>
+<div class="highlight-python"><pre>$ gcc --version</pre>
+</div>
+<p>If gcc is found, it&#8217;s good, else:</p>
+<div class="highlight-python"><pre>$ apt-get install gcc</pre>
+</div>
+<p>We also need make and ed:</p>
+<div class="highlight-python"><pre>$ apt-get install make ed</pre>
+</div>
+<p>Then, we will need <strong>Autoconf</strong> in ersion 2.57 or greater. To see if it is available:</p>
+<div class="highlight-python"><pre>$ autoconf --version</pre>
+</div>
+<p>If not, install it:</p>
+<div class="highlight-python"><pre>$ apt-get install autoconf
+$ autoconf --version
+version 2.65</pre>
+</div>
+<p>We will also need USB development librairies:</p>
+<div class="highlight-python"><pre>$ apt-get install libusb-dev</pre>
+</div>
+<p>And then, install swig:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># apt-get install swig</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Owfs<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Download OWFS (adapt following lines to your version) and extract package:</p>
+<div class="highlight-python"><pre>$ cd /usr/src
+$ wget http://downloads.sourceforge.net/project/owfs/owfs/2.8p4/owfs-2.8p4.tar.gz
+$ tar xvzf owfs-2.8p4.tar.gz
+$ cd owfs-2.8p4</pre>
+</div>
+<p>Set configuration options with python binding and compile it:</p>
+<div class="highlight-python"><pre>$ ./configure --with-python
+$ make</pre>
+</div>
+<p>As root / with sudo:</p>
+<div class="highlight-python"><pre>$ make install</pre>
+</div>
+<p>or Download OWFS from repository:</p>
+<div class="highlight-python"><pre>$ sudo apt-get install cvs
+$ cd /usr/src
+$ cvs -z3 -d:pserver:anonymous@owfs.cvs.sourceforge.net:/cvsroot/owfs co owfs
+$ cd owfs</pre>
+</div>
+<p>Set configuration options with python binding and compile it:</p>
+<div class="highlight-python"><pre>$ autoreconf -i
+$ ./configure --with-python
+$ make</pre>
+</div>
+<p>As root / with sudo:</p>
+<div class="highlight-python"><pre>$ make install</pre>
+</div>
+<p>OWFS is now installed for python</p>
+<div class="section" id="test-owfs">
+<h4>Test OWFS<a class="headerlink" href="#test-owfs" title="Permalink to this headline">¶</a></h4>
+<p>To test, you can do this:</p>
+<div class="highlight-python"><pre>$ python
+&gt;&gt;&gt; import ow
+&gt;&gt;&gt; print ow.__version__
+2.8p4-1.18</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
+<p>Make sure you installed OWFS before installing this plugin.</p>
+</div>
+<div class="section" id="wiring-standards">
+<h2>Wiring standards<a class="headerlink" href="#wiring-standards" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="http://owfs.org/index.php?page=wiring-standards">http://owfs.org/index.php?page=wiring-standards</a></p>
+</div>
+<div class="section" id="onewire-interfaces">
+<h2>Onewire interfaces<a class="headerlink" href="#onewire-interfaces" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ds9490r">
+<h3>DS9490R<a class="headerlink" href="#ds9490r" title="Permalink to this headline">¶</a></h3>
+<img alt="../../_images/ds9490r.png" src="../../_images/ds9490r.png" />
+<p>The device address to use for this interface will be <strong>u</strong></p>
+<p>Here is the description on this interface connection :</p>
+<img alt="../../_images/ds9490r_rj11.jpg" src="../../_images/ds9490r_rj11.jpg" />
+</div>
+<div class="section" id="permissions">
+<h3>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h3>
+<p>You have to be root to use Onewire network. To Allow every user on your computer to use Onewire, follow this instructions :</p>
+<p>First, we need Vendor ID and Product ID:</p>
+<div class="highlight-python"><pre>$ lsusb  | grep DS1490
+Bus 006 Device 013: ID 04fa:2490 Dallas Semiconductor DS1490F 2-in-1 Fob, 1-Wire adapter</pre>
+</div>
+<p>Here, Vendor ID is 04fa and Product ID is 2490 (it&#8217;s the same for all DS1490).</p>
+<p>Add a udev rule for the OneWire in the file <strong>/etc/udev/rules.d/onewire.rules</strong>:</p>
+<div class="highlight-python"><pre>SUBSYSTEMS=="usb", ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", SYMLINK+="onewire", MODE="0666"</pre>
+</div>
+<p>If you haven&#8217;t a DS9490, you should adjust with your VendorID ans ProductID.</p>
+<p>Now, you just have to unplug and plug again your Onewire stick.</p>
+</div>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="common-parameters">
+<h3>Common parameters<a class="headerlink" href="#common-parameters" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="others">
+<h3>others...<a class="headerlink" href="#others" title="Permalink to this headline">¶</a></h3>
+<p>There are other configuration items which depend on components. You will find them in the components chapters of this page.</p>
+</div>
+</div>
+<div class="section" id="ds18b20">
+<h2>DS18B20<a class="headerlink" href="#ds18b20" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="how-to-plug">
+<h3>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="parasit-mode">
+<h4>Parasit mode<a class="headerlink" href="#parasit-mode" title="Permalink to this headline">¶</a></h4>
+<img alt="../../_images/1w-ds18b20-par.png" src="../../_images/1w-ds18b20-par.png" />
+</div>
+<div class="section" id="normal-mode">
+<h4>Normal mode<a class="headerlink" href="#normal-mode" title="Permalink to this headline">¶</a></h4>
+<img alt="../../_images/1w-ds18b20.png" src="../../_images/1w-ds18b20.png" />
+</div>
+</div>
+<div class="section" id="configuration-items">
+<h3>Configuration items<a class="headerlink" href="#configuration-items" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="4%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ds18b20-en</td>
+<td><em>unchecked</em></td>
+<td>Enabling (or not) DS18B20 components support.</td>
+</tr>
+<tr class="row-odd"><td>ds18b20-int</td>
+<td>60</td>
+<td>The interval between each DS18B20 component reading. If you want to monitor your house temperature, 60 or 120s is a good value. If you want to monitor something where temperature can change quickly, you can put a small value (5s for example) but you will have to set <strong>cache</strong> to False to get instant values.</td>
+</tr>
+<tr class="row-even"><td>ds18b20-res (1)</td>
+<td>12</td>
+<td>Resolution of temperature read on onewire network. Possible values : 9, 10, 11, 12.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>(1)</strong> Note that the resolution has an impact on time for reading temperature on device.
+On <a class="reference external" href="http://www.maxim-ic.com/app-notes/index.mvp/id/4377">Maxim site</a> you will find this table which indicates time taken for each resolution.</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="16%" />
+<col width="19%" />
+<col width="19%" />
+<col width="19%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Resolution</td>
+<td>9 bits</td>
+<td>10 bits</td>
+<td>11 bits</td>
+<td>12 bits</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="56%" />
+<col width="14%" />
+<col width="14%" />
+<col width="8%" />
+<col width="8%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Conversion Time (ms)</td>
+<td>93.75</td>
+<td>187.5</td>
+<td>375</td>
+<td>750</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="12%" />
+<col width="15%" />
+<col width="19%" />
+<col width="23%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>LSB (°C)</td>
+<td>0.5</td>
+<td>0.25</td>
+<td>0.125</td>
+<td>0.0625</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="monitoring-my-house-temperatures">
+<h3>Monitoring my house temperatures<a class="headerlink" href="#monitoring-my-house-temperatures" title="Permalink to this headline">¶</a></h3>
+<p>You should set <strong>ds18b20-int</strong> between 60 seconds and 300 seconds (5 minutes) depending on the precison you want to have.
+Less than 60 seconds is useless, more than 300 seconds could be not sufficient for managing temperature.</p>
+</div>
+<div class="section" id="creating-a-device-for-a-ds18b20">
+<h3>Creating a device for a DS18B20<a class="headerlink" href="#creating-a-device-for-a-ds18b20" title="Permalink to this headline">¶</a></h3>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="13%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Field</th>
+<th class="head">Suggested value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td>&nbsp;</td>
+<td>A name</td>
+</tr>
+<tr class="row-odd"><td>Address</td>
+<td>&nbsp;</td>
+<td>The DS18b20 id (you can get it with this helper command : <strong>onewire ds18b20</strong> which will give you all your DS18B20 detected)</td>
+</tr>
+<tr class="row-even"><td>Feature</td>
+<td><strong>1Wire.Thermometer</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Usage</td>
+<td><strong>Temperature</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Description</td>
+<td>&nbsp;</td>
+<td>a short description (Placement, usage, etc)</td>
+</tr>
+<tr class="row-odd"><td>Reference</td>
+<td>&nbsp;</td>
+<td>the device reference (model, etc)</td>
+</tr>
+</tbody>
+</table>
+<p>Example :
+.. image:: onewire_create_thermometer.png</p>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see your temperature.</p>
+</div>
+</div>
+<div class="section" id="ds18s20">
+<h2>DS18S20<a class="headerlink" href="#ds18s20" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="difference-with-ds18b20">
+<h3>Difference with DS18B20<a class="headerlink" href="#difference-with-ds18b20" title="Permalink to this headline">¶</a></h3>
+<p>The DS18**B**20 component offers 4 resolutions for temperature : 9 ~ 12 bits. The DS18**S**20 offers only a 9bits resolution.</p>
+</div>
+<div class="section" id="id2">
+<h3>How to plug<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>Parasit mode<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<img alt="../../_images/1w-ds18s20-par.png" src="../../_images/1w-ds18s20-par.png" />
+</div>
+<div class="section" id="id4">
+<h4>Normal mode<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<img alt="../../_images/1w-ds18s20.png" src="../../_images/1w-ds18s20.png" />
+</div>
+</div>
+<div class="section" id="id5">
+<h3>Configuration items<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="3%" />
+<col width="4%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ds18s20-en</td>
+<td><em>unchecked</em></td>
+<td>Enabling (or not) DS18S20 components support.</td>
+</tr>
+<tr class="row-odd"><td>ds18s20-int</td>
+<td>60</td>
+<td>The interval between each DS18S20 component reading. If you want to monitor your house temperature, 60 or 120s is a good value. If you want to monitor something where temperature can change quickly, you can put a small value (5s for example) but you will have to set <strong>cache</strong> to False to get instant values.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="configuration-examples">
+<h3>Configuration examples<a class="headerlink" href="#configuration-examples" title="Permalink to this headline">¶</a></h3>
+<p>See DS18S20 component for the examples.</p>
+</div>
+<div class="section" id="creating-a-device-for-a-ds18s20">
+<h3>Creating a device for a DS18S20<a class="headerlink" href="#creating-a-device-for-a-ds18s20" title="Permalink to this headline">¶</a></h3>
+<p>See DS18S20 component for the indications.</p>
+</div>
+</div>
+<div class="section" id="ds2401">
+<h2>DS2401<a class="headerlink" href="#ds2401" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h3>How to plug<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h4>Parasit mode<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<img alt="../../_images/1w-ds2401.png" src="../../_images/1w-ds2401.png" />
+</div>
+</div>
+<div class="section" id="id8">
+<h3>Configuration items<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="9%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ds2401-en</td>
+<td><em>unchecked</em></td>
+<td>Enabling (or not) DS2401 components support.</td>
+</tr>
+<tr class="row-odd"><td>ds2401-int</td>
+<td>5</td>
+<td>Interval between each DS2401 component reading. The interval to set depends on the usage you will have for DS2401 components.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="opening-sensor-for-a-garage-door">
+<h4>Opening sensor for a garage door<a class="headerlink" href="#opening-sensor-for-a-garage-door" title="Permalink to this headline">¶</a></h4>
+<p>A garage door is something that takes time to close/open, especially when it has a motor.
+Opening or closing such a door can take up to 15 seconds,
+so there is no risk that someone opens and closes your door without being &#8220;seen&#8221; by the DS2401 component (with a 5 seconds value).</p>
+</div>
+</div>
+<div class="section" id="creating-a-device-for-a-ds2401">
+<h3>Creating a device for a DS2401<a class="headerlink" href="#creating-a-device-for-a-ds2401" title="Permalink to this headline">¶</a></h3>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="15%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Field</th>
+<th class="head">Suggested value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td>&nbsp;</td>
+<td>A name</td>
+</tr>
+<tr class="row-odd"><td>Address</td>
+<td>&nbsp;</td>
+<td>The DS2401 idid (you can get it with this helper command : <strong>onewire ds2401</strong> which will give you all your DS2401 detected)</td>
+</tr>
+<tr class="row-even"><td>Feature</td>
+<td><strong>1Wire.Serial Number</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Usage</td>
+<td>&nbsp;</td>
+<td>The appropriate usage (shutter, window, door, ...)</td>
+</tr>
+<tr class="row-even"><td>Description</td>
+<td>&nbsp;</td>
+<td>a short description (Placement, usage, etc)</td>
+</tr>
+<tr class="row-odd"><td>Reference</td>
+<td>&nbsp;</td>
+<td>the device reference (model, etc)</td>
+</tr>
+</tbody>
+</table>
+<p>Example :
+.. image:: onewire_creare_serial.png</p>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the status of your DS2401 (present or not)</p>
+</div>
+</div>
+<div class="section" id="ds2438-in-ms-t-module-not-in-0-1-0-in-dev-release">
+<h2>DS2438 in MS-T module (not in 0.1.0 : in dev release)<a class="headerlink" href="#ds2438-in-ms-t-module-not-in-0-1-0-in-dev-release" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/mst.jpg" src="../../_images/mst.jpg" />
+<div class="section" id="id9">
+<h3>How to plug<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<img alt="../../_images/1w-ds2438-MST-connection.png" src="../../_images/1w-ds2438-MST-connection.png" />
+</div>
+<div class="section" id="id10">
+<h3>Configuration items<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="9%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ds2438-en</td>
+<td><em>unchecked</em></td>
+<td>Enabling (or not) DS2401 components support.</td>
+</tr>
+<tr class="row-odd"><td>ds2438-int</td>
+<td>60</td>
+<td>Interval between each DS2438 component reading. Interval to set depends on the usage you will have for DS2438 comopnents.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="creating-a-device-for-a-ds2438z-temperature">
+<h3>Creating a device for a DS2438Z - temperature<a class="headerlink" href="#creating-a-device-for-a-ds2438z-temperature" title="Permalink to this headline">¶</a></h3>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<p><em>To get an introduction to helpers, you can read the :doc:`Helper documentation &lt;/enduser/configuration/plugins/helpers&gt;`. To use a helper, the plugin must be stopped.</em></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">For some reasons, it is not a good idea to use both onewire helper and onewire plugin :
+you could obtain permission issues...
+These issues could even force you to reboot your computer or wait a long time before using back the plugin or the helper.
+So, you should only use the helper when the plugin is stopped and shouldn&#8217;t start the plugin when using the helper.
+It is a sad thing and we will look how to correct these bug (which is linked to the <em>ow</em> library).
+If you have a solution about this, feel free to report it :)</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Notice about parameter: parameter has the same possible values as defined in &#8220;configuration &gt; device&#8221;.
+For the following examples we will use the &#8220;u&#8221; device which is Usb adaptor.</p>
+</div>
+</div>
+<div class="section" id="onewire-all">
+<h3>onewire all<a class="headerlink" href="#onewire-all" title="Permalink to this headline">¶</a></h3>
+<p><strong>onewire all</strong> will list all onewire components found on your 1 wire network.</p>
+<p>Example:</p>
+<div class="highlight-python"><pre>onewire all u
+| Family | Component id | Type    |
+-----------------------------------
+| 28     | C57B2E020000 | DS18B20 |
+| 01     | 4507B2130000 | DS2401  |
+| 81     | 93702C000000 | DS1420  |</pre>
+</div>
+</div>
+<div class="section" id="onewire-detail">
+<h3>onewire detail<a class="headerlink" href="#onewire-detail" title="Permalink to this headline">¶</a></h3>
+<p><strong>onewire detail</strong> will display all attributes of  component.</p>
+<p>Example:</p>
+<div class="highlight-python"><pre>onewire detail u C57B2E020000
+C57B2E020000 attributes :
+- address : 28C57B2E0200005D
+- crc8 : 5D
+- die : C2
+- family : 28
+- fasttemp : 25
+- id : C57B2E020000
+- locator : FFFFFFFFFFFFFFFF
+- power : 0
+- present : 1
+- r_address : 5D0000022E7BC528
+- r_id : 0000022E7BC5
+- r_locator : FFFFFFFFFFFFFFFF
+- temperature : 25.1875
+- temperature10 : 25.25
+- temperature11 : 25.25
+- temperature12 : 25.1875
+- temperature9 : 25
+- temphigh : 75
+- templow : 70
+- trim : 56247
+- trimblanket : 0
+- trimvalid : 0
+- type : DS18B20</pre>
+</div>
+</div>
+<div class="section" id="onewire-ds18b20">
+<h3>onewire ds18b20<a class="headerlink" href="#onewire-ds18b20" title="Permalink to this headline">¶</a></h3>
+<p><strong>onewire ds18b20</strong> will display important data about all DS18B20 components found.</p>
+<p>Example:</p>
+<div class="highlight-python"><pre>onewire ds18b20 u
+DS18B20 : id=C57B2E020000
+- Temperature : 25.125
+- Powered (1) / parasit (0) : 0</pre>
+</div>
+</div>
+<div class="section" id="onewire-ds18s20">
+<h3>onewire ds18s20<a class="headerlink" href="#onewire-ds18s20" title="Permalink to this headline">¶</a></h3>
+<p><strong>onewire ds18s20</strong> will display important data about all DS18S20 components found.</p>
+<p>Example:</p>
+<div class="highlight-python"><pre>onewire ds18s20 u
+DS18S20 : id=F1F0DB010800
+- Temperature : 28.75
+- Powered (1) / parasit (0) : 0</pre>
+</div>
+</div>
+<div class="section" id="onewire-ds2401">
+<h3>onewire ds2401<a class="headerlink" href="#onewire-ds2401" title="Permalink to this headline">¶</a></h3>
+<p><strong>onewire ds2401</strong> will display important data about all DS2401 components found.</p>
+<p>Example:</p>
+<div class="highlight-python"><pre>onewire ds2401 u
+DS2401 : id=4507B2130000
+- Present : 1</pre>
+</div>
+</div>
+<div class="section" id="onewire-ds2438">
+<h3>onewire ds2438<a class="headerlink" href="#onewire-ds2438" title="Permalink to this headline">¶</a></h3>
+<p><strong>onewire ds2438</strong> will display important data about all DS2438 components found.</p>
+<p>Example:</p>
+<div class="highlight-python"><pre>onewire ds2438 u
+DS2438 : id=F1F0DB010800
+- Temperature : 28.75
+- Humidity : 78</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin onewire</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#known-features">Known features</a><ul>
+<li><a class="reference internal" href="#owfs-2-8p2-and-owfs-2-8p3-don-t-work-fine-with-python">Owfs 2.8p2 and owfs 2.8p3 don&#8217;t work fine with python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prerequisite-install-owfs">Prerequisite : install OWFS</a><ul>
+<li><a class="reference internal" href="#ubuntu-debian-installation">Ubuntu/Debian installation</a><ul>
+<li><a class="reference internal" href="#tools-needed-to-compile-owfs">Tools needed to compile OWFS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Owfs</a><ul>
+<li><a class="reference internal" href="#test-owfs">Test OWFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#wiring-standards">Wiring standards</a></li>
+<li><a class="reference internal" href="#onewire-interfaces">Onewire interfaces</a><ul>
+<li><a class="reference internal" href="#ds9490r">DS9490R</a></li>
+<li><a class="reference internal" href="#permissions">Permissions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#common-parameters">Common parameters</a></li>
+<li><a class="reference internal" href="#others">others...</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ds18b20">DS18B20</a><ul>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a><ul>
+<li><a class="reference internal" href="#parasit-mode">Parasit mode</a></li>
+<li><a class="reference internal" href="#normal-mode">Normal mode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-items">Configuration items</a></li>
+<li><a class="reference internal" href="#monitoring-my-house-temperatures">Monitoring my house temperatures</a></li>
+<li><a class="reference internal" href="#creating-a-device-for-a-ds18b20">Creating a device for a DS18B20</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ds18s20">DS18S20</a><ul>
+<li><a class="reference internal" href="#difference-with-ds18b20">Difference with DS18B20</a></li>
+<li><a class="reference internal" href="#id2">How to plug</a><ul>
+<li><a class="reference internal" href="#id3">Parasit mode</a></li>
+<li><a class="reference internal" href="#id4">Normal mode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">Configuration items</a></li>
+<li><a class="reference internal" href="#configuration-examples">Configuration examples</a></li>
+<li><a class="reference internal" href="#creating-a-device-for-a-ds18s20">Creating a device for a DS18S20</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ds2401">DS2401</a><ul>
+<li><a class="reference internal" href="#id6">How to plug</a><ul>
+<li><a class="reference internal" href="#id7">Parasit mode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">Configuration items</a><ul>
+<li><a class="reference internal" href="#opening-sensor-for-a-garage-door">Opening sensor for a garage door</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-device-for-a-ds2401">Creating a device for a DS2401</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ds2438-in-ms-t-module-not-in-0-1-0-in-dev-release">DS2438 in MS-T module (not in 0.1.0 : in dev release)</a><ul>
+<li><a class="reference internal" href="#id9">How to plug</a></li>
+<li><a class="reference internal" href="#id10">Configuration items</a></li>
+<li><a class="reference internal" href="#creating-a-device-for-a-ds2438z-temperature">Creating a device for a DS2438Z - temperature</a></li>
+<li><a class="reference internal" href="#onewire-all">onewire all</a></li>
+<li><a class="reference internal" href="#onewire-detail">onewire detail</a></li>
+<li><a class="reference internal" href="#onewire-ds18b20">onewire ds18b20</a></li>
+<li><a class="reference internal" href="#onewire-ds18s20">onewire ds18s20</a></li>
+<li><a class="reference internal" href="#onewire-ds2401">onewire ds2401</a></li>
+<li><a class="reference internal" href="#onewire-ds2438">onewire ds2438</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../../releases/0.1.0.html">Release 0.1.0</a></li>
+    
+    
+      <li>Next: <a href="../cidmodem/index.html">Plugin CIDmodem</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Plugin onewire</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/plugins/onewire/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../../releases/0.1.0.html" title="Release 0.1.0">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../cidmodem/index.html" title="Plugin CIDmodem">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

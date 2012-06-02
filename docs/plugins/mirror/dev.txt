@@ -1,0 +1,74 @@
+=====================================
+Plugin mirror - developer information
+=====================================
+
+xPL Schema 
+==========
+
+The `sensor.basic <http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC>`_ schema is used by this plugin.
+
+Here are the events for which a xPL message is sent
+
+Mir:ror faced up
+----------------
+
+.. code-Block::
+
+    xpl-trig
+    {
+    ...
+    }
+    sensor.basic
+    {
+    device=mirror
+    type=activated
+    current=HIGH
+    }
+
+Mir:ror faced down
+------------------
+
+.. code-Block::
+
+    xpl-trig
+    {
+    ...
+    }
+    sensor.basic
+    {
+    device=mirror
+    type=activated
+    current=LOW
+    }
+
+A RFID element is detected
+--------------------------
+
+.. code-Block::
+
+    xpl-trig
+    {
+    ...
+    }
+    sensor.basic
+    {
+    device=
+    type=present
+    current=HIGH
+    }
+
+A RFID element is no more detected
+----------------------------------
+
+.. code-Block::
+
+    xpl-trig
+    {
+    ...
+    }
+    sensor.basic
+    {
+    device=
+    type=present
+    current=LOW
+    }

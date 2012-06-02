@@ -1,0 +1,213 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="../plcbus/index.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="../ipx800/index.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../ipx800/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../plcbus/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="plugins-mirror-index">
+            
+  <p>!Plugin mirror
+&lt;div class=&#8221;to_dev_or_doc&#8221;&gt;
+((plugin_mirror_dev|Go this plugin development informations))
+&lt;/div&gt;
+{maketoc}</p>
+<p>!!Purpose
+Mir:ror plugin allows to use Mir:ror by [http://www.nabaztag.com/mirror/indexEN.html|Violet] device.</p>
+<p>Mir:ror is a small passive RFID reader which is provided with RFID like litte rabbits (Nanoztag) or Stamps (zTamps). Each RFID element has an unique ID. The plugin will send an event with the ID when a RFID element is near Mir:ror or if you put it far from Mir:ror.</p>
+<p>{IMG(attId=&#8221;178&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}</p>
+<p>!!Known issues
+Using Mir:ror device on (or near) a metallic ground shield may the RFID elements detection fail.</p>
+<p>!!How to plug
+Just plug USB on your computer. Mir:ror should light on.</p>
+<p>!!Installation
+Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
+<p>!!Permissions management
+The needed udev rule is given while installing the plugin. See ((Set_a_udev_rule|this page)) to apply it.</p>
+<p>!!Plugin configuration
+{FANCYTABLE(head=&gt;Key~|~Default value~|~Description)}
+device~|~ /dev/mirror ~|~ This is the address of the Mir:ror device.
+service~|~Service~|~Distributed services, water, gaz, electricity
+communication~|~Communication~|~Telephony, videophone, mails, messaging
+{FANCYTABLE}
+&lt;br /&gt;
+You can now start the plugin (start button).</p>
+<p>!!Creating a device for the Mir:ror
+In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
+{FANCYTABLE(head=&gt;Field~|~Suggested value~|~Description)}
+Name~|~Mir:ror~|~The name you want to give to your Mir:ror device
+Address~|~**mirror**~|~
+Feature~|~**RFID.Mirror base**~|~
+Usage~|~**Mir:ror**~|~
+Description~|~~|~a short description (Placement, usage, etc)
+Reference~|~~|~the device reference (model, etc)
+{FANCYTABLE}
+&lt;br /&gt;
+Example :
+&lt;br /&gt;
+{IMG(attId=&#8221;188&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}
+&lt;br /&gt;
+((Setup_your_devices|Attribute the feature to a place)) and you can now see the status of your Mir:ror (on or off)</p>
+<p>!!Creating a device for a RFID element
+In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
+{FANCYTABLE(head=&gt;Field~|~Suggested value~|~Description)}
+Name~|~Green nanoztag~|~The name you want to give to your RFID element
+Address~|~000008d00218c10916a8a9000000~|~The id of the RFID element. To get the id of a RFID element, use this helper : <a href="#id1"><span class="problematic" id="id2">**</span></a>mirror read ** and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.
+Feature~|~**RFID.Mirror tag**~|~
+Usage~|~**Nanoztag**~|~
+Description~|~~|~a short description (Placement, usage, etc)
+Reference~|~~|~the device reference (model, etc)
+{FANCYTABLE}
+&lt;br /&gt;
+Example :
+&lt;br /&gt;
+{IMG(attId=&#8221;189&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}
+&lt;br /&gt;
+((Setup_your_devices|Attribute the feature to a place)) and you can now see the status of your RFID element (on or off)</p>
+<p>!!Helpers
+To get an introduction to helpers, you can read the ((Plugins_helpers|Helper documentation)). To use a helper, the plugin must be stopped.</p>
+<p>!!!mirror read
+<strong>mirror read</strong> helper will wait for an action on <a href="#id3"><span class="problematic" id="id4">**</span></a>** and display it. It is usefull to get RFID identifier.</p>
+<p>!!!!Example : RFID in
+{CODE()}
+$ mirror read /dev/mirror
+Device : 000008d00218c10916a8a9000000
+Type : present
+Current : HIGH
+{CODE}</p>
+<p>!!!!Example : RFID out
+{CODE()}
+$ mirror read /dev/mirror
+Device : 000008d00218c10916a8a9000000
+Type : present
+Current : LOW
+{CODE}</p>
+<p>!!!!Example : Mir:ror faced up
+{CODE()}
+$ mirror read /dev/mirror
+Device : mirror
+Type : activated
+Current : HIGH
+{CODE}</p>
+<p>!!!!Example : Mir:ror faced down
+{CODE()}
+$ mirror read /dev/mirror
+Device : mirror
+Type : activated
+Current : LOW
+{CODE}</p>
+<p>I had some problem and need to run &#8220;od -x &lt; /dev/mirror&#8221; at least once to make my mirror working.</p>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../ipx800/index.html">&lt;no title&gt;</a></li>
+    
+    
+      <li>Next: <a href="../plcbus/index.html">&lt;no title&gt;</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>&lt;no title&gt;</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/plugins/mirror/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../ipx800/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../plcbus/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

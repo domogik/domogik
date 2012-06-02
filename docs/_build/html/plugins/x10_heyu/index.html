@@ -1,0 +1,267 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="../xpl_time/index.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="../wol_ping/index.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../wol_ping/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../xpl_time/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="plugins-x10_heyu-index">
+            
+  <p>!X10 plugin</p>
+<p>{maketoc}</p>
+<p>!!Purpose
+X10 is an automation technology which allows to switch and dim lights, control appliances, etc. This plugin allows to control X10 devices if you got a <strong>CM11</strong> / <strong>CM12</strong> adaptator. If you want to use another adaptator, check if there are available plugins for these adaptators.</p>
+<p><em>Note : at this day (august 2010), creating a plugin for CM15 is planned, so CM15 support is only a question of time.</em></p>
+<p>!!How to plug</p>
+<p>{img fileId=&#8221;185&#8221; thumb=&#8221;y&#8221; alt=&#8221;&#8221; rel=&#8221;box[g]&#8221;} {img fileId=&#8221;184&#8221; thumb=&#8221;y&#8221; alt=&#8221;&#8221; rel=&#8221;box[g]&#8221;}</p>
+<p>On the left the CM12DK module which is used to send commands to all x10 plugged in modules.
+On the right a LM12 module used to control a lamp.
+!!Heyu
+This plugin uses [<a class="reference external" href="http://www.heyu.org/">http://www.heyu.org/</a><a href="#id1"><span class="problematic" id="id2">|</span></a>Heyu] as an external tool to use CM11 adaptator. As said on Heyu&#8217;s homepage, <em>Heyu is a text-based console program for remotely controlling lights and appliances at home or office</em>. So, you will first need to install Heyu.</p>
+<p>!!!Prepare
+Create or edit /etc/udev/rules.d/10-local.rules, and add :
+{CODE()}
+KERNEL==&#8221;ttyUSB*&#8221;,DRIVERS==&#8221;pl2303&#8221;,SYMLINK+=&#8221;cm11&#8221;,MODE=&#8221;0666&#8221;
+{CODE}
+<em>MODE</em> sets the rights on the device. In this case everybody is allowed to send a command to it. By default only root can do it. As you probably won&#8217;t start Domogik as root...</p>
+<p>Then, plug in your CM11 device. You should have a /dev/cm11 link created :
+{CODE()}
+# ls -l /dev/cm11
+lrwxrwxrwx 1 root root 7 2010-07-19 09:50 /dev/cm11 -&gt; ttyUSB3
+{CODE}</p>
+<p>Note that &#8220;ttyUSB3&#8221; may change on your installation.</p>
+<p>!!!Installation
+Get the last sources (eventually adapt the following line) and uncompress them :
+{CODE()}
+wget <a class="reference external" href="http://www.heyu.org/download/heyu-2.9.3.tar.gz">http://www.heyu.org/download/heyu-2.9.3.tar.gz</a>
+tar xzf heyu-2.9.3.tar.gz
+cd heyu-2.9.3/
+{CODE}</p>
+<p>Lauch sources compilation :
+{CODE()}
+./Configure
+make
+{CODE}</p>
+<p>Launch installation with root user (or as sudo) :
+{CODE()}
+make install
+{CODE}
+* Choose &#8220;3. In directory /etc/heyu  (for system-wide access)&#8221;
+* Answer &#8220;/dev/cm11&#8221; to the question &#8220;To which port is the CM11 attached ?&#8221;</p>
+<p>!!!Checking installation
+!!!!Get heyu information
+Launch this command :
+{CODE()}
+heyu info
+{CODE}</p>
+<p>You should obtain something like :
+{CODE()}
+Heyu version 2.8.0
+Configuration at /etc/heyu/x10.conf
+Powerline interface on /dev/cm11
+Firmware revision Level = 8
+Interface battery usage = Unknown
+Raw interface clock: Mon, Day 199, 08:58:50
+(&#8211;&gt; Civil Time: Mon 19 Jul 2010   09:58:50 CEST)
+No schedule has been uploaded by Heyu.
+Housecode = A
+0 = off, 1 = on,               unit  16.......8...4..1
+Last addressed device =       0x0000 (0000000000000000)
+Status of monitored devices = 0x0000 (0000000000000000)
+Status of dimmed devices =    0x0000 (0000000000000000)
+{CODE}</p>
+<p>!!!!Try using an appliance
+Plug in an appliance device (using A1 code for example) and run :
+{CODE()}
+heyu on A1
+{CODE}
+The appliance should switch on. Now run :
+{CODE()}
+heyu off A1
+{CODE}
+The appliance should switch off.</p>
+<p>!!!!Try using a lamp
+Plug in a lamp device (using A2 code for example) and run :
+{CODE()}
+heyu on A2
+{CODE}
+The lamp should switch on. Now, run (one or more times) :
+{CODE()}
+heyu dim A2 10
+{CODE}
+This command lowers brightness of 10 units each time you call it. So, your lamp intensity should decrease. Now, run :
+{CODE()}
+heyu bright A2 10
+{CODE}
+This command increases brightness of 10 units each time you call it. So, your lamp intensity should increase.</p>
+<p>Finally, run :
+{CODE()}
+heyu off A2
+heyu stop
+{CODE}</p>
+<p>!!Plugin configuration
+!!!Enabling plugin
+You can enable plugin by using (from your domogik directory) :
+{CODE()}
+dmgenplug x10_heyu
+{CODE}</p>
+<p>You just have to reload administration page to see the plugin in the list.</p>
+<p>!!!Configuration
+In the administration panel, go to x10_heyu configuration page.</p>
+<p>!!!!heyu-cfg-path
+Path to Heyu config file
+Default : /etc/heyu/x10.conf
+The default value (/etc/heyu/x10.cfg) should be fine. When set don&#8217;t forget to save it!</p>
+<p>!!!Start the plugin
+You can now start the plugin (start button).</p>
+<p>!!Creating x10 devices
+!!!Creating a lamp device
+In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
+* Name : Short name, like &#8220;Hall&#8221;
+* Description : Device details, like &#8220;Hall light&#8221;
+* Address : X10 address, like &#8220;A4&#8221;
+* Reference : X10 module&#8217;s model, only for information, like &#8220;LM12&#8221;
+* Type :
+** X10.switch (provides only on/off)
+** X10.dimmer (provides on/off and dim/bright)
+* Usage : Light</p>
+<p>Example :</p>
+<p>{IMG(attId=&#8221;194&#8221;)}{IMG}   {IMG(attId=&#8221;195&#8221;)}{IMG}</p>
+<p>((Setup_your_devices|Attribute the features to a place and you can now control your lamp)).</p>
+<p>!!!Creating an appliance device
+In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
+* Name : Short name, like &#8220;Coffee machine&#8221;
+* Description : Describe your coffee machine if you want!
+* Address : X10 address, like &#8220;A3&#8221;
+* Reference : X10 module&#8217;s model, only for information, like &#8220;AM12&#8221;
+* Type : X10.switch
+* Usage : Appliance</p>
+<p>((Setup_your_devices|Attribute the features to a place and you can now control your appliance)).</p>
+<p>!!Developper Notes</p>
+<p>!!!xPL schema
+The [<a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_X10">http://xplproject.org.uk/wiki/index.php?title=Schema_-_X10</a>.BASIC|x10.basic] schema is used.</p>
+<p>!!!/command
+{CODE()}
+/command/x10/&lt;address&gt;/on # switch on the lamp / appliance
+/command/x10/&lt;address&gt;/off # switch off the lamp / appliance
+{CODE}
+<em>Only for lamps</em>
+{CODE()}
+/command/x10/&lt;address&gt;/dim/&lt;value&gt; # dim units by &lt;level&gt; (1-22) (decrease brightness)
+/command/x10/&lt;address&gt;/bright/&lt;value&gt; # brighten units by &lt;level&gt; (1-22) (increase brightness)
+{CODE}
+Note that these values are relative.</p>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../wol_ping/index.html">&lt;no title&gt;</a></li>
+    
+    
+      <li>Next: <a href="../xpl_time/index.html">&lt;no title&gt;</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>&lt;no title&gt;</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/plugins/x10_heyu/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../wol_ping/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../xpl_time/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

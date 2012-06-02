@@ -31,6 +31,21 @@ End User Documentation
   :doc:`Plugins management </enduser/administration/plugin>` |
   :doc:`Accounts management </enduser/administration/account>`
 
+Plugins
+=======
+
+Each plugin has its own page with details like functionalities and requirements.
+
+* :doc:`onewire	</plugins/onewire/index>` Use 1 Wire devices
+* :doc:`cidmodem </plugins/cidmodem/index>` Get caller ID with a modem
+* :doc:`ipx800 </plugins/ipx800/index>` Use IPX800 relayboard
+* :doc:`mirror </plugins/mirror/index>` Use of Mirror by Violet
+* :doc:`plcbus </plugins/plcbus/index>` Use Plcbus devices
+* :doc:`teleinfo </plugins/teleinfo/index>` Get electricity consumption information (only French providers)
+* :doc:`wol_ping </plugins/wol_ping/index>` Ping and wake up computers with Wake on Lan
+* :doc:`x10_heyu </plugins/x10_heyu/index>` Use X10 devices with Heyu
+* :doc:`xpl_time </plugins/xpl_time/index>` Send date and time over xPL
+
 Technical Documentation
 =======================
 * :doc:`Actuators </technical/actuator>`

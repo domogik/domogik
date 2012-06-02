@@ -1,0 +1,45 @@
+{maketoc}
+
+!Purpose
+This plugin send date and time regulary on xPL network. Alone this plugin is useless : he is used by scenariis for checking date and time.
+
+!Plugin configuration
+!!Enabling plugin
+You can enable plugin by using :
+{CODE()}
+dmgenplug xpl_time
+{CODE}
+
+You just have to reload administration page to see the plugin in the list.
+
+!Configuration
+In Domogik administration, go to datetime configuration page. There is no specific configuration for this plugin.
+
+!Start plugin
+You can now start the plugin (start button).
+
+!Devices and widgets
+There is no need (and no way) to create a device, and so to set widgets on UI for this plugin.
+
+!Developper notes
+!!xPL schema
+The [DATETIME.BASIC schema|http://xplproject.org.uk/wiki/index.php?title=Schema_-_DATETIME.BASIC] is used by this plugin.
+
+Example : 
+{CODE()}
+xpl-trig     
+{        
+...  
+}             
+datetime.basic       
+{         
+datetime=20110308115010  
+date=20110308  
+time=115010 
+format1=201103081150101 
+}  
+{CODE}   
+* datetime : <yyyymmddhhmmss> 
+* date : <yyyymmdd>
+* time : <hhmmss>
+* format1 : <yyyymmddhhmmss+weekday>        

@@ -1,0 +1,81 @@
+!Plugin wol_ping
+<div class="to_dev_or_doc">
+((plugin_wol_ping_dev|Go this plugin development information))
+</div>
+{maketoc}
+
+
+!!Purpose
+WOL and Ping plugin allows to ping a computer to see if it is alive and to send a broadcast magic packet to a computer when getting an xPL message. This magic packet tells target computer to wake up.
+
+!!Installation
+Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.
+
+!!Plugin configuration
+!!!Common parameters
+{FANCYTABLE(head=&gt;Key~|~Default value~|~Description)}
+ping-interval~|~60~|~ Define the interval between each ping request for a computer. You shouldn't use a value under 15 seconds.
+{FANCYTABLE}
+!!!Interface parameters
+{FANCYTABLE(head=&gt;Key~|~Default value~|~Description)}
+name~|~~|~Name of the computer. This will be used as address when creating a device : don't use special characters. 
+ip~|~0.0.0.0~|~Ip address (or DNS name) of the computer.
+mac~|~ff:ff:ff:ff:ff:ff~|~Mac address of the computer
+wol-port~|~~|~Port used for wake on lan of the computer. The port is a value between 0 and 9. Common used values are 7, 9, 0.
+{FANCYTABLE}
+<br />
+You can now start the plugin (start button).
+
+!!Creating a device for a computer
+In administration, go to **Organization &gt; Devices** page. Create a new device like this :
+{FANCYTABLE(head=&gt;Field~|~Suggested value~|~Description)}
+Name~|~~|~The name of the computer
+Address~|~~|~The value you set for the **name** parameter in plugin configuration.
+Feature~|~**Computer.control**~|~ 
+Usage~|~Server~|~A computer related usage
+Description~|~~|~a short description (Placement, usage, etc)
+Reference~|~~|~the device reference (model, etc)
+{FANCYTABLE}
+<br />
+Example :
+<br />
+{IMG(attId="193",stylebox="border",align="center")}{IMG}
+<br />
+There are 2 features available :
+* WOL feature (to wake up computer)
+* Ping feature (to see computer status)
+
+((Setup_your_devices|Attribute the features to a place)) and you can now wake up your computer or check its state.
+
+!!Configuration for target computers to wake up (linux)
+Check if your network device allow wakeonlan :
+{CODE()}
+$ sudo ethtool eth0
+{CODE}
+
+If you got : 
+{CODE()}
+Wake-on: d
+{CODE}
+The WOL is not activated. 
+
+If you got : 
+{CODE()}
+Wake-on: g
+{CODE}
+The WOL is activated. 
+
+If it is not activated, you need to enable it. Edit the file **/etc/rc.local** and add the following line before the line containing **exit 0** :
+{CODE()}
+ethtool -s eth0 wol g
+{CODE}
+
+To get the mac address of the computer, use the following command :
+{CODE()}
+$ ifconfig
+eth0    Lien encap:Ethernet  HWaddr 00:15:60:B1:xx:xx
+[...]
+{CODE}
+**HWaddr** is the ac address.
+
+

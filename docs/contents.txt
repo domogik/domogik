@@ -27,6 +27,15 @@ Table Of Content
     /enduser/administration/plugin
     /enduser/administration/account
     /releases/0.1.0
+    /plugins/onewire/index
+    /plugins/cidmodem/index
+    /plugins/ipx800/index
+    /plugins/mirror/index
+    /plugins/plcbus/index
+    /plugins/teleinfo/index
+    /plugins/wol_ping/index
+    /plugins/x10_heyu/index
+    /plugins/xpl_time/index
     /technical/actuator
     /technical/sensor
     /technical/device_feature_usage

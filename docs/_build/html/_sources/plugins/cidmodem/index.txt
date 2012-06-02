@@ -1,0 +1,167 @@
+===============
+Plugin CIDmodem
+===============
+
+Purpose
+=======
+This plugin allows to know who called. This plugin uses a modem 
+
+Prerequisites 
+=============
+
+Material
+--------
+You will need a 56k modem with Caller ID feature (most of them does it). "winmodem" are not supported.
+
+Dependancies - Ubuntu/Debian installation
+-----------------------------------------
+To use cidmodem plugin, you need python serial package. To install it, launch this command as root: ::
+
+    $ apt-get install python-serial
+
+How to plug
+===========
+Simply plug modem like others phone. Then plug modem on computer.
+
+.. image:: cidmodem-plug.png
+
+Permissions management
+----------------------
+By default, you need to be root to access a modem device. To give access to everybody on your computer to the modem device, follow these instructions.
+
+First, get vendor and product ids. Here the example with a PL2303 Modem: ::
+
+    $ lsusb
+    ...
+    Bus 006 Device 020: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port   
+    ...
+
+Here, vendor id is 067b and product id is 2303.
+
+Create an udev rule for modem in file **/etc/udev/rules.d/modem.rules**: ::
+
+    UBSYSTEMS=="usb", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="modem", MODE="0666"    
+
+You just have to unplug and plug back your modem to have permissions on it as a non root user. Your modem device will have **/dev/modem** as entry point
+
+Plugin configuration
+====================
+Enabling plugin
+---------------
+You can enable plugin by using: ::
+
+    dmgenplug cidmodem
+
+You just have to reload administration page to see the plugin in the list.
+
+Configuration
+-------------
+In Domogik administration, go to cidmodem configuration page.
+
+device
+******
+This is the path to your modem device. If you follow previous instructions (cf permissions management), this should be **/dev/modem**.
+Defaut : /dev/modem
+
+cid-command
+***********
+You should kept default value if plugin works. If modem doesn't detect inbound calls, you may have to change this.
+Default : AT#CID=1
+
+Alternate values
+****************
+For some modems, you could need to use **AT+CID=1**.
+Maybe there may also be different way to write this command.
+If you are in this case and you find the good command, please tell us or complete this page :)
+
+For a Conexant based CX93010 usb modem.
+Bus 002 Device 004: ID 0572:1329 Conexant Systems (Rockwell), Inc.
+
+use: AT+VCID=1
+
+Start plugin
+------------
+You can now start the plugin (start button).
+
+Check plugin works
+------------------
+Go to helper tool and use **cidmodem read <device>** helper. Make an inbound call and you should see calling phone number.
+
+Creating a device for Caller Id
+===============================
+In administration, go to **Organization > Devices** page. Create a new device like this :
+
+* Name : a name ("Phone", etc)
+* Description : a short description 
+* Address : device address must be "phone".
+* Reference : whatever you want
+* Usage : "Telephony"
+* Type : "Communication.Caller id"
+
+Example : 
+
+.. image:: cidmodem_create.png
+
+You can now :doc:`Attribute the feature to a place </enduser/configuration/devices>`.
+
+* List of inbound calls : 
+
+.. image:: cidmodem_list_call.png
+
+* An inbound call happens :
+
+.. image:: cidmodem_inbound_call.png
+
+Helpers
+=======
+*To get an introduction to helpers, you can read the :doc:`Helper documentation </enduser/configuration/plugins/helpers>`. To use a helper, the plugin must be stopped.*
+
+cidmodem read <device>
+----------------------
+**cidmodem read** helper will wait for an inbound call on **<device>** and display phone number. It is usefull to check inbound calls are correctly detected.
+
+Example 
+*******
+
+.. code-block:: none
+
+    $ cidmodem read /dev/modem
+    Phone numer : 0102030405
+
+Developper notes
+================
+
+xPL Schema 
+----------
+The `CID.BASIC <http://xplproject.org.uk/wiki/index.php?title=Schema_-_CID.BASIC>`_ schema is used by this plugin.
+
+Here is xPL schema send when an inbound calls occurs: ::
+
+    xpl-trig
+    {
+    ...
+    }
+    cid.basic
+    {
+    calltype=INBOUND
+    phone=0102030405
+    }
+
+How it works 
+------------
+The xPL client listens to the modem. When it detects an incoming call, it sends a XPL-TRIG over the network.
+
+Example of what the modem sees for an incoming call: ::
+
+    RING
+    
+    NMBR = 0688xxxxxx
+    
+    DATE = 1021
+    
+    TIME = 2149
+    
+    RING
+
+When a line containing NMBR is detected, the client gets the number and sends it over the network.
+We don't get date and time because this information will be added by the stats manager.

@@ -1,0 +1,191 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="../x10_heyu/index.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="../teleinfo/index.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../teleinfo/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../x10_heyu/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="plugins-wol_ping-index">
+            
+  <p>!Plugin wol_ping
+&lt;div class=&#8221;to_dev_or_doc&#8221;&gt;
+((plugin_wol_ping_dev|Go this plugin development information))
+&lt;/div&gt;
+{maketoc}</p>
+<p>!!Purpose
+WOL and Ping plugin allows to ping a computer to see if it is alive and to send a broadcast magic packet to a computer when getting an xPL message. This magic packet tells target computer to wake up.</p>
+<p>!!Installation
+Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
+<p>!!Plugin configuration
+!!!Common parameters
+{FANCYTABLE(head=&amp;gt;Key~|~Default value~|~Description)}
+ping-interval~|~60~|~ Define the interval between each ping request for a computer. You shouldn&#8217;t use a value under 15 seconds.
+{FANCYTABLE}
+!!!Interface parameters
+{FANCYTABLE(head=&amp;gt;Key~|~Default value~|~Description)}
+name~|~~|~Name of the computer. This will be used as address when creating a device : don&#8217;t use special characters.
+ip~|~0.0.0.0~|~Ip address (or DNS name) of the computer.
+mac~|~ff:ff:ff:ff:ff:ff~|~Mac address of the computer
+wol-port~|~~|~Port used for wake on lan of the computer. The port is a value between 0 and 9. Common used values are 7, 9, 0.
+{FANCYTABLE}
+&lt;br /&gt;
+You can now start the plugin (start button).</p>
+<p>!!Creating a device for a computer
+In administration, go to <strong>Organization &amp;gt; Devices</strong> page. Create a new device like this :
+{FANCYTABLE(head=&amp;gt;Field~|~Suggested value~|~Description)}
+Name~|~~|~The name of the computer
+Address~|~~|~The value you set for the <strong>name</strong> parameter in plugin configuration.
+Feature~|~**Computer.control**~|~
+Usage~|~Server~|~A computer related usage
+Description~|~~|~a short description (Placement, usage, etc)
+Reference~|~~|~the device reference (model, etc)
+{FANCYTABLE}
+&lt;br /&gt;
+Example :
+&lt;br /&gt;
+{IMG(attId=&#8221;193&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}
+&lt;br /&gt;
+There are 2 features available :
+* WOL feature (to wake up computer)
+* Ping feature (to see computer status)</p>
+<p>((Setup_your_devices|Attribute the features to a place)) and you can now wake up your computer or check its state.</p>
+<p>!!Configuration for target computers to wake up (linux)
+Check if your network device allow wakeonlan :
+{CODE()}
+$ sudo ethtool eth0
+{CODE}</p>
+<p>If you got :
+{CODE()}
+Wake-on: d
+{CODE}
+The WOL is not activated.</p>
+<p>If you got :
+{CODE()}
+Wake-on: g
+{CODE}
+The WOL is activated.</p>
+<p>If it is not activated, you need to enable it. Edit the file <strong>/etc/rc.local</strong> and add the following line before the line containing <strong>exit 0</strong> :
+{CODE()}
+ethtool -s eth0 wol g
+{CODE}</p>
+<p>To get the mac address of the computer, use the following command :
+{CODE()}
+$ ifconfig
+eth0    Lien encap:Ethernet  HWaddr 00:15:60:B1:xx:xx
+[...]
+{CODE}
+<strong>HWaddr</strong> is the ac address.</p>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../teleinfo/index.html">&lt;no title&gt;</a></li>
+    
+    
+      <li>Next: <a href="../x10_heyu/index.html">&lt;no title&gt;</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>&lt;no title&gt;</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/plugins/wol_ping/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../teleinfo/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../x10_heyu/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

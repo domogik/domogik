@@ -1,0 +1,319 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugin CIDmodem &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="../ipx800/index.html" />
+    <link rel="prev" title="Plugin onewire" href="../onewire/index.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../onewire/index.html" title="Plugin onewire">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../ipx800/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="plugins-cidmodem-index">
+            
+  <div class="section" id="plugin-cidmodem">
+<h1>Plugin CIDmodem<a class="headerlink" href="#plugin-cidmodem" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>This plugin allows to know who called. This plugin uses a modem</p>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="material">
+<h3>Material<a class="headerlink" href="#material" title="Permalink to this headline">¶</a></h3>
+<p>You will need a 56k modem with Caller ID feature (most of them does it). &#8220;winmodem&#8221; are not supported.</p>
+</div>
+<div class="section" id="dependancies-ubuntu-debian-installation">
+<h3>Dependancies - Ubuntu/Debian installation<a class="headerlink" href="#dependancies-ubuntu-debian-installation" title="Permalink to this headline">¶</a></h3>
+<p>To use cidmodem plugin, you need python serial package. To install it, launch this command as root:</p>
+<div class="highlight-python"><pre>$ apt-get install python-serial</pre>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-plug">
+<h2>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h2>
+<p>Simply plug modem like others phone. Then plug modem on computer.</p>
+<img alt="../../_images/cidmodem-plug.png" src="../../_images/cidmodem-plug.png" />
+<div class="section" id="permissions-management">
+<h3>Permissions management<a class="headerlink" href="#permissions-management" title="Permalink to this headline">¶</a></h3>
+<p>By default, you need to be root to access a modem device. To give access to everybody on your computer to the modem device, follow these instructions.</p>
+<p>First, get vendor and product ids. Here the example with a PL2303 Modem:</p>
+<div class="highlight-python"><pre>$ lsusb
+...
+Bus 006 Device 020: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+...</pre>
+</div>
+<p>Here, vendor id is 067b and product id is 2303.</p>
+<p>Create an udev rule for modem in file <strong>/etc/udev/rules.d/modem.rules</strong>:</p>
+<div class="highlight-python"><pre>UBSYSTEMS=="usb", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="modem", MODE="0666"</pre>
+</div>
+<p>You just have to unplug and plug back your modem to have permissions on it as a non root user. Your modem device will have <strong>/dev/modem</strong> as entry point</p>
+</div>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enabling-plugin">
+<h3>Enabling plugin<a class="headerlink" href="#enabling-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can enable plugin by using:</p>
+<div class="highlight-python"><pre>dmgenplug cidmodem</pre>
+</div>
+<p>You just have to reload administration page to see the plugin in the list.</p>
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>In Domogik administration, go to cidmodem configuration page.</p>
+<div class="section" id="device">
+<h4>device<a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h4>
+<p>This is the path to your modem device. If you follow previous instructions (cf permissions management), this should be <strong>/dev/modem</strong>.
+Defaut : /dev/modem</p>
+</div>
+<div class="section" id="cid-command">
+<h4>cid-command<a class="headerlink" href="#cid-command" title="Permalink to this headline">¶</a></h4>
+<p>You should kept default value if plugin works. If modem doesn&#8217;t detect inbound calls, you may have to change this.
+Default : AT#CID=1</p>
+</div>
+<div class="section" id="alternate-values">
+<h4>Alternate values<a class="headerlink" href="#alternate-values" title="Permalink to this headline">¶</a></h4>
+<p>For some modems, you could need to use <strong>AT+CID=1</strong>.
+Maybe there may also be different way to write this command.
+If you are in this case and you find the good command, please tell us or complete this page :)</p>
+<p>For a Conexant based CX93010 usb modem.
+Bus 002 Device 004: ID 0572:1329 Conexant Systems (Rockwell), Inc.</p>
+<p>use: AT+VCID=1</p>
+</div>
+</div>
+<div class="section" id="start-plugin">
+<h3>Start plugin<a class="headerlink" href="#start-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can now start the plugin (start button).</p>
+</div>
+<div class="section" id="check-plugin-works">
+<h3>Check plugin works<a class="headerlink" href="#check-plugin-works" title="Permalink to this headline">¶</a></h3>
+<p>Go to helper tool and use <strong>cidmodem read &lt;device&gt;</strong> helper. Make an inbound call and you should see calling phone number.</p>
+</div>
+</div>
+<div class="section" id="creating-a-device-for-caller-id">
+<h2>Creating a device for Caller Id<a class="headerlink" href="#creating-a-device-for-caller-id" title="Permalink to this headline">¶</a></h2>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<ul class="simple">
+<li>Name : a name (&#8220;Phone&#8221;, etc)</li>
+<li>Description : a short description</li>
+<li>Address : device address must be &#8220;phone&#8221;.</li>
+<li>Reference : whatever you want</li>
+<li>Usage : &#8220;Telephony&#8221;</li>
+<li>Type : &#8220;Communication.Caller id&#8221;</li>
+</ul>
+<p>Example :</p>
+<img alt="../../_images/cidmodem_create.png" src="../../_images/cidmodem_create.png" />
+<p>You can now <a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a>.</p>
+<ul class="simple">
+<li>List of inbound calls :</li>
+</ul>
+<img alt="../../_images/cidmodem_list_call.png" src="../../_images/cidmodem_list_call.png" />
+<ul class="simple">
+<li>An inbound call happens :</li>
+</ul>
+<img alt="../../_images/cidmodem_inbound_call.png" src="../../_images/cidmodem_inbound_call.png" />
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p><em>To get an introduction to helpers, you can read the :doc:`Helper documentation &lt;/enduser/configuration/plugins/helpers&gt;`. To use a helper, the plugin must be stopped.</em></p>
+<div class="section" id="cidmodem-read-device">
+<h3>cidmodem read &lt;device&gt;<a class="headerlink" href="#cidmodem-read-device" title="Permalink to this headline">¶</a></h3>
+<p><strong>cidmodem read</strong> helper will wait for an inbound call on <strong>&lt;device&gt;</strong> and display phone number. It is usefull to check inbound calls are correctly detected.</p>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>$ cidmodem read /dev/modem
+Phone numer : 0102030405
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="developper-notes">
+<h2>Developper notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="xpl-schema">
+<h3>xPL Schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_CID.BASIC">CID.BASIC</a> schema is used by this plugin.</p>
+<p>Here is xPL schema send when an inbound calls occurs:</p>
+<div class="highlight-python"><pre>xpl-trig
+{
+...
+}
+cid.basic
+{
+calltype=INBOUND
+phone=0102030405
+}</pre>
+</div>
+</div>
+<div class="section" id="how-it-works">
+<h3>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h3>
+<p>The xPL client listens to the modem. When it detects an incoming call, it sends a XPL-TRIG over the network.</p>
+<p>Example of what the modem sees for an incoming call:</p>
+<div class="highlight-python"><pre>RING
+
+NMBR = 0688xxxxxx
+
+DATE = 1021
+
+TIME = 2149
+
+RING</pre>
+</div>
+<p>When a line containing NMBR is detected, the client gets the number and sends it over the network.
+We don&#8217;t get date and time because this information will be added by the stats manager.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin CIDmodem</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#material">Material</a></li>
+<li><a class="reference internal" href="#dependancies-ubuntu-debian-installation">Dependancies - Ubuntu/Debian installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a><ul>
+<li><a class="reference internal" href="#permissions-management">Permissions management</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#enabling-plugin">Enabling plugin</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#device">device</a></li>
+<li><a class="reference internal" href="#cid-command">cid-command</a></li>
+<li><a class="reference internal" href="#alternate-values">Alternate values</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#start-plugin">Start plugin</a></li>
+<li><a class="reference internal" href="#check-plugin-works">Check plugin works</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-device-for-caller-id">Creating a device for Caller Id</a></li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
+<li><a class="reference internal" href="#cidmodem-read-device">cidmodem read &lt;device&gt;</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#developper-notes">Developper notes</a><ul>
+<li><a class="reference internal" href="#xpl-schema">xPL Schema</a></li>
+<li><a class="reference internal" href="#how-it-works">How it works</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../onewire/index.html">Plugin onewire</a></li>
+    
+    
+      <li>Next: <a href="../ipx800/index.html">&lt;no title&gt;</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Plugin CIDmodem</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/plugins/cidmodem/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../onewire/index.html" title="Plugin onewire">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../ipx800/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
