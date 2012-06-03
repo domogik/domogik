@@ -51,7 +51,7 @@ class Lighting(XplPlugin):
         Create the lighting class
         """
         XplPlugin.__init__(self, name = 'lighting')
-        self.log.info("lighting.__init__ : Start ...")
+        self.log.debug("lighting.__init__ : Start ...")
         self._config = Query(self.myxpl, self.log)
 
         self.log.debug("lighting.__init__ : Try to get configuration from XPL")
@@ -75,7 +75,8 @@ class Lighting(XplPlugin):
         except:
             error = "Something went wrong during lightingAPI init : %s" %  \
                      (traceback.format_exc())
-            self.log.exception("lighting.__init__ : "+error)
+            self.log.error("lighting.__init__ : "+error)
+            self.force_leave()
             raise LightingException(error)
 
         self.log.debug("lighting.__init__ : Try to create listeners")
@@ -86,7 +87,8 @@ class Lighting(XplPlugin):
 #        Listener(self.lighting_basic_trig, self.myxpl,
 #                 {'schema': 'lighting.basic', 'xpltype': 'xpl-trig'})
         self.enable_hbeat()
-        self.log.info("lighting plugin correctly started")
+        self._mylighting.reload_config()
+        self.log.info("Plugin lighting correctly started.")
 
     def lighting_basic_trig(self, message):
         """

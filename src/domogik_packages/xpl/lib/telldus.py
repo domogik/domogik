@@ -45,7 +45,7 @@ import traceback
 from threading import Timer
 from domogik.xpl.common.xplmessage import XplMessage
 from pympler.asizeof import asizeof
-from domogik_packages.xpl.lib.telldus import MEMORY_LIGHTING_SCENE
+from domogik_packages.xpl.lib.lightplugin import MEMORY_LIGHTING_SCENE
 import ConfigParser
 import os
 import glob
@@ -472,9 +472,9 @@ class TelldusAPI:
             elif value == 100 :
                 self.send_xpl("xpl-trig", deviceid, TELLSTICK_UP, 100)
         elif method == TELLSTICK_UP  :
-            self.send_xpl("xpl-trig", deviceid, TELLSTICK_SHUT, 100)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHUT, 100)
         elif method == TELLSTICK_DOWN  :
-            self.send_xpl("xpl-trig", deviceid, TELLSTICK_SHUT, 0)
+            self.send_xpl("xpl-trig", deviceid, TELLDUS_SHUT, 0)
         self.send_xpl("xpl-trig", deviceid, method, value)
         self.log.debug("send_xpl_ack : Done")
 

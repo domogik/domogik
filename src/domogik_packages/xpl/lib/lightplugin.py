@@ -336,6 +336,19 @@ class LightingExtension():
                     self._scenes[scene][device][channel]["faderate"])
         myxpl.send(mess)
 
+    def stat_scnlist_scene(self, myxpl, scene):
+        """
+        @param myxpl : The XPL sender
+        @param message : The XPL message
+        """
+        mess = XplMessage()
+        mess.set_type("xpl-cmnd")
+        mess.set_schema("lighting.config")
+        mess.add_data({"client" : self._name})
+        mess.add_data({"command" : "scninfo"})
+        mess.add_data({"scene" : scene})
+        myxpl.send(mess)
+
     def stat_scnlist(self, myxpl, message):
         """
         @param myxpl : The XPL sender
@@ -347,15 +360,11 @@ class LightingExtension():
         if scenes == None:
             self._plugin.log.warning("LightingExtension.stat_scnlist : can't retrieve scenes from lighting gateway.")
         else:
+            i=0
             for scene in scenes.split(","):
-                mess = XplMessage()
-                mess.set_type("xpl-cmnd")
-                mess.set_schema("lighting.config")
-                mess.add_data({"client" : self._name})
-                mess.add_data({"command" : "scninfo"})
-                mess.add_data({"scene" : scene})
-                myxpl.send(mess)
-                time.sleep(SLEEP)
+                i = i + 1
+                timer = Timer(SLEEP*i, self.stat_scnlist_scene, args=[myxpl,scene])
+                timer.start()
 
     def stat_scninfo(self, myxpl, message):
         """

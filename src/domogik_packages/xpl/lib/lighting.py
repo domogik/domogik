@@ -66,6 +66,12 @@ class LightingAPI():
         self._gateway = LightingGateway(broadcast, log,
             self.data_files_dir, "lighting", myxpl)
 
+    def reload_config(self):
+        '''
+        Reload the configuration
+        '''
+        self._gateway.reload_config()
+
     def config_cmnd_listener(self, message):
         """
         Listen to lighting.request messages
@@ -91,6 +97,7 @@ class LightingAPI():
             'scndel': lambda x,m: self._gateway.scenes.cmnd_scndel(x, m),
             'scnadddev': lambda x,m: self._gateway.scenes.cmnd_scnadddev(x, m),
             'scndeldev': lambda x,m: self._gateway.scenes.cmnd_scndeldev(x, m),
+            'devinfo': lambda x,m: self._gateway.scenes.cmnd_devinfo(x, m),
         }
         try:
             command = None
@@ -192,6 +199,12 @@ class LightingGateway():
         self.preferred_network = "n0"
         self.scenes = LightingScene(self, self.data_files_dir)
         self.clients = LightingClient(self, self.data_files_dir)
+
+    def reload_config(self):
+        '''
+        Reload configuration
+        '''
+        self.scenes.reload_config()
 
     def status(self):
         """

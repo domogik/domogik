@@ -101,6 +101,7 @@ class Telldus(XplHlpPlugin):
         Listener(self.telldus_reload_config_cb, self.myxpl,
                  {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
                   'command': 'reload', 'plugin': 'telldus'})
+        self.enable_hbeat()
         try:
             boo = self._config.query('telldus', 'lightext')
             if boo == None:
@@ -148,7 +149,6 @@ class Telldus(XplHlpPlugin):
             self.lighting.enable_lighting()
         self.log.debug("telldus.__init__ : Try to load the helpers.")
         self.enable_helper()
-        self.enable_hbeat()
         self.log.info("Telldus plugin correctly started")
 
     def telldus_cmnd_cb(self, message):
