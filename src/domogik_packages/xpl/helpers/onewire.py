@@ -304,7 +304,7 @@ class OneWireNetwork:
             ret.append("DS2408 : id=%s" % comp.id)
             ret.append(display % ("SWITCHS_ALL", comp.PIO_ALL))
             ret.append(display % ("SWITCH 0 ", comp.PIO_A))
-            ret.append(display % ("SWITCH 1 ", comp.PIO_1))
+            ret.append(display % ("SWITCH 1 ", comp.PIO_B))
         
         for comp in self._root.find(type = "DS2408"):
             ret.append("DS2408 : id=%s" % comp.id)
@@ -317,6 +317,12 @@ class OneWireNetwork:
             ret.append(display % ("SWITCH 5 ", comp.PIO_5))
             ret.append(display % ("SWITCH 6 ", comp.PIO_6))
             ret.append(display % ("SWITCH 7 ", comp.PIO_7))
+        
+        for comp in self._root.find(type = "DS2413"):
+            ret.append("DS2408 : id=%s" % comp.id)
+            ret.append(display % ("SWITCHS_ALL", comp.PIO_ALL))
+            ret.append(display % ("SWITCH 0 ", comp.PIO_A))
+            ret.append(display % ("SWITCH 1 ", comp.PIO_B))
             
         return ret
 
