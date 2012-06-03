@@ -174,6 +174,7 @@ ipx800 find
 **ipx800 find** helper will discover all available IPX800 boards on network.
 
 .. code-block:: none
+
     $ ipx800 find
     List of all IPX800 boards found :
     192.168.0.102 : IPX800
@@ -204,7 +205,7 @@ ipx800 status <board ip> <login (optionnal)> <password (optionnal)>
 Upgrade IPX800 firmware
 =======================
 
-1.  Go on [http://www.gce-electronics.com/|GCE Electronics website]
+1.  Go on `GCE Electronics website <http://www.gce-electronics.com>`_
 2.  Go to your IPX800 model page. Click on "Télécharger" on bottom to see all availables downloads :
     .. image:: ipx800_website_download.png
 3.  Download the latest release
@@ -346,7 +347,8 @@ Example :
 * Reset counter 0 : http://ip:port/counter.cgi?count=0
 * Reset counter 2 : http://ip:port/counter.cgi?count=2
 
-***/command
+/command
+********
 Here are the url to use for each feature of IPX800 board. "address" is <boardname>-<element type (led, btn...)><number of element>
 
 Switch : 
@@ -368,7 +370,7 @@ xpl-cmnd
 ********
 The COMMAND.BASIC xPL schema is used in this module : http://xplproject.org.uk/wiki/index.php?title=Schema_-_CONTROL.BASIC
 
-.. code-block::
+.. code-block:: none
 
     CONTROL.BASIC
     {
@@ -393,7 +395,7 @@ xpl-trig
 ********
 The SENSOR.BASIC xPL schema is used in this module : http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC
 
-.. code-block::
+.. code-block:: none
 
     SENSOR.BASIC
     {

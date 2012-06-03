@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>Plugin wol_ping - developer information &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,7 +24,9 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" /> 
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Set a udev rule" href="../../various/udev_rule.html" />
+    <link rel="prev" title="Plugin mirror - developer information" href="../mirror/dev.html" /> 
   </head>
   <body>
 
@@ -38,7 +40,11 @@
         <a title="Global index" href="../../genindex.html">Index</a>  |
       </div>
       <div class="nav">
-    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a></div>
+    &laquo; <a href="../mirror/dev.html" title="Plugin mirror - developer information">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../../various/udev_rule.html" title="Set a udev rule">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -46,52 +52,67 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-wol_ping-dev">
             
-  <p>!Plugin wol_ping - developer information
-&lt;div class=&#8221;to_dev_or_doc&#8221;&gt;
-((plugin_wol_ping|Go this plugin documentation))
-&lt;/div&gt;
-{maketoc}</p>
-<p>!!WOL part
-xPL client listens to the xPL network in order to get command messages <em>control.basic</em> with <em>device=&#8221;computer&#8221;</em> and <em>type=&#8221;wakeonlan&#8221;</em>. When one is detected, it sends a magic packet to the mac address defined in <em>mac</em> option on port defined in <em>wol-port</em> for computer name defined in <em>name</em>.</p>
-<p>!!!xPL schema
-* [<a class="reference external" href="http://xplproject.org.uk/wiki/index.php/">http://xplproject.org.uk/wiki/index.php/</a><a href="#id1"><span class="problematic" id="id2">Schema_</span></a>-_CONTROL.BASIC|Control.basic]
-* [<a class="reference external" href="http://xplproject.org.uk/wiki/index.php/">http://xplproject.org.uk/wiki/index.php/</a><a href="#id3"><span class="problematic" id="id4">Schema_</span></a>-_SENSOR.BASIC|Sensor.basic]</p>
+  <div class="section" id="plugin-wol-ping-developer-information">
+<h1>Plugin wol_ping - developer information<a class="headerlink" href="#plugin-wol-ping-developer-information" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>Go this plugin documentation</em></a></p>
+<div class="section" id="wol-part">
+<h2>WOL part<a class="headerlink" href="#wol-part" title="Permalink to this headline">¶</a></h2>
+<p>xPL client listens to the xPL network in order to get command messages <em>control.basic</em> with <em>device=&#8221;computer&#8221;</em> and <em>type=&#8221;wakeonlan&#8221;</em>.
+When one is detected, it sends a magic packet to the mac address defined in <em>mac</em> option on port defined in <em>wol-port</em> for computer name defined in <em>name</em>.</p>
+<div class="section" id="xpl-schema">
+<h3>xPL schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://xplproject.org.uk/wiki/index.php/Schema_-_CONTROL.BASIC">Control.basic</a></li>
+<li><a class="reference external" href="http://xplproject.org.uk/wiki/index.php/Schema_-_SENSOR.BASIC">Sensor.basic</a></li>
+</ul>
 <p>When the plugin gets a <em>control.basic message</em>, it sends a magic packet to the mac address specified in the xPL command.</p>
-<p>!!!!Message to send to plugin for asking to start a computer
-To ask a plugin to send a magic packet, you should send this <strong>xpl-cmnd</strong> message :
-{CODE()}
-CONTROL.BASIC
+<div class="section" id="message-to-send-to-plugin-for-asking-to-start-a-computer">
+<h4>Message to send to plugin for asking to start a computer<a class="headerlink" href="#message-to-send-to-plugin-for-asking-to-start-a-computer" title="Permalink to this headline">¶</a></h4>
+<p>To ask a plugin to send a magic packet, you should send this <strong>xpl-cmnd</strong> message:</p>
+<div class="highlight-python"><pre>CONTROL.BASIC
 {
 DEVICE=
 TYPE=wakeonlan
 CURRENT=HIGH
-}
-{CODE}</p>
-<p>!!!!Message sent by plugin when it successfully send a magic packet
-It is a <strong>xpl-trig</strong> message :
-{CODE()}
-SENSOR.BASIC
+}</pre>
+</div>
+</div>
+<div class="section" id="message-sent-by-plugin-when-it-successfully-send-a-magic-packet">
+<h4>Message sent by plugin when it successfully send a magic packet<a class="headerlink" href="#message-sent-by-plugin-when-it-successfully-send-a-magic-packet" title="Permalink to this headline">¶</a></h4>
+<p>It is a <strong>xpl-trig</strong> message:</p>
+<div class="highlight-python"><pre>SENSOR.BASIC
 {
 DEVICE=
 TYPE=wakeonlan
 CURRENT=HIGH
-}
-{CODE}</p>
-<p>!!!/command
-Here is the url to use by UI to wake up a computer with <em>dyonisos</em> as computer name: <strong>http://ip:port/command/computer/dyonisos/wol</strong></p>
-<p>!!Ping part
-Each <em>ping-interval</em> seconds, plugin will ping all computers defined in configuration options. When getting a status for a computer, a xPl message is sent.</p>
-<p>!!!xPL schema
-* [<a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR">http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR</a>.BASIC|Sensor.basic]</p>
-<p>It is a <strong>xpl-trig</strong> message if status evolved and <strong>xpl-stat</strong> message if status doesn&#8217;t evolved :
-{CODE()}
-SENSOR.BASIC
+}</pre>
+</div>
+</div>
+</div>
+<div class="section" id="command">
+<h3>/command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h3>
+<p>Here is the url to use by UI to wake up a computer with <em>dyonisos</em> as computer name: <strong>http://ip:port/command/computer/dyonisos/wol</strong></p>
+</div>
+</div>
+<div class="section" id="ping-part">
+<h2>Ping part<a class="headerlink" href="#ping-part" title="Permalink to this headline">¶</a></h2>
+<p>Each <em>ping-interval</em> seconds, plugin will ping all computers defined in configuration options. When getting a status for a computer, a xPl message is sent.</p>
+<div class="section" id="id1">
+<h3>xPL schema<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://xplproject.org.uk/wiki/index.php/Schema_-_SENSOR.BASIC">Sensor.basic</a></li>
+</ul>
+<p>It is a <strong>xpl-trig</strong> message if status evolved and <strong>xpl-stat</strong> message if status doesn&#8217;t evolved:</p>
+<div class="highlight-python"><pre>SENSOR.BASIC
 {
 DEVICE=
 TYPE=ping
 CURRENT=
-}
-{CODE}</p>
+}</pre>
+</div>
+</div>
+</div>
+</div>
 
 
           </div>         
@@ -103,9 +124,33 @@ CURRENT=
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin wol_ping - developer information</a><ul>
+<li><a class="reference internal" href="#wol-part">WOL part</a><ul>
+<li><a class="reference internal" href="#xpl-schema">xPL schema</a><ul>
+<li><a class="reference internal" href="#message-to-send-to-plugin-for-asking-to-start-a-computer">Message to send to plugin for asking to start a computer</a></li>
+<li><a class="reference internal" href="#message-sent-by-plugin-when-it-successfully-send-a-magic-packet">Message sent by plugin when it successfully send a magic packet</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#command">/command</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ping-part">Ping part</a><ul>
+<li><a class="reference internal" href="#id1">xPL schema</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
+      <li>Prev: <a href="../mirror/dev.html">Plugin mirror - developer information</a></li>
+    
+    
+      <li>Next: <a href="../../various/udev_rule.html">Set a udev rule</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -113,7 +158,7 @@ CURRENT=
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>Plugin wol_ping - developer information</li></ul>
         
       </li>
   </ul>  
@@ -145,7 +190,11 @@ CURRENT=
     
     <div id="ft">
       <div class="nav">
-    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a></div>
+    &laquo; <a href="../mirror/dev.html" title="Plugin mirror - developer information">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../../various/udev_rule.html" title="Set a udev rule">next</a> &raquo;</div>
     </div>
   </div>
 

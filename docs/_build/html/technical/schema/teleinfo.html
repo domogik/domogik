@@ -1,0 +1,217 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xPL Schema for teleinfo &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="prev" title="REST /helper" href="../rinor/rest_helper.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../rinor/rest_helper.html" title="REST /helper">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a></div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="technical-schema-teleinfo">
+            
+  <div class="section" id="xpl-schema-for-teleinfo">
+<h1>xPL Schema for teleinfo<a class="headerlink" href="#xpl-schema-for-teleinfo" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="but">
+<h2>But<a class="headerlink" href="#but" title="Permalink to this headline">¶</a></h2>
+<p>xPL ne semble pas encore posséder de schéma bien défini pour envoyer les informations issues d&#8217;un montage téléinfo.</p>
+<p>Cette page propose donc d&#8217;en définir un.</p>
+</div>
+<div class="section" id="teleinfo-basic-message-specification">
+<h2>Teleinfo.basic Message specification<a class="headerlink" href="#teleinfo-basic-message-specification" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Class = TELEINFO</li>
+<li>Type = BASIC</li>
+</ul>
+<p>Le schéma TELEINFO.BASIC est utilisé pour transmettre les informations relevées sur le bus &#8220;téléinfo&#8221; des compteurs électriques.</p>
+<div class="section" id="xpl-trig-structure">
+<h3>XPL-TRIG Structure<a class="headerlink" href="#xpl-trig-structure" title="Permalink to this headline">¶</a></h3>
+<p>Ce schéma ne possède aucune structure de type &#8216;trigger&#8217;, le type &#8216;stat&#8217; devrait être utilisé à la place.</p>
+</div>
+<div class="section" id="xpl-cmnd-structure">
+<h3>XPL-CMND Structure<a class="headerlink" href="#xpl-cmnd-structure" title="Permalink to this headline">¶</a></h3>
+<p>Ce schéma est utilisé uniquement pour la transmission des informations relevées par le module &#8220;téléinfo&#8221;.
+Il n&#8217;y a donc besoin d&#8217;aucune commande.</p>
+</div>
+<div class="section" id="xpl-stat-structure">
+<h3>XPL-STAT Structure<a class="headerlink" href="#xpl-stat-structure" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="trame-normale">
+<h4>Trame normale<a class="headerlink" href="#trame-normale" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>TELEINFO.BASIC
+{
+ADCO=&lt;Adresse du compteur&gt;
+OPTARIF=&lt;Option tarifaire&gt;
+ISOUSC=&lt;Intensité souscrite&gt;
+BASE=&lt;Index option base&gt;
+IINST=&lt;Intensité instantanée&gt;
+IMAX=&lt;Intensité maximale appelée&gt;
+MOTDETAT=&lt;Mot d&#39;état du compteur&gt;
+[HCHC=&lt;Heures|creuses&gt;]
+[HCHP=&lt;Heures|pleines&gt;]
+[EJPHN=&lt;Heures|normales&gt;]
+[EJPHPM=&lt;Heures|de pointe&gt;]
+[BBRHCJB=&lt;Heures|creuses jours bleus&gt;]
+[BBRHPJB=&lt;Heures|pleines jours bleus&gt;]
+[BBRHCJW=&lt;Heures|creuses jours blancs&gt;]
+[BBRHPJW=&lt;Heures|pleines jours blancs&gt;]
+[BBRHCJR=&lt;Heures|creuses jours rouges&gt;]
+[BBRHPJR=&lt;Heures|pleines jours rouges&gt;]
+[PEJP=&lt;Préavis|début EJP (30min)&gt;]
+[PTEC=&lt;Période|tarifaire actuelle&gt;]
+[DEMAIN=&lt;Couleur|du lendemain&gt;]
+[ADPS=&lt;Avertissement|de dépassement&gt;]
+[PAPP=&lt;Puissance|apparente&gt;]
+[HHPHC=&lt;Horaire|heure pleine/heure creuse&gt;]
+[PPOT=&lt;Présence|des potentiels&gt;]
+[IINST1=&lt;Intensité|instantanée phase 1&gt;]
+[IINST2=&lt;Intensité|instantanée phase 2&gt;]
+[IINST3=&lt;Intensité|instantanée phase 3&gt;]
+[IMAX1=&lt;Intensité|maximale phase 1&gt;]
+[IMAX2=&lt;Intensité|maximale phase 2&gt;]
+[IMAX3=&lt;Intensité|maximale phase 3&gt;]
+[PMAX=&lt;Puissance|maximale triphasée&gt;]
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="trame-courte">
+<h4>Trame courte<a class="headerlink" href="#trame-courte" title="Permalink to this headline">¶</a></h4>
+<p>Dans le cas d&#8217;un compteur triphasé, si il y a dépassement d&#8217;intensité sur une des phases, les trames émises sont modifiées et formatées de la façon suivante :</p>
+<div class="highlight-none"><div class="highlight"><pre>TELEINFO.BASIC
+{
+ADIR1=&lt;Dépassement d&#39;intensité sur la phase 1&gt;
+ADIR2=&lt;Dépassement d&#39;intensité sur la phase 2&gt;
+ADIR3=&lt;Dépassement d&#39;intensité sur la phase 3&gt;
+ADCO=&lt;Adresse du compteur&gt;
+IINST1=&lt;Intensité instantanée phase 1&gt;
+IINST2=&lt;Intensité instantanée phase 2&gt;
+IINST3=&lt;Intensité instantanée phase 3&gt;
+}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">xPL Schema for teleinfo</a><ul>
+<li><a class="reference internal" href="#but">But</a></li>
+<li><a class="reference internal" href="#teleinfo-basic-message-specification">Teleinfo.basic Message specification</a><ul>
+<li><a class="reference internal" href="#xpl-trig-structure">XPL-TRIG Structure</a></li>
+<li><a class="reference internal" href="#xpl-cmnd-structure">XPL-CMND Structure</a></li>
+<li><a class="reference internal" href="#xpl-stat-structure">XPL-STAT Structure</a><ul>
+<li><a class="reference internal" href="#trame-normale">Trame normale</a></li>
+<li><a class="reference internal" href="#trame-courte">Trame courte</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../rinor/rest_helper.html">REST /helper</a></li>
+    
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>xPL Schema for teleinfo</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/technical/schema/teleinfo.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../rinor/rest_helper.html" title="REST /helper">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a></div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

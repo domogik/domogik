@@ -1,127 +1,160 @@
-{maketoc}
+===============
+Plugin teleinfo
+===============
 
-!Purpose
+Purpose
+=======
 Teleinformation is a protocol used by a French power provider. 
 The electric meter sends information on a special bus. 
 
 With some custom PCB, you can read this information and keep/log/study your power consumption. 
-The PCB [http://teleinfo.dauguet.net/articles.php?lng=fr&pg=44|is available here]. Some other "teleinfo modem" are available elsewhere on the net.
+The PCB `is available here <http://teleinfo.dauguet.net/articles.php?lng=fr&pg=44>`_. Some other "teleinfo modem" are available elsewhere on the net.
 
 Models supported by plugin :
+
 * Dauguet USB Teleinfo modem
 * Dauguet Seriel Teleinfo modem
 
 Others modem could be supported by plugin. Feel free to test them with this plugin and report us :)
 
-!!Interesting links about Teleinfo
+Interesting links about Teleinfo
+--------------------------------
 * (fr) http://www.planete-domotique.com/blog/2010/03/30/la-teleinformation-edf/
 * (fr) http://bernard.lefrancois.free.fr/teleinfo.htm
 
-!Known issues
+Known issues
+============
 Actually the plugin support only one teleinfo modem. In a futur release, it will support several teleinfo modem.
 
-!Prerequisites
-!!Dependancies - Ubuntu/Debian installation
-To use Plcbus plugin, you need python serial package. To install it, launch this command :
-{CODE()}
-sudo apt-get install python-serial
-{CODE}
+Prerequisites
+=============
 
-!How to plug
+Dependancies - Ubuntu/Debian installation
+-----------------------------------------
 
-!!Example with Dauguet Usb model
+To use Plcbus plugin, you need python serial package. To install it, launch this command: ::
+
+    $ sudo apt-get install python-serial
+
+How to plug
+===========
+
+Example with Dauguet Usb model
+------------------------------
+
 First, you should have an electric meter like this : 
-{IMG(attId="86")}{IMG}
+.. image:: teleinfo-elec-meter.jpg
 
-Open the bottom part (be careful, if there is a metallic security to prevoid opening, you may be looking for the wrong thing!!) of the electric meter. On the right, you should see **I1** and **I2** : it is there you should plug the teleinfo modem. On this photo, there are both a teleinfo modem and a heating programmer pluged.
-{IMG(attId="87")}{IMG}
+Open the bottom part (be careful, if there is a metallic security to prevoid opening, you may be looking for the wrong thing!!) of the electric meter.
+On the right, you should see **I1** and **I2** : it is there you should plug the teleinfo modem.
+
+On this photo, there are both a teleinfo modem and a heating programmer pluged.
+.. image:: teleinfo-elec-meter-zoom.jpg
 
 Here is the Usb teleinfo modem : on the left, the usb plug, on the right, the 2 wires that are plugged on I1 and I2 :
-{IMG(attId="85")}{IMG}
+.. image:: teleinfo-assembly.jpg
 
-!!Permissions management
-By default, you need to be root to access teleinfo modem. To give access to everybody on your computer to the teleinfo modem, follow these instructions.
+Permissions management
+----------------------
+By default, you need to be root to access teleinfo modem.
+To give access to everybody on your computer to the teleinfo modem, follow these instructions.
 
-Create an udev rule for teleinfo in file **/etc/udev/rules.d/teleinfo.rules** :
-!!!Moschip usb->serial adapter.
-If you use a usb to serial adapter (modship model) with a serial Teleinfo modem, you can use this rule :
-{CODE()}
-KERNEL=="ttyUSB*", ATTRS{port_number}=="0", DRIVERS=="moschip7720", SYMLINK+="teleinfo", MODE="0666"
-{CODE}
+Create an udev rule for teleinfo in file **/etc/udev/rules.d/teleinfo.rules**
 
+Moschip usb->serial adapter
+***************************
+If you use a usb to serial adapter (modship model) with a serial Teleinfo modem, you can use this rule: ::
 
-!!!Dauguet usb assemby
-Available on [http://teleinfo.dauguet.net|http://teleinfo.dauguet.net] : Usb model.
-{CODE()}
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="teleinfo", MODE="0666"
-{CODE}
+    KERNEL=="ttyUSB*", ATTRS{port_number}=="0", DRIVERS=="moschip7720", SYMLINK+="teleinfo", MODE="0666"
 
-!!!Other assemblies
+Dauguet usb assemby
+*******************
+Available on http://teleinfo.dauguet.net : Usb model ::
+
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="teleinfo", MODE="0666"
+
+Other assemblies
+****************
 *Feel free to give us your teleinfo modem model and udev rules ;)*
 
-!!!!Example for an usb model
-First, get vendor and product ids with **lsusb** command :
-{CODE()}
-# lsusb
-Bus 006 Device 013: ID 0123:4567 Some bla bla
-{CODE}
+Example for an usb model
+########################
+
+First, get vendor and product ids with **lsusb** command: ::
+
+    $ lsusb
+    Bus 006 Device 013: ID 0123:4567 Some bla bla
+
 Here, vendor id is 0123and product id is 4567.
 
-The rule will be :
-{CODE()}
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="0123", ATTRS{idProduct}=="4567 ", SYMLINK+="teleinfo", MODE="0666"
-{CODE}
+The rule will be: ::
 
-!!!Apply the rule
-You just have to unplug and plug back your Teleinfo modem to have permissions on it as a non root user. Your Teleinfo modem device will have **/dev/teleinfo** as entry point
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="0123", ATTRS{idProduct}=="4567 ", SYMLINK+="teleinfo", MODE="0666"
 
-!!!Check the device under Linux
+Apply the rule
+**************
+You just have to unplug and plug back your Teleinfo modem to have permissions on it as a non root user.
+Your Teleinfo modem device will have **/dev/teleinfo** as entry point
+
+Check the device under Linux
+****************************
 Setup the connection according to the Teleinfo specifications
-{CODE()}
-# stty -F /dev/teleinfo 1200 sane evenp parenb cs7 -crtscts
-{CODE}
 
-Display the data flow
-{CODE()}
-# cat /dev/teleinfo
-ADCO 012345678901 =
-OPTARIF HC.. <
-ISOUSC 60 <
-HCHC 009205446 $
-HCHP 011101473 %
-PTEC HP..
-IINST 002 Y
-IMAX 047 J
-PAPP 00520 (
-HHPHC D /
-MOTDETAT 000000 B
-...
-{CODE}
-!Plugin configuration
-!!Enabling plugin
-You can enable plugin by using :
-{CODE()}
-dmgenplug teleinfo
-{CODE}
+.. code-block:: none
+
+    $ stty -F /dev/teleinfo 1200 sane evenp parenb cs7 -crtscts
+
+Display the data flow ::
+
+    $ cat /dev/teleinfo
+    ADCO 012345678901 =
+    OPTARIF HC.. <
+    ISOUSC 60 <
+    HCHC 009205446 $
+    HCHP 011101473 %
+    PTEC HP..
+    IINST 002 Y
+    IMAX 047 J
+    PAPP 00520 (
+    HHPHC D /
+    MOTDETAT 000000 B
+    ...
+
+Plugin configuration
+====================
+
+Enabling plugin
+---------------
+You can enable plugin by using: ::
+
+    $ dmgenplug teleinfo
 
 You just have to reload administration page to see the plugin in the list.
 
-!!Configuration
+Configuration
+-------------
 In Domogik administration, go to teleinfo configuration page.
 
-!!!device
-This is the address of Teleinfo modem device. If you follow previsous instructions about permissions, it should be **/dev/teleinfo**. Elsewhere, it could be something like **/dev/ttyUSB0** for an usb model.
+device
+******
+This is the address of Teleinfo modem device.
+If you follow previsous instructions about permissions, it should be **/dev/teleinfo**.
+Elsewhere, it could be something like **/dev/ttyUSB0** for an usb model.
 Default : /dev/teleinfo
 
-!!!interval
+interval
+********
 This is the time between each read of modem teleinfo for getting data.
 Default : 60
 
-!!Start plugin
+Start plugin
+------------
 You can now start the plugin (start button).
 
-!Creating a device for Teleinfo modem
+Creating a device for Teleinfo modem
+====================================
 In administration, go to **Organization > Devices** page. Create a new device like this :
+
 * Name : "Teleinformation" or whatever you want
 * Description : some description
 * Address : "teleinfo" (don't change this value)
@@ -131,9 +164,10 @@ In administration, go to **Organization > Devices** page. Create a new device li
 
 Example : 
 
-{IMG(attId="192")}{IMG}
+.. image:: teleinfo_create.png
 
 Several features are available : 
+
 * Maximum power
 * Instant power
 * Off peak hours
@@ -142,66 +176,107 @@ Several features are available :
 * Apparent power
 * Hourly group
 
-((Setup_your_devices|Attribute the features to a place. You now have access to your electricity informations)).
+:doc:`Attribute the features to a place </enduser/configuration/devices>`. You now have access to your electricity informations.
 
-!Helpers
-*To get an introduction to helpers, you can read the ((Plugins_helpers|Helper documentation)). To use a helper, the plugin must be stopped.*
+Helpers
+=======
+*To get an introduction to helpers, you can read the :doc:`Helper documentation </enduser/configuration/plugins/helpers>`.
+To use a helper, the plugin must be stopped.*
 
-!!teleinfo read <device>
+teleinfo read <device>
+----------------------
 **teleinfo read <device>** will read current data on electric meter and display them. Example : 
 
-{CODE()}
-$ teleinfo read /dev/teleinfo
-Electric meter data :
-ADCO       : 030928084432
-OPTARIF    : HC..          
-ISOUSC     : 45             
-HCHC       : 005809449      
-HCHP       : 006852296     
-PTEC       : HP..           
-IINST      : 004           
-IMAX       : 048           
-PAPP       : 00860          
-HHPHC      : D              
-MOTDETAT   : 000000      
-{CODE}
-!Teleinfo data explanation
-*Note : this plugin is only related to french people, so following data has no interest to be translated.*
-||**Tag**    |**Format**             |**Description**
-ADCO       |12 car.                | N° d'identification du compteur
-OPTARIF    |4 car.                 | Option tarifaire (type d'abonnement)
-ISOUSC     |2 car. unité = ampères | Intensité souscrite 
-BASE       |9 car. unité = Wh      | Index si option = base 
-HCHC       |9 car. unité = Wh      | Index heures creuses si option = heures creuses
-HCHP       |9 car. unité = Wh      | Index heures pleines si option = heures creuses
-EJP HN     |9 car. unité = Wh      | Index heures normales si option = EJP
-EJP HPM    |9 car. unité = Wh      | Index heures de pointe mobile si option = EJP 
-BBR HC JB  |9 car. unité = Wh      | Index heures creuses jours bleus si option = tempo
-BBR HP JB  |9 car. unité = Wh      | Index heures pleines jours bleus si option = tempo
-BBR HC JW  |9 car. unité = Wh      | Index heures creuses jours blancs si option = tempo
-BBR HP JW  |9 car. unité = Wh      | Index heures pleines jours blancs si option = tempo
-BBR HC JR  |9 car. unité = Wh      | Index heures creuses jours rouges si option = tempo
-BBR HP JR  |9 car. unité = Wh      | Index heures pleines jours rouges si option = tempo
-PEJP       |2 car.                 | Préavis EJP si option = EJP (30mn avant période EJP)
-PTEC       |4 car.                 | Période tarifaire en cours 
-DEMAIN     |                       | Couleur du lendemain si option = tempo
-**IINST**  |3 car. unité = ampères | Intensité instantanée 
-ADPS       |3 car. unité = ampères | Avertissement de dépassement de puissance souscrite (message émis uniquement en cas de dépassement effectif, dans ce cas il est immédiat)
-**IMAX**   |3 car. unité = ampères | Intensité maximale
-PAPP       |5 car. unité = Volt.ampères | Puissance apparente : PAPP 
-HHPHC      |1 car.                 | Groupe horaire si option = heures creuses ou tempo 
-MOTDETAT   |6 car.                 | Mot d'état (autocontrôle) ||
+.. code--block:: none
 
+    $ teleinfo read /dev/teleinfo
+    Electric meter data :
+    ADCO       : 030928084432
+    OPTARIF    : HC..          
+    ISOUSC     : 45             
+    HCHC       : 005809449      
+    HCHP       : 006852296     
+    PTEC       : HP..           
+    IINST      : 004           
+    IMAX       : 048           
+    PAPP       : 00860          
+    HHPHC      : D              
+    MOTDETAT   : 000000      
 
-!! Three phase specific data
+Teleinfo data explanation
+=========================
+
+.. note::
+
+    this plugin is only related to french people, so following data has no interest to be translated.
+
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| Tag        | Format                      | Description                                                                                                   |
++============+=============================+===============================================================================================================+
+| ADCO       | 12 car.                     | N° d'identification du compteur                                                                               |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| OPTARIF    | 4 car.                      | Option tarifaire (type d'abonnement)                                                                          |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| ISOUSC     | 2 car. unité = ampères      | Intensité souscrite                                                                                           |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BASE       | 9 car. unité = Wh           | Index si option = base                                                                                        |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| HCHC       | 9 car. unité = Wh           | Index heures creuses si option = heures creuses                                                               |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| HCHP       | 9 car. unité = Wh           | Index heures pleines si option = heures creuses                                                               |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| EJP HN     | 9 car. unité = Wh           | Index heures normales si option = EJP                                                                         |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| EJP HPM    | 9 car. unité = Wh           | Index heures de pointe mobile si option = EJP                                                                 |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BBR HC JB  | 9 car. unité = Wh           | Index heures creuses jours bleus si option = tempo                                                            |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BBR HP JB  | 9 car. unité = Wh           | Index heures pleines jours bleus si option = tempo                                                            |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BBR HC JW  | 9 car. unité = Wh           | Index heures creuses jours blancs si option = tempo                                                           |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BBR HP JW  | 9 car. unité = Wh           | Index heures pleines jours blancs si option = tempo                                                           |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BBR HC JR  | 9 car. unité = Wh           | Index heures creuses jours rouges si option = tempo                                                           |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| BBR HP JR  | 9 car. unité = Wh           | Index heures pleines jours rouges si option = tempo                                                           |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| PEJP       | 2 car.                      | Préavis EJP si option = EJP (30mn avant période EJP)                                                          |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| PTEC       | 4 car.                      | Période tarifaire en cours                                                                                    |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| DEMAIN     |                             | Couleur du lendemain si option = tempo                                                                        |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| **IINST**  | 3 car. unité = ampères      | Intensité instantanée                                                                                         |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| ADPS       | 3 car. unité = ampères      | Avertissement de dépassement de puissance souscrite                                                           |
+|            |                             | (message émis uniquement en cas de dépassement effectif, dans ce cas il est immédiat)                         |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| **IMAX**   | 3 car. unité = ampères      | Intensité maximale                                                                                            |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| PAPP       | 5 car. unité = Volt.ampères | Puissance apparente : PAPP                                                                                    |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| HHPHC      | 1 car.                      | Groupe horaire si option = heures creuses ou tempo                                                            |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+| MOTDETAT   | 6 car.                      | Mot d'état (autocontrôle)                                                                                     |
++------------+-----------------------------+---------------------------------------------------------------------------------------------------------------+
+
+Three phase specific data
+-------------------------
 If you have a 3-phase install, you will have more informations: 
+
 * iinst1, iinst2,iinst3 instead of iinst
 * imax1, imax2, imax3 instaed of imax
 
 If you use more than provided power on one phase, the information sent by teleinfo will change, and you will receive message using the schema teleinfo.short with only a few information :
+
 * ADIR1, ADIR2, ADIR3 : intensity overload on each phase
 * IINST1, IINST2, IINST3 : intensity on each phase.
-!Developper notes
-!!xPL schema
-See the ((xPL_teleinfo_schema|xPL Teleinfo Schema page))
+
+Developper notes
+================
+
+xPL schema
+----------
+See the :doc:`xPL Teleinfo Schema page </technical/schema/teleinfo>`
 

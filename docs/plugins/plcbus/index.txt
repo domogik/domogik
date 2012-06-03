@@ -121,14 +121,14 @@ Creating a lamp device
 
 In the administration panel, go to **Organization > Devices** page. Create a new device like this :
 
-* Name : Short name, like "Hall"
-* Address : A3 (for example)
-* Description : Device details, like "Hall light"
-* Reference : Plcbus module's model, only for informations, like "PLCBUS-2221"
-* Usage : "Light"
-* Type : 
-** plcbus.switch provides only on/off
-** plcbus.dimmer provides on/off and dim/bright.
+*   Name : Short name, like "Hall"
+*   Address : A3 (for example)
+*   Description : Device details, like "Hall light"
+*   Reference : Plcbus module's model, only for informations, like "PLCBUS-2221"
+*   Usage : "Light"
+*   Type : 
+    * plcbus.switch provides only on/off
+    * plcbus.dimmer provides on/off and dim/bright.
 
 Examples :
 
@@ -208,6 +208,7 @@ xpl-stat
 ********
 
 .. code-block:: none
+
     PLCBUS.BASIC
     {
     USERCODE=<plcbus network usercode>

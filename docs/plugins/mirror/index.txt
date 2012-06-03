@@ -2,6 +2,8 @@
 Plugin mirror
 =============
 
+:doc:`Go this plugin development information </plugins/mirror/dev>`
+
 Purpose
 =======
 Mir:ror plugin allows to use Mir:ror by `Violet <http://www.nabaztag.com/mirror/indexEN.html>`_ device.
@@ -25,7 +27,7 @@ Plugins are installed from the user interface administration. See ((Installing_t
 
 Permissions management
 ======================
-The needed udev rule is given while installing the plugin. See ((Set_a_udev_rule|this page)) to apply it.
+The needed udev rule is given while installing the plugin. See :doc:`Setting UDEV rule </various/udev_rule>` to apply it.
 
 Plugin configuration
 ====================
@@ -92,7 +94,7 @@ mirror read
 Example: RFID in
 ****************
 
-.. code-block::
+.. code-block:: none
 
     $ mirror read /dev/mirror
     Device : 000008d00218c10916a8a9000000
@@ -102,7 +104,7 @@ Example: RFID in
 Example: RFID out
 *****************
 
-.. code-block::
+.. code-block:: none
 
     $ mirror read /dev/mirror
     Device : 000008d00218c10916a8a9000000
@@ -112,7 +114,7 @@ Example: RFID out
 Example: Mir:ror faced up
 *************************
 
-.. code-block::
+.. code-block:: none
 
     $ mirror read /dev/mirror
     Device : mirror
@@ -122,7 +124,7 @@ Example: Mir:ror faced up
 Example: Mir:ror faced down
 ***************************
 
-.. code-block::
+.. code-block:: none
 
     $ mirror read /dev/mirror
     Device : mirror

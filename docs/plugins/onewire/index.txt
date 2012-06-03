@@ -2,7 +2,7 @@
 Plugin onewire
 ==============
 
-((plugin_onewire_dev|Go this plugin development information)) 
+:doc:`Go this plugin development information </plugins/onewire/dev>`
 
 Purpose
 =======
@@ -168,12 +168,22 @@ Plugin configuration
 
 Common parameters
 -----------------
-====== ============= ===========
-Key    Default value Description
-====== ============= ===========
-device u             The 1wire device address. The available values are : **u** (usb interface), **/dev/ttySO** (example for a serial interface), **remote_system:3003** (address of a OWSERVER)
-cache *checked*      Checked : use the cache. Unchecked : don't use the cache. Reading data on 1 wire netowrk is a slow operation, so if you read a lot of data, it could be a good idea to use cache. More informations on http://owfs.sourceforge.net/caching.html
-====== ============= ===========
++--------+---------------+---------------------------------------------------------------+
+| Key    | Default value | Description                                                   |
++========+===============+===============================================================+
+| device | u             | The 1wire device address.                                     |
+|        |               | The available values are :                                    |
+|        |               | **u** (usb interface),                                        |
+|        |               | **/dev/ttySO** (example for a serial interface),              |
+|        |               | **remote_system:3003** (address of a OWSERVER)                |
++--------+---------------+---------------------------------------------------------------+
+| cache  | *checked*     | Checked : use the cache.                                      |
+|        |               | Unchecked : don't use the cache.                              |
+|        |               | Reading data on 1 wire netowrk is a slow operation,           |
+|        |               | so if you read a lot of data,                                 |
+|        |               | it could be a good idea to use cache.                         |
+|        |               | More informations on http://owfs.sourceforge.net/caching.html |
++--------+---------------+---------------------------------------------------------------+
 
 others...
 ---------
@@ -194,13 +204,19 @@ Normal mode
 Configuration items
 -------------------
 
-=============== ============= ===========
-Key             Default value Description
-=============== ============= ===========
-ds18b20-en      *unchecked*   Enabling (or not) DS18B20 components support.
-ds18b20-int     60            The interval between each DS18B20 component reading. If you want to monitor your house temperature, 60 or 120s is a good value. If you want to monitor something where temperature can change quickly, you can put a small value (5s for example) but you will have to set **cache** to False to get instant values.
-ds18b20-res (1) 12            Resolution of temperature read on onewire network. Possible values : 9, 10, 11, 12.
-=============== ============= ===========
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| Key             | Default value | Description                                                                                                   |
++=================+===============+===============================================================================================================+
+| ds18b20-en      | *unchecked*   | Enabling (or not) DS18B20 components support.                                                                 |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| ds18b20-int     | 60            | The interval between each DS18B20 component reading.                                                          |
+|                 |               | If you want to monitor your house temperature,                                                                |
+|                 |               | 60 or 120s is a good value.                                                                                   |
+|                 |               | If you want to monitor something where temperature can change quickly,                                        |
+|                 |               | you can put a small value (5s for example) but you will have to set **cache** to False to get instant values. |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| ds18b20-res (1) | 12            | Resolution of temperature read on onewire network. Possible values : 9, 10, 11, 12.                           |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
 
 .. note::
     **(1)** Note that the resolution has an impact on time for reading temperature on device.
@@ -227,16 +243,22 @@ Creating a device for a DS18B20
 -------------------------------
 In administration, go to **Organization > Devices** page. Create a new device like this :
 
-=========== ===================== ===========
-Field       Suggested value       Description
-=========== ===================== ===========
-Name                              A name
-Address                           The DS18b20 id (you can get it with this helper command : **onewire ds18b20** which will give you all your DS18B20 detected)
-Feature     **1Wire.Thermometer** 
-Usage       **Temperature**
-Description                       a short description (Placement, usage, etc)
-Reference                         the device reference (model, etc)
-=========== ===================== ===========
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
+| Field           | Suggested value       | Description                                                                                                   |
++=================+=======================+===============================================================================================================+
+| Name            |                       | A name                                                                                                        |
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
+| Address         |                       | The DS18b20 id                                                                                                |
+|                 |                       | (you can get it with this helper command : **onewire ds18b20** which will give you all your DS18B20 detected) |
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
+| Feature         | **1Wire.Thermometer** |                                                                                                               |
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
+| Usage           | **Temperature**       |                                                                                                               |
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
+| Description     |                       | a short description (Placement, usage, etc)                                                                   |
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
+| Reference       |                       | the device reference (model, etc)                                                                             |
++-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
 
 Example :
 .. image:: onewire_create_thermometer.png
@@ -262,12 +284,16 @@ Normal mode
 Configuration items
 -------------------
 
-=========== ============= ===========
-Key         Default value Description
-=========== ============= ===========
-ds18s20-en  *unchecked*   Enabling (or not) DS18S20 components support.
-ds18s20-int 60            The interval between each DS18S20 component reading. If you want to monitor your house temperature, 60 or 120s is a good value. If you want to monitor something where temperature can change quickly, you can put a small value (5s for example) but you will have to set **cache** to False to get instant values.
-=========== ============= ===========
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| Key             | Default value | Description                                                                                                   |
++=================+===============+===============================================================================================================+
+| ds18s20-en      | *unchecked*   | Enabling (or not) DS18S20 components support.                                                                 |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| ds18s20-int     | 60            | The interval between each DS18S20 component reading.                                                          |
+|                 |               | If you want to monitor your house temperature, 60 or 120s is a good value.                                    |
+|                 |               | If you want to monitor something where temperature can change quickly,                                        |
+|                 |               | you can put a small value (5s for example) but you will have to set **cache** to False to get instant values. |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
 
 Configuration examples
 ----------------------
@@ -289,12 +315,15 @@ Parasit mode
 
 Configuration items
 -------------------
-========== ============= ===========
-Key        Default value Description
-========== ============= ===========
-ds2401-en  *unchecked*   Enabling (or not) DS2401 components support.
-ds2401-int 5             Interval between each DS2401 component reading. The interval to set depends on the usage you will have for DS2401 components.
-========== ============= ===========
+
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| Key             | Default value | Description                                                                                                   |
++=================+===============+===============================================================================================================+
+| ds2401-en       | *unchecked*   | Enabling (or not) DS2401 components support.                                                                  |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| ds2401-int      | 5             | Interval between each DS2401 component reading.                                                               |
+|                 |               | The interval to set depends on the usage you will have for DS2401 components.                                 |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
 
 Opening sensor for a garage door
 ********************************
@@ -306,16 +335,22 @@ Creating a device for a DS2401
 ------------------------------
 In administration, go to **Organization > Devices** page. Create a new device like this :
 
-=========== ======================= ===========
-Field       Suggested value         Description
-=========== ======================= ===========
-Name                                A name
-Address                             The DS2401 idid (you can get it with this helper command : **onewire ds2401** which will give you all your DS2401 detected)
-Feature     **1Wire.Serial Number**
-Usage                               The appropriate usage (shutter, window, door, ...)
-Description                         a short description (Placement, usage, etc)
-Reference                           the device reference (model, etc)
-=========== ======================= ===========
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
+| Field           | Suggested value         | Description                                                                                                   |
++=================+=========================+===============================================================================================================+
+| Name            |                         | A name                                                                                                        |
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
+| Address         |                         | The DS2401 idid (you can get it with this helper command :                                                    |
+|                 |                         | **onewire ds2401** which will give you all your DS2401 detected)                                              |
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
+| Feature         | **1Wire.Serial Number** |                                                                                                               |
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
+| Usage           |                         | The appropriate usage (shutter, window, door, ...)                                                            |
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
+| Description     |                         | a short description (Placement, usage, etc)                                                                   |
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
+| Reference       |                         | the device reference (model, etc)                                                                             |
++-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
 
 Example :
 .. image:: onewire_creare_serial.png
@@ -336,26 +371,36 @@ How to plug
 
 Configuration items
 -------------------
-========== ============= ===========
-Key        Default value Description
-========== ============= ===========
-ds2438-en  *unchecked*   Enabling (or not) DS2401 components support.
-ds2438-int 60            Interval between each DS2438 component reading. Interval to set depends on the usage you will have for DS2438 comopnents.
-========== ============= ===========
+
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| Key             | Default value | Description                                                                                                   |
++=================+===============+===============================================================================================================+
+| ds2438-en       | *unchecked*   | Enabling (or not) DS2401 components support.                                                                  |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
+| ds2438-int      | 60            | Interval between each DS2438 component reading.                                                               |        
+|                 |               | Interval to set depends on the usage you will have for DS2438 comopnents.                                     |
++-----------------+---------------+---------------------------------------------------------------------------------------------------------------+
 
 Creating a device for a DS2438Z - temperature
 ---------------------------------------------
 In administration, go to **Organization > Devices** page. Create a new device like this :
 
-=========== ================================== ===========
-Field       Suggested value                    Description
-=========== ================================== ===========
-Name                                           A name
-Address                                        The DS2428 id (you can get it with this helper command : **onewire ds2438** which will give you all your DS18B20 detected)
-Feature     **1Wire.Thermometer and humidity**
-Usage       **Temperature**
-Description                                    a short description (Placement, usage, etc)
-Reference                                      the device reference (model, etc)
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Field           | Suggested value                    | Description                                                                                                   |
++=================+====================================+===============================================================================================================+
+| Name            |                                    | A name                                                                                                        |
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Address         |                                    | The DS2428 id (you can get it with this helper command :                                                      |
+|                 |                                    | **onewire ds2438** which will give you all your DS18B20 detected)                                             |
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Feature         | **1Wire.Thermometer and humidity** |                                                                                                               |
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Usage           | **Temperature**                    |                                                                                                               | 
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Description     |                                    | a short description (Placement, usage, etc)                                                                   | 
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Reference       |                                    | the device reference (model, etc)                                                                             |
++-----------------+------------------------------------+---------------------------------------------------------------------------------------------------------------+
 
 Example : 
 

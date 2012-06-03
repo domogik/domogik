@@ -2,6 +2,8 @@
 Plugin onewire - developer information
 ======================================
 
+:doc:`Go this plugin documentation </plugins/onewire/index>`
+
 How to add a new component support?
 ===================================
 

@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>Plugin ipx800 &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="../mirror/index.html" />
+    <link rel="next" title="Plugin mirror" href="../mirror/index.html" />
     <link rel="prev" title="Plugin CIDmodem" href="../cidmodem/index.html" /> 
   </head>
   <body>
@@ -44,7 +44,7 @@
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../mirror/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../mirror/index.html" title="Plugin mirror">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -52,56 +52,90 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-ipx800-index">
             
-  <p>!Plugin ipx800
-{maketoc}</p>
-<p>!!Purpose
-The IPX800 is a &#8220;web relay board&#8221; : a relay bord which can be controlled with a web interface. It can be plugged on a network, so you can access and control it from your browser.</p>
-<p>{IMG(attId=&#8221;272&#8221;)}{IMG}</p>
-<p>This board exists in several version with different features :
-* IPX 800 : <a class="reference external" href="http://www.gce-electronics.com/tcp-ip/18-serveur-ip-8-relais-ethernet.html">http://www.gce-electronics.com/tcp-ip/18-serveur-ip-8-relais-ethernet.html</a>
-* IPX 800 pro : <a class="reference external" href="http://www.gce-electronics.com/tcp-ip/31-serveur-ip-8-relais-ethernet.html">http://www.gce-electronics.com/tcp-ip/31-serveur-ip-8-relais-ethernet.html</a>
-* IPX 800 v2.0 : <a class="reference external" href="http://www.gce-electronics.com/40-ipx800-v200.html">http://www.gce-electronics.com/40-ipx800-v200.html</a></p>
-<p>This plugin handle the following features :
-* relays usage and status
-* digitial input status
-* analog input status
-* counter status (and in a futur release, counter reset)</p>
-<p>!!Known issues
-!!!HTTP Authentication make plugin slower
-Using HTTP authentication make plugin interactions with relay board slower. If it is not necessary for you, avoid using HTTP authentication.</p>
-<p>!!How to plug
-The IPX relay board has just to be put in your Local Area Network.
-{IMG(attId=&#8221;64&#8221;)}{IMG}</p>
-<p>!!Plugin configuration
-!!!Enabling plugin
-You can enable plugin by using :
-{CODE()}
-dmgenplug ipx800
-{CODE}</p>
+  <div class="section" id="plugin-ipx800">
+<h1>Plugin ipx800<a class="headerlink" href="#plugin-ipx800" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>The IPX800 is a &#8220;web relay board&#8221; : a relay bord which can be controlled with a web interface.
+It can be plugged on a network, so you can access and control it from your browser.</p>
+<img alt="../../_images/ipx800.png" src="../../_images/ipx800.png" />
+<p>This board exists in several version with different features:</p>
+<ul class="simple">
+<li>IPX 800 : <a class="reference external" href="http://www.gce-electronics.com/tcp-ip/18-serveur-ip-8-relais-ethernet.html">http://www.gce-electronics.com/tcp-ip/18-serveur-ip-8-relais-ethernet.html</a></li>
+<li>IPX 800 pro : <a class="reference external" href="http://www.gce-electronics.com/tcp-ip/31-serveur-ip-8-relais-ethernet.html">http://www.gce-electronics.com/tcp-ip/31-serveur-ip-8-relais-ethernet.html</a></li>
+<li>IPX 800 v2.0 : <a class="reference external" href="http://www.gce-electronics.com/40-ipx800-v200.html">http://www.gce-electronics.com/40-ipx800-v200.html</a></li>
+</ul>
+<p>This plugin handle the following features :</p>
+<ul class="simple">
+<li>relays usage and status</li>
+<li>digitial input status</li>
+<li>analog input status</li>
+<li>counter status (and in a futur release, counter reset)</li>
+</ul>
+</div>
+<div class="section" id="known-issues">
+<h2>Known issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="http-authentication-make-plugin-slower">
+<h3>HTTP Authentication make plugin slower<a class="headerlink" href="#http-authentication-make-plugin-slower" title="Permalink to this headline">¶</a></h3>
+<p>Using HTTP authentication make plugin interactions with relay board slower. If it is not necessary for you, avoid using HTTP authentication.</p>
+</div>
+</div>
+<div class="section" id="how-to-plug">
+<h2>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h2>
+<p>The IPX relay board has just to be put in your Local Area Network.</p>
+<img alt="../../_images/ipx-lan.png" src="../../_images/ipx-lan.png" />
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enabling-plugin">
+<h3>Enabling plugin<a class="headerlink" href="#enabling-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can enable plugin by using:</p>
+<div class="highlight-python"><pre>dmgenplug ipx800</pre>
+</div>
 <p>You just have to reload administration page to see the plugin in the list.</p>
-<p>!!!Configuration
-In Domogik administration, go to ipx800 configuration page.</p>
-<p>!!!!name
-Name for the IPX800. This name will be used when you will create devices for your inputs or relays. Example with &#8220;ipx&#8221; name:
-* relay 0 (0..7) : &#8220;ipx-led0&#8221;
-* digital input 2 (0..3) : &#8220;ipx-btn2&#8221;
-* analog input 1 (1..2) : &#8220;ipx-an1&#8221;
-* counter 3 (0..3) : &#8220;ipx-count3&#8221;</p>
-<p>!!!!ip
-Ip of the IPX800. To find all availables IPX800 relay boards on network, you can use the <strong>ipx800 find</strong> helper.</p>
-<p>!!!!int
-Interval between each reading of IPX800 status
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>In Domogik administration, go to ipx800 configuration page.</p>
+<div class="section" id="name">
+<h4>name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
+<p>Name for the IPX800. This name will be used when you will create devices for your inputs or relays. Example with &#8220;ipx&#8221; name:</p>
+<ul class="simple">
+<li>relay 0 (0..7) : &#8220;ipx-led0&#8221;</li>
+<li>digital input 2 (0..3) : &#8220;ipx-btn2&#8221;</li>
+<li>analog input 1 (1..2) : &#8220;ipx-an1&#8221;</li>
+<li>counter 3 (0..3) : &#8220;ipx-count3&#8221;</li>
+</ul>
+</div>
+<div class="section" id="ip">
+<h4>ip<a class="headerlink" href="#ip" title="Permalink to this headline">¶</a></h4>
+<p>Ip of the IPX800. To find all availables IPX800 relay boards on network, you can use the <strong>ipx800 find</strong> helper.</p>
+</div>
+<div class="section" id="int">
+<h4>int<a class="headerlink" href="#int" title="Permalink to this headline">¶</a></h4>
+<p>Interval between each reading of IPX800 status
 Default : 5</p>
-<p>!!!!login (optionnal)
-Login for HTTP authentication.</p>
-<p>!!!!password (optionnal)
-Password for HTTP authentication.</p>
-<p>!!!Start plugin
-You can now start the plugin (start button).</p>
-<p>!!Creating devices for IPX800
-In administration, go to Organization &gt; Devices page to create your devices.</p>
-<p>!!!Relay
-Create a new device like this :</p>
+</div>
+<div class="section" id="login-optionnal">
+<h4>login (optionnal)<a class="headerlink" href="#login-optionnal" title="Permalink to this headline">¶</a></h4>
+<p>Login for HTTP authentication.</p>
+</div>
+<div class="section" id="password-optionnal">
+<h4>password (optionnal)<a class="headerlink" href="#password-optionnal" title="Permalink to this headline">¶</a></h4>
+<p>Password for HTTP authentication.</p>
+</div>
+</div>
+<div class="section" id="start-plugin">
+<h3>Start plugin<a class="headerlink" href="#start-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can now start the plugin (start button).</p>
+</div>
+</div>
+<div class="section" id="creating-devices-for-ipx800">
+<h2>Creating devices for IPX800<a class="headerlink" href="#creating-devices-for-ipx800" title="Permalink to this headline">¶</a></h2>
+<p>In administration, go to Organization &gt; Devices page to create your devices.</p>
+<div class="section" id="relay">
+<h3>Relay<a class="headerlink" href="#relay" title="Permalink to this headline">¶</a></h3>
+<p>Create a new device like this :</p>
 <ul class="simple">
 <li>Name : &#8220;IPX Relay 0&#8221; (or whatever you want)</li>
 <li>Description : a short description (Placement, usage, etc)</li>
@@ -110,11 +144,13 @@ Create a new device like this :</p>
 <li>Usage : &#8220;Appliance&#8221;, &#8220;Light&#8221; (for example)</li>
 <li>Type : RelayBoard.Relay</li>
 </ul>
-<p>((Setup_your_devices|Attribute the feature to a place and you can now see the status of your IPX800 board relay (on or off)))</p>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the status of your IPX800 board relay (on or off)</p>
 <p>Example :</p>
-<p>{IMG(attId=&#8221;184&#8221;)}{IMG}</p>
-<p>!!!Digital input
-Create a new device like this :</p>
+<img alt="../../_images/ipx800_create_relay.png" src="../../_images/ipx800_create_relay.png" />
+</div>
+<div class="section" id="digital-input">
+<h3>Digital input<a class="headerlink" href="#digital-input" title="Permalink to this headline">¶</a></h3>
+<p>Create a new device like this :</p>
 <ul class="simple">
 <li>Name : &#8220;IPX Digital Input 0&#8221; (or whatever you want)</li>
 <li>Description : a short description (Placement, usage, etc)</li>
@@ -124,10 +160,12 @@ Create a new device like this :</p>
 <li>Type : RelayBoard.Digital_Input</li>
 </ul>
 <p>Example :</p>
-<p>{IMG(attId=&#8221;185&#8221;)}{IMG}</p>
-<p>((Setup_your_devices|Attribute the feature to a place and you can now see the status of your IPX800 board digital input (up or down)))</p>
-<p>!!!Analog input
-Create a new device like this :</p>
+<img alt="../../_images/ipx800_create_digital.png" src="../../_images/ipx800_create_digital.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the status of your IPX800 board digital input (up or down)</p>
+</div>
+<div class="section" id="analog-input">
+<h3>Analog input<a class="headerlink" href="#analog-input" title="Permalink to this headline">¶</a></h3>
+<p>Create a new device like this :</p>
 <ul class="simple">
 <li>Name : &#8220;IPX Analog Input 1&#8221; (or whatever you want)</li>
 <li>Description : a short description (Placement, usage, etc)</li>
@@ -136,16 +174,24 @@ Create a new device like this :</p>
 <li>Usage : &#8220;Electricity&#8221; (for example)</li>
 <li>Type : RelayBoard.Analog_Input</li>
 </ul>
-<p><em>Notice that for relay and digital input, number of item start at &#8216;0&#8217; and for analog input, it starts to &#8216;1&#8217;. It is due to IPX800 design.</em></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Notice that for relay and digital input, number of item start at &#8216;0&#8217; and for analog input, it starts to &#8216;1&#8217;. It is due to IPX800 design.</p>
+</div>
 <p>Example :</p>
-<p>{IMG(attId=&#8221;186&#8221;)}{IMG}</p>
-<p>((Setup_your_devices|Attribute the feature to a place and you can now see the value of your IPX800 board analog input.))</p>
-<p>!!!Counter
-<strong>Warning</strong> : counter are not well ordered in IPX800 firmware :
+<img alt="../../_images/ipx800_create_analog.png" src="../../_images/ipx800_create_analog.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the value of your IPX800 board analog input</p>
+</div>
+<div class="section" id="counter">
+<h3>Counter<a class="headerlink" href="#counter" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">counter are not well ordered in IPX800 firmware :
 * count1 =&gt; btn3
 * count2 =&gt; btn2
 * count3 =&gt; btn1
 * count4 =&gt; btn0</p>
+</div>
 <p>Create a new device like this :</p>
 <ul class="simple">
 <li>Name : &#8220;IPX Counter 0&#8221; (or whatever you want)</li>
@@ -156,22 +202,28 @@ Create a new device like this :</p>
 <li>Type : RelayBoard.Counter</li>
 </ul>
 <p>Example :</p>
-<p>{IMG(attId=&#8221;187&#8221;)}{IMG}</p>
-<p>((Setup_your_devices|Attribute the feature to a place and you can now see the count of your IPX800 board counter.))</p>
-<p>!!Helpers
-<em>To get an introduction to helpers, you can read the ((Plugins_helpers|Helper documentation)). To use a helper, the plugin must be stopped.</em></p>
-<p>!!!ipx800 find
-<strong>ipx800 find</strong> helper will discover all available IPX800 boards on network.</p>
-<p>{CODE()}
-$ ipx800 find
+<img alt="../../_images/ipx800_create_counter.png" src="../../_images/ipx800_create_counter.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the count of your IPX800 board counter.</p>
+</div>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p>To get an introduction to helpers, you can read the <a class="reference internal" href="../../enduser/configuration/plugins/helpers.html"><em>Helper documentation</em></a>.
+To use a helper, the plugin must be stopped.</p>
+<div class="section" id="ipx800-find">
+<h3>ipx800 find<a class="headerlink" href="#ipx800-find" title="Permalink to this headline">¶</a></h3>
+<p><strong>ipx800 find</strong> helper will discover all available IPX800 boards on network.</p>
+<div class="highlight-none"><div class="highlight"><pre>$ ipx800 find
 List of all IPX800 boards found :
 192.168.0.102 : IPX800
 192.168.0.103 : RELAYBOARD
-{CODE}</p>
-<p>!!!ipx800 status &lt;board ip&gt; &lt;login (optionnal)&gt; &lt;password (optionnal)&gt;
-<strong>ipx800 status &lt;board ip&gt; &lt;login&gt; &lt;password&gt;</strong> helper will give you status of board&#8217;s elements.</p>
-<p>{CODE()}
-$ ipx800 status 192.168.0.102 admin pass
+</pre></div>
+</div>
+</div>
+<div class="section" id="ipx800-status-board-ip-login-optionnal-password-optionnal">
+<h3>ipx800 status &lt;board ip&gt; &lt;login (optionnal)&gt; &lt;password (optionnal)&gt;<a class="headerlink" href="#ipx800-status-board-ip-login-optionnal-password-optionnal" title="Permalink to this headline">¶</a></h3>
+<p><strong>ipx800 status &lt;board ip&gt; &lt;login&gt; &lt;password&gt;</strong> helper will give you status of board&#8217;s elements.</p>
+<div class="highlight-none"><div class="highlight"><pre>$ ipx800 status 192.168.0.102 admin pass
 List of relay :
 - led0 : 0
 - led1 : 0
@@ -186,72 +238,93 @@ List of analog input :
 List of counters :
 - count0 : 5
 - count1 : 47
-{CODE}</p>
-<p>!!Upgrade IPX800 firmware
-1. Go on [<a class="reference external" href="http://www.gce-electronics.com/">http://www.gce-electronics.com/</a><a href="#id1"><span class="problematic" id="id2">|</span></a>GCE Electronics website]
-2. Go to your IPX800 model page. Click on &#8220;Télécharger&#8221; on bottom to see all availables downloads :
-{IMG(attId=&#8221;275&#8221;)}{IMG}
-3. Download the latest release
-4. Extract it :
-{CODE()}
-$ mkdir /tmp/ipx800
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="upgrade-ipx800-firmware">
+<h2>Upgrade IPX800 firmware<a class="headerlink" href="#upgrade-ipx800-firmware" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Go on <a class="reference external" href="http://www.gce-electronics.com">GCE Electronics website</a></p>
+</li>
+<li><p class="first">Go to your IPX800 model page. Click on &#8220;Télécharger&#8221; on bottom to see all availables downloads :
+.. image:: ipx800_website_download.png</p>
+</li>
+<li><p class="first">Download the latest release</p>
+</li>
+<li><p class="first">Extract it:</p>
+<div class="highlight-python"><pre>$ mkdir /tmp/ipx800
 $ cd /tmp/ipx800
-$ unrar e &#8220;/path/to/IPX800 V2 3.xx.xx.rar&#8221;
-{CODE}</p>
-<p>5. Download the linux utility to flash the IPX800 firmware :
-{ATTACH(name=&#8221;flash.sh&#8221;,file=&#8221;flash.sh&#8221;,id=&#8221;276&#8221;,dls=&#8221;1&#8221;,icon=&#8221;1&#8221;)}{ATTACH}
-Notice that this script is also available in Domogik sources in this path : <strong>src/tools/ipx800/flash.sh</strong>.
-6. Launch utility like this :
-{CODE()}
-$ ./flash.sh /path/to/IPX800 V2 3.xx.xx/Flash/gceip3xxxx.hex
-{CODE}
-Follow script instructions</p>
-<p>If everything went fine, you should obtain this kind of output :
-{CODE()}
-$ ./flash.sh gceip30021.hex
+$ unrar e "/path/to/IPX800 V2 3.xx.xx.rar"</pre>
+</div>
+</li>
+<li><p class="first">Download the linux utility to flash the IPX800 firmware :
+.. document:: flash.sh
+Notice that this script is also available in Domogik sources in this path : <strong>src/tools/ipx800/flash.sh</strong>.</p>
+</li>
+<li><p class="first">Launch utility like this:</p>
+<div class="highlight-python"><pre>$ ./flash.sh /path/to/IPX800 V2 3.xx.xx/Flash/gceip3xxxx.hex</pre>
+</div>
+</li>
+</ol>
+<p>Follow script instructions</p>
+<p>If everything went fine, you should obtain this kind of output:</p>
+<div class="highlight-python"><pre>$ ./flash.sh gceip30021.hex
 You are about to update IPX800 board with this firmware :
 - gceip30021.hex
-[Enter] to continue. [ctrl]-[c] to abort.</p>
-<p>Manual operations to do before hitting [enter] to flash board :
+[Enter] to continue. [ctrl]-[c] to abort.
+
+Manual operations to do before hitting [enter] to flash board :
 1. Check your computer ip is on 192.168.1.x network
 2. Unplug board.
 3. Wait a few minutes.
-4. While plug in board, press [enter]</p>
-<p>Start updating...
-tftp&gt; Sent 283047 bytes in 16.5 seconds
-{CODE}</p>
-<p>!!Make a hard reset on IPX800 firmware
-A hard reset will make IPX800 relayboard going back to default settings (DHCP enabled, etc). To do this, just follow these steps :
-1. Unplug Ipx800 board
-2. Connect J2&#8217;s up pin and J92&#8217;s left pin together (see red pins in picture)
-{IMG(attId=&#8221;274&#8221;)}{IMG}
-3. Plug IPX800 board
-4. Wait for relays clacking
-5. Disconnect J2 and J92 pins
-6. Unplug board
-7. Plug board</p>
-<p>!!Upgrade IPX800 website
-1. Go on <strong>http://ipx800/mpfsupload/</strong> (assuming ipx800 is associated to your ipx800 IP address).
-{IMG(attId=&#8221;273&#8221;)}{IMG}
-2. Choose website package to upload.
-3. Click on upload</p>
+4. While plug in board, press [enter]
+
+Start updating...
+tftp&gt; Sent 283047 bytes in 16.5 seconds</pre>
+</div>
+</div>
+<div class="section" id="make-a-hard-reset-on-ipx800-firmware">
+<h2>Make a hard reset on IPX800 firmware<a class="headerlink" href="#make-a-hard-reset-on-ipx800-firmware" title="Permalink to this headline">¶</a></h2>
+<p>A hard reset will make IPX800 relayboard going back to default settings (DHCP enabled, etc). To do this, just follow these steps :</p>
+<ol class="arabic simple">
+<li>Unplug Ipx800 board</li>
+<li>Connect J2&#8217;s up pin and J92&#8217;s left pin together (see red pins in picture)
+.. image:: ipx800_hard_reset.png</li>
+<li>Plug IPX800 board</li>
+<li>Wait for relays clacking</li>
+<li>Disconnect J2 and J92 pins</li>
+<li>Unplug board</li>
+<li>Plug board</li>
+</ol>
+</div>
+<div class="section" id="upgrade-ipx800-website">
+<h2>Upgrade IPX800 website<a class="headerlink" href="#upgrade-ipx800-website" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Go on <strong>http://ipx800/mpfsupload/</strong> (assuming ipx800 is associated to your ipx800 IP address).
+.. image:: ipx800_hard_reset_upload_site.png</li>
+<li>Choose website package to upload.</li>
+<li>Click on upload</li>
+</ol>
 <p>Your IPX800&#8217;s website is updated.</p>
-<p>!!Developper notes
-!!!Finding an IPX relay board
-TO discover all IPX relay boards on local network, you can send the following message on UDP (port 30303) :
-{CODE()}
-Discovery: Who is out there?
-{CODE}</p>
-<p>All IPX relay boards will answser
-{CODE()}
-&lt;name of relay board&gt;
-&lt;mac address of relay board&gt;
-{CODE}</p>
-<p>!!!Get actual card status
-You can get the actual status of the card with this url : <a class="reference external" href="http://ip:port/status.xml">http://ip:port/status.xml</a></p>
-<p>This will give this xml data :</p>
-<p>{CODE()}
-&lt;response&gt;
+</div>
+<div class="section" id="developper-notes">
+<h2>Developper notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="finding-an-ipx-relay-board">
+<h3>Finding an IPX relay board<a class="headerlink" href="#finding-an-ipx-relay-board" title="Permalink to this headline">¶</a></h3>
+<p>TO discover all IPX relay boards on local network, you can send the following message on UDP (port 30303):</p>
+<div class="highlight-python"><pre>Discovery: Who is out there?</pre>
+</div>
+<p>All IPX relay boards will answser:</p>
+<div class="highlight-python"><pre>&lt;name of relay board&gt;
+&lt;mac address of relay board&gt;</pre>
+</div>
+</div>
+<div class="section" id="get-actual-card-status">
+<h3>Get actual card status<a class="headerlink" href="#get-actual-card-status" title="Permalink to this headline">¶</a></h3>
+<p>You can get the actual status of the card with this url : <a class="reference external" href="http://ip:port/status.xml">http://ip:port/status.xml</a></p>
+<p>This will give this xml data:</p>
+<div class="highlight-python"><pre>&lt;response&gt;
 &lt;led0&gt;0&lt;/led0&gt;
 &lt;led1&gt;1&lt;/led1&gt;
 &lt;led2&gt;1&lt;/led2&gt;
@@ -271,80 +344,123 @@ You can get the actual status of the card with this url : <a class="reference ex
 &lt;count2&gt;0&lt;/count2&gt;            #
 &lt;count3&gt;0&lt;/count3&gt;            #
 &lt;count4&gt;0&lt;/count4&gt;            #
-&lt;/response&gt;
-{CODE}
-* ledX : status of each relay (0 =&gt; OFF, 1 =&gt; ON)
-* btnX : status of each digital input (up =&gt; ON, down =&gt; OFF)
-* anX : value of each analog input (0 for 0V, 1024 for 3.3V)
-* countX : value of each counter (0...)</p>
-<p>!!!API
-!!!!Change the relay state
-Calling this url will change a relay state
+&lt;/response&gt;</pre>
+</div>
+<ul class="simple">
+<li>ledX : status of each relay (0 =&gt; OFF, 1 =&gt; ON)</li>
+<li>btnX : status of each digital input (up =&gt; ON, down =&gt; OFF)</li>
+<li>anX : value of each analog input (0 for 0V, 1024 for 3.3V)</li>
+<li>countX : value of each counter (0...)</li>
+</ul>
+</div>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="change-the-relay-state">
+<h4>Change the relay state<a class="headerlink" href="#change-the-relay-state" title="Permalink to this headline">¶</a></h4>
+<p>Calling this url will change a relay state
 <a class="reference external" href="http://ip:port/leds.cgi?led=N">http://ip:port/leds.cgi?led=N</a>  (N=0..7)</p>
-<p>Example :
-* change relay 0 state : <a class="reference external" href="http://ip:port/leds.cgi?led=0">http://ip:port/leds.cgi?led=0</a>
-* change relay 2 state : <a class="reference external" href="http://ip:port/leds.cgi?led=2">http://ip:port/leds.cgi?led=2</a></p>
-<p>!!!!Send a pulse to the relay
-Calling this url will send a pulse to the relay
+<p>Example :</p>
+<ul class="simple">
+<li>change relay 0 state : <a class="reference external" href="http://ip:port/leds.cgi?led=0">http://ip:port/leds.cgi?led=0</a></li>
+<li>change relay 2 state : <a class="reference external" href="http://ip:port/leds.cgi?led=2">http://ip:port/leds.cgi?led=2</a></li>
+</ul>
+</div>
+<div class="section" id="send-a-pulse-to-the-relay">
+<h4>Send a pulse to the relay<a class="headerlink" href="#send-a-pulse-to-the-relay" title="Permalink to this headline">¶</a></h4>
+<p>Calling this url will send a pulse to the relay
 <a class="reference external" href="http://ip:port/rlyfs.cgi?rlyf=N">http://ip:port/rlyfs.cgi?rlyf=N</a>  (N=0..7)</p>
-<p>Example :
-* send a pulse to  relay 0 : <a class="reference external" href="http://ip:port/rlyfs.cgi?rlyf=0">http://ip:port/rlyfs.cgi?rlyf=0</a>
-* send a pulse to  relay 2 : <a class="reference external" href="http://ip:port/rlyfs.cgi?rlyf=2">http://ip:port/rlyfs.cgi?rlyf=2</a></p>
-<p>Note : sending a pulse to a relay that is already in state 1, will only put it to state 0 after pulse duration</p>
-<p>!!!!Reset counter  &#8211; beta feature on IPX
-Calling this url will reset a counter :
+<p>Example :</p>
+<ul class="simple">
+<li>send a pulse to  relay 0 : <a class="reference external" href="http://ip:port/rlyfs.cgi?rlyf=0">http://ip:port/rlyfs.cgi?rlyf=0</a></li>
+<li>send a pulse to  relay 2 : <a class="reference external" href="http://ip:port/rlyfs.cgi?rlyf=2">http://ip:port/rlyfs.cgi?rlyf=2</a></li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Sending a pulse to a relay that is already in state 1, will only put it to state 0 after pulse duration</p>
+</div>
+</div>
+<div class="section" id="reset-counter-beta-feature-on-ipx">
+<h4>Reset counter  &#8211; beta feature on IPX<a class="headerlink" href="#reset-counter-beta-feature-on-ipx" title="Permalink to this headline">¶</a></h4>
+<p>Calling this url will reset a counter :
 <a class="reference external" href="http://ip:port/counter.cgi?count=N">http://ip:port/counter.cgi?count=N</a> (N=0..3)</p>
-<p>Example :
-* Reset counter 0 : <a class="reference external" href="http://ip:port/counter.cgi?count=0">http://ip:port/counter.cgi?count=0</a>
-* Reset counter 2 : <a class="reference external" href="http://ip:port/counter.cgi?count=2">http://ip:port/counter.cgi?count=2</a></p>
-<p>!!!!/command
-Here are the url to use for each feature of IPX800 board. &#8220;address&#8221; is &lt;boardname&gt;-&lt;element type (led, btn...)&gt;&lt;number of element&gt;</p>
-<p>Switch :
-* /command/relayboard/&lt;address&gt;/high
-* /command/relayboard/&lt;address&gt;/low
-Trigger :
-* /command/relayboard/&lt;address&gt;/pulse</p>
-<p>||TODO : reset counter when implemented||</p>
-<p>!!!xPL Schema
-!!!!xpl-cmnd
-The COMMAND.BASIC xPL schema is used in this module : <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_CONTROL.BASIC">http://xplproject.org.uk/wiki/index.php?title=Schema_-_CONTROL.BASIC</a></p>
-<p>{CODE()}
-CONTROL.BASIC
+<p>Example :</p>
+<ul class="simple">
+<li>Reset counter 0 : <a class="reference external" href="http://ip:port/counter.cgi?count=0">http://ip:port/counter.cgi?count=0</a></li>
+<li>Reset counter 2 : <a class="reference external" href="http://ip:port/counter.cgi?count=2">http://ip:port/counter.cgi?count=2</a></li>
+</ul>
+</div>
+<div class="section" id="command">
+<h4>/command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h4>
+<p>Here are the url to use for each feature of IPX800 board. &#8220;address&#8221; is &lt;boardname&gt;-&lt;element type (led, btn...)&gt;&lt;number of element&gt;</p>
+<p>Switch :</p>
+<ul class="simple">
+<li>/command/relayboard/&lt;address&gt;/high</li>
+<li>/command/relayboard/&lt;address&gt;/low</li>
+</ul>
+<p>Trigger :</p>
+<ul class="simple">
+<li>/command/relayboard/&lt;address&gt;/pulse</li>
+</ul>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Reset counter when implemented</p>
+</div>
+</div>
+</div>
+<div class="section" id="xpl-schema">
+<h3>xPL Schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="xpl-cmnd">
+<h4>xpl-cmnd<a class="headerlink" href="#xpl-cmnd" title="Permalink to this headline">¶</a></h4>
+<p>The COMMAND.BASIC xPL schema is used in this module : <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_CONTROL.BASIC">http://xplproject.org.uk/wiki/index.php?title=Schema_-_CONTROL.BASIC</a></p>
+<div class="highlight-none"><div class="highlight"><pre>CONTROL.BASIC
 {
 DEVICE=&lt;device name&gt;
 TYPE=&lt;device type&gt;
 CURRENT=&lt;value sent to the device&gt;
 }
-{CODE}
-* device : &lt;relay board name in plugin config&gt;-&lt;element : btn0, btn1...&gt;
-* type :
-** output for a relay
-** count for the counter
-* current :
-** HIGH, LOW, PULSE for a relay
-** 0 to reset counter</p>
-<p>!!!!xpl-stat
-There is no usage of xpl-stat with this plugin</p>
-<p>!!!!xpl-trig
-The SENSOR.BASIC xPL schema is used in this module : <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC">http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC</a></p>
-<p>{CODE()}
-SENSOR.BASIC
+</pre></div>
+</div>
+<ul class="simple">
+<li>device : &lt;relay board name in plugin config&gt;-&lt;element : btn0, btn1...&gt;</li>
+<li>type :</li>
+<li>output for a relay
+* count for the counter</li>
+<li>current :
+* HIGH, LOW, PULSE for a relay
+* 0 to reset counter</li>
+</ul>
+</div>
+<div class="section" id="xpl-stat">
+<h4>xpl-stat<a class="headerlink" href="#xpl-stat" title="Permalink to this headline">¶</a></h4>
+<p>There is no usage of xpl-stat with this plugin</p>
+</div>
+<div class="section" id="xpl-trig">
+<h4>xpl-trig<a class="headerlink" href="#xpl-trig" title="Permalink to this headline">¶</a></h4>
+<p>The SENSOR.BASIC xPL schema is used in this module : <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC">http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC</a></p>
+<div class="highlight-none"><div class="highlight"><pre>SENSOR.BASIC
 {
 DEVICE=&lt;device name&gt;
 TYPE=&lt;device type&gt;
 CURRENT=&lt;current value&gt;
 }
-{CODE}
-* device : &lt;relay board name in plugin config&gt;-&lt;element : btn0, btn1...&gt;
-* type :
-** output for a relay
-** input for the digital input
-** voltage for the analog input
-** count for the counter
-* current :
-** HIGH, LOW for a relay (there is no PULSE value here)
-** 0 to reset counter</p>
+</pre></div>
+</div>
+<ul class="simple">
+<li>device : &lt;relay board name in plugin config&gt;-&lt;element : btn0, btn1...&gt;</li>
+<li>type :
+* output for a relay
+* input for the digital input
+* voltage for the analog input
+* count for the counter</li>
+<li>current :
+* HIGH, LOW for a relay (there is no PULSE value here)
+* 0 to reset counter</li>
+</ul>
 <p>A xpl-trig message is sent at each status change for board&#8217;s elements.</p>
+</div>
+</div>
+</div>
+</div>
 
 
           </div>         
@@ -356,13 +472,72 @@ CURRENT=&lt;current value&gt;
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin ipx800</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#known-issues">Known issues</a><ul>
+<li><a class="reference internal" href="#http-authentication-make-plugin-slower">HTTP Authentication make plugin slower</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a></li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#enabling-plugin">Enabling plugin</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#name">name</a></li>
+<li><a class="reference internal" href="#ip">ip</a></li>
+<li><a class="reference internal" href="#int">int</a></li>
+<li><a class="reference internal" href="#login-optionnal">login (optionnal)</a></li>
+<li><a class="reference internal" href="#password-optionnal">password (optionnal)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#start-plugin">Start plugin</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-devices-for-ipx800">Creating devices for IPX800</a><ul>
+<li><a class="reference internal" href="#relay">Relay</a></li>
+<li><a class="reference internal" href="#digital-input">Digital input</a></li>
+<li><a class="reference internal" href="#analog-input">Analog input</a></li>
+<li><a class="reference internal" href="#counter">Counter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
+<li><a class="reference internal" href="#ipx800-find">ipx800 find</a></li>
+<li><a class="reference internal" href="#ipx800-status-board-ip-login-optionnal-password-optionnal">ipx800 status &lt;board ip&gt; &lt;login (optionnal)&gt; &lt;password (optionnal)&gt;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-ipx800-firmware">Upgrade IPX800 firmware</a></li>
+<li><a class="reference internal" href="#make-a-hard-reset-on-ipx800-firmware">Make a hard reset on IPX800 firmware</a></li>
+<li><a class="reference internal" href="#upgrade-ipx800-website">Upgrade IPX800 website</a></li>
+<li><a class="reference internal" href="#developper-notes">Developper notes</a><ul>
+<li><a class="reference internal" href="#finding-an-ipx-relay-board">Finding an IPX relay board</a></li>
+<li><a class="reference internal" href="#get-actual-card-status">Get actual card status</a></li>
+<li><a class="reference internal" href="#api">API</a><ul>
+<li><a class="reference internal" href="#change-the-relay-state">Change the relay state</a></li>
+<li><a class="reference internal" href="#send-a-pulse-to-the-relay">Send a pulse to the relay</a></li>
+<li><a class="reference internal" href="#reset-counter-beta-feature-on-ipx">Reset counter  &#8211; beta feature on IPX</a></li>
+<li><a class="reference internal" href="#command">/command</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#xpl-schema">xPL Schema</a><ul>
+<li><a class="reference internal" href="#xpl-cmnd">xpl-cmnd</a></li>
+<li><a class="reference internal" href="#xpl-stat">xpl-stat</a></li>
+<li><a class="reference internal" href="#xpl-trig">xpl-trig</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
       <li>Prev: <a href="../cidmodem/index.html">Plugin CIDmodem</a></li>
     
     
-      <li>Next: <a href="../mirror/index.html">&lt;no title&gt;</a></li>
+      <li>Next: <a href="../mirror/index.html">Plugin mirror</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -370,7 +545,7 @@ CURRENT=&lt;current value&gt;
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>Plugin ipx800</li></ul>
         
       </li>
   </ul>  
@@ -406,7 +581,7 @@ CURRENT=&lt;current value&gt;
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../mirror/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../mirror/index.html" title="Plugin mirror">next</a> &raquo;</div>
     </div>
   </div>
 

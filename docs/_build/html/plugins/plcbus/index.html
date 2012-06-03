@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>PLCBUS plugin &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="../teleinfo/index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="../mirror/index.html" /> 
+    <link rel="next" title="Plugin teleinfo" href="../teleinfo/index.html" />
+    <link rel="prev" title="Plugin mirror" href="../mirror/index.html" /> 
   </head>
   <body>
 
@@ -40,11 +40,11 @@
         <a title="Global index" href="../../genindex.html">Index</a>  |
       </div>
       <div class="nav">
-    &laquo; <a href="../mirror/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../mirror/index.html" title="Plugin mirror">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../teleinfo/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../teleinfo/index.html" title="Plugin teleinfo">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -52,113 +52,174 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-plcbus-index">
             
-  <p>!PLCBUS plugin
-{maketoc}</p>
-<p>!!Purpose
-Plcbus is an automation technology wich allows to switch and dim lights, control appliances, etc. This plugin allows to control plcbus devices.</p>
-<p>Following interfaces are supported :
-* PLCBUS-1141U</p>
-<p>!!Prerequisite
-!!!Ubuntu/Debian installation
-To use the plcbus plugin, you need the python serial package. To install it, launch this command :
-{CODE()}
-sudo apt-get install python-serial
-{CODE}
-!!How to plug</p>
-<p>Simply plug the interface into some USB port, and on the power line.
-{img fileId=&#8221;189&#8221; thumb=&#8221;y&#8221; rel=&#8221;box[g]&#8221; title=&#8221;Plcbus Interface&#8221; alt=&#8221;Plcbus Interface&#8221;}</p>
-<p>!!!Permissions management
-To give access to everybody on your computer to the Plcbus interface and have a <strong>/dev/plcbus</strong> entry point, follow these instructions.</p>
-<p>First, get vendor and product ids :
-{CODE()}
-$ lsusb
+  <div class="section" id="plcbus-plugin">
+<h1>PLCBUS plugin<a class="headerlink" href="#plcbus-plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>Plcbus is an automation technology wich allows to switch and dim lights, control appliances, etc. This plugin allows to control plcbus devices.</p>
+<p>Following interfaces are supported :</p>
+<ul class="simple">
+<li>PLCBUS-1141U</li>
+</ul>
+</div>
+<div class="section" id="prerequisite">
+<h2>Prerequisite<a class="headerlink" href="#prerequisite" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ubuntu-debian-installation">
+<h3>Ubuntu/Debian installation<a class="headerlink" href="#ubuntu-debian-installation" title="Permalink to this headline">¶</a></h3>
+<p>To use the plcbus plugin, you need the python serial package. To install it, launch this command:</p>
+<div class="highlight-python"><pre>sudo apt-get install python-serial</pre>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-plug">
+<h2>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h2>
+<p>Simply plug the interface into some USB port, and on the power line.</p>
+<img alt="../../_images/display189.jpeg" src="../../_images/display189.jpeg" />
+<div class="section" id="permissions-management">
+<h3>Permissions management<a class="headerlink" href="#permissions-management" title="Permalink to this headline">¶</a></h3>
+<p>To give access to everybody on your computer to the Plcbus interface and have a <strong>/dev/plcbus</strong> entry point, follow these instructions.</p>
+<p>First, get vendor and product ids:</p>
+<div class="highlight-python"><pre>$ lsusb
 ...
 Bus 005 Device 002: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
-...
-{CODE}</p>
+...</pre>
+</div>
 <p>Here, vendor id is 067b and product id is 2303.</p>
-<p>Create an udev rule for Plcbus in file <strong>/etc/udev/rules.d/plcbus.rules</strong> :
-{CODE()}
-SUBSYSTEMS==&#8221;usb&#8221;, ATTRS{idVendor}==&#8221;067b&#8221;, ATTRS{idProduct}==&#8221;2303&#8221;, SYMLINK+=&#8221;plcbus&#8221;, MODE=&#8221;0666&#8221;
-{CODE}</p>
-<p>You then just have to unplug and plug back your PLCBUS interface to have permissions on it as a non root user. Your interface will always have a symlink /dev/plcbus, no matter what the real device is.
-!!Plugin configuration
-!!!Enabling the plugin
-You can enable the plugin by using :
-{CODE()}
-dmgenplug plcbus
-{CODE}</p>
+<p>Create an udev rule for Plcbus in file <strong>/etc/udev/rules.d/plcbus.rules</strong>:</p>
+<div class="highlight-python"><pre>SUBSYSTEMS=="usb", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="plcbus", MODE="0666"</pre>
+</div>
+<p>You then just have to unplug and plug back your PLCBUS interface to have permissions on it as a non root user.
+Your interface will always have a symlink /dev/plcbus, no matter what the real device is.</p>
+</div>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enabling-the-plugin">
+<h3>Enabling the plugin<a class="headerlink" href="#enabling-the-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can enable the plugin by using:</p>
+<div class="highlight-python"><pre>dmgenplug plcbus</pre>
+</div>
 <p>You just have to reload the administration page in Domogik to see the plugin in the list.</p>
-<p>!!!Configuration
-In Domogik administration, go to the plcbus configuration page.</p>
-<p>{img fileId=&#8221;186&#8221; thumb=&#8221;y&#8221; rel=&#8221;box[g]&#8221; title=&#8221;Plcbus configuration example&#8221;}</p>
-<p>!!!!device
-Path to Plcbus interface
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>In Domogik administration, go to the plcbus configuration page.</p>
+<img alt="../../_images/display186.jpeg" src="../../_images/display186.jpeg" />
+<div class="section" id="device">
+<h4>device<a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h4>
+<p>Path to Plcbus interface
 Default : /dev/plcbus</p>
-<p>!!!!usercode
-The user code you want to use in your house. You can safely keep the default value or choose your own one. It is only really usefull if you have more than 255 plcbus items or if your neighbours also have plcbus devices.</p>
-<p>||TODO : example of usercode or allowed values||
-!!!!probe-interval
-To detect changes made by other controllers than Domogik (remotes, switches, etc), Domogik uses fastpolling. It also helps to discover new devices. You can start setting this value to 5 seconds and then adapt it to your needs.
+</div>
+<div class="section" id="usercode">
+<h4>usercode<a class="headerlink" href="#usercode" title="Permalink to this headline">¶</a></h4>
+<p>The user code you want to use in your house. You can safely keep the default value or choose your own one.
+It is only really usefull if you have more than 255 plcbus items or if your neighbours also have plcbus devices.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">example of usercode or allowed values</p>
+</div>
+</div>
+<div class="section" id="probe-interval">
+<h4>probe-interval<a class="headerlink" href="#probe-interval" title="Permalink to this headline">¶</a></h4>
+<p>To detect changes made by other controllers than Domogik (remotes, switches, etc), Domogik uses fastpolling. It also helps to discover new devices.
+You can start setting this value to 5 seconds and then adapt it to your needs.
 The plugin will do a fastpoll every <strong>probe-interval</strong> seconds. In fact, it uses 2 commands :</p>
 <ul class="simple">
 <li>First do a &#8220;GET_ALL_ID_PULSE&#8221;, to detect all devices.</li>
 <li>Then do a &#8220;GET_ALL_ON_ID_PULSE&#8221;, to detect the state of all devices.</li>
 </ul>
 <p>It is much faster than the STATUS_REQUEST order, because you ask all the devices in one house using only 1 message.</p>
-<p>||TODO : example values||
-!!!!probe-list
-The plugin will scan devices in all housecodes indicated by this field. If you know you only have devices with housecodes &#8220;A&#8221; and &#8220;B&#8221;, then only keep &#8220;AB&#8221; in this field, so that the plugin won&#8217;t scan other roomcodes.
-!!!!Save your configuration
-Just hit the button and wait the &#8220;configuration saved succesfully&#8221; message.
-!!!!Start the plugin
-You can now start the plugin (start button).
-!!Creating Plcbus devices
-||TODO : complete following||</p>
-<p>!!!Affect an address to a PLCBus module
-||TODO : create a device with a given address, affect feature, use feature for ON, check...||</p>
-<p>!!!Creating a lamp device</p>
-<p>In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-* Name : Short name, like &#8220;Hall&#8221;
-* Address : A3 (for example)
-* Description : Device details, like &#8220;Hall light&#8221;
-* Reference : Plcbus module&#8217;s model, only for informations, like &#8220;PLCBUS-2221&#8221;
-* Usage : &#8220;Light&#8221;
-* Type :
-** plcbus.switch provides only on/off
-** plcbus.dimmer provides on/off and dim/bright.</p>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">example values||</p>
+</div>
+</div>
+<div class="section" id="probe-list">
+<h4>probe-list<a class="headerlink" href="#probe-list" title="Permalink to this headline">¶</a></h4>
+<p>The plugin will scan devices in all housecodes indicated by this field.
+If you know you only have devices with housecodes &#8220;A&#8221; and &#8220;B&#8221;, then only keep &#8220;AB&#8221; in this field, so that the plugin won&#8217;t scan other roomcodes.</p>
+</div>
+<div class="section" id="save-your-configuration">
+<h4>Save your configuration<a class="headerlink" href="#save-your-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Just hit the button and wait the &#8220;configuration saved succesfully&#8221; message.</p>
+</div>
+<div class="section" id="start-the-plugin">
+<h4>Start the plugin<a class="headerlink" href="#start-the-plugin" title="Permalink to this headline">¶</a></h4>
+<p>You can now start the plugin (start button).</p>
+</div>
+</div>
+</div>
+<div class="section" id="creating-plcbus-devices">
+<h2>Creating Plcbus devices<a class="headerlink" href="#creating-plcbus-devices" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">complete following</p>
+</div>
+<div class="section" id="affect-an-address-to-a-plcbus-module">
+<h3>Affect an address to a PLCBus module<a class="headerlink" href="#affect-an-address-to-a-plcbus-module" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">create a device with a given address, affect feature, use feature for ON, check...</p>
+</div>
+</div>
+<div class="section" id="creating-a-lamp-device">
+<h3>Creating a lamp device<a class="headerlink" href="#creating-a-lamp-device" title="Permalink to this headline">¶</a></h3>
+<p>In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<ul class="simple">
+<li>Name : Short name, like &#8220;Hall&#8221;</li>
+<li>Address : A3 (for example)</li>
+<li>Description : Device details, like &#8220;Hall light&#8221;</li>
+<li>Reference : Plcbus module&#8217;s model, only for informations, like &#8220;PLCBUS-2221&#8221;</li>
+<li>Usage : &#8220;Light&#8221;</li>
+<li>Type :
+* plcbus.switch provides only on/off
+* plcbus.dimmer provides on/off and dim/bright.</li>
+</ul>
 <p>Examples :</p>
-<p>{IMG(attId=&#8221;190&#8221;)}{IMG}   {IMG(attId=&#8221;191&#8221;)}{IMG}</p>
-<p>((Setup_your_devices|Attribute the features to a place and you will be able to control your lamp.))</p>
-<p>!!!Creating an appliance device
-In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-* Name : Short name, like &#8220;Swimming pump&#8221;
-* Description : Swimming pool motor pump
-* Address : A3
-* Reference : PLC2268HX2
-* Type : PLCBus.Switch
-* Usage : &#8220;Appliance&#8221; (for example)</p>
-<p>((Setup_your_devices|Attribute the features to a place and you can now control your appliance.))</p>
-<p>!!Helpers
-<em>To get an introduction to helpers, you can read the ((Plugins_helpers|Helper documentation)). To use a helper, the plugin must be stopped.</em></p>
-<p>!!!Discover your devices - plcbus all &lt;home code&gt; &lt;user code&gt;
-To check if your device are correctly plugged or if your interface is able to see them, you may use the <strong>plcbus all</strong> helper. The interface parameter is not mandatory (by default it uses &#8220;/dev/plcbus&#8221;), you just have to use this command.
+<img alt="../../_images/plcbus_create_dimmer.png" src="../../_images/plcbus_create_dimmer.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the features to a place</em></a> you will be able to control your lamp.</p>
+</div>
+<div class="section" id="creating-an-appliance-device">
+<h3>Creating an appliance device<a class="headerlink" href="#creating-an-appliance-device" title="Permalink to this headline">¶</a></h3>
+<p>In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<ul class="simple">
+<li>Name : Short name, like &#8220;Swimming pump&#8221;</li>
+<li>Description : Swimming pool motor pump</li>
+<li>Address : A3</li>
+<li>Reference : PLC2268HX2</li>
+<li>Type : PLCBus.Switch</li>
+<li>Usage : &#8220;Appliance&#8221; (for example)</li>
+</ul>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the features to a place</em></a> you can now control your appliance.</p>
+</div>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p>To get an introduction to helpers, you can read the <a class="reference internal" href="../../enduser/configuration/plugins/helpers.html"><em>Helper documentation</em></a>. To use a helper, the plugin must be stopped.</p>
+<div class="section" id="discover-your-devices-plcbus-all-home-code-user-code">
+<h3>Discover your devices - plcbus all &lt;home code&gt; &lt;user code&gt;<a class="headerlink" href="#discover-your-devices-plcbus-all-home-code-user-code" title="Permalink to this headline">¶</a></h3>
+<p>To check if your device are correctly plugged or if your interface is able to see them, you may use the <strong>plcbus all</strong> helper.
+The interface parameter is not mandatory (by default it uses &#8220;/dev/plcbus&#8221;), you just have to use this command.
 After about 10 seconds, a result like this should be displayed :</p>
-<p>{img fileId=&#8221;258&#8221; thumb=&#8221;y&#8221; rel=&#8221;box[g]&#8221; desc=&#8221;in this example &#8220;A&#8221; is my Home Code and &#8220;00&#8221; is my User Code! &#8221; title=&#8221;In this example &#8220;A&#8221; is my Home Code and &#8220;00&#8221; is my User Code ! &#8220;}
-{CODE()}$ plcbus all A 00
+<img alt="../../_images/display258.jpeg" src="../../_images/display258.jpeg" />
+<div class="highlight-none"><div class="highlight"><pre>$ plcbus all A 00
 A1 on
 A2 on
 A3 off
 A4 off
-{CODE}
-As you can see in this example you can also see the device status.
-!!Developper Notes</p>
-<p>!!!xPL schema
-No official xPL Schema exists for Plcbus. A dedicated schema has been made for this feature.
-[<a class="reference external" href="http://xplproject.org.uk/forums/viewtopic.php">http://xplproject.org.uk/forums/viewtopic.php</a>?f=2&amp;t=908&amp;|Discussion on official xPL Forum about this xPL schema]</p>
-<p>!!!!xpl-cmnd
-{CODE()}
-PLCBUS.BASIC
+</pre></div>
+</div>
+<p>As you can see in this example you can also see the device status.
+Developper Notes
+================</p>
+</div>
+<div class="section" id="xpl-schema">
+<h3>xPL schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h3>
+<p>No official xPL Schema exists for Plcbus. A dedicated schema has been made for this feature.
+<a class="reference external" href="http://xplproject.org.uk/forums/viewtopic.php?f=2&amp;t=908&amp;">Discussion on official xPL Forum about this xPL schema</a></p>
+<div class="section" id="xpl-cmnd">
+<h4>xpl-cmnd<a class="headerlink" href="#xpl-cmnd" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>PLCBUS.BASIC
 {
 USERCODE=&lt;plcbus network usercode&gt;
 DEVICE=&lt;sensor name&gt;
@@ -167,15 +228,24 @@ COMMAND=&lt;value sent to the device&gt;
 [DATA1=&lt;additional data&gt;]
 [DATA2=&lt;additional data&gt;]
 }
-{CODE}</p>
-<p>This sends a command to the plcbus plugin. The usercode used is always the same in one house (it only changes if we manage a plcbus system in many houses near from each others). ACK may be ignored if not usable with the defined COMMAND.</p>
-<p>||TODO : explain more Usercode and Device (with examples)||
-||TODO : check if ACK is used or not||
-||TODO : list of available COMMAND values||
-||TODO : DATA1 and DATA2 : description of usage||</p>
-<p>!!!!xpl-stat
-{CODE()}
-PLCBUS.BASIC
+</pre></div>
+</div>
+<p>This sends a command to the plcbus plugin.
+The usercode used is always the same in one house (it only changes if we manage a plcbus system in many houses near from each others).
+ACK may be ignored if not usable with the defined COMMAND.</p>
+<div class="admonition-todo admonition" id="index-4">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>explain more Usercode and Device (with examples)</li>
+<li>check if ACK is used or not</li>
+<li>list of available COMMAND values</li>
+<li>DATA1 and DATA2 : description of usage</li>
+</ul>
+</div>
+</div>
+<div class="section" id="xpl-stat">
+<h4>xpl-stat<a class="headerlink" href="#xpl-stat" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>PLCBUS.BASIC
 {
 USERCODE=&lt;plcbus network usercode&gt;
 DEVICE=&lt;device name&gt;
@@ -183,12 +253,17 @@ COMMAND=&lt;value sent to the device&gt;
 [DATA1=&lt;additional data&gt;]
 [DATA2=&lt;additional data&gt;]
 }
-{CODE}</p>
+</pre></div>
+</div>
 <p>It is used to send a message when a command is received <em>from</em> the plcbus network (for ex, is sent by a remote).</p>
-<p>||TODO : a remote sending should be a trig! Check it in code||</p>
-<p>!!!!xpl-trig
-{CODE()}
-PLCBUS.BASIC
+<div class="admonition-todo admonition" id="index-5">
+<p class="first admonition-title">Todo</p>
+<p class="last">a remote sending should be a trig! Check it in code</p>
+</div>
+</div>
+<div class="section" id="xpl-trig">
+<h4>xpl-trig<a class="headerlink" href="#xpl-trig" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>PLCBUS.BASIC
 {
 USERCODE=&lt;plcbus network usercode&gt;
 DEVICE=&lt;device name&gt;
@@ -197,42 +272,60 @@ ACK=1
 [DATA1=&lt;additional data&gt;]
 [DATA2=&lt;additional data&gt;]
 }
-{CODE}</p>
-<p>This is used to send an acknowledge when an ack command is received.
-||TODO : and maybe also when an event is received||</p>
-<p>!!!!Command</p>
+</pre></div>
+</div>
+<p>This is used to send an acknowledge when an ack command is received.</p>
+<div class="admonition-todo admonition" id="index-6">
+<p class="first admonition-title">Todo</p>
+<p class="last">and maybe also when an event is received</p>
+</div>
+</div>
+<div class="section" id="command">
+<h4>Command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h4>
 <p>Manual command example, assuming your usercode is &#8220;FF&#8221;</p>
 <p>First go to ~/domogik/src/domogik/xpl/bin/</p>
-<ul class="simple">
-<li>Turn ON A1 :</li>
+<ul>
+<li><p class="first">Turn ON A1:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "device=A1,command=ON,usercode=FF"</pre>
+</div>
+</li>
+<li><p class="first">Turn OFF A1:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "device=A1,command=OFF,usercode=FF"</pre>
+</div>
+</li>
+<li><p class="first">Preselect Dimmer to 40% on A1:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "device=A1,command=PRESET_DIM,usercode=FF,data1=40"</pre>
+</div>
+</li>
+<li><p class="first">Preselect Dimmer to 40% with 3 secondes Fade Rate on A1:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "device=A1,command=PRESET_DIM,usercode=FF,data1=40,data2=3"</pre>
+</div>
+</li>
+<li><p class="first">Preselect No Fade Rate on A1:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "device=A1,command=PRESET_DIM,usercode=FF,data2=0"</pre>
+</div>
+</li>
+<li><p class="first">Turn ALL Ligths OFF:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "command=ALL_LIGHTS_OFF"</pre>
+</div>
+</li>
+<li><p class="first">Turn ALL Ligths ON:</p>
+<div class="highlight-python"><pre>./send.py xpl-cmnd plcbus.basic "command=ALL_LIGHTS_ON"</pre>
+</div>
+</li>
+<li><p class="first">/command/plcbus/&lt;address&gt;/dim/&lt;value&gt;</p>
+</li>
+<li><p class="first">/command/plcbus/&lt;address&gt;/bright/&lt;value&gt;</p>
+</li>
 </ul>
-<p>{CODE()}./send.py xpl-cmnd plcbus.basic &#8220;device=A1,command=ON,usercode=FF&#8221;{CODE}</p>
-<ul class="simple">
-<li>Turn OFF A1 :</li>
-</ul>
-<blockquote>
-<div>{CODE()}./send.py xpl-cmnd plcbus.basic &#8220;device=A1,command=OFF,usercode=FF&#8221;{CODE}</div></blockquote>
-<ul class="simple">
-<li>Preselect Dimmer to 40% on A1 :</li>
-</ul>
-<p>{CODE()}./send.py xpl-cmnd plcbus.basic &#8220;device=A1,command=PRESET_DIM,usercode=FF,data1=40&#8221;{CODE}</p>
-<ul class="simple">
-<li>Preselect Dimmer to 40% with 3 secondes Fade Rate on A1 :</li>
-</ul>
-<p>{CODE()}./send.py xpl-cmnd plcbus.basic &#8220;device=A1,command=PRESET_DIM,usercode=FF,data1=40,data2=3&#8221;{CODE}</p>
-<ul class="simple">
-<li>Preselect No Fade Rate on A1 :</li>
-</ul>
-<p>{CODE()}./send.py xpl-cmnd plcbus.basic &#8220;device=A1,command=PRESET_DIM,usercode=FF,data2=0&#8221;{CODE}</p>
-<p><a href="#id1"><span class="problematic" id="id2">*</span></a>Turn ALL Ligths OFF :
-{CODE()} ./send.py xpl-cmnd plcbus.basic &#8220;command=ALL_LIGHTS_OFF&#8221;{CODE}</p>
-<p><a href="#id3"><span class="problematic" id="id4">*</span></a>Turn ALL Ligths ON :
-{CODE()} ./send.py xpl-cmnd plcbus.basic &#8220;command=ALL_LIGHTS_ON&#8221;{CODE}</p>
-<ul class="simple">
-<li>/command/plcbus/&lt;address&gt;/dim/&lt;value&gt;</li>
-<li>/command/plcbus/&lt;address&gt;/bright/&lt;value&gt;</li>
-</ul>
-<p>||TODO : complete/comment/interval for values||</p>
+<div class="admonition-todo admonition" id="index-7">
+<p class="first admonition-title">Todo</p>
+<p class="last">complete/comment/interval for values</p>
+</div>
+</div>
+</div>
+</div>
+</div>
 
 
           </div>         
@@ -244,13 +337,59 @@ ACK=1
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PLCBUS plugin</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#prerequisite">Prerequisite</a><ul>
+<li><a class="reference internal" href="#ubuntu-debian-installation">Ubuntu/Debian installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a><ul>
+<li><a class="reference internal" href="#permissions-management">Permissions management</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#enabling-the-plugin">Enabling the plugin</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#device">device</a></li>
+<li><a class="reference internal" href="#usercode">usercode</a></li>
+<li><a class="reference internal" href="#probe-interval">probe-interval</a></li>
+<li><a class="reference internal" href="#probe-list">probe-list</a></li>
+<li><a class="reference internal" href="#save-your-configuration">Save your configuration</a></li>
+<li><a class="reference internal" href="#start-the-plugin">Start the plugin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-plcbus-devices">Creating Plcbus devices</a><ul>
+<li><a class="reference internal" href="#affect-an-address-to-a-plcbus-module">Affect an address to a PLCBus module</a></li>
+<li><a class="reference internal" href="#creating-a-lamp-device">Creating a lamp device</a></li>
+<li><a class="reference internal" href="#creating-an-appliance-device">Creating an appliance device</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
+<li><a class="reference internal" href="#discover-your-devices-plcbus-all-home-code-user-code">Discover your devices - plcbus all &lt;home code&gt; &lt;user code&gt;</a></li>
+<li><a class="reference internal" href="#xpl-schema">xPL schema</a><ul>
+<li><a class="reference internal" href="#xpl-cmnd">xpl-cmnd</a></li>
+<li><a class="reference internal" href="#xpl-stat">xpl-stat</a></li>
+<li><a class="reference internal" href="#xpl-trig">xpl-trig</a></li>
+<li><a class="reference internal" href="#command">Command</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
-      <li>Prev: <a href="../mirror/index.html">&lt;no title&gt;</a></li>
+      <li>Prev: <a href="../mirror/index.html">Plugin mirror</a></li>
     
     
-      <li>Next: <a href="../teleinfo/index.html">&lt;no title&gt;</a></li>
+      <li>Next: <a href="../teleinfo/index.html">Plugin teleinfo</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -258,7 +397,7 @@ ACK=1
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>PLCBUS plugin</li></ul>
         
       </li>
   </ul>  
@@ -290,11 +429,11 @@ ACK=1
     
     <div id="ft">
       <div class="nav">
-    &laquo; <a href="../mirror/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../mirror/index.html" title="Plugin mirror">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../teleinfo/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../teleinfo/index.html" title="Plugin teleinfo">next</a> &raquo;</div>
     </div>
   </div>
 

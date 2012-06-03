@@ -54,7 +54,7 @@
             
   <div class="section" id="plugin-onewire">
 <h1>Plugin onewire<a class="headerlink" href="#plugin-onewire" title="Permalink to this headline">¶</a></h1>
-<p>((plugin_onewire_dev|Go this plugin development information))</p>
+<p><a class="reference internal" href="dev.html"><em>Go this plugin development information</em></a></p>
 <div class="section" id="purpose">
 <h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
 <p>This plugin aims at communicating with 1-Wire devices.</p>
@@ -213,6 +213,38 @@ Bus 006 Device 013: ID 04fa:2490 Dallas Semiconductor DS1490F 2-in-1 Fob, 1-Wire
 <h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="common-parameters">
 <h3>Common parameters<a class="headerlink" href="#common-parameters" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="17%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>device</td>
+<td>u</td>
+<td>The 1wire device address.
+The available values are :
+<strong>u</strong> (usb interface),
+<strong>/dev/ttySO</strong> (example for a serial interface),
+<strong>remote_system:3003</strong> (address of a OWSERVER)</td>
+</tr>
+<tr class="row-odd"><td>cache</td>
+<td><em>checked</em></td>
+<td>Checked : use the cache.
+Unchecked : don&#8217;t use the cache.
+Reading data on 1 wire netowrk is a slow operation,
+so if you read a lot of data,
+it could be a good idea to use cache.
+More informations on <a class="reference external" href="http://owfs.sourceforge.net/caching.html">http://owfs.sourceforge.net/caching.html</a></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="others">
 <h3>others...<a class="headerlink" href="#others" title="Permalink to this headline">¶</a></h3>
@@ -236,9 +268,9 @@ Bus 006 Device 013: ID 04fa:2490 Dallas Semiconductor DS1490F 2-in-1 Fob, 1-Wire
 <h3>Configuration items<a class="headerlink" href="#configuration-items" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="4%" />
-<col width="4%" />
-<col width="92%" />
+<col width="12%" />
+<col width="10%" />
+<col width="78%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Key</th>
@@ -253,7 +285,11 @@ Bus 006 Device 013: ID 04fa:2490 Dallas Semiconductor DS1490F 2-in-1 Fob, 1-Wire
 </tr>
 <tr class="row-odd"><td>ds18b20-int</td>
 <td>60</td>
-<td>The interval between each DS18B20 component reading. If you want to monitor your house temperature, 60 or 120s is a good value. If you want to monitor something where temperature can change quickly, you can put a small value (5s for example) but you will have to set <strong>cache</strong> to False to get instant values.</td>
+<td>The interval between each DS18B20 component reading.
+If you want to monitor your house temperature,
+60 or 120s is a good value.
+If you want to monitor something where temperature can change quickly,
+you can put a small value (5s for example) but you will have to set <strong>cache</strong> to False to get instant values.</td>
 </tr>
 <tr class="row-even"><td>ds18b20-res (1)</td>
 <td>12</td>
@@ -328,9 +364,9 @@ Less than 60 seconds is useless, more than 300 seconds could be not sufficient f
 <p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="13%" />
-<col width="79%" />
+<col width="11%" />
+<col width="15%" />
+<col width="74%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Field</th>
@@ -345,7 +381,8 @@ Less than 60 seconds is useless, more than 300 seconds could be not sufficient f
 </tr>
 <tr class="row-odd"><td>Address</td>
 <td>&nbsp;</td>
-<td>The DS18b20 id (you can get it with this helper command : <strong>onewire ds18b20</strong> which will give you all your DS18B20 detected)</td>
+<td>The DS18b20 id
+(you can get it with this helper command : <strong>onewire ds18b20</strong> which will give you all your DS18B20 detected)</td>
 </tr>
 <tr class="row-even"><td>Feature</td>
 <td><strong>1Wire.Thermometer</strong></td>
@@ -391,9 +428,9 @@ Less than 60 seconds is useless, more than 300 seconds could be not sufficient f
 <h3>Configuration items<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="3%" />
-<col width="4%" />
-<col width="93%" />
+<col width="12%" />
+<col width="10%" />
+<col width="78%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Key</th>
@@ -408,7 +445,10 @@ Less than 60 seconds is useless, more than 300 seconds could be not sufficient f
 </tr>
 <tr class="row-odd"><td>ds18s20-int</td>
 <td>60</td>
-<td>The interval between each DS18S20 component reading. If you want to monitor your house temperature, 60 or 120s is a good value. If you want to monitor something where temperature can change quickly, you can put a small value (5s for example) but you will have to set <strong>cache</strong> to False to get instant values.</td>
+<td>The interval between each DS18S20 component reading.
+If you want to monitor your house temperature, 60 or 120s is a good value.
+If you want to monitor something where temperature can change quickly,
+you can put a small value (5s for example) but you will have to set <strong>cache</strong> to False to get instant values.</td>
 </tr>
 </tbody>
 </table>
@@ -435,9 +475,9 @@ Less than 60 seconds is useless, more than 300 seconds could be not sufficient f
 <h3>Configuration items<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="9%" />
-<col width="84%" />
+<col width="12%" />
+<col width="10%" />
+<col width="78%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Key</th>
@@ -452,7 +492,8 @@ Less than 60 seconds is useless, more than 300 seconds could be not sufficient f
 </tr>
 <tr class="row-odd"><td>ds2401-int</td>
 <td>5</td>
-<td>Interval between each DS2401 component reading. The interval to set depends on the usage you will have for DS2401 components.</td>
+<td>Interval between each DS2401 component reading.
+The interval to set depends on the usage you will have for DS2401 components.</td>
 </tr>
 </tbody>
 </table>
@@ -468,9 +509,9 @@ so there is no risk that someone opens and closes your door without being &#8220
 <p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="15%" />
-<col width="78%" />
+<col width="11%" />
+<col width="16%" />
+<col width="73%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Field</th>
@@ -485,7 +526,8 @@ so there is no risk that someone opens and closes your door without being &#8220
 </tr>
 <tr class="row-odd"><td>Address</td>
 <td>&nbsp;</td>
-<td>The DS2401 idid (you can get it with this helper command : <strong>onewire ds2401</strong> which will give you all your DS2401 detected)</td>
+<td>The DS2401 idid (you can get it with this helper command :
+<strong>onewire ds2401</strong> which will give you all your DS2401 detected)</td>
 </tr>
 <tr class="row-even"><td>Feature</td>
 <td><strong>1Wire.Serial Number</strong></td>
@@ -521,9 +563,9 @@ so there is no risk that someone opens and closes your door without being &#8220
 <h3>Configuration items<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="9%" />
-<col width="84%" />
+<col width="12%" />
+<col width="10%" />
+<col width="78%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Key</th>
@@ -538,7 +580,8 @@ so there is no risk that someone opens and closes your door without being &#8220
 </tr>
 <tr class="row-odd"><td>ds2438-int</td>
 <td>60</td>
-<td>Interval between each DS2438 component reading. Interval to set depends on the usage you will have for DS2438 comopnents.</td>
+<td>Interval between each DS2438 component reading.
+Interval to set depends on the usage you will have for DS2438 comopnents.</td>
 </tr>
 </tbody>
 </table>
@@ -546,6 +589,53 @@ so there is no risk that someone opens and closes your door without being &#8220
 <div class="section" id="creating-a-device-for-a-ds2438z-temperature">
 <h3>Creating a device for a DS2438Z - temperature<a class="headerlink" href="#creating-a-device-for-a-ds2438z-temperature" title="Permalink to this headline">¶</a></h3>
 <p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="22%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Field</th>
+<th class="head">Suggested value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td>&nbsp;</td>
+<td>A name</td>
+</tr>
+<tr class="row-odd"><td>Address</td>
+<td>&nbsp;</td>
+<td>The DS2428 id (you can get it with this helper command :
+<strong>onewire ds2438</strong> which will give you all your DS18B20 detected)</td>
+</tr>
+<tr class="row-even"><td>Feature</td>
+<td><strong>1Wire.Thermometer and humidity</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Usage</td>
+<td><strong>Temperature</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Description</td>
+<td>&nbsp;</td>
+<td>a short description (Placement, usage, etc)</td>
+</tr>
+<tr class="row-odd"><td>Reference</td>
+<td>&nbsp;</td>
+<td>the device reference (model, etc)</td>
+</tr>
+</tbody>
+</table>
+<p>Example :</p>
+<img alt="../../_images/onewire_create_ds2438.png" src="../../_images/onewire_create_ds2438.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see your temperature.</p>
+</div>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
 <p><em>To get an introduction to helpers, you can read the :doc:`Helper documentation &lt;/enduser/configuration/plugins/helpers&gt;`. To use a helper, the plugin must be stopped.</em></p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -560,7 +650,6 @@ If you have a solution about this, feel free to report it :)</p>
 <p class="first admonition-title">Note</p>
 <p class="last">Notice about parameter: parameter has the same possible values as defined in &#8220;configuration &gt; device&#8221;.
 For the following examples we will use the &#8220;u&#8221; device which is Usb adaptor.</p>
-</div>
 </div>
 <div class="section" id="onewire-all">
 <h3>onewire all<a class="headerlink" href="#onewire-all" title="Permalink to this headline">¶</a></h3>
@@ -727,6 +816,9 @@ DS2438 : id=F1F0DB010800
 <li><a class="reference internal" href="#id9">How to plug</a></li>
 <li><a class="reference internal" href="#id10">Configuration items</a></li>
 <li><a class="reference internal" href="#creating-a-device-for-a-ds2438z-temperature">Creating a device for a DS2438Z - temperature</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
 <li><a class="reference internal" href="#onewire-all">onewire all</a></li>
 <li><a class="reference internal" href="#onewire-detail">onewire detail</a></li>
 <li><a class="reference internal" href="#onewire-ds18b20">onewire ds18b20</a></li>

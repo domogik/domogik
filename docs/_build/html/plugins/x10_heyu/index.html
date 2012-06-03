@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>X10 plugin &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="../xpl_time/index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="../wol_ping/index.html" /> 
+    <link rel="next" title="Plugin xpl_time" href="../xpl_time/index.html" />
+    <link rel="prev" title="Plugin wol_ping" href="../wol_ping/index.html" /> 
   </head>
   <body>
 
@@ -40,11 +40,11 @@
         <a title="Global index" href="../../genindex.html">Index</a>  |
       </div>
       <div class="nav">
-    &laquo; <a href="../wol_ping/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../wol_ping/index.html" title="Plugin wol_ping">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../xpl_time/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../xpl_time/index.html" title="Plugin xpl_time">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -52,150 +52,194 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-x10_heyu-index">
             
-  <p>!X10 plugin</p>
-<p>{maketoc}</p>
-<p>!!Purpose
-X10 is an automation technology which allows to switch and dim lights, control appliances, etc. This plugin allows to control X10 devices if you got a <strong>CM11</strong> / <strong>CM12</strong> adaptator. If you want to use another adaptator, check if there are available plugins for these adaptators.</p>
-<p><em>Note : at this day (august 2010), creating a plugin for CM15 is planned, so CM15 support is only a question of time.</em></p>
-<p>!!How to plug</p>
-<p>{img fileId=&#8221;185&#8221; thumb=&#8221;y&#8221; alt=&#8221;&#8221; rel=&#8221;box[g]&#8221;} {img fileId=&#8221;184&#8221; thumb=&#8221;y&#8221; alt=&#8221;&#8221; rel=&#8221;box[g]&#8221;}</p>
+  <div class="section" id="x10-plugin">
+<h1>X10 plugin<a class="headerlink" href="#x10-plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>X10 is an automation technology which allows to switch and dim lights, control appliances, etc.
+This plugin allows to control X10 devices if you got a <strong>CM11</strong> / <strong>CM12</strong> adaptator.
+If you want to use another adaptator, check if there are available plugins for these adaptators.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">at this day (august 2010), creating a plugin for CM15 is planned, so CM15 support is only a question of time.</p>
+</div>
+</div>
+<div class="section" id="how-to-plug">
+<h2>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/display185.png" src="../../_images/display185.png" />
+<img alt="../../_images/display184.png" src="../../_images/display184.png" />
 <p>On the left the CM12DK module which is used to send commands to all x10 plugged in modules.
-On the right a LM12 module used to control a lamp.
-!!Heyu
-This plugin uses [<a class="reference external" href="http://www.heyu.org/">http://www.heyu.org/</a><a href="#id1"><span class="problematic" id="id2">|</span></a>Heyu] as an external tool to use CM11 adaptator. As said on Heyu&#8217;s homepage, <em>Heyu is a text-based console program for remotely controlling lights and appliances at home or office</em>. So, you will first need to install Heyu.</p>
-<p>!!!Prepare
-Create or edit /etc/udev/rules.d/10-local.rules, and add :
-{CODE()}
-KERNEL==&#8221;ttyUSB*&#8221;,DRIVERS==&#8221;pl2303&#8221;,SYMLINK+=&#8221;cm11&#8221;,MODE=&#8221;0666&#8221;
-{CODE}
-<em>MODE</em> sets the rights on the device. In this case everybody is allowed to send a command to it. By default only root can do it. As you probably won&#8217;t start Domogik as root...</p>
-<p>Then, plug in your CM11 device. You should have a /dev/cm11 link created :
-{CODE()}
-# ls -l /dev/cm11
-lrwxrwxrwx 1 root root 7 2010-07-19 09:50 /dev/cm11 -&gt; ttyUSB3
-{CODE}</p>
+On the right a LM12 module used to control a lamp.</p>
+</div>
+<div class="section" id="heyu">
+<h2>Heyu<a class="headerlink" href="#heyu" title="Permalink to this headline">¶</a></h2>
+<p>This plugin uses <a class="reference external" href="http://www.heyu.org">Heyu</a> as an external tool to use CM11 adaptator.
+As said on Heyu&#8217;s homepage, <em>Heyu is a text-based console program for remotely controlling lights and appliances at home or office</em>.
+So, you will first need to install Heyu.</p>
+<div class="section" id="prepare">
+<h3>Prepare<a class="headerlink" href="#prepare" title="Permalink to this headline">¶</a></h3>
+<p>Create or edit /etc/udev/rules.d/10-local.rules, and add:</p>
+<div class="highlight-python"><pre>KERNEL=="ttyUSB*",DRIVERS=="pl2303",SYMLINK+="cm11",MODE="0666"</pre>
+</div>
+<p><em>MODE</em> sets the rights on the device. In this case everybody is allowed to send a command to it.
+By default only root can do it. As you probably won&#8217;t start Domogik as root...</p>
+<p>Then, plug in your CM11 device. You should have a /dev/cm11 link created:</p>
+<div class="highlight-python"><pre>$ ls -l /dev/cm11
+lrwxrwxrwx 1 root root 7 2010-07-19 09:50 /dev/cm11 -&gt; ttyUSB3</pre>
+</div>
 <p>Note that &#8220;ttyUSB3&#8221; may change on your installation.</p>
-<p>!!!Installation
-Get the last sources (eventually adapt the following line) and uncompress them :
-{CODE()}
-wget <a class="reference external" href="http://www.heyu.org/download/heyu-2.9.3.tar.gz">http://www.heyu.org/download/heyu-2.9.3.tar.gz</a>
-tar xzf heyu-2.9.3.tar.gz
-cd heyu-2.9.3/
-{CODE}</p>
-<p>Lauch sources compilation :
-{CODE()}
-./Configure
-make
-{CODE}</p>
-<p>Launch installation with root user (or as sudo) :
-{CODE()}
-make install
-{CODE}
-* Choose &#8220;3. In directory /etc/heyu  (for system-wide access)&#8221;
-* Answer &#8220;/dev/cm11&#8221; to the question &#8220;To which port is the CM11 attached ?&#8221;</p>
-<p>!!!Checking installation
-!!!!Get heyu information
-Launch this command :
-{CODE()}
-heyu info
-{CODE}</p>
-<p>You should obtain something like :
-{CODE()}
-Heyu version 2.8.0
+</div>
+<div class="section" id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<p>Get the last sources (eventually adapt the following line) and uncompress them:</p>
+<div class="highlight-python"><pre>$ wget http://www.heyu.org/download/heyu-2.9.3.tar.gz
+$ tar xzf heyu-2.9.3.tar.gz
+$ cd heyu-2.9.3/</pre>
+</div>
+<p>Lauch sources compilation:</p>
+<div class="highlight-python"><pre>$ ./Configure
+$ make</pre>
+</div>
+<p>Launch installation with root user (or as sudo):</p>
+<div class="highlight-python"><pre>$ make install</pre>
+</div>
+<ul class="simple">
+<li>Choose &#8220;3. In directory /etc/heyu  (for system-wide access)&#8221;</li>
+<li>Answer &#8220;/dev/cm11&#8221; to the question &#8220;To which port is the CM11 attached ?&#8221;</li>
+</ul>
+</div>
+<div class="section" id="checking-installation">
+<h3>Checking installation<a class="headerlink" href="#checking-installation" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="get-heyu-information">
+<h4>Get heyu information<a class="headerlink" href="#get-heyu-information" title="Permalink to this headline">¶</a></h4>
+<p>Launch this command:</p>
+<div class="highlight-python"><pre>$ heyu info</pre>
+</div>
+<p>You should obtain something like:</p>
+<div class="highlight-python"><pre>Heyu version 2.8.0
 Configuration at /etc/heyu/x10.conf
 Powerline interface on /dev/cm11
 Firmware revision Level = 8
 Interface battery usage = Unknown
 Raw interface clock: Mon, Day 199, 08:58:50
-(&#8211;&gt; Civil Time: Mon 19 Jul 2010   09:58:50 CEST)
+(--&gt; Civil Time: Mon 19 Jul 2010   09:58:50 CEST)
 No schedule has been uploaded by Heyu.
 Housecode = A
 0 = off, 1 = on,               unit  16.......8...4..1
 Last addressed device =       0x0000 (0000000000000000)
 Status of monitored devices = 0x0000 (0000000000000000)
-Status of dimmed devices =    0x0000 (0000000000000000)
-{CODE}</p>
-<p>!!!!Try using an appliance
-Plug in an appliance device (using A1 code for example) and run :
-{CODE()}
-heyu on A1
-{CODE}
-The appliance should switch on. Now run :
-{CODE()}
-heyu off A1
-{CODE}
-The appliance should switch off.</p>
-<p>!!!!Try using a lamp
-Plug in a lamp device (using A2 code for example) and run :
-{CODE()}
-heyu on A2
-{CODE}
-The lamp should switch on. Now, run (one or more times) :
-{CODE()}
-heyu dim A2 10
-{CODE}
-This command lowers brightness of 10 units each time you call it. So, your lamp intensity should decrease. Now, run :
-{CODE()}
-heyu bright A2 10
-{CODE}
-This command increases brightness of 10 units each time you call it. So, your lamp intensity should increase.</p>
-<p>Finally, run :
-{CODE()}
-heyu off A2
-heyu stop
-{CODE}</p>
-<p>!!Plugin configuration
-!!!Enabling plugin
-You can enable plugin by using (from your domogik directory) :
-{CODE()}
-dmgenplug x10_heyu
-{CODE}</p>
+Status of dimmed devices =    0x0000 (0000000000000000)</pre>
+</div>
+</div>
+<div class="section" id="try-using-an-appliance">
+<h4>Try using an appliance<a class="headerlink" href="#try-using-an-appliance" title="Permalink to this headline">¶</a></h4>
+<p>Plug in an appliance device (using A1 code for example) and run:</p>
+<div class="highlight-python"><pre>$ heyu on A1</pre>
+</div>
+<p>The appliance should switch on. Now run:</p>
+<div class="highlight-python"><pre>$ heyu off A1</pre>
+</div>
+<p>The appliance should switch off.</p>
+</div>
+<div class="section" id="try-using-a-lamp">
+<h4>Try using a lamp<a class="headerlink" href="#try-using-a-lamp" title="Permalink to this headline">¶</a></h4>
+<p>Plug in a lamp device (using A2 code for example) and run:</p>
+<div class="highlight-python"><pre>$ heyu on A2</pre>
+</div>
+<p>The lamp should switch on. Now, run (one or more times):</p>
+<div class="highlight-python"><pre>$ heyu dim A2 10</pre>
+</div>
+<p>This command lowers brightness of 10 units each time you call it.
+So, your lamp intensity should decrease. Now, run:</p>
+<div class="highlight-python"><pre>$ heyu bright A2 10</pre>
+</div>
+<p>This command increases brightness of 10 units each time you call it. So, your lamp intensity should increase.</p>
+<p>Finally, run:</p>
+<div class="highlight-python"><pre>$ heyu off A2
+$ heyu stop</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enabling-plugin">
+<h3>Enabling plugin<a class="headerlink" href="#enabling-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can enable plugin by using (from your domogik directory):</p>
+<div class="highlight-python"><pre>$ dmgenplug x10_heyu</pre>
+</div>
 <p>You just have to reload administration page to see the plugin in the list.</p>
-<p>!!!Configuration
-In the administration panel, go to x10_heyu configuration page.</p>
-<p>!!!!heyu-cfg-path
-Path to Heyu config file
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>In the administration panel, go to x10_heyu configuration page.</p>
+<div class="section" id="heyu-cfg-path">
+<h4>heyu-cfg-path<a class="headerlink" href="#heyu-cfg-path" title="Permalink to this headline">¶</a></h4>
+<p>Path to Heyu config file
 Default : /etc/heyu/x10.conf
 The default value (/etc/heyu/x10.cfg) should be fine. When set don&#8217;t forget to save it!</p>
-<p>!!!Start the plugin
-You can now start the plugin (start button).</p>
-<p>!!Creating x10 devices
-!!!Creating a lamp device
-In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-* Name : Short name, like &#8220;Hall&#8221;
-* Description : Device details, like &#8220;Hall light&#8221;
-* Address : X10 address, like &#8220;A4&#8221;
-* Reference : X10 module&#8217;s model, only for information, like &#8220;LM12&#8221;
-* Type :
-** X10.switch (provides only on/off)
-** X10.dimmer (provides on/off and dim/bright)
-* Usage : Light</p>
+</div>
+</div>
+<div class="section" id="start-the-plugin">
+<h3>Start the plugin<a class="headerlink" href="#start-the-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can now start the plugin (start button).</p>
+</div>
+</div>
+<div class="section" id="creating-x10-devices">
+<h2>Creating x10 devices<a class="headerlink" href="#creating-x10-devices" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-a-lamp-device">
+<h3>Creating a lamp device<a class="headerlink" href="#creating-a-lamp-device" title="Permalink to this headline">¶</a></h3>
+<p>In the administration panel, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<ul class="simple">
+<li>Name : Short name, like &#8220;Hall&#8221;</li>
+<li>Description : Device details, like &#8220;Hall light&#8221;</li>
+<li>Address : X10 address, like &#8220;A4&#8221;</li>
+<li>Reference : X10 module&#8217;s model, only for information, like &#8220;LM12&#8221;</li>
+<li>Type :
+* X10.switch (provides only on/off)
+* X10.dimmer (provides on/off and dim/bright)</li>
+<li>Usage : Light</li>
+</ul>
 <p>Example :</p>
-<p>{IMG(attId=&#8221;194&#8221;)}{IMG}   {IMG(attId=&#8221;195&#8221;)}{IMG}</p>
-<p>((Setup_your_devices|Attribute the features to a place and you can now control your lamp)).</p>
-<p>!!!Creating an appliance device
-In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-* Name : Short name, like &#8220;Coffee machine&#8221;
-* Description : Describe your coffee machine if you want!
-* Address : X10 address, like &#8220;A3&#8221;
-* Reference : X10 module&#8217;s model, only for information, like &#8220;AM12&#8221;
-* Type : X10.switch
-* Usage : Appliance</p>
-<p>((Setup_your_devices|Attribute the features to a place and you can now control your appliance)).</p>
-<p>!!Developper Notes</p>
-<p>!!!xPL schema
-The [<a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_X10">http://xplproject.org.uk/wiki/index.php?title=Schema_-_X10</a>.BASIC|x10.basic] schema is used.</p>
-<p>!!!/command
-{CODE()}
-/command/x10/&lt;address&gt;/on # switch on the lamp / appliance
+<img alt="../../_images/x10_create_dimmer.png" src="../../_images/x10_create_dimmer.png" />
+<img alt="../../_images/x10_create_switch.png" src="../../_images/x10_create_switch.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the features to a place</em></a> and you can now control your lamp.</p>
+</div>
+<div class="section" id="creating-an-appliance-device">
+<h3>Creating an appliance device<a class="headerlink" href="#creating-an-appliance-device" title="Permalink to this headline">¶</a></h3>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<ul class="simple">
+<li>Name : Short name, like &#8220;Coffee machine&#8221;</li>
+<li>Description : Describe your coffee machine if you want!</li>
+<li>Address : X10 address, like &#8220;A3&#8221;</li>
+<li>Reference : X10 module&#8217;s model, only for information, like &#8220;AM12&#8221;</li>
+<li>Type : X10.switch</li>
+<li>Usage : Appliance</li>
+</ul>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the features to a place</em></a> and you can now control your appliance.</p>
+</div>
+</div>
+<div class="section" id="developper-notes">
+<h2>Developper Notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="xpl-schema">
+<h3>xPL schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_X10.BASIC">x10.basic</a> schema is used.</p>
+</div>
+<div class="section" id="command">
+<h3>/command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>/command/x10/&lt;address&gt;/on # switch on the lamp / appliance
 /command/x10/&lt;address&gt;/off # switch off the lamp / appliance
-{CODE}
-<em>Only for lamps</em>
-{CODE()}
-/command/x10/&lt;address&gt;/dim/&lt;value&gt; # dim units by &lt;level&gt; (1-22) (decrease brightness)
+</pre></div>
+</div>
+<p><em>Only for lamps</em></p>
+<div class="highlight-none"><div class="highlight"><pre>/command/x10/&lt;address&gt;/dim/&lt;value&gt; # dim units by &lt;level&gt; (1-22) (decrease brightness)
 /command/x10/&lt;address&gt;/bright/&lt;value&gt; # brighten units by &lt;level&gt; (1-22) (increase brightness)
-{CODE}
-Note that these values are relative.</p>
+</pre></div>
+</div>
+<p>Note that these values are relative.</p>
+</div>
+</div>
+</div>
 
 
           </div>         
@@ -207,13 +251,52 @@ Note that these values are relative.</p>
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">X10 plugin</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a></li>
+<li><a class="reference internal" href="#heyu">Heyu</a><ul>
+<li><a class="reference internal" href="#prepare">Prepare</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#checking-installation">Checking installation</a><ul>
+<li><a class="reference internal" href="#get-heyu-information">Get heyu information</a></li>
+<li><a class="reference internal" href="#try-using-an-appliance">Try using an appliance</a></li>
+<li><a class="reference internal" href="#try-using-a-lamp">Try using a lamp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#enabling-plugin">Enabling plugin</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#heyu-cfg-path">heyu-cfg-path</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#start-the-plugin">Start the plugin</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-x10-devices">Creating x10 devices</a><ul>
+<li><a class="reference internal" href="#creating-a-lamp-device">Creating a lamp device</a></li>
+<li><a class="reference internal" href="#creating-an-appliance-device">Creating an appliance device</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#developper-notes">Developper Notes</a><ul>
+<li><a class="reference internal" href="#xpl-schema">xPL schema</a></li>
+<li><a class="reference internal" href="#command">/command</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
-      <li>Prev: <a href="../wol_ping/index.html">&lt;no title&gt;</a></li>
+      <li>Prev: <a href="../wol_ping/index.html">Plugin wol_ping</a></li>
     
     
-      <li>Next: <a href="../xpl_time/index.html">&lt;no title&gt;</a></li>
+      <li>Next: <a href="../xpl_time/index.html">Plugin xpl_time</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -221,7 +304,7 @@ Note that these values are relative.</p>
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>X10 plugin</li></ul>
         
       </li>
   </ul>  
@@ -253,11 +336,11 @@ Note that these values are relative.</p>
     
     <div id="ft">
       <div class="nav">
-    &laquo; <a href="../wol_ping/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../wol_ping/index.html" title="Plugin wol_ping">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../xpl_time/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../xpl_time/index.html" title="Plugin xpl_time">next</a> &raquo;</div>
     </div>
   </div>
 

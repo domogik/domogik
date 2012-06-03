@@ -36,6 +36,10 @@ Table Of Content
     /plugins/wol_ping/index
     /plugins/x10_heyu/index
     /plugins/xpl_time/index
+    /plugins/onewire/dev
+    /plugins/mirror/dev
+    /plugins/wol_ping/dev
+    /various/udev_rule
     /technical/actuator
     /technical/sensor
     /technical/device_feature_usage
@@ -52,3 +56,4 @@ Table Of Content
     /technical/rinor/rest_xplcmnd
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
+    /technical/schema/teleinfo

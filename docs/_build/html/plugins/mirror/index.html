@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>Plugin mirror &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="../plcbus/index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="../ipx800/index.html" /> 
+    <link rel="next" title="PLCBUS plugin" href="../plcbus/index.html" />
+    <link rel="prev" title="Plugin ipx800" href="../ipx800/index.html" /> 
   </head>
   <body>
 
@@ -40,11 +40,11 @@
         <a title="Global index" href="../../genindex.html">Index</a>  |
       </div>
       <div class="nav">
-    &laquo; <a href="../ipx800/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../ipx800/index.html" title="Plugin ipx800">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../plcbus/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../plcbus/index.html" title="PLCBUS plugin">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -52,96 +52,172 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-mirror-index">
             
-  <p>!Plugin mirror
-&lt;div class=&#8221;to_dev_or_doc&#8221;&gt;
-((plugin_mirror_dev|Go this plugin development informations))
-&lt;/div&gt;
-{maketoc}</p>
-<p>!!Purpose
-Mir:ror plugin allows to use Mir:ror by [http://www.nabaztag.com/mirror/indexEN.html|Violet] device.</p>
-<p>Mir:ror is a small passive RFID reader which is provided with RFID like litte rabbits (Nanoztag) or Stamps (zTamps). Each RFID element has an unique ID. The plugin will send an event with the ID when a RFID element is near Mir:ror or if you put it far from Mir:ror.</p>
-<p>{IMG(attId=&#8221;178&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}</p>
-<p>!!Known issues
-Using Mir:ror device on (or near) a metallic ground shield may the RFID elements detection fail.</p>
-<p>!!How to plug
-Just plug USB on your computer. Mir:ror should light on.</p>
-<p>!!Installation
-Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
-<p>!!Permissions management
-The needed udev rule is given while installing the plugin. See ((Set_a_udev_rule|this page)) to apply it.</p>
-<p>!!Plugin configuration
-{FANCYTABLE(head=&gt;Key~|~Default value~|~Description)}
-device~|~ /dev/mirror ~|~ This is the address of the Mir:ror device.
-service~|~Service~|~Distributed services, water, gaz, electricity
-communication~|~Communication~|~Telephony, videophone, mails, messaging
-{FANCYTABLE}
-&lt;br /&gt;
-You can now start the plugin (start button).</p>
-<p>!!Creating a device for the Mir:ror
-In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-{FANCYTABLE(head=&gt;Field~|~Suggested value~|~Description)}
-Name~|~Mir:ror~|~The name you want to give to your Mir:ror device
-Address~|~**mirror**~|~
-Feature~|~**RFID.Mirror base**~|~
-Usage~|~**Mir:ror**~|~
-Description~|~~|~a short description (Placement, usage, etc)
-Reference~|~~|~the device reference (model, etc)
-{FANCYTABLE}
-&lt;br /&gt;
-Example :
-&lt;br /&gt;
-{IMG(attId=&#8221;188&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}
-&lt;br /&gt;
-((Setup_your_devices|Attribute the feature to a place)) and you can now see the status of your Mir:ror (on or off)</p>
-<p>!!Creating a device for a RFID element
-In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-{FANCYTABLE(head=&gt;Field~|~Suggested value~|~Description)}
-Name~|~Green nanoztag~|~The name you want to give to your RFID element
-Address~|~000008d00218c10916a8a9000000~|~The id of the RFID element. To get the id of a RFID element, use this helper : <a href="#id1"><span class="problematic" id="id2">**</span></a>mirror read ** and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.
-Feature~|~**RFID.Mirror tag**~|~
-Usage~|~**Nanoztag**~|~
-Description~|~~|~a short description (Placement, usage, etc)
-Reference~|~~|~the device reference (model, etc)
-{FANCYTABLE}
-&lt;br /&gt;
-Example :
-&lt;br /&gt;
-{IMG(attId=&#8221;189&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}
-&lt;br /&gt;
-((Setup_your_devices|Attribute the feature to a place)) and you can now see the status of your RFID element (on or off)</p>
-<p>!!Helpers
-To get an introduction to helpers, you can read the ((Plugins_helpers|Helper documentation)). To use a helper, the plugin must be stopped.</p>
-<p>!!!mirror read
-<strong>mirror read</strong> helper will wait for an action on <a href="#id3"><span class="problematic" id="id4">**</span></a>** and display it. It is usefull to get RFID identifier.</p>
-<p>!!!!Example : RFID in
-{CODE()}
-$ mirror read /dev/mirror
+  <div class="section" id="plugin-mirror">
+<h1>Plugin mirror<a class="headerlink" href="#plugin-mirror" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="dev.html"><em>Go this plugin development information</em></a></p>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>Mir:ror plugin allows to use Mir:ror by <a class="reference external" href="http://www.nabaztag.com/mirror/indexEN.html">Violet</a> device.</p>
+<p>Mir:ror is a small passive RFID reader which is provided with RFID like litte rabbits (Nanoztag) or Stamps (zTamps).
+Each RFID element has an unique ID. The plugin will send an event with the ID when a RFID element is near Mir:ror or if you put it far from Mir:ror.</p>
+<img alt="../../_images/mirror.png" src="../../_images/mirror.png" />
+</div>
+<div class="section" id="known-issues">
+<h2>Known issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<p>Using Mir:ror device on (or near) a metallic ground shield may the RFID elements detection fail.</p>
+</div>
+<div class="section" id="how-to-plug">
+<h2>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h2>
+<p>Just plug USB on your computer. Mir:ror should light on.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
+</div>
+<div class="section" id="permissions-management">
+<h2>Permissions management<a class="headerlink" href="#permissions-management" title="Permalink to this headline">¶</a></h2>
+<p>The needed udev rule is given while installing the plugin. See <a class="reference internal" href="../../various/udev_rule.html"><em>Setting UDEV rule</em></a> to apply it.</p>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="60%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>device</td>
+<td>/dev/mirror</td>
+<td>This is the address of the Mir:ror device.</td>
+</tr>
+<tr class="row-odd"><td>service</td>
+<td>Service</td>
+<td>Distributed services, water, gaz, electricity</td>
+</tr>
+<tr class="row-even"><td>communication</td>
+<td>Communication</td>
+<td>Telephony, videophone, mails, messaging</td>
+</tr>
+</tbody>
+</table>
+<p>You can now start the plugin (start button).</p>
+</div>
+<div class="section" id="creating-a-device-for-the-mir-ror">
+<h2>Creating a device for the Mir:ror<a class="headerlink" href="#creating-a-device-for-the-mir-ror" title="Permalink to this headline">¶</a></h2>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="28%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Field</th>
+<th class="head">Suggested value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td>Mir:ror</td>
+<td>The name you want to give to your Mir:ror device</td>
+</tr>
+<tr class="row-odd"><td>Address</td>
+<td><strong>mirror</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Feature</td>
+<td><strong>RFID.Mirror base</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Usage</td>
+<td><strong>Mir:ror</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Description</td>
+<td>&nbsp;</td>
+<td>a short description (Placement, usage, etc)</td>
+</tr>
+<tr class="row-odd"><td>Reference</td>
+<td>&nbsp;</td>
+<td>the device reference (model, etc)</td>
+</tr>
+</tbody>
+</table>
+<p>Example :</p>
+<img alt="../../_images/mirror_create_base.png" src="../../_images/mirror_create_base.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the status of your Mir:ror (on or off)</p>
+</div>
+<div class="section" id="creating-a-device-for-a-rfid-element">
+<h2>Creating a device for a RFID element<a class="headerlink" href="#creating-a-device-for-a-rfid-element" title="Permalink to this headline">¶</a></h2>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
+=========== =============================== ===========
+Field       Suggested value                 Description
+=========== =============================== ===========
+Name        Green nanoztag                  The name you want to give to your RFID element
+Address     000008d00218c10916a8a9000000    The id of the RFID element. To get the id of a RFID element, use this helper : <strong>mirror read ** and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.
+Feature     **RFID.Mirror tag</strong>
+Usage       <strong>Nanoztag</strong>
+Description                                 a short description (Placement, usage, etc)
+Reference                                   the device reference (model, etc)
+=========== =============================== ===========</p>
+<p>Example :</p>
+<img alt="../../_images/mirror_create_tag.png" src="../../_images/mirror_create_tag.png" />
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the status of your RFID element (on or off)</p>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p>To get an introduction to helpers, you can read the <a class="reference internal" href="../../enduser/configuration/plugins/helpers.html"><em>Helper documentation</em></a>. To use a helper, the plugin must be stopped.</p>
+<div class="section" id="mirror-read">
+<h3>mirror read<a class="headerlink" href="#mirror-read" title="Permalink to this headline">¶</a></h3>
+<p><strong>mirror read</strong> helper will wait for an action on ____ and display it. It is usefull to get RFID identifier.</p>
+<div class="section" id="example-rfid-in">
+<h4>Example: RFID in<a class="headerlink" href="#example-rfid-in" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>$ mirror read /dev/mirror
 Device : 000008d00218c10916a8a9000000
 Type : present
 Current : HIGH
-{CODE}</p>
-<p>!!!!Example : RFID out
-{CODE()}
-$ mirror read /dev/mirror
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-rfid-out">
+<h4>Example: RFID out<a class="headerlink" href="#example-rfid-out" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>$ mirror read /dev/mirror
 Device : 000008d00218c10916a8a9000000
 Type : present
 Current : LOW
-{CODE}</p>
-<p>!!!!Example : Mir:ror faced up
-{CODE()}
-$ mirror read /dev/mirror
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-mir-ror-faced-up">
+<h4>Example: Mir:ror faced up<a class="headerlink" href="#example-mir-ror-faced-up" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>$ mirror read /dev/mirror
 Device : mirror
 Type : activated
 Current : HIGH
-{CODE}</p>
-<p>!!!!Example : Mir:ror faced down
-{CODE()}
-$ mirror read /dev/mirror
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-mir-ror-faced-down">
+<h4>Example: Mir:ror faced down<a class="headerlink" href="#example-mir-ror-faced-down" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none"><div class="highlight"><pre>$ mirror read /dev/mirror
 Device : mirror
 Type : activated
 Current : LOW
-{CODE}</p>
+</pre></div>
+</div>
 <p>I had some problem and need to run &#8220;od -x &lt; /dev/mirror&#8221; at least once to make my mirror working.</p>
+</div>
+</div>
+</div>
+</div>
 
 
           </div>         
@@ -153,13 +229,38 @@ Current : LOW
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin mirror</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#known-issues">Known issues</a></li>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#permissions-management">Permissions management</a></li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a></li>
+<li><a class="reference internal" href="#creating-a-device-for-the-mir-ror">Creating a device for the Mir:ror</a></li>
+<li><a class="reference internal" href="#creating-a-device-for-a-rfid-element">Creating a device for a RFID element</a></li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
+<li><a class="reference internal" href="#mirror-read">mirror read</a><ul>
+<li><a class="reference internal" href="#example-rfid-in">Example: RFID in</a></li>
+<li><a class="reference internal" href="#example-rfid-out">Example: RFID out</a></li>
+<li><a class="reference internal" href="#example-mir-ror-faced-up">Example: Mir:ror faced up</a></li>
+<li><a class="reference internal" href="#example-mir-ror-faced-down">Example: Mir:ror faced down</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
-      <li>Prev: <a href="../ipx800/index.html">&lt;no title&gt;</a></li>
+      <li>Prev: <a href="../ipx800/index.html">Plugin ipx800</a></li>
     
     
-      <li>Next: <a href="../plcbus/index.html">&lt;no title&gt;</a></li>
+      <li>Next: <a href="../plcbus/index.html">PLCBUS plugin</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -167,7 +268,7 @@ Current : LOW
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>Plugin mirror</li></ul>
         
       </li>
   </ul>  
@@ -199,11 +300,11 @@ Current : LOW
     
     <div id="ft">
       <div class="nav">
-    &laquo; <a href="../ipx800/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../ipx800/index.html" title="Plugin ipx800">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../plcbus/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../plcbus/index.html" title="PLCBUS plugin">next</a> &raquo;</div>
     </div>
   </div>
 

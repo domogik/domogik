@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>Plugin wol_ping &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="../x10_heyu/index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="../teleinfo/index.html" /> 
+    <link rel="next" title="X10 plugin" href="../x10_heyu/index.html" />
+    <link rel="prev" title="Plugin teleinfo" href="../teleinfo/index.html" /> 
   </head>
   <body>
 
@@ -40,11 +40,11 @@
         <a title="Global index" href="../../genindex.html">Index</a>  |
       </div>
       <div class="nav">
-    &laquo; <a href="../teleinfo/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../teleinfo/index.html" title="Plugin teleinfo">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../x10_heyu/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../x10_heyu/index.html" title="X10 plugin">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -52,74 +52,154 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-wol_ping-index">
             
-  <p>!Plugin wol_ping
-&lt;div class=&#8221;to_dev_or_doc&#8221;&gt;
-((plugin_wol_ping_dev|Go this plugin development information))
-&lt;/div&gt;
-{maketoc}</p>
-<p>!!Purpose
-WOL and Ping plugin allows to ping a computer to see if it is alive and to send a broadcast magic packet to a computer when getting an xPL message. This magic packet tells target computer to wake up.</p>
-<p>!!Installation
-Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
-<p>!!Plugin configuration
-!!!Common parameters
-{FANCYTABLE(head=&amp;gt;Key~|~Default value~|~Description)}
-ping-interval~|~60~|~ Define the interval between each ping request for a computer. You shouldn&#8217;t use a value under 15 seconds.
-{FANCYTABLE}
-!!!Interface parameters
-{FANCYTABLE(head=&amp;gt;Key~|~Default value~|~Description)}
-name~|~~|~Name of the computer. This will be used as address when creating a device : don&#8217;t use special characters.
-ip~|~0.0.0.0~|~Ip address (or DNS name) of the computer.
-mac~|~ff:ff:ff:ff:ff:ff~|~Mac address of the computer
-wol-port~|~~|~Port used for wake on lan of the computer. The port is a value between 0 and 9. Common used values are 7, 9, 0.
-{FANCYTABLE}
-&lt;br /&gt;
-You can now start the plugin (start button).</p>
-<p>!!Creating a device for a computer
-In administration, go to <strong>Organization &amp;gt; Devices</strong> page. Create a new device like this :
-{FANCYTABLE(head=&amp;gt;Field~|~Suggested value~|~Description)}
-Name~|~~|~The name of the computer
-Address~|~~|~The value you set for the <strong>name</strong> parameter in plugin configuration.
-Feature~|~**Computer.control**~|~
-Usage~|~Server~|~A computer related usage
-Description~|~~|~a short description (Placement, usage, etc)
-Reference~|~~|~the device reference (model, etc)
-{FANCYTABLE}
-&lt;br /&gt;
-Example :
-&lt;br /&gt;
-{IMG(attId=&#8221;193&#8221;,stylebox=&#8221;border&#8221;,align=&#8221;center&#8221;)}{IMG}
-&lt;br /&gt;
-There are 2 features available :
-* WOL feature (to wake up computer)
-* Ping feature (to see computer status)</p>
-<p>((Setup_your_devices|Attribute the features to a place)) and you can now wake up your computer or check its state.</p>
-<p>!!Configuration for target computers to wake up (linux)
-Check if your network device allow wakeonlan :
-{CODE()}
-$ sudo ethtool eth0
-{CODE}</p>
-<p>If you got :
-{CODE()}
-Wake-on: d
-{CODE}
-The WOL is not activated.</p>
-<p>If you got :
-{CODE()}
-Wake-on: g
-{CODE}
-The WOL is activated.</p>
-<p>If it is not activated, you need to enable it. Edit the file <strong>/etc/rc.local</strong> and add the following line before the line containing <strong>exit 0</strong> :
-{CODE()}
-ethtool -s eth0 wol g
-{CODE}</p>
-<p>To get the mac address of the computer, use the following command :
-{CODE()}
-$ ifconfig
+  <div class="section" id="plugin-wol-ping">
+<h1>Plugin wol_ping<a class="headerlink" href="#plugin-wol-ping" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="dev.html"><em>Go this plugin development information</em></a></p>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>WOL and Ping plugin allows to ping a computer to see if it is alive and to send a broadcast magic packet to a computer when getting an xPL message.
+This magic packet tells target computer to wake up.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.</p>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="common-parameters">
+<h3>Common parameters<a class="headerlink" href="#common-parameters" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="11%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ping-interval</td>
+<td>60</td>
+<td>Define the interval between each ping request for a computer. You shouldn&#8217;t use a value under 15 seconds.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="interface-parameters">
+<h3>Interface parameters<a class="headerlink" href="#interface-parameters" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="12%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>&nbsp;</td>
+<td>Name of the computer. This will be used as address when creating a device : don&#8217;t use special characters.</td>
+</tr>
+<tr class="row-odd"><td>ip</td>
+<td>0.0.0.0</td>
+<td>Ip address (or DNS name) of the computer.</td>
+</tr>
+<tr class="row-even"><td>mac</td>
+<td>ff:ff:ff:ff:ff:ff</td>
+<td>Mac address of the computer</td>
+</tr>
+<tr class="row-odd"><td>wol-port</td>
+<td>&nbsp;</td>
+<td>Port used for wake on lan of the computer. The port is a value between 0 and 9. Common used values are 7, 9, 0.</td>
+</tr>
+</tbody>
+</table>
+<p>You can now start the plugin (start button).</p>
+</div>
+</div>
+<div class="section" id="creating-a-device-for-a-computer">
+<h2>Creating a device for a computer<a class="headerlink" href="#creating-a-device-for-a-computer" title="Permalink to this headline">¶</a></h2>
+<p>In administration, go to <strong>Organization &amp;gt; Devices</strong> page. Create a new device like this :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="20%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Field</th>
+<th class="head">Suggested value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td>&nbsp;</td>
+<td>The name of the computer</td>
+</tr>
+<tr class="row-odd"><td>Address</td>
+<td>&nbsp;</td>
+<td>The value you set for the <strong>name</strong> parameter in plugin configuration.</td>
+</tr>
+<tr class="row-even"><td>Feature</td>
+<td><strong>Computer.control</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Usage</td>
+<td>Server</td>
+<td>A computer related usage</td>
+</tr>
+<tr class="row-even"><td>Description</td>
+<td>&nbsp;</td>
+<td>a short description (Placement, usage, etc)</td>
+</tr>
+<tr class="row-odd"><td>Reference</td>
+<td>&nbsp;</td>
+<td>the device reference (model, etc)</td>
+</tr>
+</tbody>
+</table>
+<p>Example :</p>
+<img alt="../../_images/wol_ping_create.png" src="../../_images/wol_ping_create.png" />
+<p>There are 2 features available :</p>
+<ul class="simple">
+<li>WOL feature (to wake up computer)</li>
+<li>Ping feature (to see computer status)</li>
+</ul>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the features to a place</em></a> and you can now wake up your computer or check its state.</p>
+</div>
+<div class="section" id="configuration-for-target-computers-to-wake-up-linux">
+<h2>Configuration for target computers to wake up (linux)<a class="headerlink" href="#configuration-for-target-computers-to-wake-up-linux" title="Permalink to this headline">¶</a></h2>
+<p>Check if your network device allow wakeonlan:</p>
+<div class="highlight-python"><pre>$ sudo ethtool eth0</pre>
+</div>
+<p>If you got:</p>
+<div class="highlight-python"><pre>Wake-on: d</pre>
+</div>
+<p>The WOL is not activated.</p>
+<p>If you got:</p>
+<div class="highlight-python"><pre>Wake-on: g</pre>
+</div>
+<p>The WOL is activated.</p>
+<p>If it is not activated, you need to enable it.
+Edit the file <strong>/etc/rc.local</strong> and add the following line before the line containing <strong>exit 0</strong>:</p>
+<div class="highlight-python"><pre>ethtool -s eth0 wol g</pre>
+</div>
+<p>To get the mac address of the computer, use the following command:</p>
+<div class="highlight-python"><pre>$ ifconfig
 eth0    Lien encap:Ethernet  HWaddr 00:15:60:B1:xx:xx
-[...]
-{CODE}
-<strong>HWaddr</strong> is the ac address.</p>
+[...]</pre>
+</div>
+<p><strong>HWaddr</strong> is the ac address.</p>
+</div>
+</div>
 
 
           </div>         
@@ -131,13 +211,29 @@ eth0    Lien encap:Ethernet  HWaddr 00:15:60:B1:xx:xx
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin wol_ping</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#common-parameters">Common parameters</a></li>
+<li><a class="reference internal" href="#interface-parameters">Interface parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-device-for-a-computer">Creating a device for a computer</a></li>
+<li><a class="reference internal" href="#configuration-for-target-computers-to-wake-up-linux">Configuration for target computers to wake up (linux)</a></li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
-      <li>Prev: <a href="../teleinfo/index.html">&lt;no title&gt;</a></li>
+      <li>Prev: <a href="../teleinfo/index.html">Plugin teleinfo</a></li>
     
     
-      <li>Next: <a href="../x10_heyu/index.html">&lt;no title&gt;</a></li>
+      <li>Next: <a href="../x10_heyu/index.html">X10 plugin</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -145,7 +241,7 @@ eth0    Lien encap:Ethernet  HWaddr 00:15:60:B1:xx:xx
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>Plugin wol_ping</li></ul>
         
       </li>
   </ul>  
@@ -177,11 +273,11 @@ eth0    Lien encap:Ethernet  HWaddr 00:15:60:B1:xx:xx
     
     <div id="ft">
       <div class="nav">
-    &laquo; <a href="../teleinfo/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../teleinfo/index.html" title="Plugin teleinfo">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../x10_heyu/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../x10_heyu/index.html" title="X10 plugin">next</a> &raquo;</div>
     </div>
   </div>
 

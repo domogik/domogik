@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Set a udev rule &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Actuators" href="../technical/actuator.html" />
+    <link rel="prev" title="Plugin wol_ping - developer information" href="../plugins/wol_ping/dev.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../plugins/wol_ping/dev.html" title="Plugin wol_ping - developer information">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="../technical/actuator.html" title="Actuators">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="various-udev_rule">
+            
+  <div class="section" id="set-a-udev-rule">
+<h1>Set a udev rule<a class="headerlink" href="#set-a-udev-rule" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>Setting a udev rule allow the computer to create a permanent /dev/mydevice entry for a device. This is usefull to be sure of the path of a device.</p>
+</div>
+<div class="section" id="udev-rules-are-indicated-by-domogik-plugins">
+<h2>Udev rules are indicated by Domogik plugins<a class="headerlink" href="#udev-rules-are-indicated-by-domogik-plugins" title="Permalink to this headline">¶</a></h2>
+<p>In Domogik, the udev rules to create for a device is indicated :</p>
+<ul class="simple">
+<li>when installing a plugin</li>
+<li>in the plugin page</li>
+</ul>
+<p>Copy the suggested rule (and if necessary adapt it) and put it in the given file.</p>
+<p>Then, you just have to unplug/plug the device</p>
+<p>Check the rule is used with the following command. You should see the new device entry:</p>
+<div class="highlight-python"><pre>$ ls -ltr</pre>
+</div>
+</div>
+<div class="section" id="how-to-create-a-rule-example">
+<h2>How to create a rule (example)<a class="headerlink" href="#how-to-create-a-rule-example" title="Permalink to this headline">¶</a></h2>
+<p>By default, you need to be root to access some devices. To give access to everybody on your computer to the device, follow these instructions.</p>
+<p>First, get vendor and product ids. Example for a Mir:ror device:</p>
+<div class="highlight-python"><pre>$ dmesg | grep Mirror
+generic-usb 0003:1DA8:1301.0002: hiddev0,hidraw1: USB HID v1.00 Device [Violet Mirror] on usb-0000:00:1d.0-2/input0</pre>
+</div>
+<p>Here, vendor id is 1da8 and product id is 1301.</p>
+<p>Create an udev rule for the Mir:ror device in file <strong>/etc/udev/rules.d/mirror.rules</strong>:</p>
+<div class="highlight-python"><pre>KERNEL=="hidraw*", ATTRS{idVendor}=="1da8", ATTRS{idProduct}=="1301", SYMLINK+="mirror", MODE="0666"</pre>
+</div>
+<p>You just have to unplug and plug back your Mir:ror to have permissions on it as a non root user.
+Your Mir:ror device will have <strong>/dev/mirror</strong> as entry point</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Set a udev rule</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#udev-rules-are-indicated-by-domogik-plugins">Udev rules are indicated by Domogik plugins</a></li>
+<li><a class="reference internal" href="#how-to-create-a-rule-example">How to create a rule (example)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../plugins/wol_ping/dev.html">Plugin wol_ping - developer information</a></li>
+    
+    
+      <li>Next: <a href="../technical/actuator.html">Actuators</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Set a udev rule</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/various/udev_rule.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../plugins/wol_ping/dev.html" title="Plugin wol_ping - developer information">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="../technical/actuator.html" title="Actuators">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

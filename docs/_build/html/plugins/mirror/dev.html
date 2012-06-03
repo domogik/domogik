@@ -1,0 +1,206 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugin mirror - developer information &mdash; Domogik 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Plugin wol_ping - developer information" href="../wol_ping/dev.html" />
+    <link rel="prev" title="Plugin onewire - developer information" href="../onewire/dev.html" /> 
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Domogik 0.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+      </div>
+      <div class="nav">
+    &laquo; <a href="../onewire/dev.html" title="Plugin onewire - developer information">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../wol_ping/dev.html" title="Plugin wol_ping - developer information">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="plugins-mirror-dev">
+            
+  <div class="section" id="plugin-mirror-developer-information">
+<h1>Plugin mirror - developer information<a class="headerlink" href="#plugin-mirror-developer-information" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>Go this plugin documentation</em></a></p>
+<div class="section" id="xpl-schema">
+<h2>xPL Schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://xplproject.org.uk/wiki/index.php?title=Schema_-_SENSOR.BASIC">sensor.basic</a> schema is used by this plugin.</p>
+<p>Here are the events for which a xPL message is sent</p>
+<div class="section" id="mir-ror-faced-up">
+<h3>Mir:ror faced up<a class="headerlink" href="#mir-ror-faced-up" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>xpl-trig
+{
+...
+}
+sensor.basic
+{
+device=mirror
+type=activated
+current=HIGH
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="mir-ror-faced-down">
+<h3>Mir:ror faced down<a class="headerlink" href="#mir-ror-faced-down" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>xpl-trig
+{
+...
+}
+sensor.basic
+{
+device=mirror
+type=activated
+current=LOW
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-rfid-element-is-detected">
+<h3>A RFID element is detected<a class="headerlink" href="#a-rfid-element-is-detected" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>xpl-trig
+{
+...
+}
+sensor.basic
+{
+device=
+type=present
+current=HIGH
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-rfid-element-is-no-more-detected">
+<h3>A RFID element is no more detected<a class="headerlink" href="#a-rfid-element-is-no-more-detected" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>xpl-trig
+{
+...
+}
+sensor.basic
+{
+device=
+type=present
+current=LOW
+}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin mirror - developer information</a><ul>
+<li><a class="reference internal" href="#xpl-schema">xPL Schema</a><ul>
+<li><a class="reference internal" href="#mir-ror-faced-up">Mir:ror faced up</a></li>
+<li><a class="reference internal" href="#mir-ror-faced-down">Mir:ror faced down</a></li>
+<li><a class="reference internal" href="#a-rfid-element-is-detected">A RFID element is detected</a></li>
+<li><a class="reference internal" href="#a-rfid-element-is-no-more-detected">A RFID element is no more detected</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../onewire/dev.html">Plugin onewire - developer information</a></li>
+    
+    
+      <li>Next: <a href="../wol_ping/dev.html">Plugin wol_ping - developer information</a></li>
+    
+  </ul>
+  <h3>You are here:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Domogik 0.1 documentation</a>
+        
+        <ul><li>Plugin mirror - developer information</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/plugins/mirror/dev.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../onewire/dev.html" title="Plugin onewire - developer information">previous</a> 
+     |
+    <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
+   |
+    <a href="../wol_ping/dev.html" title="Plugin wol_ping - developer information">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Domogik 0.1 documentation</title>
+    <title>Plugin teleinfo &mdash; Domogik 0.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Domogik 0.1 documentation" href="../../index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="../wol_ping/index.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="../plcbus/index.html" /> 
+    <link rel="next" title="Plugin wol_ping" href="../wol_ping/index.html" />
+    <link rel="prev" title="PLCBUS plugin" href="../plcbus/index.html" /> 
   </head>
   <body>
 
@@ -40,11 +40,11 @@
         <a title="Global index" href="../../genindex.html">Index</a>  |
       </div>
       <div class="nav">
-    &laquo; <a href="../plcbus/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../plcbus/index.html" title="PLCBUS plugin">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../wol_ping/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../wol_ping/index.html" title="Plugin wol_ping">next</a> &raquo;</div>
     </div>
     
     <div id="bd">
@@ -52,71 +52,99 @@
         <div class="yui-b">
           <div class="yui-g" id="plugins-teleinfo-index">
             
-  <p>{maketoc}</p>
-<p>!Purpose
-Teleinformation is a protocol used by a French power provider.
+  <div class="section" id="plugin-teleinfo">
+<h1>Plugin teleinfo<a class="headerlink" href="#plugin-teleinfo" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>Teleinformation is a protocol used by a French power provider.
 The electric meter sends information on a special bus.</p>
 <p>With some custom PCB, you can read this information and keep/log/study your power consumption.
-The PCB [<a class="reference external" href="http://teleinfo.dauguet.net/articles.php">http://teleinfo.dauguet.net/articles.php</a>?lng=fr&amp;pg=44|is available here]. Some other &#8220;teleinfo modem&#8221; are available elsewhere on the net.</p>
-<p>Models supported by plugin :
-* Dauguet USB Teleinfo modem
-* Dauguet Seriel Teleinfo modem</p>
+The PCB <a class="reference external" href="http://teleinfo.dauguet.net/articles.php?lng=fr&amp;pg=44">is available here</a>. Some other &#8220;teleinfo modem&#8221; are available elsewhere on the net.</p>
+<p>Models supported by plugin :</p>
+<ul class="simple">
+<li>Dauguet USB Teleinfo modem</li>
+<li>Dauguet Seriel Teleinfo modem</li>
+</ul>
 <p>Others modem could be supported by plugin. Feel free to test them with this plugin and report us :)</p>
-<p>!!Interesting links about Teleinfo
-* (fr) <a class="reference external" href="http://www.planete-domotique.com/blog/2010/03/30/la-teleinformation-edf/">http://www.planete-domotique.com/blog/2010/03/30/la-teleinformation-edf/</a>
-* (fr) <a class="reference external" href="http://bernard.lefrancois.free.fr/teleinfo.htm">http://bernard.lefrancois.free.fr/teleinfo.htm</a></p>
-<p>!Known issues
-Actually the plugin support only one teleinfo modem. In a futur release, it will support several teleinfo modem.</p>
-<p>!Prerequisites
-!!Dependancies - Ubuntu/Debian installation
-To use Plcbus plugin, you need python serial package. To install it, launch this command :
-{CODE()}
-sudo apt-get install python-serial
-{CODE}</p>
-<p>!How to plug</p>
-<p>!!Example with Dauguet Usb model
-First, you should have an electric meter like this :
-{IMG(attId=&#8221;86&#8221;)}{IMG}</p>
-<p>Open the bottom part (be careful, if there is a metallic security to prevoid opening, you may be looking for the wrong thing!!) of the electric meter. On the right, you should see <strong>I1</strong> and <strong>I2</strong> : it is there you should plug the teleinfo modem. On this photo, there are both a teleinfo modem and a heating programmer pluged.
-{IMG(attId=&#8221;87&#8221;)}{IMG}</p>
+<div class="section" id="interesting-links-about-teleinfo">
+<h3>Interesting links about Teleinfo<a class="headerlink" href="#interesting-links-about-teleinfo" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>(fr) <a class="reference external" href="http://www.planete-domotique.com/blog/2010/03/30/la-teleinformation-edf/">http://www.planete-domotique.com/blog/2010/03/30/la-teleinformation-edf/</a></li>
+<li>(fr) <a class="reference external" href="http://bernard.lefrancois.free.fr/teleinfo.htm">http://bernard.lefrancois.free.fr/teleinfo.htm</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="known-issues">
+<h2>Known issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<p>Actually the plugin support only one teleinfo modem. In a futur release, it will support several teleinfo modem.</p>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dependancies-ubuntu-debian-installation">
+<h3>Dependancies - Ubuntu/Debian installation<a class="headerlink" href="#dependancies-ubuntu-debian-installation" title="Permalink to this headline">¶</a></h3>
+<p>To use Plcbus plugin, you need python serial package. To install it, launch this command:</p>
+<div class="highlight-python"><pre>$ sudo apt-get install python-serial</pre>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-plug">
+<h2>How to plug<a class="headerlink" href="#how-to-plug" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="example-with-dauguet-usb-model">
+<h3>Example with Dauguet Usb model<a class="headerlink" href="#example-with-dauguet-usb-model" title="Permalink to this headline">¶</a></h3>
+<p>First, you should have an electric meter like this :
+.. image:: teleinfo-elec-meter.jpg</p>
+<p>Open the bottom part (be careful, if there is a metallic security to prevoid opening, you may be looking for the wrong thing!!) of the electric meter.
+On the right, you should see <strong>I1</strong> and <strong>I2</strong> : it is there you should plug the teleinfo modem.</p>
+<p>On this photo, there are both a teleinfo modem and a heating programmer pluged.
+.. image:: teleinfo-elec-meter-zoom.jpg</p>
 <p>Here is the Usb teleinfo modem : on the left, the usb plug, on the right, the 2 wires that are plugged on I1 and I2 :
-{IMG(attId=&#8221;85&#8221;)}{IMG}</p>
-<p>!!Permissions management
-By default, you need to be root to access teleinfo modem. To give access to everybody on your computer to the teleinfo modem, follow these instructions.</p>
-<p>Create an udev rule for teleinfo in file <strong>/etc/udev/rules.d/teleinfo.rules</strong> :
-!!!Moschip usb-&gt;serial adapter.
-If you use a usb to serial adapter (modship model) with a serial Teleinfo modem, you can use this rule :
-{CODE()}
-KERNEL==&#8221;ttyUSB*&#8221;, ATTRS{port_number}==&#8221;0&#8221;, DRIVERS==&#8221;moschip7720&#8221;, SYMLINK+=&#8221;teleinfo&#8221;, MODE=&#8221;0666&#8221;
-{CODE}</p>
-<p>!!!Dauguet usb assemby
-Available on [<a class="reference external" href="http://teleinfo.dauguet">http://teleinfo.dauguet</a>.net|http://teleinfo.dauguet.net] : Usb model.
-{CODE()}
-SUBSYSTEMS==&#8221;usb&#8221;, ATTRS{idVendor}==&#8221;0403&#8221;, ATTRS{idProduct}==&#8221;6001&#8221;, SYMLINK+=&#8221;teleinfo&#8221;, MODE=&#8221;0666&#8221;
-{CODE}</p>
-<p>!!!Other assemblies
-<em>Feel free to give us your teleinfo modem model and udev rules ;)</em></p>
-<p>!!!!Example for an usb model
-First, get vendor and product ids with <strong>lsusb</strong> command :
-{CODE()}
-# lsusb
-Bus 006 Device 013: ID 0123:4567 Some bla bla
-{CODE}
-Here, vendor id is 0123and product id is 4567.</p>
-<p>The rule will be :
-{CODE()}
-SUBSYSTEMS==&#8221;usb&#8221;, ATTRS{idVendor}==&#8221;0123&#8221;, ATTRS{idProduct}==&#8221;4567 &#8221;, SYMLINK+=&#8221;teleinfo&#8221;, MODE=&#8221;0666&#8221;
-{CODE}</p>
-<p>!!!Apply the rule
-You just have to unplug and plug back your Teleinfo modem to have permissions on it as a non root user. Your Teleinfo modem device will have <strong>/dev/teleinfo</strong> as entry point</p>
-<p>!!!Check the device under Linux
-Setup the connection according to the Teleinfo specifications
-{CODE()}
-# stty -F /dev/teleinfo 1200 sane evenp parenb cs7 -crtscts
-{CODE}</p>
-<p>Display the data flow
-{CODE()}
-# cat /dev/teleinfo
+.. image:: teleinfo-assembly.jpg</p>
+</div>
+<div class="section" id="permissions-management">
+<h3>Permissions management<a class="headerlink" href="#permissions-management" title="Permalink to this headline">¶</a></h3>
+<p>By default, you need to be root to access teleinfo modem.
+To give access to everybody on your computer to the teleinfo modem, follow these instructions.</p>
+<p>Create an udev rule for teleinfo in file <strong>/etc/udev/rules.d/teleinfo.rules</strong></p>
+<div class="section" id="moschip-usb-serial-adapter">
+<h4>Moschip usb-&gt;serial adapter<a class="headerlink" href="#moschip-usb-serial-adapter" title="Permalink to this headline">¶</a></h4>
+<p>If you use a usb to serial adapter (modship model) with a serial Teleinfo modem, you can use this rule:</p>
+<div class="highlight-python"><pre>KERNEL=="ttyUSB*", ATTRS{port_number}=="0", DRIVERS=="moschip7720", SYMLINK+="teleinfo", MODE="0666"</pre>
+</div>
+</div>
+<div class="section" id="dauguet-usb-assemby">
+<h4>Dauguet usb assemby<a class="headerlink" href="#dauguet-usb-assemby" title="Permalink to this headline">¶</a></h4>
+<p>Available on <a class="reference external" href="http://teleinfo.dauguet.net">http://teleinfo.dauguet.net</a> : Usb model</p>
+<div class="highlight-python"><pre>SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="teleinfo", MODE="0666"</pre>
+</div>
+</div>
+<div class="section" id="other-assemblies">
+<h4>Other assemblies<a class="headerlink" href="#other-assemblies" title="Permalink to this headline">¶</a></h4>
+<p><em>Feel free to give us your teleinfo modem model and udev rules ;)</em></p>
+<div class="section" id="example-for-an-usb-model">
+<h5>Example for an usb model<a class="headerlink" href="#example-for-an-usb-model" title="Permalink to this headline">¶</a></h5>
+<p>First, get vendor and product ids with <strong>lsusb</strong> command:</p>
+<div class="highlight-python"><pre>$ lsusb
+Bus 006 Device 013: ID 0123:4567 Some bla bla</pre>
+</div>
+<p>Here, vendor id is 0123and product id is 4567.</p>
+<p>The rule will be:</p>
+<div class="highlight-python"><pre>SUBSYSTEMS=="usb", ATTRS{idVendor}=="0123", ATTRS{idProduct}=="4567 ", SYMLINK+="teleinfo", MODE="0666"</pre>
+</div>
+</div>
+</div>
+<div class="section" id="apply-the-rule">
+<h4>Apply the rule<a class="headerlink" href="#apply-the-rule" title="Permalink to this headline">¶</a></h4>
+<p>You just have to unplug and plug back your Teleinfo modem to have permissions on it as a non root user.
+Your Teleinfo modem device will have <strong>/dev/teleinfo</strong> as entry point</p>
+</div>
+<div class="section" id="check-the-device-under-linux">
+<h4>Check the device under Linux<a class="headerlink" href="#check-the-device-under-linux" title="Permalink to this headline">¶</a></h4>
+<p>Setup the connection according to the Teleinfo specifications</p>
+<div class="highlight-none"><div class="highlight"><pre>$ stty -F /dev/teleinfo 1200 sane evenp parenb cs7 -crtscts
+</pre></div>
+</div>
+<p>Display the data flow</p>
+<div class="highlight-python"><pre>$ cat /dev/teleinfo
 ADCO 012345678901 =
 OPTARIF HC.. &lt;
 ISOUSC 60 &lt;
@@ -128,99 +156,211 @@ IMAX 047 J
 PAPP 00520 (
 HHPHC D /
 MOTDETAT 000000 B
-...
-{CODE}
-!Plugin configuration
-!!Enabling plugin
-You can enable plugin by using :
-{CODE()}
-dmgenplug teleinfo
-{CODE}</p>
+...</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enabling-plugin">
+<h3>Enabling plugin<a class="headerlink" href="#enabling-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can enable plugin by using:</p>
+<div class="highlight-python"><pre>$ dmgenplug teleinfo</pre>
+</div>
 <p>You just have to reload administration page to see the plugin in the list.</p>
-<p>!!Configuration
-In Domogik administration, go to teleinfo configuration page.</p>
-<p>!!!device
-This is the address of Teleinfo modem device. If you follow previsous instructions about permissions, it should be <strong>/dev/teleinfo</strong>. Elsewhere, it could be something like <strong>/dev/ttyUSB0</strong> for an usb model.
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>In Domogik administration, go to teleinfo configuration page.</p>
+<div class="section" id="device">
+<h4>device<a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h4>
+<p>This is the address of Teleinfo modem device.
+If you follow previsous instructions about permissions, it should be <strong>/dev/teleinfo</strong>.
+Elsewhere, it could be something like <strong>/dev/ttyUSB0</strong> for an usb model.
 Default : /dev/teleinfo</p>
-<p>!!!interval
-This is the time between each read of modem teleinfo for getting data.
+</div>
+<div class="section" id="interval">
+<h4>interval<a class="headerlink" href="#interval" title="Permalink to this headline">¶</a></h4>
+<p>This is the time between each read of modem teleinfo for getting data.
 Default : 60</p>
-<p>!!Start plugin
-You can now start the plugin (start button).</p>
-<p>!Creating a device for Teleinfo modem
-In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-* Name : &#8220;Teleinformation&#8221; or whatever you want
-* Description : some description
-* Address : &#8220;teleinfo&#8221; (don&#8217;t change this value)
-* Reference : &#8220;Dauguet usb model&#8221; or whatever you want
-* Usage : &#8220;Service.Teleinfo&#8221;
-* Type : &#8220;Electricity&#8221;</p>
+</div>
+</div>
+<div class="section" id="start-plugin">
+<h3>Start plugin<a class="headerlink" href="#start-plugin" title="Permalink to this headline">¶</a></h3>
+<p>You can now start the plugin (start button).</p>
+</div>
+</div>
+<div class="section" id="creating-a-device-for-teleinfo-modem">
+<h2>Creating a device for Teleinfo modem<a class="headerlink" href="#creating-a-device-for-teleinfo-modem" title="Permalink to this headline">¶</a></h2>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<ul class="simple">
+<li>Name : &#8220;Teleinformation&#8221; or whatever you want</li>
+<li>Description : some description</li>
+<li>Address : &#8220;teleinfo&#8221; (don&#8217;t change this value)</li>
+<li>Reference : &#8220;Dauguet usb model&#8221; or whatever you want</li>
+<li>Usage : &#8220;Service.Teleinfo&#8221;</li>
+<li>Type : &#8220;Electricity&#8221;</li>
+</ul>
 <p>Example :</p>
-<p>{IMG(attId=&#8221;192&#8221;)}{IMG}</p>
-<p>Several features are available :
-* Maximum power
-* Instant power
-* Off peak hours
-* Peak hours
-* Tariff period
-* Apparent power
-* Hourly group</p>
-<p>((Setup_your_devices|Attribute the features to a place. You now have access to your electricity informations)).</p>
-<p>!Helpers
-<em>To get an introduction to helpers, you can read the ((Plugins_helpers|Helper documentation)). To use a helper, the plugin must be stopped.</em></p>
-<p>!!teleinfo read &lt;device&gt;
-<strong>teleinfo read &lt;device&gt;</strong> will read current data on electric meter and display them. Example :</p>
-<p>{CODE()}
-$ teleinfo read /dev/teleinfo
-Electric meter data :
-ADCO       : 030928084432
-OPTARIF    : HC..
-ISOUSC     : 45
-HCHC       : 005809449
-HCHP       : 006852296
-PTEC       : HP..
-IINST      : 004
-IMAX       : 048
-PAPP       : 00860
-HHPHC      : D
-MOTDETAT   : 000000
-{CODE}
-!Teleinfo data explanation
-<em>Note : this plugin is only related to french people, so following data has no interest to be translated.</em>
-||**Tag**    <a href="#id1"><span class="problematic" id="id2">|**Format**             |**Description**
-ADCO       |12 car.                | N° d&#8217;identification du compteur
-OPTARIF    |4 car.                 | Option tarifaire (type d&#8217;abonnement)
-ISOUSC     |2 car. unité = ampères | Intensité souscrite
-BASE       |9 car. unité = Wh      | Index si option = base
-HCHC       |9 car. unité = Wh      | Index heures creuses si option = heures creuses
-HCHP       |9 car. unité = Wh      | Index heures pleines si option = heures creuses
-EJP HN     |9 car. unité = Wh      | Index heures normales si option = EJP
-EJP HPM    |9 car. unité = Wh      | Index heures de pointe mobile si option = EJP
-BBR HC JB  |9 car. unité = Wh      | Index heures creuses jours bleus si option = tempo
-BBR HP JB  |9 car. unité = Wh      | Index heures pleines jours bleus si option = tempo
-BBR HC JW  |9 car. unité = Wh      | Index heures creuses jours blancs si option = tempo
-BBR HP JW  |9 car. unité = Wh      | Index heures pleines jours blancs si option = tempo
-BBR HC JR  |9 car. unité = Wh      | Index heures creuses jours rouges si option = tempo
-BBR HP JR  |9 car. unité = Wh      | Index heures pleines jours rouges si option = tempo
-PEJP       |2 car.                 | Préavis EJP si option = EJP (30mn avant période EJP)
-PTEC       |4 car.                 | Période tarifaire en cours
-DEMAIN     |                       | Couleur du lendemain si option = tempo
-**IINST**  |3 car. unité = ampères | Intensité instantanée
-ADPS       |3 car. unité = ampères | Avertissement de dépassement de puissance souscrite (message émis uniquement en cas de dépassement effectif, dans ce cas il est immédiat)
-**IMAX**   |3 car. unité = ampères | Intensité maximale
-PAPP       |5 car. unité = Volt.ampères | Puissance apparente : PAPP
-HHPHC      |1 car.                 | Groupe horaire si option = heures creuses ou tempo
-MOTDETAT   |6 car.                 | Mot d&#8217;état (autocontrôle) ||</span></a></p>
-<p>!! Three phase specific data
-If you have a 3-phase install, you will have more informations:
-* iinst1, iinst2,iinst3 instead of iinst
-* imax1, imax2, imax3 instaed of imax</p>
-<p>If you use more than provided power on one phase, the information sent by teleinfo will change, and you will receive message using the schema teleinfo.short with only a few information :
-* ADIR1, ADIR2, ADIR3 : intensity overload on each phase
-* IINST1, IINST2, IINST3 : intensity on each phase.
-!Developper notes
-!!xPL schema
-See the ((xPL_teleinfo_schema|xPL Teleinfo Schema page))</p>
+<img alt="../../_images/teleinfo_create.png" src="../../_images/teleinfo_create.png" />
+<p>Several features are available :</p>
+<ul class="simple">
+<li>Maximum power</li>
+<li>Instant power</li>
+<li>Off peak hours</li>
+<li>Peak hours</li>
+<li>Tariff period</li>
+<li>Apparent power</li>
+<li>Hourly group</li>
+</ul>
+<p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the features to a place</em></a>. You now have access to your electricity informations.</p>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p><em>To get an introduction to helpers, you can read the :doc:`Helper documentation &lt;/enduser/configuration/plugins/helpers&gt;`.
+To use a helper, the plugin must be stopped.</em></p>
+<div class="section" id="teleinfo-read-device">
+<h3>teleinfo read &lt;device&gt;<a class="headerlink" href="#teleinfo-read-device" title="Permalink to this headline">¶</a></h3>
+<p><strong>teleinfo read &lt;device&gt;</strong> will read current data on electric meter and display them. Example :</p>
+</div>
+</div>
+<div class="section" id="teleinfo-data-explanation">
+<h2>Teleinfo data explanation<a class="headerlink" href="#teleinfo-data-explanation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">this plugin is only related to french people, so following data has no interest to be translated.</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="19%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Tag</th>
+<th class="head">Format</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ADCO</td>
+<td>12 car.</td>
+<td>N° d&#8217;identification du compteur</td>
+</tr>
+<tr class="row-odd"><td>OPTARIF</td>
+<td>4 car.</td>
+<td>Option tarifaire (type d&#8217;abonnement)</td>
+</tr>
+<tr class="row-even"><td>ISOUSC</td>
+<td>2 car. unité = ampères</td>
+<td>Intensité souscrite</td>
+</tr>
+<tr class="row-odd"><td>BASE</td>
+<td>9 car. unité = Wh</td>
+<td>Index si option = base</td>
+</tr>
+<tr class="row-even"><td>HCHC</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures creuses si option = heures creuses</td>
+</tr>
+<tr class="row-odd"><td>HCHP</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures pleines si option = heures creuses</td>
+</tr>
+<tr class="row-even"><td>EJP HN</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures normales si option = EJP</td>
+</tr>
+<tr class="row-odd"><td>EJP HPM</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures de pointe mobile si option = EJP</td>
+</tr>
+<tr class="row-even"><td>BBR HC JB</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures creuses jours bleus si option = tempo</td>
+</tr>
+<tr class="row-odd"><td>BBR HP JB</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures pleines jours bleus si option = tempo</td>
+</tr>
+<tr class="row-even"><td>BBR HC JW</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures creuses jours blancs si option = tempo</td>
+</tr>
+<tr class="row-odd"><td>BBR HP JW</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures pleines jours blancs si option = tempo</td>
+</tr>
+<tr class="row-even"><td>BBR HC JR</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures creuses jours rouges si option = tempo</td>
+</tr>
+<tr class="row-odd"><td>BBR HP JR</td>
+<td>9 car. unité = Wh</td>
+<td>Index heures pleines jours rouges si option = tempo</td>
+</tr>
+<tr class="row-even"><td>PEJP</td>
+<td>2 car.</td>
+<td>Préavis EJP si option = EJP (30mn avant période EJP)</td>
+</tr>
+<tr class="row-odd"><td>PTEC</td>
+<td>4 car.</td>
+<td>Période tarifaire en cours</td>
+</tr>
+<tr class="row-even"><td>DEMAIN</td>
+<td>&nbsp;</td>
+<td>Couleur du lendemain si option = tempo</td>
+</tr>
+<tr class="row-odd"><td><strong>IINST</strong></td>
+<td>3 car. unité = ampères</td>
+<td>Intensité instantanée</td>
+</tr>
+<tr class="row-even"><td>ADPS</td>
+<td>3 car. unité = ampères</td>
+<td>Avertissement de dépassement de puissance souscrite
+(message émis uniquement en cas de dépassement effectif, dans ce cas il est immédiat)</td>
+</tr>
+<tr class="row-odd"><td><strong>IMAX</strong></td>
+<td>3 car. unité = ampères</td>
+<td>Intensité maximale</td>
+</tr>
+<tr class="row-even"><td>PAPP</td>
+<td>5 car. unité = Volt.ampères</td>
+<td>Puissance apparente : PAPP</td>
+</tr>
+<tr class="row-odd"><td>HHPHC</td>
+<td>1 car.</td>
+<td>Groupe horaire si option = heures creuses ou tempo</td>
+</tr>
+<tr class="row-even"><td>MOTDETAT</td>
+<td>6 car.</td>
+<td>Mot d&#8217;état (autocontrôle)</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="three-phase-specific-data">
+<h3>Three phase specific data<a class="headerlink" href="#three-phase-specific-data" title="Permalink to this headline">¶</a></h3>
+<p>If you have a 3-phase install, you will have more informations:</p>
+<ul class="simple">
+<li>iinst1, iinst2,iinst3 instead of iinst</li>
+<li>imax1, imax2, imax3 instaed of imax</li>
+</ul>
+<p>If you use more than provided power on one phase, the information sent by teleinfo will change, and you will receive message using the schema teleinfo.short with only a few information :</p>
+<ul class="simple">
+<li>ADIR1, ADIR2, ADIR3 : intensity overload on each phase</li>
+<li>IINST1, IINST2, IINST3 : intensity on each phase.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="developper-notes">
+<h2>Developper notes<a class="headerlink" href="#developper-notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="xpl-schema">
+<h3>xPL schema<a class="headerlink" href="#xpl-schema" title="Permalink to this headline">¶</a></h3>
+<p>See the <a class="reference internal" href="../../technical/schema/teleinfo.html"><em>xPL Teleinfo Schema page</em></a></p>
+</div>
+</div>
+</div>
 
 
           </div>         
@@ -232,13 +372,67 @@ See the ((xPL_teleinfo_schema|xPL Teleinfo Schema page))</p>
             
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin teleinfo</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a><ul>
+<li><a class="reference internal" href="#interesting-links-about-teleinfo">Interesting links about Teleinfo</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#known-issues">Known issues</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#dependancies-ubuntu-debian-installation">Dependancies - Ubuntu/Debian installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-plug">How to plug</a><ul>
+<li><a class="reference internal" href="#example-with-dauguet-usb-model">Example with Dauguet Usb model</a></li>
+<li><a class="reference internal" href="#permissions-management">Permissions management</a><ul>
+<li><a class="reference internal" href="#moschip-usb-serial-adapter">Moschip usb-&gt;serial adapter</a></li>
+<li><a class="reference internal" href="#dauguet-usb-assemby">Dauguet usb assemby</a></li>
+<li><a class="reference internal" href="#other-assemblies">Other assemblies</a><ul>
+<li><a class="reference internal" href="#example-for-an-usb-model">Example for an usb model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apply-the-rule">Apply the rule</a></li>
+<li><a class="reference internal" href="#check-the-device-under-linux">Check the device under Linux</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plugin-configuration">Plugin configuration</a><ul>
+<li><a class="reference internal" href="#enabling-plugin">Enabling plugin</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#device">device</a></li>
+<li><a class="reference internal" href="#interval">interval</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#start-plugin">Start plugin</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-device-for-teleinfo-modem">Creating a device for Teleinfo modem</a></li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
+<li><a class="reference internal" href="#teleinfo-read-device">teleinfo read &lt;device&gt;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#teleinfo-data-explanation">Teleinfo data explanation</a><ul>
+<li><a class="reference internal" href="#three-phase-specific-data">Three phase specific data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#developper-notes">Developper notes</a><ul>
+<li><a class="reference internal" href="#xpl-schema">xPL schema</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h3>Browse</h3>
   <ul>
     
-      <li>Prev: <a href="../plcbus/index.html">&lt;no title&gt;</a></li>
+      <li>Prev: <a href="../plcbus/index.html">PLCBUS plugin</a></li>
     
     
-      <li>Next: <a href="../wol_ping/index.html">&lt;no title&gt;</a></li>
+      <li>Next: <a href="../wol_ping/index.html">Plugin wol_ping</a></li>
     
   </ul>
   <h3>You are here:</h3>
@@ -246,7 +440,7 @@ See the ((xPL_teleinfo_schema|xPL Teleinfo Schema page))</p>
       <li>
         <a href="../../index.html">Domogik 0.1 documentation</a>
         
-        <ul><li>&lt;no title&gt;</li></ul>
+        <ul><li>Plugin teleinfo</li></ul>
         
       </li>
   </ul>  
@@ -278,11 +472,11 @@ See the ((xPL_teleinfo_schema|xPL Teleinfo Schema page))</p>
     
     <div id="ft">
       <div class="nav">
-    &laquo; <a href="../plcbus/index.html" title="&amp;lt;no title&amp;gt;">previous</a> 
+    &laquo; <a href="../plcbus/index.html" title="PLCBUS plugin">previous</a> 
      |
     <a title="Domogik 0.1 documentation" href="../../index.html" accesskey="U">up</a>
    |
-    <a href="../wol_ping/index.html" title="&amp;lt;no title&amp;gt;">next</a> &raquo;</div>
+    <a href="../wol_ping/index.html" title="Plugin wol_ping">next</a> &raquo;</div>
     </div>
   </div>
 

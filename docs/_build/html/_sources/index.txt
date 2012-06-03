@@ -68,3 +68,6 @@ Technical Documentation
     * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
     * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
+
+* **Schemas:**
+  :doc:`xPL Schema for teleinfo </technical/schema/teleinfo>`

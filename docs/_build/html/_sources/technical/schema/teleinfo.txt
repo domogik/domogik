@@ -1,0 +1,87 @@
+=======================
+xPL Schema for teleinfo
+=======================
+
+But
+===
+xPL ne semble pas encore posséder de schéma bien défini pour envoyer les informations issues d'un montage téléinfo.
+
+Cette page propose donc d'en définir un.
+
+Teleinfo.basic Message specification 
+====================================
+
+* Class = TELEINFO
+* Type = BASIC
+
+Le schéma TELEINFO.BASIC est utilisé pour transmettre les informations relevées sur le bus "téléinfo" des compteurs électriques.
+
+XPL-TRIG Structure 
+------------------
+Ce schéma ne possède aucune structure de type 'trigger', le type 'stat' devrait être utilisé à la place.
+
+XPL-CMND Structure 
+------------------
+Ce schéma est utilisé uniquement pour la transmission des informations relevées par le module "téléinfo".
+Il n'y a donc besoin d'aucune commande.
+
+XPL-STAT Structure 
+------------------
+
+Trame normale 
+*************
+
+.. code-block:: none
+
+    TELEINFO.BASIC
+    {
+    ADCO=<Adresse du compteur>
+    OPTARIF=<Option tarifaire>
+    ISOUSC=<Intensité souscrite>
+    BASE=<Index option base>
+    IINST=<Intensité instantanée>
+    IMAX=<Intensité maximale appelée>
+    MOTDETAT=<Mot d'état du compteur>
+    [HCHC=<Heures|creuses>]
+    [HCHP=<Heures|pleines>]
+    [EJPHN=<Heures|normales>]
+    [EJPHPM=<Heures|de pointe>]
+    [BBRHCJB=<Heures|creuses jours bleus>]
+    [BBRHPJB=<Heures|pleines jours bleus>]
+    [BBRHCJW=<Heures|creuses jours blancs>]
+    [BBRHPJW=<Heures|pleines jours blancs>]
+    [BBRHCJR=<Heures|creuses jours rouges>]
+    [BBRHPJR=<Heures|pleines jours rouges>]
+    [PEJP=<Préavis|début EJP (30min)>]
+    [PTEC=<Période|tarifaire actuelle>]
+    [DEMAIN=<Couleur|du lendemain>]
+    [ADPS=<Avertissement|de dépassement>]
+    [PAPP=<Puissance|apparente>]
+    [HHPHC=<Horaire|heure pleine/heure creuse>]
+    [PPOT=<Présence|des potentiels>]
+    [IINST1=<Intensité|instantanée phase 1>]
+    [IINST2=<Intensité|instantanée phase 2>]
+    [IINST3=<Intensité|instantanée phase 3>]
+    [IMAX1=<Intensité|maximale phase 1>]
+    [IMAX2=<Intensité|maximale phase 2>]
+    [IMAX3=<Intensité|maximale phase 3>]
+    [PMAX=<Puissance|maximale triphasée>]
+    }
+
+Trame courte 
+************
+Dans le cas d'un compteur triphasé, si il y a dépassement d'intensité sur une des phases, les trames émises sont modifiées et formatées de la façon suivante :
+
+
+.. code-block:: none
+
+    TELEINFO.BASIC
+    {
+    ADIR1=<Dépassement d'intensité sur la phase 1>
+    ADIR2=<Dépassement d'intensité sur la phase 2>
+    ADIR3=<Dépassement d'intensité sur la phase 3>
+    ADCO=<Adresse du compteur>
+    IINST1=<Intensité instantanée phase 1>
+    IINST2=<Intensité instantanée phase 2>
+    IINST3=<Intensité instantanée phase 3>
+    }
