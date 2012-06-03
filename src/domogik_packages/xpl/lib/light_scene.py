@@ -154,8 +154,8 @@ class LightingScene():
         else:
             return False
 
-    def add_device(self, scene, device, channel=-1, level=100,
-                faderate=0, location=None):
+    def add_device(self, scene, device, channel=-1, level="100",
+                faderate="0", location=None):
         """
         Add a new device to scene.
         """
@@ -229,13 +229,14 @@ class LightingScene():
         ret = list()
         nbscene = 0
         for scene in self._scenes:
-            nbscene = nbscene + 1
-            for cha in self._scenes[scene]["devices"][device]:
-                res = ""
-                res = scene + "," + str(cha)
-                res = res + "," + str(self._scenes[scene]["devices"][device][cha]["level"])
-                res = res+"," + str(self._scenes[scene]["devices"][device][cha]["fade-rate"])
-                ret.append(res)
+            if device in self._scenes[scene]["devices"]:
+                for cha in self._scenes[scene]["devices"][device]:
+                    nbscene = nbscene + 1
+                    res = ""
+                    res = scene + "," + str(cha)
+                    res = res + "," + str(self._scenes[scene]["devices"][device][cha]["level"])
+                    res = res+"," + str(self._scenes[scene]["devices"][device][cha]["fade-rate"])
+                    ret.append(res)
         return ret, nbscene
 
     def device_scene_info(self, scene, device):
@@ -429,14 +430,15 @@ class LightingScene():
         if 'client' in message.data:
             mess.add_data({"client" : message.data['client']})
         if device == None:
-            mess.add_data({"device" : "None"})
-            mess.add_data({"status" : "not-found"})
+            mess.add_data({"scene-count" : 0})
+            mess.add_data({"status" : "parameter-device-not-found"})
         else:
-            mess.add_data({"status" : "ok"})
+            mess.add_data({"device" : device})
             devinfos, scenecount = self.device_info(device)
             for dev in devinfos :
                 mess.add_data({"scene" :  dev})
             mess.add_data({"scene-count" : scenecount})
+            mess.add_data({"status" : "ok"})
         myxpl.send(mess)
 
     def cmnd_scnlist(self, myxpl, message):
@@ -470,9 +472,9 @@ class LightingScene():
         if 'client' in message.data:
             mess.add_data({"client" : message.data['client']})
         mess.add_data({"command" : "scnlist"})
-        mess.add_data({"status" : "ok"})
-        mess.add_data({"scene-count" : self.count()})
         mess.add_data({"scenes" : self.scenes()})
+        mess.add_data({"scene-count" : self.count()})
+        mess.add_data({"status" : "ok"})
         myxpl.send(mess)
 
     def cmnd_scnadd(self, myxpl, message):
@@ -721,7 +723,7 @@ class LightingSceneStore():
                             for channel in config.options(device):
                                 level, separator, faderate = \
                                     str(config.get(device, channel)).partition(",")
-                                add_dev_cb(scene, device, int(channel), int(level), int(faderate))
+                                add_dev_cb(scene, device, int(channel), str(level), str(faderate))
                         else :
                             self._log.warning("load_all : find a device %s in devices but no section [%s] for configuration" % \
                         scene, scene)
