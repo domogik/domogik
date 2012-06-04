@@ -114,7 +114,7 @@ You can now :doc:`Attribute the feature to a place </enduser/configuration/devic
 
 Helpers
 =======
-*To get an introduction to helpers, you can read the :doc:`Helper documentation </enduser/configuration/plugins/helpers>`. To use a helper, the plugin must be stopped.*
+To get an introduction to helpers, you can read the :doc:`Helper documentation </enduser/configuration/plugins/helpers>`. To use a helper, the plugin must be stopped.
 
 cidmodem read <device>
 ----------------------

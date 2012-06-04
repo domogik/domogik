@@ -207,7 +207,9 @@ Upgrade IPX800 firmware
 
 1.  Go on `GCE Electronics website <http://www.gce-electronics.com>`_
 2.  Go to your IPX800 model page. Click on "Télécharger" on bottom to see all availables downloads :
-    .. image:: ipx800_website_download.png
+
+.. image:: ipx800_website_download.png
+
 3.  Download the latest release
 4.  Extract it: ::
 
@@ -215,8 +217,8 @@ Upgrade IPX800 firmware
         $ cd /tmp/ipx800
         $ unrar e "/path/to/IPX800 V2 3.xx.xx.rar"
 
-5.  Download the linux utility to flash the IPX800 firmware :
-    .. document:: flash.sh
+5.  Download the linux utility to flash the IPX800 firmware : :download:`flash.sh <flash.sh>`
+
     Notice that this script is also available in Domogik sources in this path : **src/tools/ipx800/flash.sh**.
 6.  Launch utility like this: ::
     
@@ -246,7 +248,9 @@ A hard reset will make IPX800 relayboard going back to default settings (DHCP en
 
 1.  Unplug Ipx800 board
 2.  Connect J2's up pin and J92's left pin together (see red pins in picture)
-    .. image:: ipx800_hard_reset.png
+
+.. image:: ipx800_hard_reset.png
+
 3.  Plug IPX800 board
 4.  Wait for relays clacking 
 5.  Disconnect J2 and J92 pins
@@ -257,7 +261,9 @@ Upgrade IPX800 website
 ======================
 
 1.  Go on **http://ipx800/mpfsupload/** (assuming ipx800 is associated to your ipx800 IP address).
-    .. image:: ipx800_hard_reset_upload_site.png
+
+.. image:: ipx800_hard_reset_upload_site.png
+
 2.  Choose website package to upload.
 3.  Click on upload
 
@@ -382,8 +388,11 @@ The COMMAND.BASIC xPL schema is used in this module : http://xplproject.org.uk/w
 *   device : <relay board name in plugin config>-<element : btn0, btn1...>
 *   type : 
 *   output for a relay
+
     * count for the counter
+
 *   current : 
+
     * HIGH, LOW, PULSE for a relay
     * 0 to reset counter
 
@@ -405,12 +414,15 @@ The SENSOR.BASIC xPL schema is used in this module : http://xplproject.org.uk/wi
     }
 
 *   device : <relay board name in plugin config>-<element : btn0, btn1...>
-*   type : 
+*   type :
+
     * output for a relay
     * input for the digital input
     * voltage for the analog input
     * count for the counter
+
 *   current : 
+
     * HIGH, LOW for a relay (there is no PULSE value here)
     * 0 to reset counter
 

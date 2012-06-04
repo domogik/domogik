@@ -88,7 +88,7 @@ The plugin will do a fastpoll every **probe-interval** seconds. In fact, it uses
 It is much faster than the STATUS_REQUEST order, because you ask all the devices in one house using only 1 message.
 
 .. todo::
-    example values||
+    example values
 
 probe-list
 **********

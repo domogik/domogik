@@ -157,17 +157,46 @@ Each RFID element has an unique ID. The plugin will send an event with the ID wh
 </div>
 <div class="section" id="creating-a-device-for-a-rfid-element">
 <h2>Creating a device for a RFID element<a class="headerlink" href="#creating-a-device-for-a-rfid-element" title="Permalink to this headline">¶</a></h2>
-<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :
-=========== =============================== ===========
-Field       Suggested value                 Description
-=========== =============================== ===========
-Name        Green nanoztag                  The name you want to give to your RFID element
-Address     000008d00218c10916a8a9000000    The id of the RFID element. To get the id of a RFID element, use this helper : <strong>mirror read ** and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.
-Feature     **RFID.Mirror tag</strong>
-Usage       <strong>Nanoztag</strong>
-Description                                 a short description (Placement, usage, etc)
-Reference                                   the device reference (model, etc)
-=========== =============================== ===========</p>
+<p>In administration, go to <strong>Organization &gt; Devices</strong> page. Create a new device like this :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="14%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Field</th>
+<th class="head">Suggested value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td>Green nanoztag</td>
+<td>The name you want to give to your RFID element</td>
+</tr>
+<tr class="row-odd"><td>Address</td>
+<td>000008d00218c10916a8a9000000</td>
+<td>The id of the RFID element. To get the id of a RFID element, use this helper : <strong>mirror read</strong> and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.</td>
+</tr>
+<tr class="row-even"><td>Feature</td>
+<td><strong>RFID.Mirror tag</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Usage</td>
+<td><strong>Nanoztag</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Description</td>
+<td>&nbsp;</td>
+<td>a short description (Placement, usage, etc)</td>
+</tr>
+<tr class="row-odd"><td>Reference</td>
+<td>&nbsp;</td>
+<td>the device reference (model, etc)</td>
+</tr>
+</tbody>
+</table>
 <p>Example :</p>
 <img alt="../../_images/mirror_create_tag.png" src="../../_images/mirror_create_tag.png" />
 <p><a class="reference internal" href="../../enduser/configuration/devices.html"><em>Attribute the feature to a place</em></a> and you can now see the status of your RFID element (on or off)</p>

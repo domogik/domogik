@@ -42,7 +42,8 @@ How to plug
 Example with Dauguet Usb model
 ------------------------------
 
-First, you should have an electric meter like this : 
+First, you should have an electric meter like this:
+
 .. image:: teleinfo-elec-meter.jpg
 
 Open the bottom part (be careful, if there is a metallic security to prevoid opening, you may be looking for the wrong thing!!) of the electric meter.
@@ -51,7 +52,8 @@ On the right, you should see **I1** and **I2** : it is there you should plug the
 On this photo, there are both a teleinfo modem and a heating programmer pluged.
 .. image:: teleinfo-elec-meter-zoom.jpg
 
-Here is the Usb teleinfo modem : on the left, the usb plug, on the right, the 2 wires that are plugged on I1 and I2 :
+Here is the Usb teleinfo modem : on the left, the usb plug, on the right, the 2 wires that are plugged on I1 and I2:
+
 .. image:: teleinfo-assembly.jpg
 
 Permissions management

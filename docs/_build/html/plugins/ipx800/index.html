@@ -244,12 +244,12 @@ List of counters :
 </div>
 <div class="section" id="upgrade-ipx800-firmware">
 <h2>Upgrade IPX800 firmware<a class="headerlink" href="#upgrade-ipx800-firmware" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p class="first">Go on <a class="reference external" href="http://www.gce-electronics.com">GCE Electronics website</a></p>
-</li>
-<li><p class="first">Go to your IPX800 model page. Click on &#8220;Télécharger&#8221; on bottom to see all availables downloads :
-.. image:: ipx800_website_download.png</p>
-</li>
+<ol class="arabic simple">
+<li>Go on <a class="reference external" href="http://www.gce-electronics.com">GCE Electronics website</a></li>
+<li>Go to your IPX800 model page. Click on &#8220;Télécharger&#8221; on bottom to see all availables downloads :</li>
+</ol>
+<img alt="../../_images/ipx800_website_download.png" src="../../_images/ipx800_website_download.png" />
+<ol class="arabic" start="3">
 <li><p class="first">Download the latest release</p>
 </li>
 <li><p class="first">Extract it:</p>
@@ -258,9 +258,8 @@ $ cd /tmp/ipx800
 $ unrar e "/path/to/IPX800 V2 3.xx.xx.rar"</pre>
 </div>
 </li>
-<li><p class="first">Download the linux utility to flash the IPX800 firmware :
-.. document:: flash.sh
-Notice that this script is also available in Domogik sources in this path : <strong>src/tools/ipx800/flash.sh</strong>.</p>
+<li><p class="first">Download the linux utility to flash the IPX800 firmware : <a class="reference download internal" href="../../_downloads/flash.sh"><tt class="xref download docutils literal"><span class="pre">flash.sh</span></tt></a></p>
+<p>Notice that this script is also available in Domogik sources in this path : <strong>src/tools/ipx800/flash.sh</strong>.</p>
 </li>
 <li><p class="first">Launch utility like this:</p>
 <div class="highlight-python"><pre>$ ./flash.sh /path/to/IPX800 V2 3.xx.xx/Flash/gceip3xxxx.hex</pre>
@@ -289,8 +288,10 @@ tftp&gt; Sent 283047 bytes in 16.5 seconds</pre>
 <p>A hard reset will make IPX800 relayboard going back to default settings (DHCP enabled, etc). To do this, just follow these steps :</p>
 <ol class="arabic simple">
 <li>Unplug Ipx800 board</li>
-<li>Connect J2&#8217;s up pin and J92&#8217;s left pin together (see red pins in picture)
-.. image:: ipx800_hard_reset.png</li>
+<li>Connect J2&#8217;s up pin and J92&#8217;s left pin together (see red pins in picture)</li>
+</ol>
+<img alt="../../_images/ipx800_hard_reset.png" src="../../_images/ipx800_hard_reset.png" />
+<ol class="arabic simple" start="3">
 <li>Plug IPX800 board</li>
 <li>Wait for relays clacking</li>
 <li>Disconnect J2 and J92 pins</li>
@@ -301,8 +302,10 @@ tftp&gt; Sent 283047 bytes in 16.5 seconds</pre>
 <div class="section" id="upgrade-ipx800-website">
 <h2>Upgrade IPX800 website<a class="headerlink" href="#upgrade-ipx800-website" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li>Go on <strong>http://ipx800/mpfsupload/</strong> (assuming ipx800 is associated to your ipx800 IP address).
-.. image:: ipx800_hard_reset_upload_site.png</li>
+<li>Go on <strong>http://ipx800/mpfsupload/</strong> (assuming ipx800 is associated to your ipx800 IP address).</li>
+</ol>
+<img alt="../../_images/ipx800_hard_reset_upload_site.png" src="../../_images/ipx800_hard_reset_upload_site.png" />
+<ol class="arabic simple" start="2">
 <li>Choose website package to upload.</li>
 <li>Click on upload</li>
 </ol>
@@ -423,11 +426,15 @@ CURRENT=&lt;value sent to the device&gt;
 <ul class="simple">
 <li>device : &lt;relay board name in plugin config&gt;-&lt;element : btn0, btn1...&gt;</li>
 <li>type :</li>
-<li>output for a relay
-* count for the counter</li>
-<li>current :
-* HIGH, LOW, PULSE for a relay
-* 0 to reset counter</li>
+<li>output for a relay<ul>
+<li>count for the counter</li>
+</ul>
+</li>
+<li>current :<ul>
+<li>HIGH, LOW, PULSE for a relay</li>
+<li>0 to reset counter</li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="xpl-stat">
@@ -447,14 +454,18 @@ CURRENT=&lt;current value&gt;
 </div>
 <ul class="simple">
 <li>device : &lt;relay board name in plugin config&gt;-&lt;element : btn0, btn1...&gt;</li>
-<li>type :
-* output for a relay
-* input for the digital input
-* voltage for the analog input
-* count for the counter</li>
-<li>current :
-* HIGH, LOW for a relay (there is no PULSE value here)
-* 0 to reset counter</li>
+<li>type :<ul>
+<li>output for a relay</li>
+<li>input for the digital input</li>
+<li>voltage for the analog input</li>
+<li>count for the counter</li>
+</ul>
+</li>
+<li>current :<ul>
+<li>HIGH, LOW for a relay (there is no PULSE value here)</li>
+<li>0 to reset counter</li>
+</ul>
+</li>
 </ul>
 <p>A xpl-trig message is sent at each status change for board&#8217;s elements.</p>
 </div>

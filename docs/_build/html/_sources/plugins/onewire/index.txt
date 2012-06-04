@@ -261,6 +261,7 @@ In administration, go to **Organization > Devices** page. Create a new device li
 +-----------------+-----------------------+---------------------------------------------------------------------------------------------------------------+
 
 Example :
+
 .. image:: onewire_create_thermometer.png
 
 :doc:`Attribute the feature to a place </enduser/configuration/devices>` and you can now see your temperature.
@@ -269,7 +270,7 @@ DS18S20
 =======
 Difference with DS18B20
 -----------------------
-The DS18**B**20 component offers 4 resolutions for temperature : 9 ~ 12 bits. The DS18**S**20 offers only a 9bits resolution.
+The DS18 **B** 20 component offers 4 resolutions for temperature : 9 ~ 12 bits. The DS18 **S** 20 offers only a 9bits resolution.
 
 How to plug 
 -----------
@@ -353,6 +354,7 @@ In administration, go to **Organization > Devices** page. Create a new device li
 +-----------------+-------------------------+---------------------------------------------------------------------------------------------------------------+
 
 Example :
+
 .. image:: onewire_creare_serial.png
 
 :doc:`Attribute the feature to a place </enduser/configuration/devices>` and you can now see the status of your DS2401 (present or not)
@@ -410,7 +412,7 @@ Example :
 
 Helpers
 =======
-*To get an introduction to helpers, you can read the :doc:`Helper documentation </enduser/configuration/plugins/helpers>`. To use a helper, the plugin must be stopped.*
+To get an introduction to helpers, you can read the :doc:`Helper documentation </enduser/configuration/plugins/helpers>`. To use a helper, the plugin must be stopped.
 
 .. warning::
     For some reasons, it is not a good idea to use both onewire helper and onewire plugin :

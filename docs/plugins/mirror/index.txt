@@ -66,11 +66,12 @@ Example :
 Creating a device for a RFID element
 ====================================
 In administration, go to **Organization > Devices** page. Create a new device like this :
+
 =========== =============================== ===========
 Field       Suggested value                 Description
 =========== =============================== ===========
 Name        Green nanoztag                  The name you want to give to your RFID element
-Address     000008d00218c10916a8a9000000    The id of the RFID element. To get the id of a RFID element, use this helper : **mirror read ** and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.
+Address     000008d00218c10916a8a9000000    The id of the RFID element. To get the id of a RFID element, use this helper : **mirror read** and put the RFID element on the Mir:ror. The RFID id will be displayed. Use it as address.
 Feature     **RFID.Mirror tag**  
 Usage       **Nanoztag**          
 Description                                 a short description (Placement, usage, etc)
