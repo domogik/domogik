@@ -687,7 +687,7 @@ class PackageManager():
             self.log(msg)
             raise PackageException(msg)
 
-    def get_available_updates(self, pkg_type, id, version):
+    def get_available_updates(self, pkg_type, pkg_id, version):
         """ List all available updates for a package
             @param pkg_type : package type
             @param id : package id
@@ -696,23 +696,23 @@ class PackageManager():
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
         
-        # TODO : to review
-        
-
-        #upd_list = []
-        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
-        #    for fic in files:
-        #        if fic[-5:] == ".json":
-        #            pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-        #            if pkg_json["identity"]["type"] == pkg_type and pkg_json["identity"]["id"] == id \
-        #               and pkg_json["identity"]["version"] > version:
-        #                upd_list.append({"type" : pkg_json["identity"]["type"],
-        #                                 "id" : pkg_json["identity"]["id"],
-        #                                 "version" : pkg_json["identity"]["version"],
-        #                                 "priority" : pkg_json["identity"]["priority"],
-        #                                 "changelog" : pkg_json["identity"]["changelog"]})
-        #return upd_list
-
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for fic in files:
+                if fic[-5:] != ".json":
+                    continue
+                my_json = json.load(open("%s/%s" % (root, fic)))
+                for my_pkg in my_json["packages"]:
+                    if pkg_type == my_pkg["type"] and \
+                       pkg_id == my_pkg["id"] and \
+                       version < my_pkg["version"]:
+                        pkg_list.append({"type" : pkg_type,
+                                         "id" : pkg_id,
+                                         "version" : my_pkg["version"],
+                                         "priority" : my_pkg["priority"], 
+                                         "changelog" : my_pkg["changelog"]})
+        return pkg_list
+                       
     def list_packages(self):
         """ List all packages in cache folder 
             Used for printing on command line
@@ -829,29 +829,6 @@ class PackageManager():
                         fullname == my_pkg["fullname"]):
                         pkg_list.append(my_pkg)
                        
-
-        # TODO : review
-        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
-        #    for fic in files:
-        #        if fic[-5:] == ".json":
-        #            pkg_obj = PackageJson(path = "%s/%s" % (root, fic))
-        #            pkg_json = pkg_obj.json
-        #            if version == None:
-        #                if fullname == pkg_json["identity"]["fullname"]:
-        #                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-        #                                     "version" : pkg_json["identity"]["version"],
-        #                                     "priority" : pkg_json["identity"]["priority"],
-        #                                     "source" : pkg_json["identity"]["source"],
-        #                                     "obj" : pkg_obj,
-        #                                     "json" : pkg_json})
-        #            else:
-        #                if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
-        #                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-        #                                     "version" : pkg_json["identity"]["version"],
-        #                                     "priority" : pkg_json["identity"]["priority"],
-        #                                     "obj" : pkg_obj,
-        #                                     "json" : pkg_json})
-
         if len(pkg_list) == 0:
             if version == None:
                 version = "*"
