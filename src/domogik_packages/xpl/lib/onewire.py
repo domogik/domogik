@@ -339,7 +339,7 @@ class ComponentDs2408:
         Start listening for onewire ds2408
         """
         while not self._stop.isSet():
-            for comp in self.chain(self.root.find(type = "DS2408"),self.root.find(type = "DS2406"),self.root.find(type = "DS2405")):
+            for comp in self.chain(self.root.find(type = "DS2408"),self.root.find(type = "DS2406"),self.root.find(type = "DS2405"),self.root.find(type = "DS2413")):
                 my_id = comp.family+"."+comp.id
                 try:
                     if comp.family == "05":
@@ -412,7 +412,7 @@ class OneWireNetwork:
         
         map = ["A","B","A","B","A","B","A","B"]    # Used to map PIO_0/1 to  PIO_A/B for other devices 
         fam = device[:2]                  # Extract familly code
-        if fam == "12":                   # Fam = 12 - DS2406
+        if fam == "12" or fam == "3A":    # Fam = 12 - DS2406 |  3A = DS2413
             pio = "PIO_"+map[int(gpio)]   # Rename PIO to A & B
         elif fam == "05":                 # DS2405 - Only one PIO named "PIO"
             pio = "PIO"

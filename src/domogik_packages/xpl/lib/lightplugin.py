@@ -34,11 +34,14 @@ class XplHlpPlugin(XplPlugin)
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 import traceback
-import time
+#import time
 import threading
+from threading import Timer
+
 
 SCENELOCK = threading.Lock()
 SLEEP = 0.1
+START = 30
 MEMORY_LIGHTING_SCENE = 100
 
 class LightingExtension():
@@ -360,10 +363,10 @@ class LightingExtension():
         if scenes == None:
             self._plugin.log.warning("LightingExtension.stat_scnlist : can't retrieve scenes from lighting gateway.")
         else:
-            i=0
+            i = 0
             for scene in scenes.split(","):
                 i = i + 1
-                timer = Timer(SLEEP*i, self.stat_scnlist_scene, args=[myxpl,scene])
+                timer = Timer(START+SLEEP*i, self.stat_scnlist_scene, args=[myxpl, scene])
                 timer.start()
 
     def stat_scninfo(self, myxpl, message):
@@ -438,6 +441,6 @@ class LightingExtension():
         else:
             if which == MEMORY_LIGHTING_SCENE:
                 return len(self._scenes), 0
-        return None
         self._plugin.log.debug("memory_usage : Done :-)")
+        return None
 
