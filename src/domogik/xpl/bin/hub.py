@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-       
 
+
+# dependencies needed : twisted, netifaces
+# pip install twisted
+# pip install netifaces
+
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 
@@ -16,6 +21,7 @@ from time import time
 from twisted.python import log
 from sys import stdout
 from threading import Thread, Event
+from netifaces import interfaces, ifaddresses, AF_INET
 
 # client status
 ALIVE = "alive"
@@ -102,6 +108,10 @@ class MulticastPingPong(DatagramProtocol):
     def __init__(self, file_clients, do_log_bandwidth, file_bandwidth, do_log_invalid_data, file_invalid_data):
         """ Init MulticastPingPong object
         """
+        ### Host's IP
+        self._ips = self._ip4_addresses()
+        log.msg("The hub will be bind to the following addresses : %s" % self._ips)
+
         ### Client list
         self._file_clients = file_clients
         self._client_list = []
@@ -140,6 +150,21 @@ class MulticastPingPong(DatagramProtocol):
 
         self._timer_append_invalid_data = self.__InternalTimer(30, self._append_invalid_data, self._stop)
         self._timer_append_invalid_data.start()
+
+    def _ip4_addresses(self):
+        """ Return the list of all ipv4 addresses of the host
+        """
+        ip_list = []
+        for interface in interfaces():
+            try:
+                for link in ifaddresses(interface)[AF_INET]:
+                    ip_list.append(link['addr'])
+            except:
+                # Probably a non configured interface (wifi for example)
+                # Do nothing
+                pass
+        return ip_list
+
 
     def stop_threads(self):
         """ Stop all threads
@@ -236,6 +261,15 @@ class MulticastPingPong(DatagramProtocol):
             return True
         else:
             return False
+
+    def _is_local_client(self, ip):
+        """ Check if the client ip comes from the localhost or not
+            @param ip : ip address
+        """
+        if ip in self._ips:
+            log.msg("Local xpl client")
+            return True
+        return False
 
     def _add_client(self, ip, port, xpl):
         """ Add a new client in the client list
@@ -487,8 +521,7 @@ class MulticastPingPong(DatagramProtocol):
         # When the hub receives a hbeat.app or config.app message, the hub should extract the "remote-ip" value from the message body and compare the IP address with the list of addresses the hub is currently bound to for the local computer. If the address does not match any local addresses, the packet moves on to the delivery/rebroadcast step. 
 
         # check if this is a local hbeat message
-        # TODO : check if the hbeat comes from localhost or not
-        if self._is_hbeat(xpl):
+        if self._is_local_client(ip) and self._is_hbeat(xpl):
             # handle new clients
             if self._is_new_client(client_id):  
                 self._add_client(ip, port, xpl)
