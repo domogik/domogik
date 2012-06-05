@@ -219,7 +219,7 @@ function copy_sample_files {
         exit 6
     fi
     if [ -d "/etc/logrotate.d/" ];then
-		cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
+        cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/domogik
     fi
     if [ -d "/etc/init.d/" ];then
