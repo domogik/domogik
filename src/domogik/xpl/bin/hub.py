@@ -1,5 +1,40 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-       
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
+
+License
+=======
+
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+Plugin purpose
+==============
+
+xpl Hub
+
+Implements
+==========
+
+class Hub()
+class MulticastPingPong(DatagramProtocol)
+    class __InternalTimer(Thread)
+
+@author: Fritz SMH <fritz.smh@gmail.com>
+@copyright: (C) 2007-2012 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 
 # dependencies needed : twisted, netifaces
@@ -22,6 +57,12 @@ from twisted.python import log
 from sys import stdout
 from threading import Thread, Event
 from netifaces import interfaces, ifaddresses, AF_INET
+import ConfigParser
+import traceback
+
+# config file
+CONFIG_FILE = "/etc/xplhub/xplhub.cfg"
+LOG_FILE = "/var/log/xplhub/xplhub.log"
 
 # client status
 ALIVE = "alive"
@@ -38,19 +79,31 @@ class Hub():
         """ Init hub
         """
         ### Initiate the logger
-        # TODO : handle log file
-        # 1. create a /etc/domogik/xplhub.cfg file
-        # 2. use this file
-        # log.startLogging(open(’/var/log/foo.log’, ’w’))
-        log.startLogging(stdout)
+        log.startLogging(open(LOG_FILE, "w"))
+        #log.startLogging(stdout)
 
         ### Read hub options
+        # read config file
+        config_p = ConfigParser.ConfigParser()
+        try:
+            with open(CONFIG_FILE) as cfg_file:
+                config_p.readfp(cfg_file)
+                # get config
+                config = {}
+                for k, v in config_p.items('hub'):
+                    config[k] = v
+
+        except:
+            log.err("Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
+            return
+        print config
+ 
         # TODO
-        file_clients = "/tmp/client_list.txt"
-        do_log_bandwidth = True
-        file_bandwidth = "/tmp/bandwidth.csv"
-        do_log_invalid_data = True
-        file_invalid_data = "/tmp/invalid_data.csv"
+        file_clients = "%s/client_list.txt" % config['log_dir_path']
+        do_log_bandwidth = config['log_bandwidth']
+        file_bandwidth = "%s/bandwidth.csv" % config['log_dir_path']
+        do_log_invalid_data = config['log_invalid_data']
+        file_invalid_data = "%s/invalid_data.csv" % config['log_dir_path']
 
         ### Start listening to udp
         # We use listenMultiple=True so that we can run MulticastServer.py and
@@ -573,4 +626,10 @@ class MulticastPingPong(DatagramProtocol):
 
 if __name__ == "__main__":
     Hub()
+
+
+
+
+
+
 
