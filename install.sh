@@ -374,7 +374,7 @@ function call_app_installer {
 }
 
 function check_python {
-if [ ! -x "$(which python)" ];then
+    if [ ! -x "$(which python)" ];then
         echo "No python binary found, please install at least python2.6";
         exit 11
     else
@@ -382,7 +382,7 @@ if [ ! -x "$(which python)" ];then
             echo "Bad python version used, please install at least 2.6, and check /usr/bin/python starts the good version."
             exit 12
         fi
-fi
+    fi
 }
 
 function copy_tools {
