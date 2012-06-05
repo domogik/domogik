@@ -98,7 +98,6 @@ class Hub():
             return
         print config
  
-        # TODO
         file_clients = "%s/client_list.txt" % config['log_dir_path']
         do_log_bandwidth = config['log_bandwidth']
         file_bandwidth = "%s/bandwidth.csv" % config['log_dir_path']
@@ -570,7 +569,7 @@ class MulticastPingPong(DatagramProtocol):
                 self._log_invalid_data(client_id, datagram)
             return
 
-        # TODO : 
+        # TODO : needed ????
         # When the hub receives a hbeat.app or config.app message, the hub should extract the "remote-ip" value from the message body and compare the IP address with the list of addresses the hub is currently bound to for the local computer. If the address does not match any local addresses, the packet moves on to the delivery/rebroadcast step. 
 
         # check if this is a local hbeat message
