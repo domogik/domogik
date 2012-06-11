@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="scene">
+    <schema name="scene.basic">
+        <xpltype type="*">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="scene"/>
+                <value field="running"/>
+                <value field="stats"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
