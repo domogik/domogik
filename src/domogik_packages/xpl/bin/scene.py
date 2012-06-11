@@ -7,23 +7,22 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik_packages.xpl.lib.scene import Scene
-from domogik_packages.xpl.lib.scene import SceneException
+from domogik_packages.xpl.lib.scene import *
+import threading
 
-
-class Scene(XplPlugin):
+class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
    """
    def __init__(self):
       XplPlugin.__init__(self, name = 'scene')
        # Configuration
-      self._config = Query(self.myxpl, self.log)
-      print self._config
+#      self._config = Query(self.myxpl, self.log)
+ #     print self._config
       ### Create Mini_Scene object
       try:
           self.scene = Scene(self.log, self.send_xpl)
           self.log.info("Start Scene")
-
+          self.scene.open()
 
       except SceneException as err:
           self.log.error(err.value)
@@ -35,8 +34,8 @@ class Scene(XplPlugin):
       try:
           self.log.info("Start listening to Scene")
           scene_listen = threading.Thread(None,
-                                        self.miniscene.listen,
-                                        "listen_scene",
+                                        self.scene.listen,
+                                        None,
                                         (),
                                         {})
           scene_listen.start()
@@ -50,17 +49,19 @@ class Scene(XplPlugin):
       ### Create listeners for commands
       self.log.info("Creating listener for KNX")
       Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
-      self.add_stop_cb(self.scene.close)
       self.enable_hbeat()
 
       self.log.info("Plugin ready :)")
 
    def scene_cmd(self, message):
-      print "2"       
+      """ routine lorsque le plugin recoit un message xpl
+      """
+      print "scene_cmd"       
 
    def send_xpl(self,data):
        """boucle d'envoie d'une message xpl
        """
+       print "send_xpl"
 
 
    def create_scene(num_script, rest_server, id_device1, key_stat1, test1, value1, id_device2, key_stat2, test2, value2,technologie1, adress_1,value_out1,technologie2,adress_2, value_out2, test_type, temp_wait):
@@ -140,5 +141,4 @@ class Scene(XplPlugin):
 
 if __name__ == "__main__":
 
-   INST = Scene()
-
+   INST = SceneManager()
