@@ -177,7 +177,7 @@ class PackageXml():
                                            "interface" : k_interface,
                                            "optionnal" : k_optionnal,
                                            "key" : k_key,
-                                           "desc" : k_desc,
+                                           "description" : k_desc,
                                            "type" : k_type,
                                            "options": k_options,
                                            "default" : k_default})
@@ -420,7 +420,7 @@ class PackageXml():
         my_udev = [] 
         for rule in self.udev_rules:
             my_udev.append({"model" : rule["model"],
-                            "desc" : rule["desc"],
+                            "description" : rule["desc"],
                             "filename" : rule["filename"],
                             "rule" : rule["rule"]})
         my_json["udev-rules"] = my_udev
