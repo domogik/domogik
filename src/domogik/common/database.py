@@ -238,7 +238,7 @@ class DbHelper():
         self.__session.add(area)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return area
 
@@ -264,7 +264,7 @@ class DbHelper():
         self.__session.add(area)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return area
 
@@ -296,7 +296,7 @@ class DbHelper():
             self.__session.delete(area)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return area
         else:
@@ -364,7 +364,7 @@ class DbHelper():
         self.__session.add(room)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return room
 
@@ -398,7 +398,7 @@ class DbHelper():
         self.__session.add(room)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return room
 
@@ -422,7 +422,7 @@ class DbHelper():
             self.__session.delete(room)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return room
         else:
@@ -477,7 +477,7 @@ class DbHelper():
         self.__session.add(du)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return du
 
@@ -509,7 +509,7 @@ class DbHelper():
         self.__session.add(device_usage)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_usage
 
@@ -535,7 +535,7 @@ class DbHelper():
             self.__session.delete(du)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return du
         else:
@@ -595,7 +595,7 @@ class DbHelper():
         self.__session.add(dty)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dty
 
@@ -628,7 +628,7 @@ class DbHelper():
             device_type.description = ucode(dty_description)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception)
         return device_type
 
@@ -663,7 +663,7 @@ class DbHelper():
             self.__session.delete(dty)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return dty
         else:
@@ -799,7 +799,7 @@ class DbHelper():
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_m
 
@@ -846,7 +846,7 @@ class DbHelper():
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_m
 
@@ -869,7 +869,7 @@ class DbHelper():
         self.__session.delete(dfm)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dfm
 
@@ -926,7 +926,7 @@ class DbHelper():
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_m
 
@@ -969,7 +969,7 @@ class DbHelper():
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_m
 
@@ -992,7 +992,7 @@ class DbHelper():
         self.__session.delete(dfm)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dfm
 
@@ -1155,7 +1155,7 @@ class DbHelper():
         self.__session.add(device_feature_asso)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_asso
 
@@ -1177,7 +1177,7 @@ class DbHelper():
         self.__session.delete(dfa)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dfa
 
@@ -1198,7 +1198,7 @@ class DbHelper():
             self.__session.delete(dfa)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dfa_list
 
@@ -1219,7 +1219,7 @@ class DbHelper():
             self.__session.delete(dfa)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dfa_list
 
@@ -1260,7 +1260,7 @@ class DbHelper():
         self.__session.add(dt)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dt
 
@@ -1289,7 +1289,7 @@ class DbHelper():
         self.__session.add(device_tech)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_tech
 
@@ -1321,7 +1321,7 @@ class DbHelper():
             self.__session.delete(dt)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return dt
         else:
@@ -1398,7 +1398,7 @@ class DbHelper():
         self.__session.add(plugin_config)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
         return plugin_config
 
@@ -1420,7 +1420,7 @@ class DbHelper():
             self.__session.delete(plc)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
         return plugin_config_list
 
@@ -1444,7 +1444,7 @@ class DbHelper():
             self.__session.delete(plugin_config)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
         return plugin_config
         
@@ -1549,7 +1549,7 @@ class DbHelper():
                 df = DeviceFeature(device_id=device.id, device_feature_model_id=dfm.id)
                 self.__session.add(df)
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
@@ -1592,7 +1592,7 @@ class DbHelper():
         self.__session.add(device)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
@@ -1611,7 +1611,7 @@ class DbHelper():
         self.__session.delete(device)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
@@ -1673,7 +1673,7 @@ class DbHelper():
         self.__session.add(device_config)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_config
 
@@ -1698,7 +1698,7 @@ class DbHelper():
             self.__session.delete(device_config)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dc_list_d
 
@@ -2002,7 +2002,7 @@ class DbHelper():
         self.__session.add(device_stat)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         # Eventually remove old stats
         if hist_size > 0:
@@ -2022,7 +2022,7 @@ class DbHelper():
                 self.__session.delete(stat)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_stat
 
@@ -2044,7 +2044,7 @@ class DbHelper():
             self.__session.delete(ds)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_stats_l
 
@@ -2083,7 +2083,7 @@ class DbHelper():
         self.__session.add(trigger)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return trigger
 
@@ -2113,7 +2113,7 @@ class DbHelper():
         self.__session.add(trigger)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return trigger
 
@@ -2131,7 +2131,7 @@ class DbHelper():
             self.__session.delete(trigger)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return trigger
         else:
@@ -2225,7 +2225,7 @@ class DbHelper():
         self.__session.add(user_account)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return user_account
 
@@ -2276,7 +2276,7 @@ class DbHelper():
         self.__session.add(user_acc)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return user_acc
 
@@ -2307,7 +2307,7 @@ class DbHelper():
         self.__session.add(person)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return user_acc
 
@@ -2333,7 +2333,7 @@ class DbHelper():
         self.__session.add(user_acc)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return True
 
@@ -2368,7 +2368,7 @@ class DbHelper():
             self.__session.delete(user_account)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return user_account
         else:
@@ -2410,7 +2410,7 @@ class DbHelper():
         self.__session.add(person)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return person
 
@@ -2440,7 +2440,7 @@ class DbHelper():
         self.__session.add(person)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return person
 
@@ -2458,7 +2458,7 @@ class DbHelper():
             self.__session.delete(person)
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return person
         else:
@@ -2490,7 +2490,7 @@ class DbHelper():
         self.__session.add(ui_item_config)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return ui_item_config
 
@@ -2593,7 +2593,7 @@ class DbHelper():
         if len(ui_item_config_list) > 0:
             try:
                 self.__session.commit()
-            except Exception, sql_exception:
+            except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return ui_item_config_list
 
@@ -2653,7 +2653,7 @@ class DbHelper():
         self.__session.add(system_config)
         try:
             self.__session.commit()
-        except Exception, sql_exception:
+        except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return system_config
 
