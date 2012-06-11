@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import subprocess
 import time
@@ -35,7 +36,7 @@ class MiniScene(XplPlugin):
           self.log.info("Start listening to Mini Scene")
           mini_scene_listen = threading.Thread(None,
                                         self.miniscene.listen,
-                                        "miniscene_knx",
+                                        "listen_miniscene",
                                         (),
                                         {})
           miniscene_listen.start()
@@ -56,6 +57,10 @@ class MiniScene(XplPlugin):
 
    def mini_scene_cmd(self, message):
       print "2"       
+
+   def send_xpl(self,data):
+       """boucle d'envoie d'une message xpl
+       """
 
 
    def create_scene(num_script, rest_server, id_device1, key_stat1, test1, value1, id_device2, key_stat2, test2, value2,technologie1, adress_1,value_out1,technologie2,adress_2, value_out2, test_type, temp_wait):

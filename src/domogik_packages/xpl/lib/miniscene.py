@@ -69,10 +69,17 @@ class MiniScene:
         """ close t
         """
 
+    def listen(self):
+        """close
+        """
+    def stop_listen(self):
+        """ rien du tout
+        """
+
 if __name__ == "__main__":                                                      
                                                      
     obj = MiniScene(None, decode)                                                     
-    obj.open(device)
+    obj.open()
     obj.listen()           
 
 
