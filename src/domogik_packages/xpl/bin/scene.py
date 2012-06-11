@@ -7,25 +7,25 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik_packages.xpl.lib.miniscene import MiniScene
+from domogik_packages.xpl.lib.scene import Scene
+from domogik_packages.xpl.lib.scene import SceneException
 
 
-class MiniScene(XplPlugin):
+class Scene(XplPlugin):
    """Plugin destine a faire de petite automatisation
    """
    def __init__(self):
-      XplPlugin.__init__(self, name = 'miniscene')
-      self._config = Query(self.myxpl, self.log)
+      XplPlugin.__init__(self, name = 'scene')
        # Configuration
       self._config = Query(self.myxpl, self.log)
-
+      print self._config
       ### Create Mini_Scene object
       try:
-          self.miniscene = MiniScene(self.log, self.send_xpl)
-          self.log.info("Start Mini Scene")
+          self.scene = Scene(self.log, self.send_xpl)
+          self.log.info("Start Scene")
 
 
-      except MiniSceneException as err:
+      except SceneException as err:
           self.log.error(err.value)
           print(err.value)
           self.force_leave()
@@ -33,14 +33,14 @@ class MiniScene(XplPlugin):
 
       ### Start listening 
       try:
-          self.log.info("Start listening to Mini Scene")
-          mini_scene_listen = threading.Thread(None,
+          self.log.info("Start listening to Scene")
+          scene_listen = threading.Thread(None,
                                         self.miniscene.listen,
-                                        "listen_miniscene",
+                                        "listen_scene",
                                         (),
                                         {})
-          miniscene_listen.start()
-      except MiniSceneException as err:
+          scene_listen.start()
+      except SceneException as err:
           self.log.error(err.value)
           print(err.value)
           self.force_leave()
@@ -49,13 +49,13 @@ class MiniScene(XplPlugin):
 
       ### Create listeners for commands
       self.log.info("Creating listener for KNX")
-      Listener(self.miniscene_cmd, self.myxpl,{'schema':'miniscene.basic'})
-      self.add_stop_cb(self.miniscene.close)
+      Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
+      self.add_stop_cb(self.scene.close)
       self.enable_hbeat()
 
       self.log.info("Plugin ready :)")
 
-   def mini_scene_cmd(self, message):
+   def scene_cmd(self, message):
       print "2"       
 
    def send_xpl(self,data):
@@ -140,5 +140,5 @@ class MiniScene(XplPlugin):
 
 if __name__ == "__main__":
 
-   INST = MiniScene()
+   INST = Scene()
 

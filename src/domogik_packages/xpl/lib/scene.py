@@ -37,9 +37,9 @@ Implements
 import subprocess
 
 
-class MiniSceneException(Exception):
+class SceneException(Exception):
     """
-    Mini Scene exception
+    Scene exception
     """
 
     def __init__(self, value):
@@ -50,7 +50,7 @@ class MiniSceneException(Exception):
         return repr(self.value)
 
 
-class MiniScene:
+class Scene:
    
 
     def __init__(self, log, callback):
@@ -63,22 +63,29 @@ class MiniScene:
         """ open
             @param device :
         """
+        print "ouverture du plugin"
 
 
     def close(self):
         """ close t
         """
+        print "fermeture du plugin"
 
     def listen(self):
         """close
         """
+        print "demarage du listen"
+        self._read = True
+        
     def stop_listen(self):
         """ rien du tout
         """
+        print "arret du listen"
+        self._read = False
 
 if __name__ == "__main__":                                                      
                                                      
-    obj = MiniScene(None, decode)                                                     
+    obj = Scene(None, decode)                                                     
     obj.open()
     obj.listen()           
 
