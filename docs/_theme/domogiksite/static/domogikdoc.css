@@ -2,7 +2,6 @@
 html { background:#2D2C2F;}
 body { font:12px/1.5 Verdana,sans-serif; background:#2D2C2F; color: white;}
 #custom-doc { width:76.54em;*width:74.69em;min-width:995px; max-width:100em; margin:auto; text-align:left; padding-top:16px; margin-top:0;} 
-#hd { padding: 4px 0 12px 0; }
 #bd { background:#005774; }
 #ft { color:#487858; font-size:90%; padding-bottom: 2em; }
 
@@ -26,11 +25,9 @@ a.reference em { font-style: normal; }
 #sidebar li { margin-top: 0.2em; margin-bottom: 0.2em; }
 
 /*** nav ***/
-div.nav { margin: 0; font-size: 11px; text-align: right; color: #487858;}
-#hd div.nav { margin-top: -27px; }
-#ft div.nav { margin-bottom: -18px; }
+#site-nav { margin: 0; position: absolute; right: 10px; top:8em;}
 #hd h1 a { color: white; }
-#global-nav { position:absolute; top:5px; margin-left: -5px; padding:7px 0; color:#009ed2; }
+#global-nav { margin-left: -5px; padding:7px 0; color:#009ed2; }
 #global-nav a:link, #global-nav a:visited {color:#009ed2;}
 #global-nav a {padding:0 4px;}
 #global-nav a.about {padding-left:0;}
@@ -54,19 +51,19 @@ hr { color:#ccc; background-color:#ccc; height:1px; border:0; }
 p, ul, dl { margin-top:.6em; margin-bottom:1em; padding-bottom: 0.1em;}
 #yui-main div.yui-b img { max-width: 50em; margin-left: auto; margin-right: auto; display: block; }
 caption { font-size:1em; font-weight:bold; margin-top:0.5em; margin-bottom:0.5em; margin-left: 2px; text-align: center; }
-blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#234f32; border-left:2px solid #94da3a; } 
+blockquote.epigraph { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#223c4f; border-left:2px solid #3694da; font-style: italic; } 
 strong { font-weight: bold; }
 em { font-style: italic; }
 ins { font-weight: bold; text-decoration: none; }
 
 /*** lists ***/
-ul { padding-left:30px; }
+#custom-doc ul { padding-left:30px; }
 ol { padding-left:30px; }
 ol.arabic li { list-style-type: decimal; }
-ul li { list-style-type:square; margin-bottom:.4em; }
+#custom-doc ul li { list-style-type:square; margin-bottom:.4em; }
 ol li { margin-bottom: .4em; }
-ul ul { padding-left:1.2em; }
-ul ul ul { padding-left:1em; }
+#custom-doc ul ul { padding-left:1.2em; }
+#custom-doc ul ul ul { padding-left:1em; }
 ul.linklist, ul.toc { padding-left:0; }
 ul.toc ul { margin-left:.6em; }
 ul.toc ul li { list-style-type:square; }
@@ -113,6 +110,9 @@ dt .literal, table .literal { background:none; }
 .warning { padding-left:65px; background:url(icons-warning.png) .8em .8em no-repeat;}
 .admonition-title { font-weight:bold; margin-top:0 !important; margin-bottom:0 !important;}
 .admonition .last { margin-bottom:0 !important; }
+
+.admonition-todo { padding:.8em 1em .8em; margin: 1em 0; border:1px solid #7d7b7d; }
+.admonition-todo { padding-left:65px; background:url(icons-todo.png) .8em .8em no-repeat;}
 
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }
