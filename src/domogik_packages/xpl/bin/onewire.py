@@ -209,26 +209,35 @@ class OneWireManager(XplPlugin):
 
 
     def read_xpl(self, message):
-        switch = message.data['switch']
-        device = message.data['device']
-        data = message.data['data']
-        print "Message XPL %s" %message
-        r = self.ow.write(device, switch, data)
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("sensor.basic")
-        mess.add_data({"device" :  device})
-        mess.add_data({"command" :  "switch"+switch})
-        self.myxpl.send(mess)
-	print "Setting PIO "+switch+"="+data+" for device "+device
+        switch = None
+        device = None
+        data = None
+        
+        if 'switch' in message.data:
+            switch = message.data['switch']
+        if 'device' in message.data:
+            device = message.data['device']
+        if 'data' in message.data:
+            data = message.data['data']
 
-	mess2 = XplMessage()
-        mess2.set_type("xpl-trig")
-        mess2.set_schema("sensor.basic")
-        mess2.add_data({"device" :  device})
-        mess2.add_data({"data"+switch : r })
-        mess2.add_data({"type" : "PIO_ALL"})
-        self.myxpl.send(mess2)
+        print "Message XPL %s" %message
+        if (switch != None and device != None and data != None):
+            r = self.ow.write(device, switch, data)
+            mess = XplMessage()
+            mess.set_type("xpl-trig")
+            mess.set_schema("sensor.basic")
+            mess.add_data({"device" :  device})
+            mess.add_data({"command" :  "switch"+switch})
+            self.myxpl.send(mess)
+            print "Setting PIO "+switch+"="+data+" for device "+device
+
+            mess2 = XplMessage()
+            mess2.set_type("xpl-trig")
+            mess2.set_schema("sensor.basic")
+            mess2.add_data({"device" :  device})
+            mess2.add_data({"data"+switch : r })
+            mess2.add_data({"type" : "PIO_ALL"})
+            self.myxpl.send(mess2)
 
 
 if __name__ == "__main__":
