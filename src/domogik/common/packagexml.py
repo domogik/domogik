@@ -451,6 +451,9 @@ class PackageXml():
         # features
         my_json["device_feature_models"] = self.device_feature_models 
             
+        print("# Some updates needs to be done manually :")
+        print("# - adapt the file path in 'files' : src/domogik/xpl/* => src/domogik_packages/xpl/*")
+        print("# - rename the xml file as json in 'files' : src/share/domogik/plugins/myplugin.xml => src/..../myplugin.json")
         return json.dumps(my_json, sort_keys=True, indent=4)
 
 if __name__ == "__main__":
