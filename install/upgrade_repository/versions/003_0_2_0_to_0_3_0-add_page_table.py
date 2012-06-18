@@ -6,11 +6,13 @@ from domogik.common.sql_schema import Page, Room, Area
 def upgrade(migrate_engine):
     # bind the engine
     meta = MetaData(bind=migrate_engine)
+
     # create the new table
-    page = Table(Page.__tablename__, meta)
-    meta.create( page )
+    page = Page.__table__
+    page.create(bind=migrate_engine)
+
     # insert the root element
-    page.insert(name='ROOT', lft=1, rgt=2, description='', icon='')
+    page.insert(name='ROOT', left=1, right=2, description='', icon='')
 
     # TODO transfere the data
 
@@ -21,8 +23,6 @@ def upgrade(migrate_engine):
     # Drop the old area table
     # area = Table(Area.__tablename__, meta)
     # meta.drop( area )
-    pass
-
 
 def downgrade(migrate_engine):
     # bind the engine
@@ -39,5 +39,4 @@ def downgrade(migrate_engine):
 
     # drop the page table
     page = Table(Page.__tablename__, meta)
-    meta.drop(page)
-    pass
+    page.drop()

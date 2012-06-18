@@ -85,37 +85,40 @@ _db_prefix = dict(_config[1])['db_prefix']
 
 
 # Define objects
+
 class Page(Base):
     """Page: is something to display widgets in the ui"""
 
     __tablename__ = '%s_ui_page' % _db_prefix
     id = Column(Integer, primary_key=True)
-    lft = Column(Integer, primary_key=True)
-    rgt = Column(Integer, primary_key=True)
+    left = Column(Integer, primary_key=True)
+    right = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText(), nullable=True)
     icon = Column(Unicode(30), nullable=True)
 
-    def __init__(self, name, description=None, icon=None):
+    def __init__(self, name, left, right, description=None, icon=None):
         """Class constructor
-        @param lft : left value
-        @param rgt : rgt value
+        @param left : left value
+        @param right : right value
         @param name : short name of the area
         @param description : extended description, optional
         @param icon : the icon to display
         """
+        self.left = left
+        self.right = right
         self.name = ucode(name)
         self.description = ucode(description)
         self.icon = ucode(icon)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Page(id=%s, lft=%s, rgt=%s, name='%s', desc='%s', icon='%s')>" % (self.id,self.lft, self.rgt,  self.name, self.description, self.icon)
+        return "<Page(id=%s, left=%s, right=%s, name='%s', desc='%s', icon='%s')>" % (self.id, self.left, self.right, self.name, self.description, self.icon)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return Area.__tablename__
+        return Page.__tablename__
 
 
 class Area(Base):
