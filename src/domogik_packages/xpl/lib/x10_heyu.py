@@ -330,7 +330,7 @@ class X10Monitor:
             self._pipe = pipe
             self._cbs = []
             log = logger.Logger(self.__class__.__name__)
-            self._log = log.get_logger()
+            self._log = log.get_logger('x10_heyu')
 
         def add_cb(self, cb):
             """
