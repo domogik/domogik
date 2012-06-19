@@ -83,9 +83,17 @@ class Scene:
         print "arret du listen"
         self._read = False
 
+def decode(message):
+    """ dédage du message
+    """
+    print "%s" % message
+
+
+
+
 if __name__ == "__main__":                                                      
                                                      
-    obj = Scene(None, decode)                                                     
+    obj = Scene(None, decode)
     obj.open()
     obj.listen()           
 
