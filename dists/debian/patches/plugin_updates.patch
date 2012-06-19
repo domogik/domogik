@@ -1,0 +1,19 @@
+diff --git a/src/domogik/common/packagemanager.py b/src/domogik/common/packagemanager.py
+--- a/src/domogik/common/packagemanager.py
++++ b/src/domogik/common/packagemanager.py
+@@ -689,6 +689,15 @@
+         if PACKAGE_MODE != True:
+             raise PackageException("Package mode not activated")
+         
++        upd_list = []
++        for pkg in self.get_packages_list(None, None, None):
++            if pkg["type"] == pkg_type and pkg["id"] == id and pkg["version"] > version :
++                upd_list.append({"type" : pkg["type"],
++                                 "id" : pkg["id"],
++                                 "version" : pkg["version"],
++                                 "priority" : pkg["priority"],
++                                 "changelog" : pkg["changelog"]})
++        return sorted(upd_list, key = lambda k: (k['id']))
+         # TODO : to review
+         
+ 

@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --with bash-completion --with python2
+	dh $@ install --with bash-completion --with python2
 
 override_dh_auto_install:
 	#dh_auto_install
@@ -18,6 +18,10 @@ override_dh_install:
 	/bin/mkdir -p debian/tmp/usr/lib/domogik
 	/bin/cp -Rf install debian/tmp/usr/lib/domogik
 	/bin/cp -Rf src/tools debian/tmp/usr/lib/domogik
+	/bin/mkdir -p debian/tmp/var/lib/domogik
+	#/bin/cp -Rf src/domogik/__init__.py debian/tmp/var/lib/domogik/
+	/bin/mkdir -p debian/tmp/etc/apache2/sites-available/
+	/usr/bin/install -c -p -m 644 debian/domogik.apache2 debian/tmp/etc/apache2/sites-available/domogik
 	dh_install --sourcedir=debian/tmp
 	#dh_python2 -p zeitgeist-core usr/share/zeitgeist/fts-python
 

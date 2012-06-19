@@ -4,13 +4,15 @@ set -e
 case "$1" in
   configure|upgrade)
         #/usr/bin/python /usr/share/pyshared/domoweb/manage.py syncdb --noinput
-        /bin/chown -Rf domogik:root /var/lib/domogik
-        /bin/chown domogik:adm /var/log/domogik
-        /bin/chown -Rf domogik:root /etc/domogik
-        /bin/chown root:root /etc/default/domogik
-        /bin/chmod 660 /etc/domogik/*
-        /bin/chown -Rf domogik:root /var/run/domogik
-        /bin/chown -Rf domogik:root /var/cache/domogik
+        chown -Rf domogik:domogik /var/lib/domogik
+        chmod 770 /var/lib/domogik
+        chown domogik:adm /var/log/domogik
+        chown -Rf domogik:root /etc/domogik
+        chown root:root /etc/default/domogik
+        chmod 660 /etc/domogik/*
+        chown -Rf domogik:root /var/run/domogik
+        chown -Rf domogik:root /var/cache/domogik
+        chown -Rf domogik:root /var/lock/domogik
   ;;
 
   abort-upgrade|abort-remove|abort-configure)

@@ -2,9 +2,9 @@
 
 ### BEGIN INIT INFO
 # Provides:          domogik
-# Required-Start:    $local_fs $network xplhub mysql
+# Required-Start:    $local_fs $network xplhub
 # Required-Stop:     $local_fs $network xplhub
-# Should-Start:
+# Should-Start:      mysql xplhub
 # Should-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
@@ -17,10 +17,15 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/dmg_manager
 NAME=dmg_manager
 DESC="Domogik"
-LOGFILE=/var/log/domogik/console.log
-PIDFILE=/var/run/domogik/manager.pid
+LOGDIR="/var/log/domogik"
+PIDDIR="/var/run/domogik"
+PIDFILE="$PIDDIR/manager.pid"
+LOCKDIR="/var/lock/domogik"
 
-test -x $DAEMON || exit 0
+if [ ! -x $DAEMON ] ; then
+    echo "Can't find $DAEMON"
+    exit 0
+fi
 
 #Don't update these values.
 #Use /etc/default/domogik instead
@@ -40,65 +45,63 @@ if [ "x$RUN" != "xyes" ] ; then
     exit 0
 fi
 
-[ -z $HOSTNAME ] && HOSTNAME=$(/bin/cat /etc/hostname)
-
 start_server() {
-    #/bin/su - ${DOMOGIK_USER} -c "$DAEMON $MANAGER_PARAMS >>$LOGFILE 2>&1"
-    /bin/su - ${DOMOGIK_USER} -c "$DAEMON $MANAGER_PARAMS"
+    /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:$PATH && $DAEMON $MANAGER_PARAMS"
     sleep $STARTTIME
 }
 
 stop_server() {
-	if [ -f $PIDFILE ] ; then
-		killproc -p $PIDFILE $DAEMON >/dev/null 2>&1
-		sleep $DIETIME
-	fi
-	if [ -f $PIDFILE ] ; then
-		killproc -p $PIDFILE $DAEMON -9 >/dev/null 2>&1
-		sleep $DIETIME
-	fi
+    if [ -f $PIDFILE ] ; then
+        killproc -p $PIDFILE $DAEMON >/dev/null 2>&1
+        sleep $DIETIME
+    fi
+    if [ -f $PIDFILE ] ; then
+        killproc -p $PIDFILE $DAEMON -9 >/dev/null 2>&1
+        sleep $DIETIME
+    fi
 }
 
 stop_plugins() {
-	/bin/su - ${DOMOGIK_USER} -c "/usr/sbin/dmg_send xpl-cmnd domogik.system 'command=stop,plugin=*,host=${HOSTNAME}'"
-	sleep $DIETIME
+    [ -z $HOSTNAME ] && HOSTNAME=$(/bin/cat /etc/hostname)
+    [ -f $PIDFILE ] && /bin/su - ${DOMOGIK_USER} -c "/usr/sbin/dmg_send xpl-cmnd domogik.system 'command=stop,plugin=*,host=${HOSTNAME}'"
+    sleep $DIETIME
 }
 
 kill_all() {
-	for f in $(find /var/run/domogik/*.pid 2>/dev/null); do
-		killproc -p $f $DAEMON >/dev/null 2>&1
-	done
-	for f in $(find /var/run/domogik/*.pid 2>/dev/null); do
-		killproc -p $f $DAEMON -9 >/dev/null 2>&1
-	done
-	sleep $DIETIME
-	for f in $(find /var/run/domogik/*.pid 2>/dev/null); do
-		killproc -p $f $DAEMON -9 >/dev/null 2>&1
-	done
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        killproc -p $f $DAEMON >/dev/null 2>&1
+    done
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        killproc -p $f $DAEMON -9 >/dev/null 2>&1
+    done
+    sleep $DIETIME
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        killproc -p $f $DAEMON -9 >/dev/null 2>&1
+    done
 }
 
 kill_all_plugins() {
-	for f in $(find /var/run/domogik/*.pid 2>/dev/null); do
-		[ "$f" != "/var/run/domogik/manager.pid" ] && \
-		[ "$f" != "/var/run/domogik/dbmgr.pid" ] && \
-		[ "$f" != "/var/run/domogik/rest.pid" ] && \
-		 killproc -p $f $DAEMON >/dev/null 2>&1
-	done
-	sleep $DIETIME
-	for f in $(find /var/run/domogik/*.pid 2>/dev/null); do
-		[ "$f" != "/var/run/domogik/manager.pid" ] && \
-		[ "$f" != "/var/run/domogik/dbmgr.pid" ] && \
-		[ "$f" != "/var/run/domogik/rest.pid" ] && \
-		killproc -p $f $DAEMON -9 >/dev/null 2>&1
-	done
-	sleep $DIETIME
-	for f in $(find /var/run/domogik/*.pid 2>/dev/null); do
-		[ "$f" != "/var/run/domogik/manager.pid" ] && \
-		[ "$f" != "/var/run/domogik/dbmgr.pid" ] && \
-		[ "$f" != "/var/run/domogik/rest.pid" ] && \
-		killproc -p $f $DAEMON -9 >/dev/null 2>&1
-	done
-	sleep $DIETIME
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        [ "$f" != "$PIDDIR/manager.pid" ] && \
+        [ "$f" != "$PIDDIR/dbmgr.pid" ] && \
+        [ "$f" != "$PIDDIR/rest.pid" ] && \
+         killproc -p $f $DAEMON >/dev/null 2>&1
+    done
+    sleep $DIETIME
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        [ "$f" != "$PIDDIR/manager.pid" ] && \
+        [ "$f" != "$PIDDIR/dbmgr.pid" ] && \
+        [ "$f" != "$PIDDIR/rest.pid" ] && \
+        killproc -p $f $DAEMON -9 >/dev/null 2>&1
+    done
+    sleep $DIETIME
+    for f in $(find $PIDDIR/*.pid 2>/dev/null); do
+        [ "$f" != "$PIDDIR/manager.pid" ] && \
+        [ "$f" != "$PIDDIR/dbmgr.pid" ] && \
+        [ "$f" != "$PIDDIR/rest.pid" ] && \
+        killproc -p $f $DAEMON -9 >/dev/null 2>&1
+    done
+    sleep $DIETIME
 }
 
 restart_server() {
@@ -109,71 +112,79 @@ restart_server() {
 }
 
 running() {
-	set +e
-	STAT="0"
-	pidofproc -p $PIDFILE $DAEMON >/dev/null || STAT="$?"
-	if [ $STAT = 0 ] ; then
-		echo y
-	else
-		echo n
-	fi
-	set -e
+    set +e
+    STAT="0"
+    pidofproc -p $PIDFILE $DAEMON >/dev/null || STAT="$?"
+    if [ $STAT = 0 ] ; then
+        echo y
+    else
+        echo n
+    fi
+    set -e
+}
+
+# Check if the directory for lock exists
+check_dirs() {
+    #USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
+    [ ! -d $PIDDIR ] && mkdir $PIDDIR
+    [ -p $PIDDIR/dmg-manager-state ] && rm -f $PIDDIR/dmg-manager-state
+    chown ${DOMOGIK_USER}: $PIDDIR
+    [ ! -d $LOCKDIR ] && mkdir $LOCKDIR
+    chown ${DOMOGIK_USER}: $LOCKDIR
+    [ ! -d $LOGDIR ] && mkdir $LOGDIR
+    chown ${DOMOGIK_USER}: $LOGDIR
 }
 
 case "$1" in
   start)
-		[ ! -d /var/run/domogik ] && \
-			/bin/mkdir /var/run/domogik && \
-			/bin/chown -Rf ${DOMOGIK_USER}:root /var/run/domogik
-		set +e
-		rm -f /var/run/domogik/dmg-manager-state >/dev/null 2>&1
-		set -e
-		if [ $# -eq 1 ];then
-			log_daemon_msg "Starting $DESC " "$NAME"
-			if [ "$(running)" = "y" ] ; then
-					log_progress_msg "apparently already running"
-					log_end_msg 0
-					exit 0
-			fi
-			start_server
-			if  [ "$(running)" = "y" ] ;  then
-				# It's ok, the server started and is running
-				log_end_msg 0
-			else
-				# It is not running after we did start
-				log_end_msg 1
-			fi
-		else
-			case "$2" in
-				manager)
-					log_daemon_msg "Starting $DESC " "$NAME"
-					if [ "$(running)" = "y" ] ; then
-							log_progress_msg "apparently already running"
-							log_end_msg 0
-							exit 0
-					fi
-					[ -p /var/run/domogik/dmg-manager-state ] && rm -f /var/run/domogik/dmg-manager-state
-					mkfifo /var/run/domogik/dmg-manager-state
-					chown ${DOMOGIK_USER}: /var/run/domogik/dmg-manager-state
-					start_server
-					cat < /var/run/domogik/dmg-manager-state
-					rm -f /var/run/domogik/dmg-manager-state
-					sleep $STARTTIME
-					if  [ "$(running)" = "y" ] ;  then
-						# It's ok, the server started and is running
-						log_end_msg 0
-					else
-						# It is not running after we did start
-						log_end_msg 1
-					fi
-				;;
-				*)
-					echo "usage: $0 start [manager]"
-				;;
-			esac
-		fi
+    check_dirs
+    if [ $# -eq 1 ];then
+        log_daemon_msg "Starting $DESC " "$NAME"
+        if [ "$(running)" = "y" ] ; then
+                log_progress_msg "apparently already running"
+                log_end_msg 0
+                exit 0
+        fi
+        start_server
+        if  [ "$(running)" = "y" ] ;  then
+            # It's ok, the server started and is running
+            log_end_msg 0
+        else
+            # It is not running after we did start
+            log_end_msg 1
+        fi
+    else
+        case "$2" in
+            manager)
+                log_daemon_msg "Starting $DESC " "$NAME"
+                if [ "$(running)" = "y" ] ; then
+                        log_progress_msg "apparently already running"
+                        log_end_msg 0
+                        exit 0
+                fi
+                [ -p $PIDDIR/dmg-manager-state ] && rm -f /var/run/domogik/dmg-manager-state
+                mkfifo /var/run/domogik/dmg-manager-state
+                chown ${DOMOGIK_USER}: /var/run/domogik/dmg-manager-state
+                start_server
+                cat < /var/run/domogik/dmg-manager-state
+                rm -f /var/run/domogik/dmg-manager-state
+                sleep $STARTTIME
+                if  [ "$(running)" = "y" ] ;  then
+                    # It's ok, the server started and is running
+                    log_end_msg 0
+                else
+                    # It is not running after we did start
+                    log_end_msg 1
+                fi
+            ;;
+            *)
+                echo "usage: $0 start [manager]"
+            ;;
+        esac
+    fi
     ;;
   stop)
+    check_dirs
     if [ $# -eq 1 ];then
         log_daemon_msg "Stopping $DESC" "$NAME"
         stop_plugins
@@ -187,20 +198,21 @@ case "$1" in
     else
         case "$2" in
             manager)
-				log_daemon_msg "Stop manager"
-				stop_server
+                log_daemon_msg "Stop manager"
+                stop_server
             ;;
             plugins)
-				log_daemon_msg "Stop plugins"
-				stop_plugins
+                log_daemon_msg "Stop plugins"
+                stop_plugins
             ;;
-			*)
-				echo "usage: $0 stop [manager|plugins]"
+            *)
+                echo "usage: $0 stop [manager|plugins]"
             ;;
         esac
     fi
     ;;
   kill)
+    check_dirs
     if [ $# -eq 1 ];then
         log_daemon_msg "Stopping $DESC" "$NAME"
         stop_plugins
@@ -214,21 +226,22 @@ case "$1" in
     else
         case "$2" in
             manager)
-				log_daemon_msg "Kill manager"
-				stop_server
+                log_daemon_msg "Kill manager"
+                stop_server
             ;;
             plugins)
-				log_daemon_msg "Kill plugins"
-				stop_plugins
-				kill_all_plugins
+                log_daemon_msg "Kill plugins"
+                stop_plugins
+                kill_all_plugins
             ;;
-			*)
-				echo "usage: $0 kill [manager|plugins]"
-			;;
+            *)
+                echo "usage: $0 kill [manager|plugins]"
+            ;;
         esac
     fi
     ;;
   force-reload|restart)
+    check_dirs
     if [ $# -eq 1 ];then
         log_daemon_msg "Restarting $DESC" "$NAME"
         restart_server
@@ -238,7 +251,7 @@ case "$1" in
             log_end_msg 1
         fi
     else
-		echo "usage: $0 {force-reload|restart}"
+        echo "usage: $0 {force-reload|restart}"
     fi
     ;;
   status)
@@ -247,24 +260,24 @@ case "$1" in
     else
         case "$2" in
             manager)
-				if [ -f /var/run/domogik/manager.pid ] && [ $(/bin/ps `cat /var/run/domogik/manager.pid` | /bin/grep -c "$") -gt 1 ] ; then
-					echo " * manager is running"
-				else
-					echo " * manager is not running"
-				fi
-				if [ -f /var/run/domogik/dbmgr.pid ] && [ $(/bin/ps `cat /var/run/domogik/dbmgr.pid` | /bin/grep -c "$") -gt 1 ] ; then
-					echo " * dbmgr is running"
-				else
-					echo " * dbmgr is not running"
-				fi
-				if [ -f /var/run/domogik/rest.pid ] && [ $(/bin/ps `cat /var/run/domogik/rest.pid` | /bin/grep -c "$") -gt 1 ] ; then
-					echo " * rest is running"
-				else
-					echo " * rest is not running"
-				fi
+                if [ -f /var/run/domogik/manager.pid ] && [ $(/bin/ps `cat /var/run/domogik/manager.pid` | /bin/grep -c "$") -gt 1 ] ; then
+                    echo " * manager is running"
+                else
+                    echo " * manager is not running"
+                fi
+                if [ -f /var/run/domogik/dbmgr.pid ] && [ $(/bin/ps `cat /var/run/domogik/dbmgr.pid` | /bin/grep -c "$") -gt 1 ] ; then
+                    echo " * dbmgr is running"
+                else
+                    echo " * dbmgr is not running"
+                fi
+                if [ -f /var/run/domogik/rest.pid ] && [ $(/bin/ps `cat /var/run/domogik/rest.pid` | /bin/grep -c "$") -gt 1 ] ; then
+                    echo " * rest is running"
+                else
+                    echo " * rest is not running"
+                fi
             ;;
-			*)
-				echo "usage: $0 kill [manager]"
+            *)
+                echo "usage: $0 status [manager]"
             ;;
         esac
     fi

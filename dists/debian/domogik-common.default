@@ -1,0 +1,37 @@
+# This file defines config parameters for domogik
+
+#Start domogik daemon under this user
+DOMOGIK_USER=domogik
+
+# This variable can take 6 parameters :
+# -d to start the database manager (launch only on master host)
+# -r to start the rest component (launch only on master host)
+# -E to manage external members (launch only on master host)
+# -p to regulary ping plugins
+# -t <ping duration> to customize ping duration
+# -w <wait time between 2 ping> to customize ping delay
+# Remember : Your domogik installation must have *one* and *only one*
+# instance of each manager running.
+# Your domogik installation won't start on this computer if :
+#  - The database manager is not already running elsewhere on the network
+#  - You do not pass -d parameter to the manager
+MANAGER_PARAMS="-d -r -p -E"
+
+#Should we start domogik at startup
+RUN=yes
+
+# Time to wait for the server to die, in seconds
+# If this value is set too low you might not
+# let some servers to die gracefully and
+# 'restart' will not work
+DIETIME=2
+
+# Time to wait for the server to start, in seconds
+# If this value is set each time the server is
+# started (on start or restart) the script will
+# stall to try to determine if it is running
+# If it is not set and the server takes time
+# to setup a pid file the log message might
+# be a false positive (says it did not start
+# when it actually did)
+STARTTIME=1

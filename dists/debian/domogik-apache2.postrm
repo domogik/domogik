@@ -1,0 +1,38 @@
+#!/bin/sh -e
+
+# Try to stop the apache server in a sane way. If it does not success let the admin
+# do it himself.
+reload_server() {
+  set +e
+  if [ -x /usr/sbin/invoke-rc.d ]; then
+    invoke-rc.d apache2 reload
+  else
+    /etc/init.d/apache2 reload
+  fi
+  errno=$?
+  set -e
+}
+
+case "$1" in
+  upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+      reload_server
+  ;;
+  remove)
+	  set +e
+      a2dissite domogik
+	  set -e
+      reload_server
+  ;;
+  purge)
+      rm -rf /var/log/apache2/domogik
+      rm -rf /var/www/domogik
+  ;;
+  *)
+    echo "postrm called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+#DEBHELPER#
+
+exit 0

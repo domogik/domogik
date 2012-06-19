@@ -1,0 +1,3 @@
+/etc/apache2/sites-available
+/var/log/apache2/domogik
+/var/www/domogik
