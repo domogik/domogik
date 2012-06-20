@@ -331,6 +331,10 @@ class X10Monitor:
             self._cbs = []
             log = logger.Logger(self.__class__.__name__)
             self._log = log.get_logger('x10_heyu')
+            
+            # for last command
+            self._selectedunit = None
+            self._last_hashcmd = None
 
         def add_cb(self, cb):
             """
@@ -349,7 +353,7 @@ class X10Monitor:
             """
             Starts to check the stdout line
             """
-            units = []
+            unit = None
             order = None
             arg = None
             out = None
@@ -360,22 +364,26 @@ class X10Monitor:
                 while not self._pipe.stdout.closed and out != '':
                     out = self._pipe.stdout.readline()
                     if 'addr unit' in out:
-                        units.append(out.split()[8].lower())
+                        unit = out.split()[8].lower()
+                        self._selectedunit = unit
                     elif 'func' in out:
                         if "Alert" in out or "Clear" in out:
                             #RF Security device
                             (order, unit) = regex_security.sub(r"\1,\2", out).lower().split(",")
-                            units = [unit]
                         else:
                             #Standard order
                             order = out.split()[4].lower()
                         if '%' in out:
                             arg = out.split()[9].replace('%','')
-                    if units and order:
-                        self._call_cbs(units, order, arg)
-                        units = []
-                        order = None
-                        arg = None
+                    if self._selectedunit and order:
+                        hashcmd = '%s-%s-%s' % (self._selectedunit,order,arg)
+                        if (hashcmd != self._last_hashcmd):
+                            print ('before call : %s' % unit)
+                            self._call_cbs([self._selectedunit], order, arg)
+                            self._last_hashcmd = hashcmd
+                            unit = None
+                            order = None
+                            arg = None
             except ValueError:
                 #The pipe is closed
                 self._log.warning("The heyu-monitor pipe is closed. Finish silently.")
