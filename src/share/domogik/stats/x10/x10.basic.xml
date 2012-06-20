@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<statistic technology="x10no">
+<statistic technology="x10">
     <schema name="x10.basic">
         <xpltype type="*">
             <listener>
