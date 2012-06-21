@@ -378,7 +378,6 @@ class X10Monitor:
                     if self._selectedunit and order:
                         hashcmd = '%s-%s-%s' % (self._selectedunit,order,arg)
                         if (hashcmd != self._last_hashcmd):
-                            print ('before call : %s' % unit)
                             self._call_cbs([self._selectedunit], order, arg)
                             self._last_hashcmd = hashcmd
                             unit = None
