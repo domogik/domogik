@@ -775,6 +775,12 @@ target=*
             device_id = self.rest_request[0]
             key = self.rest_request[1]
 
+            # Replace wildcard value by None value
+            if device_id=='*':
+                device_id = None
+            if key=='*':
+                key = None
+
         ### all ######################################
         if self.rest_request[2] == "all":
             self._rest_stats_all(device_id, key)
@@ -818,7 +824,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         idx = 1
         while idx < len(self.rest_request):
-            for data in self._db.list_last_n_stats_of_device_by_key(self.rest_request[idx+1], self.rest_request[idx],  1):
+            for data in self._db.list_last_n_stats_of_device(self.rest_request[idx], self.rest_request[idx+1],  1):
                 json_data.add_data(data)
             idx += 2
         self.send_http_response_ok(json_data.get())
@@ -834,7 +840,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_device_stats(device_id):
+        for data in self._db.list_device_stats(device_id,key):
             # TODO : filter by key
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
@@ -851,7 +857,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_last_n_stats_of_device_by_key(key, device_id,  num):
+        for data in self._db.list_last_n_stats_of_device(device_id, key,  num):
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
@@ -883,8 +889,8 @@ target=*
             csv_data = CsvHelper()
         values = []
         if st_interval != None and st_selector != None:
-            data = self._db.filter_stats_of_device_by_key(key,
-                                                               device_id,
+            data = self._db.filter_stats_of_device_by_key(device_id,
+                                                               key,
                                                                st_from,
                                                                st_to,
                                                                st_interval,

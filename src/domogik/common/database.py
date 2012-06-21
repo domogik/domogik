@@ -1705,64 +1705,63 @@ class DbHelper():
 ####
 # Device stats
 ####
-    def list_all_device_stats(self):
-        """Return a list of all device stats
-
-        @return a list of DeviceStats objects
-
-        """
-        return self.__session.query(DeviceStats).all()
-
-    def list_device_stats(self, ds_device_id):
+    def list_device_stats(self, ds_device_id=None,ds_skey=None,ds_number=None):
         """Return a list of all stats for a device
 
         @param ds_device_id : the device id
+        @param ds_key : statistic key
         @return a list of DeviceStats objects
 
         """
-        return self.__session.query(
-                        DeviceStats
-                    ).filter_by(device_id=ds_device_id
-                    ).all()
+        
+        filters = {}
+        if ds_device_id:
+            filters['device_id'] = ds_device_id
+        if ds_skey:
+            filters['skey'] = ucode(ds_skey)
+        
+        if ds_number:
+            return self.__session.query(
+                            DeviceStats
+                        ).filter_by(**filters
+                        ).limit(ds_number
+                        ).all()
+        else:
+            return self.__session.query(
+                            DeviceStats
+                        ).filter_by(**filters
+                        ).all()
 
-    def list_device_stats_by_key(self, ds_key, ds_device_id):
-        """Return a list of all stats for a key and a device
 
-        @param ds_key : the stat key
-        @param ds_device_id : the device id
-        @return a list of DeviceStats objects
-
-        """
-        return self.__session.query(
-                        DeviceStats
-                    ).filter_by(device_id=ds_device_id
-                    ).filter_by(skey=ucode(ds_key)
-                    ).all()
-
-    def list_last_n_stats_of_device_by_key(self, ds_key, ds_device_id, ds_number):
+    def list_last_n_stats_of_device(self, ds_device_id=None,ds_skey=None,ds_number=None):
         """Get the N latest statistics of a device for a given key
 
+        @param ds_device_id : the device id
         @param ds_key : statistic key
-        @param ds_device_id : device id
         @param ds_number : the number of statistics we want to retreive
         @return a list of DeviceStats objects (older records first)
 
         """
+        filters = {}
+        if ds_device_id:
+            filters['device_id'] = ds_device_id
+        if ds_skey:
+            filters['skey'] = ucode(ds_skey)
+
         list_s = self.__session.query(
                             DeviceStats
-                        ).filter_by(skey=ucode(ds_key)
-                        ).filter_by(device_id=ds_device_id
+                        ).filter_by(**filters
                         ).order_by(sqlalchemy.desc(DeviceStats.date)
                         ).limit(ds_number
                         ).all()
         list_s.reverse()
         return list_s
-
-    def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_date_ts=None, end_date_ts=None):
+    
+    def list_stats_of_device_between_by_key(self, ds_device_id=None, ds_key=None, start_date_ts=None, end_date_ts=None):
         """Get statistics of a device between two dates for a given key
 
+        @param ds_device_id : the device id
         @param ds_key : statistic key
-        @param ds_device_id : device id
         @param start_date_ts : datetime start, optional (timestamp)
         @param end_date_ts : datetime end, optional (timestamp)
         @return a list of DeviceStats objects (older records first)
@@ -1771,10 +1770,8 @@ class DbHelper():
         if start_date_ts and end_date_ts:
             if end_date_ts < start_date_ts:
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
-        query = self.__session.query(
-                        DeviceStats
-                    ).filter_by(skey=ucode(ds_key)
-                    ).filter_by(device_id=ds_device_id)
+        
+        query = self.list_device_stats(ds_device_id, ds_key)
         if start_date_ts:
             query = query.filter("date >= '" + _datetime_string_from_tstamp(start_date_ts)+"'")
         if end_date_ts:
@@ -1782,22 +1779,27 @@ class DbHelper():
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
-    def get_last_stat_of_device_by_key(self, ds_key, ds_device_id):
+    def get_last_stat_of_device(self, ds_device_id=None,ds_key=None):
         """Get the latest statistic of a device for a given key
 
+        @param ds_device_id : the device id
         @param ds_key : statistic key
-        @param ds_device_id : device id
         @return a DeviceStats object
 
         """
+        filters = {}
+        if ds_device_id:
+            filters['device_id'] = ds_device_id
+        if ds_skey:
+            filters['skey'] = ucode(ds_skey)
+
         return self.__session.query(
                         DeviceStats
-                    ).filter_by(skey=ucode(ds_key)
-                    ).filter_by(device_id=ds_device_id
+                    ).filter_by(**filters
                     ).order_by(sqlalchemy.desc(DeviceStats.date)
                     ).first()
 
-    def filter_stats_of_device_by_key(self, ds_key, ds_device_id, start_date_ts, end_date_ts, step_used, function_used):
+    def filter_stats_of_device_by_key(self, ds_device_id, ds_key,  start_date_ts, end_date_ts, step_used, function_used):
         """Filter statistic values within a period for a given step (minute, hour, day, week, month, year). It then
         applies a function (min, max, avg) for the values within the step.
 
@@ -1969,17 +1971,15 @@ class DbHelper():
                 }
             }
 
-    def device_has_stats(self, ds_device_id):
+    def device_has_stats(self, ds_device_id=None,ds_skey=None):
         """Check if the device has stats that were recorded
 
-        @param d_device_id : device id
+        @param ds_device_id : the device id
+        @param ds_key : statistic key
         @return True or False
 
         """
-        return self.__session.query(
-                        DeviceStats
-                    ).filter_by(device_id=ds_device_id
-                    ).count() > 0
+        return self.list_device_stats(ds_device_id,ds_skey,1).count() > 0        
 
     def add_device_stat(self, ds_timestamp, ds_key, ds_value, ds_device_id, hist_size=0):
         """Add a device stat record

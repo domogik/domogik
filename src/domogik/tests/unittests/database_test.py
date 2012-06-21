@@ -923,7 +923,9 @@ class DeviceStatsTestCase(GenericTestCase):
         self.remove_all_device_stats()
 
     def test_empty_list(self):
-        assert len(db.list_all_device_stats()) == 0
+        assert len(db.list_device_stats()) == 0
+        assert len(db.device_has_stats()) == False
+
 
     def __has_stat_values(self, device_stats_values, expected_values):
         if len(device_stats_values) != len(expected_values): return False
@@ -937,6 +939,8 @@ class DeviceStatsTestCase(GenericTestCase):
         du1 = db.add_device_usage('lighting', 'Lighting')
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
+
+        # Add device stats
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
         ds1 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
@@ -945,6 +949,8 @@ class DeviceStatsTestCase(GenericTestCase):
         assert ds1.timestamp == make_ts(2010, 04, 9, 12, 0)
         ds2 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
         assert ds2.skey == 'val_char' and ds2.value == 'plop'
+
+        # Add for device1
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
@@ -955,31 +961,50 @@ class DeviceStatsTestCase(GenericTestCase):
         db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 8, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val2', 9, device1.id)
 
+        # Add for device2
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 100, device2.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 200, device2.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 300, device2.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, device2.id)
 
-        assert len(db.list_device_stats(device1.id)) == 11
-        assert db.get_last_stat_of_device_by_key('val1', device1.id).value == '8'
-        assert db.get_last_stat_of_device_by_key('val2', device1.id).value == '9'
+        assert db.get_last_stat_of_device( device1.id, 'val1').value == '8'
+        assert db.get_last_stat_of_device( device1.id, 'val2').value == '9'
 
-        stats_l = db.list_last_n_stats_of_device_by_key('val1', device1.id, 3)
+        stats_l = db.list_last_n_stats_of_device(device1.id,'val1', 3)
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
-        stats_l = db.list_stats_of_device_between_by_key('val1', device1.id, make_ts(2010, 04, 9, 12, 2),
+        stats_l = db.list_stats_of_device_between_by_key( device1.id, 'val1', make_ts(2010, 04, 9, 12, 2),
                                                          make_ts(2010, 04, 9, 12, 4))
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
-        stats_l = db.list_stats_of_device_between_by_key('val1', device1.id,
+        stats_l = db.list_stats_of_device_between_by_key(device1.id, 'val1',
                                                          make_ts(2010, 04, 9, 12, 3))
         assert len(stats_l) == 2
         assert stats_l[0].value == '6' and stats_l[1].value == '8'
-        stats_l = db.list_stats_of_device_between_by_key('val1', device1.id,
+        stats_l = db.list_stats_of_device_between_by_key(device1.id, 'val1', 
                                                          end_date_ts=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
         assert stats_l[0].get_date_as_timestamp() == 1270810800.0
+
+        # Verify for unified list_device_stats
+        assert len(db.list_device_stats()) == 15
+        assert len(db.list_device_stats(device1.id)) == 11
+        assert len(db.list_device_stats(device2.id)) == 4
+        assert len(db.list_device_stats(device1.id,'val1')) == 5
+        assert len(db.list_device_stats(device1.id,'val2')) == 5
+        assert len(db.list_device_stats(device2.id,'val1')) == 2
+        assert len(db.list_device_stats(device2.id,'val2')) == 2
+        assert len(db.list_device_stats(None,'val1')) == 7
+        assert len(db.list_device_stats(None,'val2')) == 7
+        assert len(db.list_device_stats(None,None)) == 14
+        assert len(db.list_device_stats()) == 14
+        assert len(db.device_has_stats()) == True
+        assert len(db.device_has_stats(None,None)) == True
+        assert len(db.device_has_stats(device1.id,'val1')) == True
+        assert len(db.device_has_stats(device1.id,'val3')) == False
+        
+
 
     def test_add_with_hist_size(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
@@ -992,9 +1017,9 @@ class DeviceStatsTestCase(GenericTestCase):
         db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 3, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 4, device1.id)
         assert len(db.list_device_stats(device1.id)) == 5
-        assert len(db.list_device_stats_by_key('val1', device1.id)) == 4
+        assert len(db.list_device_stats(device1.id,'val1' )) == 4
         db.add_device_stat(make_ts(2010, 04, 9, 12, 5), 'val1', 5, device1.id, 2)
-        stat_list = db.list_device_stats_by_key('val1', device1.id)
+        stat_list = db.list_device_stats( device1.id,'val1')
         assert len(stat_list) == 2
         for stat in stat_list:
             assert stat.value in ['4', '5']
@@ -1038,8 +1063,8 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='valm', 
-                                                       ds_device_id=device1.id,
+            results = db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+                                                       ds_key='valm', 
                                                        start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
                                                        end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
                                                        step_used='minute', function_used=func)
@@ -1072,8 +1097,8 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='valh', 
-                                                       ds_device_id=device1.id,
+            results = db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+                                                       ds_key='valh', 
                                                        start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
                                                        end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
                                                        step_used='hour', function_used=func)
@@ -1103,8 +1128,8 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='vald', 
-                                                       ds_device_id=device1.id,
+            results = db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+                                                       ds_key='vald', 
                                                        start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                        end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                        step_used='day', function_used=func)
@@ -1167,8 +1192,8 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results =  db.filter_stats_of_device_by_key(ds_key='valmy', 
-                                                        ds_device_id=device1.id,
+            results =  db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+                                                        ds_key='valmy', 
                                                         start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
                                                         end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
                                                         step_used='month', function_used=func)
@@ -1178,7 +1203,7 @@ class DeviceStatsTestCase(GenericTestCase):
                                                         and results['global_values']['avg'] == 13.5
 
         # Test with no end date
-        results =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
+        results =  db.filter_stats_of_device_by_key(ds_device_id=device1.id, ds_key='valmy', 
                                                     start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                     end_date_ts=None, step_used='month', function_used='avg')
         ym_list = [(r[0], r[1]) for r in results['values']]
@@ -1199,8 +1224,8 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results =  db.filter_stats_of_device_by_key(ds_key='valmy', 
-                                                        ds_device_id=device1.id,
+            results =  db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+                                                        ds_key='valmy', 
                                                         start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                         end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
                                                         step_used='year', function_used=func)
