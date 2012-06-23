@@ -8,6 +8,9 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.scene import *
+from urllib import *
+import glob
+from xml.dom import minidom
 import threading
 
 class SceneManager(XplPlugin):
@@ -62,6 +65,93 @@ class SceneManager(XplPlugin):
        """boucle d'envoie d'une message xpl
        """
        print "send_xpl"
+
+   def search_filter(self, techno, device_adr, key_stat):
+
+      filetoopen= self.get_stats_files_directory()
+      filetoopen= filetoopen[:filetoopen.find('stats')+6]
+      files = glob.glob("%s/*/*xml" % filetoopen)
+      print "files récupérer"
+      res = {}
+      for _files in files:
+         if _files[-4:] == ".xml":
+            doc = minidom.parse(_files)
+            technology = doc.documentElement.attributes.get("technology").value
+            schema_types = self.get_schemas_and_types(doc.documentElement)
+            if technology not in res:
+               res[technology] = {}
+            device_list=[]
+            for schema in schema_types:
+               if schema not in res[technology]:
+                  res[technology][schema] = {}
+               for xpl_type in schema_types[schema]:
+                   if xpl_type == "xpl-trig" and technology == techno:
+                      device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                      if len(filter(str(device),device_list)) == 0:
+                         print "test reussi"
+                         device_list.append(str(device))
+
+                   print str(device_list)
+  def get_schemas_and_types(self, node):
+      """ Get the schema and the xpl message type
+      @param node : the root (statistic) node
+      @return {'schema1': ['type1','type2'], 'schema2', ['type1','type3']}
+      """
+      res = {}
+      schemas = node.getElementsByTagName("schema")
+      for schema in schemas:
+          res[schema.attributes.get("name").value] = {}
+          for xpltype in schema.getElementsByTagName("xpltype"):
+              if xpltype.attributes.get("type").value == "*":
+                  res[schema.attributes.get("name").value]["xpl-trig"] = xpltype
+                  res[schema.attributes.get("name").value]["xpl-stat"] = xpltype
+              else:
+                  res[schema.attributes.get("name").value][xpltype.attributes.get("type").value] = xpltype
+      return res
+
+  def parse_mapping(self, node):
+      """ Parse the "mapping" node
+      """
+
+      values = []
+      device_node = node.getElementsByTagName("device")[0]
+      device = None
+      static_device = None
+      device_type = None
+      if device_node.attributes.has_key("field"):
+          device = device_node.attributes["field"].value.lower()
+      elif device_node.attributes.has_key("static_name"):
+          static_device = device_node.attributes["static_name"].value.lower()
+      elif device_node.attributes.has_key("type"):
+          device_type = device_node.attributes["type"].value.lower()
+
+      for value in node.getElementsByTagName("value"):
+          name = value.attributes["field"].value
+          data = {}
+          data["name"] = name
+          #If a "name" attribute is defined, use it as vallue, else value is empty
+          if value.attributes.has_key("history_size"):
+              data["history_size"] = int(value.attributes["history_size"].value)
+          else:
+              data["history_size"] = 0
+          if value.attributes.has_key("new_name"):
+              data["new_name"] = value.attributes["new_name"].value.lower()
+              if value.attributes.has_key("filter_key"):
+                  data["filter_key"] = value.attributes["filter_key"].value.lower()
+                  if value.attributes.has_key("filter_value"):
+                      data["filter_value"] = value.attributes["filter_value"].value.lower()
+                  else:
+                      data["filter_value"] = None
+              else:
+                  data["filter_key"] = None
+                  data["filter_value"] = None
+          else:
+              data["new_name"] = None
+              data["filter_key"] = None
+              data["filter_value"] = None
+          values.append(data)
+      return device, values, static_device, device_type
+
 
 
    def create_scene(num_script, rest_server, id_device1, key_stat1, test1, value1, id_device2, key_stat2, test2, value2,technologie1, adress_1,value_out1,technologie2,adress_2, value_out2, test_type, temp_wait):

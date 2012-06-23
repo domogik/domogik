@@ -213,7 +213,7 @@
         "src/share/domogik/url2xpl/knx/HVACeco.xml", 
         "src/share/domogik/url2xpl/knx/HVACstop.xml", 
         "src/share/domogik/url2xpl/knx/HVACnormal.xml", 
-        "src/share/domogik/url2xpl/knx/Add.xml"
+        "src/share/domogik/url2xpl/knx/Add.xml",
         "src/share/domogik/data/knx/knx.txt"
     ], 
     "identity": {
