@@ -203,10 +203,10 @@ class DbHelper():
         self.__session.expire_all()
         p = Page(name=name, description=descr, icon=icon)
         parent = self.__session.query(Page).filter_by(id=parentId).first()
-	p.lft = int(parent.lft) + 1
-        p.rgt = int(parent.lft) + 2
-	self.__session.query(Page).filter(Page.rgt > parent.lft).update({Page.rgt: Page.rgt + 2})
-	self.__session.query(Page).filter(Page.lft > parent.lft).update({Page.lft: Page.lft + 2})
+	p.left = int(parent.left) + 1
+        p.right = int(parent.left) + 2
+	self.__session.query(Page).filter(Page.right > parent.left).update({Page.right: Page.right + 2})
+	self.__session.query(Page).filter(Page.left > parent.left).update({Page.left: Page.left + 2})
         self.__session.add(p)
         try:
             self.__session.commit()
@@ -258,12 +258,12 @@ class DbHelper():
         p = self.__session.query(Page).filter_by(id=id).first()
         if p:
             # chek if there are no children
-            if p.lft + 1 != p.rgt:
+            if p.left + 1 != p.right:
                 self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
             else:
-                dl = p.rgt - p.lft + 1
-		self.__session.query(Page).filter(Page.rgt > p.rgt).update({Page.rgt: Page.rgt - dl})
-		self.__session.query(Page).filter(Page.lft > p.rgt).update({Page.lft: Page.lft - dl})
+                dl = p.right - p.left + 1
+		self.__session.query(Page).filter(Page.right > p.right).update({Page.right: Page.right - dl})
+		self.__session.query(Page).filter(Page.left > p.right).update({Page.left: Page.left - dl})
                 self.__session.delete(p)
                 try:
                     self.__session.commit()

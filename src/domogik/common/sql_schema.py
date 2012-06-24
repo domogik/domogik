@@ -97,7 +97,7 @@ class Page(Base):
     description = Column(UnicodeText(), nullable=True)
     icon = Column(Unicode(30), nullable=True)
 
-    def __init__(self, name, left, right, description=None, icon=None):
+    def __init__(self, name, left=0, right=0, description=None, icon=None):
         """Class constructor
         @param left : left value
         @param right : right value
