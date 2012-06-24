@@ -94,11 +94,17 @@ class Dawndusk(XplPlugin):
                     'command-%s' % str(num))
                 dawn = self._config.query('dawndusk', 'dawn-%s' % str(num))
                 dusk = self._config.query('dawndusk', 'dusk-%s' % str(num))
+                
+                # Add +/- minutes after/before event
+                dawnminutes = self._config.query('dawndusk', 'dawnminutes-%s' % str(num))
+                duskminutes = self._config.query('dawndusk', 'duskminutes-%s' % str(num))
+
                 if schema != None:
                     self.log.debug("dawndusk.__init__ : Device from \
                         xpl : device=%s," % (add))
                     self.devices[add] = {"schema":schema, "command":command,
                                 "dawn":dawn,"dusk":dusk, "addname":addname,
+                                "dawnminutes":dawnminutes,"duskminutes":duskminutes,
                                 "xpltype":xpltype}
                 else:
                     loop = False
@@ -184,6 +190,9 @@ class Dawndusk(XplPlugin):
                 mess.add_data({self.devices[dev]["command"] : \
                     self.devices[dev][status]})
                 mess.add_data({self.devices[dev]["addname"] : dev})
+                mess.add_data({self.devices[dev]["dawnminutes"] : dev})
+                mess.add_data({self.devices[dev]["duskminutes"] : dev})
+
                 self.myxpl.send(mess)
         self.log.debug("dawndusk.dawndusk_trig_cb() : Done :)")
 
@@ -208,6 +217,7 @@ class Dawndusk(XplPlugin):
             if query == "dawn":
                 mess.set_schema("datetime.basic")
                 dawn = self._mydawndusk.get_next_dawn()
+                dawn = dawn + datetime.timedelta(minutes=int(message.data['dawnminutes']))
                 mess.add_data({"status": dawn.strftime("%Y%m%d%H%M%S"), \
                     "type": "dawn" })
                 sendit = True
@@ -216,6 +226,7 @@ class Dawndusk(XplPlugin):
             elif query == "dusk":
                 mess.set_schema("datetime.basic")
                 dusk = self._mydawndusk.get_next_dusk()
+                dusk = dusk + datetime.timedelta(minutes=int(message.data['duskminutes']))
                 mess.add_data({"status" :  dusk.strftime("%Y%m%d%H%M%S"), \
                     "type": "dusk" })
                 sendit = True
@@ -310,6 +321,9 @@ class Dawndusk(XplPlugin):
             mess.add_data({self.devices[dev]["command"] : \
                 self.devices[dev][state]})
             mess.add_data({self.devices[dev]["addname"] : dev})
+            mess.add_data({self.devices[dev]["dawnminutes"] : dev})
+            mess.add_data({self.devices[dev]["duskminutes"] : dev})
+            
             self.myxpl.send(mess)
         self.log.info("dawndusk : send signal for %s"%state)
         self.log.debug("dawndusk.sendDawnDusk() : Done :-)")
