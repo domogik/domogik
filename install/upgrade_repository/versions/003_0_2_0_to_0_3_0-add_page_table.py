@@ -12,7 +12,9 @@ def upgrade(migrate_engine):
     page.create(bind=migrate_engine)
 
     # insert the root element
-    page.insert(name='ROOT', left=1, right=2, description='', icon='')
+    page = Table(Page.__tablename__, meta, autoload=True)
+    insert = page.insert()
+    insert.execute(name='ROOT', left=1, right=2, description='', icon='')
 
     # TODO transfere the data
 
