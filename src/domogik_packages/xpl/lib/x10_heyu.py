@@ -334,7 +334,7 @@ class X10Monitor:
             
             # for last command
             self._selectedunit = None
-#            self._last_hashcmd = None
+            self._last_hashcmd = None
 
         def add_cb(self, cb):
             """
@@ -376,15 +376,13 @@ class X10Monitor:
                         if '%' in out:
                             arg = out.split()[9].replace('%','')
                     if self._selectedunit and order:
-                        #hashcmd = '%s-%s-%s' % (self._selectedunit,order,arg)
-                        #self._log.debug('hascmd=%s' % hashcmd)
-                        #self._log.debug('lasthascmd=%s' % self._last_hashcmd)
-                        #if (hashcmd != self._last_hashcmd):
-                        self._call_cbs([self._selectedunit], order, arg)
-                        #self._last_hashcmd = hashcmd
-                        unit = None
-                        order = None
-                        arg = None
+                        hashcmd = '%s-%s-%s' % (self._selectedunit,order,arg)
+                        if (hashcmd != self._last_hashcmd):
+                            self._call_cbs([self._selectedunit], order, arg)
+                            self._last_hashcmd = hashcmd
+                            unit = None
+                            order = None
+                            arg = None
             except ValueError:
                 #The pipe is closed
                 self._log.warning("The heyu-monitor pipe is closed. Finish silently.")
