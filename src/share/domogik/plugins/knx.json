@@ -213,7 +213,8 @@
         "src/share/domogik/url2xpl/knx/HVACeco.xml", 
         "src/share/domogik/url2xpl/knx/HVACstop.xml", 
         "src/share/domogik/url2xpl/knx/HVACnormal.xml", 
-        "src/share/domogik/url2xpl/knx/Add.xml"
+        "src/share/domogik/url2xpl/knx/Add.xml",
+        "src/share/domogik/data/knx/knx.txt"
     ], 
     "identity": {
         "author": "Basilic", 
@@ -231,7 +232,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "knx", 
         "type": "plugin", 
-        "version": "0.1a0"
+        "version": "0.1b0"
     }, 
     "json_version": 1, 
     "technology": {

@@ -36,7 +36,9 @@ if ! getent passwd domogik >/dev/null; then
 	  set +e
 	  /bin/cp /etc/skel/* /var/lib/domogik/ >/dev/null 2>&1
 	  /bin/cp /etc/skel/.* /var/lib/domogik/ >/dev/null 2>&1
-	  echo PATH=\"\/usr/sbin:\$PATH\" >> /var/lib/domogik/.profile
+	  echo export PATH=\"/usr/sbin:\$PATH\" >> /var/lib/domogik/.profile
+	  echo export PYTHONPATH=\"/var/lib/domogik/\" >> /var/lib/domogik/.profile
+	  echo export PYTHONPATH=\"/var/lib/domogik/\" >> /var/lib/domogik/.bashrc
 	  set -e
 fi
 

@@ -1,0 +1,31 @@
+#!/bin/sh -e
+
+reload_server() {
+  set +e
+  if [ -x /usr/sbin/invoke-rc.d ]; then
+    invoke-rc.d apache2 reload
+  else
+    /etc/init.d/apache2 reload
+  fi
+  errno=$?
+  set -e
+}
+
+case "$1" in
+  configure)
+        /usr/sbin/a2ensite domogik
+        reload_server
+  ;;
+
+  abort-upgrade|abort-remove|abort-configure)
+  ;;
+
+  *)
+    echo "postinst called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+#DEBHELPER#
+
+exit 0
