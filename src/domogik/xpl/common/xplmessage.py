@@ -111,15 +111,23 @@ REGEXP_SCHEMA = r"""(?P<schema>
                 """
 REGEXP_DATA = r"""(?P<data>(?:.*=.*\n)+)
               """
+#REGEXP_SINGLE_DATA = r"""(?P<data>
+#                         (?P<data_name>[a-z, 0-9, \-]{1,16})
+#                         =
+#                         (?P<data_value>[a-z, A-Z, 0-9, \!, \", \#, \$, \%, \
+#                             \&, ', \(, \), \*, \+, \,, \-, \., \/, :, ;, \<, \>, ?, \=, \
+#                             \{, \}, |\, \~, \\, \[, \], \@, _].*)$  # [32-126] allowed!
+#                         )
+#                     """
+
 REGEXP_SINGLE_DATA = r"""(?P<data>
-                             (?P<data_name>[a-z, 0-9, \-]{1,16})
+                             (?P<data_name>[a-z0-9 ,-]{1,16})
                              =
-#                             (?P<data_value>[a-z, A-Z, 0-9, \-, \., \/, _].*)$  # [32-126] allowed!
-                             (?P<data_value>[a-z, A-Z, 0-9, \!, \", \#, \$, \%, \
-                                     \&, ', \(, \), \*, \+, \,, \-, \., \/, :, ;, \<, \>, ?, \=, \
-                                     \{, \}, |\, \~, \\, \[, \], \@, _].*)$  # [32-126] allowed!
+                             (?P<data_value>[%s].*)$
                          )
-                     """
+                     """ % re.escape(''.join(chr(x) for x in xrange(32, 256)))
+
+
 REGEXP_GLOBAL = r"""(?P<type_>.*)\n
                     \{\n
                     hop=(?P<hop_count>.*)\n
