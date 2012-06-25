@@ -1986,14 +1986,14 @@ class DbHelper():
         my_db = DbHelper()
         
         last_values = my_db.list_last_n_stats_of_device(device_id,key,ds_number=2)
-        if len(last_values)>=2:
+        if last_values and len(last_values)>=2:
             val0 = last_values[0].value
             val1 = last_values[1].value
             
-        if val0 == val1 and val0 == value:
-            return last_values[1].id
-        else:
-            return None
+            if val0 == val1 and val0 == value:
+                return last_values[1].id
+        
+        return None
 
 
     def add_device_stat(self, ds_timestamp, ds_key, ds_value, ds_device_id, hist_size=0):
@@ -2046,6 +2046,8 @@ class DbHelper():
                 self.__session.commit()
             except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            self.log.debug("BRUNO added_device_stat" % ())
+
         return device_stat
 
     def del_device_stats(self, ds_device_id, ds_key=None):
