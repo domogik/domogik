@@ -158,6 +158,10 @@ check_python
 copy_sample_files
 create_log_dir
 
+# install netifaces and twisted
+pip install twisted
+pip install netifaces
+
 
 echo "Everything seems to be good, the python xPL hub should be installed correctly."
 trap - EXIT
