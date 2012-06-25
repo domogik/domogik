@@ -31,91 +31,153 @@ Karotz support. www.karotz.com
 
 import hmac
 import urllib
+import urllib2
 import time
 import random
 import hashlib
 import base64
 import re
 import time
+from xml.dom.minidom import parse, parseString
+from threading import *
 
 APIKEY= '98df6205-9cd3-4579-883b-51c7b6095e95'
 SECRET= '8666cd42-e664-49ab-b789-7cc24c754253'
-#INSTALLID = 'c3c29ee3-ced6-48d3-b18b-77cc43caba72'
+APIKAROTZ = 'http://api.karotz.com/api/karotz/'
 
-# sign parameters in alphabetical order
-def sign(parameters, signature):
-    keys = parameters.keys()
-    keys.sort()
-    sortedParameters = [(key, parameters[key]) for key in keys]
-    query = urllib.urlencode(sortedParameters)
-    digest_maker = hmac.new(signature, query, hashlib.sha1)
-    signValue = base64.b64encode(digest_maker.digest())
-    query = query + "&signature=" + urllib.quote(signValue)
-    return query
 
 class Karotz:
     def __init__(self,log,instid):
         self.INSTALLID=instid
         self._log = log
+        self._log.debug("Karotz lib init installid: %s" % instid )
+        self.interactiveId = ""
+        self.stopInteractiveTimer = None
+
+        self.keepInteractiveDelay = 10
+    
+    def restApiCall(self,cmd):
+        url = APIKAROTZ + cmd
         
+        self._log.debug(">> HTTP %s" % url)
+        
+        try: 
+            req = urllib2.urlopen(url)
+            
+        except urllib2.URLError, e:
+            if hasattr(e, 'reason'):
+                self._log.error("Exception URLError, reason: "+  e.reason)
+            elif hasattr(e, 'code'):
+                self._log.error("Exception URLError, code: %d " % e.code)
+            else:
+                self._log.error("Exception URLError")
+            return ""
+        except urllib2.HTTPError, err:
+            self._log.error("Http Error, errCode %d" %  err.code)
+            return ""
+        except:
+            self._log.error("Http OtherError")
+            return ""
+        else:
+            response = req.read()
+            self._log.debug("<< HTTP %s" % response)    
+            return response
+    
+    # sign parameters in alphabetical order
+    def sign(self,parameters, signature):
+        keys = parameters.keys()
+        keys.sort()
+        sortedParameters = [(key, parameters[key]) for key in keys]
+        query = urllib.urlencode(sortedParameters)
+        digest_maker = hmac.new(signature, query, hashlib.sha1)
+        signValue = base64.b64encode(digest_maker.digest())
+        query = query + "&signature=" + urllib.quote(signValue)
+        return query
+
+    # parse interactiveId from XmlResult
+    def getInteractiveId(self,xmlString):
+        try:
+            doc = parseString(xmlString)
+            return doc.getElementsByTagName("VoosMsg")[0].getElementsByTagName("interactiveMode")[0].getElementsByTagName("interactiveId")[0].firstChild.nodeValue
+        except Exception as e:
+             self._log.error("unable to parse interactiveId")
+             return ""
+
+    #parse response code: OK or KO
+    def getResponseCode(self,xmlString):
+        try:
+            doc = parseString(xmlString)
+            return doc.getElementsByTagName("VoosMsg")[0].getElementsByTagName("response")[0].getElementsByTagName("code")[0].firstChild.nodeValue
+        except Exception as e:
+             self._log.error("unable to parse response code")
+             return ""
+        
+    # start interactive         
     def start(self):
+
+        if (not self.interactiveId == ""):
+            self._log.debug("start skip, already interactiveid=%s",self.interactiveId)
+            return True            
+        
         self.parameters = {}
         self.parameters['installid'] = self.INSTALLID
         self.parameters['apikey'] = APIKEY
         self.parameters['once'] = "%d" % random.randint(100000000, 99999999999)
         self.parameters['timestamp'] = "%d" % time.time()
+        self.interactiveId = ""
 
-        self.query = sign(self.parameters, SECRET)
-        #print query
 
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/start?%s" % self.query)
-        token = f.read() # should return an hex string if auth is ok, error 500 if not
-        #print token
-
-        data=re.findall(r'<(.*?)>(.*?)</.*?>', token)
-
-        for elmt in data:
-            if elmt[0]=='interactiveId':
-               self.intid=elmt[1]   
-               self._log.debug("interactiveid=%s",self.intid)     
+        self.query = self.sign(self.parameters, SECRET)
         
+        xmlResponse = self.restApiCall("start?%s" % self.query)
+        
+        interactiveId = self.getInteractiveId(xmlResponse)
+        if interactiveId == '':
+            self._log.error("start failed, unable to retrieve interactiveid")
+            return False
+     
+        self.interactiveId=interactiveId
+        self._log.debug("start succeeded, interactiveid=%s",self.interactiveId)
+        return True
+
+    def stopInteraction(self):
+        xmlResponse = self.restApiCall("interactivemode?action=stop&interactiveid=%s" % self.interactiveId)
+        self._log.debug("RESPONSE CODE : %s " % self.getResponseCode(xmlResponse) )
+        self.interactiveId = ""
+        
+
+    # memorize end of interaction (
     def stop(self):
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/interactivemode?action=stop&interactiveid=%s" % self.intid)
-        token = f.read()
-        self._log.debug("Stop interactiveid=%s",self.intid)
-                
+        
+        if (self.interactiveId  == ""):
+            self._log.debug("Stop interactiveMode : ignore (no interactiveId)")
+            return
+        
+        if self.stopInteractiveTimer:
+            self._log.info("Found timer, cancel...")
+            self.stopInteractiveTimer.cancel()
+        self._log.debug("Start timer %d sec... " % self.keepInteractiveDelay)
+        self.stopInteractiveTimer = Timer(self.keepInteractiveDelay , self.stopInteraction )
+        self.stopInteractiveTimer.start()
+                                
     def tts(self,txt,lg):
         
-        self.start()
+        if self.start():
 
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/tts?action=speak&lang=" + lg + "&text=" + txt + "&interactiveid=%s" % self.intid)
-        token = f.read()
+            params = urllib.urlencode({'action': 'speak', 'lang': lg, 'text': txt, 'interactiveid': self.interactiveId})
+            xmlResponse = self.restApiCall("tts?%s" % params)
+            responseCode = self.getResponseCode(xmlResponse)
+            self._log.debug("RESPONSE CODE : %s " % responseCode ) 
+            
+            self.stop()
         
+    def led(self,color,duration):
+        if self.start():
+            self.restApiCall("led?action=light&color=" + color + "&interactiveid=%s" % self.interactiveId)
+            time.sleep(int(duration))
 
-        time.sleep(2)
-
-        self.stop()
    
-        
-    def led(self,color,temps):
-    
-        self.start()
-        
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/led?action=light&color=" + color + "&interactiveid=%s" % self.intid)
-        token = f.read()
-        
-        time.sleep(int(temps))
-        
-        self.stop()
-    
     def ears(self,right,left):
-        
-        self.start()
- 
-        f = urllib.urlopen("http://api.karotz.com/api/karotz/ears?left=" + left + "&right=" + right + "&reset=false&interactiveid=%s" % self.intid)
-        token = f.read()
-        
-        #time.sleep(10)
-        
-        #self.stop()       
+        if self.start():
+           self.restApiCall("ears?left=" + left + "&right=" + right + "&reset=false&interactiveid=%s" % self.interactiveId)
             

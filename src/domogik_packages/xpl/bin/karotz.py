@@ -42,9 +42,10 @@ from domogik_packages.xpl.lib.karotz import Karotz
 import traceback
 
 
+
 class KarotzMain(XplPlugin):
     '''Manage ZiBase
-    '''	
+    '''    
     def __init__(self):
         """ Create lister and launch bg listening
         """
@@ -59,23 +60,25 @@ class KarotzMain(XplPlugin):
         self.instid = self._config.query('karotz', 'installid')
         self.lang = self._config.query('karotz', 'language')
         
-        self.log.info("Creating listener for Karotz")
-        Listener(self.karotz_command, self.myxpl, {'schema': 'karotz.basic',
-                'xpltype': 'xpl-cmnd'})
-        
-        
         try:
-            self.kar=Karotz(self.log,self.instid)
+            self.log.info("Starting library")
+            self.karotz=Karotz(self.log,self.instid)
+            self.log.info("Started")
         except:
             self.log.error("Error to create Karotz object=%s" % (traceback.format_exc()))
             return
+
+                
+        self.log.info("Creating listener for Karotz")
+        Listener(self.xpl_command, self.myxpl, {'schema': 'karotz.basic', 'xpltype': 'xpl-cmnd'})
+        
 
         #self.add_stop_cb(self.stop)
         self.enable_hbeat()
 
         self.log.info("Plugin ready :)")
         
-    def karotz_command(self, message):
+    def xpl_command(self, message):
         """ Call karotz lib function in function of given xpl message
             @param message : xpl message
         """
@@ -86,7 +89,7 @@ class KarotzMain(XplPlugin):
         if 'command' in message.data:
             cmd = message.data['command']
         if 'device' in message.data:
-            dev = message.data['device']
+            device = message.data['device']
         if 'value' in message.data:
             value=message.data['value']
         if 'time' in message.data:
@@ -102,17 +105,19 @@ class KarotzMain(XplPlugin):
             self.log.warning("value not specified")
             return
         else:
-            self.log.debug("%s received : device = %s value=%s " % (cmd, dev, value))
+            #self.log.debug("xpl %s received : device = %s value=%s " % (cmd, device, value))
+            self.log.debug("xpl %s received " % (cmd) )    
+
             try:
                 if cmd=='tts':
-                    self.log.debug("command=%s language=%s" % (cmd, self.lang))
-                    self.kar.tts(value,self.lang.upper())
+                    self.log.debug("xpl command=%s language=%s" % (cmd, self.lang))
+                    self.karotz.tts(value,self.lang.upper())
                 if cmd=='led':
-                    self.log.debug("command=%s color=%s time=%s" % (cmd, value,tps))
-                    self.kar.led(value,tps)
+                    self.log.debug("xpl command=%s color=%s time=%s" % (cmd, value,tps))
+                    self.karotz.led(value,tps)
                 if cmd=='ears':
-                    self.log.debug("command=%s right=%s left=%s" % (cmd, right, left))
-                    self.kar.ears(right,left)
+                    self.log.debug("xpl command=%s right=%s left=%s" % (cmd, right, left))
+                    self.karotz.ears(right,left)
             except:
                 self.log.error("Error to send command=%s" % (traceback.format_exc()))
   
