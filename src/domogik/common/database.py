@@ -1991,14 +1991,14 @@ class DbHelper():
         last_values = my_db.list_last_n_stats_of_device(device_id,key,ds_number=2)
         if last_values and len(last_values)>=2:
             # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
-            self.log.debug("##################### CHEKC %s(%s)" % (last_values[1].device.id,key))
-            self.log.debug("##################### CHECK DEVICE %s in %s = %s" % (last_values[1].device.id,db_round_filter,str(last_values[1].device.id) in db_round_filter))
-            self.log.debug("##################### CHEKC FEATURES %s in %s = %s" % (key,db_round_filter[last_values[1].device.id],key in db_round_filter[last_values[1].device.id]))
-            if last_values[1].device.id in db_round_filter and key in db_round_filter[last_values[1].device.id]:
-                self.log.debug("OPTION EXIST")
-                rvalue = int(float(value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
-                val0 = int(float(last_values[0].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
-                val1 = int(float(last_values[1].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+            # Ex: db_round_filter = {"12" : { "total_space" : 1000, "free_space" : 1000, "percent_used" : 0.5, "used_space": 1000 } }
+            if str(last_values[1].device.id) in db_round_filter: 
+                self.log.debug("DEVICE EXIST")
+                if key in db_round_filter[str(last_values[1].device.id)]:
+                    self.log.debug("FEATURE EXIST")
+                    rvalue = int(float(value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+                    val0 = int(float(last_values[0].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+                    val1 = int(float(last_values[1].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
             else:
                 rvalue = value
                 val0 = last_values[0].value
