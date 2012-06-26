@@ -41,6 +41,7 @@ Implements
 import datetime, hashlib, time
 from types import DictType
 
+import json
 import sqlalchemy
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker,scoped_session
@@ -1985,12 +1986,26 @@ class DbHelper():
     def _get_duplicated_devicestats_id(self,device_id,key,value):
         my_db = DbHelper()
         
+        db_round = self.__db_config['db_round_filter']
+        db_round_filter = json.loads(db_round)
         last_values = my_db.list_last_n_stats_of_device(device_id,key,ds_number=2)
         if last_values and len(last_values)>=2:
-            val0 = last_values[0].value
-            val1 = last_values[1].value
+            # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
+            self.log.debug("##################### CHEKC %s(%s)" % (last_values[1].device.id,key))
+            self.log.debug("##################### CHECK DEVICE %s in %s = %s" % (last_values[1].device.id,db_round_filter,str(last_values[1].device.id) in db_round_filter))
+            self.log.debug("##################### CHEKC FEATURES %s in %s = %s" % (key,db_round_filter[last_values[1].device.id],key in db_round_filter[last_values[1].device.id]))
+            if last_values[1].device.id in db_round_filter and key in db_round_filter[last_values[1].device.id]:
+                self.log.debug("OPTION EXIST")
+                rvalue = int(float(value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+                val0 = int(float(last_values[0].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+                val1 = int(float(last_values[1].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+            else:
+                rvalue = value
+                val0 = last_values[0].value
+                val1 = last_values[1].value
             
-            if val0 == val1 and val0 == value:
+            if val0 == val1 and val0 == rvalue:
+                self.log.debug("##################### REMOVE %s for %s(%s)" % (last_values[1].id,last_values[1].device.id,key))
                 return last_values[1].id
         
         return None
@@ -2046,7 +2061,6 @@ class DbHelper():
                 self.__session.commit()
             except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            self.log.debug("BRUNO added_device_stat" % ())
 
         return device_stat
 
