@@ -180,14 +180,14 @@ class DbHelper():
 ####
 # Pages
 ####
-    def list_pages(self):
-        """Return all areas
-
-        @return a list of Area objects
-
-        """
-        ret = self.__session.query(Page).all()
-        return ret
+    #def list_pages(self):
+    #    """Return all areas
+    #
+    #    @return a list of Area objects
+    #
+    #   """
+    #    ret = self.__session.query(Page).all()
+    #    return ret
 
     def add_page(self, name, parentId, descr=None, icon=None):
         """Add a page
@@ -256,6 +256,8 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         p = self.__session.query(Page).filter_by(id=id).first()
+        if id == 1:
+            self.__raise_dbhelper_exception("Can not delete page %s, this is the root page" % p, True)
         if p:
             # chek if there are no children
             if p.left + 1 != p.right:
@@ -272,6 +274,26 @@ class DbHelper():
                 return p
         else:
             self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % id)
+
+    def view_page(self, id):
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        return p 
+
+    def tree_page(self, id):
+        self.__session.expire_all()
+        if id==0:
+            ret = self.__session.query(Page).all()
+        else:
+            p = self.__session.query(Page).filter_by(id=id).first()
+            ret = self.__session.query(Page).between(Page.Left, p.left, p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        return ret 
+
+    def path_page(self, id):
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        ret = self.__session.query(Page).filter(Page.left < p.left).filter(Page.right > p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        return ret 
 
 ####
 # Areas

@@ -1213,7 +1213,7 @@ target=*
             ### list
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
-                    self._rest_base_page_list()
+                    self._rest_base_page_tree(0)
                 elif len(self.rest_request) == 3:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1240,6 +1240,24 @@ target=*
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
                     self._rest_base_page_del(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "tree":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_tree(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "path":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_path(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "view":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_view(page_id=self.rest_request[2])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1787,7 +1805,7 @@ target=*
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_page_update(self):
-        """ update areas
+        """ update a page
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1799,6 +1817,46 @@ target=*
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
+    
+    def _rest_base_page_path(self, page_id=None):
+        """ find the path to a page
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        try:
+            for p in self._db.path_page(page_id):
+	        json_data.add_data(p)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_page_view(self, page_id=None):
+        """ find the path to a page
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        try:
+            page = self._db.view_page(page_id)
+	    json_data.add_data(page)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_page_tree(self, page_id):
+        """ find the path to a page
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("page")
+        try:
+            for p in self._db.tree_page(page_id):
+	        json_data.add_data(p)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
 
 ######
 # /base/area processing
