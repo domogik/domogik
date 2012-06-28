@@ -1991,7 +1991,7 @@ class DbHelper():
         last_values = my_db.list_last_n_stats_of_device(device_id,key,ds_number=2)
         if last_values and len(last_values)>=2:
             # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
-            # Ex: db_round_filter = {"12" : { "total_space" : 1000, "free_space" : 1000, "percent_used" : 0.5, "used_space": 1000 } }
+            # Ex: db_round_filter = {"12" : { "total_space" : 1048576, "free_space" : 1048576, "percent_used" : 0.5, "used_space": 1048576 },"13" : { "hchp" : 500, "hchc" : 500, "papp" : 200 }}
             self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value,last_values[0].value,last_values[1].value,id))
             if str(last_values[1].device.id) in db_round_filter and key in db_round_filter[str(last_values[1].device.id)]:
                     round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
