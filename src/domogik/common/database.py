@@ -1992,13 +1992,14 @@ class DbHelper():
         if last_values and len(last_values)>=2:
             # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
             # Ex: db_round_filter = {"12" : { "total_space" : 1000, "free_space" : 1000, "percent_used" : 0.5, "used_space": 1000 } }
-            if str(last_values[1].device.id) in db_round_filter: 
-                self.log.debug("DEVICE EXIST")
-                if key in db_round_filter[str(last_values[1].device.id)]:
-                    self.log.debug("FEATURE EXIST")
-                    rvalue = int(float(value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
-                    val0 = int(float(last_values[0].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
-                    val1 = int(float(last_values[1].value) / db_round_filter[last_values[1].device.device_type_id]) * db_round_filter[last_values[1].device.device_type_id]
+            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value,last_values[0].value,last_values[1].value,id))
+            if str(last_values[1].device.id) in db_round_filter and key in db_round_filter[str(last_values[1].device.id)]:
+                    round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
+                    rvalue = int(float(value) / round_value) * round_value
+                    val0 = int(float(last_values[0].value) / round_value) * round_value
+                    val1 = int(float(last_values[1].value) / round_value) * round_value
+                    self.log.debug("rvalue=%s" % rvalue)
+                    self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue,value,val0,val1))
             else:
                 rvalue = value
                 val0 = last_values[0].value
