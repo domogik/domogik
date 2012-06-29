@@ -237,7 +237,7 @@ class DbHelper():
         if descr is not None:
             if descr == '': descr = None
             p.descr = ucode(descr)
-        self.__session.add(area)
+        self.__session.add(p)
         #if parent != 0:
             # TODO UPDATE lft and rgt
         try:
@@ -246,7 +246,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return p
 
-    def del_page(self, id):
+    def del_page(self, pid):
         """Delete a page record
 
         @param area_id : id of the page to delete
@@ -255,25 +255,27 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        p = self.__session.query(Page).filter_by(id=id).first()
-        if id == 1:
-            self.__raise_dbhelper_exception("Can not delete page %s, this is the root page" % p, True)
-        if p:
-            # chek if there are no children
-            if p.left + 1 != p.right:
-                self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
-            else:
-                dl = p.right - p.left + 1
-		self.__session.query(Page).filter(Page.right > p.right).update({Page.right: Page.right - dl})
-		self.__session.query(Page).filter(Page.left > p.right).update({Page.left: Page.left - dl})
-                self.__session.delete(p)
-                try:
-                    self.__session.commit()
-                except Exception, sql_exception:
-                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-                return p
+        print pid
+        if pid == '1':
+            self.__raise_dbhelper_exception("Can not delete the root page", True)
         else:
-            self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % id)
+            p = self.__session.query(Page).filter_by(id=pid).first()
+            if p:
+            # chek if there are no children
+                if p.left + 1 != p.right:
+                    self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
+                else:
+                    dl = p.right - p.left + 1
+		    self.__session.query(Page).filter(Page.right > p.right).update({Page.right: Page.right - dl})
+		    self.__session.query(Page).filter(Page.left > p.right).update({Page.left: Page.left - dl})
+                    self.__session.delete(p)
+                    try:
+                        self.__session.commit()
+                    except Exception, sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                    return p
+            else:
+                self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % pid)
 
     def view_page(self, id):
         self.__session.expire_all()
@@ -283,10 +285,10 @@ class DbHelper():
     def tree_page(self, id):
         self.__session.expire_all()
         if id==0:
-            ret = self.__session.query(Page).all()
+            ret = self.__session.query(Page).order_by(sqlalchemy.asc(Page.left)).all()
         else:
             p = self.__session.query(Page).filter_by(id=id).first()
-            ret = self.__session.query(Page).between(Page.Left, p.left, p.right).order_by(sqlalchemy.asc(Page.left)).all()
+            ret = self.__session.query(Page).filter(Page.left > p.left).filter(Page.left < p.right).order_by(sqlalchemy.asc(Page.left)).all()
         return ret 
 
     def path_page(self, id):
