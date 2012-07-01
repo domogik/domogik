@@ -1988,11 +1988,10 @@ class DbHelper():
         
         db_round_filter = None
         self.log.debug("before read config")
-        try:
+
+        if self.__db_config.has_key('db_round_filter'):
             db_round = self.__db_config['db_round_filter']
             db_round_filter = json.loads(db_round)
-        except:
-            pass
         
         self.log.debug("after read")
         last_values = my_db.list_last_n_stats_of_device(device_id,key,ds_number=2)
