@@ -294,7 +294,7 @@ class DbHelper():
     def path_page(self, id):
         self.__session.expire_all()
         p = self.__session.query(Page).filter_by(id=id).first()
-        ret = self.__session.query(Page).filter(Page.left <= p.left).filter(Page.right >= p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        ret = self.__session.query(Page).filter(Page.left <= p.left).filter(Page.right >= p.right).order_by(sqlalchemy.desc(Page.left)).all()
         return ret 
 
 ####
