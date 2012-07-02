@@ -130,7 +130,7 @@ class DbHelper():
             if engine != None:
                 DbHelper.__engine = engine
             else:
-                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8')
+                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', pool_recycle=7200)
         if DbHelper.__session_object == None:
             DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
         self.__session = DbHelper.__session_object()
