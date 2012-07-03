@@ -271,7 +271,9 @@ class ProcessRequest():
         """ Process request
             This function call appropriate functions for processing path
         """
-        if self.rest_type == "command":
+        if self.rest_type == "robots.txt":
+            self.rest_robots_txt()
+        elif self.rest_type == "command":
             self.rest_command()
         elif self.rest_type == "stats":
             self.rest_stats()
@@ -549,6 +551,15 @@ class ProcessRequest():
         global_version = sys.modules["domogik"].__version__
         return global_version
 
+
+######
+# /robots.txt processing
+######
+
+    def rest_robots_txt(self):
+        """ Tell crawlers to go away
+        """
+        self.send_http_response_ok("# go away\nUser-agent: *\nDisallow: /\n")
 
 ######
 # /command processing
