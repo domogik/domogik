@@ -33,7 +33,7 @@ Implements
 @organization: Domogik
 """
 
-from sqlalchemy import Table, MetaData, String, Column, Index
+from sqlalchemy import Table, MetaData, Index
 from domogik.common.sql_schema import DeviceStats
 
 def upgrade(migrate_engine):
