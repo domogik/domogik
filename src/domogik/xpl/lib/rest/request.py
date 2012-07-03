@@ -1811,8 +1811,9 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("page")
         try:
-            area = self._db.update_page(self.get_parameters("id"), self.get_parameters("name"), \
-                                        self.get_parameters("description"), self.get_parameters("icon"), self.get_parameters("parent") )
+            area = self._db.update_page(id=self.get_parameters("id"), name=self.get_parameters("name"), \
+                                        descr=self.get_parameters("description"), icon=self.get_parameters("icon"), \
+                                        parent=self.get_parameters("parent") )
             json_data.add_data(area)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
