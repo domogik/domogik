@@ -54,6 +54,7 @@ function generate_pkg() {
     -X src/tools/drm/ \
     -X src/tools/drm-yii/ \
     -X src/tools/ipx800/ \
+    -X docs/ \
     -t tgz $ARCHIVE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
