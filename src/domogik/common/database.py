@@ -235,8 +235,8 @@ class DbHelper():
         if icon is not None:
             p.icon = ucode(icon)
         if descr is not None:
-            if descr == '': descr = None
-            p.descr = ucode(descr)
+            if descr == '': description = None
+            p.description = ucode(descr)
         self.__session.add(p)
         #if parent != 0:
             # TODO UPDATE lft and rgt
