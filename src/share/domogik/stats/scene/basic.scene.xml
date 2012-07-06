@@ -7,7 +7,9 @@
             </listener>
             <mapping>
                 <device field="scene"/>
-                <value field="running"/>
+                <value field="command"/>
+                <value field="runing"/>
+                <value field="data"/>
                 <value field="stats"/>
             </mapping>
         </xpltype>

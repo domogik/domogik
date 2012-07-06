@@ -16,11 +16,9 @@ import threading
 class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
    """
+   sceneC = 0
    def __init__(self):
       XplPlugin.__init__(self, name = 'scene')
-       # Configuration
-#      self._config = Query(self.myxpl, self.log)
- #     print self._config
       ### Create Mini_Scene object
       try:
           self.scene = Scene(self.log, self.send_xpl)
@@ -59,15 +57,101 @@ class SceneManager(XplPlugin):
    def scene_cmd(self, message):
       """ routine lorsque le plugin recoit un message xpl
       """
-      print "scene_cmd"       
+      if message.data['command']=="Create" and message.data['scene'] =='0':
+         self.sceneC = self.sceneC + 1
+         device1_id = ''
+         device1_adr = ''
+         device1_tech = ''
+         device1_key = ''
+         device1_op = ''
+         device1_value = ''
+         device2_id = ''
+         device2_adr = ''
+         device2_tech = ''
+         device2_key = ''
+         device2_op = ''
+         device2_value = ''
+         op_global = ''
+         action_true_techno = ''
+         action_true_adr = ''
+         action_true_value = ''
+         action_true_cmd = ''
+         action_false_techno = ''
+         action_false_adr = ''
+         action_false_value = ''
+         action_false_cmd = ''
+         filter_device1 = ''
+         filter_device2 = ''
+
+         rinor=message.data['rinor']
+
+         if 'device1id' in message.data:
+            device1_adr = message.data['device1adr']
+            device1_id = message.data['device1id']
+            device1_key = message.data['device1key']
+            device1_tech=message.data['device1tech']
+            device1_key=message.data['device1key']
+            if 'device1op' in message.data:
+               device1_op=message.data['device1op']
+               device1_value=message.data['device1val']
+
+         if 'device2id' in message.data:
+            device2_adr = message.data['device2adr']
+            device2_id = message.data['device2id']
+            device2_key = message.data['device2key']
+            device2_tech=message.data['device2tech']
+            device2_key=message.data['device2key']
+            if 'device2op' in message.data:
+               device2_op=message.data['device2op']
+               device2_value=message.data['device2val']
+
+         if 'opglobal' in message.data:
+            op_global = message.data['opglobal']
+
+         condition={'test1':device1_op, 'value1':device1_value,'test2':device2_op,'value2':device2_value,'test_global':op_global}
+
+         if 'actiontrueadr' in message.data:
+            action_true_techno = message.data['actiontruetech']
+            action_true_adr = message.data['actiontrueadr']
+            action_true_value = message.data['actiontrueval']
+            if 'actiontruecmd' in message.data:
+                action_true_cmd = message.data['actiontruecmd']
+
+         action_true={'techno':action_true_techno,'address':action_true_adr, 'command':action_true_cmd,'value':action_true_value}
+
+         if 'actionfalseadr' in message.data:
+            action_false_techno = message.data['actionfalsetech']
+            action_false_adr = message.data['actionfalseadr']
+            action_false_value = message.data['actionfalseval']
+            if 'actionfalsecmd' in message.data:
+                action_false_cmd = message.data['actionfalsecmd']
+
+         action_false={'techno':action_false_techno,'address':action_false_adr, 'command':action_false_cmd,'value':action_false_value}
+         
+         if device1_tech != '' and device1_key !='':
+            filter_device1 = self.search_filter(device1_tech, device1_key)
+         if device2_tech != '' and device2_key != '':
+            filter_device2 = self.search_filter(device2_tech, device2_key)
+         device1 = {'address':device1_adr,'id':device1_id, 'key_stat':device1_key,'listener':filter_device1}
+         device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
+
+         Mini_scene = Mscene(self.sceneC,device1,device2,condition,action_true,action_false, rinor)
+         Mini_scene.start()
+
+         print "création d'une scene"
+
+      elif message.data['command']=="Start":
+         print 'Start scene'
+      elif message.data['command']=='Stop':
+         print 'Stop scene'
 
    def send_xpl(self,data):
        """boucle d'envoie d'une message xpl
        """
        print "send_xpl"
 
-   def search_filter(self, techno, device_adr, key_stat):
-
+   def search_filter(self, techno, key_stat):
+      device_list=[]
       filetoopen= self.get_stats_files_directory()
       filetoopen= filetoopen[:filetoopen.find('stats')+6]
       files = glob.glob("%s/*/*xml" % filetoopen)
@@ -80,19 +164,23 @@ class SceneManager(XplPlugin):
             schema_types = self.get_schemas_and_types(doc.documentElement)
             if technology not in res:
                res[technology] = {}
-            device_list=[]
             for schema in schema_types:
                if schema not in res[technology]:
                   res[technology][schema] = {}
-               for xpl_type in schema_types[schema]:
-                   if xpl_type == "xpl-trig" and technology == techno:
-                      device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
-                      if len(filter(str(device),device_list)) == 0:
-                         print "test reussi"
-                         device_list.append(str(device))
+                  for xpl_type in schema_types[schema]:
+                     if xpl_type == "xpl-trig" and technology == techno:
+                        device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                        for i in range(len(mapping)):
+                           if mapping[i]['name']==key_stat and schema not in device_list:
+                              test ={}
+                              test["schema"]="%s" %(schema)
+                              test["device"]="%s" %(device)
+                              device_list.append(test)
+      return device_list
 
-                   print str(device_list)
-  def get_schemas_and_types(self, node):
+
+
+   def get_schemas_and_types(self, node):
       """ Get the schema and the xpl message type
       @param node : the root (statistic) node
       @return {'schema1': ['type1','type2'], 'schema2', ['type1','type3']}
@@ -109,7 +197,7 @@ class SceneManager(XplPlugin):
                   res[schema.attributes.get("name").value][xpltype.attributes.get("type").value] = xpltype
       return res
 
-  def parse_mapping(self, node):
+   def parse_mapping(self, node):
       """ Parse the "mapping" node
       """
 
@@ -151,83 +239,6 @@ class SceneManager(XplPlugin):
               data["filter_value"] = None
           values.append(data)
       return device, values, static_device, device_type
-
-
-
-   def create_scene(num_script, rest_server, id_device1, key_stat1, test1, value1, id_device2, key_stat2, test2, value2,technologie1, adress_1,value_out1,technologie2,adress_2, value_out2, test_type, temp_wait):
-
-      filetoopen = "mini_scene%s.py" %num_script
-      fichier = open(filetoopen,"a")
-
-      fichier.write("#!/usr/bin/python  \n \n")
-
-      fichier.write("import urllib2  \n")
-
-      fichier.write("import time  \n \n")
-
-      fichier.write("while True:  \n")
-   
-      url = "   the_url = 'http://%s/stats/%s/%s/latest' \n" %(rest_server, id_device1, key_stat1)
-      fichier.write(url)
-      fichier.write("   req = urllib2.Request(the_url)  \n")
-      fichier.write("   handle = urllib2.urlopen(req)  \n")
-      fichier.write("   resp1 = handle.read()  \n")
-      fichier.write("   resp1 = resp1[resp1.find('value')+10:]  \n")
-      fichier.write("   resp1 = resp1[:resp1.find(',')-1]  \n")
-      if test1 != "==" and test1 != "":
-         fichier.write("   resp1 = float(resp1)\n")
-
-      if id_device2<>"":
-         url = "   the_url = 'http://%s/stats/%s/%s/latest' \n" %(rest_server, id_device2, key_stat2)
-         fichier.write(url)
-         fichier.write("   req = urllib2.Request(the_url)  \n")
-         fichier.write("   handle = urllib2.urlopen(req)  \n")
-         fichier.write("   resp2 = handle.read()  \n")
-         fichier.write("   resp2 = resp2[resp2.find('value')+10:]  \n")
-         fichier.write("   resp2 = resp2[:resp2.find(',')-1]  \n")
-         if test2 != "==" and test2 != "":
-            fichier.write("   resp2 = float(resp2)\n")
-
-         if test_type != "and" and test_type != "or":
-            fichier.write("   resp1 = float(resp1)\n")
-            fichier.write("   resp2 = float(resp2)\n")
-
-
-      condition = "   if resp1 %s%s: \n" %(test1, value1)
-      if id_device2 != "" and test_type != "":
-         condition = '   if resp1 %s%s %s resp2 %s%s : \n' %(test1, value1,test_type,test2,value2)
-
-      fichier.write(condition)
-
-      if technologie1 != "":
-         si_vrai="      the_url = 'http://%s/command/%s/%s/%s' \n" %(rest_server, technologie1, adress_1, value_out1)
-         si_vrai=si_vrai.replace('"','')
-         fichier.write(si_vrai)
-         fichier.write("      req = urllib2.Request(the_url)  \n")
-         fichier.write("      handle = urllib2.urlopen(req)  \n")
-         fichier.write("      cmd1 = handle.read()  \n")
-
-      if technologie2 != "":
-         fichier.write("   else:\n")
-         si_vrai="      the_url = 'http://%s/command/%s/%s/%s' \n" %(rest_server, technologie2, adress_2, value_out2)
-         si_vrai=si_vrai.replace('"','')
-         fichier.write(si_vrai)
-         fichier.write("      req = urllib2.Request(the_url)  \n")
-         fichier.write("      handle = urllib2.urlopen(req)  \n")
-         fichier.write("      cmd1 = handle.read()  \n")
-   
-      tempo = "   time.sleep(%s)" %temp_wait
-      fichier.write(tempo)
-      fichier.close
-      command = "chmod +x mini_scene%s.py" %num_script
-      subp2 = subprocess.Popen(command, shell = True)
-      command = "python mini_scene%s.py" %num_script
-      subp2 = subprocess.Popen(command, shell = True)
-      print "Mini Scene Lancer"
-
-   def start_scene(num_script):
-      command = "python mini_scene%s.py" %num_script
-      subp2 = subprocess.Popen(command, shell = True)
 
 if __name__ == "__main__":
 
