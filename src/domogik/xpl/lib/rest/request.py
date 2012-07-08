@@ -83,12 +83,58 @@ class ProcessRequest():
 
     urls = {
         '^//$':                                                                                   'rest_status',
+	# /account
+        '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
+        '^/account/user/list$':						                         '_rest_account_user_list',
+        '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		                 '_rest_account_user_list',
+        '^/account/user/add/.*$':						                 '_rest_account_user_add',
+        '^/account/user/update/.*$':				                                 '_rest_account_user_update',
+        '^/account/user/password/.*$':				        	                 '_rest_account_user_password',
+        '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
+        '^/account/person/list$':						                 '_rest_account_person_list',
+        '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
+        '^/account/person/add/.*$':					                         '_rest_account_person_add',
+        '^/account/person/update/.*$':					                         '_rest_account_person_update',
+        '^/account/person/password/.*$':				                         '_rest_account_person_password',
+        '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
+        # /base/area
+        '^/base/area/list$':			                                                 '_rest_base_area_list',
+        '^/base/area/list/by-id/(?P<area_id>[0-9]+)$':	                                         '_rest_base_area_list',
+        '^/base/area/add/.*$':		 	                                                 '_rest_base_area_add',
+        '^/base/area/update/.*$':		                                                 '_rest_base_area_update',
+        '^/base/area/del/(?P<area_id>[0-9]+)$':		                                         '_rest_base_area_del',
+        # /base/device
+        # /base/device_technology
+        # /base/device_type
+        # /base/device_usage
+        # /base/feature
+        # /base/feature_association
+        # /base/page
+        # /base/room
+        # /base/ui-config
+	# /command
+	'^/command.*$':                                                                          'rest_command',
+        # /event
+        '^/events/domogik/new$':						                 '_rest_events_domogik_new',
+        '^/events/domogik/get/(?P<ticketid>[0-9]+)$':					         '_rest_events_domogik_get',
+        '^/events/domogik/free/(?P<ticket_id>[0-9]+)$':			                         '_rest_events_domogik_free',
+        #'^/events/request/new/.*$':					                         'needs a new function',
+        '^/events/request/get/(?P<ticket_id>[0-9]+)$':				                 '_rest_events_request_get',
+        '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                         '_rest_events_request_free',
+        # /plugin
         '^/plugin/list$':                                                                        '_rest_plugin_list',
         '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
         '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
         '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
         '^/plugin/(?P<command>enable|disable)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':             '_rest_plugin_enable_disable',
-    }
+        '^/plugin/(?P<command>start|stop)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':                 '_rest_plugin_start_stop',
+        '^/plugin/config/list/by-name/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                         '_rest_plugin_config_list',
+        '^/plugin/config/list/by-name/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$': '_rest_plugin_config_list',
+        '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                             '_rest_plugin_config_del',
+        '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
+	'^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
+        # /stats
+   }
 
 
 ######
@@ -289,10 +335,10 @@ class ProcessRequest():
                 self.log.debug("New url parser" )
                 self.log.debug( k )
                 self.log.debug( m.groupdict() )
-		if len( m.groupdict() ) == 0:
+                if len( m.groupdict() ) == 0:
                     eval('self.' + self.urls[k] + '()')
                 else:
-		    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"='"+k+"'" for (v,k) in m.groupdict().iteritems()]) + ')')
+                    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"='"+k+"'" for (v,k) in m.groupdict().iteritems()]) + ')')
                 break
         if found == 0:
             if self.rest_type == "command":
@@ -1239,7 +1285,7 @@ target=*
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                t_base_area_listelf.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
                                                   self.jsonp, self.jsonp_cb)
                 return
 
@@ -4266,19 +4312,19 @@ target=*
                         if message.data.has_key("dep%s-version" % idx):
                             version = message.data["dep%s-version" % idx]
                         else:
-                            version = "";
+                            version = ""
                         if message.data.has_key("dep%s-cmd-line" % idx):
                             cmd_line = message.data["dep%s-cmd-line" % idx]
                         else:
-                            cmd_line = "";
+                            cmd_line = ""
                         if message.data.has_key("dep%s-candidate" % idx):
                             candidate = message.data["dep%s-candidate" % idx]
                         else:
-                            candidate = "";
+                            candidate = ""
                         if message.data.has_key("dep%s-error" % idx):
                             error = message.data["dep%s-error" % idx]
                         else:
-                            error = "";
+                            error = ""
         
                         data = {
                                    "type" : "python",
@@ -4343,10 +4389,10 @@ target=*
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
-           self.log.debug("Package install : no answer")
-           self.send_http_response_error(999, "No data or timeout on installing package",
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
                                           self.jsonp, self.jsonp_cb)
-           return
+            return
         
         self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
         
@@ -4472,10 +4518,10 @@ target=*
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
-           self.log.debug("Package install : no answer")
-           self.send_http_response_error(999, "No data or timeout on installing package",
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
                                           self.jsonp, self.jsonp_cb)
-           return
+            return
         
         self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
         
