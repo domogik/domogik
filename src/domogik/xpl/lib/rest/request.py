@@ -81,6 +81,16 @@ class ProcessRequest():
     """ Class for processing a request
     """
 
+    urls = {
+        '^//$':                                                                                   'rest_status',
+        '^/plugin/list$':                                                                        '_rest_plugin_list',
+        '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
+        '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
+        '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
+        '^/plugin/(?P<command>enable|disable)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':             '_rest_plugin_enable_disable',
+    }
+
+
 ######
 # init namespace
 ######
@@ -271,41 +281,55 @@ class ProcessRequest():
         """ Process request
             This function call appropriate functions for processing path
         """
-        if self.rest_type == "command":
-            self.rest_command()
-        elif self.rest_type == "stats":
-            self.rest_stats()
-        elif self.rest_type == "events":
-            self.rest_events()
-        # commented for security reasons
-        #elif self.rest_type == "xpl-cmnd":
-        #    self.rest_xpl_cmnd()
-        elif self.rest_type == "base":
-            self.rest_base()
-        elif self.rest_type == "plugin":
-            self.rest_plugin()
-        elif self.rest_type == "account":
-            self.rest_account()
-        elif self.rest_type == "queuecontent":
-            self.rest_queuecontent()
-        elif self.rest_type == "helper":
-            self.rest_helper()
-        elif self.rest_type == "testlongpoll":
-            self.rest_testlongpoll()
-        elif self.rest_type == "repo":
-            self.rest_repo()
-        elif self.rest_type == "scenario":
-            self.rest_scenario()
-        elif self.rest_type == "package":
-            self.rest_package()
-        elif self.rest_type == "log":
-            self.rest_log()
-        elif self.rest_type == "host":
-            self.rest_host()
-        elif self.rest_type == None:
-            self.rest_status()
-        else:
-            self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
+        found = 0
+        for k in self.urls:
+            m = re.match(k, self.path)
+            if m:
+                found = 1
+                self.log.debug("New url parser" )
+                self.log.debug( k )
+                self.log.debug( m.groupdict() )
+		if len( m.groupdict() ) == 0:
+                    eval('self.' + self.urls[k] + '()')
+                else:
+		    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"='"+k+"'" for (v,k) in m.groupdict().iteritems()]) + ')')
+                break
+        if found == 0:
+            if self.rest_type == "command":
+                self.rest_command()
+            elif self.rest_type == "stats":
+                self.rest_stats()
+            elif self.rest_type == "events":
+                self.rest_events()
+            # commented for security reasons
+            #elif self.rest_type == "xpl-cmnd":
+            #    self.rest_xpl_cmnd()
+            elif self.rest_type == "base":
+                self.rest_base()
+            elif self.rest_type == "plugin":
+                self.rest_plugin()
+            elif self.rest_type == "account":
+                self.rest_account()
+            elif self.rest_type == "queuecontent":
+                self.rest_queuecontent()
+            elif self.rest_type == "helper":
+                self.rest_helper()
+            elif self.rest_type == "testlongpoll":
+                self.rest_testlongpoll()
+            elif self.rest_type == "repo":
+                self.rest_repo()
+            elif self.rest_type == "scenario":
+                self.rest_scenario()
+            elif self.rest_type == "package":
+                self.rest_package()
+            elif self.rest_type == "log":
+                self.rest_log()
+            elif self.rest_type == "host":
+                self.rest_host()
+            elif self.rest_type == None:
+                self.rest_status()
+            else:
+                self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
                                           "] is not supported", \
                                           self.jsonp, self.jsonp_cb)
 
