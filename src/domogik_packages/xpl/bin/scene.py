@@ -17,9 +17,13 @@ class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
    """
    sceneC = 0
+   globalscene=[]
    def __init__(self):
       XplPlugin.__init__(self, name = 'scene')
       ### Create Mini_Scene object
+      print "manager= %s" %self.myxpl
+      self.manager= self.myxpl
+      print self.manager
       try:
           self.scene = Scene(self.log, self.send_xpl)
           self.log.info("Start Scene")
@@ -51,6 +55,12 @@ class SceneManager(XplPlugin):
       self.log.info("Creating listener for KNX")
       Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
       self.enable_hbeat()
+      self.filetoopen=self.get_data_files_directory()
+      self.filetoopen= self.filetoopen+"/scene.txt"
+      mem = self.scene.read_scene(self.filetoopen)
+      for i in range(len(mem)):
+         if mem[i] != '':
+            self.scene_cmd(mem[i])
 
       self.log.info("Plugin ready :)")
 
@@ -58,6 +68,7 @@ class SceneManager(XplPlugin):
       """ routine lorsque le plugin recoit un message xpl
       """
       if message.data['command']=="Create" and message.data['scene'] =='0':
+         self.scene.add_scene(self.filetoopen,str(message))
          self.sceneC = self.sceneC + 1
          device1_id = ''
          device1_adr = ''
@@ -134,8 +145,9 @@ class SceneManager(XplPlugin):
             filter_device2 = self.search_filter(device2_tech, device2_key)
          device1 = {'address':device1_adr,'id':device1_id, 'key_stat':device1_key,'listener':filter_device1}
          device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
-
-         Mini_scene = Mscene(self.sceneC,device1,device2,condition,action_true,action_false, rinor)
+         
+         print 'self.manager=%s' %self.manager
+         Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor)
          Mini_scene.start()
 
          print "création d'une scene"
