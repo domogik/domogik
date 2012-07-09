@@ -1,5 +1,69 @@
-.. _index:
+=======
+Domogik
+=======
+* **Overview:**
+  :doc:`Quick </overview/index>` |
+  :doc:`Detailed </overview/detailed>`
 
-=====================
-Domogik documentation
-=====================
+End User Documentation
+======================
+* :doc:`Domogik requirements </enduser/requirements>`
+* **Installation:**
+  :doc:`Standard Installation </enduser/installation/index>` |
+  :doc:`Configure external access to Domogik </enduser/installation/external>`
+* **Configuration:**
+  :doc:`First Use </enduser/configuration/index>` |
+  :doc:`Create and configure your house </enduser/configuration/house>`
+    
+    * **Plugins:**
+      :doc:`Overview </enduser/configuration/plugins/index>` |
+      :doc:`Installation and configuration </enduser/configuration/plugins/install>` |
+      :doc:`Helpers </enduser/configuration/plugins/helpers>`
+        
+* :doc:`Set up your devices </enduser/configuration/devices>`
+
+* **Management:**
+  :doc:`House management </enduser/administration/house>` |
+  :doc:`Areas management </enduser/administration/area>` |
+  :doc:`Rooms management </enduser/administration/room>` |
+  :doc:`Devices management </enduser/administration/device>` |
+  :doc:`Plugins management </enduser/administration/plugin>` |
+  :doc:`Accounts management </enduser/administration/account>`
+
+Plugins
+=======
+
+Each plugin has its own page with details like functionalities and requirements.
+
+* :doc:`onewire	</plugins/onewire/index>` Use 1 Wire devices
+* :doc:`cidmodem </plugins/cidmodem/index>` Get caller ID with a modem
+* :doc:`ipx800 </plugins/ipx800/index>` Use IPX800 relayboard
+* :doc:`mirror </plugins/mirror/index>` Use of Mirror by Violet
+* :doc:`plcbus </plugins/plcbus/index>` Use Plcbus devices
+* :doc:`teleinfo </plugins/teleinfo/index>` Get electricity consumption information (only French providers)
+* :doc:`wol_ping </plugins/wol_ping/index>` Ping and wake up computers with Wake on Lan
+* :doc:`x10_heyu </plugins/x10_heyu/index>` Use X10 devices with Heyu
+* :doc:`xpl_time </plugins/xpl_time/index>` Send date and time over xPL
+
+Technical Documentation
+=======================
+* :doc:`Actuators </technical/actuator>`
+* :doc:`Sensors </technical/sensor>`
+* :doc:`Device types, features and usages  </technical/device_feature_usage>`
+* **Database:**
+  :doc:`Model </technical/database>`
+* **UI:**
+  :doc:`Model </technical/ui_add_icons>`
+* **RINOR:**
+  :doc:`Overview </technical/rinor/index>` |
+  :doc:`Statistics Manager </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
+  
+    * :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (area, rooms, devices, events, etc)
+    * :doc:`REST /command </technical/rinor/rest_command>`: Send commands to devices
+    * :doc:`REST /events </technical/rinor/rest_events>`: Get events
+    * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
+    * :doc:`REST /account </technical/rinor/rest_account>`: List accounts, login, etc
+    * :doc:`REST /plugin </technical/rinor/rest_plugin>`: Start, stop xPL plugins
+    * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
+    * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
+    * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers

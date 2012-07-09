@@ -1,0 +1,56 @@
+================
+Plugins overview
+================
+
+What is a plugin ?
+==================
+A plugin is a set of software that adds new functionnalities to Domogik.
+A plugin can add functionnalities for a home automation technology (ex: X10, Plcbus, etc) or other stuff (e.g. interaction with a media center).
+A plugin works in background (it is a daemon).
+
+Choosing and installing plugins
+-------------------------------
+Right now in :doc:`Release 0.1.0 </releases/0.1.0>`, there is no way to choose which plugin are installed in Domogik :
+we give you with this version a set of already installed plugins. See :doc:`plugin configuration section </enduser/configuration/plugins/install>` to enable / disable them.
+In future releases we will add the possibility to install plugins manually.
+We are also looking for an easy way to centralize plugins (with repositories like you have in Linux distributions to install third-party softwares. 
+
+Plugin list
+-----------
+All plugins are listed on the `plugins page <http://wiki.domogik.org/Plugins_in_Domogik>`_.
+
+What is a widget
+================
+A widget is a graphic element that allows you to control or get the status of a device feature.
+
+Links between plugins and widgets
+=================================
+.. note::
+    Reading this chapter is not really important to use Domogik.
+    But if you want to understand the link between plugins and widgets, you should read it ;)
+
+A plugin itself provides no graphic item. Graphic items used in the web UI to control functionnalities provided by the plugin are not directly linked to a plugin.
+We call these control **widgets**. Let's see how a widget can be linked to a plugin.
+
+.. figure:: link_plugin_widget.png
+
+    Illustrated example for plugins X10, Plcbus and Ipx800
+
+A widget is linked to a **feature type** (binary, trigger, number, string, etc).
+A plugin provides one or more **features**. Example : x10.Switch, Plcbus.Switch, Plcbus.Dimmer, 1wire.Temperature, 1wire.ID, RelayBoard.Relay, RelayBoard.Digital_Input, etc.
+A same feature (same name) can be different between two technologies (e.g. feedback or not).
+If you want, you can read the :doc:`Actuators </technical/actuator>` and :doc:`Sensors </technical/sensor>` pages to get more information about this.
+And each feature of a technology is linked to a feature type.
+
+When you create a device, you choose a **Feature** for your device, for example "Plcbus.Switch".
+This feature implies a feature type ("binary" in this example).
+So the web UI will be able to get this feature type and allow you to use all widgets linked to this feature type.
+
+.. image:: onewire_create_serial.png
+
+When creating a device you also choose a **usage** (Light, Appliance, Heating, etc).
+Widgets will use the choosen usage to display the corresponding icons on the widget.
+
+What next?
+==========
+* :doc:`Plugin Installation and configuration </enduser/configuration/plugins/install>`

@@ -1,0 +1,21 @@
+================
+House management
+================
+
+Go to the house organisation page
+=================================
+
+In the administration panel, click on *House* from the *Organization* menu.
+
+.. image:: house_name.png
+
+There is only one thing you can do here : set your house name. This name will be displayed in visualization mode.
+
+Setting the house name
+----------------------
+
+Just set a name and click on the **Save** button.
+
+What next?
+==========
+* :doc:`Area management </enduser/administration/area>`

@@ -1,0 +1,49 @@
+===============================
+Create and configure your house
+===============================
+
+Your house
+==========
+The first thing to do in Domogik is to configure your house or your flat.
+In this documentation we will use the **house** term to design a house a flat or whatever place you could live in.
+
+Here is the architecture choosen in Domogik to separate your house in several areas: ::
+
+    | House | => | Areas* | => | Rooms |
+
+optionnal*
+
+Example of a house with several areas
+-------------------------------------
+A house is often made of several **areas**.
+An area can be a floor, a "day" zone (with kitchen, living room, etc), a "night" zone with all bedrooms, the garden, the garage, the cellar, a swimming pool area, etc.
+Often you won't have the same needs in automation for theses different areas so separating them is a good idea to get a better access to automation commands and data.
+In an area you will have **rooms**. Sometimes it could be not exactly rooms (in your swimming pool area you could have the swimming pool and a deck).
+
+A typical house example with basement, groundfloor and one floor : 
+
+.. image:: dmg-house-organisation-01.png
+
+.. todo:: review this picture with final icons
+
+Example of a house with no area
+-------------------------------
+If you live in a small flat or if you don't want to separate your house in several areas, you could obtain this architecture :
+
+.. image:: dmg-house-organisation-02.png
+
+Configure your house
+====================
+To configure your house you will have to go to the **administration** panel and follow the following steps.
+
+1. Go to **Organisation > House** section to :doc:`define your house name </enduser/administration/house>`.
+2. Go to **Organisation > Area** section to :doc:`create your different Areas </enduser/administration/area>` (If you don't want/need any area, go to the next step).
+3. Go to **Organisation > Room** section to :doc:`create your different Rooms </enduser/administration/room>`. In this section you will also be able to put your rooms into areas.
+
+Right now if you go back to the **Visualisation** mode, you should see your house.
+
+.. image:: show_without_devices.png
+
+What next?
+==========
+* :doc:`Plugins Overview </enduser/configuration/plugins/index>`

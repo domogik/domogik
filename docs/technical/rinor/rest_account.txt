@@ -1,0 +1,133 @@
+=============
+REST /account
+=============
+
+**/account** entry allow to manage all account-linked features : login, password updating, user and persons management.
+A user is a logical account wich allows to acces to Domogik features. A person is a physical people. A user can be linked to a person.
+
+Authenticate
+============
+
+/account/auth/<login>/<password>
+--------------------------------
+Try to login as <login> with password <password>
+When authentication is ok reply is: ::
+    
+    {"status" : "OK", "code" : 0, "description" : "Access granted"}
+
+Else, if wrong login or password: ::
+
+    {"status" : "ERROR", "code" : 999, "description" : "Access refused"}
+
+Users
+=====
+
+/account/user/password/id/<id>/old/<old password>/new/<new password>
+--------------------------------------------------------------------
+Change the password from <old_password> to <new_password> for user id <id>
+
+/account/user/list
+------------------
+List all user accounts
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "account" : [
+            {
+                "skin_used" : "",
+                "person" : {
+                    "last_name" : "Admin",
+                    "first_name" : "Admin",
+                    "id" : 1,
+                    "birthdate" : "1900-01-01"
+                },
+                "is_admin" : "True",
+                "person_id" : 1,
+                "login" : "admin",
+                "id" : 1
+            }
+        ]
+    }
+
+/account/user/list/by-id/<id>
+-----------------------------
+Result : same as /list with only the user associated to the id
+
+/account/user/add/login/<login>/password/<password>/is_admin/<True,False>/skin_used/<skin to use (optional)>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Add user account + person 
+
+Result : same as /list with only the user added
+
+/account/user/add/login/<login>/password/<password>/is_admin/<True,False>/skin_used/<skin to use (optional)>/person_id/<person id>
+----------------------------------------------------------------------------------------------------------------------------------
+Add user account for an existing person 
+
+Result : same as /list with only the user added
+
+/account/user/update/id/<id>/login/<login>/is_admin/<True,False>/skin_used/<skin to use (optional)>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Update account + person 
+
+Result : same as /list with only the user updated
+
+/account/user/update/id/<id>/login/<login>/is_admin/<True,False>/skin_used/<skin to use (optional)>/person_id/<person id>
+-------------------------------------------------------------------------------------------------------------------------
+Update account for an existing person 
+
+Result : same as /list with only the user updated
+
+/account/user/del/<id>
+----------------------
+Del account (user account only) 
+
+Result : same as /list with only the user deleted
+
+Persons 
+=======
+
+/account/person/list
+--------------------
+List all persons
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "person" : [
+            {
+                "last_name" : "Admin",
+                "first_name" : "Admin",
+                "id" : 1,
+                "birthdate" : "1900-01-01"
+            }
+        ]
+    }
+
+/account/person/list/by-id/<id>
+-------------------------------
+Result : same as /list with only the person filtered
+
+/account/person/add/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
+-------------------------------------------------------------------------------------------------
+Add a person
+
+Result : same as /list with only the person added
+
+/account/person/update/id/<id>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
+------------------------------------------------------------------------------------------------------------
+Update person
+
+Result : same as /list with only the person updated
+
+/account/person/del/<id>
+------------------------
+Del person (and user account linked if it exists) 
+
+Result : same as /list with only the person deleted

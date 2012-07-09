@@ -1,0 +1,265 @@
+=============
+REST /command
+=============
+
+The **/command** entry in REST is used by User Interfaces to send commands to devices. The URL is translated in a xPL message (see Developper notes for details).
+
+For example :
+**/command/x10/A3/on** will act as sending this xPL message: ::
+
+    xml-cmnd
+    {
+    ...
+    }
+    x10.basic
+    {
+    command=on
+    device=A3
+    }
+
+This translation is made by RINOR, which uses a xml file to convert URL to xPL.
+
+Flow
+====
+.. image:: rest-command.png
+
+Developper notes 
+================
+Url description
+---------------
+.. code-block:: none
+
+    http://ip:port/command/<technology>/<address>/<command>/command [/...]
+
+The goal is to be able to generate a xpl message based on a simple url.
+
+The url must use one of these layouts:
+
+* /command/<technology>/<address>/<command>
+* /command/<technology>/<address>/<command>/<mandatory_param1>/.../<mandatory_paramN>
+* /command/<technology>/<address>/<command>/<mandatory_param1>/<optional_param1_name>/<optional_param1_value>/.../<optional_paramN_name>/<optional_paramN_value>
+
+The url is formatted like this :
+
+* first section is command, it is always the same to send a command
+* second section is technology/address
+* for a given technology/address, one or many commands are defined
+* for each command, one or many mandatory parameters are defined, each one has a position (first param always represents the same thing). This command will always be called with all these parameters.
+* for each command, one or more optional parameters are defined. They can be added, or not, at the end of the "/command/technology/address/<mandatory_params>/" url, without command.
+
+An xpl message is: ::
+
+    xpl-cmnd
+    {
+    ...
+    }
+    <schema_name>.<schema_type>
+    {
+    [key_command=command]
+    [mandatory_param1=value1]
+    [mandatory_param2=value2]
+    [optional_param1=optional_value1]
+    }
+
+The mandatory_param keys will be found in the xml mapping definition, only the value (identified by its position) will be added in the url.
+
+Optional_param keys will be found in the xml mapping and identified by optional_param_name in the url. The value will be the one passed as optional_param_value in the url.
+
+Xml description
+---------------
+Note:
+
+* technology should match the name used in the xml schema, and the id from the database (x10, plcbus, 1wire...)
+* "address" can be either : 
+
+    * the device "physical" address, ie a unique identifier for the device in the technology
+    * any string of your choice if the device has no address.
+
+* mandatory parameters are always at the same place, in the same command
+* optional parameters are always __after__ the mandatory ones, and always in the form <param_name>/<param_value> 
+
+
+Each plugin will provide several xml files (one by command).
+Two plugins of the same technology (example : several x10 plugins for several interfaces like CM11, CM15) can provide the same commands and so, the same xml files. So, check if there is not already another plugin which provide the xml file ;)
+
+Files will be put in a dedicated folder like this : <technology>/<command>.xml
+
+Example: ::
+
+    computer/wol.xml
+    plcbus/on.xml
+    plcbus/off.xml
+    plcbus/dim.xml
+    x10/on.xml
+    x10/off.xml
+    x10/dim.xml
+
+Adding a new xml file
+^^^^^^^^^^^^^^^^^^^^^
+
+.. warning::
+    Actually (release 0.1), plugins are given with Domogik so there is no need (and no way) to install a plugin with an existing tool.
+    The following lines explain what will be done when plugin's installation will be available.
+
+Xml files are provided by plugins. A plugin has to provide a file for each command of the technology it uses.
+So, several plugins can provide the same xml files. This problem is solved at plugin installation :
+
+* plugin installation lists plugin's xml files provided
+* plugin installation lists statmgr's xml files already installed
+* if there is a conflict (xml files already exists) :
+
+    * tell user that there is a conflict
+    * display a diff of the 2 (or more) conflicted files
+    * ask user to choose one file (default : the file already installed)
+
+* plugin installation installs xml files and continue his installation
+
+Xml file description
+^^^^^^^^^^^^^^^^^^^^
+.. code-block:: xml
+
+    <technology id="Technology given in URL">
+      <command name="Command given in URL">
+        <schema>xPL schema that will be used</schema>
+        <command-key>(optionnal) key in xPL schema which will contains the command given in URL</command-key>
+        <command-xpl-value>(if command-key) The real value of the command key in xPL schema (ex : preset_dim => dim)</command-xpl-value>
+        <adress-key>(optionnal) key in xPL schema which will contain the device address given in URL</adress-key>    
+        <parameters> <!-- optionnal if you have parameters -->
+          <parameter key="The key of a couple key=value added to the xPL message with the param value" 
+                     location="#param in the url (1 is the first param, not the first part of url" 
+                     value="value of a key"  <!-- optionnal -->
+                     mode="append||prepend"  <!-- optionnal -->
+                 />
+          <parameter key="param2" location="2"/>
+          ...
+        </parameters>
+        <listener>
+          <!-- define the listener to create in command to wait for plugin response to /command -->
+          <schema>xPL schema that will be listen for</schema>
+          <xpltype>xPL schema type : xpl-stat, xpl-trig</xpltype>
+          <filter>
+            <!-- list of 'key' nodes.
+                 each node must have 2 parameters :
+                      - name : the "key" of the pair
+                      - command : the "value" of the pair
+                      A message will be loggued only if schema and xpltype are corrects,
+                      and only if for all "key" nodes specified, there is a name=value pair in the message.
+            -->
+            <!-- the 2 following key/values should be set if command-key/command-value and address-key are defines in previous part of xml -->
+            <key name="command" value="command name given in <value>...</value> in <command/> bloc" />
+            <key name="device" value="@address@"/> <!-- the value @address@ is the only one to use! It will be replaced by the good address in REST processing -->
+            <!-- other filters on static values (optionnal) -->
+            <key name="somekey" value="somevalue"/>
+          </filters>
+        </listener>
+      </command>
+    </technology>
+
+Notice about parameter > value attribute
+""""""""""""""""""""""""""""""""""""""""
+If 'value' is specified, key attribute has to be specified. the usage is to define static 'key=value' to xpl schema. 
+This is useful for schemas needing sone information not given in command (example : /command/computer/<address>/wol and 'type=wakeonlan' in xpl command.basic schema
+        
+Notice about parameter > mode attribute
+"""""""""""""""""""""""""""""""""""""""
+If 'mode' is specified and key attribute equals an existing key in the message (no matter if this key is defined after in xml specification), then the value of the param will be appended/prepended to the value of the existing key.
+ex : let's say you have an url '/command/yourtechno/address/yourcommand/foo1/foo2' and :
+- a pair "param1=foo1" is defined by '<parameter key="param1" location="1"/>'
+if you define in the xml a section '<parameter key="param1" location="2" mode="prepend"/>', then the value of the second parameter will be prepended to the "foo1" value, 
+so your pair will become : "param1=foo2 foo1"
+This is useful for nasty schemas which defines "command=command_name command_attr" such as audio.slimserv
+
+Example for http://ip:port/command/plcbus/A3/on
+"""""""""""""""""""""""""""""""""""""""""""""""
+.. code-block:: xml
+
+    <technology id="plcbus">
+      <command name="on">
+        <schema>plcbus.basic</schema>
+        <command-key>command</command-key>	
+        <adress-key>device</adress-key>	
+        <command-xpl-value>on</command-xpl-value>
+        <parameters/>                                                                                          
+      </command>	
+      <listener>
+        <schema>plcbus.basic</schema>
+        <xpltype>xpl-trig</xpltype>
+        <filter>
+          <key name="command" value="on" />
+          <key name="device" value="@address@"/>
+        </filter>
+      </listener>
+    </technology>
+
+Example for http://ip:port/command/plcbus/A4/dim/55
+"""""""""""""""""""""""""""""""""""""""""""""""""""
+.. code-block:: xml
+
+    <technology id="plcbus">
+      <command name="dim">
+        <schema>plcbus.basic</schema>
+        <command-key>command</command-key>	
+        <adress-key>device</adress-key>	
+        <command-xpl-value>dim</command-xpl-value>         
+        <parameters>                                                                                            
+          <parameter key="value" location="1"/>                                                           
+        </parameters>                                                                                           
+      </command>	
+      <listener>
+        <schema>plcbus.basic</schema>
+        <xpltype>xpl-trig</xpltype>
+        <filter>
+          <key name="command" value="dim" />
+          <key name="device" value="@address@"/>
+        </filter>
+      </listener>
+    </technology>
+
+Example for http://ip:port/command/computer/<computer name>/wol
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.. code-block:: xml
+
+    <technology id="computer">
+      <command name="wol">
+        <schema>command.basic</schema>
+        <command-key>current</command-key>    
+        <adress-key>device</adress-key>    
+        <command-xpl-value>on</command-xpl-value>          
+        <parameters>
+          <parameter key="type" value="wakeonlan"/>          
+        </parameters>
+      </command>    
+      <listener>
+        <schema>sensor.basic</schema>
+        <xpltype>xpl-trig</xpltype>
+        <filter>
+          <key name="type" value="wakeonlan" />
+          <key name="current" value="on" />
+          <key name="device" value="@address@"/>
+        </filter>
+      </listener>
+    </technology>
+
+How REST gets xpl-trig for a /command 
+=====================================
+
+* REST start
+* REST do some init stuff
+* REST try to get QUEUE_COMMAND_* values from database. If not get default values 
+* REST loads all xml files availables for /command
+* REST create a queue for /command
+* REST get a /command call
+* REST create a thread for /command (like all others /foo)
+* REST create and send XPL message 
+* REST start counting for timeout (see QUEUE_COMMAND_TIMEOUT)
+* while timeout not reached, REST read queue to get xpl-trig
+* if timeout reached, REST send timeout message
+* else :
+    * REST transform xpl-trig in json data
+    * REST send data
+
+How UI will get status of device ?
+==================================
+
+REST only send a OK/KO response with the xpl-trig xPL message received when a /command is successfull. 
+To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/stats** or **/events** REST feature to get info from this device.

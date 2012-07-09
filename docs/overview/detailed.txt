@@ -1,0 +1,17 @@
+=====================
+Detailed architecture
+=====================
+
+.. todo:: describe, get some data from obsolete version and delete others
+
+Internal architecture
+=====================
+.. image:: internal_architecture.png
+
+Browser interactions with UI and REST API
+-----------------------------------------
+.. image:: browser_interact_ui_rest.png
+
+What next?
+==========
+* :doc:`Domogik requirements <../enduser/requirements>`

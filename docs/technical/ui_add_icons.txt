@@ -1,0 +1,43 @@
+===================================
+How to add your own room/area icons
+===================================
+
+1. Add your icon(s) in Django's folder
+======================================
+Put you icon somewhere in Django design folder. Usually in the *images* folder of the current skin theme.
+Your icon has to be declined in three differents size: 16x16, 32x32 and 64x64:
+
+**src/domogik/ui/djangodomo/core/templates/design/skins/default/images/room** ::
+
+    bathroom_16.png  bedroom_16.png  garage_16.png  kidsroom_16.png  kitchen_16.png  office_16.png  tvlounge_16.png
+    bathroom_32.png  bedroom_32.png  garage_32.png  kidsroom_32.png  kitchen_32.png  office_32.png  tvlounge_32.png
+    bathroom_64.png  bedroom_64.png  garage_64.png  kidsroom_64.png  kitchen_64.png  office_64.png  tvlounge_64.png
+
+2. Configure the icon path
+==========================
+Open the icon css file:
+**src/domogik/ui/djangodomo/core/templates/design/skins/default/css/ui-icon.css**
+
+Add css class for each icon format, prefixed by :code:`icon64-room-*, icon32-room-* or icon16-room-* (same for icon64-area-*)`
+
+For example: ::
+
+    .icon64-room-myicon { background-image:url(../images/room/myicon_64.png);}
+    .icon32-room-myicon { background-image:url(../images/room/myicon_32.png);}
+    .icon16-room-myicon { background-image:url(../images/room/myicon_16.png);}
+
+3. Declare the new icon
+=======================
+Open the icon js file:
+**src/domogik/ui/djangodomo/core/templates/design/js/dmg.icons.js**
+
+Add the icon id (should mach the id used in the css classes), in one of the 2 icons lists: ::
+
+    var area_icons = ["grndfloor", "firstfloor", "basement"];
+    var room_icons = ["kitchen", "bedroom", `"tvlounge", "bathroom", "office", 'kidsroom', 'garage'];
+
+For example: ::
+
+    var room_icons = ["kitchen", "bedroom", "tvlounge", "bathroom", "office", 'kidsroom', 'garage', 'myicon'];
+
+Don't forget to refresh your browser (ie: :kbd:`ctrl+F5` for firefox).

@@ -1,0 +1,13 @@
+==================
+Plugins management
+==================
+
+Presentation
+============
+For the moment, all is said in :doc:`Plugins Installation and configuration </enduser/configuration/plugins/install>` page.
+
+We keep this page for future releases when new features linked to plugins could appear (auto-discovery, helpers integration, etc).
+
+What next?
+==========
+* :doc:`Accounts management </enduser/administration/account>`
