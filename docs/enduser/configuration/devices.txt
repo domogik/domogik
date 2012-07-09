@@ -69,5 +69,4 @@ You come back to the visualisation mode : your widgets are now ready to use.
 
 What next?
 ==========
-* :doc:`Common usage of widgets </enduser/configuration/widgets>`
 * :doc:`House management </enduser/administration/house>`

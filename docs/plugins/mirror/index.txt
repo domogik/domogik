@@ -21,10 +21,6 @@ How to plug
 ===========
 Just plug USB on your computer. Mir:ror should light on.
 
-Installation
-============
-Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.
-
 Permissions management
 ======================
 The needed udev rule is given while installing the plugin. See :doc:`Setting UDEV rule </various/udev_rule>` to apply it.

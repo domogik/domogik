@@ -19,7 +19,6 @@ Table Of Content
     /enduser/configuration/plugins/install
     /enduser/configuration/plugins/helpers
     /enduser/configuration/devices
-    /enduser/configuration/widgets
     /enduser/administration/house
     /enduser/administration/area
     /enduser/administration/room
@@ -56,4 +55,3 @@ Table Of Content
     /technical/rinor/rest_xplcmnd
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
-    /technical/schema/teleinfo

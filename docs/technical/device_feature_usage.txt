@@ -95,8 +95,3 @@ Common
 #. Electricity
 
     * default_options: { "actuator": { "binary": {}, "range": {}, "trigger": {} }, "sensor": {"boolean": {}, "number": {}, "string": {} } }
-
-Special
--------
-* Squeezebox
-* Mir:ror

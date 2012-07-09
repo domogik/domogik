@@ -122,7 +122,6 @@ To test, you can do this: ::
 
 Installation
 ============
-Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.
 
 Make sure you installed OWFS before installing this plugin.
  

@@ -84,9 +84,7 @@ Plugin not shut down
 Example: ::
 
     $ ipx800 find
-
-.. warning::
-    Plugin 'ipx800' is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use the helper.
+    warning: Plugin 'ipx800' is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use the helper.
     In next releases, helpers will be implemented in a different way, so that they can be used while associated plugin is running
 
 Missing parameter(s)
@@ -100,7 +98,8 @@ Missing parameter(s)
 
 Helpers in future
 =================
-Following things should change in next releases : 
+Following things should change in next releases :
+
 * Helpers will really be included in plugins (no need anymore to shut down the plugin in order to use associated helper).
 * We want to implement auto discovery for most plugins and integrate this feature in the web UI.
 

@@ -21,8 +21,8 @@ Type of returned values
     
     * value : json structure
 
-Features
-========
+Exemple Features
+================
 
 1Wire.Temperature 
 -----------------

@@ -9,22 +9,22 @@ Command values
 ==============
 * binary
 
-    * parameters : ~np~{command, value0, value1}~/np~ (ex. ~np~{"command":"", "value0":"off", "value1":"on"}~/np~)
+    * parameters : ``{command, value0, value1}`` (ex. ``{"command":"", "value0":"off", "value1":"on"}``)
     * value : one of the 2 values
 
 * range
 
-    * parameters : ~np~{command, valueMin, valueMax}~/np~ (ex. ~np~{"command": "dim", "valueMin":0, "valueMax":100}~/np~)
+    * parameters : ``{command, valueMin, valueMax}`` (ex. ``{"command": "dim", "valueMin":0, "valueMax":100}``)
     * value : value between valueMin and valueMax
 
 * list
 
-    * parameters : ~np~{command , [value0, value1, ..., valueN] }~/np~ (ex. ~np~{ "command":"update" , "commandValues": ["off", "eco", "confort"] }~/np~)
+    * parameters : ``{command , [value0, value1, ..., valueN] }`` (ex. ``{ "command":"update" , "commandValues": ["off", "eco", "confort"] }``)
     * value : one of the configured states
 
 * trigger
 
-    * parameters : ~np~{command, value}~/np~ (ex. ~np~{"command":"wol",  "value":"X"}~/np~)
+    * parameters : ``{command, value}`` (ex. ``{"command":"wol",  "value":"X"}``)
     * value : unique value
 
 * number
@@ -39,8 +39,8 @@ Command values
 
     * value : json structure
 
-Features
-========
+Exemple Features
+================
 
 x10.Switch 
 ----------

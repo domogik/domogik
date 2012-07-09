@@ -166,7 +166,7 @@ html_show_sphinx = False
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Domogikdoc'
 
-todo_include_todos = True
+#todo_include_todos = True
 
 # -- Options for LaTeX output --------------------------------------------------
 

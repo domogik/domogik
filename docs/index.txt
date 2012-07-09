@@ -20,8 +20,7 @@ End User Documentation
       :doc:`Installation and configuration </enduser/configuration/plugins/install>` |
       :doc:`Helpers </enduser/configuration/plugins/helpers>`
         
-* :doc:`Set up your devices </enduser/configuration/devices>` |
-  :doc:`Common usage of widgets </enduser/configuration/widgets>`
+* :doc:`Set up your devices </enduser/configuration/devices>`
 
 * **Management:**
   :doc:`House management </enduser/administration/house>` |
@@ -68,6 +67,3 @@ Technical Documentation
     * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
     * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
-
-* **Schemas:**
-  :doc:`xPL Schema for teleinfo </technical/schema/teleinfo>`

@@ -9,10 +9,6 @@ Purpose
 WOL and Ping plugin allows to ping a computer to see if it is alive and to send a broadcast magic packet to a computer when getting an xPL message.
 This magic packet tells target computer to wake up.
 
-Installation
-============
-Plugins are installed from the user interface administration. See ((Installing_the_packages|this page)) for more details.
-
 Plugin configuration
 ====================
 

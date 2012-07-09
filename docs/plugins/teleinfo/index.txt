@@ -274,11 +274,3 @@ If you use more than provided power on one phase, the information sent by telein
 
 * ADIR1, ADIR2, ADIR3 : intensity overload on each phase
 * IINST1, IINST2, IINST3 : intensity on each phase.
-
-Developper notes
-================
-
-xPL schema
-----------
-See the :doc:`xPL Teleinfo Schema page </technical/schema/teleinfo>`
-
