@@ -104,14 +104,53 @@ class ProcessRequest():
         '^/base/area/update/.*$':		                                                 '_rest_base_area_update',
         '^/base/area/del/(?P<area_id>[0-9]+)$':		                                         '_rest_base_area_del',
         # /base/device
+        '^/base/device/list$':			                                                 '_rest_base_device_list',
+        '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
+        '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
+        '^/base/device/del/(?P<id>[0-9]+)$':		                                         '_rest_base_device_del',
         # /base/device_technology
+        '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
+        '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
+        '^/base/device_technology/add/.*$':		 	                                 '_rest_base_device_technology_add',
+        '^/base/device_technology/update/.*$':		                                         '_rest_base_device_technology_update',
+        '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
         # /base/device_type
+        '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
+        '^/base/device_type/add/.*$':		 	                                         '_rest_base_device_type_add',
+        '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
+        '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                                 '_rest_base_device_type_del',
         # /base/device_usage
+        '^/base/device_usage/list$':			                                         '_rest_base_device_usage_list',
+        '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
+        '^/base/device_usage/add/.*$':		 	                                         '_rest_base_device_usage_add',
+        '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
+        '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                                 '_rest_base_device_usage_del',
         # /base/feature
+        '^/base/feature/list$':			                                                 '_rest_base_feature_list',
+        '^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                         '_rest_base_feature_list',
+        '^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			         '_rest_base_feature_list',
         # /base/feature_association
-        # /base/page
+        '^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
+        '^/base/feature_association/by-house$':			                                 '_rest_base_feature_association_list_by_house',
+        '^/base/feature_association/by-area/(?P<id>[0-9]+)$':			                 '_rest_base_feature_association_list_by_area',
+        '^/base/feature_association/by-room/(?P<id>[0-9]+)$':			                 '_rest_base_feature_association_list_by_room',
+        '^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
         # /base/room
+        '^/base/room/list$':                                                                     '_rest_base_room_list',
+        '^/base/room/list/by-id/(?P<room_id>[0-9]+)$':                                           '_rest_base_room_list',
+        '^/base/room/list/by-area/(?P<area_id>[0-9]+)$':                                         '_rest_base_room_list',
+        '^/base/room/add/.*$':                                                                   '_rest_base_room_add',
+        '^/base/room/update/.*$':                                                                '_rest_base_room_update',
+        '^/base/room/del/(?P<room_id>[0-9]+)$':                                                  '_rest_base_room_del',
         # /base/ui-config
+        '^/base/ui-config/list$':                                                                '_rest_base_ui_item_config_list',
+        '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':                  '_rest_base_ui_item_config_list',
+        '^/base/ui-config/list/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':      '_rest_base_ui_item_config_list',
+        '^/base/ui-config/list/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_list',
+        '^/base/ui-config/set/.*$':                                                              '_rest_base_ui_item_config_set',
+        '^/base/ui-config/del/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_ui_item_config_del',
+        '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':       '_rest_base_ui_item_config_del',
+        '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
 	# /command
 	'^/command.*$':                                                                          'rest_command',
         # /event
@@ -121,6 +160,14 @@ class ProcessRequest():
         #'^/events/request/new/.*$':					                         'needs a new function',
         '^/events/request/get/(?P<ticket_id>[0-9]+)$':				                 '_rest_events_request_get',
         '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                         '_rest_events_request_free',
+        # /helper
+        '^/helper/.*$':			                                                         'rest_helper',
+        # /host
+        '^/host/.*$':			                                                         'rest_host',
+        # /log
+        # TODO
+        # /package
+        # TODO
         # /plugin
         '^/plugin/list$':                                                                        '_rest_plugin_list',
         '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
@@ -133,7 +180,15 @@ class ProcessRequest():
         '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                             '_rest_plugin_config_del',
         '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
 	'^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
+	# /queuecontent
+        # TODO
+        # /repo
+        '^/repo/put$':                                                                           '_rest_repo_put',
+        '^/repo/get/(?P<file_name>[a-z0-9]+)$':                                                  '_rest_repo_get',
+        # /scenario
+        # TODO
         # /stats
+        # TODO
    }
 
 
