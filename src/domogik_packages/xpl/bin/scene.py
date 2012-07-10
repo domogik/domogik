@@ -12,11 +12,12 @@ from urllib import *
 import glob
 from xml.dom import minidom
 import threading
+import ast
 
 class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
    """
-   sceneC = 0
+   sceneCount = 0
    globalscene=[]
    def __init__(self):
       XplPlugin.__init__(self, name = 'scene')
@@ -59,17 +60,39 @@ class SceneManager(XplPlugin):
       self.filetoopen= self.filetoopen+"/scene.txt"
       mem = self.scene.read_scene(self.filetoopen)
       for i in range(len(mem)):
-         if mem[i] != '':
-            self.scene_cmd(mem[i])
+         liste=str(mem[i])
+         print "maliste:%s" %liste
+         msg=XplMessage()
+         msg.set_schema('scene.basic')
+         msg.set_type('xpl-cmnd')
+         if liste !='':
+            liste=ast.literal_eval(liste)
+            print liste
+            self.mem_scene(liste) 
+            for _truc in liste:
+               print "%s : %s" %(_truc,liste[_truc])
+ #           msg.add_data(test)          
+#         self.myxpl.send(msg)
 
       self.log.info("Plugin ready :)")
+
+   def mem_scene(self, ligne):
+   ### create a scene for init plugin
+   ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
+      self.sceneCount = self.sceneCount + 1
+      Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'])
+      Mini_scene.start()
 
    def scene_cmd(self, message):
       """ routine lorsque le plugin recoit un message xpl
       """
       if message.data['command']=="Create" and message.data['scene'] =='0':
-         self.scene.add_scene(self.filetoopen,str(message))
-         self.sceneC = self.sceneC + 1
+         msg=''
+         self.sceneCount = self.sceneCount + 1
+         if 'scene' not in message data
+            self.sceneC = self.sceneCount
+         else
+            self.sceneC = message
          device1_id = ''
          device1_adr = ''
          device1_tech = ''
@@ -148,6 +171,10 @@ class SceneManager(XplPlugin):
          
          print 'self.manager=%s' %self.manager
          Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor)
+         msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
+         self.scene.add_scene(self.filetoopen,msg)
+         the_url="http://%s/base/device/add/name/%s/address/%s/usage_id/scene/description/scene_plugin/reference/Mscene" %(self.Mscene,self.Mscene)
+
          Mini_scene.start()
 
          print "création d'une scene"
