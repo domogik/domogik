@@ -94,6 +94,7 @@ class Dawndusk(XplPlugin):
                     'command-%s' % str(num))
                 dawn = self._config.query('dawndusk', 'dawn-%s' % str(num))
                 dusk = self._config.query('dawndusk', 'dusk-%s' % str(num))
+                
                 if schema != None:
                     self.log.debug("dawndusk.__init__ : Device from \
                         xpl : device=%s," % (add))
@@ -173,7 +174,7 @@ class Dawndusk(XplPlugin):
         self.log.debug("dawndusk.dawndusk_trig_cb :  type %s received \
             with status %s" % (mtype, status))
         if mtype == "dawndusk" and status != None:
-            #We receive a trig indicating that the dawn or dus has occured.
+            #We receive a trig indicating that the dawn or dusk has occured.
             #We need to schedule the next one
             self.add_next_event()
             for dev in self.devices:
@@ -184,6 +185,7 @@ class Dawndusk(XplPlugin):
                 mess.add_data({self.devices[dev]["command"] : \
                     self.devices[dev][status]})
                 mess.add_data({self.devices[dev]["addname"] : dev})
+
                 self.myxpl.send(mess)
         self.log.debug("dawndusk.dawndusk_trig_cb() : Done :)")
 
@@ -270,7 +272,10 @@ class Dawndusk(XplPlugin):
         Get the next event date : dawn or dusk
         """
         ddate, dstate = self.get_next_event()
-        self._mydawndusk.sched_add(ddate, self.send_dawndusk, dstate)
+        
+        if ddate > datetime.datetime.today():
+            self._mydawndusk.sched_add(ddate, self.send_dawndusk, dstate)
+            
 
     def get_next_event(self):
         """
@@ -278,8 +283,24 @@ class Dawndusk(XplPlugin):
         @return rdate : the next event date
         @return rstate : the event type : DAWN or DUSK
         """
+        dawnminutes = 0
+        duskminutes = 0
+        
+        # Get minutes parameters
+        if self._config.query('dawndusk', 'dawnminutes'):
+            dawnminutes = int(self._config.query('dawndusk', 'dawnminutes'))
+        if self._config.query('dawndusk', 'duskminutes'):
+            duskminutes = int(self._config.query('dawndusk', 'duskminutes'))
+        
         dawn = self._mydawndusk.get_next_dawn()
         dusk = self._mydawndusk.get_next_dusk()
+        
+        # Add or reduce the n minutes before event
+        dawn = dawn + datetime.timedelta(minutes=dawnminutes)
+        dusk = dusk + datetime.timedelta(minutes=duskminutes)
+        
+        self.log.debug("get_next_event DAWN = %s" % dawn)
+        self.log.debug("get_next_event DUSK = %s" % dusk)
         if dusk < dawn :
             rdate = dusk
             rstate = "dusk"
@@ -310,6 +331,7 @@ class Dawndusk(XplPlugin):
             mess.add_data({self.devices[dev]["command"] : \
                 self.devices[dev][state]})
             mess.add_data({self.devices[dev]["addname"] : dev})
+            
             self.myxpl.send(mess)
         self.log.info("dawndusk : send signal for %s"%state)
         self.log.debug("dawndusk.sendDawnDusk() : Done :-)")
