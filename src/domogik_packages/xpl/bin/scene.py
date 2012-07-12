@@ -143,7 +143,7 @@ class SceneManager(XplPlugin):
             device2_key = data['device2key']
             device2_tech= data['device2tech']
             device2_key= data['device2key']
-            if 'device2op' in message.data and data['device2op']!='':
+            if 'device2op' in data and data['device2op']!='':
                device2_op= data['device2op']
                device2_value= data['device2val']
 

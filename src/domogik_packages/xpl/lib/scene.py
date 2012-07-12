@@ -195,7 +195,7 @@ class Mscene():
           self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig',self.device1['listener'][i]['device']:self.device1['address']})
           print "listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s" %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
        if self.device2["id"] != '' and self.device2["key_stat"] != '':
-          the_url = 'http://%s/stats/%s/%s/latest' %(grinor, device2['id'], device2['key_stat'])
+          the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor,self.device2['id'], self.device2['key_stat'])
           req = urllib2.Request(the_url)
           handle = urllib2.urlopen(req)
           resp2 = handle.read()
@@ -299,6 +299,7 @@ class Mscene():
                 condition2='true'
              else:
                 condition2='false'
+       print "condition2 : %s" %condition2
        print "Global test %s" %self.gcondition['test_global']
        if self.gcondition['test_global'] != '':
           if self.gcondition['test_global']=='=':
@@ -321,12 +322,12 @@ class Mscene():
                 condition2 = 'true'
              else:
                 condition2 = 'false'
-          elif self.gcondition['test_global']== 'and':
+          elif self.gcondition['test_global']== 'And':
              if condition1 == 'true' and condition2 == 'true':
                 condition = 'true'
              else:
                 condition = 'false'
-          elif self.gcondition['test_global']== 'or':
+          elif self.gcondition['test_global']== 'Or':
              if condition1 == 'true' or condition2 == 'true':
                 condition = 'true'
              else:
@@ -356,7 +357,7 @@ class Mscene():
           msg.set_type('xpl-trig')
           msg.add_data({'number': 'scene_' + self.number})
           msg.add_data({'run':'OK'})
-          msg.add_data({'statue':'true'})
+          msg.add_data({'stats':'true'})
           self.myxpl.send(msg)
 
        if condition == 'false' and condition != last_value:
@@ -374,7 +375,7 @@ class Mscene():
           msg.set_type('xpl-trig')
           msg.add_data({'number': 'scene_' + self.number})
           msg.add_data({'run':'OK'})
-          msg.add_data({'statue':'false'})
+          msg.add_data({'stats':'false'})
           self.myxpl.send(msg)
 
        if condition == last_value:
@@ -383,7 +384,7 @@ class Mscene():
           msg.set_type('xpl-stat')
           msg.add_data({'number': 'scene_' + self.number})
           msg.add_data({'run':'OK'})
-          msg.add_data({'statue': condition})
+          msg.add_data({'stats': condition})
           self.myxpl.send(msg)
 
        return condition
