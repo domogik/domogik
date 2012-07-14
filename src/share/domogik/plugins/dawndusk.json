@@ -1,4 +1,3 @@
-
 {
     "configuration": [
         {
@@ -123,20 +122,20 @@
         },
         {
             "default": "0", 
-            "description": "Value in +/- minutes after/before dawn event", 
+            "description": "Value in +/- seconds after/before dawn event", 
             "id": "12", 
-            "interface": "no", 
-            "key": "dawnminutes", 
+            "interface": "yes", 
+            "key": "dawnseconds", 
             "optionnal": "yes", 
             "options": [], 
             "type": "string"
         },
         {
             "default": "0", 
-            "description": "Value in +/- minutes after/before dusk event", 
+            "description": "Value in +/- seconds after/before dusk event", 
             "id": "13", 
-            "interface": "no", 
-            "key": "duskminutes", 
+            "interface": "yes", 
+            "key": "duskseconds", 
             "optionnal": "yes", 
             "options": [], 
             "type": "string"

@@ -106,7 +106,7 @@ class DawnduskAPI:
         else :
             self._scheduler.shutdown()
 
-    def sched_add(self, sdate, cb_function, label):
+    def sched_add(self, sdev,sdate, cb_function, label):
         """
         Add an event in the schedulered tasks
         @param sdate : the date of the event
@@ -117,19 +117,19 @@ class DawnduskAPI:
         if self.use_cron == False:
             if label == "dawn" or label == "dusk":
                 self.job = self._scheduler.add_date_job(cb_function, \
-                    sdate, args = [label])
+                    sdate, args = [sdev, label])
                 self.log.debug("dawndusk.schedAdd : Use internal cron \
-                    for %s" % label)
+                    for device %s(%s)" % (sdev,label))
             elif label == "dawn-test":
                 self.job_test_dawn = self._scheduler.add_date_job\
-                    (cb_function, sdate, args = ["dawn"])
+                    (cb_function, sdate, args = [sdev, "dawn"])
                 self.log.debug("dawndusk.schedAdd : Use internal cron \
-                    for %s" % "dawn")
+                    for device %s(%s)" % (sdev,"dawn"))
             elif label == "dusk-test":
                 self.job_test_dusk = self._scheduler.add_date_job\
-                    (cb_function, sdate, args = ["dusk"])
+                    (cb_function, sdate, args = [sdev, "dusk"])
                 self.log.debug("dawndusk.schedAdd : Use internal cron \
-                    for %s" % "dusk")
+                    for device %s(%s)" % (sdev,"dusk"))
             for i in self._scheduler.get_jobs():
                 self.log.debug("APScheduler : %-10s | %8s" % \
                     (str(i.trigger), i.runs))
@@ -165,8 +165,9 @@ class DawnduskAPI:
                     external cron")
                 self.log.debug("dawndusk.schedAdd : Done :(")
                 return False
-        self.log.info("Add a new event of type %s at %s" % (label, sdate))
+        self.log.info("Add a new event for device %s of type %s at %s" % (sdev,label, sdate))
         return True
+
 
     def get_next_dawn(self):
         """
