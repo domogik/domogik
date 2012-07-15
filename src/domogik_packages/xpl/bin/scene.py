@@ -13,6 +13,7 @@ import glob
 from xml.dom import minidom
 import threading
 import ast
+import os
 
 class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
@@ -57,7 +58,16 @@ class SceneManager(XplPlugin):
       Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
       self.enable_hbeat()
       self.filetoopen=self.get_data_files_directory()
+      path = self.get_data_files_directory()
+      if os.path.exists(path)== False:
+         os.mkdir(path)
+         print "Création du répertoire %s" %path
       self.filetoopen= self.filetoopen+"/scene.txt"
+      if os.path.exists(self.filetoopen)== False:
+         fichier= open(self.filetoopen,'w')
+         fichier.write('')
+         fichier.close()
+         print "Création du fichier de stockage %s" %self.filetoopen
       mem = self.scene.read_scene(self.filetoopen)
       for i in range(len(mem)):
          liste=str(mem[i])

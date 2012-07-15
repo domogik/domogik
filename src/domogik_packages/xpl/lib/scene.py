@@ -344,11 +344,13 @@ class Mscene():
        if condition == 'true' and condition != last_value and self.gaction_true != '':
           print ' envoie de la commande true'
 #         http://ip:port/command/<technology>/<address>/<command>/command [/...]
+          print 'techno: %s, address: %s,command: %s,value:%s' %(self.gaction_true['techno'], self.gaction_true['address'],self.gaction_true['command'], self.gaction_true['value'])
+
           if self.gaction_true['techno'] != '':
              if self.gaction_true['command']=='':
                 the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['value'])
              else:
-              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gation_true['command'],self.gaction_true['value'])
+              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['command'],self.gaction_true['value'])
              req = urllib2.Request(the_url)
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
@@ -366,7 +368,7 @@ class Mscene():
              if self.gaction_false['command']== '':
                 the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['value'])
              else:
-                the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gation_true['command'],self.gaction_true['value'])
+                the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['command'],self.gaction_false['value'])
              req = urllib2.Request(the_url)
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
