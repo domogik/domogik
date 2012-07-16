@@ -1,0 +1,8 @@
+.. _toc:
+================
+Table Of Content
+================
+.. toctree::
+    /index
+    /__PKG_NAME__
+    /helpers

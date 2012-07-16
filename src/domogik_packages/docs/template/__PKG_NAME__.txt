@@ -1,0 +1,89 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+.. todo:: 
+    Quick description of the package usage : features, ...
+    Put a photography or picture of the materials
+
+Known issues
+============
+
+.. todo:: 
+    Eventually if there are some issues with the package, list them. If not, delete this chapter.
+
+How to plug
+===========
+
+.. todo:: 
+    Explain how to plug the material. If there is nothing to plug, delete this chapter or replace it with the appropriate one (account creation for a web service, ...)
+
+Create the udev rule
+--------------------
+
+.. todo::
+    If needed, tell the user to create an udev rule. Else, delete this chapter.
+
+You may create a udev rule for this device. The rule and filename are given in the **Requirements** tab of the plugin configuration page.
+
+Plugin configuration
+====================
+
+.. todo:: 
+    If the packahe is not a plugin, delete this chapter
+
+Configuration
+-------------
+In Domogik administration, go to the __PKG_NAME__ configuration page.
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| .. todo::     |               | .. todo::                                                                                           |
+|     key 1     |               |     Description of the first configuration key                                                      |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| .. todo::     |               | .. todo::                                                                                           |
+|     key 2     |               |     Description of the second configuration key                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Creating devices for __PKG_NAME__
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+Feature 1
+*********
+
+.. todo:: 
+    Update the screenshot
+    Describe the data to set in each field of the device creation box
+
+.. |example_feature1| image:: example_feature1.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_feature1| | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : ...                                                                   |
+|                    |                   | Example for ... : ...                                                                      |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | xxx.yyy                                                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (...)                                                                 |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+
