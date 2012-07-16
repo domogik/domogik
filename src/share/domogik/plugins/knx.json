@@ -232,7 +232,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "knx", 
         "type": "plugin", 
-        "version": "0.1b0"
+        "version": "0.1b1"
     }, 
     "json_version": 1, 
     "technology": {
