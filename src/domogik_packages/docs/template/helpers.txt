@@ -6,7 +6,7 @@ Helpers
     For each helper create a chapter which describes it.
 
 __PKG_NAME__ first_helper_command
-===========
+=================================
 
 **__PKG_NAME__ first_helper_command** helper will do.....
 
