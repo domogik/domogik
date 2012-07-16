@@ -1,0 +1,71 @@
+=================
+Relaybaord update
+=================
+
+Upgrade IPX800 v2 firmware
+==========================
+
+1.  Go on `GCE Electronics website <http://www.gce-electronics.com>`_
+2.  Go to your IPX800 model page. Click on "Télécharger" on bottom to see all availables downloads :
+
+.. image:: ipx800_website_download.png
+
+3.  Download the latest release
+4.  Extract it: ::
+
+        $ mkdir /tmp/ipx800
+        $ cd /tmp/ipx800
+        $ unrar e "/path/to/IPX800 V2 3.xx.xx.rar"
+
+5.  Download the linux utility to flash the IPX800 firmware : :download:`flash.sh <flash.sh>`
+
+    Notice that this script is also available in Domogik sources in this path : **src/tools/ipx800/flash.sh**.
+6.  Launch the utility like this (change the ip address with your relayboard ip): ::
+    
+    $ ./flash.sh 192.168.1.150 /path/to/IPX800 V2 3.xx.xx/Flash/gceip3xxxx.hex
+
+Follow script instructions
+
+If everything went fine, you should obtain this kind of output: ::
+
+    $ ./flash.sh gceip30021.hex 
+    You are about to update IPX800 board with this firmware :
+    - gceip30021.hex
+    [Enter] to continue. [ctrl]-[c] to abort.
+    
+    Manual operations to do before hitting [enter] to flash board :
+    1. Check your computer ip is on 192.168.1.x network
+    2. Unplug board.
+    3. Wait a few minutes.
+    4. While plug in board, press [enter]
+    
+    Start updating...
+    tftp> Sent 283047 bytes in 16.5 seconds
+
+Make a hard reset on IPX800 v2
+==============================
+A hard reset will make IPX800 relayboard going back to default settings (DHCP enabled, etc). To do this, just follow these steps : 
+
+1.  Unplug Ipx800 board
+2.  Connect J2's up pin and J92's left pin together (see red pins in picture)
+
+.. image:: ipx800_hard_reset.png
+
+3.  Plug IPX800 board
+4.  Wait for relays clacking 
+5.  Disconnect J2 and J92 pins
+6.  Unplug board
+7.  Plug board 
+
+Upgrade IPX800 v2 website
+=========================
+
+1.  Go on **http://ipx800/mpfsupload/** (assuming ipx800 is associated to your ipx800 IP address).
+
+.. image:: ipx800_hard_reset_upload_site.png
+
+2.  Choose website package to upload.
+3.  Click on upload
+
+Your IPX800's website is updated.
+
