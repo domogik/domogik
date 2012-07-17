@@ -19,7 +19,9 @@ Parameters description
 
 /stats/<device id>/<key>/all
 ----------------------------
-Get all values. You may avoid to use this entry : there could be several thousands values in database!
+
+.. warning ::
+    Using this feature can be risky : it can took some time to return all the values and often there is no need to do so.
 
 Result: ::
 
@@ -39,17 +41,38 @@ Result: ::
         ]
     }
 
+Wildcard usage
+**************
+
+You can use the '*' to get the values for all the keys or all the devices.
+
+Example : 
+
+* Get all stattistics (don''t use it until it is for test purpore) : ``/stat/*/*/all``
+* Return all the values for all the keys of a device : ``/stat/5/*/all``
+
 /stats/<device id>/<key>/latest
 -------------------------------
 Get latest value
 
 Result : same than /all but with only one value
 
+Wildcard usage
+**************
+* Return the last value for all the devices : ``/stat/*/*/lastest``
+* Return the last value for all keys of a device : ``/stat/5/*/lastest``
+
 /stats/<device id>/<key>/last/<number of item to get>
 -----------------------------------------------------
 Get the N last values
 
 Result : same than /all but with only N values
+
+Wildcard usage
+**************
+
+* Return the last 10 values for all the devices : ``/stat/*/*/last/10``
+* Return the last 10 values for all keys of a device : ``/stat/5/*/last/10``
 
 /stats/<device id>/<key>/from/<start time> {/to/<end time>}
 -----------------------------------------------------------
@@ -63,7 +86,7 @@ Get values from <start time> to ...
 Result : same than /all but with values between start and end time
 
 Example
-^^^^^^^
+*******
 **/stats/4/temperature/from/1286226613/to/1286500000**
 
 .. code-block:: python
@@ -116,7 +139,7 @@ Result : for performance issue, the return format is different from /all. Follow
 * values : a list of tuples
 
 Tuples format
-^^^^^^^^^^^^^
+*************
 .. code-block:: none
 
     # Minutes
