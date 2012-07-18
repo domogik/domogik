@@ -11,12 +11,12 @@ There are several types of packages :
 
 Plugins
 -------
-A plugin is the main type of packages in Domogik. It allows you to use some devices (x10 gateway, Zwave stick, ...) or some software (web service, ...) in Domogik.
+Plugin is the main package type in Domogik. It allows you to use some devices (x10 gateway, Zwave stick, ...) or some software (web service, ...) in Domogik.
 
 A plugin is made of :
 
 * A json file which describes the plugin, the features, ...
-* Some xml files to describe the way the database and the user interfaces will speak with the xPL network.
+* Some xml files to describe the way the database and the user interfaces will communicate with the xPL network.
 * Some python files.
 
 External members
@@ -25,7 +25,7 @@ An external member is a xPL client not linked to Domogik. It can be a product li
 
 * The RFXCOM xPL.
 * A sqeezebox.
-* An DIY or arduino board with an ethernet shield and a sketch which speaks xPL.
+* An diy or arduino board with an ethernet shield and a sketch which communicate xPL.
 * A xPL program made outside of Domogik (xpl-perl for example).
 
 To interact with Domogik, some files must be created for an external member :
@@ -48,10 +48,10 @@ Before creating the package
 Create the package
 ------------------
 
-* Make specification for your package on the wiki. You can create a page wiki.domogik.org/<package type>/<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin. **TODO : page liée**
-* Start developing the package. **TODO : page liée**
-* Write the package documentation at the same time. **TODO : page liée**
-* Write some test cases for the package. **TODO : page liée**
-* Test your package. **TODO : page liée**
-* Generate the package and send a request to upload it on a repository. **TODO : page liée**
+#. Make specification for your package on the wiki. You can create a page wiki.domogik.org/<package type>/<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin. **TODO : page liée**
+#. Start developing the package. **TODO : page liée**
+#. Write the package documentation at the same time. **TODO : page liée**
+#. Write some test cases for the package. **TODO : page liée**
+#. Test your package. **TODO : page liée**
+#. Generate the package and send a request to upload it on a repository. **TODO : page liée**
 
