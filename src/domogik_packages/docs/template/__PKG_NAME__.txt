@@ -14,6 +14,16 @@ Known issues
 .. todo:: 
     Eventually if there are some issues with the package, list them. If not, delete this chapter.
 
+Dependencies
+============
+
+.. todo::
+    If the package has some dependencies, list them here. Else, delete this chapter.
+
+    * For Domogik dependencies (a plugin which depends on another plugin), just mention their name.
+    * For Python dependencies, just mention their name : the command line to install them will be indicated to the user when he will try to install the package.
+    * For other dependencies (like heyu, owfs, ...), explain how to install them.
+
 How to plug
 ===========
 
@@ -69,6 +79,10 @@ Feature 1
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Address           | The device address : ...                                                                   |
 |                    |                   | Example for ... : ...                                                                      |
+|                    |                   |                                                                                            |
+|                    |                   | .. todo::                                                                                  |
+|                    |                   |     For some packages, you need to use a helper command to get the devices addresses.      |
+|                    |                   |     If this is the case, mention it here.                                                  |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Feature           | xxx.yyy                                                                                    |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
