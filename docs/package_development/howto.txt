@@ -43,15 +43,20 @@ Before creating the package
 ---------------------------
 
 * Check if there is not already an existing (or in development) package for what you want to do.
-* Look into the packages life cycle. **TODO : page liée**
+* Look into :doc:`the packages life cycle <packages_lifecycle>`.
 
 Create the package
 ------------------
 
-#. Make specification for your package on the wiki. You can create a page wiki.domogik.org/<package type>/<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin. **TODO : page liée**
-#. Start developing the package. **TODO : page liée**
-#. Write the package documentation at the same time. **TODO : page liée**
-#. Write some test cases for the package. **TODO : page liée**
-#. Test your package. **TODO : page liée**
-#. Generate the package and send a request to upload it on a repository. **TODO : page liée**
+.. image:: packages_lifecycle.png
+
+Download :download:`SVG source file <packages_lifecycle.svg>`.
+
+#. :doc:`Make specification <specifications>` for your package on the wiki. You can create a page wiki.domogik.org/<package type>/<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin.
+#. :doc:`Start developing the package <developing>`.
+#. Write the :doc:`package documentation <documentation>` at the same time.
+#. Write some :doc:`test cases <test_cases>` for the package. 
+#. :doc:`Test your package <test_the_package>`.
+#. :doc:`Generate the package <generate_the_package>` and send a request to upload it on a repository. 
+
 

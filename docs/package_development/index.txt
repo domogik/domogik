@@ -2,7 +2,7 @@
 Packages development
 ====================
 
-* :doc: `Steps to follow to create a package </package_development/steps>`
+* :doc:`Steps to follow to create a package <howto>`
 
 
 

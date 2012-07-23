@@ -1,0 +1,28 @@
+===================
+Developing a plugin
+===================
+
+Plugin name
+===========
+The plugin name must have a maxium size of 8 characters. This restriction is linked to xPL.
+
+Version number
+==============
+The plugin version must respect the :doc:`rules for version numbers <rules_for_version_numbers>`.
+
+Files
+=====
+At least, a plugin consist of the following files :
+
+* :doc:`src/domogik_packages/xpl/bin/myplg.py <plugin_bin_part>` : the python part that is the link between the library and the xPL network. This is called the *bin* part. 
+* :doc:`src/domogik_packages/xpl/lib/myplg.py <plugin_library_part>` : the python part that contains all the functions/classes related to the device/service the plugin will handle. This is called the *library* part. 
+* :doc:`src/share/domogik/plugins/myplg.json <plugin_json_file>` : a json file which describe the plugin and the features it handles.
+
+Then, a plugin should have at least one file on one of the following folders :
+
+* :doc:`src/share/domogik/stats/ <stats_files>` : in this folder are stored the xml files that describes the way data in xPL messages are inserted in the database.
+* :doc:`src/share/domogik/url2xpl/ <url2xpl_files>` : in this folder are stored the xml files that describes how the rest server will create and send a xPL message when it receives a command from a user interface.
+
+With which part should I begin ?
+================================
+First, you should develop the *library*. When the *library* is functionnal or when some features of your *library* are functionnal, you could start the *bin* part. Then, create the json file and finish with the needed xml files for *stats* and *url2xpl*.

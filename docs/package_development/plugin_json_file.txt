@@ -1,0 +1,80 @@
+================
+Plugin json file
+================
+
+Purpose
+=======
+The Json file describe the package and the features of the package. There is one common part which is the same for all packages type and some optionnal parts that depends on the package type.
+
+.. warning ::
+   In json, you must write *\\n* each time you want to create a newline in the data.
+
+The common part
+===============
+The common part is like this : 
+
+Example
+-------
+
+::
+
+    {
+        "json_version": 1,
+        "identity": {
+            "type": "plugin",
+            "id": "onwire",
+            "category": "onewire",
+            "version": "0.1",
+            "domogik_min_version": "0.2.0",
+            "documentation": 'http://wiki.domogik.org/plugin_onewire',
+            "description": 'Manage 1-wire devices...',
+            "author": 'Domogik',
+            "author_email": 'xx@xxx.fr',
+            "changelog" : "0.1\n-Create plugin",
+            "dependencies": [
+                {  
+                    "id": "owfs (>=2.8.4)",
+                    "type": "other"
+                }
+            ],
+         },
+        "files": [
+            "src/share/domogik/design/plugin/onewire/icon.png",
+            "src/share/domogik/plugins/onewire.json",
+            ...
+        ],
+    }
+
+Description
+-----------
+
+* json_version : version of the json file for this particular element type.
+
+  * identity : element identity.
+
+    * type : the type id for the element:
+
+      * plugin.
+      * external.
+
+    * id : package id (name).
+    * category : package category (for a plugin, it will be its technology).
+    * version : package version.
+    * domogik_min_version : minimum Domogik version required by the package.
+    * description : package description.
+    * author : Name or surname of the developper.
+    * author_email : email the developper.
+    * documentation : link to the specification page.
+    * changelog : changelog. For each version you must indicate the fixes/upgrades.
+    * dependencies : table of dependencies needed by the package :
+
+      * type : type of the dependency
+
+        python : a python dependency (distutils2 format). Ex : 'pyserial (>=2.5)', 'foo (>1.0, <1.8)', ...
+
+        plugin : a Domogik plugin dependency : another plugin must run in order this one could be functionnal.
+
+        other : another dependency (example : owfs for onewire, which need a manual installation).
+
+  * files : list of the files included in the package.
+
