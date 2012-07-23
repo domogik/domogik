@@ -2,6 +2,14 @@
 Plugin json file
 ================
 
+
+.. todo :: 
+    ajouter un tableau avec des coches pour dire si chaque partie concerne tel ou tel type de package
+
+    s/plugin/package/
+    
+
+
 Purpose
 =======
 The Json file describe the package and the features of the package. There is one common part which is the same for all packages type and some optionnal parts that depends on the package type.
@@ -77,4 +85,150 @@ Description
         other : another dependency (example : owfs for onewire, which need a manual installation).
 
   * files : list of the files included in the package.
+
+Plugin part
+===========
+You must add the following parts in the json file when developping a plugin.
+
+Technology
+----------
+
+Example
+*******
+::
+
+        "technology": {
+            "description": "1-wire",
+            "id": "onewire",
+            "name": "1-wire"
+        },
+
+Description
+***********
+These data will be inserted in database during the package installation.
+
+* technology : description of the plugin technology
+
+  * id : technilogy id.
+  * name : tehcnology name.
+  * description : short description of the technology.
+
+
+Device types
+------------
+
+Example
+*******
+::
+
+        "device_types": [
+            {
+                "description": "Thermometer",
+                "id": "onewire.thermometer",
+                "name": "Thermometer"
+            },
+            ...
+        ]
+
+Description
+***********
+These data will be inserted in database during the package installation.
+
+* device_types : list of the device types allowed by the plugin
+
+  * id : device type id
+  * name : device type name
+  * description :  short description of the device type
+
+
+Device feature models
+---------------------
+
+Example
+*******
+::
+
+        "device_feature_models": [
+            {
+                "device_type_id": "onewire.thermometer",
+                "id": "onewire.thermometer.temperature",
+                "name": "Temperature",
+                "feature_type": "sensor",
+                "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}",
+                "return_confirmation": "0",
+                "stat_key": "temperature",
+                "value_type": "number"
+            },
+            ...
+        ]
+
+Description
+***********
+These data will be inserted in database during the package installation.
+
+* device_feature_models : list of the device features models allowed by the plugin
+
+  * device_type_id : device type to which the model is related to.
+  * id : device feature model id
+  * name : name of the device feature model.
+  * feature_type : *sensor* or *actuator* : type of the feature.
+  * parameters : parameters of the feature. 
+  * return_confirmation: *0* or *1* : does the device will give a confirmation after an action has been request ?
+  * stat_key : associated stat key in database (this is related to the key defined in :doc:`the stat files <stats_files>`.
+  * value_type : *number*, *string*, *boolean*, *binary*. The type of the value.
+
+.. todo ::
+    Give more details about parameters
+
+Configuration elements
+----------------------
+These data are read by the manager.
+
+Example
+*******
+::
+
+        "configuration": [
+            {  
+                "id": "0",
+                "interface": "no",
+                "key": "startup-plugin",
+                "type": "boolean",
+                "options": [],
+                "default": "False",
+                "desc": "Automatically start plugin at Domogik startup",
+                "optionnal": "no",
+            },
+            ...
+        ]
+
+Description
+***********
+
+* configuration : list of the configuration parameters of a plugin
+  * id : number of the configuration item. The display order will be related to the id.
+  * interface : *yes* or *no*. If *yes*, group with all the following keys with *interface = yes*. This group of keys allow to configure N iterations of these keys. 
+  * type : the type of the value to set for the key. 
+    * string : the default type
+    * number : a number
+    * boolean : True, False
+    * enum : a list of options. Example: ::
+
+        "type" : "enum",
+        "options": [
+            "ipx800v1",
+            "ipx800pro",
+            "ipx800v2",
+            "ipx800v3"
+        ],
+
+
+  * options : if *type = enum*, list the available options in this table.
+  * default : suggested value.
+  * description : parameter short description.
+  * optionnal : *yes* or *no* : is the parameter optionnal or not ? It is used only for notification in the user interface.
+
+
+.. todo :: 
+    détailer enum
 
