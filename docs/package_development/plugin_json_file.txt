@@ -2,6 +2,8 @@
 Plugin json file
 ================
 
+.. |yes| image:: yes.png
+.. |no|  image:: no.png
 
 .. todo :: 
     ajouter un tableau avec des coches pour dire si chaque partie concerne tel ou tel type de package
@@ -19,6 +21,13 @@ The Json file describe the package and the features of the package. There is one
 
 The common part
 ===============
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
+
 The common part is like this : 
 
 Example
@@ -86,12 +95,18 @@ Description
 
   * files : list of the files included in the package.
 
-Plugin part
-===========
+Optionnal parts
+===============
 You must add the following parts in the json file when developping a plugin.
 
 Technology
 ----------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
 
 Example
 *******
@@ -116,6 +131,12 @@ These data will be inserted in database during the package installation.
 
 Device types
 ------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
 
 Example
 *******
@@ -143,6 +164,12 @@ These data will be inserted in database during the package installation.
 
 Device feature models
 ---------------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
 
 Example
 *******
@@ -182,6 +209,13 @@ These data will be inserted in database during the package installation.
 
 Configuration elements
 ----------------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |no|
+========================================== ======= =========
+
 These data are read by the manager.
 
 Example
@@ -196,7 +230,7 @@ Example
                 "type": "boolean",
                 "options": [],
                 "default": "False",
-                "desc": "Automatically start plugin at Domogik startup",
+                "description": "Automatically start plugin at Domogik startup",
                 "optionnal": "no",
             },
             ...
@@ -231,4 +265,75 @@ Description
 
 .. todo :: 
     détailer enum
+
+
+Udev rules
+----------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |no|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "udev-rules": [
+            {  
+                "description": "Usb DS9490R adaptator",
+                "filename": "onewire.rules",
+                "model": "DS9490R",
+                "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"04fa\", ATTRS{idProduct}==\"2490\", SYMLINK+=\"onewire\", MODE=\"0666\""
+            }
+        ]
+
+Description
+***********
+
+* udev-rules : list of the suggested udev rules.
+  * description : short desciption of the rule. Indicate the related device model here.
+  * filename : suggested filename to use for the rule.
+  * model : related device model.
+  * rule : the udev rule.
+
+
+
+
+
+External members identification
+-------------------------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |no|    |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "external": {
+            "device_id": "rgb",
+            "vendor_id": "arduino"
+        },
+
+Description
+***********
+
+* external : description of the vendor and device id of the external member. This is used to identify a specific external member model.
+  * device_id : device id.
+  * vendor_id : vendor id.
+
+How to insert the data in database
+==================================
+
+*This action is only for developpers!*
+
+If you want to manually insert the data of the json in the database, launch this command : ::
+
+    cd src/tools/packages
+    ./insert_data.py ../../share/domogik/plugins/<your plugin name>.json
 
