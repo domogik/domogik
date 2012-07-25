@@ -16,7 +16,7 @@ At least, a plugin consist of the following files :
 
 * :doc:`src/domogik_packages/xpl/bin/myplg.py <plugin_bin_part>` : the python part that is the link between the library and the xPL network. This is called the *bin* part. 
 * :doc:`src/domogik_packages/xpl/lib/myplg.py <plugin_library_part>` : the python part that contains all the functions/classes related to the device/service the plugin will handle. This is called the *library* part. 
-* :doc:`src/share/domogik/plugins/myplg.json <plugin_json_file>` : a json file which describe the plugin and the features it handles.
+* :doc:`src/share/domogik/plugins/myplg.json <json_file>` : a json file which describe the plugin and the features it handles.
 
 Then, a plugin should have at least one file on one of the following folders :
 
