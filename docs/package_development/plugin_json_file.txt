@@ -1,16 +1,9 @@
 ================
-Plugin json file
+Package json file
 ================
 
 .. |yes| image:: yes.png
 .. |no|  image:: no.png
-
-.. todo :: 
-    ajouter un tableau avec des coches pour dire si chaque partie concerne tel ou tel type de package
-
-    s/plugin/package/
-    
-
 
 Purpose
 =======
@@ -97,7 +90,7 @@ Description
 
 Optionnal parts
 ===============
-You must add the following parts in the json file when developping a plugin.
+You must add the following parts in the json file when developping a package.
 
 Technology
 ----------
@@ -122,7 +115,7 @@ Description
 ***********
 These data will be inserted in database during the package installation.
 
-* technology : description of the plugin technology
+* technology : description of the package technology
 
   * id : technilogy id.
   * name : tehcnology name.
@@ -155,7 +148,7 @@ Description
 ***********
 These data will be inserted in database during the package installation.
 
-* device_types : list of the device types allowed by the plugin
+* device_types : list of the device types allowed by the package
 
   * id : device type id
   * name : device type name
@@ -193,7 +186,7 @@ Description
 ***********
 These data will be inserted in database during the package installation.
 
-* device_feature_models : list of the device features models allowed by the plugin
+* device_feature_models : list of the device features models allowed by the package
 
   * device_type_id : device type to which the model is related to.
   * id : device feature model id
