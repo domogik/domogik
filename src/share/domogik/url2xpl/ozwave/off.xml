@@ -1,0 +1,17 @@
+<technology id="ozwave">
+  <command name="off">
+    <schema>ozwave.basic</schema>
+    <command-key>command</command-key>
+    <address-key>node</address-key>
+    <command-xpl-value>off</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>ozwave.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="off" />
+      <key name="node" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
