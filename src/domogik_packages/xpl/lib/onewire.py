@@ -168,7 +168,8 @@ class ComponentDs18s20:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
                     print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
-                    self.callback(my_type, {"device" : my_id,
+                    if temperature != 85: # Temp = 85 when read error occurs - Can safely be ignored
+                        self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
             self._stop.wait(self.interval)
@@ -327,16 +328,24 @@ class ComponentDs2408:
         self.old_PIO_ALL = {}
         self._stop = stop
         self.start_listening()
+    
+    def chain(self,*iterables):
+        for it in iterables:
+            for element in it:
+                yield element
 
     def start_listening(self):
         """
         Start listening for onewire ds2408
         """
         while not self._stop.isSet():
-            for comp in self.root.find(type = "DS2408"):
+            for comp in self.chain(self.root.find(type = "DS2408"),self.root.find(type = "DS2406"),self.root.find(type = "DS2405"),self.root.find(type = "DS2413")):
                 my_id = comp.family+"."+comp.id
                 try:
-                    PIO_ALL = comp.PIO_ALL
+                    if comp.family == "05":
+                        PIO_ALL = comp.PIO
+                    else:
+                        PIO_ALL = comp.PIO_ALL
                     print("PIO.ALL=%s" % PIO_ALL)
 
                 except AttributeError:
@@ -358,20 +367,17 @@ class ComponentDs2408:
                     print("type=%s, id=%s, PIO_ALL=%s" % (my_type, my_id, PIO_ALL))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "PIO_ALL",
-                                         "data0" : comp.PIO_0,
-                                         "data1" : comp.PIO_1,
-                                         "data2" : comp.PIO_2,
-                                         "data3" : comp.PIO_3,
-                                         "data4" : comp.PIO_4,
-                                         "data5" : comp.PIO_5,
-                                         "data6" : comp.PIO_6,
-                                         "data7" : comp.PIO_7,
+                                         "data0" : getattr(comp,self.onewire.pio_map(my_id,0)),
+                                         "data1" : getattr(comp,self.onewire.pio_map(my_id,1)),
+                                         "data2" : getattr(comp,self.onewire.pio_map(my_id,2)),
+                                         "data3" : getattr(comp,self.onewire.pio_map(my_id,3)),
+                                         "data4" : getattr(comp,self.onewire.pio_map(my_id,4)),
+                                         "data5" : getattr(comp,self.onewire.pio_map(my_id,5)),
+                                         "data6" : getattr(comp,self.onewire.pio_map(my_id,6)),
+                                         "data7" : getattr(comp,self.onewire.pio_map(my_id,7)),
                                          "current" : PIO_ALL})
 
             self._stop.wait(self.interval)
-
-
-
 
 class OneWireNetwork:
     """
@@ -401,21 +407,26 @@ class OneWireNetwork:
         Getter for self._root
         """
         return self._root 
+        
+    def pio_map(self,device,gpio):
+        
+        map = ["A","B","A","B","A","B","A","B"]    # Used to map PIO_0/1 to  PIO_A/B for other devices 
+        fam = device[:2]                  # Extract familly code
+        if fam == "12" or fam == "3A":    # Fam = 12 - DS2406 |  3A = DS2413
+            pio = "PIO_"+map[int(gpio)]   # Rename PIO to A & B
+        elif fam == "05":                 # DS2405 - Only one PIO named "PIO"
+            pio = "PIO"
+        else:                             # All other cases
+            pio = "PIO_"+str(gpio)
+        return pio 
 
     def write(self,device,pio,value):
-        map = ["A","B"]                   # Used to map PIO_0/1 to  PIO_A/B for other devices 
-        ret = 0                           # Ensure we will return a value
-        s = ow.Sensor( '/'+device) 
-        fam = device[:2]                  # Extract familly code
-        if fam == "12":                   # Fam = 12 - DS2406
-            pio = map[pio]                # Rename PIO et A & B
         try:
-            if fam == "05":               # DS2405 - Only one PIO named "PIO"
-                setattr(s,"PIO", value)
-                ret = getattr(s,"PIO")
-            else:                         # All other cases
-                setattr(s,"PIO_"+pio, value)
-                ret = getattr(s,"PIO_"+pio)
+            ret = 0                           # Ensure we will return a value
+            s = ow.Sensor( '/'+device) 
+            gpio = self.pio_map(device,pio)
+            ret = setattr(s,gpio,value)
+            ret = getattr(s,gpio)
         except:
-            raise OneWireException("Can't access given PIO %s" % pio)
+            raise OneWireException("Can't access given PIO %s" % gpio)
         return ret

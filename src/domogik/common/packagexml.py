@@ -177,7 +177,7 @@ class PackageXml():
                                            "interface" : k_interface,
                                            "optionnal" : k_optionnal,
                                            "key" : k_key,
-                                           "desc" : k_desc,
+                                           "description" : k_desc,
                                            "type" : k_type,
                                            "options": k_options,
                                            "default" : k_default})
@@ -420,7 +420,7 @@ class PackageXml():
         my_udev = [] 
         for rule in self.udev_rules:
             my_udev.append({"model" : rule["model"],
-                            "desc" : rule["desc"],
+                            "description" : rule["desc"],
                             "filename" : rule["filename"],
                             "rule" : rule["rule"]})
         my_json["udev-rules"] = my_udev
@@ -451,6 +451,9 @@ class PackageXml():
         # features
         my_json["device_feature_models"] = self.device_feature_models 
             
+        print("# Some updates needs to be done manually :")
+        print("# - adapt the file path in 'files' : src/domogik/xpl/* => src/domogik_packages/xpl/*")
+        print("# - rename the xml file as json in 'files' : src/share/domogik/plugins/myplugin.xml => src/..../myplugin.json")
         return json.dumps(my_json, sort_keys=True, indent=4)
 
 if __name__ == "__main__":

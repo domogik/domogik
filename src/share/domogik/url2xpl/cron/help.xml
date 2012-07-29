@@ -1,0 +1,19 @@
+<technology id="cron">
+  <command name="help">
+    <schema>helper.basic</schema>
+    <command-key>command</command-key>
+    <address-key>plugin</address-key>
+    <command-xpl-value>help</command-xpl-value>
+    <parameters>
+        <parameter key="cmd" location="1"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>helper.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="status" value="ok" />
+      <key name="plugin" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

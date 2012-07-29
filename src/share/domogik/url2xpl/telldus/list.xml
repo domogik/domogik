@@ -1,0 +1,19 @@
+<technology id="telldus">
+  <command name="list">
+    <schema>helper.basic</schema>
+    <command-key>command</command-key>
+    <address-key>plugin</address-key>
+    <command-xpl-value>list</command-xpl-value>
+    <parameters>
+        <parameter key="devicetype" location="1"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>helper.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="status" value="ok" />
+      <key name="plugin" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

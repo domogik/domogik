@@ -219,7 +219,7 @@ function copy_sample_files {
         exit 6
     fi
     if [ -d "/etc/logrotate.d/" ];then
-		cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
+        cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/domogik
     fi
     if [ -d "/etc/init.d/" ];then
@@ -272,7 +272,7 @@ function update_user_config {
 
         read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
         bind_iface=${bind_iface:-lo}
-        bind_addr=$(ifconfig $bind_iface|egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|head -1)
+        bind_addr=$($CMD_NET $bind_iface|egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|head -1)
         if [ "x$bind_addr" = "x" ];then
             echo "Can't find the address associated to the interface!"
             exit 20
@@ -373,8 +373,22 @@ function call_app_installer {
     fi
 }
 
+function check_tools {
+    if [ -x "$(which ip)" ];then
+        CMD_NET='ip addr show'
+    else
+	if [  -x "$(which ifconfig)" ];then
+		CMD_NET='ifconfig'
+	else
+		echo "no network command found"
+            	exit 21
+        fi
+    fi
+}
+
+
 function check_python {
-if [ ! -x "$(which python)" ];then
+    if [ ! -x "$(which python)" ];then
         echo "No python binary found, please install at least python2.6";
         exit 11
     else
@@ -382,7 +396,7 @@ if [ ! -x "$(which python)" ];then
             echo "Bad python version used, please install at least 2.6, and check /usr/bin/python starts the good version."
             exit 12
         fi
-fi
+    fi
 }
 
 function copy_tools {
@@ -433,6 +447,7 @@ if [ "$(dirname $0)" != "." ];then
 fi
 
 #stop_domogik
+check_tools
 check_python
 test_sources $0
 read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE

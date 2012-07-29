@@ -49,4 +49,4 @@ def get_path(dir_only=False):
             return hub[arch] 
 
 if __name__ == "__main__":
-    print get_path(True)
+    print(get_path(True))

@@ -1,0 +1,8 @@
+/var/log/xplhub/*.log {
+        weekly
+        missingok
+        rotate 9
+        copytruncate
+        compress
+        notifempty
+}

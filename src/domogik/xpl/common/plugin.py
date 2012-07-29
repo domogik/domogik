@@ -151,9 +151,21 @@ class XplPlugin(BasePlugin):
        my_conf = cfg.load()
        config = dict(my_conf[1])
        if config.has_key('package_path'):
-           path = "%s/data/%s" % (config['package_path'], self._name)
+           path = "%s/domogik_packages/data/%s" % (config['package_path'], self._name)
        else:
            path = "%s/share/domogik/data/%s" % (config['src_prefix'], self._name)
+       return path
+
+    def get_stats_files_directory(self):
+       """ Return the directory where a plugin developper can store data files
+       """
+       cfg = Loader('domogik')
+       my_conf = cfg.load()
+       config = dict(my_conf[1])
+       if config.has_key('package_path'):
+           path = "%s/domogik_packages/stats/%s" % (config['package_path'], self._name)
+       else:
+           path = "%s/share/domogik/stats/%s" % (config['src_prefix'], self._name)
        return path
 
     def enable_hbeat(self, lock = False):
@@ -245,6 +257,15 @@ class XplPlugin(BasePlugin):
             "host": self.get_sanitized_hostname()})
         self.myxpl.send(mess)
 
+    def _send_hbeat_end(self):
+        """ Send the hbeat.end message
+        """
+        if hasattr(self, "myxpl"):
+            mess = XplMessage()
+            mess.set_type("xpl-stat")
+            mess.set_schema("hbeat.end")
+            self.myxpl.send(mess)
+
     def _manager_handler(self, message):
         """ Handle domogik system request for the Domogik manager
         @param message : the Xpl message received
@@ -261,6 +282,8 @@ class XplPlugin(BasePlugin):
         '''
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
+        # send hbeat.end message
+        self._send_hbeat_end()
         self.get_stop().set()
         for t in self._timers:
             if hasattr(self, "log"):

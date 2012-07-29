@@ -102,7 +102,7 @@
             "feature_type": "sensor", 
             "id": "relayboard.digital_input.digital_input", 
             "name": "Digital input", 
-            "parameters": "{}", 
+            "parameters": "{&quot;value0&quot;:&quot;low&quot;,&quot;value1&quot;:&quot;high&quot;}", 
             "return_confirmation": "0", 
             "stat_key": "input", 
             "value_type": "boolean"
@@ -158,7 +158,8 @@
         "src/share/domogik/url2xpl/relayboard/low.xml", 
         "src/share/domogik/url2xpl/relayboard/pulse.xml", 
         "src/domogik_packages/xpl/bin/ipx800.py", 
-        "src/domogik_packages/xpl/lib/ipx800.py"
+        "src/domogik_packages/xpl/lib/ipx800.py",
+        "src/domogik_packages/xpl/helpers/ipx800.py"
     ], 
     "identity": {
         "author": "Fritz", 

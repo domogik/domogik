@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="telldus">
+    <schema name="telldus.basic">
+        <xpltype type="*">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="command"/>
+                <value field="level"/>
+           </mapping>
+        </xpltype>
+    </schema>
+</statistic>

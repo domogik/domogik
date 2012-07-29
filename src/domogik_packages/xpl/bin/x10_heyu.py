@@ -43,7 +43,7 @@ import traceback
 if os.name == 'nt':
     from domogik_packages.xpl.lib.win_x10_heyu import X10API
 else:
-    from domogik_packages.xpl.lib.x10_heyu import X10API, HeyuManager
+    from domogik_packages.xpl.lib.x10_heyu import X10API, HeyuManager, X10Monitor
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
@@ -78,9 +78,10 @@ class X10Main(XplPlugin):
         #One listener for system schema, allowing to dump config
         #Listener(self.heyu_dump_config, self.myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
         #                                              'command': 'push_config', 'plugin': 'x10'})
-#        self._monitor = X10Monitor(self._heyu_cfg_path_res)
-#        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
-#        self._monitor.get_monitor().start()
+        self.log.debug("before start X10monitor")
+        self._monitor = X10Monitor(self._heyu_cfg_path_res)
+        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
+        self._monitor.get_monitor().start()
         self.enable_hbeat()
         self.log.debug("Heyu correctly started")
 

@@ -1,0 +1,17 @@
+<technology id="lighting">
+  <command name="deactivate">
+    <schema>lighting.basic</schema>
+    <command-key>command</command-key>
+    <address-key>scene</address-key>
+    <command-xpl-value>deactivate</command-xpl-value>
+    <parameters/>
+  </command>
+  <listener>
+    <schema>lighting.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="deactivate" />
+      <key name="scene" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

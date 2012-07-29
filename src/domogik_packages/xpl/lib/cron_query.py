@@ -38,8 +38,8 @@ from threading import Event
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 import traceback
-from domogik.xpl.lib.cron_tools import CronTools
-from domogik.xpl.lib.cron_tools import ERROR_PARAMETER
+from domogik_packages.xpl.lib.cron_tools import CronTools
+from domogik_packages.xpl.lib.cron_tools import ERROR_PARAMETER
 
 
 class CronQuery():

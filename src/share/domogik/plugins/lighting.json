@@ -1,0 +1,74 @@
+{
+    "configuration": [
+        {
+            "default": "True",
+            "description": "Automatically start plugin at Domogik startup",
+            "id": "0",
+            "interface": "no",
+            "key": "startup-plugin",
+            "optionnal": "no",
+            "options": [],
+            "type": "boolean"
+        },
+        {
+            "default": "True",
+            "description": "Allow the gateway to accept messages from unknow networks. You should let it to True",
+            "id": "1",
+            "interface": "no",
+            "key": "broadcast",
+            "optionnal": "no",
+            "options": [],
+            "type": "boolean"
+        }
+    ],
+    "device_feature_models": [
+        {
+            "device_type_id": "lighting.scene",
+            "feature_type": "actuator",
+            "id": "lighting.scene.switch",
+            "name": "Scene",
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;deactivate&quot;, &quot;value1&quot;:&quot;activate&quot;}",
+            "return_confirmation": "0",
+            "stat_key": "command",
+            "value_type": "binary"
+        }
+    ],
+    "device_types": [
+        {
+            "description": "Scene switch",
+            "id": "lighting.scene",
+            "name": "Scene"
+        }
+    ],
+    "files": [
+        "src/share/domogik/design/plugin/lighting/icon.png",
+        "src/share/domogik/plugins/lighting.json",
+        "src/share/domogik/stats/lighting/lighting.scene.xml",
+        "src/share/domogik/url2xpl/lighting/activate.xml",
+        "src/share/domogik/url2xpl/lighting/deactivate.xml",
+        "src/domogik_packages/xpl/bin/lighting.py",
+        "src/domogik_packages/xpl/lib/lighting.py",
+        "src/domogik_packages/xpl/lib/lightplugin.py",
+        "src/domogik_packages/xpl/lib/light_scene.py"
+    ],
+    "identity": {
+        "id": "lighting",
+        "type": "plugin",
+        "author": "Sebastien GALLET",
+        "author_email": "sgallet at gmail dot com",
+        "category": "lighting",
+        "changelog": "0.1\n - Initial release",
+        "dependencies": [],
+        "description": "For plugin developpers only. \nAllows scene management and can distribute scene configuration ever over xpl.",
+        "documentation": "http://wiki.domogik.org/plugin_lighting",
+        "domogik_min_version": "0.2.0",
+        "version": "0.1.0a1"
+    },
+    "json_version": 1,
+    "technology": {
+        "description": "Lighting messages",
+        "id": "lighting",
+        "name": "Lighting"
+    },
+    "udev-rules": []
+}

@@ -20,4 +20,4 @@ settings_local.py
 domogik.sqlite
 dist/ 
 build/
-src/domogik/tests/benchmarks/benchmarks_config.py
+_build/*

@@ -38,10 +38,18 @@ import traceback
 import datetime
 from domogik.xpl.common.xplmessage import XplMessage
 from apscheduler.scheduler import Scheduler
-from domogik.xpl.lib.cron_tools import *
-from domogik.xpl.lib.cron_helpers import CronHelpers
+from domogik_packages.xpl.lib.cron_tools import *
+from domogik_packages.xpl.lib.cron_helpers import CronHelpers
+from pympler.asizeof import asizeof
 #import logging
 #logging.basicConfig()
+
+#MEMORY USAGE
+MEMORY_PLUGIN = 1
+MEMORY_API = 2
+MEMORY_SCHEDULER = 3
+MEMORY_DATA = 4
+MEMORY_STORE = 5
 
 class CronJobs():
     """
@@ -51,15 +59,40 @@ class CronJobs():
         """
         """
         self.data = dict()
-        # Start the scheduler
         self._api = api
         self._scheduler = Scheduler()
         self._store = CronStore(self._api.log, self._api.data_files_dir)
         self._scheduler.start()
         self._store.load_all(self.add_job)
+        self._api.log.info("Load %s jobs from store." % len(self.data))
 
-    def __del__(self):
+    def memory_usage(self, which):
+        '''
+        Return the memory used by an object
+        '''
+        if which == 0 :
+            data = []
+            data.append("api : %s items, %s bytes" % (1, asizeof(self)))
+            data.append("apscheduler : %s items, %s bytes" % (1, asizeof(self._scheduler)))
+            data.append("jobs dict : %s items, %s bytes" % (len(self.data), asizeof(self.data)))
+            data.append("store : %s items, %s bytes" % (1, asizeof(self._store)))
+            return data
+        else:
+            if which == MEMORY_PLUGIN:
+                return 0, 0
+            elif which == MEMORY_API:
+                return 1, asizeof(self)
+            elif which == MEMORY_SCHEDULER:
+                return 1, asizeof(self._scheduler)
+            elif which == MEMORY_DATA:
+                return len(self.data), asizeof(self.data)
+            elif which == MEMORY_STORE:
+                return 1, asizeof(self._store)
+        return None
+
+    def stop_scheduler(self):
         """
+        Stop the aps scheduler. Must be called before killing the plugin.
         """
         self._scheduler.shutdown()
 
@@ -189,8 +222,7 @@ class CronJobs():
                     sdate, args=[device])
                 self.data[device]['apjob'] = job
                 self._job_started(device)
-                self._api.log.info("_start_jobDate : add job \
-                    at date %s" % xpldate)
+                self._api.log.info("Add job at date %s." % xpldate)
             except:
                 self._api.log.error("_start_jobDate : " + \
                     traceback.format_exc())
@@ -235,8 +267,7 @@ class CronJobs():
                     seconds=frequence, args=[device])
                 self.data[device]['apjob'] = job
                 self._job_started(device)
-                self._api.log.info("_start_jobTimer : add an \
-                    infinite timer every %s seconds" % frequence)
+                self._api.log.info("Add an infinite timer every %s seconds." % frequence)
             except:
                 self._api.log.error("_start_jobTimer : " + \
                     traceback.format_exc())
@@ -254,8 +285,7 @@ class CronJobs():
                     i = i-1
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobTimer : add a %s \
-                    beats timer every %s seconds" % (duration, frequence))
+                self._api.log.info("Add a %s beat timer every %s seconds." % (duration, frequence))
             except:
                 self._api.log.error("_start_jobTimer : " + \
                     traceback.format_exc())
@@ -323,8 +353,7 @@ class CronJobs():
                 seconds=seconds, start_date=startdate, args=[device])
             self._job_started(device)
             self.data[device]['apjob'] = job
-            self._api.log.info("_start_jobInterval : add an \
-                interval job %s" % str(job))
+            self._api.log.info("Add an interval job %s." % str(job))
         except:
             self._api.log.error("_start_jobInterval : " + \
                 traceback.format_exc())
@@ -408,8 +437,7 @@ class CronJobs():
                 second=second, start_date=startdate, args=[device])
             self.data[device]['apjob'] = job
             self._job_started(device)
-            self._api.log.info("_start_jobCron : add a cron \
-                job %s" % str(job))
+            self._api.log.info("Add a cron job %s." % str(job))
         except:
             self._api.log.error("_start_jobCron : " + \
                 traceback.format_exc())
@@ -442,6 +470,17 @@ class CronJobs():
                 valueon1 = self.data[device]['valueon1']
                 valueoff1 = self.data[device]['valueoff1']
                 res[parameter1] = {'valueon':valueon1, 'valueoff':valueoff1}
+                okk = True
+            else:
+                okk = False
+        if okk and 'parameter2' in self.data[device]:
+            parameter2 = self.data[device]['parameter2']
+            okk = False
+            if 'valueon2' in self.data[device] and \
+                'valueoff2' in self.data[device]:
+                valueon2 = self.data[device]['valueon2']
+                valueoff2 = self.data[device]['valueoff2']
+                res[parameter2] = {'valueon':valueon2, 'valueoff':valueoff2}
                 okk = True
             else:
                 okk = False
@@ -588,8 +627,7 @@ class CronJobs():
                             args=[device, parameters, events[d][h]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobHvac : add a \
-                    hvac job %s" % str(jobs))
+                self._api.log.info("Add an hvac job %s." % str(jobs))
         except:
             self._api.log.error("_start_jobHvac : " + \
                 traceback.format_exc())
@@ -717,8 +755,7 @@ class CronJobs():
                                 args=[device, parameters, events[d][h]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobAlarm : add a \
-                    alarm job %s" % str(jobs))
+                self._api.log.info("Add an alarm job %s." % str(jobs))
         except:
             self._api.log.error("_start_jobAlarm : " + \
                 traceback.format_exc())
@@ -889,8 +926,12 @@ class CronJobs():
                         i = i+1
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("_start_jobDawnAlarm : add a \
-                    dawnalarm job %s" % str(jobs))
+                talarms = ""
+                if type(self.data[device]["alarm"]) == type(""):
+                    self._api.log.info("Add a dawnalarm job %s." % str(self.data[device]["alarm"]))
+                else :
+                    for alar in self.data[device]["alarm"] :
+                        self._api.log.info("Add a dawnalarm job %s." % str(alar))
         except:
             self._api.log.error("_start_jobDawnAlarm : " + \
                 traceback.format_exc())
@@ -991,18 +1032,26 @@ class CronJobs():
         Get the list of jobs
         @return : The list of jobs
         """
-        fmtret = "%-10s | %-8s | %8s | %8s | %12s| %13s"
+        fmtret = "%-10s | %-8s | %8s | %8s | %8s | %12s| %13s"
+        fmtretn = "%s|%s|%s|%s|%s|%s|%s"
         lines = []
         if head == True:
-            lines.append(fmtret % ("device", "status", "#runs", \
+            lines.append(fmtret % ("device", "type", "status", "#runs", \
                 "#aps", "uptime(in s)", "runtime(in s)"))
-            lines.append(fmtret % ("----------", "--------", "--------", \
+            lines.append(fmtret % ("----------", "--------", "--------", "--------", \
                 "--------", "------------", "-------------"))
-        for i in self.data.iterkeys():
-            #print i
-            lines.append(fmtret % (i, self.data[i]['current'], \
-                self.get_runs(i), self.get_ap_count(i), \
-                self.get_up_time(i), self.get_run_time(i)))
+            for i in self.data.iterkeys():
+                #print i
+                lines.append(fmtret % (i, self.data[i]['current'], self.data[i]['devicetype'], \
+                    self.get_runs(i), self.get_ap_count(i), \
+                    self.get_up_time(i), self.get_run_time(i)))
+        else :
+            for i in self.data.iterkeys():
+                #print i
+                lines.append(fmtretn % (i, self.data[i]['current'], self.data[i]['devicetype'], \
+                    self.get_runs(i), self.get_ap_count(i), \
+                    self.get_up_time(i), self.get_run_time(i)))
+
         return lines
 
     def get_ap_list(self, head):
@@ -1011,12 +1060,16 @@ class CronJobs():
         @return : The list of jobs in APScheduler
         """
         fmtret = "%-10s | %8s"
+        fmtretn = "%s|%s"
         lines = []
         if head == True:
             lines.append(fmtret % ("name", "runs"))
             lines.append(fmtret % ("----------", "--------"))
-        for i in self._scheduler.get_jobs():
-            lines.append(fmtret % (str(i.trigger), i.runs))
+            for i in self._scheduler.get_jobs():
+                lines.append(fmtret % (str(i.trigger), i.runs))
+        else:
+            for i in self._scheduler.get_jobs():
+                lines.append(fmtretn % (str(i.trigger), i.runs))
         return lines
 
     def get_ap_count(self, device):
@@ -1189,24 +1242,38 @@ class CronAPI:
         """
         self.log.debug("cronAPI.basicListener : Start ...")
         actions = {
-            'halt': lambda x,d,m: self._action_halt(x,d),
-            'resume': lambda x,d,m: self._action_resume(x,d),
-            'stop': lambda x,d,m: self._action_stop(x,d),
-            'start': lambda x,d,m: self._action_start(x,d,m),
-            'status': lambda x,d,m: self._action_status(x,d),
-            'list': lambda x,d,m: self._action_list(x,d),
+            'halt': lambda x,d,m: self._action_halt(x, d),
+            'resume': lambda x,d,m: self._action_resume(x, d),
+            'stop': lambda x,d,m: self._action_stop(x, d),
+            'start': lambda x,d,m: self._action_start(x, d, m),
+            'status': lambda x,d,m: self._action_status(x, d),
+            'list': lambda x,d,m: self._action_list(x, d),
         }
+
+        commands = {
+            'list': lambda x,d,m: self._command_list(x, d, m),
+            'start': lambda x,d,m: self._action_start(x, d, m),
+        }
+
         try:
             action = None
             if 'action' in message.data:
                 action = message.data['action']
+            command = None
+            if 'command' in message.data:
+                command = message.data['command']
             device = None
             if 'device' in message.data:
                 device = message.data['device']
-            self.log.debug("cronAPI.basicListener : action %s received \
-                with device %s" % (action, device))
-
-            actions[action](self.myxpl, device, message)
+            caller = None
+            if 'caller' in message.data:
+                caller = message.data['caller']
+            self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action, device))
+            self.log.debug("cronAPI.basicListener : command %s received with caller %s" % (command, caller))
+            if action != None :
+                actions[action](self.myxpl, device, message)
+            elif command != None :
+                commands[command](self.myxpl, device, message)
         except:
             self.log.error("action _ %s _ unknown." % (action))
             error = "Exception : %s" %  \
@@ -1226,10 +1293,58 @@ class CronAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
+        mess.add_data({"device" : device})
+        mess.add_data({"action" : "list"})
         mess.add_data({"devices" : self.jobs.get_list(False)})
         mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
         myxpl.send(mess)
         self.log.debug("cronAPI._listStatus : Done :)")
+
+    def _command_list(self, myxpl, device, message):
+        """
+        Lists the timers
+        timer.basic
+           {
+            action=status
+            ...
+           }
+        """
+        self.log.debug("cronAPI._command_list : Start ...")
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("timer.basic")
+        caller = None
+        if "caller" in message.data:
+            caller = message.data['caller']
+        mess.add_data({"caller" : caller})
+        mess.add_data({"command" : "list"})
+        mess.add_data({"devices" : self.jobs.get_list(False)})
+        #mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
+        myxpl.send(mess)
+        self.log.debug("cronAPI._command_list : Done :)")
+
+    def _command_start(self, myxpl, device, message):
+        """
+        Add and start a timer
+        @param device : The timer to start
+
+        timer.basic
+            {
+             device=<name of the timer>
+             current=halted|resumed|stopped|started|went off
+             elapsed=<number of seconds between start and stop>
+            }
+        """
+        self.log.debug("cronAPI._actionAdd : Start ...")
+        devicetype = "timer"
+        if 'devicetype' in message.data:
+            devicetype = message.data['devicetype']
+        caller = None
+        if 'caller' in message.data:
+            caller = message.data['caller']
+        self._send_xpl_trig(myxpl, device, "started", \
+            self.jobs.add_job(device, devicetype, message.data), caller)
+        self.log.debug("cronAPI._actionAdd : Done :)")
 
     def _action_status(self, myxpl, device):
         """
@@ -1286,6 +1401,7 @@ class CronAPI:
         self.log.debug("cronAPI._actionHalt : Start ...")
         self._send_xpl_trig(myxpl, device, "halted", \
             self.jobs.halt_job(device))
+        self.log.debug("Halt job :)")
         self.log.debug("cronAPI._actionHalt : Done :)")
 
     def _action_start(self, myxpl, device, message):
@@ -1309,7 +1425,7 @@ class CronAPI:
             self.jobs.add_job(device, devicetype, message.data))
         self.log.debug("cronAPI._actionAdd : Done :)")
 
-    def _send_xpl_trig(self, myxpl, device, current, error):
+    def _send_xpl_trig(self, myxpl, device, current, error, caller=None):
         """
         Send the XPL Trigger
         @param myxpl : The XPL sender
@@ -1332,13 +1448,15 @@ class CronAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
+        if caller != None :
+            mess.add_data({"caller" : caller})
         mess.add_data({"device" : device})
         if error == ERROR_NO:
             mess.add_data({"current" :  current})
             mess.add_data({"elapsed" : self.jobs.get_up_time(device)})
             mess.add_data({"runtime" : self.jobs.get_run_time(device)})
             mess.add_data({"runs" : self.jobs.get_runs(device)})
-            self.log.info("cronAPI._send_xpl_trig : Send okk xpl-trig :)")
+            self.log.debug("cronAPI._send_xpl_trig : Send okk xpl-trig :)")
         else:
             if device in self.jobs.data:
                 mess.add_data({"current" : self.jobs.data[device]['current']})
@@ -1349,6 +1467,6 @@ class CronAPI:
                 mess.add_data({"elasped" :  0})
                 mess.add_data({"current" : "halted"})
             mess.add_data(self.tools.error(error))
-            self.log.info("cronAPI._send_xpl_trig : Send error xpl-trig :(")
+            self.log.debug("cronAPI._send_xpl_trig : Send error xpl-trig :(")
         myxpl.send(mess)
         self.log.debug("cronAPI._send_xpl_trig : Done :)")

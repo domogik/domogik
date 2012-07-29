@@ -43,7 +43,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
+from domogik_packages.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
 class PLCBUSException(Exception):

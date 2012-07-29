@@ -293,25 +293,32 @@ class PackageManager():
         self.log("OK")
     
 
-    def cache_package(self, cache_dir, pkg_type, id, version):
+    def cache_package(self, cache_dir, pkg_type, id, version, pkg_path = None):
         """ Download package to put it in cache
             @param cache_dir : folder in which we want to cache the file
             @param pkg_type : package type
             @param id : package id
             @param version : package version
+            @param pkg_path : path of the package to cache on local host
         """
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
-        package = "%s-%s" % (pkg_type, id)
-        pkg, status = self._find_package(package, version)
-        if status != True:
-            return False
-        # download package
-        path = pkg["archive_url"]
         dl_path = "%s/%s-%s-%s.tgz" % (cache_dir, pkg_type, id, version)
-        self.log("Caching package : '%s' to '%s'" % (path, dl_path))
-        urllib.urlretrieve(path, dl_path)
-        path = dl_path
+
+        ### cache from the web
+        if pkg_path == None:
+            package = "%s-%s" % (pkg_type, id)
+            pkg, status = self._find_package(package, version)
+            if status != True:
+                return False
+            # download package
+            path = pkg["archive_url"]
+            self.log("Caching package : '%s' to '%s'" % (path, dl_path))
+            urllib.urlretrieve(path, dl_path)
+        ### cache from a local file
+        else:
+            self.log("Caching package : '%s' to '%s'" % (pkg_path, dl_path))
+            shutil.copyfile(pkg_path, dl_path)
         self.log("OK")
         return True
 
@@ -497,6 +504,7 @@ class PackageManager():
                     self._create_init_py("%s/xpl/" % plg_path)
                     self._create_init_py("%s/xpl/bin/" % plg_path)
                     self._create_init_py("%s/xpl/lib/" % plg_path)
+                    self._create_init_py("%s/xpl/helpers/" % plg_path)
                     type_path = "plugins"
                 if pkg_type == "external":
                     type_path = "externals"
@@ -679,7 +687,7 @@ class PackageManager():
             self.log(msg)
             raise PackageException(msg)
 
-    def get_available_updates(self, pkg_type, id, version):
+    def get_available_updates(self, pkg_type, pkg_id, version):
         """ List all available updates for a package
             @param pkg_type : package type
             @param id : package id
@@ -688,23 +696,23 @@ class PackageManager():
         if PACKAGE_MODE != True:
             raise PackageException("Package mode not activated")
         
-        # TODO : to review
-        
-
-        #upd_list = []
-        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
-        #    for fic in files:
-        #        if fic[-5:] == ".json":
-        #            pkg_json = PackageJson(path = "%s/%s" % (root, fic)).json
-        #            if pkg_json["identity"]["type"] == pkg_type and pkg_json["identity"]["id"] == id \
-        #               and pkg_json["identity"]["version"] > version:
-        #                upd_list.append({"type" : pkg_json["identity"]["type"],
-        #                                 "id" : pkg_json["identity"]["id"],
-        #                                 "version" : pkg_json["identity"]["version"],
-        #                                 "priority" : pkg_json["identity"]["priority"],
-        #                                 "changelog" : pkg_json["identity"]["changelog"]})
-        #return upd_list
-
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for fic in files:
+                if fic[-5:] != ".json":
+                    continue
+                my_json = json.load(open("%s/%s" % (root, fic)))
+                for my_pkg in my_json["packages"]:
+                    if pkg_type == my_pkg["type"] and \
+                       pkg_id == my_pkg["id"] and \
+                       version < my_pkg["version"]:
+                        pkg_list.append({"type" : pkg_type,
+                                         "id" : pkg_id,
+                                         "version" : my_pkg["version"],
+                                         "priority" : my_pkg["priority"], 
+                                         "changelog" : my_pkg["changelog"]})
+        return pkg_list
+                       
     def list_packages(self):
         """ List all packages in cache folder 
             Used for printing on command line
@@ -821,29 +829,6 @@ class PackageManager():
                         fullname == my_pkg["fullname"]):
                         pkg_list.append(my_pkg)
                        
-
-        # TODO : review
-        #for root, dirs, files in os.walk(REPO_CACHE_DIR):
-        #    for fic in files:
-        #        if fic[-5:] == ".json":
-        #            pkg_obj = PackageJson(path = "%s/%s" % (root, fic))
-        #            pkg_json = pkg_obj.json
-        #            if version == None:
-        #                if fullname == pkg_json["identity"]["fullname"]:
-        #                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-        #                                     "version" : pkg_json["identity"]["version"],
-        #                                     "priority" : pkg_json["identity"]["priority"],
-        #                                     "source" : pkg_json["identity"]["source"],
-        #                                     "obj" : pkg_obj,
-        #                                     "json" : pkg_json})
-        #            else:
-        #                if fullname == pkg_json["identity"]["fullname"] and version == pkg_json["identity"]["version"]:
-        #                    pkg_list.append({"fullname" : pkg_json["identity"]["fullname"],
-        #                                     "version" : pkg_json["identity"]["version"],
-        #                                     "priority" : pkg_json["identity"]["priority"],
-        #                                     "obj" : pkg_obj,
-        #                                     "json" : pkg_json})
-
         if len(pkg_list) == 0:
             if version == None:
                 version = "*"

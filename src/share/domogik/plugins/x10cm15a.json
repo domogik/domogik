@@ -78,7 +78,7 @@
     "files": [
         "src/share/domogik/design/plugin/x10cm15a/icon.png", 
         "src/share/domogik/plugins/x10cm15a.json", 
-        "src/share/domogik/stats/x10/x10.basic-x10cm15a.xml", 
+        "src/share/domogik/stats/x10/x10.basic.xml", 
         "src/share/domogik/url2xpl/x10/bright.xml", 
         "src/share/domogik/url2xpl/x10/dim.xml", 
         "src/share/domogik/url2xpl/x10/on.xml", 

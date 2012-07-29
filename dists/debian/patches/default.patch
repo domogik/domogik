@@ -1,6 +1,6 @@
 diff -Nru domogik-0.1.99.orig/src/domogik/examples/default/domogik domogik-0.1.99/src/domogik/examples/default/domogik
---- domogik-0.1.99.orig/src/domogik/examples/default/domogik	2012-03-23 03:23:13.000000000 +0100
-+++ domogik-0.1.99/src/domogik/examples/default/domogik	2012-03-23 03:24:26.000000000 +0100
+--- domogik-0.1.99.orig/src/domogik/examples/default/domogik	2012-05-09 00:32:40.000000000 +0200
++++ domogik-0.1.99/src/domogik/examples/default/domogik	2012-05-09 00:33:54.000000000 +0200
 @@ -7,7 +7,7 @@
  # -d to start the database manager (launch only on master host)
  # -r to start the rest component (launch only on master host)
@@ -10,35 +10,13 @@ diff -Nru domogik-0.1.99.orig/src/domogik/examples/default/domogik domogik-0.1.9
  # -t <ping duration> to customize ping duration
  # -w <wait time between 2 ping> to customize ping delay
  # Remember : Your domogik installation must have *one* and *only one*
-@@ -17,16 +17,20 @@
- #  - You do not pass -d parameter to the manager
- MANAGER_PARAMS="-d -r -p -E"
+@@ -21,6 +21,9 @@
+ # If so, set this option to 'false'
+ LAUNCH_DOMOGIK_XPL_HUB=true
  
--# You may want to use a xPL hub which is not the one given with Domogik
--# If so, set this option to 'false'
--LAUNCH_DOMOGIK_XPL_HUB=true
 +#Should we start domogik at startup
 +RUN=yes
- 
--# You can define one or many extra path(s) for Domogik startup scripts.
--# This should only be useful if you use Domogik in developement mode (with setup.py develop)
--# or if you have a custom path install.
--# PATH is needed to locate 1 application :
--#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop
--CUSTOM_PATH=
-+DIETIME=2               # Time to wait for the server to die, in seconds
-+                        # If this value is set too low you might not
-+                        # let some servers to die gracefully and
-+                        # 'restart' will not work
 +
-+STARTTIME=1             # Time to wait for the server to start, in seconds
-+                        # If this value is set each time the server is
-+                        # started (on start or restart) the script will
-+                        # stall to try to determine if it is running
-+                        # If it is not set and the server takes time
-+                        # to setup a pid file the log message might
-+                        # be a false positive (says it did not start
-+                        # when it actually did)
- 
--# Interface where the xpl hub is supposed to listen for
--HUB_IFACE="lo"
+ # You can define one or many extra path(s) for Domogik startup scripts.
+ # This should only be useful if you use Domogik in developement mode (with setup.py develop)
+ # or if you have a custom path install.

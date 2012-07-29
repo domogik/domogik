@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="lighting">
+    <schema name="lighting.basic">
+        <xpltype type="*">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="scene"/>
+                <value field="command"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

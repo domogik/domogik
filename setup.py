@@ -71,12 +71,12 @@ d_files = [
 if arch != None:
     d_files.append(('/usr/sbin/', [arch]))
 else:
-    print "*************** WARNING ***************"
-    print "* Can't find an xPL Hub for your arch *"
-    print "* Please check documentation in :     *"
-    print "*  src/domogik/xpl/tools/COMPILE.txt  *"
-    print "* to get the sources and compile them.*"
-    print "***************************************"
+    print("*************** WARNING ***************")
+    print("* Can't find an xPL Hub for your arch *")
+    print("* Please check documentation in :     *")
+    print("*  src/domogik/xpl/tools/COMPILE.txt  *")
+    print("* to get the sources and compile them.*")
+    print("***************************************")
 
 setup(
     name = 'Domogik',

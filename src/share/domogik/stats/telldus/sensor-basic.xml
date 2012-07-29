@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="telldus">
+    <schema name="sensor.basic">
+        <xpltype type="*">
+            <listener>
+                <filter>
+                    <key name="type" value="telldus"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

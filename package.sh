@@ -1,18 +1,32 @@
 #!/bin/bash
 
-if [[ $# -eq 0 ]] ; then
-    REVISION=a32a4824492a
-    SHORT_RELEASE=0.1.0-alpha3
+if [[ $# -lt 1 ]] ; then
+    echo "Usage : "$(basename $0)" <'tip' or revision number> [version name]"
+    echo "Example :"
+    echo "$(basename $0) tip 0.2.0-alpha1"
+    exit 1
 else
     case $1 in
         "tip")
             REVISION=$(hg log -r tip --template '{node|short}')
-            SHORT_RELEASE=tip-$REVISION
+            SHORT_RELEASE=$REVISION-tip
             ;;
         *)
-            echo "Bad usage. Exiting..."
-            exit 1
+            set +e
+            OK=$(hg log -r $1 >/dev/null 2>&1; echo $?)
+            set -e
+            #echo $OK
+            if [[ $OK -eq 0 ]] ; then
+                REVISION=$1
+                SHORT_RELEASE=$REVISION
+            else
+                echo "Bad usage. C'ant find revision $1"
+                exit 1
+            fi
     esac
+    if [[ $# -eq 2 ]] ; then
+        SHORT_RELEASE=$2
+    fi
 fi
 
 ARCHIVE_NAME=domogik-temp
@@ -30,6 +44,7 @@ function generate_pkg() {
     -X .hg_archival.txt  \
     -X .coverage  \
     -X .hgignore  \
+    -X dists/  \
     -X src/domogik/ui/  \
     -X src/domogik_packages/ \
     -X src/external/ \

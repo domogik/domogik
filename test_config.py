@@ -114,6 +114,7 @@ def test_config_files():
     manager_params = ''
     custom_path = ''
     hub_iface = ''
+    launch_domogik_xpl_hub = ''
     for line in lines:
         item,value = line.strip().split("=")
         if item.strip() == "DOMOGIK_USER":
@@ -126,6 +127,10 @@ def test_config_files():
             hub_iface = value
         elif item.strip() == "LAUNCH_DOMOGIK_XPL_HUB":
             launch_domogik_xpl_hub = value
+        elif item.strip() == "DIETIME":
+            pass
+        elif item.strip() == "STARTTIME":
+            pass
         else:
             warning("Unknown config value in the main config file : %s" % item)
     ok("Global config file exists and contains right stuff")

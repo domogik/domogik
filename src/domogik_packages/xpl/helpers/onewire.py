@@ -96,7 +96,7 @@ class Onewire(Helper):
                   "ds2408" :
                   {
                     "cb" : self.ds2408,
-                    "desc" : "Show detail for all DS2408 devices",
+                    "desc" : "Show detail for all DS2408/DS2406/DS2405 devices",
                     "min_args" : 1,
                     "usage" : "ds2408 <adaptator device>"
                   } 
@@ -295,6 +295,17 @@ class OneWireNetwork:
         """
         ret = []
         display = " - %-30s : %s"
+
+        for comp in self._root.find(type = "DS2405"):
+            ret.append("DS2405 : id=%s" % comp.id)
+            ret.append(display % ("SWITCH 0 ", comp.PIO))
+            
+        for comp in self._root.find(type = "DS2406"):
+            ret.append("DS2408 : id=%s" % comp.id)
+            ret.append(display % ("SWITCHS_ALL", comp.PIO_ALL))
+            ret.append(display % ("SWITCH 0 ", comp.PIO_A))
+            ret.append(display % ("SWITCH 1 ", comp.PIO_B))
+        
         for comp in self._root.find(type = "DS2408"):
             ret.append("DS2408 : id=%s" % comp.id)
             ret.append(display % ("SWITCHS_ALL", comp.PIO_ALL))
@@ -306,7 +317,13 @@ class OneWireNetwork:
             ret.append(display % ("SWITCH 5 ", comp.PIO_5))
             ret.append(display % ("SWITCH 6 ", comp.PIO_6))
             ret.append(display % ("SWITCH 7 ", comp.PIO_7))
-
+        
+        for comp in self._root.find(type = "DS2413"):
+            ret.append("DS2408 : id=%s" % comp.id)
+            ret.append(display % ("SWITCHS_ALL", comp.PIO_ALL))
+            ret.append(display % ("SWITCH 0 ", comp.PIO_A))
+            ret.append(display % ("SWITCH 1 ", comp.PIO_B))
+            
         return ret
 
 

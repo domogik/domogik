@@ -36,8 +36,8 @@ class teleinfo(Helper)
 
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.teleinfo import Teleinfo
-from domogik.xpl.lib.teleinfo import TeleinfoException
+from domogik_packages.xpl.lib.teleinfo import Teleinfo
+from domogik_packages.xpl.lib.teleinfo import TeleinfoException
 from domogik.common import logger
 
 

@@ -35,7 +35,7 @@ import datetime
 import math
 from domogik.xpl.common.xplmessage import XplMessage
 import traceback
-from domogik.xpl.lib.cron_query import CronQuery
+from domogik_packages.xpl.lib.cron_query import CronQuery
 
 class zalarmsAPI:
     """

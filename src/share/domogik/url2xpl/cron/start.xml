@@ -1,0 +1,20 @@
+<technology id="cron">
+  <command name="start">
+    <schema>timer.basic</schema>
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>start</command-xpl-value>
+    <parameters>
+        <parameter key="devicetype" location="1"/>
+        <parameter key="alarm" location="2"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>timer.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="current" value="started" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

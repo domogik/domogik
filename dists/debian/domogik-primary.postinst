@@ -26,10 +26,12 @@ case "$1" in
 		db_get "domogik/interface"
 		INTERFACE="$RET"
         ADDR=$(/sbin/ifconfig $INTERFACE|/bin/egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|/usr/bin/head -1)
-        if [ "x$INTERFACE" = "x" ];then
-            echo "Can't find the address associated to the interface!"
+        if [ "x$INTERFACE" = "x" ] || [ "x$ADDR" = "x" ] ;then
+            echo "Can't find the address associated to the interface $INTERFACE!"
             exit 20
         fi
+        sed -i "s;^package_path.*$;package_path = /var/lib/domogik;" /etc/domogik/domogik.cfg
+        sed -i "s;^#src_prefix.*$;#src_prefix = ;" /etc/domogik/domogik.cfg
         sed -i "s/^bind_interface.*$/bind_interface = $ADDR/" /etc/domogik/domogik.cfg
         sed -i "s/^rest_server_port.*$/rest_server_port = 40405/" /etc/domogik/domogik.cfg
         sed -i "s/^rest_server_ip.*$/rest_server_ip = $ADDR/" /etc/domogik/domogik.cfg

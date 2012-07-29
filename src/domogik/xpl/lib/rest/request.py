@@ -138,6 +138,7 @@ class ProcessRequest():
         self.log = self.handler_params[0].log
         self.log_dm = self.handler_params[0].log_dm
         self._package_path = self.handler_params[0]._package_path
+        self._src_prefix = self.handler_params[0]._src_prefix
         self._design_dir = self.handler_params[0]._design_dir
         self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
         self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
@@ -184,7 +185,7 @@ class ProcessRequest():
 
         # package path
         if self._package_path != None:  # package mode
-            sys.path.append(self._package_path)
+            sys.path = [self._package_path] + sys.path
 
         # url processing
         #self.path = self.fixurl(self.path)
@@ -268,7 +269,9 @@ class ProcessRequest():
         """ Process request
             This function call appropriate functions for processing path
         """
-        if self.rest_type == "command":
+        if self.rest_type == "robots.txt":
+            self.rest_robots_txt()
+        elif self.rest_type == "command":
             self.rest_command()
         elif self.rest_type == "stats":
             self.rest_stats()
@@ -548,6 +551,15 @@ class ProcessRequest():
 
 
 ######
+# /robots.txt processing
+######
+
+    def rest_robots_txt(self):
+        """ Tell crawlers to go away
+        """
+        self.send_http_response_ok("# go away\nUser-agent: *\nDisallow: /\n")
+
+######
 # /command processing
 ######
 
@@ -772,6 +784,12 @@ target=*
             device_id = self.rest_request[0]
             key = self.rest_request[1]
 
+            # Replace wildcard value by None value
+            if device_id=='*':
+                device_id = None
+            if key=='*':
+                key = None
+
         ### all ######################################
         if self.rest_request[2] == "all":
             self._rest_stats_all(device_id, key)
@@ -815,7 +833,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         idx = 1
         while idx < len(self.rest_request):
-            for data in self._db.list_last_n_stats_of_device_by_key(self.rest_request[idx+1], self.rest_request[idx],  1):
+            for data in self._db.list_last_n_stats_of_device(self.rest_request[idx], self.rest_request[idx+1],  1):
                 json_data.add_data(data)
             idx += 2
         self.send_http_response_ok(json_data.get())
@@ -831,7 +849,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_device_stats(device_id):
+        for data in self._db.list_device_stats(device_id,key):
             # TODO : filter by key
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
@@ -848,7 +866,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_last_n_stats_of_device_by_key(key, device_id,  num):
+        for data in self._db.list_last_n_stats_of_device(device_id, key,  num):
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
@@ -880,8 +898,8 @@ target=*
             csv_data = CsvHelper()
         values = []
         if st_interval != None and st_selector != None:
-            data = self._db.filter_stats_of_device_by_key(key,
-                                                               device_id,
+            data = self._db.filter_stats_of_device_by_key(device_id,
+                                                               key,
                                                                st_from,
                                                                st_to,
                                                                st_interval,
@@ -3704,12 +3722,19 @@ target=*
             return
 
 
-        #package = domogik_packages.xpl.helpers
+        # get helper lib path
+        if self._package_path == None:
+            helper_path = self._src_prefix
+        else:
+            helper_path = self._package_path
+        helper_path += "/domogik_packages/xpl/helpers/"
+
         if command == "help":
             output = ["List of available helpers :"]
-            #for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-            for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
-                output.append(" - %s" % plgname)
+            for root, dirs, files in os.walk(helper_path):
+                for fic in files:
+                    if fic[-3:] == ".py" and fic[0:2] != "__":
+                        output.append(" - %s" % fic[0:-3])
             output.append("Type 'foo help' to get help on foo helper")
 
 
@@ -3724,21 +3749,24 @@ target=*
             ### load helper and create object
             try:
                 #for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-                for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
-                    if plgname == command:
-                        helper = __import__('domogik_packages.xpl.helpers.%s' % plgname, fromlist="dummy")
-                        try:
-                            helper_object = helper.MY_CLASS["cb"]()
-                            if len(self.rest_request) == 2:
-                                output = helper_object.command(self.rest_request[1])
-                            else:
-                                output = helper_object.command(self.rest_request[1], \
+                #for importer, plgname, ispkg in pkgutil.iter_modules(self._package_path):
+                for root, dirs, files in os.walk(helper_path):
+                    for fic in files:
+                        if fic[-3:] == ".py" and fic[0:2] != "__":
+                            if fic[0:-3] == command:
+                                helper = __import__('domogik_packages.xpl.helpers.%s' % command, fromlist="dummy")
+                                try:
+                                    helper_object = helper.MY_CLASS["cb"]()
+                                    if len(self.rest_request) == 2:
+                                        output = helper_object.command(self.rest_request[1])
+                                    else:
+                                        output = helper_object.command(self.rest_request[1], \
                                                                self.rest_request[2:])
-                        except HelperError as err:
-                            self.send_http_response_error(999, 
+                                except HelperError as err:
+                                    self.send_http_response_error(999, 
                                                       "Error : %s" % err.value,
                                                       self.jsonp, self.jsonp_cb)
-                            return
+                                    return
                     
                         
 
@@ -3790,44 +3818,50 @@ target=*
     def _rest_repo_put(self):
         """ Put a file on rest repository
         """
+        status, data1, data2 = self._upload_file()
+        if status:
+            json_data = JSonHelper("OK")
+            json_data.set_data_type("repository")
+            json_data.add_data({"file" : data1})
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+        else:
+            self.send_http_response_error(999, data, self.jsonp, self.jsonp_cb)
+
+
+
+    def _upload_file(self):
+        """ Put a file on rest repository
+            @Return : status (True/False), filename, file path
+        """
         self.headers.getheader('Content-type')
         print(self.headers)
         content_length = int(self.headers['Content-Length'])
 
-        if hasattr(self, "_put_filename") == False:
+        if hasattr(self, "_put_filename") == False or self._put_filename == None:
             print("No file name given!!!")
-            self.send_http_response_error(999, "You must give a file name : ?filename=foo.txt",
-                                          self.jsonp, self.jsonp_cb)
-            return
+            return False, "You must give a file name : ?filename=foo.txt", ""
         self.log.info("PUT : uploading %s" % self._put_filename)
 
         # TODO : check filename value (extension, etc)
 
         # replace name (without extension) with an unique id
-        basename, extension = os.path.splitext(self._put_filename)
-        file_id = str(uuid.uuid4())
-        file_name = "%s/%s%s" % (self.repo_dir, 
-                             file_id,
-                             extension)
+        #basename, extension = os.path.splitext(self._put_filename)
+        #file_id = str(uuid.uuid4())
+        file_name = self._put_filename
+        file_path = "%s/%s" % (self.repo_dir, file_name)
 
         try:
-            up_file = open(file_name, "w")
+            up_file = open(file_path, "w")
             up_file.write(self.rfile.read(content_length))
             up_file.close()
         except IOError:
             self.log.error("PUT : failed to upload '%s' : %s" % (self._put_filename, traceback.format_exc()))
             print(traceback.format_exc())
-            self.send_http_response_error(999, "Error while writing '%s' : %s" % (file, traceback.format_exc()),
-                                          self.jsonp, self.jsonp_cb)
-            return
+            return False, "Error while writing '%s' : %s" % (file, traceback.format_exc()), ""
 
-        self.log.info("PUT : %s uploaded as %s%s" % (self._put_filename,
-                                                   file_id, extension))
-        json_data = JSonHelper("OK")
-        json_data.set_data_type("repository")
-        json_data.add_data({"file" : "%s%s" % (file_id, extension)})
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        self.send_http_response_ok(json_data.get())
+        self.log.info("PUT : uploaded as %s" % (file_path))
+        return True, file_name, file_path
 
 
     def _rest_repo_get(self, file_name):
@@ -4083,6 +4117,15 @@ target=*
                                            self.rest_request[2],
                                            self.rest_request[3],
                                            self.rest_request[4])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### install_from_path ########################
+        elif self.rest_request[0] == "install_from_path":
+            if len(self.rest_request) == 2:
+                self._rest_package_install_from_path(self.rest_request[1])
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -4477,6 +4520,135 @@ target=*
                                                           "type" : type,
                                                           "id" : id,
                                                           "version" : version,
+                                                          "host" : host},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
+        except Empty:
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_XPL, str(message)))
+        
+
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_XPL, message.data['error']), self.jsonp, self.jsonp_cb)
+            return
+
+
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("install")
+            self.send_http_response_ok(json_data.get())
+
+    def _rest_package_install_from_path(self, host):
+        """ Upload a local package file (from UI host) and install it
+            @param host : host targetted
+            Return ok/ko as json
+        """
+        self.log.debug("Package : ask for installing an uploaded package")
+
+        #### upload the file
+        status, data1, data2 = self._upload_file()
+        if not status:
+            self.send_http_response_error(999, data1, self.jsonp, self.jsonp_cb)
+            return
+        print data1
+        #json_data = JSonHelper("OK")
+        #json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        #json_data.set_data_type("install_from_path")
+        #self.send_http_response_ok(json_data.get())
+
+        if data1[-4:] != ".tgz":
+            self.send_http_response_error(999, "Bad filename provided. It must be a .tgz file", self.jsonp, self.jsonp_cb)
+            return
+        try:
+            buf = data1[:-4].split("-")
+            pkg_type = buf[0]
+            pkg_id = buf[1]
+            pkg_version = buf[2]
+            package = "%s/%s/%s" % (pkg_type, pkg_id, pkg_version)
+        except:
+            self.send_http_response_error(999, "Bad filename provided.", self.jsonp, self.jsonp_cb)
+            return
+
+        print package
+
+        pkg_mgr = PackageManager()
+        res = pkg_mgr.cache_package(PKG_CACHE_DIR, pkg_type, pkg_id, pkg_version, data2)
+        # if package not cachable (doesn't exists, ...)
+        if res == False:
+            self.send_http_response_error(999, "Error on putting package in cache", self.jsonp, self.jsonp_cb)
+
+        #### Send xpl message to install package's rinor part
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : self.get_sanitized_hostname()})
+        message.add_data({"source" : "cache"})
+        message.add_data({"type" : pkg_type})
+        message.add_data({"id" : pkg_id})
+        message.add_data({"version" : pkg_version})
+        message.add_data({"part" : PKG_PART_RINOR})
+        self.myxpl.send(message)
+        
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install",
+                                                          "source" : "cache",
+                                                          "type" : pkg_type,
+                                                          "id" : pkg_id,
+                                                          "version" : pkg_version,
+                                                         "host" : self.get_sanitized_hostname()},
+                                           timeout = WAIT_FOR_PACKAGE_INSTALLATION)
+        except Empty:
+           self.log.debug("Package install : no answer")
+           self.send_http_response_error(999, "No data or timeout on installing package",
+                                          self.jsonp, self.jsonp_cb)
+           return
+        
+        self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
+        
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error on '%s' part : %s" % (PKG_PART_RINOR, message.data['error']), self.jsonp, self.jsonp_cb)
+
+
+        ### Send xpl message to install package bin part
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : host})
+        message.add_data({"source" : "cache"})
+        message.add_data({"type" : pkg_type})
+        message.add_data({"id" : pkg_id})
+        message.add_data({"version" : pkg_version})
+        message.add_data({"part" : PKG_PART_XPL})
+        self.myxpl.send(message)
+
+        ### Wait for answer
+        # get xpl message from queue
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install",
+                                                          "source" : "cache",
+                                                          "type" : pkg_type,
+                                                          "id" : pkg_id,
+                                                          "version" : pkg_version,
                                                           "host" : host},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:

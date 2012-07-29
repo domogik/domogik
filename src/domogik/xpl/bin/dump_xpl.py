@@ -43,17 +43,33 @@ import datetime
 from time import localtime
 from optparse import OptionParser
 
-
 class Sniffer(XplPlugin):
     '''Sniff xpl network and dump all messages
     '''
 
     def __init__(self):
         parser = OptionParser()
-        parser.add_option("-c", action="store_true", dest="compress", default=False, \
-                help="Diaply data in a compress way")
-        XplPlugin.__init__(self, name='dump_xpl', daemonize=False, parser=parser)
-        Listener(self._sniffer_cb, self.myxpl)
+        parser.add_option("-c", action="store_true", dest="compress", \
+		default=False, help="Diaply data in a compress way")
+        parser.add_option("-t", action="store", dest="xpltype", \
+                default=None, type="string", \
+                help="Filter messages on XPL message type")
+        parser.add_option("-s", action="store", dest="xplsource", \
+                default=None, type="string", \
+                help="Filter messages on XPL source field")
+        parser.add_option("-S", action="store", dest="xplschema", \
+                default=None, type="string", \
+                help="Filter messages on XPL sschema field")
+        XplPlugin.__init__(self, name='dump_xpl', daemonize=False, \
+                parser=parser)
+        fil = {}
+        if self.options.xpltype != None:
+            fil['xpltype'] = self.options.xpltype
+        if self.options.xplsource != None:
+            fil['xplsource'] = self.options.xplsource
+        if self.options.xplschema != None:
+            fil['schema'] = self.options.xplschema
+        Listener(self._sniffer_cb, self.myxpl, filter=fil)
         self.enable_hbeat()
 
     def _sniffer_cb(self, message):

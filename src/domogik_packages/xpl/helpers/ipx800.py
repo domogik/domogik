@@ -36,8 +36,8 @@ class Ipx800(Helper)
 
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.ipx800 import IPX
-from domogik.xpl.lib.ipx800 import IPXException
+from domogik_packages.xpl.lib.ipx800 import IPX
+from domogik_packages.xpl.lib.ipx800 import IPXException
 from domogik.common import logger
 
 
