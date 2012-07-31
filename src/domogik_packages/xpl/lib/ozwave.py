@@ -769,6 +769,10 @@ class OZWavemanager(threading.Thread):
             nodeID = int(nodeID)
             homeId = self.homeId
             print('homeId: %d' % homeId)
+	    if (opt != "") and (opt != 'None'):
+	        opt = int(opt)
+            if (opt == 'None') :
+                opt = 0
             if command == 'level':
                 self._manager.setNodeLevel(self.homeId, nodeID, opt)
             elif command == 'on':
