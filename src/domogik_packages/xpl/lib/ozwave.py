@@ -600,7 +600,7 @@ class OZWavemanager(threading.Thread):
         valueNode.update(args) 
         # TODO: Traiter le formattage en fonction du type de message à envoyer à domogik
         if valueId['commandClass'] == 'COMMAND_CLASS_BASIC' :
-            if valueId['genre'] == 'Basic' and node.productType =='Binary Power Switch':
+            if valueId['genre'] == 'Basic' and 'Power Switch' in node.productType:
                 msgtrig = {'typexpl':'xpl-trig', 
                                 'schema':'ozwave.basic', 
                                 'node' : activeNodeId,
