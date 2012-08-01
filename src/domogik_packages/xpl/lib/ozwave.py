@@ -604,16 +604,24 @@ class OZWavemanager(threading.Thread):
                 msgtrig = {'typexpl':'xpl-trig', 
                                 'schema':'ozwave.basic', 
                                 'node' : activeNodeId,
-                                'genre' :'Actuator', 
+				'genre' : 'Actuator',
                                 'level': valueId['value']}
-        elif valueId['commandClass'] == 'COMMAND_CLASS_SENSOR_BINARY' :
-           if valueId['type'] == 'Bool': # and node.productType =='Routing Binary Sensor':
-                msgtrig = {'typexpl':'xpl-trig', 
+        elif 'COMMAND_CLASS_SENSOR' in valueId['commandClass'] :
+	    if valueId['type'] == 'Bool' :
+                msgtrig = {'typexpl':'xpl-trig',
                                 'schema':'sensor.basic',
                                 'node' : activeNodeId,
-                                'genre' :'sensor', 
-                                'type' : valueId['label'], 
-                                'status': valueId['value']}
+                                'genre' : 'sensor',
+                                'type' : valueId['label'],
+                                'value': valueId['value']}
+	    else
+                msgtrig = {'typexpl':'xpl-trig',
+                                'schema':'sensor.basic',
+                                'node' : activeNodeId,
+				'genre' : 'sensor',
+                                'type' : valueId['label'],
+                                'value': valueId['value'],
+                                'units': valueId['units']}
         if msgtrig: self._cb_sendxPL_trig(msgtrig)
         else : print ('commande inconnue')
         

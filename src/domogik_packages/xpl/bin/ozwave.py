@@ -205,10 +205,9 @@ class OZwave(XplPlugin):
                 if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
             elif msgtrig['genre'] == 'sensor' :
                 mess.add_data({'node' : msgtrig['node'],
-                            # 'status' : msgtrig['status'] , 
-                            'status' : 'high' if (msgtrig['status'] =='True')  else 'low',
-                            # 'current' : 'on' if (msgtrig['status'] =='True')  else 'off',
-                            'type': msgtrig['genre']})
+                            'type' : msgtrig['type'] ,
+                            'value' : msgtrig['value']})
+		if msgtrig.has_key('units'): mess.add_data({'units' : msgtrig['units'] })
             print mess
             self.myxpl.send(mess)
         elif 'command' in msgtrig and msgtrig['command'] == 'Info':
