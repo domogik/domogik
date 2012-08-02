@@ -10,7 +10,7 @@ Files
 =====
 At least, an external member consist of the following file :
 
-* :doc:`src/share/domogik/plugins/myplg.json <external_member_json_file>` : a json file which describe the external member and the features it handles.
+* :doc:`src/share/domogik/plugins/myplg.json <json_file>` : a json file which describe the external member and the features it handles.
 
 Then, an external member should have at least one file on one of the following folders :
 

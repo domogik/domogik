@@ -257,7 +257,7 @@ Description
 
 
 .. todo :: 
-    détailer enum
+    detail enum
 
 
 Udev rules
