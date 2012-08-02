@@ -1,6 +1,92 @@
 =======
 Domogik
 =======
+
+.. todo::
+   This documentation is not yet finished. Missing :
+
+   * release 0.2.0 page
+   * Packages management by users
+   * Minor enhancements in pckages devlelopment part
+
+   * http://docs.domogik.org/domogik/0.1/en/overview/index.html
+     Refaire doc + schéma (domoweb sorti) et prendre en compte domodroid
+   * http://docs.domogik.org/domogik/0.1/en/overview/detailed.html
+     Idem
+     Mettre en évidence repo.domogik.org
+   * http://docs.domogik.org/domogik/0.1/en/enduser/requirements.html
+     Revoir les liens "linux pour les nuls"
+     Parler des specs matérielles ?   
+   * http://docs.domogik.org/domogik/0.1/en/enduser/terms.html
+     Revoir "Domogik components"
+     Ajouter package, repository, plugin, external member, domoweb, domodroid
+     what next
+   * http://docs.domogik.org/domogik/0.1/en/enduser/installation/index.html
+     Revoir. Gaffe à mysql-server-5.0/5.1 : 5.5 présente donc utiliser paquet générique et juste dire 5.0 en mini
+     What next : configuration des dépôts, external accès, principe des packages
+   * (inexistante) : installation Domoweb
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/index.html
+     Screenshots manquant
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/house.html
+     supprimer le todo de maj de l'image
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/index.html
+     Revoir, mixer avec les packages ?
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/install.html
+     Refaire FS, mixer avec les packages
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/helpers.html
+     Message d'erreur ipx800 find mal mis en page
+     Liste à puce dans "Helpers in future"
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/devices.html
+     Revoir screenshot de add device
+   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/widgets.html
+     Vide
+   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/house.html
+     Screenshot à revoir
+   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/area.html
+     ok
+   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/room.html
+     ok
+   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/device.html
+     Revoir screenshot add device 
+   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/plugin.html     
+     Revoir, mixer avec les packages ?
+   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/account.html
+     ok
+   * http://docs.domogik.org/domogik/0.1/en/releases/0.1.0.html
+     Désactiver les liens vers les plugins (qui ne seront plus bons)
+   * http://docs.domogik.org/domogik/0.1/en/various/udev_rule.html
+     Voir si elle sert vraiment
+   * http://docs.domogik.org/domogik/0.1/en/technical/actuator.html
+     Caractères à la con à corriger
+     Pas complète
+     Est-ce judicieux de maintenir le chapitre features ?
+   * http://docs.domogik.org/domogik/0.1/en/technical/sensor.html
+     Pas complète
+     Est-ce judicieux de maintenir le chapitre features ?
+   * http://docs.domogik.org/domogik/0.1/en/technical/device_feature_usage.html
+     Pas complète
+     Est-ce judicieux de la maintenir ?
+   * http://docs.domogik.org/domogik/0.1/en/technical/database.html
+     MAJ à faire
+   * http://docs.domogik.org/domogik/0.1/en/technical/ui_add_icons.html
+     A bouger dans la doc domoweb
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/index.html
+     Vérifier les schémas : packages absents 
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/statmgr.html   
+     Vérifier que le template du xml est à jour
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_base.html
+     Revoir en incluant à partir de quel n° d'API rest une url est présente. Donne l'historique des APIs dans une page
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_command.html
+     Vérifier que le template xml est à jour
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_stats.html
+     MAJ : *, multi
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_plugin.html
+     MAJ
+   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_xplcmnd.html
+     A virer, comme la fonctionnalité
+   * http://docs.domogik.org/domogik/0.1/en/technical/schema/teleinfo.html
+     A virer
+
 * **Overview:**
   :doc:`Quick </overview/index>` |
   :doc:`Detailed </overview/detailed>`
@@ -30,21 +116,6 @@ End User Documentation
   :doc:`Plugins management </enduser/administration/plugin>` |
   :doc:`Accounts management </enduser/administration/account>`
 
-Plugins
-=======
-
-Each plugin has its own page with details like functionalities and requirements.
-
-* :doc:`onewire	</plugins/onewire/index>` Use 1 Wire devices
-* :doc:`cidmodem </plugins/cidmodem/index>` Get caller ID with a modem
-* :doc:`ipx800 </plugins/ipx800/index>` Use IPX800 relayboard
-* :doc:`mirror </plugins/mirror/index>` Use of Mirror by Violet
-* :doc:`plcbus </plugins/plcbus/index>` Use Plcbus devices
-* :doc:`teleinfo </plugins/teleinfo/index>` Get electricity consumption information (only French providers)
-* :doc:`wol_ping </plugins/wol_ping/index>` Ping and wake up computers with Wake on Lan
-* :doc:`x10_heyu </plugins/x10_heyu/index>` Use X10 devices with Heyu
-* :doc:`xpl_time </plugins/xpl_time/index>` Send date and time over xPL
-
 Technical Documentation
 =======================
 * :doc:`Actuators </technical/actuator>`
@@ -67,3 +138,7 @@ Technical Documentation
     * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
     * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
+
+Packages development
+====================
+* :doc:`Developing a package </package_development/index>`
