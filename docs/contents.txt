@@ -26,18 +26,7 @@ Table Of Content
     /enduser/administration/plugin
     /enduser/administration/account
     /releases/0.1.0
-    /plugins/onewire/index
-    /plugins/cidmodem/index
-    /plugins/ipx800/index
-    /plugins/mirror/index
-    /plugins/plcbus/index
-    /plugins/teleinfo/index
-    /plugins/wol_ping/index
-    /plugins/x10_heyu/index
-    /plugins/xpl_time/index
-    /plugins/onewire/dev
-    /plugins/mirror/dev
-    /plugins/wol_ping/dev
+    /releases/0.2.0
     /various/udev_rule
     /technical/actuator
     /technical/sensor
@@ -55,3 +44,23 @@ Table Of Content
     /technical/rinor/rest_xplcmnd
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
+    /package_development/index
+    /package_development/howto
+    /package_development/packages_lifecycle
+    /package_development/rules_for_version_numbers
+    /package_development/specifications
+    /package_development/developing
+    /package_development/developing_a_plugin
+    /package_development/developing_an_external_member
+    /package_development/documentation
+    /package_development/test_cases
+    /package_development/test_the_package
+    /package_development/generate_the_package
+    /package_development/json_file
+    /package_development/stats_files
+    /package_development/url2xpl_files
+    /package_development/plugin_bin_part
+    /package_development/plugin_library_part
+    /package_development/data_files
+    /package_development/icon
+
