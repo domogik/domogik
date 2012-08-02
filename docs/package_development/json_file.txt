@@ -197,7 +197,7 @@ These data will be inserted in database during the package installation.
   * stat_key : associated stat key in database (this is related to the key defined in :doc:`the stat files <stats_files>`.
   * value_type : *number*, *string*, *boolean*, *binary*. The type of the value.
 
-.. todo ::
+.. todo::
     Give more details about parameters
 
 Configuration elements
@@ -256,7 +256,7 @@ Description
   * optionnal : *yes* or *no* : is the parameter optionnal or not ? It is used only for notification in the user interface.
 
 
-.. todo :: 
+.. todo:: 
     detail enum
 
 
