@@ -335,7 +335,7 @@ class OZWavemanager(threading.Thread):
     ZWave class manager
     """
 
-    def __init__(self, cb_send_xPL, cb_sendxPL_trig, stop , log,  ozwconfig = "../../../share/domogik/data/ozwave/plugins/ozwconfig/", ozwuser="",  ozwlog = False, msgEndCb =  False):
+    def __init__(self, config,  cb_send_xPL, cb_sendxPL_trig, stop , log,  ozwconfig = "../../../share/domogik/data/ozwave/plugins/ozwconfig/", ozwuser="",  ozwlog = False, msgEndCb =  False):
         """ Ouverture du manager py-openzwave
             @ param cb_send_xpl : callback pour envoi msg xpl
             @ param cb_send_trig : callback pour trig xpl
@@ -346,6 +346,7 @@ class OZWavemanager(threading.Thread):
             @ param msgEndCb (désactivée pour l'instant) Envoi d'une notification quand la transaction est complete (defaut = "--NotifyTransactions  false")
         """
         self._device = None
+        self._configPlug=config
         self._log = log
         self._cb_send_xPL= cb_send_xPL
         self._cb_sendxPL_trig= cb_sendxPL_trig
@@ -362,6 +363,21 @@ class OZWavemanager(threading.Thread):
         self._ozwconfig = ozwconfig
         
         self._ready = False
+        # récupération des association nom de réseaux et homeID
+        self._nameAssoc ={}
+        if self._configPlug != None :
+            num = 1
+            loop = True
+            while loop == True:
+                HIdName = self._configPlug.query('ozwave', 'homename-%s' % str(num))
+                HIdAssoc = self._configPlug.query('ozwave', 'homeidass-%s' % str(num))
+                if HIdName != None : 
+                    self._nameAssoc[HIdName] = long(HIdAssoc,  16)
+                else:
+                    loop = False
+                num += 1                
+        print self._nameAssoc
+       # sleep(5)
         threading.Thread.__init__(self, target=self.run)
     
         if not os.path.exists(self._ozwconfig) : 
@@ -589,7 +605,7 @@ class OZWavemanager(threading.Thread):
        
     def _handleValueChanged(self, args):
         """"Un valuenode à changé sur le réseaux zwave"""
-        msgtrig = False
+        sendxPL = False
         homeId = args['homeId']
         activeNodeId= args['nodeId']
         valueId = args['valueId']
@@ -598,32 +614,44 @@ class OZWavemanager(threading.Thread):
         node._lastUpdate = time.time()
         valueNode = self._getValueNode(homeId, activeNodeId, valueId)
         valueNode.update(args) 
-        # TODO: Traiter le formattage en fonction du type de message à envoyer à domogik
+        # formattage infos générales
+        msgtrig = {'typexpl':'xpl-trig',
+                          'addressety' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
+                          'valuetype':  valueId['type'], 
+                          'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
+                                                                                 # les labels sont liste dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
+        # TODO: Traiter le formattage en fonction du type de message à envoyer à domogik rajouter ici le traitement pour chaque command_class
+        # ne pas modifier celles qui fonctionnent mais rajouter. la fusion ce fera après implémentation des toutes les command-class.
         if valueId['commandClass'] == 'COMMAND_CLASS_BASIC' :
             if valueId['genre'] == 'Basic' and 'Power Switch' in node.productType:
-                msgtrig = {'typexpl':'xpl-trig', 
-                                'schema':'ozwave.basic', 
-                                'node' : activeNodeId,
-				'genre' : 'Actuator',
-                                'level': valueId['value']}
-        elif 'COMMAND_CLASS_SENSOR' in valueId['commandClass'] :
-	    if valueId['type'] == 'Bool' :
-                msgtrig = {'typexpl':'xpl-trig',
-                                'schema':'sensor.basic',
-                                'node' : activeNodeId,
-                                'genre' : 'sensor',
-                                'type' : valueId['label'],
-                                'value': valueId['value']}
-	    else
-                msgtrig = {'typexpl':'xpl-trig',
-                                'schema':'sensor.basic',
-                                'node' : activeNodeId,
-				'genre' : 'sensor',
-                                'type' : valueId['label'],
-                                'value': valueId['value'],
-                                'units': valueId['units']}
-        if msgtrig: self._cb_sendxPL_trig(msgtrig)
+                sendxPL = True
+                msgtrig['schema'] ='ozwave.basic'
+                msgtrig['genre'] = 'actuator'
+                msgtrig['level']=  valueId['value']
+        elif valueId['commandClass'] == 'COMMAND_CLASS_SENSOR_BINARY' : 
+            if valueId['type'] == 'Bool' :
+                sendxPL = True
+                msgtrig['schema'] ='sensor.basic'
+                msgtrig ['genre'] = 'sensor'
+                msgtrig ['type'] = 'status'
+                msgtrig ['value'] = valueId['value']
+        elif valueId['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
+                sendxPL = True
+                msgtrig['schema'] ='sensor.basic'
+                msgtrig ['genre'] = 'sensor'
+                msgtrig ['value'] = valueId['value']
+                msgtrig ['type'] = valueId['label'].lower()
+                msgtrig ['units']= valueId['units']
+        elif valueId['commandClass'] == 'COMMAND_CLASS_BATTERY' :
+                sendxPL = True
+                msgtrig['schema'] ='sensor.basic'
+                msgtrig ['genre'] = 'sensor'
+                msgtrig ['value'] = valueId['value']
+                msgtrig ['units']= valueId['units']        
+                
+        if sendxPL: self._cb_sendxPL_trig(msgtrig)
         else : print ('commande inconnue')
+
         
     def _updateNodeCapabilities(self, node):
         """Mise à jour des capabilities set du node"""
@@ -769,13 +797,28 @@ class OZWavemanager(threading.Thread):
         print "config sauvée"
         retval["File"] ="confirmed"
         return retval
+
+    def getZWRefFromxPL(self, addresseTy):
+        """ Retourne  les références Zwave envoyées depuis le xPL domogik 
+        @ param : refDeviceTy format : nomReseaux.NodeID.Instance """
+        ids = addresseTy.split('.')
+        retval ={}
+        retval['homeId'] = self._nameAssoc[ids[0]] if self._nameAssoc[ids[0]]  else self.homeId
+        print "getZWRefFromxPL : ", retval
+        retval['nodeId']  = int(ids[1])
+        retval['instance']  = int(ids[2])
+        print "getZWRefFromxPL : ", retval
+        return retval
         
-    def sendNetworkZW(self, command,  nodeID, opt =""):
-        """ Envoie la commande sur le réseaux zwave  """ 
+    def sendNetworkZW(self, command,  addresseTy, opt =""):
+        """ En provenance du réseaux xPL
+              Envoie la commande sur le réseaux zwave  """ 
         print ("envoi zwave command %s" % command)
-        if nodeID != None :
-            nodeID = int(nodeID)
-            homeId = self.homeId
+        if addresseTy != None :
+            addrZW = self.getZWRefFromxPL(addresseTy)
+            nodeID = int(addrZW['nodeId'])
+            homeId = addrZW['homeId'] # self.homeId
+            instance = addrZW['instance']
             print('homeId: %d' % homeId)
 	    if (opt != "") and (opt != 'None'):
 	        opt = int(opt)

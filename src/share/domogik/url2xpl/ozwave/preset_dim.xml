@@ -2,7 +2,7 @@
   <command name="preset_dim">
     <schema>ozwave.basic</schema>
     <command-key>command</command-key>	
-    <address-key>node</address-key>	
+    <address-key>addressety</address-key>	
     <command-xpl-value>level</command-xpl-value>  
     <parameters>                                                                                            
       <parameter key="level" location="1"/>                                                           
@@ -13,7 +13,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="level" />
-      <key name="node" value="@address@"/>
+      <key name="addressety" value="@address@"/>
     </filter>
   </listener>
 </technology>

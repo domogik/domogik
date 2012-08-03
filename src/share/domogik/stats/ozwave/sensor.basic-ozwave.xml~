@@ -4,23 +4,26 @@
         <xpltype type="*">
             <listener>
                 <filter>
-                    <key name="type" value="Temperature"/>
-                    <key name="type" value="Relative Humidity"/>
-                    <key name="type" value="Battery Level"/>
-                    <key name="type" value="Sensor"/>
+                    <key name="type" value="temperature"/>
+                    <key name="type" value="relative humidity"/>
+                    <key name="type" value="battery level"/>
+                    <key name="type" value="sensor"/>
+					<key name="type" value="status"/>
                 </filter>
             </listener>
             <mapping>
-                <device field="node"/>
+                <device field="addressety"/>
                 <value field="units"/>
                 <value field="current" new_name="temperature" 
-                       filter_key="type" filter_value="Temperature" />
+                       filter_key="type" filter_value="temperature" />
                 <value field="current" new_name="humidity" 
-                       filter_key="type" filter_value="Relative Humidity" />
+                       filter_key="type" filter_value="relative humidity" />
                 <value field="current" new_name="battery"
-                       filter_key="type" filter_value="Battery Level" />
+                       filter_key="type" filter_value="battery level" />
+                <value field="current" new_name="sensor"
+                       filter_key="type" filter_value="sensor" />
                 <value field="current" new_name="status"
-                       filter_key="type" filter_value="Sensor" />
+                       filter_key="type" filter_value="status" />
             </mapping>
         </xpltype>
     </schema>

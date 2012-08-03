@@ -2,7 +2,7 @@
   <command name="off">
     <schema>ozwave.basic</schema>
     <command-key>command</command-key>
-    <address-key>node</address-key>
+    <address-key>addressety</address-key>
     <command-xpl-value>off</command-xpl-value>
     <parameters/>
   </command>
@@ -11,7 +11,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="off" />
-      <key name="node" value="@address@"/>
+      <key name="addressety" value="@address@"/>
     </filter>
   </listener>
 </technology>

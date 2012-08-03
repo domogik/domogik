@@ -61,20 +61,21 @@ class OZwave(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         device = self._config.query('ozwave', 'device')
         ozwlogConf = self._config.query('ozwave', 'ozwlog')
+        self._config = Query(self.myxpl, self.log)
         print ('***logg :',  ozwlogConf)
         # Recupère l'emplacement des fichiers de configuration OZW
         pathConfig = self.get_data_files_directory() + '/ozwconfig/'
         pathUser = self.get_data_files_directory()  +'/'
         # Initialise le manager Open zwave
         try:
-            self.myzwave = OZWavemanager(self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, ozwconfig = pathConfig,  ozwuser = pathUser,  ozwlog = ozwlogConf,  msgEndCb = True) # ozwlog="")
+            self.myzwave = OZWavemanager(self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, ozwconfig = pathConfig,  ozwuser = pathUser,  ozwlog = ozwlogConf,  msgEndCb = True) # ozwlog="")
         except OZwaveException as e:
             self.log.error(e.value)
             print e.value
             self.force_leave()
             return    
                  
-        # Crée le listener pour les messages de commande xPL traités par le device zwave
+        # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
                                                  'xpltype': 'xpl-cmnd'})
         
@@ -101,16 +102,18 @@ class OZwave(XplPlugin):
                 self.ui_cmd_cb(message)
             else :
                 cmd = message.data['command']
-                node = int(message.data['node'])
+                # addresseTy = int(message.data['node'])
+                addresseTy = message.data['addressety']
                 if cmd == 'level' :
                     print ("appel envoi zwave command %s",  cmd)
                     lvl = message.data['level']
-                    self.myzwave.sendNetworkZW(cmd, node, lvl)
+                    self.myzwave.sendNetworkZW(cmd, addresseTy, lvl)
                 elif cmd == "on"  or cmd == "off" :
                     print ("appel envoi zwave command %s",  cmd)
-                    self.myzwave.sendNetworkZW(cmd, node)
+                    self.myzwave.sendNetworkZW(cmd, addresseTy)
                 else:
-                    self.myzwave.sendNetworkZW(cmd, node)
+                    self.myzwave.sendNetworkZW(cmd, addresseTy)
+                    
     def getdict2UIdata(self, UIdata):
         """ retourne un format dict en provenance de l'UI (passage outre le format xPL)"""
         retval = UIdata.replace('|', '{').replace('\\', '}')
@@ -195,19 +198,23 @@ class OZwave(XplPlugin):
             print msgtrig	
             mess.set_type('xpl-trig') # force xpl-trig
             mess.set_schema(msgtrig['schema'])
-            if msgtrig['genre'] == 'Actuator' :
+            if msgtrig['genre'] == 'actuator' :
                 if msgtrig['level'] == '0' : cmd ="off"
                 elif msgtrig['level']== '255': cmd ="on"
                 else: cmd ='level'
-                mess.add_data({'node' : msgtrig['node'],
+                mess.add_data({'addressety' : msgtrig['addressety'],
                             'command' : cmd,
                             'level': msgtrig['level']})
                 if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
-            elif msgtrig['genre'] == 'sensor' :
-                mess.add_data({'node' : msgtrig['node'],
+            elif msgtrig['genre'] == 'sensor' :  # tout sensor
+                if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget portal
+                    mess.add_data({'addressety' : msgtrig['addressety'],
                             'type' : msgtrig['type'] ,
-                            'value' : msgtrig['value']})
-		if msgtrig.has_key('units'): mess.add_data({'units' : msgtrig['units'] })
+                            'current' : 'low' if (msgtrig['value'] =='True')  else 'high'})
+                else : mess.add_data({'addressety' : msgtrig['addressety'],  
+                            'type' : msgtrig['type'] ,
+                            'current' : msgtrig['value'] })
+            if msgtrig.has_key('units'): mess.add_data({'units' : msgtrig['units'] })
             print mess
             self.myxpl.send(mess)
         elif 'command' in msgtrig and msgtrig['command'] == 'Info':
