@@ -1,6 +1,6 @@
-================
+=================
 Package json file
-================
+=================
 
 .. |yes| image:: yes.png
 .. |no|  image:: no.png
@@ -233,9 +233,11 @@ Description
 ***********
 
 * configuration : list of the configuration parameters of a plugin
+
   * id : number of the configuration item. The display order will be related to the id.
   * interface : *yes* or *no*. If *yes*, group with all the following keys with *interface = yes*. This group of keys allow to configure N iterations of these keys. 
   * type : the type of the value to set for the key. 
+
     * string : the default type
     * number : a number
     * boolean : True, False
