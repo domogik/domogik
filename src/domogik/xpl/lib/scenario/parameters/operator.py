@@ -33,7 +33,7 @@ class ComparisonOperatorParameter(AbstractParameter):
     This class basically provides those operators : [ '<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in' ]
     """
 
-    def __init__(self, log, xpl, trigger = None):
+    def __init__(self, log = None, xpl = None, trigger = None):
         AbstractParameter.__init__(self, log, xpl, trigger)
         self.set_type("list")
         self.add_expected_entry("operator", "string", "Operator to use for comparison")

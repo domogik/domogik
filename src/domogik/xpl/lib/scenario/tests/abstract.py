@@ -42,7 +42,7 @@ class AbstractTest:
        exception if the method can't be evaluated
     """
 
-    def __init__(self, log, xpl, trigger = None):
+    def __init__(self, log = None, xpl = None, trigger = None):
         """ Create the instance
         @param log : A logger instance
         @param xpl : The Xpl Manager instance

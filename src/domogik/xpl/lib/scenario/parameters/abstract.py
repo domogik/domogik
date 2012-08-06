@@ -36,7 +36,7 @@ class AbstractParameter:
     child classes.
     """
 
-    def __init__(self, log, xpl, trigger = None):
+    def __init__(self, log = None, xpl = None, trigger = None):
         """ Create the parameter instance
         The default init will only create the instance, and provide access to logging system and 
         xpl on self._log and self._xpl
@@ -79,18 +79,30 @@ class AbstractParameter:
         """
         return self._type
 
-    def get_filters(self):
+    def get_filters(self, entry = None):
         """ Return a dictionnary of filters
-        @return a dictionnary with "item" to filter as key, and a list of values to restrict to as value
+        @return a dictionnary with "item" to filter as key, and a list of values to restrict to as value if entry == None
+        or just the list of values if entry is specified
         """
-        return self._filters
+        if not entry:
+            return self._filters
+        elif entry not in self._filters:
+            return {}
+        else:
+            return self._filters[entry]
 
-    def get_list_of_values(self):
-        """ Return the list of correct values for all entries
+    def get_list_of_values(self, entry = None):
+        """ Return the list of correct values for all or one  token(s)
         If not empty, the user should only be able to choose one of those values for corresponding entry
-        @return a list of correct values, or {} if no possible value is defined.
+        @param entry : name of the entry to get
+        @return a list of correct values for one or all tokens, or {} if no possible value is defined.
         """
-        return self._list_of_values
+        if not entry:
+            return self._list_of_values
+        elif entry not in self._list_of_values.keys():
+            return {}
+        else:
+            return self._list_of_values[entry]
 
     def get_default_value(self, entry = None):
         """ Return the default value for the entry if defined, else for all entries
@@ -105,11 +117,14 @@ class AbstractParameter:
 
     def get_expected_entries(self):
         """ Return a dictionnary of expected entries
-        The expected entries are simply the name of the parameters the scenario manager (UI) should send with values 
+        The expected entries are simply the name of the tokens the scenario manager (UI) should send with values 
         filled by user, with some extra parameters : description and a type.
         Ex : { "time": {
             "type" : "timestamp",
-            "description": "Expected time as timestamp"
+            "description": "Expected time as timestamp",
+            "default" : "default value or empty",
+            "values" : [ "list","of","value","that","user","can","choose"],
+            "filters" : [ "list","of","filters","or",""]
             }
         }
         The 'type' and 'description' are only informative, but the more precise you will be, the easier it will be for UI 
@@ -119,7 +134,13 @@ class AbstractParameter:
         usercode, etc ...
         @return a list of expected parameters, or 
         """
-        return self._expected
+        exp = self._expected
+        print exp
+        for item in exp.keys():
+            exp[item]["default"] = self.get_default_value(item)
+            exp[item]["values"] = self.get_list_of_values(item)
+            exp[item]["filters"] = self.get_filters(item)
+        return exp
 
     def get_parameters(self):
         """ Return the parameters

@@ -34,7 +34,7 @@ class UrlParameter(AbstractParameter):
     """ This parameter looks periodically at some URL and return the content of the page
     """
 
-    def __init__(self, log, xpl, trigger = None):
+    def __init__(self, log = None, xpl = None, trigger = None):
         AbstractParameter.__init__(self, log, xpl, trigger)
         self.set_type("url")
         self.add_expected_entry("urlpath", "string", "Url the script will fetch")
