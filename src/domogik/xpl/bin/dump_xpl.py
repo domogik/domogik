@@ -59,10 +59,10 @@ class Sniffer(XplPlugin):
                 help="Filter messages on XPL source field")
         parser.add_option("-S", action="store", dest="xplschema", \
                 default=None, type="string", \
-                help="Filter messages on XPL sschema field")
+                help="Filter messages on XPL schema field")
         parser.add_option("-i", action="store", dest="xplinstance", \
                 default=None, type="string", \
-                help="Filter messages on XPL sschema field")
+                help="Filter messages on XPL instance")
         XplPlugin.__init__(self, name='dump_xpl', daemonize=False, \
                 parser=parser)
         fil = {}
