@@ -60,6 +60,9 @@ class Sniffer(XplPlugin):
         parser.add_option("-S", action="store", dest="xplschema", \
                 default=None, type="string", \
                 help="Filter messages on XPL sschema field")
+        parser.add_option("-i", action="store", dest="xplinstance", \
+                default=None, type="string", \
+                help="Filter messages on XPL sschema field")
         XplPlugin.__init__(self, name='dump_xpl', daemonize=False, \
                 parser=parser)
         fil = {}
@@ -69,6 +72,8 @@ class Sniffer(XplPlugin):
             fil['xplsource'] = self.options.xplsource
         if self.options.xplschema != None:
             fil['schema'] = self.options.xplschema
+        if self.options.xplinstance != None:
+            fil['xplinstance'] = self.options.xplinstance
         Listener(self._sniffer_cb, self.myxpl, filter=fil)
         self.enable_hbeat()
 
