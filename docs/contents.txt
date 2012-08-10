@@ -41,7 +41,6 @@ Table Of Content
     /technical/rinor/rest_stats
     /technical/rinor/rest_account
     /technical/rinor/rest_plugin
-    /technical/rinor/rest_xplcmnd
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
     /package_development/index

@@ -82,16 +82,6 @@ Domogik
      MAJ : *, multi
    * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_plugin.html
      MAJ
-   * http://docs.domogik.org/domogik/0.1/en/technical/rinor/rest_xplcmnd.html
-     A virer, comme la fonctionnalité
-   * http://docs.domogik.org/domogik/0.1/en/technical/schema/teleinfo.html
-     A virer
-   * package_development/documentation.txt:.. todo::
-   * package_development/generate_the_package.txt:.. todo::
-   * package_development/json_file.txt:.. todo::
-   * package_development/json_file.txt:.. todo::
-   * package_development/test_cases.txt:.. todo::
-   * package_development/test_the_package.txt:.. todo::
 
 
 * **Overview:**
