@@ -2,132 +2,331 @@
 REST /plugin
 ============
 
-**/account** entry allow to manage all account-linked features : login, password updating, user and persons management.
-A user is a logical account wich allows to acces to Domogik features. A person is a physical people. A user can be linked to a person.
-
-Authenticate
-============
-
-/account/auth/<login>/<password>
---------------------------------
-Try to login as <login> with password <password>
-When authentication is ok reply is: ::
-
-    {"status" : "OK", "code" : 0, "description" : "Access granted"}
-
-Else, if wrong login or password: ::
-
-    {"status" : "ERROR", "code" : 999, "description" : "Access refused"}
-
-Users
-=====
-
-/account/user/password/id/<id>/old/<old password>/new/<new password>
---------------------------------------------------------------------
-Change the password from <old_password> to <new_password> for user id <id>
-
-/account/user/list
-------------------
-List all user accounts
-
-Result: ::
-
-    {
-        "status" : "OK",
-        "code" : 0,
-        "description" : "None",
-        "account" : [
-            {
-                "skin_used" : "",
-                "person" : {
-                    "last_name" : "Admin",
-                    "first_name" : "Admin",
-                    "id" : 1,
-                    "birthdate" : "1900-01-01"
-                },
-                "is_admin" : "True",
-                "person_id" : 1,
-                "login" : "admin",
-                "id" : 1
-            }
-        ]
-    }
-
-/account/user/list/by-id/<id>
------------------------------
-Result : same as /list with only the user associated to the id
-
-/account/user/add/login/<login>/password/<password>/is_admin/<True,False>/skin_used/<skin to use (optional)>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Add user account + person 
-
-Result : same as /list with only the user added
-
-/account/user/add/login/<login>/password/<password>/is_admin/<True,False>/skin_used/<skin to use (optional)>/person_id/<person id>
-----------------------------------------------------------------------------------------------------------------------------------
-Add user account for an existing person 
-
-Result : same as /list with only the user added
-
-/account/user/update/id/<id>/login/<login>/is_admin/<True,False>/skin_used/<skin to use (optional)>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Update account + person 
-
-Result : same as /list with only the user updated
-
-/account/user/update/id/<id>/login/<login>/is_admin/<True,False>/skin_used/<skin to use (optional)>/person_id/<person id>
--------------------------------------------------------------------------------------------------------------------------
-Update account for an existing person 
-
-Result : same as /list with only the user updated
-
-/account/user/del/<id>
-----------------------
-Del account (user account only) 
-
-Result : same as /list with only the user deleted
-
-Persons 
+Purpose
 =======
 
-/account/person/list
---------------------
-List all persons
+**/plugin** entry is used to start, stop, list, get detail and configure plugins.
+For start, stop, list and detail features, a xPL dialog is made with manager and plugins.
+For configuration, REST works directly with databse.
 
-Result: ::
+xPL Schema 
+==========
+The :doc:`domogik.system </technical/xpl_domogik_system>` xPL schema is used to manage plugins by sending commands and gettings informations from the manager. 
 
-    {
-        "status" : "OK",
-        "code" : 0,
-        "description" : "None",
-        "person" : [
-            {
-                "last_name" : "Admin",
-                "first_name" : "Admin",
-                "id" : 1,
-                "birthdate" : "1900-01-01"
-            }
-        ]
-    }
+!List plugins
+!!/plugin/list
+No host notion here : we list all plugins on all hosts
+Result when OK :
+{CODE()}
+{
+    "status": "OK",
+    "code": 0,
+    "description": "None",
+    "plugin": [
+        {
+            "host": "<host name>",
+            "list": [
+                {
+                    "status" : "<on/off>",
+                    "host" : "<hostname>",
+                    "technology" : "<technology>",
+                    "id" : "<name>",
+                    "type" : "<type : hardware, plugin>",
+                },
+                ...
+            ]
+        },
+        {
+            "host": "<host name>",
+            "list": [...]
+        }
+    ]
+}
+{CODE}
+''Note : plugin name equals file name in src/domogik/xpl/bin''
 
-/account/person/list/by-id/<id>
--------------------------------
-Result : same as /list with only the person filtered
+When KO:
+{CODE()}
+{
+    "status" : "ERROR",
+    "code" : 999,
+    "description" : "Timeout on getting plugin list",
+    "plugin" : []
+}
+{CODE}
 
-/account/person/add/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
--------------------------------------------------------------------------------------------------
-Add a person
+!Get details on a plugin
+!!plugin/detail/<hostname>/<name>
+Result when OK :
 
-Result : same as /list with only the person added
+Json example for two keys (with no group) :
+{CODE()}
+{
+    "status" : "OK",
+    "code" : 0,
+    "description" : "None",
+    "plugin" : [
+        {
+            "status" : "<on/off>",
+            "host" : "<hostname>",
+            "type" : "plugin",
+            "version" : "<plugin version>",
+            "id" : "<plugin name>",
+            "configuration" : [
+                {
+                    "element-type" : "item",
+                    "optionnal" : <yes / no>,
+                    "id" : <order id>,
+                    "key" : "<key name>",
+                    "type" : "<key type>",
+                    "description" : "<key description>" 
+                    "default" : "<default value>",
+                    "list-values" : "<list of values. Ex : 'value1,value2'>"
+                },
+                {
+                    "element-type" : "item",
+                    "optionnal" : <yes / no>,
+                    "id" : <order id>,
+                    "key" : "<key name>",
+                    "type" : "<key type>",
+                    "description" : "<key description>" 
+                    "default" : "<default value>",
+                    "list-values" : "<list of values. Ex : 'value1,value2'>"
+                }
+            ],
+            "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
+            "technology" : "service",
+            "description" : "Get power consumption with teleinfo" 
+        } 
+    ]
+}
+{CODE}
 
-/account/person/update/id/<id>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
-------------------------------------------------------------------------------------------------------------
-Update person
+**Important notice for multi interface : key 'nb-int' is used to register number of defined interfaces for UI display and xpl usage. See /plugin/config for setting this value.**
 
-Result : same as /list with only the person updated
+Json example for 3 keys with a group of 2 keys
+{CODE()}
+{
+    "status" : "OK",
+    "code" : 0,
+    "description" : "None",
+    "plugin" : [
+        {
+            "status" : "<on/off>",
+            "type" : "plugin",
+            "host" : "<hostname>",
+            "version" : "<plugin version>",
+            "name" : "<plugin name>",
+            "configuration" : [
+                {
+                    "element-type" : "item",
+                    "optionnal" : <yes / no>,
+                    "id" : <order id>,
+                    "key" : "<key name>",
+                    "type" : "<key type>",
+                    "description" : "<key description>",
+                    "default" : "<default value>",
+                    "list-values" : "<list of values. Ex : 'value1,value2'>"
+                },
+                {
+                    "element-type" : "group",
+                    "elements" : [
+                        {
+                            "optionnal" : <yes / no>,
+                            "id" : <order id>,
+                            "key" : "<key name>",
+                            "type" : "<key type>",
+                            "description" : "<key description>",
+                            "default" : "<default value>",
+                            "list-values" : "<list of values. Ex : 'value1,value2'>"
+                        },
+                        {
+                            "optionnal" : <yes / no>,
+                            "id" : <order id>,
+                            "key" : "<key name>",
+                            "type" : "<key type>",
+                            "description" : "<key description>",
+                            "default" : "<default value>",
+                            "list-values" : "<list of values. Ex : 'value1,value2'>"
+                        }
+                    ]
+                }
+            ],
+            "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
+            "technology" : "service",
+            "description" : "Get power consumption with teleinfo" 
+        } 
+    ]
+}
+{CODE}
 
-/account/person/del/<id>
-------------------------
-Del person (and user account linked if it exists) 
+**Hardware specific** : Json example for one key :
+{CODE()}
+{
+    "status" : "OK",
+    "code" : 0,
+    "description" : "None",
+    "plugin" : [
+        {
+            "status" : "<on/off>",
+            "type" : "hardware",
+            "host" : "<hostname>",
+            "version" : "<plugin version>",
+            "name" : "<plugin name>",
+            "configuration" : [
+                {
+                    "id" : <order id>,
+                    "key" : "<key name>",
+                    "value" : "<value>",
+                }
+            ],
+            "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
+            "technology" : "service",
+            "description" : "Get power consumption with teleinfo" 
+        } 
+    ]
+}
+{CODE}
 
-Result : same as /list with only the person deleted
+
+When KO (example for 'cidmodem' here) :
+{CODE()}
+{
+    "status" : "ERROR",
+    "code" : 999,
+    "description" : "Timeout on getting plugin detail for cidmodem",
+    "plugin" : []
+}
+{CODE}
+
+!Enable and disable a plugin
+!!/plugin/enable/<hostname>/<plugin name>
+Result when OK : 
+{CODE()}
+{"status" : "OK", "code" : 0, "description" : "None"}
+{CODE}
+
+When KO :
+{CODE()}
+{"status" : "ERROR", "code" : 999, "description" : "The error description"}
+{CODE}
+
+!!/plugin/disable/<hostname>/<plugin name>
+Result when OK : 
+{CODE()}
+{"status" : "OK", "code" : 0, "description" : "None"}
+{CODE}
+
+When KO :
+{CODE()}
+{"status" : "ERROR", "code" : 999, "description" : "The error description"}
+{CODE}
+
+!Start and stop a plugin
+!!/plugin/start/<hostname>/<plugin name>
+Result when OK : 
+{CODE()}
+{"status" : "OK", "code" : 0, "description" : "None"}
+{CODE}
+
+When component already running (plugin : mirror, host : darkstar) :
+{CODE()}
+{"status" : "ERROR", "code" : 999, "description" : "Component mirror is already running on darkstar"}
+{CODE}
+
+When component doesn't exists (plugin : foo, host : darkstar) :
+{CODE()}
+{"status" : "ERROR", "code" : 999, "description" : "Component foo doesn't exists on darkstar"}
+{CODE}
+
+!!/plugin/stop/<hostname>/<plugin name>
+Result when OK : 
+{CODE()}
+{"status" : "OK", "code" : 0, "description" : "None"}
+{CODE}
+
+When component already shutdown (plugin : wol, host : darkstar) or when component doesn't exists :
+{CODE()}
+{"status" : "ERROR", "code" : 999, "description" : "Component wol is not running on darkstar"}
+{CODE}
+
+There may be others error messages depanding on problems that occurs. Only the description will change in json return.
+
+!Configuration
+**Important notice : key 'nb-int' is used to register number of defined interfaces for UI display and xpl usage**
+
+!!/plugin/config/list
+Result :
+{CODE()}
+{
+    "status" : "OK",
+    "code" : 0,
+    "description" : "None",
+    "config" : [
+        {
+            "key" : "startup-plugin",
+            "value" : "False",
+            "name" : "mirror",
+            "hostname" : "darkstar"
+        },
+        {
+            "key" : "device",
+            "value" : "/dev/mirror",
+            "name" : "mirror",
+            "hostname" : "darkstar"
+        },
+		...
+    ]
+}
+{CODE}
+
+!!/plugin/config/list/by-name/<hostname>/<plugin name>
+Result : same than /list with items filtered
+
+!!/plugin/config/list/by-name/<hostname>/<plugin name>/by-key/<key>
+Result : same than /list with items filtered
+
+!!/plugin/config/set/hostname/<hostname>/name/<plugin name>/key/<key>/value/<value>
+Result : same than /list with item added or updated
+
+!!/plugin/config/del/<hostname>/<plugin name>
+Result : same than /list with items deleted
+
+!!/plugin/config/del/<hostname>/<plugin name>/by-key/<key>
+Result : same than /list with items deleted
+
+!Dependencies and udev rules
+!!/plugin/dependency/<host>/<id>
+This command will get the plugin dependencies and their status.
+It will return the same data as ((REST_package|/package/dependency))
+
+!!/plugin/udev-rule/<host>/<id>
+This comment will get the udev rules needed by a plugin
+
+Example : 
+{CODE()}
+{
+    "status": "OK",
+    "code": 0,
+    "description": "None",
+    "udev-rule": [
+        {
+            "model": "modem",
+            "description": "Example for a common modem",
+            "rule": "UBSYSTEMS==\"usb\", ATTRS|idVendor|==\"067b\", ATTRS|idProduct|==\"2303\", SYMLINK+=\"modem\", MODE=\"0666\"",
+            "filename": "modem.rules"
+        }
+    ]
+}
+{CODE}
+
+!Developper Notes
+!!List and get details for a plugin
+{IMG(fileId="135")}{IMG}
+
+!!Starting and stoping a plugin
+{IMG(fileId="137")}{IMG}
+
+
+
+
