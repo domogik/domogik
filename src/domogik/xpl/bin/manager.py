@@ -135,7 +135,7 @@ class SysManager(XplPlugin):
                           action="store_true", 
                           dest="check_external", 
                           default=False, \
-                          help="This manager is the one who looks for harware.")
+                          help="This manager is the one who looks for hardware.")
         parser.add_option("-t", 
                           action="store", 
                           type="int",
