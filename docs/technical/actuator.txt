@@ -2,6 +2,10 @@
 Actuators
 =========
 
+.. warning ::
+
+    All the actuators are not listed in this page. This page purpose is to give some examples.
+
 An actuator is an item to which a command can be sent (this is the opposite of a :doc:`Sensors </technical/sensor>`).
 Note that some items can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
 

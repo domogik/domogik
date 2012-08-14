@@ -15,14 +15,14 @@ The Domogik team is proud to announce you the first release of its eponym softwa
 
 Eight plugins are provided in this version :
 
-* `onewire <http://wiki.domogik.org/plugin_onewire>`_ : 1wire technology support (DS18B20, DS18S20 and DS2401).
-* `plcbus <http://wiki.domogik.org/plugin_plcbus>`_ : PlcBus support.
-* `x10_heyu <http://wiki.domogik.org/plugin_x10_heyu>`_ : X10 support (via heyu).
-* `ipx800 <http://wiki.domogik.org/plugin_ipx800>`_ : IPX 800 support (relay cards).
-* `teleinfo <http://wiki.domogik.org/plugin_teleinfo>`_ : recent electricity meters of EDF (french power company) are supported. They allow you to get the electricity consumption.
-* `mirror <http://wiki.domogik.org/plugin_mirror>`_ : RFID Mir:ror drive support.
-* `cidmodem <http://wiki.domogik.org/plugin_cidmodem>`_ : "caller id" management with a modem.
-* `wol_ping <http://wiki.domogik.org/plugin_wol_ping>`_ : remote booting of computers and ping.
+* onewire: 1wire technology support (DS18B20, DS18S20 and DS2401).
+* plcbus: PlcBus support.
+* x10_heyu: X10 support (via heyu).
+* ipx800: IPX 800 support (relay cards).
+* teleinfo: recent electricity meters of EDF (french power company) are supported. They allow you to get the electricity consumption.
+* mirror: RFID Mir:ror drive support.
+* cidmodem: "caller id" management with a modem.
+* wol_ping: remote booting of computers and ping.
 
 .. image:: 0.1.0b.png
 

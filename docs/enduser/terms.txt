@@ -60,6 +60,24 @@ Domogik components
 
 .. glossary::
 
+    Domoweb
+        Domoweb is the official web user interface of Domogik.
+
+    Domodroid
+        Domodroid is the official android application for Domogik.
+
+    Package
+        A package is a piece of software which add some features to Domogik. It can be a plugin, an external member, ...
+ 
+    Repository
+        A repository is an online repository where are stored packages.
+
+    Plugin
+        A Domogik package which handle a technology or a web service.
+
+    External member
+        A Domogik package which allow to interact with a xPL client.
+
     xPL
         xPL is the network protocol used to allow plugins to communicate with each other.
 

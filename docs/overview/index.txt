@@ -8,10 +8,6 @@ What is Domogik in several words ?
 Domogik is a free home automation solution. It allows to use several User Interfaces (you can even create your own interface if you are willing to).
 It is modular : you can add and remove plugins easily and create your own plugins. A plugin is based on a technology (or part of a technology).
 
-.. note::
-    In :doc:`Release 0.1.0 </releases/0.1.0>`, the plugin format is not fixed. So we provide existing plugins already installed (x10, PLCBus, 1-wire...).
-    Domogik will really be fully modular in following releases.
-
 How does it work ?
 ==================
 
@@ -55,7 +51,7 @@ Plugins (X10, 1wire, Plcbus, etc) are standalone and can only communicate over t
 
 Web UI
 ------
-Domogik's Web UI supports the latest HTML5 and CSS features. We decided to comply with this in order to give customers the best experience possible with a Web UI. But this choice implies that you won't be able to use Domogik Web UI with older browsers. 
+Domoweb (the Web UIà supports the latest HTML5 and CSS features. We decided to comply with this in order to give customers the best experience possible with a Web UI. But this choice implies that you won't be able to use Domogik Web UI with older browsers. 
 
 If your browser doesn't support all HTML5 features used by Domogik, you will get this kind of notification :
 

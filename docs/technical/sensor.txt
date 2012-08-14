@@ -2,6 +2,11 @@
 Sensors
 =======
 
+.. warning ::
+
+    All the features are not listed in this page. This page purpose is to give some examples.
+
+
 Type of returned values
 =======================
 

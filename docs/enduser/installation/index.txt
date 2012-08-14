@@ -46,11 +46,7 @@ Mysql server
 
 Install packages for mysql server: ::
 
-    $ apt-get install mysql-server-5.0
-
-Or if mysql 5.1 is available on your Linux system: ::
-    
-    $ apt-get install mysql-server-5.1
+    $ apt-get install mysql-server
 
 Log on the mysql database as root user: ::
 

@@ -21,7 +21,7 @@ Then, you just have to unplug/plug the device
 
 Check the rule is used with the following command. You should see the new device entry: ::
 
-    $ ls -ltr
+    $ ls -ltr /dev
 
 How to create a rule (example)
 ==============================
