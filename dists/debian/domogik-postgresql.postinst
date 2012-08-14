@@ -21,17 +21,18 @@ case "$1" in
         db_get "domogik/db_root_pwd"
         DBROOTPWD="$RET"
         set +e
-        echo "CONNECT $DBNAME;" | \
-            /usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD  --host=$DBHOST
-        RES=$?
+#        echo "CONNECT $DBNAME;" | \
+#            /usr/bin/psql --user=$DBROOT --password=$DBROOTPWD  --host=$DBHOST
+#        RES=$?
+        RES=1
         set -e
         if [ "$RES" = "0" ]
         then
             echo "Database already exists"
         else
-            echo "Database don't exists. Try to create it"
-            echo "CREATE DATABASE $DBNAME;" | \
-                /usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
+            echo "Database don't exists. Try to create it."
+#            echo "CREATE DATABASE $DBNAME;" | \
+#                /usr/bin/psql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
             RES=$?
             echo "Done."
         fi
@@ -39,14 +40,14 @@ case "$1" in
         then
             echo "Try to create user" $DBUSER
             set +e
-            echo "GRANT ALL PRIVILEGES ON $DBNAME.* to $DBUSER@$DBHOST IDENTIFIED BY '$DBPASSWORD';" | \
-                /usr/bin/mysql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
+#            echo "GRANT ALL PRIVILEGES ON $DBNAME.* to $DBUSER@$DBHOST IDENTIFIED BY '$DBPASSWORD';" | \
+#                /usr/bin/psql --user=$DBROOT --password=$DBROOTPWD --host=$DBHOST
             set -e
             echo "Done."
-            sed -i "s;^db_type.*$;db_type = mysql;" /etc/domogik/domogik.cfg
+            sed -i "s;^db_type.*$;db_type = postgresql;" /etc/domogik/domogik.cfg
             sed -i "s;^db_user.*$;db_user = $DBUSER;" /etc/domogik/domogik.cfg
             sed -i "s;^db_password.*$;db_password = $DBPASSWORD;" /etc/domogik/domogik.cfg
-            sed -i "s;^db_port.*$;db_port = 3306;" /etc/domogik/domogik.cfg
+            sed -i "s;^db_port.*$;db_port = 5432.;" /etc/domogik/domogik.cfg
             sed -i "s;^db_name.*$;db_name = $DBNAME;" /etc/domogik/domogik.cfg
             sed -i "s;^db_host.*$;db_host = $DBHOST;" /etc/domogik/domogik.cfg
 

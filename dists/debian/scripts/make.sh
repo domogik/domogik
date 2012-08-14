@@ -17,7 +17,7 @@ then
     hg update 0.2
     cd ..
 else
-    hg clone http://hg.domogik.org/domogik/
+    hg clone http://hg.domogik.org/domogik/ 0.2
 fi
 
 #rm -Rf domogik-$VERSION

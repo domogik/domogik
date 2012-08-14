@@ -11,7 +11,8 @@ set +e
 /usr/sbin/a2enmod proxy
 /usr/sbin/a2enmod proxy_html
 /usr/sbin/a2enmod proxy_http
-/usr/sbin/a2enmod auth_mysql
+/usr/sbin/a2enmod auth_basic
+/usr/sbin/a2enmod authn_file
 set -e
 
 #DEBHELPER#

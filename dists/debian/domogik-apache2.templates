@@ -1,0 +1,27 @@
+Template: domogik-apache2/servername
+Type: string
+Description: The name of your web server.
+ This should be the name of your computer on your network or
+ ie domogik.localdomain.
+Default: mycomputer.localdomain
+
+Template: domogik-apache2/aliasname
+Type: string
+Description: An alias to join your web server.
+ This sould be the name of your computer on the Internet (fdqn) ie
+ domogik.example.com. Let it to the defaul value if don't wan't that.
+Default: domogik.localdomain
+
+Template: domogik-apache2/restserverip
+Type: string
+Description: The ip address of the domogik (rest) server.
+Default: 127.0.0.1
+
+Template: domogik-apache2/authuser
+Type: string
+Description: The user to use to authenticate.
+Default: domoapache
+
+Template: domogik-apache2/authpasswd
+Type: password
+Description: The password to use to authenticate.
