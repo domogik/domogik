@@ -1027,6 +1027,17 @@ class CronJobs():
         else:
             return 0
 
+    def get_device_type(self, device):
+        """
+        Get the type of a device.
+        @param device : the name of the device (=device in xpl)
+        @return : the uptime in seconds
+        """
+        if device in self.data.iterkeys():
+            return self.data[device]['devicetype']
+        else:
+            return 'Unknown'
+
     def get_list(self, head):
         """
         Get the list of jobs
@@ -1077,12 +1088,16 @@ class CronJobs():
         Get the numbers of jobs
         @return : The numbers of jobs in APScheduler
         """
-        if "apjobs" in self.data[device]:
-            return len(self.data[device]['apjobs'])
-        elif "apjob" in self.data[device]:
-            return 1
-        else :
+        if device in self.data.iterkeys():
+            if "apjobs" in self.data[device]:
+                return len(self.data[device]['apjobs'])
+            elif "apjob" in self.data[device]:
+                return 1
+            else :
+                return 0
+        else:
             return 0
+
 
     def get_xpl_trig(self, device, parameters, value):
         """
@@ -1253,6 +1268,7 @@ class CronAPI:
         commands = {
             'list': lambda x,d,m: self._command_list(x, d, m),
             'start': lambda x,d,m: self._action_start(x, d, m),
+            'stop': lambda x,d,m: self._action_stop(x, d),
         }
 
         try:
@@ -1454,18 +1470,25 @@ class CronAPI:
         if error == ERROR_NO:
             mess.add_data({"current" :  current})
             mess.add_data({"elapsed" : self.jobs.get_up_time(device)})
+            mess.add_data({"devicetype" : self.jobs.get_device_type(device)})
             mess.add_data({"runtime" : self.jobs.get_run_time(device)})
             mess.add_data({"runs" : self.jobs.get_runs(device)})
-            self.log.debug("cronAPI._send_xpl_trig : Send okk xpl-trig :)")
+            mess.add_data({"apjobs" : self.jobs.get_ap_count(device)})
         else:
             if device in self.jobs.data:
                 mess.add_data({"current" : self.jobs.data[device]['current']})
                 mess.add_data({"elapsed" : self.jobs.get_up_time(device)})
+                mess.add_data({"devicetype" : self.jobs.get_device_type(device)})
                 mess.add_data({"runtime" : self.jobs.get_run_time(device)})
                 mess.add_data({"runs" : self.jobs.get_runs(device)})
+                mess.add_data({"apjobs" : self.jobs.get_ap_count(device)})
             else:
-                mess.add_data({"elasped" :  0})
                 mess.add_data({"current" : "halted"})
+                mess.add_data({"devicetype" : self.jobs.get_device_type(device)})
+                mess.add_data({"elapsed" : "0"})
+                mess.add_data({"runtime" : "0"})
+                mess.add_data({"runs" : "0"})
+                mess.add_data({"apjobs" : "0"})
             mess.add_data(self.tools.error(error))
             self.log.debug("cronAPI._send_xpl_trig : Send error xpl-trig :(")
         myxpl.send(mess)
