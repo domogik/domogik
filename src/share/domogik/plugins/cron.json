@@ -54,6 +54,7 @@
         "src/share/domogik/design/plugin/cron/icon.png",
         "src/share/domogik/plugins/cron.json",
         "src/share/domogik/stats/cron/cron.xml",
+        "src/share/domogik/url2xpl/cron/create-alarm.xml",
         "src/share/domogik/url2xpl/cron/resume.xml",
         "src/share/domogik/url2xpl/cron/stop.xml",
         "src/share/domogik/url2xpl/cron/halt.xml",

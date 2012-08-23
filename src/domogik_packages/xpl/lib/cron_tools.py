@@ -227,7 +227,9 @@ class CronTools():
         @return True if hour is valid
         """
         try:
-            t = datetime.time(int(hour[0:2]), int(hour[3:5]))
+            #t = datetime.time(int(hour[0:2]), int(hour[3:5]))
+            hhhh,mmmm = hour.split(":")
+            t = datetime.time(int(hhhh), int(mmmm))
         except :
             return False
         return True

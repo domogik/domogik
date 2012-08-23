@@ -36,13 +36,15 @@ class cronAPI
 
 import traceback
 import datetime
+import urllib2
 from domogik.xpl.common.xplmessage import XplMessage
 from apscheduler.scheduler import Scheduler
 from domogik_packages.xpl.lib.cron_tools import *
 from domogik_packages.xpl.lib.cron_helpers import CronHelpers
 from pympler.asizeof import asizeof
-#import logging
-#logging.basicConfig()
+import ast
+import logging
+logging.basicConfig()
 
 #MEMORY USAGE
 MEMORY_PLUGIN = 1
@@ -619,8 +621,7 @@ class CronJobs():
                 for d in events:
                     for h in events[d]:
                         dayofweek = days[d]
-                        hour = int(h[0:2])
-                        minute = int(h[3:5])
+                        hour,minute = h.split(":")
                         jobs.append(self._scheduler.add_cron_job(\
                             self._api.send_xpl_job, day_of_week=dayofweek, \
                             hour=hour, minute=minute, \
@@ -740,8 +741,7 @@ class CronJobs():
                 for d in events:
                     for h in events[d]:
                         dayofweek = days[d]
-                        hour = int(h[0:2])
-                        minute = int(h[3:5])
+                        hour,minute = h.split(":")
                         if "single" == events[d][h]:
                             jobs.append(self._scheduler.add_cron_job(\
                             self._api.send_xpl_job, day_of_week=dayofweek, \
@@ -1181,17 +1181,60 @@ class CronAPI:
 
     def send_xpl_job(self, device, parameters=None, value=None):
         """
-        Send the XPL Trigger
+        Send the XPL Trigger or call rinor to activate device.
+        Alarms set by the UI set nst-schem to rinor to do that
         @param myxpl : The XPL sender
         @param device : The timer
         @param current : current state
         @param elapsed : elapsed time
         """
         self.log.debug("cronAPI._send_xpl_job : Start ...")
-        mess = self.jobs.get_xpl_trig(device, parameters, value)
-        if mess != None:
-            self.myxpl.send(mess)
-            self.log.debug("cronAPI._send_xpl_job : xplmessage = %s" % mess)
+        if (self.jobs.data[device]["nst-schema"] == "rinor" ):
+            #we should call rinor directly
+            #we use the rinor ip and port from ui
+            #valueon, valueoff
+            the_url = None
+            if (value == None or value == "valueon") :
+                 if self.jobs.data[device]["nst-command"]=='':
+                    the_url = 'http://%s/command/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-value0"])
+                 else:
+                    the_url = 'http://%s/command/%s/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-command"],
+                        self.jobs.data[device]["nst-value0"])
+            elif (value == "valueoff"):
+                 if self.jobs.data[device]["nst-command"]=='':
+                    the_url = 'http://%s/command/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-value1"])
+                 else:
+                    the_url = 'http://%s/command/%s/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-command"],
+                        self.jobs.data[device]["nst-value1"])
+            if (the_url != None):
+                req = urllib2.Request(the_url)
+                handle = urllib2.urlopen(req)
+                resp1 = handle.read()
+                self.jobs.data[device]['runs'] = int(self.jobs.data[device]['runs'])+1
+                self.log.debug("cronAPI._send_xpl_job : rinor called with = %s" % the_url)
+            else :
+                self.log.debug("cronAPI._send_xpl_job : can't call rinor = %s" % the_url)
+        else:
+            mess = self.jobs.get_xpl_trig(device, parameters, value)
+            if mess != None:
+                self.myxpl.send(mess)
+                self.log.debug("cronAPI._send_xpl_job : xplmessage = %s" % mess)
         self.log.debug("cronAPI._send_xpl_job : Done :)")
 
     def request_listener(self, message):
@@ -1267,8 +1310,8 @@ class CronAPI:
 
         commands = {
             'list': lambda x,d,m: self._command_list(x, d, m),
-            'start': lambda x,d,m: self._action_start(x, d, m),
-            'stop': lambda x,d,m: self._action_stop(x, d),
+            'create-alarm': lambda x,d,m: self._command_start_alarm(x, d, m),
+#            'stop': lambda x,d,m: self._action_stop(x, d),
         }
 
         try:
@@ -1361,6 +1404,45 @@ class CronAPI:
         self._send_xpl_trig(myxpl, device, "started", \
             self.jobs.add_job(device, devicetype, message.data), caller)
         self.log.debug("cronAPI._actionAdd : Done :)")
+
+    def _command_start_alarm(self, myxpl, device, message):
+        """
+        Add and start a timer
+        @param device : The timer to start
+
+        timer.basic
+            {
+             device=<name of the timer>
+             current=halted|resumed|stopped|started|went off
+             elapsed=<number of seconds between start and stop>
+            }
+        """
+        self.log.debug("cronAPI._command_start_alarm : Start ...")
+        devicetype = "alarm"
+        caller = None
+        if 'caller' in message.data:
+            caller = message.data['caller']
+        self.log.debug("cronAPI._actionAdd : Start ...")
+        caller = None
+        if 'caller' in message.data:
+            caller = message.data['caller']
+        data = message.data['data']
+        self.log.debug("cronAPI._command_start_alarm : data %s" % data)
+        data = data.replace('|','')
+        #data = data.replace(':',":'")
+        #data = data.replace(',',"',")
+        data = "{" + data + "}"
+        data = ast.literal_eval(data)
+        device = None
+        if 'device' in data:
+            device = data['device']
+        if 'devicetype' in data:
+            devicetype = data['devicetype']
+        data['current'] = "started"
+        self.log.debug("cronAPI._command_start_alarm : data %s" % data)
+        self._send_xpl_trig(myxpl, device, "started", \
+            self.jobs.add_job(device, devicetype, data), caller)
+        self.log.debug("cronAPI._command_start_alarm : Done :)")
 
     def _action_status(self, myxpl, device):
         """
