@@ -51,11 +51,11 @@ ERROR_NOT_IMPLEMENTED = 40
 
 CRONERRORS = { ERROR_NO: 'No error',
                ERROR_PARAMETER: 'Missing or wrong parameter',
-               ERROR_DEVICE_EXIST: 'Device already exist',
-               ERROR_DEVICE_NOT_EXIST: 'Device does not exist',
-               ERROR_DEVICE_NOT_STARTED: "Device is not started",
-               ERROR_DEVICE_NOT_STOPPED: "Device is not stopped",
-               ERROR_SCHEDULER: 'Error with the scheduler',
+               ERROR_DEVICE_EXIST: 'Device/alarm already exist',
+               ERROR_DEVICE_NOT_EXIST: 'Device/alarm does not exist',
+               ERROR_DEVICE_NOT_STARTED: "Device/alarm is not started",
+               ERROR_DEVICE_NOT_STOPPED: "Device/alarm is not stopped",
+               ERROR_SCHEDULER: 'Error with the scheduler (APS)',
                ERROR_STORE: 'Error with the store',
                }
 
@@ -103,7 +103,10 @@ class CronStore():
                 for option in config.options('Alarms'):
                     alarms.add(config.get('Alarms', option))
                 data['alarm'] = alarms
-            add_job_cb(data['device'], data['devicetype'], data)
+            err=add_job_cb(data['device'], data['devicetype'], data)
+            if err != ERROR_NO :
+                self._log.warning("Can't load job from %s : error=%s" % \
+                    (jobfile,CRONERRORS[err]))
 
     def _get_jobfile(self, job):
         """

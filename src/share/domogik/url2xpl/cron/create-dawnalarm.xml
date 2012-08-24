@@ -1,9 +1,9 @@
 <technology id="cron">
-  <command name="create-alarm">
+  <command name="create-dawnalarm">
     <schema>timer.basic</schema>
     <command-key>command</command-key>
     <address-key>caller</address-key>
-    <command-xpl-value>create-alarm</command-xpl-value>
+    <command-xpl-value>create-dawnalarm</command-xpl-value>
     <parameters>
       <parameter key="data" location="1"/>
     </parameters>
