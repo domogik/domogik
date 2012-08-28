@@ -96,7 +96,7 @@
         "domogik_min_version": "0.2.0",
         "id": "cron",
         "type": "plugin",
-        "version": "0.1a2"
+        "version": "0.2a1"
     },
     "json_version": 1,
     "technology": {
