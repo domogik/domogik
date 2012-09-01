@@ -43,6 +43,7 @@ import time
 from time import sleep
 import os.path
 
+
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 
@@ -181,13 +182,13 @@ class ZWaveNode:
 #        0x26: 'COMMAND_CLASS_SWITCH_MULTILEVEL',
 #        0x80: 'COMMAND_CLASS_BATTERY',
 #        0x25: 'COMMAND_CLASS_SWITCH_BINARY',
-
+#        0x20: 'COMMAND_CLASS_BASIC',
 
 
 # TODO:
 
 #        0x00: 'COMMAND_CLASS_NO_OPERATION',
-#        0x20: 'COMMAND_CLASS_BASIC',
+
 #        0x21: 'COMMAND_CLASS_CONTROLLER_REPLICATION',
 #        0x22: 'COMMAND_CLASS_APPLICATION_STATUS',
 #        0x23: 'COMMAND_CLASS_ZIP_SERVICES',
@@ -337,11 +338,13 @@ class OZWavemanager(threading.Thread):
 
     def __init__(self, config,  cb_send_xPL, cb_sendxPL_trig, stop , log,  ozwconfig = "../../../share/domogik/data/ozwave/plugins/ozwconfig/", ozwuser="",  ozwlog = False, msgEndCb =  False):
         """ Ouverture du manager py-openzwave
+            @ param config : configuration du plugin pour accès aux valeurs paramètrées"
             @ param cb_send_xpl : callback pour envoi msg xpl
             @ param cb_send_trig : callback pour trig xpl
             @ param stop : flag d'arrêt du plugin         
             @ param log : log instance domogik
-            @ param ozwconfig .: chemin d'accès au répertoire de configuration pour la librairie openszwave (déf = "./../plugins/ozwconfig/")
+            @ param ozwconfig : chemin d'accès au répertoire de configuration pour la librairie openszwave (déf = "./../plugins/ozwconfig/")
+            @ param ozwuser : chemin d'accès au répertoire de sauvegarde de la config openzwave et du log."
             @ param ozwlog (optionnel) : Activation du log d'openzawe, fichier OZW_Log.txt dans le répertoire user (déf = "--logging false")
             @ param msgEndCb (désactivée pour l'instant) Envoi d'une notification quand la transaction est complete (defaut = "--NotifyTransactions  false")
         """
@@ -372,12 +375,16 @@ class OZWavemanager(threading.Thread):
                 HIdName = self._configPlug.query('ozwave', 'homename-%s' % str(num))
                 HIdAssoc = self._configPlug.query('ozwave', 'homeidass-%s' % str(num))
                 if HIdName != None : 
-                    self._nameAssoc[HIdName] = long(HIdAssoc,  16)
+                    try :
+                        self._nameAssoc[HIdName] = long(HIdAssoc,  16)
+                    except OZwaveException as e:
+                        self._log.error(e.value)
+                        print e.value
+                        self._nameAssoc[HIdName]  = 0
                 else:
                     loop = False
                 num += 1                
         print self._nameAssoc
-       # sleep(5)
         threading.Thread.__init__(self, target=self.run)
     
         if not os.path.exists(self._ozwconfig) : 
@@ -507,6 +514,7 @@ class OZWavemanager(threading.Thread):
 
         print('\n%s\n[%s]:' % ('-'*20, args['notificationType']))
         print args
+
 #        if args:
 #            print('homeId: 0x%.8x' % args['homeId'])
 #            print('nodeId: %d' % args['nodeId'])
@@ -591,7 +599,7 @@ class OZWavemanager(threading.Thread):
             retval = ZWaveValueNode(homeId, nodeId, valueId)
             self._log.debug('Created new value node with homeId %0.8x, nodeId %d, valueId %s', homeId, nodeId, valueId)
             node._values[vid] = retval
-        return retval
+        return retval 
 
     def _handleValueAdded(self, args):
         """Un valueNode est ajouté au node depuis le réseaux zwave"""
@@ -628,6 +636,12 @@ class OZWavemanager(threading.Thread):
                 msgtrig['schema'] ='ozwave.basic'
                 msgtrig['genre'] = 'actuator'
                 msgtrig['level']=  valueId['value']
+        if valueId['commandClass'] == 'COMMAND_CLASS_SWITCH_BINARY' :
+            if valueId['type'] == 'Bool' :
+                sendxPL = True
+                msgtrig['schema'] ='ozwave.basic'
+                msgtrig['genre'] = 'actuator'
+                msgtrig['level']=  valueId['value']
         elif valueId['commandClass'] == 'COMMAND_CLASS_SENSOR_BINARY' : 
             if valueId['type'] == 'Bool' :
                 sendxPL = True
@@ -650,7 +664,7 @@ class OZWavemanager(threading.Thread):
                 msgtrig ['units']= valueId['units']        
                 
         if sendxPL: self._cb_sendxPL_trig(msgtrig)
-        else : print ('commande inconnue')
+        else : print ('commande non  implémentée : %s'  % valueId['commandClass'] )
 
         
     def _updateNodeCapabilities(self, node):
@@ -804,6 +818,7 @@ class OZWavemanager(threading.Thread):
         ids = addresseTy.split('.')
         retval ={}
         retval['homeId'] = self._nameAssoc[ids[0]] if self._nameAssoc[ids[0]]  else self.homeId
+        if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO : gérer un message pour l'utilisateur pour erreur de config.
         print "getZWRefFromxPL : ", retval
         retval['nodeId']  = int(ids[1])
         retval['instance']  = int(ids[2])
@@ -824,16 +839,31 @@ class OZWavemanager(threading.Thread):
 	        opt = int(opt)
             if (opt == 'None') :
                 opt = 0
-            if command == 'level':
-                self._manager.setNodeLevel(self.homeId, nodeID, opt)
-            elif command == 'on':
-                self._manager.setNodeOn(homeId, nodeID)
-            elif command == 'off':
-                self._manager.setNodeOff(homeId, nodeID)
-            else : 
-                self._log.info("xPL to ozwave unknown command : %s , nodeID : %d",  command,  nodeID)
+            if instance == 1 :
+                if command == 'level':
+                    self._manager.setNodeLevel(self.homeId, nodeID, opt)
+                elif command == 'on':
+                    self._manager.setNodeOn(homeId, nodeID)
+                elif command == 'off':
+                    self._manager.setNodeOff(homeId, nodeID)
+                else : 
+                    self._log.info("xPL to ozwave unknown command : %s , nodeID : %d",  command,  nodeID)
+            else : # instance secondaire, utilisation de set value
+                print ("instance secondaire")
+                node = self._getNode(self.homeId,  nodeID)
+                cmdsClass= ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY']
+                for value in node.values.keys() :
+                    val = node.values[value].valueData
+                    print ("valeur : " + val['commandClass'])
+                    if (val['commandClass'] in cmdsClass)  and val['instance'] == instance :
+                        if command=='on' : opt = 255
+                        elif command=='off' : opt = 0
+                        print ("setValue de %s, instance :%d, value : %d, on valueId : %d" %(val['commandClass'], instance,  opt, val['id']))                        
+                        if not self._manager.setValue(val['id'], opt)  : 
+                            self._log.error ("setValue return bad type : %s, instance :%d, value : %d, on valueId : %d" %(val['commandClass'], instance,  opt, val['id']))
+                            print("return bad type value")
+                        break
             print ("commande transmise")
-
             print "Request demande Type : " + self._manager.getNodeType(homeId,  nodeID)
             print "Manufact node : "+ self._manager.getNodeManufacturerName(homeId,nodeID)
 

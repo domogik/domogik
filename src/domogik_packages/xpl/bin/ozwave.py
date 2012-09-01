@@ -62,7 +62,7 @@ class OZwave(XplPlugin):
         device = self._config.query('ozwave', 'device')
         ozwlogConf = self._config.query('ozwave', 'ozwlog')
         self._config = Query(self.myxpl, self.log)
-        print ('***logg :',  ozwlogConf)
+        print ('Mode log openzwave :',  ozwlogConf)
         # Recupère l'emplacement des fichiers de configuration OZW
         pathConfig = self.get_data_files_directory() + '/ozwconfig/'
         pathUser = self.get_data_files_directory()  +'/'
@@ -105,11 +105,11 @@ class OZwave(XplPlugin):
                 # addresseTy = int(message.data['node'])
                 addresseTy = message.data['addressety']
                 if cmd == 'level' :
-                    print ("appel envoi zwave command %s",  cmd)
+                    print ("appel envoi zwave command %s" %cmd)
                     lvl = message.data['level']
                     self.myzwave.sendNetworkZW(cmd, addresseTy, lvl)
                 elif cmd == "on"  or cmd == "off" :
-                    print ("appel envoi zwave command %s",  cmd)
+                    print ("appel envoi zwave command %s" %cmd)
                     self.myzwave.sendNetworkZW(cmd, addresseTy)
                 else:
                     self.myzwave.sendNetworkZW(cmd, addresseTy)
@@ -199,8 +199,8 @@ class OZwave(XplPlugin):
             mess.set_type('xpl-trig') # force xpl-trig
             mess.set_schema(msgtrig['schema'])
             if msgtrig['genre'] == 'actuator' :
-                if msgtrig['level'] == '0' : cmd ="off"
-                elif msgtrig['level']== '255': cmd ="on"
+                if msgtrig['level'] in ['0', 'False'] : cmd ="off"
+                elif msgtrig['level'] in ['255', 'True']: cmd ="on"
                 else: cmd ='level'
                 mess.add_data({'addressety' : msgtrig['addressety'],
                             'command' : cmd,
