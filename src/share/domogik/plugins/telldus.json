@@ -226,7 +226,7 @@
                 "type": "python"
             },
             {
-                "id": "tailer (>=0.3)",
+                "id": "tailer (>=0.2.1)",
                 "type": "python"
             }
         ],
