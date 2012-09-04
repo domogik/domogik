@@ -51,7 +51,7 @@
 		    "feature_type": "sensor", 
 		    "id": "ozwave.humidity.humidity", 
 		    "name": "Humidity", 
-		    "parameters": "{}", 
+		    "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
 		    "return_confirmation": "0", 
 		    "stat_key": "humidity", 
 		    "value_type": "number"
@@ -60,7 +60,7 @@
             "feature_type": "sensor", 
             "id": "ozwave.thermometer.temperature", 
             "name": "Temperature", 
-            "parameters": "{}", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
             "return_confirmation": "0", 
             "stat_key": "temperature", 
             "value_type": "number"
@@ -72,7 +72,7 @@
             "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
             "return_confirmation": "0", 
             "stat_key": "battery", 
-            "value_type": "string"
+            "value_type": "number"
         }, {
             "device_type_id": "ozwave.sensor",
             "feature_type": "sensor",
@@ -90,7 +90,7 @@
             "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
             "return_confirmation": "0", 
             "stat_key": "battery", 
-            "value_type": "string"
+            "value_type": "number"
        }
 	],
 	"device_types" : [{
