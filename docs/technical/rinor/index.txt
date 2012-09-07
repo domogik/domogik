@@ -11,7 +11,7 @@ For example you can run: ::
 
 This will run the request and show you the results (thanks to the *-qO-* parameter).
 
-Configuration section in ~/.domogik.cfg 
+Configuration section in /etc/domogik/domogik.cfg 
 =======================================
 In Domogik configuration file, there are several options about REST in **[rest]** section:
 
@@ -36,7 +36,7 @@ With the User Interface administration, you can configure Rest parameters :
 If you don't know what you are doing, you shouldn't set these parameters. Changing these parameters implies to restart REST server.
 
 .. note::
-    These parameters may be moved in ~/.domogik.cfg file in a following release.
+    These parameters may be moved in /etc/domogik/domogik.cfg file in a following release.
 
 How to use REST with SSL?
 =========================

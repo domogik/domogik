@@ -1,5 +1,4 @@
-# Domogik stable and official repositories
-# Greater priority implies a prefered package
+# Domogik official repositories
 # priority   # url
 500          http://repo.domogik.org/repository/stable/
 400          http://repo.domogik.org/repository/testing/

@@ -13,7 +13,7 @@ Creating a device
 
 First, create your device in the administration panel : **Organization > Devices**. Be careful to indicate a valid **device address** and the corresponding **feature**. 
 
-.. image:: onewire_create_serial.png
+.. image:: create_device.jpg
 
 Right now there is no auto discovery feature in Domogik to help you to find out a device address.
 In some plugins there are helpers which can display available modules and their addresses. Feel free using them.

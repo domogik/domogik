@@ -24,10 +24,6 @@ The first time you access Domogik you should see an information notification whi
 
 .. image:: no_area_or_room.png
 
-.. todo:: screenshot with no data
-
-.. todo:: screenshot with data
-
 On the top of the screen you will get :
 
 * **Domogik banner**.
@@ -44,7 +40,7 @@ Menu
 * Visualization : go to visualization screen. 
 * Administration : go to administration section.
 * Help : direct link to this Domogik online documentation.
-* Connect/Disconnect : Login or logout from Domogik. Currently (in ((Release0.1.0|release 0.1.0))), login is needed only to access the administration part.
+* Connect/Disconnect : Login or logout from Domogik.
 
 Visualization screen
 --------------------
@@ -69,16 +65,12 @@ Under the navigation menu there are :
 * On the left the **widgets zone** of the places (room, area).
 * On the right the places and their **main widgets**.
 
-.. todo:: screenshots and light explanations about widget places (title, main, others)
-
 For rooms
 ^^^^^^^^^
 Under the navigation menu there are :
 
 * On the top the title of the room and at the right the main widgets zone.
 * On the bottom other widgets zone.
-
-.. todo:: screenshots and light explanations about widget places (title, main, others)
 
 What next?
 ==========

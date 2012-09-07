@@ -5,31 +5,25 @@ Domogik
 .. todo::
    This documentation is not yet finished. Missing :
 
+   * Review overview pages
    * release 0.2.0 page
    * Packages management by users
    * Minor enhancements in pckages devlelopment part
 
    * enduser/installation/index.txt
      What next : configuration des dépôts, external accès, principe des packages
+
    * (inexistante) : installation Domoweb
-   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/index.html
-     Screenshots manquant
-   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/house.html
-     supprimer le todo de maj de l'image
    * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/index.html
      Revoir, mixer avec les packages ?
    * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/install.html
      Refaire FS, mixer avec les packages
-   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/devices.html
-     Revoir screenshot de add device
-   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/widgets.html
-     Vide
-   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/house.html
-     Screenshot à revoir
-   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/device.html
-     Revoir screenshot add device 
    * http://docs.domogik.org/domogik/0.1/en/enduser/administration/plugin.html     
      Revoir, mixer avec les packages ?
+
+   * http://81.56.234.241:8010/dmg-docs/_build/html/package_development/packages_lifecycle.html
+
+   * Revoir tous les "what next ?"
 
 
 * **Overview:**
@@ -40,11 +34,42 @@ End User Documentation
 ======================
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**
-  :doc:`Standard Installation </enduser/installation/index>` |
-  :doc:`Configure external access to Domogik </enduser/installation/external>`
-* **Configuration:**
-  :doc:`First Use </enduser/configuration/index>` |
-  :doc:`Create and configure your house </enduser/configuration/house>`
+
+  * :doc:`Standard Installation </enduser/installation/index>` (*)
+  * :doc:`Repositories configuration </enduser/installation/repositories>` (*)
+  * :doc:`Configure external access to Domogik </enduser/installation/external>`
+  
+  Now, install Domoweb (the Domogik web user interface) before starting the following parts.
+
+* **First steps:**
+
+  * :doc:`First Use </enduser/configuration/index>` (*)
+  * :doc:`Create and configure your house </enduser/configuration/house>` (*)
+
+    * :doc:`House management </enduser/administration/house>` (*)
+    * :doc:`Areas management </enduser/administration/area>` (*)
+    * :doc:`Rooms management </enduser/administration/room>` (*)
+
+  * :doc:`Accounts management </enduser/administration/account>`
+
+* **Packages:**
+
+  * :doc:`Repositories </enduser/packages/repositories>`
+  * Installing a package **TODO** 
+  * Activate and configure a plugin **TODO** (helpers inside)
+  * Activate and configure an external member **TODO**
+
+* **Devices:**
+
+  * Create a device **TODO**
+  * Place the widget **TODO**
+ 
+
+
+
+La fin ici =====================================
+
+
     
     * **Plugins:**
       :doc:`Overview </enduser/configuration/plugins/index>` |
@@ -59,7 +84,9 @@ End User Documentation
   :doc:`Rooms management </enduser/administration/room>` |
   :doc:`Devices management </enduser/administration/device>` |
   :doc:`Plugins management </enduser/administration/plugin>` |
-  :doc:`Accounts management </enduser/administration/account>`
+
+
+
 
 Technical Documentation
 =======================
@@ -83,5 +110,5 @@ Technical Documentation
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
 
 Packages development
-====================
+********************
 * :doc:`Developing a package </package_development/index>`

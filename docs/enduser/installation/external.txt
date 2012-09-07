@@ -92,7 +92,7 @@ Before doing this, don't forget that django is not made to be directly accessibl
 
 * bind Django port on your box.
 * bind REST port on your box.
-* configure ~/.domogik.cfg file to use your public internet IP.
+* configure /etc/domogik/domogik.cfg file to use your public internet IP.
 
 Notice that doing this will make all your local Domogik use go through the internet.
 

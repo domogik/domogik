@@ -28,7 +28,7 @@ Add a device
 ============
 Click on the **Add** button to create a new device. The following window will open:
 
-.. image:: device_add.png
+.. image:: device_add.jpg
 
 * Name : name of the device. It will be displayed in visualization mode and used when you will set your device features.
 * Address : address of device. Examples:
@@ -51,7 +51,7 @@ Modify a device
 ===============
 Click on the **Modify** button to change a device. The following window will open:
 
-.. image:: device_update.png
+.. image:: device_update.jpg
 
 Update what you need and validate.
 

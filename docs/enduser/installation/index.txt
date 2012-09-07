@@ -114,7 +114,7 @@ If the choosen user doesn't exists, you will have to answser following questions
 
 Enter twice a password for the user and eventually, fill values about the new user: ::
 
-    You already have a .domogik.cfg file. Do you want to keep it ? [Y/n]
+    You already have a domogik.cfg file. Do you want to keep it ? [Y/n]
 
 If you already have a Domogik config file, you will be asked for keeping it or not: ::
 
@@ -176,7 +176,7 @@ Optional : postgresql (instead of mysql)
 If you wish to use postgresql instead of mysql
 
 * Create your database
-* Edit your *.domogik.cfg* file and put database information : db_type (postgresql), db_user, db_password...
+* Edit your */etc/domogik/domogik.cfg* file and put database information : db_type (postgresql), db_user, db_password...
 
 Make Domogik start with your computer
 -------------------------------------
