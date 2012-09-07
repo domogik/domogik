@@ -1,9 +1,9 @@
 <technology id="cron">
-  <command name="list">
+  <command name="halt">
     <schema>timer.basic</schema>
     <command-key>action</command-key>
     <address-key>device</address-key>
-    <command-xpl-value>list</command-xpl-value>
+    <command-xpl-value>halt</command-xpl-value>
     <parameters/>
   </command>
   <listener>
