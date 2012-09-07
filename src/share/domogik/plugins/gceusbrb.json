@@ -1,6 +1,3 @@
-# Some updates needs to be done manually :
-# - adapt the file path in 'files' : src/domogik/xpl/* => src/domogik_packages/xpl/*
-# - rename the xml file as json in 'files' : src/share/domogik/plugins/myplugin.xml => src/..../myplugin.json
 {
     "configuration": [
         {
@@ -54,7 +51,7 @@
         }
     ], 
     "files": [
-        "src/share/domogik/plugins/gceusbrb.xml", 
+        "src/share/domogik/plugins/gceusbrb.json", 
         "src/share/domogik/stats/relayboard/sensor.basic-gceusbrb.xml", 
         "src/share/domogik/url2xpl/relayboard/high.xml", 
         "src/share/domogik/url2xpl/relayboard/low.xml", 
