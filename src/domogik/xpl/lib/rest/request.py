@@ -1179,55 +1179,7 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        ### area #####################################
-        if self.rest_request[0] == "area":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_area_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_area_list(area_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_area_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_area_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_area_del(area_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-        elif self.rest_request[0] == "page":
+        if self.rest_request[0] == "page":
             ### list
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
@@ -1285,57 +1237,6 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 return
              
-        ### room #####################################
-        elif self.rest_request[0] == "room":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_room_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_room_list(room_id=self.rest_request[3])
-                    elif self.rest_request[2] == "by-area":
-                        self._rest_base_room_list(area_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_room_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_room_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_room_del(room_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
         ### ui_config ################################
         elif self.rest_request[0] == "ui_config":
 
@@ -1467,30 +1368,6 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_area_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_area_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_area_del(area_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
             ### others
             else:
                 self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
@@ -1614,79 +1491,6 @@ target=*
                 return
 
 
-        ### feature_association ######################
-        elif self.rest_request[0] == "feature_association":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_feature_association_list()
-                elif len(self.rest_request) == 3:
-                    if self.rest_request[2] == "by-house":
-                        self._rest_base_feature_association_list_by_house()
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 4:
-                    if self.rest_request[2] == "by-area":
-                        self._rest_base_feature_association_list_by_area(self.rest_request[3])
-                    elif self.rest_request[2] == "by-room":
-                        self._rest_base_feature_association_list_by_room(self.rest_request[3])
-                    elif self.rest_request[2] == "by-feature":
-                        self._rest_base_feature_association_list_by_feature(self.rest_request[3])
-                    #elif self.rest_request[2] == "by-device":
-                    #    self._rest_base_feature_association_list_by_device(self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-
-            ### listdeep
-            elif self.rest_request[1] == "listdeep":
-                if len(self.rest_request) == 3:
-                    if self.rest_request[2] == "by-house":
-                        self._rest_base_feature_association_listdeep_by_house()
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 4:
-                    if self.rest_request[2] == "by-area":
-                        self._rest_base_feature_association_listdeep_by_area(self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_feature_association_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 4 and self.rest_request[2] == "id":
-                    self._rest_base_feature_association_del(id=self.rest_request[3])
-                elif len(self.rest_request) == 4 and self.rest_request[2] == "feature_id":
-                    self._rest_base_feature_association_del(feature_id=self.rest_request[3])
-                elif len(self.rest_request) == 6 and self.rest_request[2] == "association_type" and self.rest_request[4] == "association_id":
-                    self._rest_base_feature_association_del(association_type=self.rest_request[3], 
-                                                            association_id=self.rest_request[5])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
-
         ### others ###################################
         else:
             self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
@@ -1793,7 +1597,7 @@ target=*
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_page_del(self, page_id=None):
-        """ delete a area
+        """ delete a page
             @param page_id : id of page
             tree handling is done in the dbhelper
         """
@@ -1829,10 +1633,10 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("page")
         try:
-            area = self._db.update_page(id=self.get_parameters("id"), name=self.get_parameters("name"), \
+            page = self._db.update_page(id=self.get_parameters("id"), name=self.get_parameters("name"), \
                                         descr=self.get_parameters("description"), icon=self.get_parameters("icon"), \
                                         parent=self.get_parameters("parent") )
-            json_data.add_data(area)
+            json_data.add_data(page)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -1875,162 +1679,6 @@ target=*
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
-
-
-######
-# /base/area processing
-######
-
-    def _rest_base_area_list(self, area_id = None):
-        """ list areas
-            @param area_id : id of area
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        if area_id == None:
-            for area in self._db.list_areas():
-                json_data.add_data(area)
-        else:
-            area = self._db.get_area_by_id(area_id)
-            if area is not None:
-                json_data.add_data(area)
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_area_add(self):
-        """ add areas
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        try:
-            area = self._db.add_area(self.get_parameters("name"), self.get_parameters("description"))
-            json_data.add_data(area)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_area_update(self):
-        """ update areas
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        try:
-            area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), \
-                                        self.get_parameters("description"))
-            json_data.add_data(area)
-        except:
-            # TODO make a function to get arranged trace and use it everywhere :)
-            json_data.set_error(code = 999, description = str(traceback.format_exc()).replace('"', "'").replace('\n', '      '))
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_area_del(self, area_id=None):
-        """ delete areas
-            @param area_id : id of area
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        try:
-            area = self._db.del_area(area_id)
-            json_data.add_data(area)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-######
-# /base/room processing
-######
-
-    def _rest_base_room_list(self, room_id = None, area_id = None):
-        """ list rooms
-            @param room_id : id of room
-            @param area_id : id of area
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
-        try:
-            if room_id == None and area_id == None:
-                for room in self._db.list_rooms():
-                    json_data.add_data(room)
-            elif room_id != None:
-                room = self._db.get_room_by_id(room_id)
-                if room is not None:
-                    json_data.add_data(room)
-            elif area_id != None:
-                if area_id == "":
-                    area_id = None
-                for room in self._db.get_all_rooms_of_area(area_id):
-                    json_data.add_data(room)
-            self.send_http_response_ok(json_data.get())
-        except:
-            self.log.error("Exception : %s" % traceback.format_exc())
-
-
-    def _rest_base_room_add(self):
-        """ add rooms
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
-        try:
-            room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), \
-                                     self.get_parameters("description"))
-            json_data.add_data(room)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_room_update(self):
-        """ update rooms
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
-        try:
-            if self.get_parameters("area_id") == "None":
-                area_id = None
-            else:
-                area_id = self.get_parameters("area_id")
-
-            room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), \
-                                        area_id, self.get_parameters("description"))
-            json_data.add_data(room)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_room_del(self, room_id=None):
-        """ delete rooms
-            @param room_id : room id
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
-        try:
-            room = self._db.del_room(room_id)
-            json_data.add_data(room)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
 
 ######
 # /base/ui_config processing
@@ -2236,11 +1884,11 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_type")
         try:
-            area = self._db.update_device_type(self.get_parameters("id"), \
+            b = self._db.update_device_type(self.get_parameters("id"), \
                                                self.get_parameters("name"), \
                                                self.get_parameters("technology_id"), \
                                                self.get_parameters("description"))
-            json_data.add_data(area)
+            json_data.add_data(b)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -2435,175 +2083,6 @@ target=*
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
-
-
-
-
-
-######
-# /base/feature_association processing
-######
-
-    def _rest_base_feature_association_list(self):
-        """ list feature association
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations():
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_house(self):
-        """ list feature association by house
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_house():
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_area(self, id):
-        """ list feature association by area
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_area_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_room(self, id):
-        """ list feature association by room
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_room_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_feature(self, id):
-        """ list feature association by feature
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_feature_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    #def _rest_base_feature_association_list_by_device(self, id):
-    #    """ list feature association by device
-    #        @param id : id of element
-    #    """
-    #    json_data = JSonHelper("OK")
-    #    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-    #    json_data.set_data_type("feature_association")
-    #    for ass in self._db.list_device_feature_associations_by_device_id(id):
-    #        json_data.add_data(ass)
-    #    self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_feature_association_listdeep_by_house(self):
-        """ list feature association by house andthings under house
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_deep_device_feature_associations_by_house():
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_listdeep_by_area(self, id):
-        """ list feature association by area
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_deep_device_feature_associations_by_area_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-
-
-
-    def _rest_base_feature_association_add(self):
-        """ add feature_association
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        try:
-            ass = self._db.add_device_feature_association( self.get_parameters("feature_id"), \
-                                                               self.get_parameters("association_type"), \
-                                                               self.get_parameters("association_id"))
-            json_data.add_data(ass)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_feature_association_del(self, id = None, 
-                                          feature_id = None,
-                                          association_type = None,
-                                          association_id = None):
-        """ delete feature association
-            @param id : association id
-            @param feature_id : feature id
-            @param association_type : house, area, room...
-            @param association_id : area id, room id, etc
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        if id != None:
-            try:
-                fa = self._db.del_device_feature_association(id)
-                json_data.add_data(fa)
-            except:
-                json_data.set_error(code = 999, description = self.get_exception())
-        elif feature_id != None:
-            try:
-                for fa in self._db.del_device_feature_association_by_device_feature_id(feature_id):
-                    json_data.add_data(fa)
-            except:
-                json_data.set_error(code = 999, description = self.get_exception())
-        elif association_type != None:
-            try:
-                for fa in self._db.del_device_feature_association_by_place(association_id, association_type):
-                    json_data.add_data(fa)
-            except:
-                json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
 
 ######
 # /plugin processing
