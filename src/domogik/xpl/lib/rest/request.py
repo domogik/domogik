@@ -79,6 +79,117 @@ class ProcessRequest():
     """ Class for processing a request
     """
 
+    urls = {
+        '^//$':                                                                                   'rest_status',
+	# /account
+        '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
+        '^/account/user/list$':						                         '_rest_account_user_list',
+        '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		                 '_rest_account_user_list',
+        '^/account/user/add/.*$':						                 '_rest_account_user_add',
+        '^/account/user/update/.*$':				                                 '_rest_account_user_update',
+        '^/account/user/password/.*$':				        	                 '_rest_account_user_password',
+        '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
+        '^/account/person/list$':						                 '_rest_account_person_list',
+        '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
+        '^/account/person/add/.*$':					                         '_rest_account_person_add',
+        '^/account/person/update/.*$':					                         '_rest_account_person_update',
+        '^/account/person/password/.*$':				                         '_rest_account_person_password',
+        '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
+        # /base/area
+        '^/base/area/list$':			                                                 '_rest_base_area_list',
+        '^/base/area/list/by-id/(?P<area_id>[0-9]+)$':	                                         '_rest_base_area_list',
+        '^/base/area/add/.*$':		 	                                                 '_rest_base_area_add',
+        '^/base/area/update/.*$':		                                                 '_rest_base_area_update',
+        '^/base/area/del/(?P<area_id>[0-9]+)$':		                                         '_rest_base_area_del',
+        # /base/device
+        '^/base/device/list$':			                                                 '_rest_base_device_list',
+        '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
+        '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
+        '^/base/device/del/(?P<id>[0-9]+)$':		                                         '_rest_base_device_del',
+        # /base/device_technology
+        '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
+        '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
+        '^/base/device_technology/add/.*$':		 	                                 '_rest_base_device_technology_add',
+        '^/base/device_technology/update/.*$':		                                         '_rest_base_device_technology_update',
+        '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
+        # /base/device_type
+        '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
+        '^/base/device_type/add/.*$':		 	                                         '_rest_base_device_type_add',
+        '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
+        '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                                 '_rest_base_device_type_del',
+        # /base/device_usage
+        '^/base/device_usage/list$':			                                         '_rest_base_device_usage_list',
+        '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
+        '^/base/device_usage/add/.*$':		 	                                         '_rest_base_device_usage_add',
+        '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
+        '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                                 '_rest_base_device_usage_del',
+        # /base/feature
+        '^/base/feature/list$':			                                                 '_rest_base_feature_list',
+        '^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                         '_rest_base_feature_list',
+        '^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			         '_rest_base_feature_list',
+        # /base/feature_association
+        '^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
+        '^/base/feature_association/by-house$':			                                 '_rest_base_feature_association_list_by_house',
+        '^/base/feature_association/by-area/(?P<id>[0-9]+)$':			                 '_rest_base_feature_association_list_by_area',
+        '^/base/feature_association/by-room/(?P<id>[0-9]+)$':			                 '_rest_base_feature_association_list_by_room',
+        '^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
+        # /base/room
+        '^/base/room/list$':                                                                     '_rest_base_room_list',
+        '^/base/room/list/by-id/(?P<room_id>[0-9]+)$':                                           '_rest_base_room_list',
+        '^/base/room/list/by-area/(?P<area_id>[0-9]+)$':                                         '_rest_base_room_list',
+        '^/base/room/add/.*$':                                                                   '_rest_base_room_add',
+        '^/base/room/update/.*$':                                                                '_rest_base_room_update',
+        '^/base/room/del/(?P<room_id>[0-9]+)$':                                                  '_rest_base_room_del',
+        # /base/ui-config
+        '^/base/ui-config/list$':                                                                '_rest_base_ui_item_config_list',
+        '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':                  '_rest_base_ui_item_config_list',
+        '^/base/ui-config/list/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':      '_rest_base_ui_item_config_list',
+        '^/base/ui-config/list/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_list',
+        '^/base/ui-config/set/.*$':                                                              '_rest_base_ui_item_config_set',
+        '^/base/ui-config/del/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_ui_item_config_del',
+        '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':       '_rest_base_ui_item_config_del',
+        '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
+	# /command
+	'^/command.*$':                                                                          'rest_command',
+        # /event
+        '^/events/domogik/new$':						                 '_rest_events_domogik_new',
+        '^/events/domogik/get/(?P<ticketid>[0-9]+)$':					         '_rest_events_domogik_get',
+        '^/events/domogik/free/(?P<ticket_id>[0-9]+)$':			                         '_rest_events_domogik_free',
+        #'^/events/request/new/.*$':					                         'needs a new function',
+        '^/events/request/get/(?P<ticket_id>[0-9]+)$':				                 '_rest_events_request_get',
+        '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                         '_rest_events_request_free',
+        # /helper
+        '^/helper/.*$':			                                                         'rest_helper',
+        # /host
+        '^/host/.*$':			                                                         'rest_host',
+        # /log
+        # TODO
+        # /package
+        # TODO
+        # /plugin
+        '^/plugin/list$':                                                                        '_rest_plugin_list',
+        '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
+        '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
+        '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
+        '^/plugin/(?P<command>enable|disable)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':             '_rest_plugin_enable_disable',
+        '^/plugin/(?P<command>start|stop)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':                 '_rest_plugin_start_stop',
+        '^/plugin/config/list/by-name/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                         '_rest_plugin_config_list',
+        '^/plugin/config/list/by-name/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$': '_rest_plugin_config_list',
+        '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                             '_rest_plugin_config_del',
+        '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
+	'^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
+	# /queuecontent
+        # TODO
+        # /repo
+        '^/repo/put$':                                                                           '_rest_repo_put',
+        '^/repo/get/(?P<file_name>[a-z0-9]+)$':                                                  '_rest_repo_get',
+        # /scenario
+        # TODO
+        # /stats
+        # TODO
+   }
+
+
 ######
 # init namespace
 ######
@@ -269,43 +380,55 @@ class ProcessRequest():
         """ Process request
             This function call appropriate functions for processing path
         """
-        if self.rest_type == "robots.txt":
-            self.rest_robots_txt()
-        elif self.rest_type == "command":
-            self.rest_command()
-        elif self.rest_type == "stats":
-            self.rest_stats()
-        elif self.rest_type == "events":
-            self.rest_events()
-        # commented for security reasons
-        #elif self.rest_type == "xpl-cmnd":
-        #    self.rest_xpl_cmnd()
-        elif self.rest_type == "base":
-            self.rest_base()
-        elif self.rest_type == "plugin":
-            self.rest_plugin()
-        elif self.rest_type == "account":
-            self.rest_account()
-        elif self.rest_type == "queuecontent":
-            self.rest_queuecontent()
-        elif self.rest_type == "helper":
-            self.rest_helper()
-        elif self.rest_type == "testlongpoll":
-            self.rest_testlongpoll()
-        elif self.rest_type == "repo":
-            self.rest_repo()
-        elif self.rest_type == "scenario":
-            self.rest_scenario()
-        elif self.rest_type == "package":
-            self.rest_package()
-        elif self.rest_type == "log":
-            self.rest_log()
-        elif self.rest_type == "host":
-            self.rest_host()
-        elif self.rest_type == None:
-            self.rest_status()
-        else:
-            self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
+        found = 0
+        for k in self.urls:
+            m = re.match(k, self.path)
+            if m:
+                found = 1
+                self.log.debug("New url parser" )
+                self.log.debug( k )
+                self.log.debug( m.groupdict() )
+                if len( m.groupdict() ) == 0:
+                    eval('self.' + self.urls[k] + '()')
+                else:
+                    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"='"+k+"'" for (v,k) in m.groupdict().iteritems()]) + ')')
+                break
+        if found == 0:
+            if self.rest_type == "command":
+                self.rest_command()
+            elif self.rest_type == "stats":
+                self.rest_stats()
+            elif self.rest_type == "events":
+                self.rest_events()
+            # commented for security reasons
+            #elif self.rest_type == "xpl-cmnd":
+            #    self.rest_xpl_cmnd()
+            elif self.rest_type == "base":
+                self.rest_base()
+            elif self.rest_type == "plugin":
+                self.rest_plugin()
+            elif self.rest_type == "account":
+                self.rest_account()
+            elif self.rest_type == "queuecontent":
+                self.rest_queuecontent()
+            elif self.rest_type == "helper":
+                self.rest_helper()
+            elif self.rest_type == "testlongpoll":
+                self.rest_testlongpoll()
+            elif self.rest_type == "repo":
+                self.rest_repo()
+            elif self.rest_type == "scenario":
+                self.rest_scenario()
+            elif self.rest_type == "package":
+                self.rest_package()
+            elif self.rest_type == "log":
+                self.rest_log()
+            elif self.rest_type == "host":
+                self.rest_host()
+            elif self.rest_type == None:
+                self.rest_status()
+            else:
+                self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
                                           "] is not supported", \
                                           self.jsonp, self.jsonp_cb)
 
@@ -3884,19 +4007,19 @@ target=*
                         if message.data.has_key("dep%s-version" % idx):
                             version = message.data["dep%s-version" % idx]
                         else:
-                            version = "";
+                            version = ""
                         if message.data.has_key("dep%s-cmd-line" % idx):
                             cmd_line = message.data["dep%s-cmd-line" % idx]
                         else:
-                            cmd_line = "";
+                            cmd_line = ""
                         if message.data.has_key("dep%s-candidate" % idx):
                             candidate = message.data["dep%s-candidate" % idx]
                         else:
-                            candidate = "";
+                            candidate = ""
                         if message.data.has_key("dep%s-error" % idx):
                             error = message.data["dep%s-error" % idx]
                         else:
-                            error = "";
+                            error = ""
         
                         data = {
                                    "type" : "python",
@@ -3961,10 +4084,10 @@ target=*
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
-           self.log.debug("Package install : no answer")
-           self.send_http_response_error(999, "No data or timeout on installing package",
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
                                           self.jsonp, self.jsonp_cb)
-           return
+            return
         
         self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
         
@@ -4090,10 +4213,10 @@ target=*
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
-           self.log.debug("Package install : no answer")
-           self.send_http_response_error(999, "No data or timeout on installing package",
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
                                           self.jsonp, self.jsonp_cb)
-           return
+            return
         
         self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
         
