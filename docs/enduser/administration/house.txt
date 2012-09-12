@@ -16,6 +16,3 @@ Setting the house name
 
 Just set a name and click on the **Save** button.
 
-What next?
-==========
-* :doc:`Area management </enduser/administration/area>`

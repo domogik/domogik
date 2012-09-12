@@ -221,8 +221,3 @@ It doesn't work?
 ----------------
 * `See errors and solutions <http://wiki.domogik.org/Errors_and_solutions>`_
 
-What next?
-==========
-* :doc:`First Use of Domogik </enduser/configuration/index>`
-* :doc:`Configure external access to Domogik </enduser/installation/external>`
-* See the :doc:`Plugins section </enduser/configuration/plugins/index>` to use and configure plugins

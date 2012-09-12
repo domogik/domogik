@@ -72,7 +72,3 @@ Under the navigation menu there are :
 * On the top the title of the room and at the right the main widgets zone.
 * On the bottom other widgets zone.
 
-What next?
-==========
-
-* :doc:`Create and configure your house </enduser/configuration/house>`

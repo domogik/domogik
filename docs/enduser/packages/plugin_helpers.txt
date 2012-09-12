@@ -105,6 +105,3 @@ Following things should change in next releases :
 
 There are also other ideas :) ...
 
-What next?
-==========
-* :doc:`Set up your devices </enduser/configuration/devices>`

@@ -64,6 +64,3 @@ If your browser doesn't support all HTML5 features used by Domogik, you will get
 
 We recommend you to use browsers like Firefox, Chrome (Chromium) or any other that respects the latest web standards.
 
-What next?
-==========
-* :doc:`Domogik requirements <../enduser/requirements>`

@@ -67,6 +67,3 @@ When you have finished to set your widgets, click on **Finish** button (top righ
 
 You come back to the visualisation mode : your widgets are now ready to use.
 
-What next?
-==========
-* :doc:`House management </enduser/administration/house>`

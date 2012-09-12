@@ -85,6 +85,3 @@ Attach rooms to areas
 
 You just have to drag and drop rooms to the place (the house or the area) you want to.
 
-What next?
-==========
-* :doc:`Devices management </enduser/administration/device>`

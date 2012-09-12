@@ -19,9 +19,4 @@ I am a newbie in Linux world, what do I need to know ?
 
 First, you should use a distribution like Ubuntu. Then, you should first learn the Linux basements.
 
-What next?
-==========
-
-* :doc:`Terms to know before using Domogik <terms>`
-* :doc:`Installation <installation/index>`
 

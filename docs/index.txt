@@ -5,33 +5,20 @@ Domogik
 .. todo::
    This documentation is not yet finished. Missing :
 
-   * Review overview pages
-   * release 0.2.0 page
-   * Packages management by users
-   * Minor enhancements in pckages devlelopment part
-
-   * enduser/installation/index.txt
-     What next : configuration des dépôts, external accès, principe des packages
-
-   * (inexistante) : installation Domoweb
-   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/index.html
-     Revoir, mixer avec les packages ?
-   * http://docs.domogik.org/domogik/0.1/en/enduser/configuration/plugins/install.html
-     Refaire FS, mixer avec les packages
-   * http://docs.domogik.org/domogik/0.1/en/enduser/administration/plugin.html     
-     Revoir, mixer avec les packages ?
-
+   * release 0.2.0 page to finish
    * http://81.56.234.241:8010/dmg-docs/_build/html/package_development/packages_lifecycle.html
 
-   * Revoir tous les "what next ?"
 
 
-* **Overview:**
-  :doc:`Quick </overview/index>` |
-  :doc:`Detailed </overview/detailed>`
+Overview
+========
+
+* :doc:`Quick </overview/index>` 
+* :doc:`Detailed </overview/detailed>`
 
 End User Documentation
 ======================
+
 * :doc:`Release 0.2.0 </releases/0.2.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**

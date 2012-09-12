@@ -6,6 +6,3 @@ Internal architecture
 =====================
 .. image:: internal_architecture.png
 
-What next?
-==========
-* :doc:`Domogik requirements <../enduser/requirements>`

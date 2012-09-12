@@ -44,6 +44,3 @@ Right now if you go back to the **Visualisation** mode, you should see your hous
 
 .. image:: show_without_devices.png
 
-What next?
-==========
-* :doc:`Plugins Overview </enduser/configuration/plugins/index>`

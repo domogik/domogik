@@ -96,8 +96,3 @@ Before doing this, don't forget that django is not made to be directly accessibl
 
 Notice that doing this will make all your local Domogik use go through the internet.
 
-What next?
-==========
-
-* :doc:`Standard Installation </enduser/installation/index>`
-* :doc:`First Use </enduser/configuration/index>`

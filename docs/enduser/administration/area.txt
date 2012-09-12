@@ -65,6 +65,3 @@ Confirm suppression. The area doesn't appear any more in the list.
 
 All rooms related to this area are now related to the **House** (see :doc:`Rooms management </enduser/administration/room>`). 
 
-What next?
-==========
-* :doc:`Rooms management </enduser/administration/room>`

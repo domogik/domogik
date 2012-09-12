@@ -65,6 +65,3 @@ Confirm suppression. The device doesn't appear anymore in the list.
 
 All the device features that were set disappear.
 
-What next?
-==========
-* :doc:`Plugins management </enduser/administration/plugin>`
