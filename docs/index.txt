@@ -32,6 +32,7 @@ Domogik
 
 End User Documentation
 ======================
+* :doc:`Release 0.2.0 </releases/0.2.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**
 
@@ -55,39 +56,15 @@ End User Documentation
 * **Packages:**
 
   * :doc:`Repositories </enduser/packages/repositories>`
-  * Installing a package **TODO** 
-  * Activate and configure a plugin **TODO** (helpers inside)
-  * Activate and configure an external member **TODO**
+  * :doc:`Installing a package </enduser/packages/installation>` (*)
+  * :doc:`Plugin configuration and startup </enduser/packages/plugin_configuration_and_startup>`(*)
+  * :doc:`Plugin helpers </enduser/packages/plugin_helpers>`(*)
 
 * **Devices:**
 
-  * Create a device **TODO**
-  * Place the widget **TODO**
+  * :doc:`Devices management </enduser/administration/device>` (*)
+  * :doc:`Set up your devices </enduser/configuration/devices>`(*)
  
-
-
-
-La fin ici =====================================
-
-
-    
-    * **Plugins:**
-      :doc:`Overview </enduser/configuration/plugins/index>` |
-      :doc:`Installation and configuration </enduser/configuration/plugins/install>` |
-      :doc:`Helpers </enduser/configuration/plugins/helpers>`
-        
-* :doc:`Set up your devices </enduser/configuration/devices>`
-
-* **Management:**
-  :doc:`House management </enduser/administration/house>` |
-  :doc:`Areas management </enduser/administration/area>` |
-  :doc:`Rooms management </enduser/administration/room>` |
-  :doc:`Devices management </enduser/administration/device>` |
-  :doc:`Plugins management </enduser/administration/plugin>` |
-
-
-
-
 Technical Documentation
 =======================
 * :doc:`Actuators </technical/actuator>`

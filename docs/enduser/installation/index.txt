@@ -182,16 +182,16 @@ Make Domogik start with your computer
 -------------------------------------
 
 For Debian or Ubuntu systems: ::
-    # update-rc.d domogik defaults
 
-For Archlinux:
-Add *@domogik* at the very end of the line starting with *DAEMON*.
+    $ sudo update-rc.d domogik defaults
+
+For Archlinux: add *@domogik* at the very end of the line starting with *DAEMON*.
 
 Start domogik
 -------------
 .. code-block:: bash
 
-    sudo /etc/init.d/domogik start
+    $ sudo /etc/init.d/domogik start
     * Starting XPL... Done.
     * Starting Manager (with -d -r -p)...
      [INFO] Check if dbmgr is running.

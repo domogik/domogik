@@ -26,4 +26,4 @@ For a complete description of each repositories, you can read :doc:`the appropri
 
 If you update this file, you will need to retsart Domogik: ::
 
-    /etc/init.d/domogik restart
+    $ sudo /etc/init.d/domogik restart

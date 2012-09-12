@@ -15,7 +15,7 @@ Helpers page is a command line tool which is used from web UI. So right now all 
 
 To access this command line tool, go to **Administration > Tools > Helpers**. You should see the command line interface: 
 
-.. image:: helper.png
+.. image:: plugin_helper.png
 
 Screen description 
 ------------------
