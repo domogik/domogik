@@ -41,8 +41,9 @@ import uuid
 import domogik.xpl.lib.scenario.tests as s_t
 import domogik.xpl.lib.scenario.parameters as s_p
 import domogik.xpl.lib.scenario.conditions as s_c
+from domogik.xpl.common.plugin import XplPlugin
 
-class ScenariosManager:
+class ScenariosManager(XplPlugin):
     """ Manage scenarios : create them, evaluate them, etc ...
         A scenario instance contains a condition, which is a boolean combination of many tests,
         and a list of actions
@@ -59,7 +60,9 @@ class ScenariosManager:
         """ Create ScenarioManager instance
             @param log : Logger instance
         """
-        self.logger = 
+        XplPlugin.__init__(self, name = 'scenario')
+        self.log.info("Scenario manager initialized") 
+        self.wait()
 
     def get_uuid(self):
         """ Return some random uuid
@@ -78,7 +81,7 @@ class ScenariosManager:
         return res
 
     def list_conditions(self):
-        """ Return the list of conditionso
+        """ Return the list of conditions
         """
         return self.__return_list_of_classes(s_c)
 
@@ -124,7 +127,10 @@ class ScenariosManager:
 
 
 if __name__ == "__main__":
+    print "init"
     s = ScenariosManager()
+    print "initialized"
     print s.list_tests()
     print s.list_conditions()
     print s.list_parameters()
+    s.force_leave()
