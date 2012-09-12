@@ -35,12 +35,14 @@ Implements
 
 from sqlalchemy import Table, MetaData, Index
 from domogik.common.sql_schema import DeviceStats
+from domogik.common import database_utils
 
 def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
 
     #1424
     core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
+    if not database_utils.index_exists(migrate_engine, DeviceStats.__tablename__, 'ix_core_device_stats_date'):
     Index('ix_core_device_stats_date', core_device_stats.c.date).create()
 
 def downgrade(migrate_engine):
