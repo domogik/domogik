@@ -1780,11 +1780,11 @@ class DbHelper():
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
-    def get_last_stat_of_device(self, ds_device_id=None,ds_key=None):
+    def get_last_stat_of_device(self, ds_device_id=None,ds_skey=None):
         """Get the latest statistic of a device for a given key
 
         @param ds_device_id : the device id
-        @param ds_key : statistic key
+        @param ds_skey : statistic key
         @return a DeviceStats object
 
         """
