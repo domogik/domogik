@@ -924,7 +924,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_empty_list(self):
         assert len(db.list_device_stats()) == 0
-        assert len(db.device_has_stats()) == False
+        assert db.device_has_stats() == False
 
 
     def __has_stat_values(self, device_stats_values, expected_values):

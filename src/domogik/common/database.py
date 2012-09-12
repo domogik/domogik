@@ -1980,7 +1980,7 @@ class DbHelper():
         @return True or False
 
         """
-        return self.list_device_stats(ds_device_id,ds_skey,1).count() > 0        
+        return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
 
     # check if the data is duplicated with older values
     def _get_duplicated_devicestats_id(self,device_id,key,value):
