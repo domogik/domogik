@@ -6,7 +6,8 @@ Domogik
    This documentation is not yet finished. Missing :
 
    * release 0.2.0 page to finish
-   * http://81.56.234.241:8010/dmg-docs/_build/html/package_development/packages_lifecycle.html
+   * REST /package
+   * http://wiki.domogik.org/Packages_management_overview
 
 
 
