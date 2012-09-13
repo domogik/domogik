@@ -95,12 +95,6 @@ class ProcessRequest():
         '^/account/person/update/.*$':					                         '_rest_account_person_update',
         '^/account/person/password/.*$':				                         '_rest_account_person_password',
         '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
-        # /base/area
-        '^/base/area/list$':			                                                 '_rest_base_area_list',
-        '^/base/area/list/by-id/(?P<area_id>[0-9]+)$':	                                         '_rest_base_area_list',
-        '^/base/area/add/.*$':		 	                                                 '_rest_base_area_add',
-        '^/base/area/update/.*$':		                                                 '_rest_base_area_update',
-        '^/base/area/del/(?P<area_id>[0-9]+)$':		                                         '_rest_base_area_del',
         # /base/device
         '^/base/device/list$':			                                                 '_rest_base_device_list',
         '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
@@ -133,13 +127,14 @@ class ProcessRequest():
         '^/base/feature_association/by-area/(?P<id>[0-9]+)$':			                 '_rest_base_feature_association_list_by_area',
         '^/base/feature_association/by-room/(?P<id>[0-9]+)$':			                 '_rest_base_feature_association_list_by_room',
         '^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
-        # /base/room
-        '^/base/room/list$':                                                                     '_rest_base_room_list',
-        '^/base/room/list/by-id/(?P<room_id>[0-9]+)$':                                           '_rest_base_room_list',
-        '^/base/room/list/by-area/(?P<area_id>[0-9]+)$':                                         '_rest_base_room_list',
-        '^/base/room/add/.*$':                                                                   '_rest_base_room_add',
-        '^/base/room/update/.*$':                                                                '_rest_base_room_update',
-        '^/base/room/del/(?P<room_id>[0-9]+)$':                                                  '_rest_base_room_del',
+        # /base/page
+        '^/base/page/list$':                                                                     '_rest_base_page_tree',
+        '^/base/page/add/.*$':                                                                   '_rest_base_page_add',
+        '^/base/page/update/.*$':                                                                '_rest_base_page_update',
+        '^/base/page/del/(?P<page_id>[0-9]+)$':                                                  '_rest_base_page_del',
+        '^/base/page/tree/(?P<page_id>[0-9]+)$':                                                 '_rest_base_page_tree',
+        '^/base/page/path/(?P<page_id>[0-9]+)$':                                                 '_rest_base_page_path',
+        '^/base/page/view/(?P<page_id>[0-9]+)$':                                                 '_rest_base_page_view',
         # /base/ui-config
         '^/base/ui-config/list$':                                                                '_rest_base_ui_item_config_list',
         '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':                  '_rest_base_ui_item_config_list',
@@ -385,15 +380,13 @@ class ProcessRequest():
             m = re.match(k, self.path)
             if m:
                 found = 1
-                self.log.debug("New url parser" )
-                self.log.debug( k )
-                self.log.debug( m.groupdict() )
                 if len( m.groupdict() ) == 0:
                     eval('self.' + self.urls[k] + '()')
                 else:
-                    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"='"+k+"'" for (v,k) in m.groupdict().iteritems()]) + ')')
+                    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"="+k2 for (v,k2) in m.groupdict().iteritems()]) + ')')
                 break
         if found == 0:
+	    self.log.warning("New url parser does not know url %s" % self.path) 
             if self.rest_type == "command":
                 self.rest_command()
             elif self.rest_type == "stats":
@@ -1790,7 +1783,7 @@ target=*
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
-    def _rest_base_page_tree(self, page_id):
+    def _rest_base_page_tree(self, page_id=0):
         """ find the path to a page
         """
         json_data = JSonHelper("OK")
