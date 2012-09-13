@@ -160,6 +160,9 @@ class ProcessRequest():
         # /log
         # TODO
         # /package
+        '^/package/get-mode$':									 '_rest_package_get_mode',
+        '^/package/list-repo$':									 '_rest_package_list_repo',
+        '^/package/update-cahce$':								 '_rest_package_update_cache',
         # TODO
         # /plugin
         '^/plugin/list$':                                                                        '_rest_plugin_list',
@@ -168,8 +171,8 @@ class ProcessRequest():
         '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
         '^/plugin/(?P<command>enable|disable)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':             '_rest_plugin_enable_disable',
         '^/plugin/(?P<command>start|stop)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':                 '_rest_plugin_start_stop',
-        '^/plugin/config/list/by-name/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                         '_rest_plugin_config_list',
-        '^/plugin/config/list/by-name/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$': '_rest_plugin_config_list',
+        '^/plugin/config/list/by-name/(?P<hostname>[a-z]+)/(?P<id>[a-z]+)$':                         '_rest_plugin_config_list',
+        '^/plugin/config/list/by-name/(?P<hostname>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$': '_rest_plugin_config_list',
         '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                             '_rest_plugin_config_del',
         '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
 	'^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
@@ -376,6 +379,8 @@ class ProcessRequest():
             This function call appropriate functions for processing path
         """
         found = 0
+        self.parameters = {}
+        self.set_parameters(0)
         for k in self.urls:
             m = re.match(k, self.path)
             if m:
@@ -383,10 +388,11 @@ class ProcessRequest():
                 if len( m.groupdict() ) == 0:
                     eval('self.' + self.urls[k] + '()')
                 else:
-                    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"="+k2 for (v,k2) in m.groupdict().iteritems()]) + ')')
+                    eval('self.'  + self.urls[k] + '(' + ', '.join([v+"='"+k2+"'" for (v,k2) in m.groupdict().iteritems()]) + ')')
                 break
         if found == 0:
 	    self.log.warning("New url parser does not know url %s" % self.path) 
+	    print("New url parser does not know url %s" % self.path) 
             if self.rest_type == "command":
                 self.rest_command()
             elif self.rest_type == "stats":
