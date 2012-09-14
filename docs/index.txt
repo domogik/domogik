@@ -73,6 +73,7 @@ Technical Documentation
     * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
     * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
+    * :doc:`REST /package </technical/rinor/rest_package>`: Packages
 
 Packages development
 ********************
