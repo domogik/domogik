@@ -54,6 +54,7 @@ import zipfile
 
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
+DOC_PATH = "src/domogik_packages/docs/" 
 
 CONFIG_FOLDER = "/etc/domogik/"
 CACHE_FOLDER = "/var/cache/domogik/"
@@ -156,9 +157,11 @@ class PackageManager():
             return
 
         # check doc files exist
-        #if not os.path.isfile(SRC_PATH + "domogik_packages/doc/plugin/%s/index.txt" % id):
-        #    self.log("There is no documentation files : the package won't be created")
-        #    return
+        doc_path = DOC_PATH + "/plugin/%s/" % id
+        doc_fullpath = SRC_PATH + doc_path
+        if not os.path.isdir(doc_fullpath):
+            self.log("There is no documentation files in '%s' : the package won't be created" % doc_fullpath)
+            return
 
         if force == False:
             self.log("\nAre these informations OK ?")
@@ -179,7 +182,7 @@ class PackageManager():
         # Create .tgz
         self._create_tar_gz("plugin-%s-%s" % (pkg_json["identity"]["id"], pkg_json["identity"]["version"]), 
                             output_dir,
-                            pkg_json["all_files"], 
+                            pkg_json["all_files"] + [doc_path], 
                             json_tmp_file,
                             pkg_json["identity"]["icon_file"])
 
@@ -272,7 +275,7 @@ class PackageManager():
             for my_file in files:
                 path =  str(my_file)
                 self.log("- %s" % path)
-                if os.path.isfile(SRC_PATH + path):
+                if os.path.isfile(SRC_PATH + path) or os.path.isdir(SRC_PATH + path):
                     tar.add(SRC_PATH + path, arcname = path)
                 else:
                     self.log("  WARNING : file doesn't exists")
