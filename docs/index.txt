@@ -6,9 +6,6 @@ Domogik
    This documentation is not yet finished. Missing :
 
    * release 0.2.0 page to finish
-   * REST /package
-   * http://wiki.domogik.org/Packages_management_overview
-
 
 
 Overview
@@ -74,7 +71,10 @@ Technical Documentation
     * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
     * :doc:`REST /package </technical/rinor/rest_package>`: Packages
+* **Packages:**
+  :doc:`Packages overview </technical/packages>`
 
-Packages development
-********************
+
+Developers Documentation
+========================
 * :doc:`Developing a package </package_development/index>`
