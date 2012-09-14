@@ -33,12 +33,12 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from xml.dom import minidom
 import pkgutil
 import importlib
 import inspect
 import uuid
 import json
+from xml.dom import minidom
 from threading import Thread
 import domogik.xpl.lib.scenario.tests as s_t
 import domogik.xpl.lib.scenario.parameters as s_p
