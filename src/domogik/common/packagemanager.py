@@ -150,10 +150,15 @@ class PackageManager():
         # display plugin informations
         pkg_obj.display()
 
-        # check file existence
+        # check files exist
         if pkg_json["files"] == []:
             self.log("There is no file defined : the package won't be created")
             return
+
+        # check doc files exist
+        #if not os.path.isfile(SRC_PATH + "domogik_packages/doc/plugin/%s/index.txt" % id):
+        #    self.log("There is no documentation files : the package won't be created")
+        #    return
 
         if force == False:
             self.log("\nAre these informations OK ?")
