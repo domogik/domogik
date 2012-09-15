@@ -153,7 +153,7 @@ class ProcessRequest():
 	    '^/command.*$':                                                                      'rest_command',
         },
         # /event
-        'event': {
+        'events': {
             '^/events/domogik/new$':						                 '_rest_events_domogik_new',
             '^/events/domogik/get/(?P<ticketid>[0-9]+)$':					 '_rest_events_domogik_get',
             '^/events/domogik/free/(?P<ticket_id>[0-9]+)$':			                 '_rest_events_domogik_free',
