@@ -371,9 +371,9 @@ class OZWavemanager(threading.Thread):
         self._libraryTypeName = 'Unknown'
         self._libraryVersion = 'Unknown'
         self._pyOzwlibVersion =  'Unknown'
-        
+        self.flagdebug =False # pour debug eviter recurtion +2
+    
         self._ozwconfig = ozwconfig
-        
         self._ready = False
         # récupération des association nom de réseaux et homeID
         self._nameAssoc ={}
@@ -655,6 +655,7 @@ class OZWavemanager(threading.Thread):
         node._lastUpdate = time.time()
         valueNode = self._getValueNode(homeId, activeNodeId, valueId)
         valueNode.update(args) 
+        print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
                           'addressety' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
@@ -682,9 +683,14 @@ class OZWavemanager(threading.Thread):
                 msgtrig ['genre'] = 'sensor'
                 msgtrig ['type'] = 'status'
                 msgtrig ['value'] = valueId['value']
-          #      args2 = args  # pour debug a supp
-          #      args2['event'] = valueId['value']
-          #      self._handleNodeEvent(args2) # pour debug a supp
+                print self.flagdebug
+                if self.flagdebug : # pour debug a supp
+                    args2 = args  
+                    args2['event'] = valueId['value']
+                    self.flagdebug = False
+                    self._handleNodeEvent(args2) # pour debug a supp
+                    self.flagdebug = True
+                    
         elif valueId['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
                 sendxPL = True
                 msgtrig['schema'] ='sensor.basic'
@@ -729,7 +735,7 @@ class OZWavemanager(threading.Thread):
                 args2['valueId'] = valuebasic[0].valueData
                 args2['notificationType'] = 'ValueChanged'
                 break
-        print "Valeur event :" + args['event']
+        print "Valeur event :" ,  args['event']
         for value in values :
             print "-- Value :"
             print value
@@ -893,7 +899,6 @@ class OZWavemanager(threading.Thread):
         retval ={}
         retval['homeId'] = self._nameAssoc[ids[0]] if self._nameAssoc[ids[0]]  else self.homeId
         if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO : gérer un message pour l'utilisateur pour erreur de config.
-        print "getZWRefFromxPL : ", retval
         retval['nodeId']  = int(ids[1])
         retval['instance']  = int(ids[2])
         print "getZWRefFromxPL : ", retval
