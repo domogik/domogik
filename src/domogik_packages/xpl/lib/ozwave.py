@@ -37,8 +37,8 @@ Implements
 from collections import namedtuple
 import binascii
 import threading
-import openzwave
-from openzwave import PyManager
+import libopenzwave
+from libopenzwave import PyManager
 import time
 from time import sleep
 import os.path
@@ -46,7 +46,7 @@ import os.path
 
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
-OZWPLuginVers = "0.1b1"
+OZWPLuginVers = "0.1b2"
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
 NodeInfo = namedtuple('NodeInfo', ['generic','basic','specific','security','version'])
 GroupInfo = namedtuple('GroupInfo', ['index','label','maxAssociations','members'])
@@ -74,7 +74,7 @@ class ZWaveValueNode:
         Initialise la valeur du node
         @param homeid: ID du réseaux home/controleur
         @param nodeid: ID du node
-        @param valueData: valueId dict (voir openzwave.pyx)
+        @param valueData: valueId dict (voir libopenzwave.pyx)
             ['valueId'] = {
                     'homeId' : uint32, # Id du réseaux
                     'nodeId' : uint8,   # Numéro du noeud
@@ -407,10 +407,10 @@ class OZWavemanager(threading.Thread):
         else : opts = "--logging false"
         # if msgEndCb : opts = opts + "--NotifyTransactions true" # false par defaut  --- desactivé, comportement bizard
         self._log.info("Try to run openzwave manager")
-        self.options = openzwave.PyOptions()
+        self.options = libopenzwave.PyOptions()
         self.options.create(self._ozwconfig, ozwuser,  opts) 
         self.options.lock() # nécessaire pour bloquer les options et autoriser le PyManager à démarrer
-        self._manager = openzwave.PyManager()
+        self._manager = libopenzwave.PyManager()
         self._manager.create()
         self._manager.addWatcher(self.cb_openzwave) # ajout d'un callback pour les notifications en provenance d'OZW.
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
@@ -474,7 +474,7 @@ class OZWavemanager(threading.Thread):
             self._pyOzwlibVersion  =  'Unknown'
             return 'py-openzwave : < 0.1 check for update, OZW revision : Unknown'
         if self._pyOzwlibVersion :
-            return 'py-openzwave : {0} , OZW revision : r539'.format(self._pyOzwlibVersion )
+            return 'python-openzwave : {0} , OZW revision : r540'.format(self._pyOzwlibVersion )
         else:
             return 'Unknown'
             
@@ -767,16 +767,17 @@ class OZWavemanager(threading.Thread):
     def _updateNodeNeighbors(self, node):
         '''Update node's neighbor list'''
         # TODO: I believe this is an OZW bug, but sleeping nodes report very odd (and long) neighbor lists
-        neighborstr = str(self._manager.getNodeNeighbors(node._homeId, node._nodeId))
-        if neighborstr is None or neighborstr == 'None':
+        neighbors = self._manager.getNodeNeighbors(node._homeId, node._nodeId)
+        if neighbors is None or neighbors == 'None':
             node._neighbors = None
         else:
-            node._neighbors = sorted([int(i) for i in filter(None, neighborstr.strip('()').split(','))])
-
+           # node._neighbors = sorted([int(i) for i in filter(None, neighborstr.strip('()').split(','))])
+            node._neighbors = neighbors
+            
         if node.isSleeping and node._neighbors is not None and len(node._neighbors) > 10:
             self._log.warning('Probable OZW bug: Node [%d] is sleeping and reports %d neighbors; marking neighbors as none.', node.id, len(node._neighbors))
             node._neighbors = None
-            
+        print ('Node [%d] neighbors are: ' %node._nodeId) , node._neighbors
         self._log.debug('Node [%d] neighbors are: %s', node._nodeId, node._neighbors)
 
     def _updateNodeInfo(self, node):
@@ -805,6 +806,7 @@ class OZWavemanager(threading.Thread):
                 members = self._manager.getAssociations(node._homeId, node._nodeId, i)
             ))
         node._groups = groups
+        print ('Node [%d] groups are: ' %node._nodeId) , node._groups
         self._log.debug('Node [%d] groups are: %s', node._nodeId, node._groups)
 
     def _updateNodeConfig(self, node):
@@ -827,6 +829,7 @@ class OZWavemanager(threading.Thread):
             self._updateNodeGroups(node)
             self._updateNodeConfig(node)
         self._ready = True
+        print ("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         self._log.info("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         #self._manager.writeConfig(self._homeId)
 
@@ -881,6 +884,7 @@ class OZWavemanager(threading.Thread):
             ln = []
             for n in self.nodes : ln.append(n)
             retval["ListNodeId"] = ln
+            print'**** getNetworkinfo : ',  retval
             return retval
         else : return {'error' : 'Zwave network not ready, be patient...'}
         
@@ -961,7 +965,7 @@ class OZWavemanager(threading.Thread):
             retval["Location"] = node.location if node.location else 'Undefined'
             retval["Type"] = node.productType
             retval["Last update"] = time.ctime(node.lastUpdate)
-            retval["Neighbors"] = node.neighbors if  node.neighbors else 'No one'
+            retval["Neighbors"] = list(node.neighbors) if  node.neighbors else 'No one'
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
         

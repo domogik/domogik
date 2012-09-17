@@ -48,7 +48,7 @@ from domogik_packages.xpl.lib.ozwave import OZwaveException
 
 
 class OZwave(XplPlugin):
-    """ Implement à listener for Zwave command messages
+    """ Implement a listener for Zwave command messages
         and launch background  manager to listening zwave events by callback
     """
     def __init__(self):
@@ -124,7 +124,7 @@ class OZwave(XplPlugin):
             
     def getUIdata2dict(self, ddict):
         """Retourne le dict formatter pour UI (passage outre le format xPL)"""
-        return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true')
+        return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None;', "'';")
         
     def ui_cmd_cb(self, message):
         """xpl en provenace de l'UI (config/special)"""
@@ -149,7 +149,7 @@ class OZwave(XplPlugin):
                                     'group' :'UI', 
                                     'node' : request['node'], 
                                     'data': info})
-                print "Refresh node :",  request['node']
+                print "Refresh node :",  request['node'],  info
             elif  request['request'] == 'SaveConfig':
                 info = self.getUIdata2dict(self.myzwave.saveNetworkConfig())
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -199,8 +199,8 @@ class OZwave(XplPlugin):
             mess.set_type('xpl-trig') # force xpl-trig
             mess.set_schema(msgtrig['schema'])
             if msgtrig['genre'] == 'actuator' :
-                if msgtrig['level'] in ['0', 'False'] : cmd ="off"
-                elif msgtrig['level'] in ['255', 'True']: cmd ="on"
+                if msgtrig['level'] in [0, 'False', False] : cmd ="off"
+                elif msgtrig['level'] in [255, 'True',  True]: cmd ="on"
                 else: cmd ='level'
                 mess.add_data({'addressety' : msgtrig['addressety'],
                             'command' : cmd,
@@ -210,7 +210,7 @@ class OZwave(XplPlugin):
                 if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget portal
                     mess.add_data({'addressety' : msgtrig['addressety'],
                             'type' : msgtrig['type'] ,
-                            'current' : 'low' if (msgtrig['value'] =='True')  else 'high'})
+                            'current' : 'low' if msgtrig['value']   else 'high'})
                 else : mess.add_data({'addressety' : msgtrig['addressety'],  
                             'type' : msgtrig['type'] ,
                             'current' : msgtrig['value'] })
