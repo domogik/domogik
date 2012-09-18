@@ -166,9 +166,10 @@ class IPXManager(XplPlugin):
         if 'type' in message.data:
             msg_type = message.data['type'].lower()
         if 'current' in message.data:
-            msg_current = message.data['current'].upper()
+            msg_current = message.data['current'].lower()
  
         data = "device=%s, type=%s, current=%s" % (msg_device, msg_type, msg_current)
+        print data
         data_name = msg_device.split("-")
         ipx_name = data_name[0]
         elt = data_name[1][0:-1]

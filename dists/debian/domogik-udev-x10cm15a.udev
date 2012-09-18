@@ -1,0 +1,1 @@
+KERNEL=="cm15a0", BUS=="usb", SYSFS{idVendor}=="0bc7", SYSFS{idProduct}=="0001", NAME="cm15a0", MODE="0666"

@@ -63,7 +63,7 @@ class Disk:
             self._callback(path, "used_space", du_used)
             self._callback(path, "total_space", du_total)
             self._callback(path, "percent_used", du_percent)
-            self._stop.wait(interval)
+            self._stop.wait(interval*60)
 
     def get_usage(self, path):
         """ Get disk usage stats for folder

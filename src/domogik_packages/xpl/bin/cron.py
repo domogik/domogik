@@ -28,6 +28,16 @@ Implements
 ==========
 Class cron
 
+Bugs
+====
+1 -
+In cronAPI.send_xpl_job : the call to rinor freeze the system until the response is received.
+This causes the list of plugin to disappear ... sometimes for a log time
+This may occur when using an old devices and plugin is disabled
+2 - Done
+When parsing an alarm, ... and when the error is detected, the job is created but no aps jobs are created
+Add a test to see how many ap jobs are created after starting
+
 Helps
 =====
 devicetypes:

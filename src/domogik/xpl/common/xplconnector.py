@@ -426,16 +426,21 @@ class Listener:
                 ok = ok and (self._filter[key] == message.type)
             elif key == "xplsource":
                 ok = ok and (self._filter[key] == message.source)
+            elif key == "xplinstance":
+                ok = ok and (self._filter[key] == message.source_instance_id)
             elif not (key in message.data or key in ("xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
-                thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb-%s" % suffixe)
-            else:
-                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb-%s" % suffixe)
-            self._manager.p.register_thread(thread)
-            thread.start()
+            try:
+                if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
+                    thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb-%s" % suffixe)
+                else:
+                    thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb-%s" % suffixe)
+                self._manager.p.register_thread(thread)
+                thread.start()
+            except:
+                self._manager.p.log.error("Listener exception : %s" % traceback.format_exc())
 
     def add_filter(self, key, value):
         """

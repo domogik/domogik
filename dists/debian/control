@@ -2,10 +2,14 @@ Source: domogik
 Section: misc
 Priority: optional
 Maintainer: Sébastien GALLET <sgallet@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), python (>= 2.6.6-3~), python-sqlalchemy,
- python2.7, python2.6, python-setuptools,
- libssl-dev, libmysqlclient-dev, libpq-dev, python-simplejson (>= 1.9.2~),
- python-openssl, python-psutil, python-pip
+Build-Depends: debhelper (>= 7.0.50~), python (>= 2.6.6-3~),
+ python2.6 | python2.7, python-dev, python2.6-dev | python2.7-dev,
+ libmysqlclient-dev, libssl-dev, libpq-dev,
+ python-sqlalchemy (>= 0.7.5~),
+ python-sqlalchemy-migrate (>= 0.7.2~), python-sqlalchemy-migrate (<< 0.7.3),
+ python-setuptools, python-distutils2, python-openssl, python-serial (>= 2.5~),
+ python-simplejson (>= 1.9.2~), python-pyinotify (>= 0.8.9~), python-pip (>= 1.0~),
+ python-httplib2 (>= 0.6.0~), python-psutil (>= 0.1.3~), python-mimeparse
 Standards-Version: 3.9.2
 Homepage: http://www.domogik.org/
 
@@ -75,7 +79,7 @@ Architecture: all
 Conflicts: domogik-postgresql, domogik-secondary
 Depends: domogik-common (= ${source:Version}),
  mysql-client, python-mysqldb,
- python-sqlalchemy (>= 0.7.5~), 
+ python-sqlalchemy (>= 0.7.5~),
  python-sqlalchemy-migrate (>= 0.7.2~), python-sqlalchemy-migrate (<< 0.7.3)
 Description: The mysql interface to domogik.
  Domogik/Domoweb is a free home automation solution.
@@ -100,28 +104,164 @@ Description: The postgresql interface to domogik.
  user interfaces : the web one and the Android one).
  This is the database interface to postgresql.
 
-Package: domogik-extras-dep
+Package: domogik-extras-stable
 Architecture: all
-Depends: domogik-common (= ${source:Version}), python-apscheduler,
- python-pyephem | python-ephem, python-bluez, python-mechanize,
- python-gdata
-Description: Extra depencies for domogik.
+Depends: domogik-common (= ${source:Version})
+Description: Extras python dependencies for domogik.
  Domogik/Domoweb is a free home automation solution.
  It is based on the xPL protocol in order to easily use a lot of
  different technologies. Domogik is multi hosts and modulable.
  You can use as many user interfaces you want (actually there are two
  user interfaces : the web one and the Android one).
- This package is optional, it contains dependencies to python modules
- needed by some plugins :
-  cron, dawndusk, bluez, sms, gagenda
+ This package contains dependencies to python modules needed by plugins
+ of the section stable.
+
+Package: domogik-extras-testing
+Architecture: all
+Depends: domogik-extras-stable (= ${source:Version})
+Description: Extras python dependencies for domogik.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This package contains dependencies to python modules needed by plugins
+ of the section testing.
+
+Package: domogik-extras-experimental
+Architecture: all
+Depends: domogik-extras-testing (= ${source:Version}),
+ python-apscheduler, python-pyephem | python-ephem,
+ python-bluez, python-pympler, python-tailer,
+ domogik-udev-rfxcom
+Description: Extras python dependencies for domogik.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This package contains dependencies to python modules needed by plugins
+ of the section experimental.
+
+Package: domogik-extras-nightly
+Architecture: all
+Provides: domogik-extras-dep
+Conflicts: domogik-extras-dep
+Replaces: domogik-extras-dep
+Depends: domogik-extras-experimental (= ${source:Version}),
+ python-mechanize, python-gdata, python-serial,
+ domogik-udev-mirror, domogik-udev-plcbus, domogik-udev-teleinfo,
+ domogik-udev-velbus, domogik-udev-x10cm15a
+Description: Extras python dependencies for domogik.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This package contains dependencies to python modules needed by plugins
+ of the section nightly.
+
+Package: domogik-udev-mirror
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for Mir:ror.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+
+Package: domogik-udev-onewire
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for Onewire.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+
+Package: domogik-udev-plcbus
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for Plcbus.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+
+Package: domogik-udev-rfxcom
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for RFXcom usb.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+
+Package: domogik-udev-teleinfo
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for Teleinfo modules.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+
+Package: domogik-udev-velbus
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for Velbus protocol.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+
+Package: domogik-udev-x10cm15a
+Architecture: all
+Depends: domogik-common (= ${source:Version})
+Description: Udev rules for X10 cm15a adaptater.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
 
 Package: domogik-apache2
 Architecture: all
-Depends: apache2, libapache2-mod-proxy-html, libapache2-mod-auth-mysql
-Description: Apache installation files for domogik.
+Depends: apache2, apache2.2-common, libapache2-mod-proxy-html
+Description: Apache configuration for domogik.
  Domogik/Domoweb is a free home automation solution.
  It is based on the xPL protocol in order to easily use a lot of
  different technologies. Domogik is multi hosts and modulable.
  You can use as many user interfaces you want (actually there are two
  user interfaces : the web one and the Android one).
- This is the apache configuration for the Domogik rest server.
+ It allows you to connect to the rest server throught Internet. This can
+ be usefull if you want to connect to your home with Domodroid from
+ anywhere in the world.
+
+Package: domogik-developper
+Architecture: all
+Depends: mercurial, gcc,
+ python (>= 2.6.6-3~), python2.6 | python2.7,
+ python-dev, python2.6-dev | python2.7-dev,
+ mysql-server, libmysqlclient-dev, mysql-client, libssl-dev, xplhub,
+ python-sqlalchemy (>= 0.7.5~),
+ python-sqlalchemy-migrate (>= 0.7.2~), python-sqlalchemy-migrate (<< 0.7.3),
+ python-setuptools, python-distutils2, python-openssl, python-serial (>= 2.5~),
+ python-simplejson (>= 1.9.2~), python-pyinotify (>= 0.8.9~), python-pip (>= 1.0~),
+ python-httplib2 (>= 0.6.0~), python-psutil (>= 0.1.3~), python-mimeparse
+Description: All dependencies for Domogik's developpers (but no Domogik code).
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This packages install all the packages needed to developp in Domogik (using mysql).
+ It does not contains Domogik, you must get sources using mercurial. Look at the
+ wiki at http://wiki.domogik.org/Use_mercurial.
+

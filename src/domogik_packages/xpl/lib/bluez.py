@@ -76,6 +76,7 @@ class BluezAPI:
         Reload config of the plugin.
         """
         self.log.debug("reload_config : Try to get configuration from XPL")
+        num = 1
         try:
             self._scan_delay = int(self._config.query('bluez', 'scan-delay'))
             self._error_delay = int(self._config.query('bluez', 'error-delay'))
@@ -86,7 +87,6 @@ class BluezAPI:
             'discovery': lambda : self._listen_adaptator_discovery(),
             }
             self.listen_adaptator = methods[listen]
-            num = 1
             loop = True
             self._targets = dict()
             while loop == True:
@@ -97,9 +97,9 @@ class BluezAPI:
                 if addr != None:
                     self._targets[addr] = {"name":name, "count":0, "status":LOW}
                     self._trig_detect("xpl-trig", addr, LOW)
+                    num += 1
                 else:
                     loop = False
-                num += 1
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())

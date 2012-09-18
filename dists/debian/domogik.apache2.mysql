@@ -1,0 +1,56 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@example.com
+    ServerName www.example.com
+    ServerAlias domogik.localhost
+    DocumentRoot /var/www/domogik
+
+    ErrorLog /var/log/apache2/domogik/error.log
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" common
+    CustomLog /var/log/apache2/domogik/access.log common
+
+    ProxyRequests Off
+    ProxyVia On
+
+	#ProxyRequests           Off
+	#LoadModule              substitute_module       modules/mod_substitute.so
+	#SetOutputFilter         SUBSTITUTE
+
+	#ProxyPass               /rest/api/              http://myhost:8888/rest/api/
+	#ProxyPassReverse        /rest/api/              http://myhost:8888/rest/api/
+	#Substitute              s|myhost|yourhost|n
+
+	#ProxyPass               /rpolk/rest/api/        http://myhost:8888/rest/api/
+	#ProxyPassReverse        /rpolk/rest/api/        http://myhost:8888/rest/api/
+	#Substitute              s|myhost:8888/rest/api|yourhost/rpolk/rest/api|n
+
+    <Location />
+        ProxyPass http://127.0.0.1:40405/
+        ProxyPassReverse http://127.0.0.1:40405/
+        ProxyHTMLURLMap http://127.0.0.1:40405/ /
+        SetOutputFilter proxy-html
+
+        #AuthBasicAuthoritative Off
+        #AuthUserFile /dev/null
+
+        #AuthMySQL_Host localhost
+        #AuthMySQL_DB domogik
+        #AuthMySQL_User domogik
+        #AuthMySQL_Password password
+
+        #AuthMySQL_Password_Table core_user_account
+        #AuthMySQL_Username_Field login
+        #AuthMySQL_Password_Field password
+        #AuthMySQL_Empty_Passwords off
+        #AuthMySQL_Encryption_Types Crypt_DES Crypt_MD5 PHP_MD5 SHA1Sum MySQL
+
+        #AuthMYSQL on
+        #AuthMySQL_Authoritative on
+
+        #AuthName "domogik"
+        #AuthType Basic
+        #require valid-user
+
+    </Location>
+
+</VirtualHost>
+

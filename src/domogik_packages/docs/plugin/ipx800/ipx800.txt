@@ -1,0 +1,187 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+The IPX800 is a **web relay board** : a relay bord which can be controlled with a web interface.
+It can be plugged on a network, so you can access and control it from your browser.
+
+.. |ipx800v1| image:: ipx800.png
+    :width: 250px
+.. |ipx800pro| image:: ipx800pro.jpg
+    :width: 250px
+.. |ipx800v2| image:: ipx800v2.jpg
+    :width: 250px
+.. |ipx800v3| image:: ipx800v3.jpg
+    :width: 250px
+
+This board exists in several version with different features. All these versions are supported by this plugin.
+
+========== =====================
+Model      Photography
+========== =====================
+IPX800     |ipx800v1|
+IPX800 pro |ipx800pro|
+IPX800 v2  |ipx800v2|
+IPX800 v3  |ipx800v3|
+========== =====================
+
+This plugin handle the following features :
+
+* relays usage and status
+* digital input status
+* analog input status
+* counter status (and in a futur release, counter reset)
+
+Known issues
+============
+
+HTTP Authentication make plugin slower
+--------------------------------------
+Using HTTP authentication make plugin interactions with relay board slower. If it is not necessary for you, avoid using HTTP authentication.
+
+How to plug
+===========
+The IPX relay board has just to be plugged in your Local Area Network. 
+
+.. image:: ipx-lan.png
+
+Plugin configuration
+====================
+
+Configuration
+-------------
+In Domogik administration, go to the ipx800 configuration page.
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| name          |               | Name for the IPX800. This name will be used when you will create devices for your inputs or relays. |
+|               |               | Example with *ipx* name :                                                                           |
+|               |               |                                                                                                     |
+|               |               | * relay 0 (0..7) : "ipx-led0"                                                                       |
+|               |               | * digital input 2 (0..3) : "ipx-btn2"                                                               |
+|               |               | * analog input 1 (1..2) : "ipx-an1"                                                                 |
+|               |               | * counter 3 (0..3) : "ipx-count3"                                                                   |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| ip            |               | Ip address of the relay board. You can use the **ipx800 find** helper to discover it                |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| int           | 5             | Interval between each poll of the relay board status                                                |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| login         |               | Login for the HTTP authentication                                                                   |
+| *(optionnal)* |               |                                                                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| password      |               | Password for the HTTP authentication                                                                |
+| *(optionnal)* |               |                                                                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Creating devices for IPX800
+---------------------------
+
+In administration, go to Organization > Devices page to create your devices.
+
+Relay
+*****
+
+.. |example_relay| image:: ipx800_create_relay.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_relay|    | Name              | The name you want to give to the device : *Bedroom light, Kitchen light, ...*              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : <ipx800 name>-led<0..7>. The number is the relay number.              |
+|                    |                   | Example for a relay board name *ipx* : ipx-led3                                            |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | RelayBoard.Relay                                                                           |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (*Light, Appliance, ...*)                                             |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Digital input
+*************
+
+.. |example_digin| image:: ipx800_create_digital.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_digin|    | Name              | The name you want to give to the device : *Front door, Kitchen window, ...*                |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : <ipx800 name>-btn<0..3>. The number is the digital input number.      |
+|                    |                   | Example for a relay board name *ipx* : ipx-btn2                                            |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | RelayBoard.Digital_Input                                                                   |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (*Door, Window, ...*)                                                 |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Analog input
+************
+
+.. |example_anain| image:: ipx800_create_analog.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_anain|    | Name              | The name you want to give to the device : *Temperature, voltage, ...*                      |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : <ipx800 name>-an<1..2>. The number is the analog input number.        |
+|                    |                   | Example for a relay board name *ipx* : ipx-an2                                             |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | RelayBoard.Analog_Input                                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (*Temperature, ...*)                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+.. note::
+    
+    Note that for relay and digital input, number of item start at '0' and for analog input, it starts to '1'. It is due to IPX800 design.
+
+Counter
+*******
+
+.. |example_count| image:: ipx800_create_counter.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_count|    | Name              | The name you want to give to the device : *Water, ...*                                     |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : <ipx800 name>-an<0..3>. The number is the digital input used number.  |
+|                    |                   | Example for a relay board name *ipx* : ipx-count3                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | RelayBoard.Counter                                                                         |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (*Water, ...*)                                                        |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+

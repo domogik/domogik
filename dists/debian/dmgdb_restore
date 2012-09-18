@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set +e
+if [ ${UID} != 0 ];then
+    echo "Must be run with root privileges";
+    exit 1;
+fi
+. /usr/share/debconf/confmodule
+
+db_version 2.0
+
+db_get "domogik/db_host"
+DBHOST="$RET"
+db_get "domogik/db_name"
+DBNAME="$RET"
+db_get "domogik/db_user"
+DBUSER="$RET"
+db_get "domogik/db_password"
+DBPASSWORD="$RET"
+
+BACKUPDIR=/var/backups
+BACKUPNAME=domogik_dump
+
+check_package() {
+    RES=$(dpkg-query -s $1 2>/dev/null | grep Status 2>/dev/null | grep -c installed 2>/dev/null)
+    if [ ${RES} != 0 ];then
+        echo y
+    else
+        echo n
+    fi
+}
+
+echo "Try to restore database from $BACKUPDIR. "
+
+echo -n "Restore mysql : "
+DOIT=$(check_package domogik-mysql)
+if [ ${DOIT} = y ]; then
+    echo y;
+    [ -f $BACKUPDIR/$BACKUPNAME.gz ] && ARCHIVE=$BACKUPDIR/$BACKUPNAME.gz
+    [ -z $ARCHIVE ] && [ -f $BACKUPDIR/$BACKUPNAME.old.gz ] && ARCHIVE=$BACKUPDIR/$BACKUPNAME.old.gz
+    [ -z $ARCHIVE ] && echo "Can't find a valid dump." && exit 1
+    echo -n "Restore from dump $ARCHIVE ... "
+    zcat $ARCHIVE | mysql --host=$DBHOST --password=$DBPASSWORD --user=$DBUSER $DBNAME
+    echo done.
+else
+    echo n
+    echo -n "Restore postgresql : "
+    DOIT=$(check_package domogik-postgresql)
+    if [ ${DOIT} = y ]; then
+        echo y
+        echo "Not implemented."
+    else
+        echo n
+    fi
+fi
+
+db_stop

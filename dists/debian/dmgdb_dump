@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set +e
+if [ ${UID} != 0 ];then
+    echo "Must be run with root privileges";
+    exit 1;
+fi
+. /usr/share/debconf/confmodule
+
+db_version 2.0
+
+db_get "domogik/db_host"
+DBHOST="$RET"
+db_get "domogik/db_name"
+DBNAME="$RET"
+db_get "domogik/db_user"
+DBUSER="$RET"
+db_get "domogik/db_password"
+DBPASSWORD="$RET"
+
+BACKUPDIR=/var/backups
+BACKUPNAME=domogik_dump
+
+check_package() {
+    RES=$(dpkg-query -s $1 2>/dev/null | grep Status 2>/dev/null | grep -c installed 2>/dev/null)
+    if [ ${RES} != 0 ];then
+        echo y
+    else
+        echo n
+    fi
+}
+
+rotate_dump() {
+    [ -f $BACKUPDIR/$BACKUPNAME.gz ] && [ -f $BACKUPDIR/$BACKUPNAME.old.gz ] && rm $BACKUPDIR/$BACKUPNAME.old.gz
+    [ -f $BACKUPDIR/$BACKUPNAME.gz ] && mv $BACKUPDIR/$BACKUPNAME.gz $BACKUPDIR/$BACKUPNAME.old.gz
+}
+
+echo "Try to dump database in $BACKUPDIR. "
+
+echo -n "Dump mysql : "
+DOIT=$(check_package domogik-mysql)
+if [ ${DOIT} = y ]; then
+    echo y;
+    rotate_dump
+    mysqldump --host=$DBHOST --add-drop-database --create-options --password=$DBPASSWORD --user=$DBUSER $DBNAME | gzip > $BACKUPDIR/$BACKUPNAME.gz
+    echo Done.
+else
+    echo n
+    echo -n "Dump postgresql : "
+    DOIT=$(check_package domogik-postgresql)
+    if [ ${DOIT} = y ]; then
+        echo y
+        rotate_dump
+        echo "Not implemented."
+        #password problem
+        #pg_dump --create --host=$DBHOST --username=$DBUSER $DBNAME | gzip > $BACKUPDIR/$BACKUPNAME.gz
+        #echo Done.
+    else
+        echo n
+    fi
+fi
+
+
+db_stop

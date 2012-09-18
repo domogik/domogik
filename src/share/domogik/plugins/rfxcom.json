@@ -754,7 +754,7 @@
             "description": "RFXCOM Usb transceiver and receiver", 
             "filename": "rfxcom.rules", 
             "model": "RFXCOM Usb", 
-            "rule": "SUBSYSTEM==\"tty\" ATTRS{product}==\"RFXCOM USB 438.92MHz transceiver\" SYMLINK+=\"rfxcom\" MODE=\"0666\""
+            "rule": "SUBSYSTEM==\"tty\" ATTRS{product}==\"RFXCOM USB 433.92MHz transceiver\" SYMLINK+=\"rfxcom\" MODE=\"0666\""
         }
     ]
 }
