@@ -18,7 +18,10 @@ Why creating the documentation in Domogik sources ?
 
 Where is located the documentation in sources ?
 -----------------------------------------------
-The packages documentation is located in *src/domogik_packages/docs/*. In this folder there is a folder for each type of packages and one more folder for the documentation template. In the package type folders, there is a folder for each package.
+The packages documentation is located in *src/domogik_packages/docs/*. In this folder there is a folder for each type of packages and one more folder for the documentation template. In the package type folders, there is a folder for each package. 
+
+.. warning ::
+    The packages documentation must be written in the **default** branch (except if for some reason you are developping the package in another branch).
 
 Creating the documentation
 ==========================
