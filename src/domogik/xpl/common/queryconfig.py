@@ -148,7 +148,13 @@ class Query():
         '''
         result = message.data
         for r in self._keys:
-            msg = "QC : res > h=%s, t=%s, k=%s, v=%s" % (result["hostname"], result["technology"], r, result[r])
+            try:
+                msg = "QC : res > h=%s, t=%s, k=%s, v=%s" % (result["hostname"], result["technology"], r, result[r])
+            except KeyError:
+                errMsg = "It seems that you received configuration elements from 2 dbmgr components. Please check if you have 2 domogik main hosts on your lan. If so, you should configure 'config_provider' in /etc/domogik/domogik.cfg."
+                print errMsg
+                self.log.error(errMsg)
+                return
             print(msg)
             self.log.debug(msg)
             if r in result:

@@ -1,0 +1,106 @@
+{
+    "configuration": [
+        {
+            "default": "False",
+            "description": "Automatically start plugin at Domogik startup",
+            "id": "0",
+            "interface": "no",
+            "key": "startup-plugin",
+            "optionnal": "no",
+            "options": [],
+            "type": "boolean"
+        },
+        {
+            "default": "127.0.0.1",
+            "description": "Address used by the proxy",
+            "id": "1",
+            "interface": "no",
+            "key": "proxy-ip",
+            "optionnal": "no",
+            "options": [],
+            "type": "string"
+        },
+        {
+            "default": "40406",
+            "description": "Port used by the proxy",
+            "id": "2",
+            "interface": "no",
+            "key": "proxy-address",
+            "optionnal": "no",
+            "options": [],
+            "type": "string"
+        },
+        {
+            "default": "False",
+            "description": "Use SSL. If set to yes, use the certificate defined in domogik.cfg",
+            "id": "3",
+            "interface": "no",
+            "key": "use-ssl",
+            "optionnal": "no",
+            "options": [],
+            "type": "boolean"
+        },
+        {
+            "default": "basic",
+            "description": "Authentication method.",
+            "id": "4",
+            "interface": "no",
+            "key": "auth-method",
+            "optionnal": "no",
+            "options": [
+                "none",
+                "basic",
+                "digest"
+            ],
+            "type": "enum"
+        },
+        {
+            "default": "user",
+            "description": "Username used to connect to the proxy",
+            "id": "5",
+            "interface": "no",
+            "key": "username",
+            "optionnal": "no",
+            "options": [],
+            "type": "string"
+        },
+        {
+            "default": "password",
+            "description": "Password used to connect to the proxy",
+            "id": "6",
+            "interface": "no",
+            "key": "password",
+            "optionnal": "no",
+            "options": [],
+            "type": "string"
+        }
+    ],
+    "device_feature_models": [],
+    "device_types": [],
+    "files": [
+        "src/share/domogik/design/plugin/proxy/icon.png",
+        "src/share/domogik/plugins/proxy.json",
+        "src/domogik_packages/xpl/bin/proxy.py",
+        "src/domogik_packages/xpl/lib/proxy.py"
+    ],
+    "identity": {
+        "author": "Sebastien GALLET",
+        "author_email": "sgallet at gmail dot com",
+        "category": "proxy",
+        "changelog": "0.1\n - plugin creation",
+        "dependencies": [],
+        "description": "A proxy to provide authenticated connection to the rest server.\nSupport ssl and basic/digest authentication mechanisms.",
+        "documentation": "http://wiki.domogik.org/plugin_proxy",
+        "domogik_min_version": "0.2.0",
+        "id": "proxy",
+        "type": "plugin",
+        "version": "0.1a0"
+    },
+    "json_version": 1,
+    "technology": {
+        "description": "Rest auth",
+        "id": "proxy",
+        "name": "Proxy"
+    },
+    "udev-rules": []
+}

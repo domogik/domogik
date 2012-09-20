@@ -767,18 +767,19 @@ class Rest(XplPlugin):
         time.sleep(1)
         self.xml = {}
         self.xml_ko = [] ## to list bad xml files
-        for techno in os.listdir(self._xml_cmd_dir):
-            for command in os.listdir(self._xml_cmd_dir + "/" + techno):
-                try:
-                    xml_file = self._xml_cmd_dir + "/" + techno + "/" + command
-                    if xml_file[-4:] == ".xml":
-                        self.log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
-                        self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
-                except:
-                    msg = "Error while loading url2xpl files : %s" % traceback.format_exc()
-                    print(msg)
-                    self.log.error(msg)
-                    self.xml_ko.append("%s/%s" % (techno, command))
+        for root, dirs, files in os.walk(self._xml_cmd_dir):
+            for techno in dirs:
+                for command in os.listdir(self._xml_cmd_dir + "/" + techno):
+                    try:
+                        xml_file = self._xml_cmd_dir + "/" + techno + "/" + command
+                        if xml_file[-4:] == ".xml":
+                            self.log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
+                            self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
+                    except:
+                        msg = "Error while loading url2xpl files : %s" % traceback.format_exc()
+                        print(msg)
+                        self.log.error(msg)
+                        self.xml_ko.append("%s/%s" % (techno, command))
                     
         self.xml_date = datetime.datetime.now()
 
