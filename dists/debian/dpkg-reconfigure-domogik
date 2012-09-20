@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e
+if [ ${UID} != 0 ];then
+    echo "Must be run with root privileges";
+    exit 1;
+fi
+
+check_package() {
+    RES=$(dpkg-query -s $1 2>/dev/null | grep Status 2>/dev/null | grep -c installed 2>/dev/null)
+    if [ ${RES} != 0 ];then
+        echo y
+    else
+        echo n
+    fi
+}
+
+echo "I will reconfigure domogik packages. "
+
+PACKAGE=domogik-mysql
+echo -n "Reconfigure $PACKAGE : "
+DOIT=$(check_package $PACKAGE)
+if [ ${DOIT} = y ]; then
+    echo y
+    dpkg-reconfigure $PACKAGE
+else
+    echo n
+fi
+
+PACKAGE=domogik-postgresql
+echo -n "Reconfigure $PACKAGE : "
+DOIT=$(check_package $PACKAGE)
+if [ ${DOIT} = y ]; then
+    echo y
+    dpkg-reconfigure $PACKAGE
+else
+    echo n
+fi
+
+PACKAGE=domogik-primary
+echo -n "Reconfigure $PACKAGE : "
+DOIT=$(check_package $PACKAGE)
+if [ ${DOIT} = y ]; then
+    echo y
+    dpkg-reconfigure $PACKAGE
+else
+    echo n
+fi
+
+PACKAGE=domogik-secondary
+echo -n "Reconfigure $PACKAGE : "
+DOIT=$(check_package $PACKAGE)
+if [ ${DOIT} = y ]; then
+    echo y
+    dpkg-reconfigure $PACKAGE
+else
+    echo n
+fi

@@ -54,6 +54,9 @@
         "src/share/domogik/design/plugin/cron/icon.png",
         "src/share/domogik/plugins/cron.json",
         "src/share/domogik/stats/cron/cron.xml",
+        "src/share/domogik/url2xpl/cron/create-alarm.xml",
+        "src/share/domogik/url2xpl/cron/create-dawnalarm.xml",
+        "src/share/domogik/url2xpl/cron/create-date.xml",
         "src/share/domogik/url2xpl/cron/resume.xml",
         "src/share/domogik/url2xpl/cron/stop.xml",
         "src/share/domogik/url2xpl/cron/halt.xml",
@@ -73,14 +76,14 @@
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "cron",
-        "changelog": "0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
+        "changelog": "0.2a1\n - Add UI commands\n0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
         "dependencies": [
             {
                 "id": "apscheduler (>=2.0.2)",
                 "type": "python"
             },
             {
-                "id": "tailer (>=0.3)",
+                "id": "tailer (>=0.2.1)",
                 "type": "python"
             },
             {
@@ -93,7 +96,7 @@
         "domogik_min_version": "0.2.0",
         "id": "cron",
         "type": "plugin",
-        "version": "0.1a2"
+        "version": "0.2a1"
     },
     "json_version": 1,
     "technology": {

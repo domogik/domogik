@@ -72,10 +72,19 @@ class Loader():
         @return pair (main_config, plugin_config)
         '''
         # lock the file
+        if not os.path.exists(os.path.dirname(LOCK_FILE)):
+            try:
+                # note : default creation mode : 0777
+                os.mkdir(os.path.dirname(LOCK_FILE)) 
+            except:
+                raise Exception, "ConfigLoader : unable to create the directory '%s'" % os.path.dirname(LOCK_FILE)
         if not os.path.exists(LOCK_FILE):
-            file = open(LOCK_FILE, "w")
-            file.write("")
-            file.close()
+            try:
+                file = open(LOCK_FILE, "w")
+                file.write("")
+                file.close()
+            except:
+                raise Exception, "ConfigLoader : unable to create the lock file '%s'" % LOCK_FILE
         file = open(LOCK_FILE, "r+")
         fcntl.flock(file.fileno(), fcntl.LOCK_EX)
 

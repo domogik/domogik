@@ -35,6 +35,7 @@ Implements
 
 from sqlalchemy import Table, MetaData, String, Column, Index
 from domogik.common.sql_schema import Device, PluginConfig, DeviceType, DeviceStats
+from domogik.common import database_utils
 
 def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
@@ -45,7 +46,8 @@ def upgrade(migrate_engine):
 
     #1064
     core_plugin_config = Table(PluginConfig.__tablename__, meta, autoload=True)
-    core_plugin_config.c.name.alter(name='id')
+    if not database_utils.column_exists(migrate_engine, PluginConfig.__tablename__, 'id'):
+        core_plugin_config.c.name.alter(name='id')
 
     #1110
     core_device_type = Table(DeviceType.__tablename__, meta, autoload=True)
@@ -53,12 +55,14 @@ def upgrade(migrate_engine):
     
     #1061
     core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-    Index('ix_core_device_stats_skey', core_device_stats.c.skey).create()
+    if not database_utils.index_exists(migrate_engine, DeviceStats.__tablename__, 'ix_core_device_stats_skey'):
+        Index('ix_core_device_stats_skey', core_device_stats.c.skey).create()
     
     #1274
     core_device_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-    Index('ix_core_device_stats_date_skey_device_id', core_device_stats.c.date, core_device_stats.c.skey, 
-                                                      core_device_stats.c.device_id).create()
+    if not database_utils.index_exists(migrate_engine, DeviceStats.__tablename__, 'ix_core_device_stats_date_skey_device_id'):
+        Index('ix_core_device_stats_date_skey_device_id', core_device_stats.c.date, core_device_stats.c.skey, 
+                                                          core_device_stats.c.device_id).create()
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)

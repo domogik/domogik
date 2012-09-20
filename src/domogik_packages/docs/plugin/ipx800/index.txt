@@ -1,0 +1,9 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </ipx800>`
+* :doc:`Helpers documentation </helpers>`
+* :doc:`Relayboard update </relayboard_update>`

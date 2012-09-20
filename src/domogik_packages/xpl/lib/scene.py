@@ -189,16 +189,18 @@ class Mscene():
        resp1 = handle.read()
        print resp1
        self.device1_stat= ast.literal_eval(resp1)['stats'][0]['value']
+       print "stat device 1 : %s" %self.device1_stat
        self.listener1 = ['','','','','','','','','','']
        for i in range(len(self.device1['listener'])):
           self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig',self.device1['listener'][i]['device']:self.device1['address']})
           print "listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s" %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
        if self.device2["id"] != '' and self.device2["key_stat"] != '':
-          the_url = 'http://%s/stats/%s/%s/latest' %(grinor, device2['id'], device2['key_stat'])
+          the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor,self.device2['id'], self.device2['key_stat'])
           req = urllib2.Request(the_url)
           handle = urllib2.urlopen(req)
           resp2 = handle.read()
           self.device2_stat= ast.literal_eval(resp2)['stats'][0]['value']
+          print "stat device 2 : %s" %self.device2_stat
           self.listener2 = ['','','','','','','','','','']
           for i in range(len(self.device2['listener'])):
              self.listener2[i]=Listener(self.cmd_device2,self.myxpl,{'schema':self.device2['listener'][i]['schema'],'xpltype':'xpl-trig',self.device2['listener'][i]['device']:self.device2['address']})
@@ -252,12 +254,19 @@ class Mscene():
              else:
                 condition1='false'
           elif self.gcondition['test1']=='<':
-             if self.device1_stat < self.gcondition['value1']:
+             print 'Test <'
+             print self.gcondition['value1']
+             print self.device1_stat
+             if float(self.device1_stat) < float(self.gcondition['value1']):
                 condition1='true'
              else:
                 condition1='false'
           elif self.gcondition['test1']=='>':
-             if self.device1_stat > self.gcondition['value1']:
+             print 'test >'
+             print 'condition:%s' %self.gcondition['value1']
+             print 'stat:%s' %self.device1_stat
+             print '%s > %s' %(self.device1_stat,self.gcondition['value1'])
+             if float(self.device1_stat) > float(self.gcondition['value1']):
                 condition1='true'
              else:
                 condition1='false'
@@ -266,6 +275,7 @@ class Mscene():
                 condition1='true'
              else:
                 condition1='false'
+       print "condition1:%s" %condition1
 
        print 'condition test device2 %s %s' %(self.gcondition['test2'],self.gcondition['value2'])
        if self.gcondition['test2'] != '' and self.gcondition['value2'] != '' :
@@ -275,12 +285,12 @@ class Mscene():
              else:
                 condition2='false'
           elif self.gcondition['test2']== '<':
-             if self.device2_stat < self.gcondition['value2']:
+             if float(self.device2_stat) < float(self.gcondition['value2']):
                 condition2='true'
              else:
                 condition2='false'
           elif self.gcondition['test2']== '>':
-             if self.device2_stat > self.gcondition['value2']:
+             if float(self.device2_stat) > float(self.gcondition['value2']):
                 condition2='true'
              else:
                 condition2='false'
@@ -289,6 +299,7 @@ class Mscene():
                 condition2='true'
              else:
                 condition2='false'
+       print "condition2 : %s" %condition2
        print "Global test %s" %self.gcondition['test_global']
        if self.gcondition['test_global'] != '':
           if self.gcondition['test_global']=='=':
@@ -302,7 +313,7 @@ class Mscene():
              else:
                 condition = 'false'
           elif self.gcondition['test_global']== '>':
-             if self.device1_stat >  self.device2_stat:
+             if float(self.device1_stat) > float(self.device2_stat):
                 condition = 'true'
              else:
                 condition = 'false'
@@ -311,12 +322,12 @@ class Mscene():
                 condition2 = 'true'
              else:
                 condition2 = 'false'
-          elif self.gcondition['test_global']== 'and':
+          elif self.gcondition['test_global']== 'And':
              if condition1 == 'true' and condition2 == 'true':
                 condition = 'true'
              else:
                 condition = 'false'
-          elif self.gcondition['test_global']== 'or':
+          elif self.gcondition['test_global']== 'Or':
              if condition1 == 'true' or condition2 == 'true':
                 condition = 'true'
              else:
@@ -333,8 +344,13 @@ class Mscene():
        if condition == 'true' and condition != last_value and self.gaction_true != '':
           print ' envoie de la commande true'
 #         http://ip:port/command/<technology>/<address>/<command>/command [/...]
+          print 'techno: %s, address: %s,command: %s,value:%s' %(self.gaction_true['techno'], self.gaction_true['address'],self.gaction_true['command'], self.gaction_true['value'])
+
           if self.gaction_true['techno'] != '':
-             the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['value'])
+             if self.gaction_true['command']=='':
+                the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['value'])
+             else:
+              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['command'],self.gaction_true['value'])
              req = urllib2.Request(the_url)
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
@@ -343,13 +359,16 @@ class Mscene():
           msg.set_type('xpl-trig')
           msg.add_data({'number': 'scene_' + self.number})
           msg.add_data({'run':'OK'})
-          msg.add_data({'statue':'true'})
+          msg.add_data({'stats':'true'})
           self.myxpl.send(msg)
 
        if condition == 'false' and condition != last_value:
           print 'envoie de la commande false'
           if self.gaction_false['techno'] != '':
-             the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['value'])
+             if self.gaction_false['command']== '':
+                the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['value'])
+             else:
+                the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['command'],self.gaction_false['value'])
              req = urllib2.Request(the_url)
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
@@ -358,7 +377,7 @@ class Mscene():
           msg.set_type('xpl-trig')
           msg.add_data({'number': 'scene_' + self.number})
           msg.add_data({'run':'OK'})
-          msg.add_data({'statue':'false'})
+          msg.add_data({'stats':'false'})
           self.myxpl.send(msg)
 
        if condition == last_value:
@@ -367,7 +386,7 @@ class Mscene():
           msg.set_type('xpl-stat')
           msg.add_data({'number': 'scene_' + self.number})
           msg.add_data({'run':'OK'})
-          msg.add_data({'statue': condition})
+          msg.add_data({'stats': condition})
           self.myxpl.send(msg)
 
        return condition

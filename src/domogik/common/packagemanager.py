@@ -54,6 +54,7 @@ import zipfile
 
 from domogik import __path__ as domopath
 SRC_PATH = "%s/" % os.path.dirname(os.path.dirname(domopath[0]))
+DOC_PATH = "src/domogik_packages/docs/" 
 
 CONFIG_FOLDER = "/etc/domogik/"
 CACHE_FOLDER = "/var/cache/domogik/"
@@ -150,9 +151,16 @@ class PackageManager():
         # display plugin informations
         pkg_obj.display()
 
-        # check file existence
+        # check files exist
         if pkg_json["files"] == []:
             self.log("There is no file defined : the package won't be created")
+            return
+
+        # check doc files exist
+        doc_path = DOC_PATH + "/plugin/%s/" % id
+        doc_fullpath = SRC_PATH + doc_path
+        if not os.path.isdir(doc_fullpath):
+            self.log("There is no documentation files in '%s' : the package won't be created" % doc_fullpath)
             return
 
         if force == False:
@@ -174,9 +182,10 @@ class PackageManager():
         # Create .tgz
         self._create_tar_gz("plugin-%s-%s" % (pkg_json["identity"]["id"], pkg_json["identity"]["version"]), 
                             output_dir,
-                            pkg_json["all_files"], 
+                            pkg_json["all_files"],
                             json_tmp_file,
-                            pkg_json["identity"]["icon_file"])
+                            pkg_json["identity"]["icon_file"],
+                            doc_fullpath)
 
     def _create_package_for_external(self, id, output_dir, force):
         """ Create package for a external
@@ -249,13 +258,14 @@ class PackageManager():
                             pkg_json["identity"]["icon_file"])
 
 
-    def _create_tar_gz(self, name, output_dir, files, info_file = None, icon_file = None):
+    def _create_tar_gz(self, name, output_dir, files, info_file = None, icon_file = None, doc_path = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
             @param name : file name
             @param output_dir : if != None, the path to put .tar.gz
             @param files : table of file names to add in tar.gz
             @param info_file : path for info.json file
             @param icon_file : path for icon.png file
+            @param doc_path : path for doc
         """
         if output_dir == None:
             my_tar = "%s/%s.tgz" % (tempfile.gettempdir(), name)
@@ -278,6 +288,9 @@ class PackageManager():
                 if os.path.isfile(icon_file):
                     self.log("- icon.png")
                     tar.add(icon_file, arcname="icon.png")
+            if doc_path != None:
+                self.log("- package documentation")
+                tar.add(doc_path, arcname="docs")
             tar.close()
 
             # delete temporary Json file

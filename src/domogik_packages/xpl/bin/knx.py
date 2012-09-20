@@ -101,6 +101,18 @@ class KNXManager(XplPlugin):
         self.add_stop_cb(self.knx.close)
         self.enable_hbeat()
 
+        ### test if config file exist
+        path = self.get_data_files_directory()
+        if os.path.exists(path)== False:
+           os.mkdir(path)
+           print "Création du répertoire %s" %path
+        path = path+"/knx.txt"
+        if os.path.exists(path)== False:
+           fichier= open(path,'w')
+           fichier.write('')
+           fichier.close()
+           print "Création du fichier de stockage %s"  %path
+
         ### Load the configuration file in the plugin
         filetoopen= self.get_data_files_directory()
         filetoopen= filetoopen+"/knx.txt"

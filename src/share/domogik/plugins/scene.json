@@ -11,12 +11,31 @@
             "type": "boolean"
         }
     ],
-    "device_feature_models": [],
-    "device_types": [],
+    "device_feature_models": [
+     {
+      "device_type_id": "scene.stat",
+      "feature_type": "sensor",
+      "id": "scene.stat.status",
+      "name": "Status",
+      "parameters": "{}",
+      "return_confirmation": "0",
+      "stat_key": "stats",
+      "value_type": "boolean"
+     }
+    ],
+    "device_types": [
+    {
+    "description": "Thermometer",
+    "id": "scene.stat",
+    "name": "scene"
+} 
+],
     "files": [
-           "/src/share/domogik/plugins/scene.py",
            "/src/domogik_packages/xpl/bin/scene.py",
-           "/src/domogik_pakages/xpl/lib/scene.py"
+           "/src/domogik_pakages/xpl/lib/scene.py",
+           "/src/share/domogik/stats/scene/basic.scene.xml",
+           "/src/share/domogik/data/scene/scene.txt",
+           "/src/share/domogik/url2xpl/scene/Create.xml"
 ],
     "identity": {
         "author": "Basilic",

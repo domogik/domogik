@@ -13,6 +13,7 @@ import glob
 from xml.dom import minidom
 import threading
 import ast
+import os
 
 class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
@@ -57,7 +58,16 @@ class SceneManager(XplPlugin):
       Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
       self.enable_hbeat()
       self.filetoopen=self.get_data_files_directory()
+      path = self.get_data_files_directory()
+      if os.path.exists(path)== False:
+         os.mkdir(path)
+         print "Création du répertoire %s" %path
       self.filetoopen= self.filetoopen+"/scene.txt"
+      if os.path.exists(self.filetoopen)== False:
+         fichier= open(self.filetoopen,'w')
+         fichier.write('')
+         fichier.close()
+         print "Création du fichier de stockage %s" %self.filetoopen
       mem = self.scene.read_scene(self.filetoopen)
       for i in range(len(mem)):
          liste=str(mem[i])
@@ -86,12 +96,19 @@ class SceneManager(XplPlugin):
    def scene_cmd(self, message):
       """ routine lorsque le plugin recoit un message xpl
       """
+      data = message.data['data']
+      data = data.replace('|','')
+      data = data.replace(':',":'")
+      data = data.replace(',',"',")
+      data = "{" + data + "'}"
+      data = ast.literal_eval(data)
+      print data 
       if message.data['command']=="Create" and message.data['scene'] =='0':
          msg=''
          self.sceneCount = self.sceneCount + 1
-         if 'scene' not in message data
+         if 'scene' not in data:
             self.sceneC = self.sceneCount
-         else
+         else:
             self.sceneC = message
          device1_id = ''
          device1_adr = ''
@@ -117,48 +134,49 @@ class SceneManager(XplPlugin):
          filter_device1 = ''
          filter_device2 = ''
 
-         rinor=message.data['rinor']
+         rinor=data['rinorip']+":"+data['rinorport']
+         print 'rinor:%s' %rinor
 
-         if 'device1id' in message.data:
-            device1_adr = message.data['device1adr']
-            device1_id = message.data['device1id']
-            device1_key = message.data['device1key']
-            device1_tech=message.data['device1tech']
-            device1_key=message.data['device1key']
-            if 'device1op' in message.data:
-               device1_op=message.data['device1op']
-               device1_value=message.data['device1val']
+         if 'device1id' in data and data['device1id'] != '':
+            device1_adr = data['device1adr']
+            device1_id = data['device1id']
+            device1_key = data['device1key']
+            device1_tech= data['device1tech']
+            device1_key= data['device1key']
+            if 'device1op' in data and data['device1op'] != '':
+               device1_op= data['device1op']
+               device1_value= data['device1val']
 
-         if 'device2id' in message.data:
-            device2_adr = message.data['device2adr']
-            device2_id = message.data['device2id']
-            device2_key = message.data['device2key']
-            device2_tech=message.data['device2tech']
-            device2_key=message.data['device2key']
-            if 'device2op' in message.data:
-               device2_op=message.data['device2op']
-               device2_value=message.data['device2val']
+         if 'device2id' in data and data['device2id'] != '':
+            device2_adr = data['device2adr']
+            device2_id = data['device2id']
+            device2_key = data['device2key']
+            device2_tech= data['device2tech']
+            device2_key= data['device2key']
+            if 'device2op' in data and data['device2op']!='':
+               device2_op= data['device2op']
+               device2_value= data['device2val']
 
-         if 'opglobal' in message.data:
-            op_global = message.data['opglobal']
+         if 'opglobal' in data and data['opglobal'] != '':
+            op_global = data['opglobal']
 
          condition={'test1':device1_op, 'value1':device1_value,'test2':device2_op,'value2':device2_value,'test_global':op_global}
 
-         if 'actiontrueadr' in message.data:
-            action_true_techno = message.data['actiontruetech']
-            action_true_adr = message.data['actiontrueadr']
-            action_true_value = message.data['actiontrueval']
-            if 'actiontruecmd' in message.data:
-                action_true_cmd = message.data['actiontruecmd']
+         if 'actiontrueadr' in data and data['actiontrueadr'] != '':
+            action_true_techno = data['actiontruetech']
+            action_true_adr = data['actiontrueadr']
+            action_true_value = data['actiontrueval']
+            if 'actiontruecmd' in data:
+                action_true_cmd = data['actiontruecmd']
 
          action_true={'techno':action_true_techno,'address':action_true_adr, 'command':action_true_cmd,'value':action_true_value}
 
-         if 'actionfalseadr' in message.data:
-            action_false_techno = message.data['actionfalsetech']
-            action_false_adr = message.data['actionfalseadr']
-            action_false_value = message.data['actionfalseval']
-            if 'actionfalsecmd' in message.data:
-                action_false_cmd = message.data['actionfalsecmd']
+         if 'actionfalseadr' in data and data['actionfalseadr'] != '':
+            action_false_techno = data['actionfalsetech']
+            action_false_adr = data['actionfalseadr']
+            action_false_value = data['actionfalseval']
+            if 'actionfalsecmd' in data:
+                action_false_cmd = data['actionfalsecmd']
 
          action_false={'techno':action_false_techno,'address':action_false_adr, 'command':action_false_cmd,'value':action_false_value}
          
@@ -166,6 +184,7 @@ class SceneManager(XplPlugin):
             filter_device1 = self.search_filter(device1_tech, device1_key)
          if device2_tech != '' and device2_key != '':
             filter_device2 = self.search_filter(device2_tech, device2_key)
+
          device1 = {'address':device1_adr,'id':device1_id, 'key_stat':device1_key,'listener':filter_device1}
          device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
          
@@ -173,7 +192,8 @@ class SceneManager(XplPlugin):
          Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor)
          msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
          self.scene.add_scene(self.filetoopen,msg)
-         the_url="http://%s/base/device/add/name/%s/address/%s/usage_id/scene/description/scene_plugin/reference/Mscene" %(self.Mscene,self.Mscene)
+
+#         the_url="http://%s/base/device/add/name/%s/address/%s/usage_id/scene/description/scene_plugin/reference/Mscene" %(self.Mscene,self.Mscene)
 
          Mini_scene.start()
 

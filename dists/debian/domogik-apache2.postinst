@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+. /usr/share/debconf/confmodule
+db_version 2.0
+
 reload_server() {
   set +e
   if [ -x /usr/sbin/invoke-rc.d ]; then
@@ -13,6 +16,22 @@ reload_server() {
 
 case "$1" in
   configure)
+        db_get "domogik-apache2/servername"
+        SERVERNAME="$RET"
+        db_get "domogik-apache2/aliasname"
+        ALIASNAME="$RET"
+        db_get "domogik-apache2/restserverip"
+        RESTSERVERIP="$RET"
+        db_get "domogik-apache2/authuser"
+        AUTHUSER="$RET"
+        db_get "domogik-apache2/authpasswd"
+        AUTHPASSWD="$RET"
+
+        sed -i "s;SERVERNAME;$SERVERNAME;" /etc/apache2/sites-available/domogik
+        sed -i "s;ALIASNAME;$ALIASNAME;" /etc/apache2/sites-available/domogik
+        sed -i "s;RESTSERVERIP;$RESTSERVERIP;" /etc/apache2/sites-available/domogik
+        sed -i "s;AUTHUSER;$AUTHUSER;" /etc/apache2/sites-available/domogik
+        htpasswd -bc /var/www/domogik/.htpass $AUTHUSER $AUTHPASSWD
         /usr/sbin/a2ensite domogik
         reload_server
   ;;
@@ -25,6 +44,8 @@ case "$1" in
     exit 1
   ;;
 esac
+
+db_stop
 
 #DEBHELPER#
 
