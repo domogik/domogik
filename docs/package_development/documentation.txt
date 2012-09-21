@@ -71,9 +71,9 @@ You just have to replace the *todo* parts of the generated documentation. To che
 
 To generate the html build: ::
 
-   $ make clean && make
+   $ make clean && make html
 
-The build is generated in the *_build* folder. This folder is not storen in Domogik sources, don't try to add this to sources.
+The build is generated in the *_build* folder. This folder is not store in Domogik sources, don't try to add this to sources.
 
 Here is an example of the generated documentation:
 
