@@ -64,11 +64,11 @@ class OZwave(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         print ('Mode log openzwave :',  ozwlogConf)
         # Recupère l'emplacement des fichiers de configuration OZW
-        pathConfig = self.get_data_files_directory() + '/ozwconfig/'
         pathUser = self.get_data_files_directory()  +'/'
+        pathConfig = self._config.query('ozwave', 'configpath') + '/'
         # Initialise le manager Open zwave
         try:
-            self.myzwave = OZWavemanager(self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, ozwconfig = pathConfig,  ozwuser = pathUser,  ozwlog = ozwlogConf,  msgEndCb = True) # ozwlog="")
+            self.myzwave = OZWavemanager(self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf,  msgEndCb = True) # ozwlog="")
         except OZwaveException as e:
             self.log.error(e.value)
             print e.value
@@ -144,7 +144,7 @@ class OZwave(XplPlugin):
                                     'data': info})
                 print "Refresh network info"
             elif request['request'] == 'GetNodeInfo' :
-                info = self.getUIdata2dict(self.myzwave.getNodeInfo(request['node']))
+                info = self.getUIdata2dict(self.myzwave.getNodeInfos(request['node']))
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : request['node'], 

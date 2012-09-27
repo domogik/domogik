@@ -9,7 +9,10 @@
                 "src/share/domogik/url2xpl/ozwave/Refresh.xml",
                 "src/share/domogik/data/ozwave/ozwconfig/*.*",
 				"src/domogik_packages/xpl/bin/ozwave.py", 
-				"src/domogik_packages/xpl/lib/ozwave.py"	
+				"src/domogik_packages/xpl/lib/ozwave.py",
+                "src/domogik_packages/xpl/lib/ozwdefs.py",
+                "src/domogik_packages/xpl/lib/ozwvalue.py", 
+                "src/domogik_packages/xpl/lib/ozwnode.py"
 			],
 	"udev-rules" : [
 		{
@@ -144,6 +147,24 @@
 			"type" : "boolean",
 			"id" : "2"
 		},{
+			"description" : "Openzwave configuration path auto detection, else use configpath.",
+			"default" : "True",
+			"options" : [],
+			"key" : "autoconfpath",
+			"interface" : "no",
+			"optionnal" : "no",
+			"type" : "boolean",
+			"id" : "3"
+		},{
+			"description" : "Path for openzwave files configuration (see your openzwave installation).",
+			"default" : "/usr/local/share/python-openzwave/config",
+			"options" : [],
+			"key" : "configpath",
+			"interface" : "no",
+			"optionnal" : "yes",
+			"type" : "string",
+			"id" : "4"
+		},{
 			"description" : "Home id name for association with device",
 			"default" : "myHomeId",
 			"options" : [],
@@ -151,7 +172,7 @@
 			"interface" : "yes",
 			"optionnal" : "no",
 			"type" : "string",
-			"id" : "3"
+			"id" : "5"
 		},{
 			"description" : "Home id refered to special page",
 			"default" : "Copy HomeId from special page",
@@ -160,7 +181,7 @@
 			"interface" : "yes",
 			"optionnal" : "no",
 			"type" : "string",
-			"id" : "4"
+			"id" : "6"
 		}
 	],
 	"technology" : {
