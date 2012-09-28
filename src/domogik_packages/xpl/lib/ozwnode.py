@@ -251,7 +251,7 @@ class ZWaveNode:
            # self._neighbors = sorted([int(i) for i in filter(None, neighborstr.strip('()').split(','))])
             self._neighbors = neighbors
         if self.isSleeping and self._neighbors is not None and len(self._neighbors) > 10:
-            self._manager._log.warning('Probable OZW bug: Node [%d] is sleeping and reports %d neighbors; marking neighbors as none.', self.id, len(self._neighbors))
+            self._ozwmanager._log.warning('Probable OZW bug: Node [%d] is sleeping and reports %d neighbors; marking neighbors as none.', self.id, len(self._neighbors))
             self._neighbors = None
         print ('Node [%d] neighbors are: ' %self._nodeId) , self._neighbors
         self._ozwmanager._log.debug('Node [%d] neighbors are: %s', self._nodeId, self._neighbors)

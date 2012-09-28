@@ -198,11 +198,11 @@
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.2.0",
 		"dependencies" : [{
-			"id" : "py-openzwave", 
+			"id" : "python-openzwave", 
             "type": "other"
 			}
 		],
-		"version" : "0.1a0.dev20120724",
+		"version" : "0.1b2.dev20120927",
 		"type" : "plugin",
 		"id" : "ozwave"
 	},
