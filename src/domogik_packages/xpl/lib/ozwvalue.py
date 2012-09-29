@@ -149,14 +149,6 @@ class ZWaveValueNode:
                 msgtrig ['genre'] = 'sensor'
                 msgtrig ['type'] = 'status'
                 msgtrig ['value'] = self.valueData['value']
-#                print FlagDebug
-#                if FlagDebug : # pour debug a supp
-#                    args2 = args  
-#                    args2['event'] = valueId['value']
-#                    FlagDebug = False
-#                    self._handleNodeEvent(args2) # pour debug a supp
-#                    FlagDebug = True
-                    
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
                 sendxPL = True
                 msgtrig['schema'] ='sensor.basic'
@@ -174,6 +166,5 @@ class ZWaveValueNode:
             return msgtrig
         else : return None
        
-
     def __str__(self):
         return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self._homeId, self._nodeId, self._valueData)

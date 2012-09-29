@@ -427,15 +427,7 @@ class OZWavemanager(threading.Thread):
     def refresh(self, node):
         self._log.debug('Requesting refresh for node {0}'.format(node.id))
         self._manager.refreshNodeInfo(node.homeId, node.id)
-    
-#    def setNodeName(self, node, name):
-#        self._log.debug('Requesting setNodeName for node {0} with new name {1}'.format(node.id, name))
-#        self._manager.setNodeName(node.homeId, node.id, name)
-# 
-#    def setNodeLocation(self, node, loc):
-#        self._log.debug('Requesting setNodeLocation for node {0} with new location {1}'.format(node.id, loc))
-#        self._manager.setNodeLocation(node.homeId, node.id, loc)
-        
+
     def setNodeOn(self, node):
         self._log.debug('Requesting setNodeOn for node {0}'.format(node.id))
         self._manager.setNodeOn(node.homeId, node.id)
@@ -460,6 +452,10 @@ class OZWavemanager(threading.Thread):
     def getNetworkInfo(self):
         """ Retourne les infos principales du réseau zwave (dict) """
         retval={}
+        retval["ConfigPath"] = self._configPath
+        retval["UserPath"] = self._userPath
+        retval["PYOZWLibVers"] = self.pyOZWLibVersion
+        retval["OZWPluginVers"] = OZWPLuginVers
         if self.ready :
             retval["HomeID"] ="0x%.8x" % self.homeId
             retval["Model"]= self.controllerNode.manufacturer + " -- " + self.controllerNode.product
@@ -470,16 +466,15 @@ class OZWavemanager(threading.Thread):
             retval["Version"] = self._libraryVersion
             retval["Node count"] = self.nodeCount
             retval["Node sleeping"] = self.sleepingNodeCount
-            retval["ConfigPath"] = self._configPath
-            retval["UserPath"] = self._userPath
-            retval["PYOZWLibVers"] = self.pyOZWLibVersion
-            retval["OZWPluginVers"] = OZWPLuginVers
+            retval["error"] =""
             ln = []
             for n in self.nodes : ln.append(n)
             retval["ListNodeId"] = ln
             print'**** getNetworkinfo : ',  retval
             return retval
-        else : return {'error' : 'Zwave network not ready, be patient...'}
+        else : 
+            retval["error"] = "Zwave network not ready, be patient..."
+            return retval
         
     def saveNetworkConfig(self):
         """Enregistre le configuration au format xml"""

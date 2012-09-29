@@ -42,7 +42,6 @@ from ozwdefs import *
 import time
 from time import sleep
 
-
 class OZwaveNodeException(OZwaveException):
     """"Zwave Node exception class"""
             
