@@ -1,0 +1,7 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </bluez>`
