@@ -84,7 +84,7 @@
             "description": "GCE 8 relay usb board",
             "filename": "relayboardusb.rules", 
             "model": "GCE 8 relay usb board", 
-            "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0403\″, ATTRS{idProduct}==\"6001\″, SYSFS{serial}==\"A100UJ32\″, SYMLINK+=\"relayboardusb\", MODE=\"0666\″"
+            "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYSFS{serial}==\"A100UJ32\", SYMLINK+=\"relayboardusb\", MODE=\"0666\""
         }
     ]
 }
