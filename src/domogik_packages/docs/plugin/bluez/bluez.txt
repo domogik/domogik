@@ -8,7 +8,7 @@ The purpose of this plugin is to detect your phone over bluetooth.
 
 Dependencies
 ============
-pybluez
+pybluez (>=0.18)
 
 Plugin configuration
 ====================
