@@ -35,6 +35,9 @@ cp -R $TPL_DIR $NEW_DOC
 [ $? -ne 0 ] && echo "ERROR : error during copy. Exiting" && exit 4
 echo "OK"
 
+# Remove the initdoc.sh in the newly created folder
+rm $NEW_DOC/initdoc.sh
+
 # Update the new doc : conf.py
 echo "Update conf.py..."
 sed -i "s/__PKG_TYPE__/$PKG_TYPE/g" $NEW_DOC/conf.py

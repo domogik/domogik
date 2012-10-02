@@ -8,8 +8,8 @@ DOMOGIK_USER=domogik
 # -r to start the rest component (launch only on master host)
 # -E to manage external members (launch only on master host)
 # -p to regulary ping plugins 
-# -t <ping duration> to customize ping duration
-# -w <wait time between 2 ping> to customize ping delay
+# -t <ping duration> to customize ping duration. Default : 20
+# -w <wait time between 2 ping> to customize ping delay. Default : 60
 # Remember : Your domogik installation must have *one* and *only one*
 # instance of each manager running.
 # Your domogik installation won't start on this computer if :

@@ -1404,7 +1404,7 @@ class DbHelper():
         list_s.reverse()
         return list_s
     
-    def list_stats_of_device_between_by_key(self, ds_device_id=None, ds_key=None, start_date_ts=None, end_date_ts=None):
+    def list_stats_of_device_between_by_key(self, ds_device_id=None, ds_skey=None, start_date_ts=None, end_date_ts=None):
         """Get statistics of a device between two dates for a given key
 
         @param ds_device_id : the device id
@@ -1418,19 +1418,25 @@ class DbHelper():
             if end_date_ts < start_date_ts:
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
         
-        query = self.list_device_stats(ds_device_id, ds_key)
+        query = self.__session.query(DeviceStats)
+        if ds_device_id:
+            query = query.filter_by(device_id=ds_device_id)
+        if ds_skey:
+            query = query.filter_by(skey= ucode(ds_skey))
+        
         if start_date_ts:
             query = query.filter("date >= '" + _datetime_string_from_tstamp(start_date_ts)+"'")
         if end_date_ts:
             query = query.filter("date <= '" + _datetime_string_from_tstamp(end_date_ts) + "'")
+            
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
-    def get_last_stat_of_device(self, ds_device_id=None,ds_key=None):
+    def get_last_stat_of_device(self, ds_device_id=None,ds_skey=None):
         """Get the latest statistic of a device for a given key
 
         @param ds_device_id : the device id
-        @param ds_key : statistic key
+        @param ds_skey : statistic key
         @return a DeviceStats object
 
         """
@@ -1626,7 +1632,7 @@ class DbHelper():
         @return True or False
 
         """
-        return self.list_device_stats(ds_device_id,ds_skey,1).count() > 0        
+        return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
 
     # check if the data is duplicated with older values
     def _get_duplicated_devicestats_id(self,device_id,key,value):

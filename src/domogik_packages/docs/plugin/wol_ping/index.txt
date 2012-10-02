@@ -1,0 +1,8 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </wol_ping>`
+* :doc:`Helpers documentation </helpers>`

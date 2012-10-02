@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="ozwave">
+    <schema name="ozwave.basic">
+        <xpltype type="xpl-trig">
+            <listener>	
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="addressety"/>
+                <value field="command"/>
+                <value field="level"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

@@ -1,0 +1,19 @@
+<technology id="ozwave">
+  <command name="Refresh">
+    <schema>ozwave.basic</schema>
+    <command-key>command</command-key>
+    <address-key>group</address-key>
+    <command-xpl-value>Refresh</command-xpl-value>
+   	<parameters>
+      <parameter key="value" location="1"/>          
+    </parameters>
+  </command>
+  <listener>
+    <schema>ozwave.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="Refresh-ack"/>
+	  <key name="group" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

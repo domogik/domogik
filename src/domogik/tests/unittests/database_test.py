@@ -642,7 +642,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_empty_list(self):
         assert len(db.list_device_stats()) == 0
-        assert len(db.device_has_stats()) == False
+        assert db.device_has_stats() == False
 
 
     def __has_stat_values(self, device_stats_values, expected_values):
@@ -707,6 +707,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
         # Verify for unified list_device_stats
         assert len(db.list_device_stats()) == 15
+        assert len(db.list_device_stats(None, None)) == 15
         assert len(db.list_device_stats(device1.id)) == 11
         assert len(db.list_device_stats(device2.id)) == 4
         assert len(db.list_device_stats(device1.id,'val1')) == 5
@@ -715,14 +716,11 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(db.list_device_stats(device2.id,'val2')) == 2
         assert len(db.list_device_stats(None,'val1')) == 7
         assert len(db.list_device_stats(None,'val2')) == 7
-        assert len(db.list_device_stats(None,None)) == 14
-        assert len(db.list_device_stats()) == 14
-        assert len(db.device_has_stats()) == True
-        assert len(db.device_has_stats(None,None)) == True
-        assert len(db.device_has_stats(device1.id,'val1')) == True
-        assert len(db.device_has_stats(device1.id,'val3')) == False
-        
 
+        assert db.device_has_stats() == True
+        assert db.device_has_stats(None, None) == True
+        assert db.device_has_stats(device1.id,'val1') == True
+        assert db.device_has_stats(device1.id,'val3') == False
 
     def test_add_with_hist_size(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')

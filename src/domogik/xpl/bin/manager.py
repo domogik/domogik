@@ -70,9 +70,9 @@ import os
 
 
 KILL_TIMEOUT = 2
-PING_DURATION = 10
+PING_DURATION = 20
 # time between 2 pings of a plugin
-WAIT_TIME_BETWEEN_PING = 15
+WAIT_TIME_BETWEEN_PING = 60
 
 PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
 
@@ -135,7 +135,7 @@ class SysManager(XplPlugin):
                           action="store_true", 
                           dest="check_external", 
                           default=False, \
-                          help="This manager is the one who looks for harware.")
+                          help="This manager is the one who looks for hardware.")
         parser.add_option("-t", 
                           action="store", 
                           type="int",
@@ -625,7 +625,7 @@ class SysManager(XplPlugin):
             max_ping = self.ping_duration
         while max_ping != 0:
             self.myxpl.send(mess)
-            time.sleep(2)
+            time.sleep(1)
             max_ping -= 1
             if self._pinglist[name].isSet():
                 break

@@ -1,0 +1,2 @@
+usr/sbin/dmgdb_dump /usr/sbin/
+usr/sbin/dmgdb_restore /usr/sbin/

@@ -119,6 +119,26 @@
             "optionnal": "no", 
             "options": [], 
             "type": "string"
+        },
+        {
+            "default": "0", 
+            "description": "Value in +/- seconds after/before dawn event", 
+            "id": "12", 
+            "interface": "yes", 
+            "key": "dawnseconds", 
+            "optionnal": "yes", 
+            "options": [], 
+            "type": "string"
+        },
+        {
+            "default": "0", 
+            "description": "Value in +/- seconds after/before dusk event", 
+            "id": "13", 
+            "interface": "yes", 
+            "key": "duskseconds", 
+            "optionnal": "yes", 
+            "options": [], 
+            "type": "string"
         }
     ], 
     "device_feature_models": [

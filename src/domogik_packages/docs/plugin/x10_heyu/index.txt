@@ -1,0 +1,8 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </x10_heyu>`
+* :doc:`Helpers documentation </helpers>`

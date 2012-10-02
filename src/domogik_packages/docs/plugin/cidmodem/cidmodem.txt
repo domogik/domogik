@@ -1,0 +1,83 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+This plugin allows to know the phone number of an inbound phone call.
+
+You will need a 56k modem with the Caller ID feature (most of them does it). *winmodem* are not supported.
+
+Dependencies
+============
+
+* Python library **pyserial**.
+
+How to plug
+===========
+
+Simply plug the modem like other phones. Then plug the modem usb or serial port on the computer.
+
+.. image :: howtoplug.png
+
+Create the udev rule
+--------------------
+
+You may create a udev rule for this device. The rule and filename are given in the **Requirements** tab of the plugin configuration page.
+
+Plugin configuration
+====================
+
+Configuration
+-------------
+In Domogik administration, go to the cidmodem configuration page.
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| device        | /dev/modem    | This is the path to your modem device.                                                              |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| cid-command   | AT#CID=1      | You should kept default value if plugin works. If modem doesn't detect inbound calls, you may have  |
+|               |               | to change it.                                                                                       |
+|               |               |                                                                                                     |
+|               |               | Other possible values:                                                                              |
+|               |               |                                                                                                     |
+|               |               | * AT+CID=1                                                                                          |
+|               |               | * Conexant based CX93010 usb modem : AT+VCID=1                                                      |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Creating devices for cidmodem
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+Caller id
+*********
+
+.. |feature_cidmodem| image:: feature_cidmodem.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |feature_cidmodem| | Name              | The name you want to give to the device : Phone, ...                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address must be **phone**                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Communication.Caller id                                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | Telephony                                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+

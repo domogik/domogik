@@ -19,11 +19,13 @@ override_dh_install:
 	/bin/cp -Rf install debian/tmp/usr/lib/domogik
 	/bin/cp -Rf src/tools debian/tmp/usr/lib/domogik
 	/bin/mkdir -p debian/tmp/var/lib/domogik
-	#/bin/cp -Rf src/domogik/__init__.py debian/tmp/var/lib/domogik/
 	/bin/mkdir -p debian/tmp/etc/apache2/sites-available/
 	/usr/bin/install -c -p -m 644 debian/domogik.apache2 debian/tmp/etc/apache2/sites-available/domogik
+	/usr/bin/install -c -p -m 755 debian/dpkg-reconfigure-domogik debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 755 debian/dpkg-preconfigure-domogik debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 755 debian/dmgdb_dump debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 755 debian/dmgdb_restore debian/tmp/usr/sbin/
 	dh_install --sourcedir=debian/tmp
-	#dh_python2 -p zeitgeist-core usr/share/zeitgeist/fts-python
 
 override_dh_installinit:
 	dh_installinit --init-script=domogik

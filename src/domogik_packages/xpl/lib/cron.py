@@ -36,13 +36,15 @@ class cronAPI
 
 import traceback
 import datetime
+import urllib2
 from domogik.xpl.common.xplmessage import XplMessage
 from apscheduler.scheduler import Scheduler
 from domogik_packages.xpl.lib.cron_tools import *
 from domogik_packages.xpl.lib.cron_helpers import CronHelpers
 from pympler.asizeof import asizeof
-#import logging
-#logging.basicConfig()
+import ast
+import logging
+logging.basicConfig()
 
 #MEMORY USAGE
 MEMORY_PLUGIN = 1
@@ -619,8 +621,7 @@ class CronJobs():
                 for d in events:
                     for h in events[d]:
                         dayofweek = days[d]
-                        hour = int(h[0:2])
-                        minute = int(h[3:5])
+                        hour,minute = h.split(":")
                         jobs.append(self._scheduler.add_cron_job(\
                             self._api.send_xpl_job, day_of_week=dayofweek, \
                             hour=hour, minute=minute, \
@@ -740,8 +741,7 @@ class CronJobs():
                 for d in events:
                     for h in events[d]:
                         dayofweek = days[d]
-                        hour = int(h[0:2])
-                        minute = int(h[3:5])
+                        hour,minute = h.split(":")
                         if "single" == events[d][h]:
                             jobs.append(self._scheduler.add_cron_job(\
                             self._api.send_xpl_job, day_of_week=dayofweek, \
@@ -962,9 +962,23 @@ class CronJobs():
                 self.data[device][key] = data[key]
         self._api.log.debug("add_job : %s" % self.data[device] )
         if 'action' in data and data['action'] == "start":
-            return self.start_job(device)
+            err = self.start_job(device)
+            if err == ERROR_NO and self.get_ap_count(device) == 0:
+                #the job is created but don't want to start
+                #we remove it
+                self.halt_job(device)
+                return ERROR_SCHEDULER
+            else:
+                return err
         elif 'current' in data and data['current'] == "started":
-            return self.start_job(device)
+            err = self.start_job(device)
+            if err == ERROR_NO and self.get_ap_count(device) == 0:
+                #the job is created but don't want to start
+                #we remove it
+                self.halt_job(device)
+                return ERROR_SCHEDULER
+            else:
+                return err
         else:
             return ERROR_NO
 
@@ -1027,6 +1041,17 @@ class CronJobs():
         else:
             return 0
 
+    def get_device_type(self, device):
+        """
+        Get the type of a device.
+        @param device : the name of the device (=device in xpl)
+        @return : the uptime in seconds
+        """
+        if device in self.data.iterkeys():
+            return self.data[device]['devicetype']
+        else:
+            return 'Unknown'
+
     def get_list(self, head):
         """
         Get the list of jobs
@@ -1077,12 +1102,16 @@ class CronJobs():
         Get the numbers of jobs
         @return : The numbers of jobs in APScheduler
         """
-        if "apjobs" in self.data[device]:
-            return len(self.data[device]['apjobs'])
-        elif "apjob" in self.data[device]:
-            return 1
-        else :
+        if device in self.data.iterkeys():
+            if "apjobs" in self.data[device]:
+                return len(self.data[device]['apjobs'])
+            elif "apjob" in self.data[device]:
+                return 1
+            else :
+                return 0
+        else:
             return 0
+
 
     def get_xpl_trig(self, device, parameters, value):
         """
@@ -1166,17 +1195,68 @@ class CronAPI:
 
     def send_xpl_job(self, device, parameters=None, value=None):
         """
-        Send the XPL Trigger
+        Send the XPL Trigger or call rinor to activate device.
+        Alarms set by the UI set nst-schem to rinor to do that
         @param myxpl : The XPL sender
         @param device : The timer
         @param current : current state
         @param elapsed : elapsed time
         """
-        self.log.debug("cronAPI._send_xpl_job : Start ...")
-        mess = self.jobs.get_xpl_trig(device, parameters, value)
-        if mess != None:
-            self.myxpl.send(mess)
-            self.log.debug("cronAPI._send_xpl_job : xplmessage = %s" % mess)
+        self.log.debug("cronAPI._send_xpl_job : Start ... %s" % parameters)
+        self.log.debug("cronAPI._send_xpl_job : Start ... %s" % value)
+        if (self.jobs.data[device]["nst-schema"] == "rinor" ):
+            #we should call rinor directly
+            #we use the rinor ip and port from ui
+            #valueon, valueoff
+            #By default, level is in nst-value0
+            #but we can overwrite in parameters
+            level = self.jobs.data[device]["nst-value0"]
+            if parameters != None and \
+                "level" in parameters and parameters["level"] != None and \
+                "valueon" in parameters["level"] and parameters["level"]["valueon"] != None :
+                level = parameters["level"]["valueon"]
+            the_url = None
+            if (value == None or value == "valueon") :
+                 if self.jobs.data[device]["nst-command"]=='':
+                    the_url = 'http://%s/command/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        level)
+                 else:
+                    the_url = 'http://%s/command/%s/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-command"],
+                        level)
+            elif (value == "valueoff"):
+                 if self.jobs.data[device]["nst-command"]=='':
+                    the_url = 'http://%s/command/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-value1"])
+                 else:
+                    the_url = 'http://%s/command/%s/%s/%s/%s' % (
+                        self.jobs.data[device]["rinorip"]+":"+self.jobs.data[device]["rinorport"],
+                        self.jobs.data[device]["nst-techno"],
+                        self.jobs.data[device]["nst-device"],
+                        self.jobs.data[device]["nst-command"],
+                        self.jobs.data[device]["nst-value1"])
+            if (the_url != None):
+                req = urllib2.Request(the_url)
+                handle = urllib2.urlopen(req)
+                resp1 = handle.read()
+                self.jobs.data[device]['runs'] = int(self.jobs.data[device]['runs'])+1
+                self.log.debug("cronAPI._send_xpl_job : rinor called with = %s" % the_url)
+            else :
+                self.log.debug("cronAPI._send_xpl_job : can't call rinor = %s" % the_url)
+        else:
+            mess = self.jobs.get_xpl_trig(device, parameters, value)
+            if mess != None:
+                self.myxpl.send(mess)
+                self.log.debug("cronAPI._send_xpl_job : xplmessage = %s" % mess)
         self.log.debug("cronAPI._send_xpl_job : Done :)")
 
     def request_listener(self, message):
@@ -1252,7 +1332,10 @@ class CronAPI:
 
         commands = {
             'list': lambda x,d,m: self._command_list(x, d, m),
-            'start': lambda x,d,m: self._action_start(x, d, m),
+            'create-alarm': lambda x,d,m: self._command_start_alarm(x, d, m),
+            'create-dawnalarm': lambda x,d,m: self._command_start_dawn_alarm(x, d, m),
+            'create-date': lambda x,d,m: self._command_start_date(x, d, m),
+#            'stop': lambda x,d,m: self._action_stop(x, d),
         }
 
         try:
@@ -1345,6 +1428,105 @@ class CronAPI:
         self._send_xpl_trig(myxpl, device, "started", \
             self.jobs.add_job(device, devicetype, message.data), caller)
         self.log.debug("cronAPI._actionAdd : Done :)")
+
+    def _command_start_date(self, myxpl, device, message):
+        """
+        Add and start a date alarm. This function is called by the UI
+        @param device : The timer to start
+
+        timer.basic
+            {
+             device=<name of the timer>
+             current=halted|resumed|stopped|started|went off
+             elapsed=<number of seconds between start and stop>
+            }
+        """
+        self.log.debug("cronAPI._command_start_date: Start ...")
+        devicetype = "date"
+        caller = None
+        if 'caller' in message.data:
+            caller = message.data['caller']
+        data = message.data['data']
+        data = data.replace('|','')
+        data = "{" + data + "}"
+        data = ast.literal_eval(data)
+        self.log.debug("cronAPI._command_start_date : data %s" % data)
+        device = None
+        if 'device' in data:
+            device = data['device']
+        if 'devicetype' in data:
+            devicetype = data['devicetype']
+        data['action'] = "start"
+        self.log.debug("cronAPI._command_start_date : data %s" % data)
+        self._send_xpl_trig(myxpl, device, "started", \
+            self.jobs.add_job(device, devicetype, data), caller)
+        self.log.debug("cronAPI._command_start_date : Done :)")
+
+    def _command_start_alarm(self, myxpl, device, message):
+        """
+        Add and start an alarm. This function is called by the UI
+        @param device : The timer to start
+
+        timer.basic
+            {
+             device=<name of the timer>
+             current=halted|resumed|stopped|started|went off
+             elapsed=<number of seconds between start and stop>
+            }
+        """
+        self.log.debug("cronAPI._command_start_alarm : Start ...")
+        devicetype = "alarm"
+        caller = None
+        if 'caller' in message.data:
+            caller = message.data['caller']
+        data = message.data['data']
+        self.log.debug("cronAPI._command_start_alarm : data %s" % data)
+        data = "{" + data + "}"
+        data = ast.literal_eval(data)
+        self.log.debug("cronAPI._command_start_alarm : data %s" % data)
+        device = None
+        if 'device' in data:
+            device = data['device']
+        if 'devicetype' in data:
+            devicetype = data['devicetype']
+        data['action'] = "start"
+        self.log.debug("cronAPI._command_start_alarm : data %s" % data)
+        self._send_xpl_trig(myxpl, device, "started", \
+            self.jobs.add_job(device, devicetype, data), caller)
+        self.log.debug("cronAPI._command_start_alarm : Done :)")
+
+    def _command_start_dawn_alarm(self, myxpl, device, message):
+        """
+        Add and start a dawn alarm. This function is called by the UI
+        @param device : The timer to start
+
+        timer.basic
+            {
+             device=<name of the timer>
+             current=halted|resumed|stopped|started|went off
+             elapsed=<number of seconds between start and stop>
+            }
+        """
+        self.log.debug("cronAPI._command_start_dawnalarm : Start ...")
+        devicetype = "dawnalarm"
+        caller = None
+        if 'caller' in message.data:
+            caller = message.data['caller']
+        data = message.data['data']
+        data = data.replace('|','')
+        data = "{" + data + "}"
+        data = ast.literal_eval(data)
+        self.log.debug("cronAPI._command_start_dawnalarm : data %s" % data)
+        device = None
+        if 'device' in data:
+            device = data['device']
+        if 'devicetype' in data:
+            devicetype = data['devicetype']
+        data['action'] = "start"
+        self.log.debug("cronAPI._command_start_dawnalarm : data %s" % data)
+        self._send_xpl_trig(myxpl, device, "started", \
+            self.jobs.add_job(device, devicetype, data), caller)
+        self.log.debug("cronAPI._command_start_dawnalarm : Done :)")
 
     def _action_status(self, myxpl, device):
         """
@@ -1454,18 +1636,25 @@ class CronAPI:
         if error == ERROR_NO:
             mess.add_data({"current" :  current})
             mess.add_data({"elapsed" : self.jobs.get_up_time(device)})
+            mess.add_data({"devicetype" : self.jobs.get_device_type(device)})
             mess.add_data({"runtime" : self.jobs.get_run_time(device)})
             mess.add_data({"runs" : self.jobs.get_runs(device)})
-            self.log.debug("cronAPI._send_xpl_trig : Send okk xpl-trig :)")
+            mess.add_data({"apjobs" : self.jobs.get_ap_count(device)})
         else:
             if device in self.jobs.data:
                 mess.add_data({"current" : self.jobs.data[device]['current']})
                 mess.add_data({"elapsed" : self.jobs.get_up_time(device)})
+                mess.add_data({"devicetype" : self.jobs.get_device_type(device)})
                 mess.add_data({"runtime" : self.jobs.get_run_time(device)})
                 mess.add_data({"runs" : self.jobs.get_runs(device)})
+                mess.add_data({"apjobs" : self.jobs.get_ap_count(device)})
             else:
-                mess.add_data({"elasped" :  0})
                 mess.add_data({"current" : "halted"})
+                mess.add_data({"devicetype" : self.jobs.get_device_type(device)})
+                mess.add_data({"elapsed" : "0"})
+                mess.add_data({"runtime" : "0"})
+                mess.add_data({"runs" : "0"})
+                mess.add_data({"apjobs" : "0"})
             mess.add_data(self.tools.error(error))
             self.log.debug("cronAPI._send_xpl_trig : Send error xpl-trig :(")
         myxpl.send(mess)
