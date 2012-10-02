@@ -1,0 +1,62 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+The purpose of this plugin is to offer cron jobs over XPL.
+It can act as a timer, a date, an interval or a cron like server. It will send an xpl message at the specified date.
+It can be called in pure XPL or via the client library.
+See documentation `here <http://xplproject.org.uk/wiki/index.php?title=Schema_-_TIMER>`_ for more details.
+
+Dependencies
+============
+
+apscheduler (>=2.0.2)
+
+Plugin configuration
+====================
+
+Creating jobs for cron
+----------------------
+In administration, go to Plugins > Cron page to create your jobs and alarms.
+
+Creating devices for cron
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+Job
+***
+
+.. |example_job| image:: example_job.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_job|      | Name              | The name you want to give to the device.                                                   |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device (job) address : the one you have specified when creatind job.                   |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | cron.job                                                                                   |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | All                                                                                        |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | A device to interact with the cron job.                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Widgets           | Switch : stop/resume the cron job.                                                         |
+|                    |                   |                                                                                            |
+|                    |                   | Halt : halt (remove) the cron job.                                                         |
+|                    |                   |                                                                                            |
+|                    |                   | Status : status (started, stopped) of the cron job.                                        |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+

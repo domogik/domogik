@@ -1,0 +1,17 @@
+=======
+Helpers
+=======
+
+.. todo::
+    For each helper create a chapter which describes it.
+
+cron first_helper_command
+=================================
+
+**cron first_helper_command** helper will do.....
+
+.. code-block:: none
+
+    $ cron first_helper_command
+    Result of the helper command.....
+

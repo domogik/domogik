@@ -1,0 +1,8 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </cron>`
+* :doc:`Helpers documentation </helpers>`
