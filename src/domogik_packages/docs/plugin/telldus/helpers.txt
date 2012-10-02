@@ -1,0 +1,79 @@
+=======
+Helpers
+=======
+
+The helper of telldus is available in plugin section. You MUST start the
+plugin to use it. If you update configuration of the plugin, you must stop
+and restart it.
+
+list
+====
+
+**list** helper will list all devices in tellduscenter
+
+.. code-block:: none
+
+    $ list
+	List all devices :
+	id : XPL id : Name
+	2 : TS2 : Plafonnier Cuisine
+	3 : TS3 : VR Cuisine
+	4 : TS4 : VR Salle a manger
+	5 : TS5 : Lampe de chevet Chambre
+	6 : TS6 : Prise mobile
+	7 : TS7 : Detecteur crepusculaire
+
+info
+====
+
+**info <device>** helper will show informations about <device>
+
+.. code-block:: none
+
+    $ info 2
+	Information for device 2 :
+	2 : Plafonnier Cuisine
+	model : selflearning-dimmer:chacon
+	protocol : arctech
+	house : 29473961 / unit: 2
+	Methods :
+	ON : Yes / OFF: Yes / DIM: Yes
+	BELL : No / TOGGLE: No / LEARN: Yes / EXECUTE: No
+	UP : No / DOWN: No / STOP: No
+
+log
+===
+
+**log <lines>** helper will show the <lines> last lines of the plugin's logs
+
+.. code-block:: none
+
+    $ log 10
+	2012-10-01 20:40:21,613 domogik-telldus INFO Daemonize plugin telldus
+	2012-10-01 20:40:21,671 domogik-telldus INFO ----------------------------------
+	2012-10-01 20:40:21,671 domogik-telldus INFO Starting plugin 'telldus' (new manager instance)
+	2012-10-01 20:40:21,688 domogik-telldus WARNING /dev/tellstick is not present but Tellstick Duo don't use it.
+	2012-10-01 20:40:22,567 domogik-telldus INFO Load 2 button configuration(s)
+	2012-10-01 20:40:22,567 domogik-telldus INFO Load 8 item(s) from XPL configuration.
+	2012-10-01 20:40:22,567 domogik-telldus INFO Load 2 buttons(s) configuration.
+	2012-10-01 20:40:22,576 domogik-telldus INFO Lighting extensions activated.
+	2012-10-01 20:40:22,576 domogik-telldus INFO Telldus plugin correctly started
+
+memory
+======
+
+**memory** helper will display memory usage of the plugin
+
+.. code-block:: none
+
+    $ memory
+	Memory use :
+	api : 1 items, 168320 bytes
+	config : 8 items, 4272 bytes
+	device queue : 1 items, 168320 bytes
+	fifo : 0 items, 280 bytes
+	received timers : 0 items, 560 bytes
+	sent timers : 0 items, 280 bytes
+	ACKs to send : 3 items, 1336 bytes
+	last commands sent : 3 items, 1336 bytes
+	scenes : 8 items, 0 bytes
