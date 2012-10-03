@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
 License
@@ -80,6 +78,135 @@ PING_DURATION = 2
 class ProcessRequest():
     """ Class for processing a request
     """
+
+    urls = {
+	# /account
+        'account': {
+            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
+            '^/account/user/list$':						                 '_rest_account_user_list',
+            '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		         '_rest_account_user_list',
+            '^/account/user/add/.*$':						                 '_rest_account_user_add',
+            '^/account/user/update/.*$':				                         '_rest_account_user_update',
+            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
+            '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
+            '^/account/person/list$':						                 '_rest_account_person_list',
+            '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
+            '^/account/person/add/.*$':					                         '_rest_account_person_add',
+            '^/account/person/update/.*$':					                 '_rest_account_person_update',
+            '^/account/person/password/.*$':				                         '_rest_account_person_password',
+            '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
+        },
+        # /base
+        'base': {
+            # /base/device
+            '^/base/device/list$':			                                         '_rest_base_device_list',
+            '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
+            '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
+            '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
+            # /base/device_technology
+            '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
+            '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
+            '^/base/device_technology/add/.*$':		 	                                 '_rest_base_device_technology_add',
+            '^/base/device_technology/update/.*$':		                                 '_rest_base_device_technology_update',
+            '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
+            # /base/device_type
+            '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
+            '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
+            '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
+            '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
+            # /base/device_usage
+            '^/base/device_usage/list$':			                                 '_rest_base_device_usage_list',
+            '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
+            '^/base/device_usage/add/.*$':		 	                                 '_rest_base_device_usage_add',
+            '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
+            '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
+            # /base/feature
+            '^/base/feature/list$':			                                         '_rest_base_feature_list',
+            '^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_base_feature_list',
+            '^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			 '_rest_base_feature_list',
+            # /base/feature_association
+            '^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
+            '^/base/feature_association/by-house$':			                         '_rest_base_feature_association_list_by_house',
+            '^/base/feature_association/by-area/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_area',
+            '^/base/feature_association/by-room/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_room',
+            '^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
+            # /base/page
+            '^/base/page/list$':                                                                 '_rest_base_page_tree',
+            '^/base/page/add/.*$':                                                               '_rest_base_page_add',
+            '^/base/page/update/.*$':                                                            '_rest_base_page_update',
+            '^/base/page/del/(?P<page_id>[0-9]+)$':                                              '_rest_base_page_del',
+            '^/base/page/tree/(?P<page_id>[0-9]+)$':                                             '_rest_base_page_tree',
+            '^/base/page/path/(?P<page_id>[0-9]+)$':                                             '_rest_base_page_path',
+            '^/base/page/view/(?P<page_id>[0-9]+)$':                                             '_rest_base_page_view',
+            # /base/ui-config
+            '^/base/ui-config/list$':                                                            '_rest_base_ui_item_config_list',
+            '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':              '_rest_base_ui_item_config_list',
+            '^/base/ui-config/list/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':  '_rest_base_ui_item_config_list',
+            '^/base/ui-config/list/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_list',
+            '^/base/ui-config/set/.*$':                                                          '_rest_base_ui_item_config_set',
+            '^/base/ui-config/del/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':               '_rest_base_ui_item_config_del',
+            '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':   '_rest_base_ui_item_config_del',
+            '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
+        },
+        # /command
+        'command': {
+	    '^/command.*$':                                                                      'rest_command',
+        },
+        # /event
+        'events': {
+            '^/events/domogik/new$':						                 '_rest_events_domogik_new',
+            '^/events/domogik/get/(?P<ticketid>[0-9]+)$':					 '_rest_events_domogik_get',
+            '^/events/domogik/free/(?P<ticket_id>[0-9]+)$':			                 '_rest_events_domogik_free',
+            #'^/events/request/new/.*$':					                 'needs a new function',
+            '^/events/request/get/(?P<ticket_id>[0-9]+)$':				         '_rest_events_request_get',
+            '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                 '_rest_events_request_free',
+        },
+        # /helper
+        'helper': {
+            '^/helper/.*$':			                                                 'rest_helper',
+        },
+        # /host
+        'host': {
+            '^/host/.*$':			                                                 'rest_host',
+        },
+        # /log
+        'log': {
+            # TODO
+        },
+        # /package
+        'package': {
+            '^/package/get-mode$':								 '_rest_package_get_mode',
+            '^/package/list-repo$':							         '_rest_package_list_repo',
+            '^/package/update-cahce$':								 '_rest_package_update_cache',
+            # TODO
+        },
+        # /plugin
+        'plugin': {
+            '^/plugin/list$':                                                                        '_rest_plugin_list',
+            '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
+            '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
+            '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
+            '^/plugin/(?P<command>enable|disable)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':             '_rest_plugin_enable_disable',
+            '^/plugin/(?P<command>start|stop)/(?P<host>[a-z]+)/(?P<plugin>[a-z]+)$':                 '_rest_plugin_start_stop',
+            '^/plugin/config/list/by-name/(?P<hostname>[a-z]+)/(?P<id>[a-z]+)$':                         '_rest_plugin_config_list',
+            '^/plugin/config/list/by-name/(?P<hostname>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$': '_rest_plugin_config_list',
+            '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                             '_rest_plugin_config_del',
+            '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
+	    '^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
+        },
+	# /queuecontent
+        # TODO
+        # /repo
+        'repo': {
+            '^/repo/put$':                                                                           '_rest_repo_put',
+            '^/repo/get/(?P<file_name>[a-z0-9]+)$':                                                  '_rest_repo_get',
+        },
+        # /scenario
+        # TODO
+        # /stats
+        # TODO
+   }
+
 
 ######
 # init namespace
@@ -271,43 +398,61 @@ class ProcessRequest():
         """ Process request
             This function call appropriate functions for processing path
         """
-        if self.rest_type == "robots.txt":
-            self.rest_robots_txt()
-        elif self.rest_type == "command":
-            self.rest_command()
-        elif self.rest_type == "stats":
-            self.rest_stats()
-        elif self.rest_type == "events":
-            self.rest_events()
-        # commented for security reasons
-        #elif self.rest_type == "xpl-cmnd":
-        #    self.rest_xpl_cmnd()
-        elif self.rest_type == "base":
-            self.rest_base()
-        elif self.rest_type == "plugin":
-            self.rest_plugin()
-        elif self.rest_type == "account":
-            self.rest_account()
-        elif self.rest_type == "queuecontent":
-            self.rest_queuecontent()
-        elif self.rest_type == "helper":
-            self.rest_helper()
-        elif self.rest_type == "testlongpoll":
-            self.rest_testlongpoll()
-        elif self.rest_type == "repo":
-            self.rest_repo()
-        elif self.rest_type == "scenario":
-            self.rest_scenario()
-        elif self.rest_type == "package":
-            self.rest_package()
-        elif self.rest_type == "log":
-            self.rest_log()
-        elif self.rest_type == "host":
-            self.rest_host()
-        elif self.rest_type == None:
-            self.rest_status()
+        found = 0
+        if self.rest_type == None:
+           self.rest_status()
+           found = 1 
         else:
-            self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
+            self.parameters = {}
+            self.set_parameters(0)
+            if self.rest_type in self.urls:
+                for k in self.urls[self.rest_type]:
+                    m = re.match(k, self.path)
+                    if m:
+                        found = 1
+                        if len( m.groupdict() ) == 0:
+                            eval('self.' + self.urls[self.rest_type][k] + '()')
+                        else:
+                            eval('self.'  + self.urls[self.rest_type][k] + '(' + ', '.join([v+"='"+k2+"'" for (v,k2) in m.groupdict().iteritems()]) + ')')
+                        break
+        if found == 0:
+	    self.log.warning("New url parser does not know url %s" % self.path) 
+	    print("New url parser does not know url %s" % self.path) 
+            if self.rest_type == "command":
+                self.rest_command()
+            elif self.rest_type == "stats":
+                self.rest_stats()
+            elif self.rest_type == "events":
+                self.rest_events()
+            # commented for security reasons
+            #elif self.rest_type == "xpl-cmnd":
+            #    self.rest_xpl_cmnd()
+            elif self.rest_type == "base":
+                self.rest_base()
+            elif self.rest_type == "plugin":
+                self.rest_plugin()
+            elif self.rest_type == "account":
+                self.rest_account()
+            elif self.rest_type == "queuecontent":
+                self.rest_queuecontent()
+            elif self.rest_type == "helper":
+                self.rest_helper()
+            elif self.rest_type == "testlongpoll":
+                self.rest_testlongpoll()
+            elif self.rest_type == "repo":
+                self.rest_repo()
+            elif self.rest_type == "scenario":
+                self.rest_scenario()
+            elif self.rest_type == "package":
+                self.rest_package()
+            elif self.rest_type == "log":
+                self.rest_log()
+            elif self.rest_type == "host":
+                self.rest_host()
+            elif self.rest_type == None:
+                self.rest_status()
+            else:
+                self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
                                           "] is not supported", \
                                           self.jsonp, self.jsonp_cb)
 
@@ -1181,106 +1326,64 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        ### area #####################################
-        if self.rest_request[0] == "area":
-
+        if self.rest_request[0] == "page":
             ### list
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
-                    self._rest_base_area_list()
+                    self._rest_base_page_tree(0)
                 elif len(self.rest_request) == 3:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_area_list(area_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-
-            ### add
+             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_area_add()
+                    self._rest_base_page_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", \
                                                   self.jsonp, self.jsonp_cb)
-
             ### update
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_area_update()
+                    self._rest_base_page_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", \
                                                   self.jsonp, self.jsonp_cb)
-
-            ### del
+	    ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
-                    self._rest_base_area_del(area_id=self.rest_request[2])
+                    self._rest_base_page_del(page_id=self.rest_request[2])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-
+            elif self.rest_request[1] == "tree":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_tree(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "path":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_path(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "view":
+                if len(self.rest_request) == 3:
+                    self._rest_base_page_view(page_id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
             ### others
             else:
                 self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
                                                   self.jsonp, self.jsonp_cb)
                 return
-
-        ### room #####################################
-        elif self.rest_request[0] == "room":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_room_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_room_list(room_id=self.rest_request[3])
-                    elif self.rest_request[2] == "by-area":
-                        self._rest_base_room_list(area_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_room_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_room_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_room_del(room_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
+             
         ### ui_config ################################
         elif self.rest_request[0] == "ui_config":
 
@@ -1412,30 +1515,6 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_area_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_area_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_area_del(area_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
             ### others
             else:
                 self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
@@ -1559,79 +1638,6 @@ target=*
                 return
 
 
-        ### feature_association ######################
-        elif self.rest_request[0] == "feature_association":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_feature_association_list()
-                elif len(self.rest_request) == 3:
-                    if self.rest_request[2] == "by-house":
-                        self._rest_base_feature_association_list_by_house()
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 4:
-                    if self.rest_request[2] == "by-area":
-                        self._rest_base_feature_association_list_by_area(self.rest_request[3])
-                    elif self.rest_request[2] == "by-room":
-                        self._rest_base_feature_association_list_by_room(self.rest_request[3])
-                    elif self.rest_request[2] == "by-feature":
-                        self._rest_base_feature_association_list_by_feature(self.rest_request[3])
-                    #elif self.rest_request[2] == "by-device":
-                    #    self._rest_base_feature_association_list_by_device(self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-
-            ### listdeep
-            elif self.rest_request[1] == "listdeep":
-                if len(self.rest_request) == 3:
-                    if self.rest_request[2] == "by-house":
-                        self._rest_base_feature_association_listdeep_by_house()
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 4:
-                    if self.rest_request[2] == "by-area":
-                        self._rest_base_feature_association_listdeep_by_area(self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_feature_association_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 4 and self.rest_request[2] == "id":
-                    self._rest_base_feature_association_del(id=self.rest_request[3])
-                elif len(self.rest_request) == 4 and self.rest_request[2] == "feature_id":
-                    self._rest_base_feature_association_del(feature_id=self.rest_request[3])
-                elif len(self.rest_request) == 6 and self.rest_request[2] == "association_type" and self.rest_request[4] == "association_id":
-                    self._rest_base_feature_association_del(association_type=self.rest_request[3], 
-                                                            association_id=self.rest_request[5])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
-
         ### others ###################################
         else:
             self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
@@ -1723,162 +1729,103 @@ target=*
         return my_date
 
 
-
-
 ######
-# /base/area processing
+# /base/page processing
 ######
-
-    def _rest_base_area_list(self, area_id = None):
-        """ list areas
-            @param area_id : id of area
+    def _rest_base_page_list(self, page_id = None):
+        """ list pages
+            @param page_id : id of the page to get, if empty list all pages
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        if area_id == None:
-            for area in self._db.list_areas():
-                json_data.add_data(area)
-        else:
-            area = self._db.get_area_by_id(area_id)
-            if area is not None:
-                json_data.add_data(area)
+        json_data.set_data_type("page")
+        for p in self._db.list_pages():
+	    json_data.add_data(p)
         self.send_http_response_ok(json_data.get())
 
-
-
-
-    def _rest_base_area_add(self):
-        """ add areas
+    def _rest_base_page_del(self, page_id=None):
+        """ delete a page
+            @param page_id : id of page
+            tree handling is done in the dbhelper
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
+        json_data.set_data_type("page")
         try:
-            area = self._db.add_area(self.get_parameters("name"), self.get_parameters("description"))
-            json_data.add_data(area)
+            p = self._db.del_page(page_id)
+            json_data.add_data(p)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
-
-
-
-    def _rest_base_area_update(self):
-        """ update areas
+    def _rest_base_page_add(self):
+        """ add a new page
+            tree handling is done in the dbhelper
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
+        json_data.set_data_type("page")
         try:
-            area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), \
-                                        self.get_parameters("description"))
-            json_data.add_data(area)
-        except:
-            # TODO make a function to get arranged trace and use it everywhere :)
-            json_data.set_error(code = 999, description = str(traceback.format_exc()).replace('"', "'").replace('\n', '      '))
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_area_del(self, area_id=None):
-        """ delete areas
-            @param area_id : id of area
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        try:
-            area = self._db.del_area(area_id)
-            json_data.add_data(area)
+            p = self._db.add_page(self.get_parameters("name"), self.get_parameters("parent"), self.get_parameters("description"), \
+                   self.get_parameters("icon") )
+            json_data.add_data(p)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
-
-
-######
-# /base/room processing
-######
-
-    def _rest_base_room_list(self, room_id = None, area_id = None):
-        """ list rooms
-            @param room_id : id of room
-            @param area_id : id of area
+    def _rest_base_page_update(self):
+        """ update a page
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
+        json_data.set_data_type("page")
         try:
-            if room_id == None and area_id == None:
-                for room in self._db.list_rooms():
-                    json_data.add_data(room)
-            elif room_id != None:
-                room = self._db.get_room_by_id(room_id)
-                if room is not None:
-                    json_data.add_data(room)
-            elif area_id != None:
-                if area_id == "":
-                    area_id = None
-                for room in self._db.get_all_rooms_of_area(area_id):
-                    json_data.add_data(room)
-            self.send_http_response_ok(json_data.get())
+            page = self._db.update_page(id=self.get_parameters("id"), name=self.get_parameters("name"), \
+                                        descr=self.get_parameters("description"), icon=self.get_parameters("icon"), \
+                                        parent=self.get_parameters("parent") )
+            json_data.add_data(page)
         except:
-            self.log.error("Exception : %s" % traceback.format_exc())
-
-
-    def _rest_base_room_add(self):
-        """ add rooms
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+    
+    def _rest_base_page_path(self, page_id=None):
+        """ find the path to a page
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
+        json_data.set_data_type("page")
         try:
-            room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), \
-                                     self.get_parameters("description"))
-            json_data.add_data(room)
+            for p in self._db.path_page(page_id):
+	        json_data.add_data(p)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
-
-
-    def _rest_base_room_update(self):
-        """ update rooms
+    def _rest_base_page_view(self, page_id=None):
+        """ find the path to a page
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
+        json_data.set_data_type("page")
         try:
-            if self.get_parameters("area_id") == "None":
-                area_id = None
-            else:
-                area_id = self.get_parameters("area_id")
-
-            room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), \
-                                        area_id, self.get_parameters("description"))
-            json_data.add_data(room)
+            page = self._db.view_page(page_id)
+	    json_data.add_data(page)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
-
-
-    def _rest_base_room_del(self, room_id=None):
-        """ delete rooms
-            @param room_id : room id
+    def _rest_base_page_tree(self, page_id=0):
+        """ find the path to a page
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
+        json_data.set_data_type("page")
         try:
-            room = self._db.del_room(room_id)
-            json_data.add_data(room)
+            for p in self._db.tree_page(page_id):
+	        json_data.add_data(p)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
-
 
 ######
 # /base/ui_config processing
@@ -2084,11 +2031,11 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_type")
         try:
-            area = self._db.update_device_type(self.get_parameters("id"), \
+            b = self._db.update_device_type(self.get_parameters("id"), \
                                                self.get_parameters("name"), \
                                                self.get_parameters("technology_id"), \
                                                self.get_parameters("description"))
-            json_data.add_data(area)
+            json_data.add_data(b)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -2283,175 +2230,6 @@ target=*
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
-
-
-
-
-
-######
-# /base/feature_association processing
-######
-
-    def _rest_base_feature_association_list(self):
-        """ list feature association
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations():
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_house(self):
-        """ list feature association by house
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_house():
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_area(self, id):
-        """ list feature association by area
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_area_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_room(self, id):
-        """ list feature association by room
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_room_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_list_by_feature(self, id):
-        """ list feature association by feature
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_associations_by_feature_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    #def _rest_base_feature_association_list_by_device(self, id):
-    #    """ list feature association by device
-    #        @param id : id of element
-    #    """
-    #    json_data = JSonHelper("OK")
-    #    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-    #    json_data.set_data_type("feature_association")
-    #    for ass in self._db.list_device_feature_associations_by_device_id(id):
-    #        json_data.add_data(ass)
-    #    self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_feature_association_listdeep_by_house(self):
-        """ list feature association by house andthings under house
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_deep_device_feature_associations_by_house():
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_feature_association_listdeep_by_area(self, id):
-        """ list feature association by area
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_deep_device_feature_associations_by_area_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-
-
-
-    def _rest_base_feature_association_add(self):
-        """ add feature_association
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        try:
-            ass = self._db.add_device_feature_association( self.get_parameters("feature_id"), \
-                                                               self.get_parameters("association_type"), \
-                                                               self.get_parameters("association_id"))
-            json_data.add_data(ass)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_feature_association_del(self, id = None, 
-                                          feature_id = None,
-                                          association_type = None,
-                                          association_id = None):
-        """ delete feature association
-            @param id : association id
-            @param feature_id : feature id
-            @param association_type : house, area, room...
-            @param association_id : area id, room id, etc
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        if id != None:
-            try:
-                fa = self._db.del_device_feature_association(id)
-                json_data.add_data(fa)
-            except:
-                json_data.set_error(code = 999, description = self.get_exception())
-        elif feature_id != None:
-            try:
-                for fa in self._db.del_device_feature_association_by_device_feature_id(feature_id):
-                    json_data.add_data(fa)
-            except:
-                json_data.set_error(code = 999, description = self.get_exception())
-        elif association_type != None:
-            try:
-                for fa in self._db.del_device_feature_association_by_place(association_id, association_type):
-                    json_data.add_data(fa)
-            except:
-                json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
 
 ######
 # /plugin processing
@@ -4253,19 +4031,19 @@ target=*
                         if message.data.has_key("dep%s-version" % idx):
                             version = message.data["dep%s-version" % idx]
                         else:
-                            version = "";
+                            version = ""
                         if message.data.has_key("dep%s-cmd-line" % idx):
                             cmd_line = message.data["dep%s-cmd-line" % idx]
                         else:
-                            cmd_line = "";
+                            cmd_line = ""
                         if message.data.has_key("dep%s-candidate" % idx):
                             candidate = message.data["dep%s-candidate" % idx]
                         else:
-                            candidate = "";
+                            candidate = ""
                         if message.data.has_key("dep%s-error" % idx):
                             error = message.data["dep%s-error" % idx]
                         else:
-                            error = "";
+                            error = ""
         
                         data = {
                                    "type" : "python",
@@ -4330,10 +4108,10 @@ target=*
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
-           self.log.debug("Package install : no answer")
-           self.send_http_response_error(999, "No data or timeout on installing package",
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
                                           self.jsonp, self.jsonp_cb)
-           return
+            return
         
         self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
         
@@ -4459,10 +4237,10 @@ target=*
                                                          "host" : self.get_sanitized_hostname()},
                                            timeout = WAIT_FOR_PACKAGE_INSTALLATION)
         except Empty:
-           self.log.debug("Package install : no answer")
-           self.send_http_response_error(999, "No data or timeout on installing package",
+            self.log.debug("Package install : no answer")
+            self.send_http_response_error(999, "No data or timeout on installing package",
                                           self.jsonp, self.jsonp_cb)
-           return
+            return
         
         self.log.debug("Package install : message received for '%s' part : %s" % (PKG_PART_RINOR, str(message)))
         

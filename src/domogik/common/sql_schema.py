@@ -86,66 +86,39 @@ _db_prefix = dict(_config[1])['db_prefix']
 
 # Define objects
 
-class Area(Base):
-    """Area : it is something like "first floor", "garden", etc ..."""
+class Page(Base):
+    """Page: is something to display widgets in the ui"""
 
-    __tablename__ = '%s_area' % _db_prefix
+    __tablename__ = '%s_ui_page' % _db_prefix
     id = Column(Integer, primary_key=True)
+    left = Column(Integer, primary_key=True)
+    right = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    description = Column(UnicodeText())
-    rooms = relation('Room', backref=__tablename__)
+    description = Column(UnicodeText(), nullable=True)
+    icon = Column(Unicode(30), nullable=True)
 
-    def __init__(self, name, description=None):
+    def __init__(self, name, left=0, right=0, description=None, icon=None):
         """Class constructor
-
+        @param left : left value
+        @param right : right value
         @param name : short name of the area
         @param description : extended description, optional
-
+        @param icon : the icon to display
         """
+        self.left = left
+        self.right = right
         self.name = ucode(name)
         self.description = ucode(description)
+        self.icon = ucode(icon)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Area(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<Page(id=%s, left=%s, right=%s, name='%s', desc='%s', icon='%s')>" % (self.id, self.left, self.right, self.name, self.description, self.icon)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return Area.__tablename__
-
-
-class Room(Base):
-    """Room"""
-
-    __tablename__ = '%s_room' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode(30), nullable=False)
-    description = Column(UnicodeText())
-    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
-    area = relation(Area)
-
-    def __init__(self, name, description=None, area_id=None):
-        """Class constructor
-
-        @param name : short name of the area
-        @param description : extended description, optional
-        @param area_id : id of the area where the room is, optional
-
-        """
-        self.name = ucode(name)
-        self.description = ucode(description)
-        self.area_id = area_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Room(id=%s, name='%s', desc='%s', area=%s)>" % (self.id, self.name, self.description, self.area)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return Room.__tablename__
-
+        return Page.__tablename__
 
 class DeviceUsage(Base):
     """Usage of a device (temperature, heating, lighting, music...)"""
@@ -394,7 +367,6 @@ class DeviceFeature(Base):
     device = relation(Device, backref=backref(__tablename__))
     device_feature_model_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
     device_feature_model = relation(DeviceFeatureModel)
-    device_feature_associations = relation("DeviceFeatureAssociation", backref=__tablename__, cascade="all, delete")
 
     UniqueConstraint(device_id, device_feature_model_id)
 
@@ -416,46 +388,6 @@ class DeviceFeature(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return DeviceFeature.__tablename__
-
-
-class DeviceFeatureAssociation(Base):
-    """Association between devices, features and an item (room, area, house)"""
-
-    __tablename__ = '%s_device_feature_association' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()))
-    device_feature = relation(DeviceFeature)
-    place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
-    place_id = Column(Integer, nullable=True)
-
-    def __init__(self, device_feature_id, place_type=None, place_id=None):
-        """Class constructor
-
-        @param device_feature_id : device feature id
-        @param place_type : room, area or house, optional (None if the feature is not associated to one of the places)
-        @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
-
-        """
-        device_feat_ass_list = [None, 'room', 'area', 'house']
-        if place_type not in device_feat_ass_list:
-            raise DbHelperException("Place type should be one of : %s" % device_feat_ass_list)
-        if place_type is None and place_id is not None:
-            raise DbHelperException("Place id should be None as item type is None")
-        if (place_type == 'room' or place_type == 'area') and place_id is None:
-            raise DbHelperException("A place id should have been provided, place type is %s" % place_type)
-        self.device_feature_id = device_feature_id
-        self.place_type = place_type
-        self.place_id = place_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>"\
-               % (self.id, self.device_feature, self.place_type, self.place_id)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceFeatureAssociation.__tablename__
 
 
 class DeviceConfig(Base):

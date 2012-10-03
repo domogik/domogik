@@ -165,6 +165,8 @@ def add_initial_data():
                          du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Closed&quot;, &quot;state1&quot;:&quot;Open&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
     _db.add_device_usage(du_id='security_camera', du_name='Security camera', du_description='Security camera',
                          du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
+    _db.add_page(name='ROOT', parentId=None, descr='', icon='')
+
     # Set sqlalchemy migrate version to the latest one
     rep_v = get_repository_version()
     meta = MetaData(bind=_engine)

@@ -75,7 +75,7 @@ import calendar
 import tempfile
 from threading import Semaphore
 
-REST_API_VERSION = "0.5"
+REST_API_VERSION = "0.6"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
 ### parameters that can be overidden by Domogik config file

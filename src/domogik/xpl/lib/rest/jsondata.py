@@ -102,11 +102,9 @@ class JSonHelper():
         # issue to force data not to be in cache
         # TODO : update when all tables will be defined!!!
         table_list = ["device_feature",  \
-                     "area",  \
                      "device",  \
                      "device_usage",  \
                      "device_config",  \
-                     "device_feature_association",  \
                      "device_stats",  \
                      "device_stats_value",  \
                      "device_technology",  \
@@ -115,7 +113,6 @@ class JSonHelper():
                      "device_type",  \
                      "device_feature_model",  \
                      "uiitemconfig",  \
-                     "room",  \
                      "useraccount",  \
                      "sensor_reference_data",  \
                      "person",  \
@@ -160,7 +157,7 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel", "Page") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")

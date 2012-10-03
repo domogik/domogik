@@ -51,10 +51,10 @@ from domogik.common.utils import ucode
 from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature, DeviceFeatureModel,
-        DeviceUsage, DeviceFeatureAssociation, DeviceConfig, DeviceStats,
-        DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Room, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, SystemInfo, Trigger
+        ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
+        DeviceUsage, DeviceConfig, DeviceStats,
+        DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
+        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, SystemInfo, Trigger, Page
 )
 
 
@@ -178,265 +178,120 @@ class DbHelper():
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()
-
 ####
-# Areas
+# Pages
 ####
-    def list_areas(self):
-        """Return all areas
+    def add_page(self, name, parentId, descr=None, icon=None):
+        """Add a page
 
-        @return a list of Area objects
-
-        """
-        ret = self.__session.query(Area).all()
-        return ret
-
-    def search_areas(self, filters):
-        """Look for area(s) with filter on their attributes
-
-        @param filters :  filter fields can be one of
-        @return a list of Area objects
-
-        """
-        if type(filters) is not DictType:
-            self.__raise_dbhelper_exception("Wrong type of 'filters', Should be a dictionnary")
-        area_list = self.__session.query(Area)
-        for f in filters:
-            filter_arg = "%s = '%s'" % (f, ucode(filters[f]))
-            area_list = area_list.filter(filter_arg)
-        return area_list.all()
-
-    def get_area_by_id(self, area_id):
-        """Fetch area information
-
-        @param area_id : The area id
-        @return an area object
-
-        """
-        return self.__session.query(Area).filter_by(id=area_id).first()
-
-
-    def get_area_by_name(self, area_name):
-        """Fetch area information
-
-        @param area_name : The area name
-        @return an area object
-
-        """
-        return self.__session.query(Area).filter(func.lower(Area.name)==ucode(area_name.lower())).first()
-
-    def add_area(self, a_name, a_description=None):
-        """Add an area
-
-        @param a_name : area name
-        @param a_description : area detailed description (optional)
-        @return an Area object
+        @param name : page name
+        @param parentId : the parent page id (to define the new lft/right values
+        @param desc : page description
+        @param icon : page icon
+        @return a Page object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        area = Area(name=a_name, description=a_description)
-        self.__session.add(area)
+        p = Page(name=name, description=descr, icon=icon)
+        if parentId != None:
+            parent = self.__session.query(Page).filter_by(id=parentId).first()
+	    p.left = int(parent.left) + 1
+            p.right = int(parent.left) + 2
+	    self.__session.query(Page).filter(Page.right > parent.left).update({Page.right: Page.right + 2})
+	    self.__session.query(Page).filter(Page.left > parent.left).update({Page.left: Page.left + 2})
+        else:
+            p.left = 1
+            p.right = 2
+        self.__session.add(p)
         try:
             self.__session.commit()
-        except Exception as sql_exception:
+        except Exception, sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return area
+        return p
+    
+    def update_page(self, id, name=None, parent=0, descr=None, icon=None):
+        """Update an page
 
-    def update_area(self, a_id, a_name=None, a_description=None):
-        """Update an area
-
-        @param a_id : area id to be updated
-        @param a_name : area name (optional)
-        @param a_description : area detailed description (optional)
-        @return an Area object
+        @param id : page id to be updated
+        @param name : page name (optional)
+        @param parent : page parent (optional)
+        @param descr : page detailed description (optional)
+        @param parent : page icon (optional)
+        @return an Page object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        area = self.__session.query(Area).filter_by(id=a_id).first()
-        if area is None:
-            self.__raise_dbhelper_exception("Area with id %s couldn't be found" % a_id)
-        if a_name is not None:
-            area.name = ucode(a_name)
-        if a_description is not None:
-            if a_description == '': a_description = None
-            area.description = ucode(a_description)
-        self.__session.add(area)
+        p = self.__session.query(Page).filter_by(id=id).first()
+        if p is None:
+            self.__raise_dbhelper_exception("Page with id %s couldn't be found" % id)
+        if name is not None:
+            p.name = ucode(name)
+        if icon is not None:
+            p.icon = ucode(icon)
+        if descr is not None:
+            if descr == '': description = None
+            p.description = ucode(descr)
+        self.__session.add(p)
+        #if parent != 0:
+            # TODO UPDATE lft and rgt
         try:
             self.__session.commit()
-        except Exception as sql_exception:
+        except Exception, sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return area
+        return p
 
-    def del_area(self, area_del_id, cascade_delete=False):
-        """Delete an area record
+    def del_page(self, pid):
+        """Delete a page record
 
-        @param area_id : id of the area to delete
-        @param cascade_delete : True if we wish to delete associated items
-        @return the deleted Area object
+        @param pid : id of the page to delete
+        @return the deleted Page object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        area = self.__session.query(Area).filter_by(id=area_del_id).first()
-        if area:
-            for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
-                if cascade_delete:
-                    self.del_room(room.id)
+        print pid
+        if pid == '1':
+            self.__raise_dbhelper_exception("Can not delete the root page", True)
+        else:
+            p = self.__session.query(Page).filter_by(id=pid).first()
+            if p:
+            # chek if there are no children
+                if p.left + 1 != p.right:
+                    self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
                 else:
-                    # Just unlink the room from the area
-                    room.area_id = None
-                    self.__session.add(room)
-            dfa_list = self.__session.query(
-                                DeviceFeatureAssociation
-                            ).filter_by(place_id=area.id, place_type=u'area'
-                            ).all()
-            for dfa in dfa_list:
-                self.__session.delete(dfa)
-            self.__session.delete(area)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return area
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete area with id %s : it doesn't exist" % area_del_id)
-
-####
-# Rooms
-####
-    def list_rooms(self):
-        """Return a list of rooms
-
-        @return list of Room objects
-
-        """
-        return self.__session.query(Room).all()
-
-    def search_rooms(self, filters):
-        """Look for room(s) with filter on their attributes
-
-        @param filters :  filter fields (dictionnary)
-        @return a list of Room objects
-
-        """
-        if type(filters) is not DictType:
-            self.__raise_dbhelper_exception("Wrong type of 'filters', Should be a dictionnary")
-        room_list = self.__session.query(Room)
-        for f in filters:
-            filter_arg = "%s = '%s'" % (f, ucode(filters[f]))
-            room_list = room_list.filter(filter_arg)
-        return room_list.all()
-
-    def get_room_by_name(self, r_name):
-        """Return information about a room
-
-        @param r_name : The room name
-        @return a room object
-
-        """
-        return self.__session.query(Room).filter(func.lower(Room.name)==ucode(r_name.lower())).first()
-
-    def get_room_by_id(self, r_id):
-        """Return information about a room
-
-        @param r_id : The room id
-        @return a room object
-
-        """
-        return self.__session.query(Room).filter_by(id=r_id).first()
-
-    def add_room(self, r_name, r_area_id=None, r_description=None):
-        """Add a room
-
-        @param r_name : room name
-        @param area_id : id of the area where the room is, optional
-        @param r_description : room detailed description, optional
-        @return : a room object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        if r_area_id != None:
-            if not self.__session.query(Area).filter_by(id=r_area_id).first():
-                self.__raise_dbhelper_exception("Couldn't add room with area id %s. It does not exist" % r_area_id)
-        room = Room(r_name, description=r_description, area_id=r_area_id)
-        self.__session.add(room)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return room
-
-    def update_room(self, r_id, r_name=None, r_area_id=None, r_description=None):
-        """Update a room
-
-        @param r_id : room id to be updated
-        @param r_name : room name (optional)
-        @param r_description : room detailed description (optional)
-        @param r_area_id : id of the area the room belongs to (optional)
-        @return a Room object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        room = self.__session.query(Room).filter_by(id=r_id).first()
-        if room is None:
-            self.__raise_dbhelper_exception("Room with id %s couldn't be found" % r_id)
-        if r_name is not None:
-            room.name = ucode(r_name)
-        if r_description is not None:
-            if r_description == '': r_description = None
-            room.description = ucode(r_description)
-        if r_area_id is not None:
-            if r_area_id != '':
-                if not self.__session.query(Area).filter_by(id=r_area_id).first():
-                    self.__raise_dbhelper_exception("Couldn't find area id %s. It does not exist" % r_area_id)
+                    dl = p.right - p.left + 1
+		    self.__session.query(Page).filter(Page.right > p.right).update({Page.right: Page.right - dl})
+		    self.__session.query(Page).filter(Page.left > p.right).update({Page.left: Page.left - dl})
+                    self.__session.delete(p)
+                    try:
+                        self.__session.commit()
+                    except Exception, sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                    return p
             else:
-                r_area_id = None
-            room.area_id = r_area_id
-        self.__session.add(room)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return room
+                self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % pid)
 
-    def del_room(self, r_id):
-        """ Delete a room with a given id
-
-        @param r_id : room id
-        @return the deleted room object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
+    def view_page(self, id):
         self.__session.expire_all()
-        room = self.__session.query(Room).filter_by(id=r_id).first()
-        if room:
-            dfa_list = self.__session.query(
-                                DeviceFeatureAssociation
-                            ).filter_by(place_id=room.id, place_type=u'room'
-                            ).all()
-            for dfa in dfa_list:
-                self.__session.delete(dfa)
-            self.__session.delete(room)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return room
+        p = self.__session.query(Page).filter_by(id=id).first()
+        return p 
+
+    def tree_page(self, id):
+        self.__session.expire_all()
+        if id==0:
+            ret = self.__session.query(Page).order_by(sqlalchemy.asc(Page.left)).all()
         else:
-            self.__raise_dbhelper_exception("Couldn't delete room with id %s : it doesn't exist" % r_id)
+            p = self.__session.query(Page).filter_by(id=id).first()
+            ret = self.__session.query(Page).filter(Page.left >= p.left).filter(Page.left <= p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        return ret 
 
-    def get_all_rooms_of_area(self, a_area_id):
-        """Return all the rooms of an area
-
-        @param a_area_id : the area id
-        @return a list of Room objects
-
-        """
-        return self.__session.query(Room).filter_by(area_id=a_area_id).all()
+    def path_page(self, id):
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        ret = self.__session.query(Page).filter(Page.left <= p.left).filter(Page.right >= p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        return ret 
 
 ####
 # Device usage
@@ -1026,205 +881,6 @@ class DbHelper():
                     ).all()
 
 ####
-# Device feature association
-####
-    def list_device_feature_associations(self):
-        """List all records for the device / feature association
-
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        return self.__session.query(DeviceFeatureAssociation).all()
-
-    def list_device_feature_associations_by_house(self):
-        """List device / feature association for the house
-
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureAssociation
-                    ).filter_by(place_type=u'house'
-                    ).all()
-
-    def list_deep_device_feature_associations_by_house(self):
-        """List device / feature association for the house : house, areas and non-affected rooms
-
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        # Get all non-affected rooms which are part of a device feature association
-        dfa_list = self.__session.query(
-                    DeviceFeatureAssociation
-                  ).filter(Room.id == DeviceFeatureAssociation.place_id
-                  ).filter(DeviceFeatureAssociation.place_type == u'room'
-                  ).filter(Room.area_id == None
-                  ).all()
-        # Get all areas which are part of a device feature association
-        dfa_list.extend(self.__session.query(
-                            DeviceFeatureAssociation
-                        ).filter_by(place_type=u'area'
-                        ).all())
-        dfa_list.extend(self.list_device_feature_associations_by_house())
-        return dfa_list
-
-    def list_device_feature_associations_by_room_id(self, room_id):
-        """List device / feature association for a room
-
-        @param room_id : room id
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureAssociation
-                    ).filter_by(place_id=room_id, place_type=u'room'
-                    ).all()
-
-    def list_device_feature_associations_by_area_id(self, area_id):
-        """List device / feature association for an area
-
-        @param area_id : area id
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureAssociation
-                    ).filter_by(place_id=area_id, place_type=u'area'
-                    ).all()
-
-    def list_deep_device_feature_associations_by_area_id(self, area_id):
-        """List device / feature association for an area and its associated rooms
-
-        @param area_id : area id
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        dfa_list = self.list_device_feature_associations_by_area_id(area_id)
-        room_list = self.__session.query(Room).filter_by(area_id=area_id).all()
-        for room in room_list:
-            dfa_list.extend(self.list_device_feature_associations_by_room_id(room.id))
-        return dfa_list
-
-    def list_device_feature_associations_by_feature_id(self, dfa_device_feature_id):
-        """List device / feature association for a device feature id
-
-        @param dfa_device_feature_id : device feature id
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureAssociation
-                    ).filter_by(device_feature_id=dfa_device_feature_id
-                    ).all()
-
-    def get_device_feature_association_by_id(self, dfa_id):
-        """Get a device feature association
-
-        @param dfa_id : device feature association id
-        @return a DeviceFeatureAssociation object
-
-        """
-        return self.__session.query(
-                        DeviceFeatureAssociation
-                    ).filter_by(id=dfa_id
-                    ).first()
-
-    def add_device_feature_association(self, d_feature_id, d_place_type=None, d_place_id=None):
-        """Add a device feature association
-
-        @param d_feature_id : device feature id
-        @param d_place_id : room id, area id or None for the house the device is associated to
-        @param d_place_type : room, area or house (None means the device is not associated)
-        @return the DeviceFeatureAssociation object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        device_feature = self.__session.query(DeviceFeature).filter_by(id=d_feature_id).first()
-        if not device_feature:
-            self.__raise_dbhelper_exception("DeviceFeature id %s doesn't exist" % d_feature_id)
-        if d_place_id is not None and d_place_type != 'house':
-            if d_place_type == 'room':
-                if not self.__session.query(Room).filter_by(id=d_place_id).first():
-                    self.__raise_dbhelper_exception("Room id %s It does not exist" % d_place_id)
-            else: # it is an area
-                if not self.__session.query(Area).filter_by(id=d_place_id).first():
-                    self.__raise_dbhelper_exception("Couldn't add device with area id %s It does not exist" % d_place_id)
-
-        device_feature_asso = DeviceFeatureAssociation(device_feature_id=d_feature_id, place_type=d_place_type,
-                                                       place_id=d_place_id)
-        self.__session.add(device_feature_asso)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_feature_asso
-
-    def del_device_feature_association(self, dfa_id):
-        """Delete a device feature association
-
-        @param dfa_id : device feature association id
-        @return the DeviceFeatureAssociation object which was deleted
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dfa = self.__session.query(
-                        DeviceFeatureAssociation
-                    ).filter_by(id=dfa_id
-                    ).first()
-        if not dfa:
-            return None
-        self.__session.delete(dfa)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dfa
-
-    def del_device_feature_association_by_device_feature_id(self, dfa_device_feature_id):
-        """Delete device feature associations for a given device feature id
-
-        @param dfa_device_feature_id : device feature id
-        @return the list of DeviceFeatureAssociation object which were deleted
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dfa_list = self.__session.query(
-                            DeviceFeatureAssociation
-                        ).filter_by(device_feature_id=dfa_device_feature_id
-                        ).all()
-        for dfa in dfa_list:
-            self.__session.delete(dfa)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dfa_list
-
-    def del_device_feature_association_by_place(self, dfa_place_id, dfa_place_type):
-        """Delete device feature associations for a given place
-
-        @param dfa_place_id : place id
-        @param dfa_place_type : place type (house, area, room)
-        @return the list of DeviceFeatureAssociation object which were deleted
-
-        """
-        dfa_list = self.__session.query(
-                            DeviceFeatureAssociation
-                        ).filter_by(place_type=dfa_place_type
-                        ).filter_by(place_id=dfa_place_id
-                        ).all()
-        for dfa in dfa_list:
-            self.__session.delete(dfa)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dfa_list
-
-####
 # Device technology
 ####
     def list_device_technologies(self):
@@ -1497,15 +1153,6 @@ class DbHelper():
                 return device
         return None
 
-    def get_all_devices_of_room(self, d_room_id):
-        """Return all the devices of a room
-
-        @param d_room_id: room id
-        @return a list of Device objects
-
-        """
-        return self.__session.query(Device).filter_by(room_id=d_room_id).all()
-
     def get_all_devices_of_usage(self, du_id):
         """Return all the devices of a usage
 
@@ -1564,7 +1211,6 @@ class DbHelper():
         @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
         @param d_description : Extended item description (optional)
         @param d_usage : Item usage id (optional)
-        @param d_room : Item room id (optional)
         @return the updated Device object
 
         """
