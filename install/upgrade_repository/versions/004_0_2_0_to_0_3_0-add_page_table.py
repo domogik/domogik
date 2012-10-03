@@ -1,6 +1,6 @@
 from sqlalchemy import *
 from migrate import *
-from domogik.common.sql_schema import Page, Room, Area
+from domogik.common.sql_schema import Page
 
 
 def upgrade(migrate_engine):
