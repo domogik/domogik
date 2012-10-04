@@ -179,6 +179,7 @@ class ProcessRequest():
 
         self._hosts_list = self.handler_params[0]._hosts_list
         self.get_installed_packages = self.handler_params[0].get_installed_packages
+        self._get_installed_packages_from_manager = self.handler_params[0]._get_installed_packages_from_manager
 
         # global init
         self.jsonp = False
@@ -4047,6 +4048,7 @@ target=*
             self.send_http_response_error(999, "Error while updating cache",
                                           self.jsonp, self.jsonp_cb)
         else:
+            self._get_installed_packages_from_manager()
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("cache")
