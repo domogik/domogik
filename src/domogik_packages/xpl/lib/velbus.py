@@ -20,15 +20,27 @@ MODULE_TYPES = {
  10 : "VMB8IR",
  11 : "VMB4PD",
  12 : "VMB1TS",
- 13 : "VMB1TC",
+ 13 : "VMB1TH",
+ 14 : "VMB1TC",
  15 : "VMB1LED",
  16 : "VMB4RYLD",
  17 : "VMB4RYNO",
  18 : "VMB4DC",
+ 19 : "VMBMPD",
  20 : "VMBDME",
  21 : "VMBDMI",
  22 : "VMB8PBU",
  23 : "VMB6PBN",
+ 24 : "VMB2PBN",
+ 25 : "VMB6PBB",
+ 26 : "VMB4RF",
+ 27 : "VMB1RYNO",
+ 28 : "VMB1BLE",
+ 29 : "VMB2BLE",
+ 30 : "VMBGP1",
+ 31 : "VMBGP2",
+ 32 : "VMBGP4",
+ 33 : "VMBGP0"
 }
 
 COMMAND_TYPES = {
@@ -298,7 +310,11 @@ class VelbusDev:
         for data_byte in data:
             __checksum += ord(data_byte)
         __checksum = -(__checksum % 256) + 256
-        return chr(__checksum)
+	try:
+            __checksum = chr(__checksum)
+        except ValueError:
+	    __checksum = chr(0) 
+        return __checksum
 
     def _parser(self, data):
         """
@@ -308,6 +324,7 @@ class VelbusDev:
         assert len(data) > 0
         assert len(data) >= 6
         assert ord(data[0]) == 0x0f
+        self._log.debug("starting parser")
         if len(data) > 14:
             self._log.warning("Velbus message: maximum %s bytes, this one is %s",
                 str(14, str(len(data))))
@@ -390,13 +407,23 @@ class VelbusDev:
         """
            Process a 0 Message
            switch status => send out when an input (switch changed)
+           HIGH = just pressed
+           LOW = just released
+           LONG = long pressed
         """
+        device = str(ord(data[2]))
         chanPres = self._byte_to_channels(data[5])
-        chanLPres = self._byte_to_channels(data[6])
-        chanRel = self._byte_to_channels(data[7])
-	self._log.debug("channels just pressed " + ''.join(map(str,chanPres)) )
-	self._log.debug("channels long pressed " + ''.join(map(str,chanLPres)) )
-	self._log.debug("channels just released " + ''.join(map(str,chanRel)) )
+        chanRel = self._byte_to_channels(data[6])
+        chanLPres = self._byte_to_channels(data[7])
+        for c in chanPres:
+            self._callback("sensor.basic",
+               {"device": str(device) + "-" + str(c), "type": "input", "current": "HIGH" })
+        for c in chanLPres:
+            self._callback("sensor.basic",
+               {"device": str(device) + "-" + str(c), "type": "input", "current": "LONG" })
+        for c in chanRel:
+            self._callback("sensor.basic",
+               {"device": str(device) + "-" + str(c), "type": "input", "current": "LOW" })
 
     def _process_236(self, data):
         """
@@ -430,6 +457,24 @@ class VelbusDev:
                {"device" : device + "-" + chan,
                "command" : command})    
 	
+    def _process_230(self, data):
+        """
+           Process a 230 message Temperature Sensor Temperature
+           Databyte 2 => High byte current sensor temperature
+           Databyte 3 => Low byte of current temperature sensor in two's complement format
+           Resolution: 0.0625 degree celcius
+        """
+        device = str(ord(data[2]))
+	cur = ord(data[5]) << 8;
+        cur = ((cur | ord(data[6])) / 32 ) * 0.0625
+	low = ord(data[7]) << 8;
+        low = ((low | ord(data[8])) / 32 ) * 0.0625
+	high = ord(data[9]) << 8;
+        high = ((high | ord(data[10])) / 32 ) * 0.0625
+        self._callback("sensor.basic",
+               {"device": device, "type": "temp", "units": "c",
+               "current": str(cur), "lowest": str(low), "highest": str(high) })
+
 # Some convert procs
     def _channels_to_byte(self, chan):
         """
