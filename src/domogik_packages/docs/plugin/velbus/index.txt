@@ -1,0 +1,8 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </velbus>`
+* :doc:`Helpers documentation </helpers>`
