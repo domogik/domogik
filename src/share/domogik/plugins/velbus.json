@@ -74,7 +74,47 @@
             "return_confirmation": "1", 
             "stat_key": "command", 
             "value_type": "binary"
-        }
+        },
+        {
+            "device_type_id": "velbus.temp", 
+            "feature_type": "sensor", 
+            "id": "velbus.temp.current", 
+            "name": "Current temperature", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "current", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "velbus.temp", 
+            "feature_type": "sensor", 
+            "id": "velbus.temp.lowest", 
+            "name": "Lowest temperature", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "lowest", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "velbus.temp", 
+            "feature_type": "sensor", 
+            "id": "velbus.temp.highest", 
+            "name": "Highest temperature", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "highest", 
+            "value_type": "number"
+ 	},
+        {
+            "device_type_id": "velbus.input", 
+            "feature_type": "sensor", 
+            "id": "velbus.input.state", 
+            "name": "State of a velbus input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "current", 
+            "value_type": "number"
+        } 
     ], 
     "device_types": [
         {
@@ -91,12 +131,23 @@
             "description": "Shutter control (up, down)", 
             "id": "velbus.shutter", 
             "name": "Shutter"
+        },
+        {
+            "description": "Temperature Sensor", 
+            "id": "velbus.temp", 
+            "name": "Temperature"
+        },
+        {
+            "description": "Input contact", 
+            "id": "velbus.input", 
+            "name": "Input"
         }
     ], 
     "files": [
         "src/share/domogik/design/plugin/velbus/icon.png", 
         "src/share/domogik/stats/velbus/lighting.device-velbus.json", 
         "src/share/domogik/url2xpl/velbus/setlevel.xml", 
+        "src/share/domogik/stats/velbus/sensor.basic-velbus.xml",
         "src/domogik_packages/xpl/bin/velbus.py", 
         "src/domogik_packages/xpl/lib/velbus.py", 
         "src/domogik_packages/xpl/helper/velbus.py"
@@ -105,7 +156,7 @@
         "author": "Maikel Punie", 
         "author_email": "maikel.puni@gmail.com", 
         "category": "velbus", 
-        "changelog": "0.1.0\n- relays only\n- serial comunication only \n0.2.0\n- added socket comunication\n0.3.0\n- added dimmer support\n0.4.0\n- added blind (up/down) support", 
+        "changelog": "0.1.0\n- relays only\n- serial comunication only \n0.2.0\n- added socket comunication\n0.3.0\n- added dimmer support\n0.4.0\n- added blind (up/down) support\n0.5.0\n- added temperature sensor support", 
         "dependencies": [
             {
                 "id": "pyserial (>=2.6)", 
