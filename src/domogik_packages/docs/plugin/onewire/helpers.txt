@@ -1,0 +1,52 @@
+=======
+Helpers
+=======
+
+.. note ::
+    For the onewire plugin, all the helpers related to a sort of components are listed in the appropriate component pages.
+
+onewire all 
+===========
+
+**onewire all** helper will list all onewire components found on your 1 wire network.
+
+.. code-block:: none
+
+    $ onewire all u
+    | Family | Component id | Type    |
+    -----------------------------------
+    | 28     | C57B2E020000 | DS18B20 |
+    | 01     | 4507B2130000 | DS2401  |
+    | 81     | 93702C000000 | DS1420  |
+
+onewire detail  
+==============
+**onewire detail** helper will display all attributes of  component.
+
+.. code-block:: none
+
+    $ onewire detail u C57B2E020000
+    C57B2E020000 attributes :
+    - address : 28C57B2E0200005D
+    - crc8 : 5D
+    - die : C2
+    - family : 28
+    - fasttemp : 25
+    - id : C57B2E020000
+    - locator : FFFFFFFFFFFFFFFF
+    - power : 0
+    - present : 1
+    - r_address : 5D0000022E7BC528
+    - r_id : 0000022E7BC5
+    - r_locator : FFFFFFFFFFFFFFFF
+    - temperature : 25.1875
+    - temperature10 : 25.25
+    - temperature11 : 25.25
+    - temperature12 : 25.1875
+    - temperature9 : 25
+    - temphigh : 75
+    - templow : 70
+    - trim : 56247
+    - trimblanket : 0
+    - trimvalid : 0
+    - type : DS18B20

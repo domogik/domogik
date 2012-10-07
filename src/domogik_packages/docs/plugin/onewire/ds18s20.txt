@@ -1,0 +1,76 @@
+=======
+DS18S20
+=======
+
+Purpose
+=======
+
+The DS18S20 is a temperature sensor with a precision of 12bits.
+
+How to plug
+===========
+
+Parasit mode
+------------
+
+.. image :: ds18s20_par.png
+
+Normal mode
+-----------
+
+.. image :: ds18s20.png
+
+Component configuration
+=======================
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| ds18s20-en    | false         | Enable (or not) the DS18S20 support.                                                                |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| ds18s20-int   | 60            | The interval between each DS18S20 component reading. If you want to monitor your house temperature, |
+|               |               | 60 or 120s is a good value. If you want to monitor something where temperature can change quickly,  |
+|               |               | you can put a small value (5s for example) but you will have to set **cache** to False to get       |
+|               |               | the instant values.                                                                                 |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Creating devices for this component
+-----------------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+.. |feature_ds18s20| image:: feature_ds18s20.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |feature_ds18s20|  | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : ...                                                                   |
+|                    |                   |                                                                                            |
+|                    |                   | You can get it with this helper command : **onewire ds18s20** which will list you all the  |
+|                    |                   | DS18S20 on the onewire network.                                                            |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | 1Wire.Thermometer                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (temperature, ...)                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+Helpers for the DS18S20
+=======================
+
+onewire ds18s20 
+---------------
+The **onewire ds18s20** helper will display important data about all DS18S20 components found.
+
+Example: ::
+
+    $ onewire ds18s20 u
+    DS18S20 : id=F1F0DB010800
+    - Temperature : 28.75
+    - Powered (1) / parasit (0) : 0
+
