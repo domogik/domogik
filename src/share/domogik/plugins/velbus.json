@@ -113,7 +113,7 @@
             "parameters": "{}", 
             "return_confirmation": "0", 
             "stat_key": "current", 
-            "value_type": "number"
+            "value_type": "string"
         } 
     ], 
     "device_types": [
@@ -146,8 +146,13 @@
     "files": [
         "src/share/domogik/design/plugin/velbus/icon.png", 
         "src/share/domogik/stats/velbus/lighting.device-velbus.json", 
-        "src/share/domogik/url2xpl/velbus/setlevel.xml", 
         "src/share/domogik/stats/velbus/sensor.basic-velbus.xml",
+        "src/share/domogik/stats/velbus/shutter.device-velbus.xml",
+        "src/share/domogik/url2xpl/velbus/setlevel.xml", 
+        "src/share/domogik/url2xpl/velbus/0.xml", 
+        "src/share/domogik/url2xpl/velbus/255.xml", 
+        "src/share/domogik/url2xpl/velbus/down.xml", 
+        "src/share/domogik/url2xpl/velbus/up.xml", 
         "src/domogik_packages/xpl/bin/velbus.py", 
         "src/domogik_packages/xpl/lib/velbus.py", 
         "src/domogik_packages/xpl/helper/velbus.py"
@@ -168,7 +173,7 @@
         "domogik_min_version": "0.2.0", 
         "id": "velbus", 
         "type": "plugin", 
-        "version": "0.4.1"
+        "version": "0.5.0"
     }, 
     "json_version": 1, 
     "technology": {
