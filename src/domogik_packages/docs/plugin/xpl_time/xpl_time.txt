@@ -1,0 +1,23 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+This plugin sends the date and time each minute on the xPL network. Alone this plugin is useless : he is used by others plugins that need to get the date or time over xpl.
+
+Plugin configuration
+====================
+
+There is no specific configuration for this plugin.
+
+Creating devices for xpl_time
+-----------------------------
+
+There is no need to create a device for this plugin.
+
+Start the plugin
+----------------
+You can now start the plugin (start button).
+
