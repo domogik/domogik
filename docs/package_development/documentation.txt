@@ -1,0 +1,84 @@
+=============
+Documentation
+=============
+
+Purpose
+=======
+Each package must have its own documentation. There are 2 type of documentation :
+
+* the :doc:`specifications and developers notes <specifications>` which are on the Domogik wiki. 
+* the end user documentation which must be created as text files in Domogik sources. 
+
+This page is only about the end user documentation.
+
+Why creating the documentation in Domogik sources ?
+---------------------------------------------------
+* The documentation is up to date with the plugin evolutions.
+* When you generate a package, the related documentation will be include in the package. When the package will be made available on one repository, its documentation will be published online for the package version. So the developers don't have to handle documentations version issues to manage : this is automatically done when the package is published.
+
+Where is located the documentation in sources ?
+-----------------------------------------------
+The packages documentation is located in *src/domogik_packages/docs/*. In this folder there is a folder for each type of packages and one more folder for the documentation template. In the package type folders, there is a folder for each package. 
+
+.. warning ::
+    The packages documentation must be written in the **default** branch (except if for some reason you are developping the package in another branch).
+
+Creating the documentation
+==========================
+In order to help you to create it, there is a template and a script to prepare your package documentation skeleton from this template. ::
+
+    $ ./initdoc.sh
+    Usage : initdoc.sh <type of the package> <name of the package>
+
+To use it, just do (assuming you created a *plugin* named *plgname*): ::
+
+    $ cd src/domogik_packages/docs/template
+    $ ./initdoc.sh plugin plgname
+    Creating template for the plugin plgname...
+    Check if the documentation doesn't already exists...
+    OK
+    Copy the template...
+    OK
+    Update conf.py...
+    OK
+    Update contents.txt...
+    OK
+    Update helpers.txt...
+    OK
+    Update contents.txt...
+    OK
+    Update the main file...
+    OK
+    
+    The documentation for the plugin plgname has been initiated. You can now update it in src/domogik_packages/docs/plugin/plgname/
+    To generate the html documentation, do :
+     make clean && make html
+    It will be generated in the folder src/domogik_packages/docs/plugin/plgname/_build/html/
+    The _build folder will not be updated on the mercurial repository as it is generated content.
+
+These files are created :
+
+* conf.py : *do not modify it!* It is needed for creating the html build of the documentation.
+* Makefile : *the same*.
+* _theme : *do not modify!* This contains the theme used by the html build.
+* index.txt : the main page of the documentation. You should update it only if you add additionnal documentation pages.
+* contents.txt : similar to index.txt. You just have to add the additionnal documentation pages if needed.
+* *plgname*.txt : the main package documentation page.
+* helpers.txt : the helpers of the package (if any) documentation page.
+* example_feature1.png : screenshot example for device creation box.
+
+You just have to replace the *todo* parts of the generated documentation. To check it, just generate it and check the html build.
+
+To generate the html build: ::
+
+   $ make clean && make html
+
+The build is generated in the *_build* folder. This folder is not store in Domogik sources, don't try to add this to sources.
+
+Here is an example of the generated documentation:
+
+.. image:: doc_toc.png
+
+.. image:: doc_main.png
+
+.. image:: doc_helpers.png

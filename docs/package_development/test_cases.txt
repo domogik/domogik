@@ -1,0 +1,33 @@
+==========
+Test cases
+==========
+
+.. todo::
+   Finish
+
+
+Purpose
+=======
+Yes, 
+
+* Writing some test cases is time losed for devleoping new features...
+* Writing some test cases is boring...
+* Writing some test cases will not impress girls...
+
+But,
+
+* Writing some test cases is **not** a waste of time!
+* Wirting some test cases allow to check the package works as expecting, even on minor features on each package release!
+* Writing some test cases allow ohter people that you to test the package and will give you more time the next time for developing!
+
+And moreover, your package will never see the *stable* repository if you don't write some test cases because we consider that a non tested package is not a reliable package.
+
+
+Writing the test cases
+======================
+Actually the test cases are written on a dedicated tool names *Testlink*. For more informations, send an email on the mailing list or directly ask us on irc.
+
+.. todo::
+    Testlink usage will be describe here.
+
+

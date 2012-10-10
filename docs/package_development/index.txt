@@ -1,0 +1,10 @@
+====================
+Packages development
+====================
+
+* :doc:`Steps to follow to create a package <howto>`
+
+
+
+
+

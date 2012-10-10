@@ -1,0 +1,10 @@
+======================
+Developing the package
+======================
+
+* :doc:`Developing a plugin <developing_a_plugin>`.
+* :doc:`Developing an external member <developing_an_external_member>`.
+
+All packages need an :doc:`icon <icon>`.
+
+

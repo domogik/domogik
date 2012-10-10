@@ -1,0 +1,78 @@
+====================
+Generate the package
+====================
+
+Check the list of the files
+===========================
+First, check in the :doc:`json file <json_file>` if all your package's files are listed. If not, add the missing files.
+
+Set a valid version number
+==========================
+Each time you create a new release for a package, you must update its version number (:doc:`see the dedicated page<rules_for_version_numbers>`).
+Update also the changelog in the :doc:`json file <json_file>` with a description of the updates.
+
+Set the Domogik min version
+===========================
+When you develop a package or a new feature in a package, this feature may eventually use a new Domogik feature. In this case, you will have to update the :doc:`json file <json_file>`.
+
+Generate the package
+====================
+From Domogik sources, lauch: ::
+
+    $ dmg_pkgmgr --create --type <package type : plugin, external> <id of the package>
+
+Example for the plugin cidmodem: ::
+
+    $ dmg_pkgmgr --create --type plugin cidmodem
+    Plugin id : cidmodem
+    Xml file OK
+    ---- Package informations -------------------------------
+    Type                : plugin
+    Id                  : cidmodem
+    Full name           : plugin-cidmodem
+    Release             : 0.2
+    Technology          : communication
+    Link for doc        : http://wiki.domogik.org/plugin_cidmodem
+    Description         : Get caller id with a modem : when receiving an incoming call on a classic telephonic line, this plugin gets the incoming call number and send it on xPL.
+    Changelog           : 0.2
+    - adapt plugin for release 0.2
+    
+    0.1
+    - plugin creation
+    Author              : Fritz
+    Author's email      : fritz.smh at gmail.com
+    Domogik min release : 0.2.0
+    ----- Python dependencies -------------------------------
+    - {'python': u'pyserial (>=2.5)'}
+    ----- Package files -------------------------------------
+    - src/share/domogik/plugins/cidmodem.xml
+    - src/share/domogik/stats/communication/cid.basic-cidmodem.xml
+    - src/domogik/xpl/bin/cidmodem.py
+    - src/domogik/xpl/lib/cidmodem.py
+    ----- Package external files ----------------------------
+    ---------------------------------------------------------
+    
+    Are these informations OK ?
+    [o/N]o
+    Generating package : '/tmp/plugin-cidmodem-0.2.tgz'
+    - src/share/domogik/plugins/cidmodem.xml
+    - src/share/domogik/stats/communication/cid.basic-cidmodem.xml
+    - src/domogik/xpl/bin/cidmodem.py
+    - src/domogik/xpl/lib/cidmodem.py
+    - info.xml
+    OK
+
+How to put the package archive on a repository
+==============================================
+You just need to write an email to *domogik-developers <domogik-developers@lists.labs.libre-entreprise.org>*
+
+Email example for the *plugin cidmodem 0.2* :
+    Subject : Package plugin-cidmodem-0.2
+    File attached : plugin-cidmodem-0.2.tgz
+    Body :
+    Hi,
+    Here is the version 0.2.0 of the plugin cidmodem. It includes : .....
+    This version is not yet totally functionnal.
+    ...
+
+Then, the Domogik team will handle this package and put it on the appropriate repository

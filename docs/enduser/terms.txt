@@ -1,0 +1,92 @@
+==================================
+Terms to know before using Domogik
+==================================
+
+.. note:: Please note that following definitions are short definitions. To get more information about these terms, feel free to search the wiki :)
+
+House organisation
+==================
+
+.. glossary::
+
+    House
+        The house or flat for which you install a home automation solution.
+
+    Area
+        A floor, the garage, the cellar, etc.
+
+    Room
+        Kitchen, living room, bedroom, etc
+
+Plugins, devices, features and widgets
+======================================
+
+.. glossary::
+
+    Plugin
+        A plugin is a xPL daemon which handle a technology (or a part of a technology).
+
+    Device
+        A device is a hardware or software element. For example : a ''onewire DS18B20'' component is a device, a computer to control is a device, a ''X10 LM12'' module is a device. For software elements the ''Yahoo weather'' service is also considered as a device.
+
+    Reference (of a device)
+        A reference is the model of a hardware or software component. For example, a onewire DS18B20 component has "DS18B20" as reference. Actually it is a useless information for Domogik but it may be useful for you.
+
+    Address (of a device)
+        The  address of a device is used by the device technology to identify it on the network. For example it could be 'A1' for a X10 device.
+
+    Feature
+        A feature is what a device provides. For example a lamp device could have both the switch and dimmer features. For a 1-wire component it can be the temperature, the humidity or the serial number.
+
+    Usage
+        The usage describes what the device is used for : light, appliance, heating...
+
+    Widget
+        A widget is a graphic part of the User Interface which controls a feature.
+
+Accounts
+========
+
+.. glossary::
+
+    User
+        A user account to connect to Domogik application.
+
+    Person
+        Physical person you want to register. A person can have several accounts (users) or none.
+
+Domogik components
+==================
+
+.. glossary::
+
+    Domoweb
+        Domoweb is the official web user interface of Domogik.
+
+    Domodroid
+        Domodroid is the official android application for Domogik.
+
+    Package
+        A package is a piece of software which add some features to Domogik. It can be a plugin, an external member, ...
+ 
+    Repository
+        A repository is an online repository where are stored packages.
+
+    Plugin
+        A Domogik package which handle a technology or a web service.
+
+    External member
+        A Domogik package which allow to interact with a xPL client.
+
+    xPL
+        xPL is the network protocol used to allow plugins to communicate with each other.
+
+    UI
+        A User Interface.
+
+    Django
+        Django is the (Python) framework used for the web UI.
+
+    REST/RINOR
+        ''REST is a software architecture for distributed hypermedia systems such as the World Wide Web (extract from Wikipedia)''. Because it uses this architecture the "REST" component of Domogik has this name.
+        REST is the component which makes the link between the database and the xPL network on one side and all available user interfaces on the other side.
