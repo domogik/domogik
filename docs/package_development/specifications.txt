@@ -1,0 +1,20 @@
+=================================
+Create the package specifications
+=================================
+
+Why do we need to write specifications ?
+========================================
+
+* Writing some specification is something important : writing the way the package will work and the xpl schema used helps the developper to produce a clear code. It also helps other people to understand the code.
+* In the project Domogik, the quality is very important. So, before starting to develop a package, the developper should ask the other developpers to read its package specifications : they could help to improve the way the package will be developped.
+* The specification will be used after the package development to understand how the package features work.
+* Developpers informations can be added in this page.
+
+Create the page on the wiki
+===========================
+
+Create a page on the wiki : **wiki.domogik.org/<package type>/<package name>**. Examples :
+
+* plugin ipx800: wiki.domogik.org/plugin_ipx800
+* external member rfxcom: wiki.domogik.org/external_rfxcom
+

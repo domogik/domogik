@@ -1,0 +1,22 @@
+.. _requirements:
+
+====================
+Domogik requirements
+====================
+
+What do you need to use Domogik
+===============================
+
+To run Domogik, you need to have :
+
+* a computer
+* a GNU/Linux distribution (Ubuntu, Debian, Archlinux, or others)
+
+Then depending on which plugin you want to use you will need devices : Plcbus, 1-wire, relay boards, etc.
+
+I am a newbie in Linux world, what do I need to know ?
+======================================================
+
+First, you should use a distribution like Ubuntu. Then, you should first learn the Linux basements.
+
+
