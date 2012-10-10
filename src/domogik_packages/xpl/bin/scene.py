@@ -96,13 +96,14 @@ class SceneManager(XplPlugin):
    def scene_cmd(self, message):
       """ routine lorsque le plugin recoit un message xpl
       """
-      data = message.data['data']
-      data = data.replace('|','')
-      data = data.replace(':',":'")
-      data = data.replace(',',"',")
-      data = "{" + data + "'}"
-      data = ast.literal_eval(data)
-      print data 
+      if "data" in message.data:
+          data = message.data['data']
+          data = data.replace('|','')
+          data = data.replace(':',":'")
+          data = data.replace(',',"',")
+          data = "{" + data + "'}"
+          data = ast.literal_eval(data)
+          print data 
       if message.data['command']=="Create" and message.data['scene'] =='0':
          msg=''
          self.sceneCount = self.sceneCount + 1
@@ -199,9 +200,9 @@ class SceneManager(XplPlugin):
 
          print "création d'une scene"
 
-      elif message.data['command']=="Start":
+      elif message.data['command']=="start":
          print 'Start scene'
-      elif message.data['command']=='Stop':
+      elif message.data['command']=='stop':
          print 'Stop scene'
 
    def send_xpl(self,data):

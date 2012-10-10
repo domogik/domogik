@@ -137,6 +137,7 @@ class Mscene():
     glistener = ''
 
     def __init__(self,number,xplmanager,device1,device2,condition,Action_true,Action_false,rinor):
+      print "number = %s" %number
       self.number="scene_%s" %number
       self.myxpl=xplmanager
       print "myxpl=%s" %self.myxpl
@@ -144,7 +145,7 @@ class Mscene():
       msg.set_schema('scene.basic')
       msg.set_type('xpl-trig')
       msg.add_data({'number': self.number})
-      msg.add_data({'run':'Start'})
+      msg.add_data({'run':'start'})
       msg.add_data({'statue':'unknow'})
       self.myxpl.send(msg)
       print "fin de l'init lib envoie du XPl"
@@ -164,9 +165,11 @@ class Mscene():
       self.gcondition=condition
       self.grinor= rinor
 
-      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','scene':self.number})
+      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})
 
     def cmd_scene(self,message):
+       print "reception d'un message scene: '%s'" %message
+       print "command = %s" %message.data['command']
        if message.data['command']=='start':
           self.start()
        elif message.data['command']=='stop':
@@ -208,8 +211,8 @@ class Mscene():
        msg.set_schema('scene.basic')
        msg.set_type('xpl-trig')
        msg.add_data({'number': self.number})
-       msg.add_data({'run':'Start'})
-       msg.add_data({'statue':'None'})
+       msg.add_data({'run':'start'})
+       msg.add_data({'stats':'None'})
        self.myxpl.send(msg)
        self.etat_scene = self.test()
 
@@ -224,8 +227,8 @@ class Mscene():
        msg.set_schema('scene.basic')
        msg.set_type('xpl-trig')
        msg.add_data({'number': self.number})
-       msg.add_data({'run':'Stop'})
-       msg.add_data({'statue':'None'})
+       msg.add_data({'run':'stop'})
+       msg.add_data({'stats':'None'})
        self.myxpl.send(msg)
 
     def cmd_device1(self, message):
@@ -357,8 +360,8 @@ class Mscene():
           msg=XplMessage()
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
-          msg.add_data({'number': 'scene_' + self.number})
-          msg.add_data({'run':'OK'})
+          msg.add_data({'number': self.number})
+          msg.add_data({'run':'start'})
           msg.add_data({'stats':'true'})
           self.myxpl.send(msg)
 
@@ -375,8 +378,8 @@ class Mscene():
           msg=XplMessage()
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
-          msg.add_data({'number': 'scene_' + self.number})
-          msg.add_data({'run':'OK'})
+          msg.add_data({'number': self.number})
+          msg.add_data({'run':'start'})
           msg.add_data({'stats':'false'})
           self.myxpl.send(msg)
 
@@ -384,8 +387,8 @@ class Mscene():
           msg=XplMessage()
           msg.set_schema('scene.basic')
           msg.set_type('xpl-stat')
-          msg.add_data({'number': 'scene_' + self.number})
-          msg.add_data({'run':'OK'})
+          msg.add_data({'number': self.number})
+          msg.add_data({'run':'start'})
           msg.add_data({'stats': condition})
           self.myxpl.send(msg)
 
