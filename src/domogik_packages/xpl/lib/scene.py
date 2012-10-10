@@ -195,7 +195,7 @@ class Mscene():
        print "stat device 1 : %s" %self.device1_stat
        self.listener1 = ['','','','','','','','','','']
        for i in range(len(self.device1['listener'])):
-          self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig',self.device1['listener'][i]['device']:self.device1['address']})
+          self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig'}) #,self.device1['listener'][i]['device']:self.device1['address']})
           print "listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s" %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
        if self.device2["id"] != '' and self.device2["key_stat"] != '':
           the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor,self.device2['id'], self.device2['key_stat'])
@@ -233,15 +233,23 @@ class Mscene():
 
     def cmd_device1(self, message):
        print "%s message for device1" %self.number
-       self.device1_stat=message.data[self.key_stat1]
-       print 'new value for device 1 = %s' %self.device1_stat
-       self.etat_scene = self.test()
+       for i in self.device1['listener']:
+           print i
+           if i['xpl_stat'] in message.data:
+               print "%s message for device1" %self.number
+               self.device1_stat=message.data[i['xpl_stat']]
+               print 'new value for device 1 = %s' %self.device1_stat
+               self.etat_scene = self.test()
 
     def cmd_device2(self, message):
        print "%s message for device2" %self.number
-       self.device2_stat=message.data[self.key_stat2]
-       print 'new value for device 2 = %s' %self.device2_stat
-       self.etat_scene = self.test()
+       for i in self.device2['listener']:
+           print i
+           if i['xpl_stat'] in message.data:
+               self.device2_stat=message.data[i['xpl_stat']]
+               print 'new value for device 2 = %s' %self.device2_stat
+               self.etat_scene = self.test()
+
 
     def test(self):
        # function was call when an xpl-trig for on of device was receve

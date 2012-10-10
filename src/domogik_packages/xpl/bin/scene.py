@@ -183,6 +183,7 @@ class SceneManager(XplPlugin):
          
          if device1_tech != '' and device1_key !='':
             filter_device1 = self.search_filter(device1_tech, device1_key)
+            print "filre: %s" %filter_device1
          if device2_tech != '' and device2_key != '':
             filter_device2 = self.search_filter(device2_tech, device2_key)
 
@@ -217,6 +218,7 @@ class SceneManager(XplPlugin):
       files = glob.glob("%s/*/*xml" % filetoopen)
       print "files récupérer"
       res = {}
+      print "technologie: %s, key_stat: %s" %(techno,key_stat)
       for _files in files:
          if _files[-4:] == ".xml":
             doc = minidom.parse(_files)
@@ -230,12 +232,24 @@ class SceneManager(XplPlugin):
                   for xpl_type in schema_types[schema]:
                      if xpl_type == "xpl-trig" and technology == techno:
                         device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                        print "device: %s" %device
                         for i in range(len(mapping)):
+                           print "keystat recherche %s, schema %s" %(mapping[i]['name'], schema)
+                           print "mapping= %s" %mapping[i]
+                           if "new_name" in mapping[i]:
+                              if mapping[i]['new_name']==key_stat and schema not in device_list:
+                                 test ={}
+                                 test["schema"]="%s" %(schema)
+                                 test["device"]="%s" %(device)
+                                 test["xpl_stat"]="%s" %(mapping[i]['name'])
+                                 device_list.append(test)
                            if mapping[i]['name']==key_stat and schema not in device_list:
                               test ={}
                               test["schema"]="%s" %(schema)
                               test["device"]="%s" %(device)
+                              test["xpl_stat"]="%s" %(mapping[i]['name'])
                               device_list.append(test)
+      print "device_list: %s" %device_list
       return device_list
 
 
