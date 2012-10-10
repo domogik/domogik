@@ -17,7 +17,7 @@ When you develop a package or a new feature in a package, this feature may event
 
 Generate the package
 ====================
-From Domogik sources, lauch: ::
+From Domogik sources, run: ::
 
     $ dmg_pkgmgr --create --type <package type : plugin, external> <id of the package>
 
