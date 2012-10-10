@@ -4,7 +4,7 @@ Documentation
 
 Purpose
 =======
-Each package must have its own documentation. There are 2 type of documentation :
+Each package must have its own documentation. There are 2 types of documentation :
 
 * the :doc:`specifications and developers notes <specifications>` which are on the Domogik wiki. 
 * the end user documentation which must be created as text files in Domogik sources. 
