@@ -70,7 +70,7 @@ class SceneManager(XplPlugin):
          print "Création du fichier de stockage %s" %self.filetoopen
       mem = self.scene.read_scene(self.filetoopen)
 
-      self.sceneCount='0'
+      self.sceneCount=0
       for i in range(len(mem)):
          liste=str(mem[i])
          print "maliste:%s" %liste
@@ -91,6 +91,8 @@ class SceneManager(XplPlugin):
    ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
       self.sceneCount = int(ligne['scene'])#self.sceneCount + 1
       Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'])
+
+
       Mini_scene.start()
 
    def scene_cmd(self, message):
@@ -103,6 +105,9 @@ class SceneManager(XplPlugin):
           data = data.replace(',',"',")
           data = "{" + data + "'}"
           data = ast.literal_eval(data)
+          data['actiontrueval'] = data['actiontrueval'].replace("%#",",")
+          data['actionfalseval'] = data['actionfalseval'].replace("%#",",")
+
           print data 
       if message.data['command']=="Create" and message.data['scene'] =='0':
          msg=''
@@ -166,6 +171,7 @@ class SceneManager(XplPlugin):
          if 'actiontrueadr' in data and data['actiontrueadr'] != '':
             action_true_techno = data['actiontruetech']
             action_true_adr = data['actiontrueadr']
+            print "actrion_true_value = %s" %data['actiontrueval']
             action_true_value = data['actiontrueval']
             if 'actiontruecmd' in data:
                 action_true_cmd = data['actiontruecmd']

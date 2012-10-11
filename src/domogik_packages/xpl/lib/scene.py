@@ -357,7 +357,10 @@ class Mscene():
 #         http://ip:port/command/<technology>/<address>/<command>/command [/...]
           print 'techno: %s, address: %s,command: %s,value:%s' %(self.gaction_true['techno'], self.gaction_true['address'],self.gaction_true['command'], self.gaction_true['value'])
 
-          if self.gaction_true['techno'] != '':
+          if self.gaction_true['techno'] == 'command' and self.gaction_true['address']== 'command' and self.gaction_true['command']=='command':
+             subp = subprocess.Popen(self.gaction_true['value'], shell=True) 
+
+          if self.gaction_true['techno'] != '' and self.gaction_true['techno'] != 'command' and self.gaction_true['address'] != 'command':
              if self.gaction_true['command']=='':
                 the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['value'])
              else:
@@ -375,7 +378,11 @@ class Mscene():
 
        if condition == 'false' and condition != last_value:
           print 'envoie de la commande false'
-          if self.gaction_false['techno'] != '':
+
+          if self.gaction_false['techno'] == 'command' and self.gaction_false['address']== 'command' and self.gaction_false['command']=='command':
+             subp = subprocess.Popen(self.gaction_false['value'], shell=True) 
+
+          if self.gaction_false['techno'] != '' and self.gaction_false['techno'] != 'command' and self.gaction_false['address'] != 'command':
              if self.gaction_false['command']== '':
                 the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['value'])
              else:
