@@ -81,8 +81,6 @@ class SceneManager(XplPlugin):
             self.mem_scene(liste) 
             for _truc in liste:
                print "%s : %s" %(_truc,liste[_truc])
- #           msg.add_data(test)          
-#         self.myxpl.send(msg)
 
       self.log.info("Plugin ready :)")
 
@@ -200,6 +198,15 @@ class SceneManager(XplPlugin):
          Mini_scene.start()
 
          print "création d'une scene"
+         msg=XplMessage()
+         msg.set_schema('scene.basic')
+         msg.set_type('xpl-trig')
+         msg.add_data({'command':'Create-ack'})
+         msg.add_data({'scene':'0'})
+         scene_number= 'scene_%s OK' %self.sceneC
+         msg.add_data({'data':scene_number}) 
+
+         self.myxpl.send(msg)
 
       elif message.data['command']=="start":
          print 'Start scene'
