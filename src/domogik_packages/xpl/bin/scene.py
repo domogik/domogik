@@ -69,6 +69,8 @@ class SceneManager(XplPlugin):
          fichier.close()
          print "Création du fichier de stockage %s" %self.filetoopen
       mem = self.scene.read_scene(self.filetoopen)
+
+      self.sceneCount='0'
       for i in range(len(mem)):
          liste=str(mem[i])
          print "maliste:%s" %liste
@@ -87,7 +89,7 @@ class SceneManager(XplPlugin):
    def mem_scene(self, ligne):
    ### create a scene for init plugin
    ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
-      self.sceneCount = self.sceneCount + 1
+      self.sceneCount = int(ligne['scene'])#self.sceneCount + 1
       Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'])
       Mini_scene.start()
 
