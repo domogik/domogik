@@ -17,7 +17,7 @@
 {%- endmacro %}
 
 {% block document %}
-  <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'index' else '' }}{% endblock %}">
+  <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'indexDESACTIVATED' else '' }}{% endblock %}">
     <div id="hd">
       <h1><a href="{{ pathto('index') }}">{{ docstitle }}</a></h1>
       <div id="global-nav">
@@ -37,7 +37,7 @@
         </div>
       </div>
       {% block sidebarwrapper %}
-        {% if pagename != 'index' %}
+        {% if pagename != 'indexDESACTIVATED' %}
           <div class="yui-b" id="sidebar">
             {{ sidebar() }}
             {%- if last_updated %}
