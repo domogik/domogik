@@ -141,13 +141,16 @@ class Mscene():
       self.number="scene_%s" %number
       self.myxpl=xplmanager
       print "myxpl=%s" %self.myxpl
-      msg=XplMessage()
-      msg.set_schema('scene.basic')
-      msg.set_type('xpl-trig')
-      msg.add_data({'number': self.number})
-      msg.add_data({'run':'start'})
-      msg.add_data({'statue':'unknow'})
-      self.myxpl.send(msg)
+      msg1=XplMessage()
+      self.sourcexpl = msg1.source
+      print "source init = %s" %self.sourcexpl
+      msg1.set_schema('scene.basic')
+      msg1.set_source(self.sourcexpl)
+      msg1.set_type('xpl-trig')
+      msg1.add_data({'number': self.number})
+      msg1.add_data({'run':'start'})
+      msg1.add_data({'statue':'unknow'})
+      self.myxpl.send(msg1)
       print "fin de l'init lib envoie du XPl"
 #      XplPlugin.__init__(self, name = 'send', daemonize = False, parser = None, nohub = True)
 
@@ -207,13 +210,14 @@ class Mscene():
           self.listener2 = ['','','','','','','','','','']
           for i in range(len(self.device2['listener'])):
              self.listener2[i]=Listener(self.cmd_device2,self.myxpl,{'schema':self.device2['listener'][i]['schema'],'xpltype':'xpl-trig',self.device2['listener'][i]['device']:self.device2['address']})
-       msg=XplMessage()
-       msg.set_schema('scene.basic')
-       msg.set_type('xpl-trig')
-       msg.add_data({'number': self.number})
-       msg.add_data({'run':'start'})
-       msg.add_data({'stats':'None'})
-       self.myxpl.send(msg)
+       msg1=XplMessage()
+       msg1.set_source(self.sourcexpl)
+       msg1.set_schema('scene.basic')
+       msg1.set_type('xpl-trig')
+       msg1.add_data({'number': self.number})
+       msg1.add_data({'run':'start'})
+       msg1.add_data({'stats':'None'})
+       self.myxpl.send(msg1)
        self.etat_scene = self.test()
 
 
@@ -223,13 +227,14 @@ class Mscene():
              self.myxpl.del_listener(self.listener1[j])
           if self.listener2[j] != '':
              self.myxpl.del_listener(self.listener2[j])
-       msg=XplMessage()
-       msg.set_schema('scene.basic')
-       msg.set_type('xpl-trig')
-       msg.add_data({'number': self.number})
-       msg.add_data({'run':'stop'})
-       msg.add_data({'stats':'None'})
-       self.myxpl.send(msg)
+       msg1=XplMessage()
+       msg1.set_schema('scene.basic')
+       msg1.set_source(self.sourcexpl)
+       msg1.set_type('xpl-trig')
+       msg1.add_data({'number': self.number})
+       msg1.add_data({'run':'stop'})
+       msg1.add_data({'stats':'None'})
+       self.myxpl.send(msg1)
 
     def cmd_device1(self, message):
        print "%s message for device1" %self.number
