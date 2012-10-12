@@ -109,117 +109,113 @@ class SceneManager(XplPlugin):
           data['actionfalseval'] = data['actionfalseval'].replace("%#",",")
 
           print data 
-      if message.data['command']=="Create" and message.data['scene'] =='0':
-         msg=''
-         self.sceneCount = self.sceneCount + 1
-         if 'scene' not in data:
-            self.sceneC = self.sceneCount
-         else:
-            self.sceneC = message
-         device1_id = ''
-         device1_adr = ''
-         device1_tech = ''
-         device1_key = ''
-         device1_op = ''
-         device1_value = ''
-         device2_id = ''
-         device2_adr = ''
-         device2_tech = ''
-         device2_key = ''
-         device2_op = ''
-         device2_value = ''
-         op_global = ''
-         action_true_techno = ''
-         action_true_adr = ''
-         action_true_value = ''
-         action_true_cmd = ''
-         action_false_techno = ''
-         action_false_adr = ''
-         action_false_value = ''
-         action_false_cmd = ''
-         filter_device1 = ''
-         filter_device2 = ''
+          if message.data['command']=="Create" and message.data['scene'] =='0':
+             msg=''
+             self.sceneCount = self.sceneCount + 1
+             if 'scene' not in data:
+                self.sceneC = self.sceneCount
+             else:
+                self.sceneC = message
+             device1_id = ''
+             device1_adr = ''
+             device1_tech = ''
+             device1_key = ''
+             device1_op = ''
+             device1_value = ''
+             device2_id = ''
+             device2_adr = ''
+             device2_tech = ''
+             device2_key = ''
+             device2_op = ''
+             device2_value = ''
+             op_global = ''
+             action_true_techno = ''
+             action_true_adr = ''
+             action_true_value = ''
+             action_true_cmd = ''
+             action_false_techno = ''
+             action_false_adr = ''
+             action_false_value = ''
+             action_false_cmd = ''
+             filter_device1 = ''
+             filter_device2 = ''
 
-         rinor=data['rinorip']+":"+data['rinorport']
-         print 'rinor:%s' %rinor
+             rinor=data['rinorip']+":"+data['rinorport']
+             print 'rinor:%s' %rinor
 
-         if 'device1id' in data and data['device1id'] != '':
-            device1_adr = data['device1adr']
-            device1_id = data['device1id']
-            device1_key = data['device1key']
-            device1_tech= data['device1tech']
-            device1_key= data['device1key']
-            if 'device1op' in data and data['device1op'] != '':
-               device1_op= data['device1op']
-               device1_value= data['device1val']
+             if 'device1id' in data and data['device1id'] != '':
+                device1_adr = data['device1adr']
+                device1_id = data['device1id']
+                device1_key = data['device1key']
+                device1_tech= data['device1tech']
+                device1_key= data['device1key']
+                if 'device1op' in data and data['device1op'] != '':
+                   device1_op= data['device1op']
+                   device1_value= data['device1val']
 
-         if 'device2id' in data and data['device2id'] != '':
-            device2_adr = data['device2adr']
-            device2_id = data['device2id']
-            device2_key = data['device2key']
-            device2_tech= data['device2tech']
-            device2_key= data['device2key']
-            if 'device2op' in data and data['device2op']!='':
-               device2_op= data['device2op']
-               device2_value= data['device2val']
+             if 'device2id' in data and data['device2id'] != '':
+                device2_adr = data['device2adr']
+                device2_id = data['device2id']
+                device2_key = data['device2key']
+                device2_tech= data['device2tech']
+                device2_key= data['device2key']
+                if 'device2op' in data and data['device2op']!='':
+                   device2_op= data['device2op']
+                   device2_value= data['device2val']
 
-         if 'opglobal' in data and data['opglobal'] != '':
-            op_global = data['opglobal']
+             if 'opglobal' in data and data['opglobal'] != '':
+                op_global = data['opglobal']
 
-         condition={'test1':device1_op, 'value1':device1_value,'test2':device2_op,'value2':device2_value,'test_global':op_global}
+             condition={'test1':device1_op, 'value1':device1_value,'test2':device2_op,'value2':device2_value,'test_global':op_global}
 
-         if 'actiontrueadr' in data and data['actiontrueadr'] != '':
-            action_true_techno = data['actiontruetech']
-            action_true_adr = data['actiontrueadr']
-            print "actrion_true_value = %s" %data['actiontrueval']
-            action_true_value = data['actiontrueval']
-            if 'actiontruecmd' in data:
-                action_true_cmd = data['actiontruecmd']
+             if 'actiontrueadr' in data and data['actiontrueadr'] != '':
+                action_true_techno = data['actiontruetech']
+                action_true_adr = data['actiontrueadr']
+                print "actrion_true_value = %s" %data['actiontrueval']
+                action_true_value = data['actiontrueval']
+                if 'actiontruecmd' in data:
+                    action_true_cmd = data['actiontruecmd']
 
-         action_true={'techno':action_true_techno,'address':action_true_adr, 'command':action_true_cmd,'value':action_true_value}
+             action_true={'techno':action_true_techno,'address':action_true_adr, 'command':action_true_cmd,'value':action_true_value}
 
-         if 'actionfalseadr' in data and data['actionfalseadr'] != '':
-            action_false_techno = data['actionfalsetech']
-            action_false_adr = data['actionfalseadr']
-            action_false_value = data['actionfalseval']
-            if 'actionfalsecmd' in data:
-                action_false_cmd = data['actionfalsecmd']
+             if 'actionfalseadr' in data and data['actionfalseadr'] != '':
+                action_false_techno = data['actionfalsetech']
+                action_false_adr = data['actionfalseadr']
+                action_false_value = data['actionfalseval']
+                if 'actionfalsecmd' in data:
+                    action_false_cmd = data['actionfalsecmd']
 
-         action_false={'techno':action_false_techno,'address':action_false_adr, 'command':action_false_cmd,'value':action_false_value}
+             action_false={'techno':action_false_techno,'address':action_false_adr, 'command':action_false_cmd,'value':action_false_value}
          
-         if device1_tech != '' and device1_key !='':
-            filter_device1 = self.search_filter(device1_tech, device1_key)
-            print "filre: %s" %filter_device1
-         if device2_tech != '' and device2_key != '':
-            filter_device2 = self.search_filter(device2_tech, device2_key)
+             if device1_tech != '' and device1_key !='':
+                filter_device1 = self.search_filter(device1_tech, device1_key)
+                print "filre: %s" %filter_device1
+             if device2_tech != '' and device2_key != '':
+                filter_device2 = self.search_filter(device2_tech, device2_key)
 
-         device1 = {'address':device1_adr,'id':device1_id, 'key_stat':device1_key,'listener':filter_device1}
-         device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
+             device1 = {'address':device1_adr,'id':device1_id, 'key_stat':device1_key,'listener':filter_device1}
+             device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
          
-         print 'self.manager=%s' %self.manager
-         Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor)
-         msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
-         self.scene.add_scene(self.filetoopen,msg)
+             print 'self.manager=%s' %self.manager
+             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor)
+             msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
+             self.scene.add_scene(self.filetoopen,msg)
 
 #         the_url="http://%s/base/device/add/name/%s/address/%s/usage_id/scene/description/scene_plugin/reference/Mscene" %(self.Mscene,self.Mscene)
 
-         Mini_scene.start()
+             Mini_scene.start()
 
-         print "création d'une scene"
-         msg=XplMessage()
-         msg.set_schema('scene.basic')
-         msg.set_type('xpl-trig')
-         msg.add_data({'command':'Create-ack'})
-         msg.add_data({'scene':'0'})
-         scene_number= 'scene_%s OK' %self.sceneC
-         msg.add_data({'data':scene_number}) 
+             print "création d'une scene"
+             msg=XplMessage()
+             msg.set_schema('scene.basic')
+             msg.set_type('xpl-trig')
+             msg.add_data({'command':'Create-ack'})
+             msg.add_data({'scene':'0'})
+             scene_number= 'scene_%s OK' %self.sceneC
+             msg.add_data({'data':scene_number}) 
 
-         self.myxpl.send(msg)
+             self.myxpl.send(msg)
 
-      elif message.data['command']=="start":
-         print 'Start scene'
-      elif message.data['command']=='stop':
-         print 'Stop scene'
 
    def send_xpl(self,data):
        """boucle d'envoie d'une message xpl

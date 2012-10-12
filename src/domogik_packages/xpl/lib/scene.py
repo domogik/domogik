@@ -369,6 +369,7 @@ class Mscene():
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
           msg=XplMessage()
+          msg.set_source('xpl-rest.domogik')
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
           msg.add_data({'number': self.number})
@@ -391,15 +392,18 @@ class Mscene():
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
           msg=XplMessage()
+          msg.set_source('xpl-rest.domogik')
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
           msg.add_data({'number': self.number})
           msg.add_data({'run':'start'})
           msg.add_data({'stats':'false'})
           self.myxpl.send(msg)
+          print msg
 
        if condition == last_value:
           msg=XplMessage()
+          msg.set_source('xpl-rest.domogik')
           msg.set_schema('scene.basic')
           msg.set_type('xpl-stat')
           msg.add_data({'number': self.number})
