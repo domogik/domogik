@@ -14,6 +14,7 @@ from xml.dom import minidom
 import threading
 import ast
 import os
+import platform
 
 class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
@@ -90,7 +91,7 @@ class SceneManager(XplPlugin):
    ### create a scene for init plugin
    ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
       self.sceneCount = int(ligne['scene'])#self.sceneCount + 1
-      Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'])
+      Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'],platform.uname()[1])
 
 
       Mini_scene.start()
@@ -197,7 +198,7 @@ class SceneManager(XplPlugin):
              device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
          
              print 'self.manager=%s' %self.manager
-             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor)
+             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor,platform.uname()[1])
              msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
              self.scene.add_scene(self.filetoopen,msg)
 
@@ -208,6 +209,8 @@ class SceneManager(XplPlugin):
              print "création d'une scene"
              msg=XplMessage()
              msg.set_schema('scene.basic')
+             sender= "domogik-scene.%s" %platform.uname()[1]
+             msg.set_sender(sender)
              msg.set_type('xpl-trig')
              msg.add_data({'command':'Create-ack'})
              msg.add_data({'scene':'0'})

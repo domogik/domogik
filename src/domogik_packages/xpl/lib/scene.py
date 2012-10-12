@@ -33,7 +33,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
+import platform
 import subprocess
 import urllib2
 import time
@@ -135,17 +135,17 @@ class Mscene():
     listener1 = ['','','','','','','','','','']
     listener2 = ['','','','','','','','','','']
     glistener = ''
-
-    def __init__(self,number,xplmanager,device1,device2,condition,Action_true,Action_false,rinor):
+   
+    def __init__(self,number,xplmanager,device1,device2,condition,Action_true,Action_false,rinor,host):
       print "number = %s" %number
       self.number="scene_%s" %number
       self.myxpl=xplmanager
       print "myxpl=%s" %self.myxpl
+      self.senderscene = "domogik-scene%s.%s" %(number,host)
+      self.senderplug = "domogik-scene.%s" %host  
       msg1=XplMessage()
-      self.sourcexpl = msg1.source
-      print "source init = %s" %self.sourcexpl
       msg1.set_schema('scene.basic')
-      msg1.set_source(self.sourcexpl)
+      msg1.set_source(self.senderplug)
       msg1.set_type('xpl-trig')
       msg1.add_data({'number': self.number})
       msg1.add_data({'run':'start'})
@@ -211,7 +211,7 @@ class Mscene():
           for i in range(len(self.device2['listener'])):
              self.listener2[i]=Listener(self.cmd_device2,self.myxpl,{'schema':self.device2['listener'][i]['schema'],'xpltype':'xpl-trig',self.device2['listener'][i]['device']:self.device2['address']})
        msg1=XplMessage()
-       msg1.set_source(self.sourcexpl)
+       msg1.set_source(self.senderplug)
        msg1.set_schema('scene.basic')
        msg1.set_type('xpl-trig')
        msg1.add_data({'number': self.number})
@@ -229,7 +229,7 @@ class Mscene():
              self.myxpl.del_listener(self.listener2[j])
        msg1=XplMessage()
        msg1.set_schema('scene.basic')
-       msg1.set_source(self.sourcexpl)
+       msg1.set_source(self.senderplug)
        msg1.set_type('xpl-trig')
        msg1.add_data({'number': self.number})
        msg1.add_data({'run':'stop'})
@@ -374,7 +374,7 @@ class Mscene():
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
           msg=XplMessage()
-          msg.set_source('xpl-rest.domogik')
+          msg.set_source(self.senderscene)
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
           msg.add_data({'number': self.number})
@@ -397,7 +397,7 @@ class Mscene():
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
           msg=XplMessage()
-          msg.set_source('xpl-rest.domogik')
+          msg.set_source(self.senderscene)
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
           msg.add_data({'number': self.number})
@@ -408,7 +408,7 @@ class Mscene():
 
        if condition == last_value:
           msg=XplMessage()
-          msg.set_source('xpl-rest.domogik')
+          msg.set_source(self.senderscene)
           msg.set_schema('scene.basic')
           msg.set_type('xpl-stat')
           msg.add_data({'number': self.number})
