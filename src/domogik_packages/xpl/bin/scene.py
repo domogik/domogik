@@ -89,11 +89,16 @@ class SceneManager(XplPlugin):
    def mem_scene(self, ligne):
    ### create a scene for init plugin
    ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
+      if 'option_start' in ligne:
+         option_start=ligne['option_start']
+      else:
+         option_start='true'
+
       self.sceneCount = int(ligne['scene'])#self.sceneCount + 1
       Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'],self.get_sanitized_hostname())
 
-
-      Mini_scene.start()
+      if option_start=='true':
+         Mini_scene.start()
 
    def scene_cmd(self, message):
       """ routine lorsque le plugin recoit un message xpl
@@ -141,10 +146,17 @@ class SceneManager(XplPlugin):
              action_false_cmd = ''
              filter_device1 = ''
              filter_device2 = ''
-
+             descrip=''
              rinor=data['rinorip']+":"+data['rinorport']
              print 'rinor:%s' %rinor
-
+             if 'option_start' in data:
+                option_start=data['option_start']
+             else:
+                option_start='true'
+             if 'descrip' in data:
+                descrip=data['descrip']
+             else:
+                descrip="pas de description"
              if 'device1id' in data and data['device1id'] != '':
                 device1_adr = data['device1adr']
                 device1_id = data['device1id']
@@ -199,19 +211,19 @@ class SceneManager(XplPlugin):
              device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
          
              print 'self.manager=%s' %self.manager
-             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false,self.get_sanitized_hostname() )
-             msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
+             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false,rinor,self.get_sanitized_hostname())
+             msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s','descrip':'%s','option_start':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor,descrip,option_start)
              self.scene.add_scene(self.filetoopen,msg)
-
+             print "message to file: %s" %msg
 #         the_url="http://%s/base/device/add/name/%s/address/%s/usage_id/scene/description/scene_plugin/reference/Mscene" %(self.Mscene,self.Mscene)
-
-             Mini_scene.start()
+             if option_start=='true':
+                Mini_scene.start()
 
              print "création d'une scene"
              msg=XplMessage()
              msg.set_schema('scene.basic')
              sender= "domogik-scene.%s" %self.get_sanitized_hostname()
-             msg.set_sender(sender)
+             msg.set_source(sender)
              msg.set_type('xpl-trig')
              msg.add_data({'command':'Create-ack'})
              msg.add_data({'scene':'0'})
@@ -226,7 +238,7 @@ class SceneManager(XplPlugin):
              msg=XplMessage()
              msg.set_schema('scene.basic')
              sender= "domogik-scene.%s" %self.get_sanitized_hostname() 
-             msg.set_sender(sender)
+             msg.set_source(sender)
              msg.set_type('xpl-trig')
              msg.add_data({'command':'Read-ack'})
              msg.add_data({'scene':'0'})
@@ -238,7 +250,7 @@ class SceneManager(XplPlugin):
              msg=XplMessage()
              msg.set_schema('scene.basic')
              sender= "domogik-scene.%s" %self.get_sanitized_hostname()
-             msg.set_sender(sender)
+             msg.set_source(sender)
              msg.set_type('xpl-trig')
              msg.add_data({'command':'Delete-ack'})
              msg.add_data({'scene':'0'})

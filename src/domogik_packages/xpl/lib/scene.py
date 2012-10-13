@@ -217,8 +217,9 @@ class Mscene():
        msg1.add_data({'run':'start'})
        msg1.add_data({'stats':'None'})
        self.myxpl.send(msg1)
-       self.etat_scene = self.test()
 
+       self.etat_scene = self.test()
+       
 
     def stop(self):
        for j in range(len(self.listener1)):
