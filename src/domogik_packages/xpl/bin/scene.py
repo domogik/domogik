@@ -14,7 +14,6 @@ from xml.dom import minidom
 import threading
 import ast
 import os
-import platform
 
 class SceneManager(XplPlugin):
    """Plugin destine a faire de petite automatisation
@@ -91,7 +90,7 @@ class SceneManager(XplPlugin):
    ### create a scene for init plugin
    ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
       self.sceneCount = int(ligne['scene'])#self.sceneCount + 1
-      Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'],platform.uname()[1])
+      Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'],self.get_sanitized_hostname())
 
 
       Mini_scene.start()
@@ -106,8 +105,10 @@ class SceneManager(XplPlugin):
           data = data.replace(',',"',")
           data = "{" + data + "'}"
           data = ast.literal_eval(data)
-          data['actiontrueval'] = data['actiontrueval'].replace("%#",",")
-          data['actionfalseval'] = data['actionfalseval'].replace("%#",",")
+          if "actiontrueval" in message.data:
+              data['actiontrueval'] = data['actiontrueval'].replace("%#",",")
+          if "actionfalseval" in message.data:
+              data['actionfalseval'] = data['actionfalseval'].replace("%#",",")
 
           print data 
           if message.data['command']=="Create" and message.data['scene'] =='0':
@@ -198,7 +199,7 @@ class SceneManager(XplPlugin):
              device2 = {'address':device2_adr,'id':device2_id, 'key_stat':device2_key,'listener':filter_device2}
          
              print 'self.manager=%s' %self.manager
-             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false, rinor,platform.uname()[1])
+             Mini_scene = Mscene(self.sceneC,self.manager,device1,device2,condition,action_true,action_false,self.get_sanitized_hostname() )
              msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
              self.scene.add_scene(self.filetoopen,msg)
 
@@ -209,7 +210,7 @@ class SceneManager(XplPlugin):
              print "création d'une scene"
              msg=XplMessage()
              msg.set_schema('scene.basic')
-             sender= "domogik-scene.%s" %platform.uname()[1]
+             sender= "domogik-scene.%s" %self.get_sanitized_hostname()
              msg.set_sender(sender)
              msg.set_type('xpl-trig')
              msg.add_data({'command':'Create-ack'})
@@ -218,6 +219,32 @@ class SceneManager(XplPlugin):
              msg.add_data({'data':scene_number}) 
 
              self.myxpl.send(msg)
+
+          if message.data['command']=="Read" and message.data['scene'] =='0':
+             mem = self.scene.read_scene(self.filetoopen)
+             list_scene=mem
+             msg=XplMessage()
+             msg.set_schema('scene.basic')
+             sender= "domogik-scene.%s" %self.get_sanitized_hostname() 
+             msg.set_sender(sender)
+             msg.set_type('xpl-trig')
+             msg.add_data({'command':'Read-ack'})
+             msg.add_data({'scene':'0'})
+             msg.add_data({'data':list_scene})
+
+          if message.data['command']=="Delete" and message.data['scene'] !='0':
+             mem = self.scene.read_scene(self.filetoopen)
+             list_scene=mem
+             msg=XplMessage()
+             msg.set_schema('scene.basic')
+             sender= "domogik-scene.%s" %self.get_sanitized_hostname()
+             msg.set_sender(sender)
+             msg.set_type('xpl-trig')
+             msg.add_data({'command':'Delete-ack'})
+             msg.add_data({'scene':'0'})
+             scene_number= 'scene_%s OK' %self.sceneC
+             msg.add_data({'data':list_scene})
+
 
 
    def send_xpl(self,data):

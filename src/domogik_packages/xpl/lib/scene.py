@@ -33,7 +33,6 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-import platform
 import subprocess
 import urllib2
 import time
