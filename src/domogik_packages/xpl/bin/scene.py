@@ -103,6 +103,7 @@ class SceneManager(XplPlugin):
    def scene_cmd(self, message):
       """ routine lorsque le plugin recoit un message xpl
       """
+      print "message recu: %s" %message
       if "data" in message.data:
           data = message.data['data']
           data = data.replace('|','')
@@ -256,6 +257,27 @@ class SceneManager(XplPlugin):
              msg.add_data({'scene':'0'})
              scene_number= 'scene_%s OK' %self.sceneC
              msg.add_data({'data':list_scene})
+
+      if "command" in message.data:
+
+         if message.data['command']== "true":
+            msg=XplMessage()
+            msg.set_schema('scene.basic')
+            sender= "domogik-scene.%s" %self.get_sanitized_hostname()
+            msg.set_source(sender)
+            msg.set_type('xpl-trig')
+            msg.add_data({'number':message.data['number']})
+            msg.add_data({'stats':'true'})
+            self.myxpl.send(msg)
+         if message.data['command']== "false":
+            msg=XplMessage()
+            msg.set_schema('scene.basic')
+            sender= "domogik-scene.%s" %self.get_sanitized_hostname()
+            msg.set_source(sender)
+            msg.set_type('xpl-trig')
+            msg.add_data({'number':message.data['number']})
+            msg.add_data({'stats':'false'})
+            self.myxpl.send(msg)
 
 
 
