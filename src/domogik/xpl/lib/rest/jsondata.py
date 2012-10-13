@@ -144,7 +144,7 @@ class JSonHelper():
     def _process_data(self, data, idx = 0, key = None, max_depth = MAX_DEPTH):
         """ Recursive function. Generate json data
         """
-        #print "==== PROCESS DATA " + str(idx) + " ===="
+        #print("==== PROCESS DATA " + str(idx) + " ====")
 
         # check deepth in recursivity
         if idx > max_depth:
@@ -170,8 +170,8 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        #print "TYPE=%s" % data_type
-        #print data
+        #print("TYPE=%s" % data_type)
+        #print(data)
 
         ### type instance (sql object)
         if data_type in instance_type:
@@ -180,7 +180,7 @@ class JSonHelper():
                 sub_data_type = data._type.lower()
             except:
                 sub_data_type = "instance"
-            #print "SUB TYPE = %s" % sub_data_type
+            #print("SUB TYPE = %s" % sub_data_type)
 
             if idx == 0:
                 data_json += "{"
@@ -191,9 +191,9 @@ class JSonHelper():
                 sub_data_key = key
                 sub_data = getattr(data, key)
                 sub_data_type = type(sub_data).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
+                #print("    DATA KEY : " + str(sub_data_key))
+                #print("    DATA : " + str(sub_data))
+                #print("    DATA TYPE : " + str(sub_data_type))
                 data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth)
             data_json = data_json[0:len(data_json)-1] + "},"
 
@@ -204,9 +204,9 @@ class JSonHelper():
                 sub_data_key = key 
                 sub_data = getattr(data, key)
                 sub_data_type = type(sub_data).__name__ 
-                #print "    DATA KEY : " + str(sub_data_key) 
-                #print "    DATA : " + unicode(sub_data) 
-                #print "    DATA TYPE : " + str(sub_data_type) 
+                #print("    DATA KEY : " + str(sub_data_key) )
+                #print("    DATA : " + unicode(sub_data) )
+                #print("    DATA TYPE : " + str(sub_data_type) )
                 my_buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth) 
                 # if max depth in recursivity, we don't display "foo : {}"
                 if re.match(".*#MAX_DEPTH#.*", my_buffer) is None:
@@ -217,11 +217,11 @@ class JSonHelper():
         elif data_type in list_type:
             # get first data type
             if len(data) == 0:
-                #print "DATA vide=%s" % data
+                #print("DATA vide=%s" % data)
                 data_json = '"%s" : [],' % key
             else:
                 sub_data_elt0_type = type(data[0]).__name__
-                #print "DATA=%s" % data
+                #print("DATA=%s" % data)
                 # start table
                 if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
                     data_json += '"%s" : [' % key
@@ -235,9 +235,9 @@ class JSonHelper():
                 for sub_data in data:
                     sub_data_key  = "NOKEY"
                     sub_data_type = type(sub_data).__name__
-                    #print "    DATA KEY : " + str(sub_data_key)
-                    #print "    DATA : " + str(sub_data)
-                    #print "    DATA TYPE : " + str(sub_data_type)
+                    #print("    DATA KEY : " + str(sub_data_key))
+                    #print("    DATA : " + str(sub_data))
+                    #print("    DATA TYPE : " + str(sub_data_type))
                     data_json += self._process_sub_data(idx + 1, True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth)
                 # finish table
                 data_json = data_json[0:len(data_json)-1] + "],"
@@ -253,9 +253,9 @@ class JSonHelper():
                 sub_data_key = key
                 sub_data = data[key]
                 sub_data_type = type(sub_data).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
+                #print("    DATA KEY : " + str(sub_data_key))
+                #print("    DATA : " + str(sub_data))
+                #print("    DATA TYPE : " + str(sub_data_type))
                 data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth)
             if data == {}:
                 data_json += "},"
