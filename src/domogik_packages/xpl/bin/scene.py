@@ -106,11 +106,12 @@ class SceneManager(XplPlugin):
       print "message recu: %s" %message
       if "data" in message.data:
           data = message.data['data']
-          data = data.replace('|','')
-          data = data.replace(':',":'")
-          data = data.replace(',',"',")
-          data = "{" + data + "'}"
-          data = ast.literal_eval(data)
+          if message.data['data']!="Read all scene":
+             data = data.replace('|','')
+             data = data.replace(':',":'")
+             data = data.replace(',',"',")
+             data = "{" + data + "'}"
+             data = ast.literal_eval(data)
           if "actiontrueval" in message.data:
               data['actiontrueval'] = data['actiontrueval'].replace("%#",",")
           if "actionfalseval" in message.data:
@@ -235,7 +236,21 @@ class SceneManager(XplPlugin):
 
           if message.data['command']=="Read" and message.data['scene'] =='0':
              mem = self.scene.read_scene(self.filetoopen)
-             list_scene=mem
+             print('commande read')
+             list_scene=""
+             for i in range(len(mem)):
+                liste=str(mem[i])
+                print "maliste:%s" %liste
+                if liste !='':
+                   liste=ast.literal_eval(liste)
+                   if 'scene' in liste:
+                      scenee=liste['scene']
+                   else:
+                      scenee='None'
+                   if 'descrip' in liste:
+                      list_scene=list_scene+"Scene_"+scenee+" "+liste['descrip']+","
+                   else:
+                      list_scene=list_scene+"Scene_"+scenee+" Pas de description,"
              msg=XplMessage()
              msg.set_schema('scene.basic')
              sender= "domogik-scene.%s" %self.get_sanitized_hostname() 
@@ -244,6 +259,7 @@ class SceneManager(XplPlugin):
              msg.add_data({'command':'Read-ack'})
              msg.add_data({'scene':'0'})
              msg.add_data({'data':list_scene})
+             self.myxpl.send(msg)
 
           if message.data['command']=="Delete" and message.data['scene'] !='0':
              mem = self.scene.read_scene(self.filetoopen)
@@ -257,7 +273,7 @@ class SceneManager(XplPlugin):
              msg.add_data({'scene':'0'})
              scene_number= 'scene_%s OK' %self.sceneC
              msg.add_data({'data':list_scene})
-
+             self.myxpl.send(msg)
       if "command" in message.data:
 
          if message.data['command']== "true":
