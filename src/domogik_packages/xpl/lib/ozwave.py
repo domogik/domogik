@@ -384,7 +384,7 @@ class OZWavemanager(threading.Thread):
         # recherche de la valueId qui a envoyée le NodeEvent
         node = self._fetchNode(homeId, activeNodeId)
         values = node.getValuesForCommandClass('COMMAND_CLASS_BASIC')
-        print "*************** Node event handle *******"
+        print("*************** Node event handle *******")
         print node.productType
         if len(node.commandClasses) == 0 : node._updateCommandClasses()
         print node.commandClasses 
@@ -398,15 +398,15 @@ class OZWavemanager(threading.Thread):
                 args2['valueId'] = valuebasic[0].valueData
                 args2['notificationType'] = 'ValueChanged'
                 break
-        print "Valeur event :" ,  args['event']
+        print("Valeur event :" ,  args['event'])
         for value in values :
-            print "-- Value :"
-            print value
+            print("-- Value :")
+            print(value)
         if args2 :
-                print "Event transmit à ValueChanged :"
-                print args2
+                print("Event transmit à ValueChanged :")
+                print(args2)
                 self._handleValueChanged(args2)
-                print"********** Node event handle fin du traitement ******"        
+                print("********** Node event handle fin du traitement ******"        )
                 
     def _handleInitializationComplete(self, args):
         # La séquence d'initialisation est terminée
@@ -480,7 +480,7 @@ class OZWavemanager(threading.Thread):
         """Enregistre le configuration au format xml"""
         retval = {}
         self._manager.writeConfig(self.homeId)
-        print "config sauvée"
+        print("config sauvée")
         retval["File"] ="confirmed"
         return retval
 
@@ -493,7 +493,7 @@ class OZWavemanager(threading.Thread):
         if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO : gérer un message pour l'utilisateur pour erreur de config.
         retval['nodeId']  = int(ids[1])
         retval['instance']  = int(ids[2])
-        print "getZWRefFromxPL : ", retval
+        print("getZWRefFromxPL : ", retval)
         return retval
         
     def sendNetworkZW(self, command,  addresseTy, opt =""):
@@ -535,8 +535,8 @@ class OZWavemanager(threading.Thread):
                             print("return bad type value")
                         break
             print ("commande transmise")
-            print "Request demande Type : " + self._manager.getNodeType(homeId,  nodeID)
-            print "Manufact node : "+ self._manager.getNodeManufacturerName(homeId,nodeID)
+            print ("Request demande Type : " + self._manager.getNodeType(homeId,  nodeID))
+            print ("Manufact node : "+ self._manager.getNodeManufacturerName(homeId,nodeID))
 
     def getNodeInfos(self,  nodeID):
         """ Retourne les informations d'un device, format dict{} """

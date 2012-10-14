@@ -69,7 +69,7 @@ class RELAY:
             f = urllib.urlopen( self.url1)
             self._log.debug("Trying to acces to First Pulse URL  %s  " % (self.url1))
             if f.read().strip() == "ok.":
-                 #print "premier ok"
+                 #print("premier ok")
                  self._log.debug("First Pulse Url response %s  " % (f.read().strip()))
                  self._log.debug("Waiting for %s seconds to acces the second URL  " % (delay))
                  time.sleep(delay)
@@ -79,7 +79,7 @@ class RELAY:
                  f = urllib.urlopen( self.url2)
                  self._log.debug("Trying to acces to Second Pulse URL  %s  " % (self.url2))
                  if f.read().strip() == "ok.":
-                      #print "second ok"
+                      #print("second ok")
                       self._log.debug("Second Pulse Url response %s  " % (f.read().strip()))
                       return True
                  else:

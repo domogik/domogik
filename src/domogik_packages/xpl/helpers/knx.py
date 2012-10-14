@@ -49,7 +49,7 @@ class KNXHelper(Helper):
    def __init__(self):
 #      XplPlugin.__init__(momo, name ='knx')
 #     momo._config = Query(self.myxpl, self.log)
-      print "test"
+      print("test")
       self.commands =   \
                { "all" : 
                   {
@@ -68,6 +68,6 @@ class KNXHelper(Helper):
          liste.append(ligne)
 
       for i in range(len(liste)):
-         print "%s. %s" %(i,liste[i])
+         print("%s. %s" %(i,liste[i]))
 
 MY_CLASS = {"cb": KNXHelper}

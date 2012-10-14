@@ -109,7 +109,7 @@ class X10Main(XplPlugin):
     #        if res:
     #            self.log.warning("Error during heyu restart : %s" % res)
     #    else:
-    #        print "empty res"
+    #        print("empty res")
 #
     #def heyu_dump_config(self, message):
     #    """

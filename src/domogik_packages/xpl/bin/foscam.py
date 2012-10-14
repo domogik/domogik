@@ -96,13 +96,13 @@ class foscam(XplPlugin):
             self.log.warning("Camera named '%s' is not defined" % device)
             return
         if msg_type == 'output' and msg_current.lower() in ['high']:
-             print "high recu"
+             print ("high recu")
              self.log.debug("high command receive on relay '%s'" % device)
              # Our listener catch a Message with low output command
              status = self._foscammanager.close_relay(ip, port, user, password, device)
              # Send xpl-trig to say plugin whell receive high command
              if status == True:
-                  #print "high ACKed"
+                  #print ("high ACKed")
                   self.log.debug("high command Ack on relay '%s'" % device)
                   mess = XplMessage()
                   mess.set_type('xpl-trig')
@@ -112,13 +112,13 @@ class foscam(XplPlugin):
                   mess.add_data({'current' : 'high'})
                   self.myxpl.send(mess)
         if msg_type == 'output' and msg_current.lower() in ['low']:
-             print "low recu"
+             print ("low recu")
              self.log.debug("low command receive on relay '%s'" % device)
              # Our listener catch a Message with low output command
              status = self._foscammanager.open_relay(ip, port, user, password, device)
              # Send xpl-trig to say plugin whell receive low command
              if status == True:
-                  #print "low ACKed"
+                  #print ("low ACKed")
                   self.log.debug("low command Ack on relay '%s'" % device)
                   mess = XplMessage()
                   mess.set_type('xpl-trig')
@@ -129,13 +129,13 @@ class foscam(XplPlugin):
                   self.myxpl.send(mess)
 
         if msg_type == 'output' and msg_current.lower() in ['pulse']:
-             print "pulse recu"
+             print ("pulse recu")
              self.log.debug("pulse command receive on relay '%s'" % device)
              # Our listener catch a Message with output pulse output command
              status = self._foscammanager.pulse_relay(ip, port, user, password, delay, device)
              # Send xpl-trig to say plugin whell receive pulse command
              if status == True:
-                  print "pulse ACKed"
+                  print ("pulse ACKed")
                   self.log.debug("pulse command Ack on relay '%s'" % device)
                   mess = XplMessage()
                   mess.set_type('xpl-trig')

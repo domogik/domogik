@@ -90,9 +90,9 @@ class plcbus(Helper):
         return self.liste_found
 
     def _command_cb(self, f):
-        #print "DEBUG command : %s" % f["d_command"]
-        #print "DEBUG data1 : %s" % f["d_data1"]
-        #print "DEBUG data3 : %s" % f["d_data2"]
+        #print("DEBUG command : %s" % f["d_command"])
+        #print("DEBUG data1 : %s" % f["d_data1"])
+        #print("DEBUG data3 : %s" % f["d_data2"])
         if f["d_command"] == "GET_ALL_ID_PULSE":
             data = int("%s%s" % (f["d_data1"], f["d_data2"]))
             house = f["d_home_unit"][0]

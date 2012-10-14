@@ -171,7 +171,7 @@ class ZWave(threading.Thread):
                 frame += hexchar
                 if len(frame) == frame_length:
                    # On est à la fin de la trame, on la print
-                   # print "Nouvelle trame : %s" % frame
+                   # print("Nouvelle trame : %s" % frame)
                    # Calcul et verification du checksum
                    chksum = frame[(frame_length-2):frame_length]
                    self.__checksum(frame[0:frame_length-2])

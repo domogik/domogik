@@ -148,10 +148,10 @@ class serialHandler(threading.Thread):
 
     def _is_ack_for_message(self, m1, m2):
         #check the ACK bit
-        #print "ACK check " + m1.encode('HEX') +" " + m2
+        #print("ACK check " + m1.encode('HEX') +" " + m2)
         #check house code and user code in hexa string format like '45E0'
         if(m1[4:8].upper() == m2[4:8].upper()) and (m1[8:10].upper() == m2[8:10].upper()): #Compare user code + home unit
-            #print "housecode and usercode OK"
+            #print("housecode and usercode OK")
             return (int(m1[14:16], 16) & 0x20) #test only one bit
         return False
 
@@ -277,7 +277,7 @@ class serialHandler(threading.Thread):
                 self._send(item)
 #                self._mutex.unlock()
 #                self._mutex.testandset()
-            #print "receiving"
+            #print("receiving")
             self.receive()
 
     def _is_ack(self, message):

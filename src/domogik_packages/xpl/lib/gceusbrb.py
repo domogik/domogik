@@ -119,7 +119,7 @@ class Relayboardusb:
         print("Sleep 1")
         time.sleep(1) # sleep
         res = self._relayboardusb.readline()
-        print "res=%s" % res
+        print("res=%s" % res)
         if res != "?":
             print("Command is OK") # check status of the command
             # compute the result : 00000010
@@ -163,7 +163,7 @@ class Relayboardusb:
         self._relayboardusb.write("%s" % cmd)
         #res = binascii.hexlify(self._samsung.readline()) # ? keep the readline for checkS cmd !
         res = self._relayboardusb.readline()
-        print "res=%s" % res
+        print("res=%s" % res)
         if res != "?":
             print("Command is OK") # check status of the command
             return True
@@ -196,7 +196,7 @@ class Relayboardusb:
         #if data['elt'] == "led":
         #    elt_type = 'output'
         elt_type = 'output'    
-        print "%s-%s(%s)-%s"  % (device, current, data['value'], elt_type)
+        print("%s-%s(%s)-%s"  % (device, current, data['value'], elt_type))
         self._callback(device, current, elt_type)
 
 
@@ -230,7 +230,7 @@ class Relayboardusb:
         print("Code for command : '%s'" % cmd)
         self._relayboardusb.write("%s" % cmd)
         res = self._relayboardusb.readline()
-        print "res=%s" % res
+        print("res=%s" % res)
         if res != "?":
             print("Command is OK") # check status of the command
         else:

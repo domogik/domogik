@@ -142,14 +142,14 @@ class OZwave(XplPlugin):
                                     'group' :'UI', 
                                     'node' : 0, 
                                     'data': info})
-                print "Refresh network info"
+                print ("Refresh network info")
             elif request['request'] == 'GetNodeInfo' :
                 info = self.getUIdata2dict(self.myzwave.getNodeInfos(request['node']))
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : request['node'], 
                                     'data': info})
-                print "Refresh node :",  request['node'],  info
+                print ("Refresh node :",  request['node'],  info)
             elif  request['request'] == 'SaveConfig':
                 info = self.getUIdata2dict(self.myzwave.saveNetworkConfig())
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -172,13 +172,13 @@ class OZwave(XplPlugin):
                 for inf in info['Values']:
                     mess.add_data({'value%d' %i :  self.getUIdata2dict(inf)})
                     i = i +1
-                print mess
+                print (mess)
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : request['node'], 
                                     'data': "unknow request"})
-                print "commande inconnue"
+                print ("commande inconnue")
             self.myxpl.send(mess)
                                   
                                     

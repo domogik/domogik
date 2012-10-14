@@ -23,9 +23,9 @@ class SceneManager(XplPlugin):
    def __init__(self):
       XplPlugin.__init__(self, name = 'scene')
       ### Create Mini_Scene object
-      print "manager= %s" %self.myxpl
+      print ("manager= %s" %self.myxpl)
       self.manager= self.myxpl
-      print self.manager
+      print (self.manager)
       try:
           self.scene = Scene(self.log, self.send_xpl)
           self.log.info("Start Scene")

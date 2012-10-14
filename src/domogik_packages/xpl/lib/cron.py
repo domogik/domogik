@@ -109,8 +109,8 @@ class CronJobs():
                     self._scheduler.unschedule_job(\
                         self.data[device]['apjob'])
                 except:
-                    print "Can't unschedule AP job %s" % \
-                        self.data[device]['apjob']
+                    print("Can't unschedule AP job %s" % \
+                        self.data[device]['apjob'])
                 del(self.data[device]['apjob'])
             if 'apjobs' in self.data[device]:
                 while len(self.data[device]['apjobs']) > 0:
@@ -118,7 +118,7 @@ class CronJobs():
                     try:
                         self._scheduler.unschedule_job(i)
                     except:
-                        print "Can't unschedule AP job %s" % i
+                        print("Can't unschedule AP job %s" % i)
                 del (self.data[device]['apjobs'])
             return ERROR_NO
         else:
@@ -586,7 +586,7 @@ class CronJobs():
                         cont = True
                         while cont:
                             d = ds[0:2]
-                            #print "d=%s"%d
+                            #print("d=%s"%d)
                             if len(ds) < 2:
                                 cont = False
                             elif d not in days:
@@ -595,12 +595,12 @@ class CronJobs():
                             else:
                                 events[d] = {}
                                 for hs in hrs.split(","):
-                                    #print "hs=%s"%hs
+                                    #print("hs=%s"%hs)
                                     i = hs.find("-")
                                     deb = hs[0:i]
                                     end = hs[i+1:]
-                                    #print "deb=%s"%deb
-                                    #print "end=%s"%end
+                                    #print("deb=%s"%deb)
+                                    #print("end=%s"%end)
                                     if self._api.tools.is_valid_hour(deb):
                                         events[d][deb] = "valueon"
                                     else:
@@ -614,9 +614,9 @@ class CronJobs():
                             ds = ds[2:]
                             if len(ds) < 2:
                                 cont = False
-                            #print "okk=%s"%okk
+                            #print("okk=%s"%okk)
             if okk:
-                #print "events=%s"%events
+                #print("events=%s"%events)
                 jobs = []
                 for d in events:
                     for h in events[d]:
@@ -699,7 +699,7 @@ class CronJobs():
                         cont = True
                         while cont:
                             d = ds[0:2]
-                            #print "d=%s"%d
+                            #print("d=%s"%d)
                             if len(ds)<2:
                                 cont = False
                             elif d not in days:
@@ -708,7 +708,7 @@ class CronJobs():
                             else:
                                 events[d] = {}
                                 for hs in hrs.split(","):
-                                    #print "hs=%s"%hs
+                                    #print("hs=%s"%hs)
                                     i = hs.find("-")
                                     if i < 0:
                                         #This is a single date
@@ -719,8 +719,8 @@ class CronJobs():
                                         #this is an interval period
                                         deb = hs[0:i]
                                         end = hs[i+1:]
-                                        #print "deb=%s"%deb
-                                        #print "end=%s"%end
+                                        #print("deb=%s"%deb)
+                                        #print("end=%s"%end)
                                         if self._api.tools.is_valid_hour(deb):
                                             events[d][deb] = "valueon"
                                         else:
@@ -734,9 +734,9 @@ class CronJobs():
                             ds = ds[2:]
                             if len(ds) < 2:
                                 cont = False
-                                #print "okk=%s"%okk
+                                #print("okk=%s"%okk)
             if okk:
-                #print "events=%s"%events
+                #print("events=%s"%events)
                 jobs = []
                 for d in events:
                     for h in events[d]:
@@ -747,8 +747,8 @@ class CronJobs():
                             self._api.send_xpl_job, day_of_week=dayofweek, \
                             hour=hour, minute=minute, args=[device]))
                         else:
-                            #print "parameters=%s"%parameters
-                            #print "value=%s"%events[d][h]
+                            #print("parameters=%s"%parameters)
+                            #print("value=%s"%events[d][h])
                             jobs.append(self._scheduler.add_cron_job(\
                                 self._api.send_xpl_job, day_of_week=dayofweek, \
                                 hour=hour, minute=minute, \
@@ -830,7 +830,7 @@ class CronJobs():
                         cont = True
                         while cont:
                             d = ds[0:2]
-                            #print "d=%s"%d
+                            #print("d=%s"%d)
                             if len(ds)<2:
                                 cont = False
                             elif d not in days:
@@ -851,8 +851,8 @@ class CronJobs():
                                     #we are in the time part
                                     deb = hs[0:i]
                                     end = hs[i+1:]
-                                    #print "deb=%s"%deb
-                                    #print "end=%s"%end
+                                    #print("deb=%s"%deb)
+                                    #print("end=%s"%end)
                                     if self._api.tools.is_valid_hour(deb):
                                         events[d]["deb"] = deb
                                     else:
@@ -869,14 +869,14 @@ class CronJobs():
                                 else :
                                     dims = hrs[idx2+1:]
                                     for dim in dims.split(","):
-                                        #print "dim=%s"%dim
+                                        #print("dim=%s"%dim)
                                         #we are in the dim parts
                                         if self._api.tools.is_valid_int(dim):
                                             sdims.add(int(dim))
                                         else:
                                             cont = False
                                             okk = False
-                                #print "dims=%s"%dims
+                                #print("dims=%s"%dims)
                                 if len(sdims) == 0:
                                     sdims = [10, 20, 30, 40, 50, 60, 70, \
                                         80, 90]
@@ -885,12 +885,12 @@ class CronJobs():
                             ds = ds[2:]
                             if len(ds)<2:
                                 cont = False
-                                #print "okk=%s"%okk
-            #print "okk=%s"%okk
+                                #print("okk=%s"%okk)
+            #print("okk=%s"%okk)
             if okk:
-                #print "events=%s"%events
+                #print("events=%s"%events)
                 jobs = []
-                #print "events=%s"%events
+                #print("events=%s"%events)
                 for d in events:
                     dayofweek = days[d]
                     delta = self._api.tools.delta_hour(events[d]["end"], \
@@ -905,7 +905,7 @@ class CronJobs():
                         param_dim = {"command" : {"valueon":"dim", \
                             "valueoff":"dim"}, \
                             "level" : {"valueon":d, "valueoff":dim}}
-                        #print "dim=%s"%dim
+                        #print("dim=%s"%dim)
                         hour, minute = self._api.tools.add_hour(\
                             events[d]["deb"], i*deltas)
                         param_dim['level']["valueon"] = dim
@@ -1125,13 +1125,13 @@ class CronJobs():
         mess.set_schema("timer.basic")
         empty = True
         try:
-            #print "value=%s"%value
+            #print("value=%s"%value)
             if parameters != None:
-                #print "parameters=%s"%parameters
+                #print("parameters=%s"%parameters)
                 for key in parameters:
-                    #print "key=%s"%key
+                    #print("key=%s"%key)
                     if value in parameters[key]:
-                        #print "key=%s"%parameters[key][value]
+                        #print("key=%s"%parameters[key][value])
                         mess.add_data({key:parameters[key][value]})
                         empty = False
                     else :
@@ -1139,7 +1139,7 @@ class CronJobs():
             for key in self.data[device]:
                 if key[0:4].startswith("nst-"):
                     k = key[4:]
-                    #print "k=%s"%k
+                    #print("k=%s"%k)
                     if k.startswith("schema"):
                         mess.set_schema(self.data[device][key])
                         empty = False
