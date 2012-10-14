@@ -661,7 +661,6 @@ class SysManager(XplPlugin):
     def _set_component_not_running(self, message):
         """ Set the component to off in the list
         """
-        print("HBEAT.END : %s" % message.source)
         vendor_device = message.source.split(".")[0]
         vendor_id = vendor_device.split("-")[0].lower()
         device_id = vendor_device.split("-")[1].lower()
@@ -1162,7 +1161,6 @@ class SysManager(XplPlugin):
             This function use a semaphore to be used only by 1 command at a time
         """
         self.sema_installed.acquire()
-        print("*** acquire ***")
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.package')
@@ -1190,7 +1188,6 @@ class SysManager(XplPlugin):
         self.myxpl.send(mess)
         time.sleep(0.3) # make sure to make a pause between 2 messages
         self.sema_installed.release()
-        print("*** release ***")
 
     def _pkg_get_dependencies(self, message):
         """ Return the list of dependencies for a package
@@ -1386,7 +1383,6 @@ class SysManager(XplPlugin):
         """ Uninstall a package
             @param message : xpl message received
         """
-        print("call uninstall")
         try:
             pkg_type = message.data['type']
             pkg_id = message.data['id']

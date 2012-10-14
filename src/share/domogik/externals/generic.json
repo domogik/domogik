@@ -1,0 +1,104 @@
+{
+    "configuration": [], 
+    "device_feature_models": [
+        {
+            "device_type_id": "generic.tank", 
+            "feature_type": "sensor", 
+            "id": "generic.tank.distance", 
+            "name": "Distance", 
+            "parameters": "{&quot;unit&quot;:&quot;cm&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "distance", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.tank", 
+            "feature_type": "sensor", 
+            "id": "generic.tank.level", 
+            "name": "Level", 
+            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "percent", 
+            "value_type": "number"
+        },
+        {
+            "device_type_id": "generic.rgb_leds", 
+            "feature_type": "actuator", 
+            "id": "generic.rgb_leds.color", 
+            "name": "Color", 
+            "parameters": "{}", 
+            "return_confirmation": "1", 
+            "stat_key": "color", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "generic.rgb_leds", 
+            "feature_type": "actuator", 
+            "id": "generic.rgb_leds.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;setcolor&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "command", 
+            "value_type": "binary"
+        },
+        {
+            "device_type_id": "generic.thermometer", 
+            "feature_type": "sensor", 
+            "id": "generic.thermometer.temperature", 
+            "name": "Temperature", 
+            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "temperature", 
+            "value_type": "number"
+        }
+    ], 
+    "device_types": [
+        {
+            "description": "Tank", 
+            "id": "generic.tank", 
+            "name": "Tank"
+        },
+        {
+            "description": "RGB leds controller", 
+            "id": "generic.rgb_leds", 
+            "name": "RGB leds controller"
+        },
+        {
+            "description": "Thermometer", 
+            "id": "generic.thermometer", 
+            "name": "Thermometer"
+        }
+    ], 
+    "external": {
+        "device_id": "none", 
+        "vendor_id": "none"
+    }, 
+    "files": [
+        "src/share/domogik/design/external/generic/icon.png", 
+        "src/share/domogik/externals/generic.json", 
+        "src/share/domogik/stats/arduino/sensor.basic-generic-tank.xml",
+        "src/share/domogik/url2xpl/generic/setcolor.xml", 
+        "src/share/domogik/stats/generic/arduino.rgb-generic.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml"
+    ], 
+    "identity": {
+        "author": "Fritz", 
+        "author_email": "fritz.smh at gmail.com", 
+        "category": "generic", 
+        "changelog": "0.1\n- Creation\n- Tank level\n- RGB leds (arduino)", 
+        "dependencies": [], 
+        "description": "This external members allow you to use some generic xpl devices with Domogik",
+        "documentation": "http://wiki.domogik.org/external_generic", 
+        "domogik_min_version": "0.2.0", 
+        "id": "generic", 
+        "type": "external", 
+        "version": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Generic", 
+        "id": "generic", 
+        "name": "generic"
+    }, 
+    "udev-rules": []
+}
