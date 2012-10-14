@@ -274,21 +274,25 @@ class SceneManager(XplPlugin):
              scene_number= 'scene_%s OK' %self.sceneC
              msg.add_data({'data':list_scene})
              self.myxpl.send(msg)
-      if "command" in message.data:
 
-         if message.data['command']== "true":
+      if "command" in message.data and message.type=="xpl-cmnd":
+         print("Message recu contenant commande et xpl-cmdn")
+ 
+         if message.data['command'] == "true" and message.type == "xpl-cmnd":
+            print("Réception xpl cmnd true")
             msg=XplMessage()
             msg.set_schema('scene.basic')
-            sender= "domogik-scene.%s" %self.get_sanitized_hostname()
+            sender= "domogik-scene0.%s" %self.get_sanitized_hostname()
             msg.set_source(sender)
             msg.set_type('xpl-trig')
             msg.add_data({'number':message.data['number']})
             msg.add_data({'stats':'true'})
             self.myxpl.send(msg)
-         if message.data['command']== "false":
+         if message.data['command']== "false" and message.type=="xpl-cmnd":
+            print("Réceptino xpl cmnd false")
             msg=XplMessage()
             msg.set_schema('scene.basic')
-            sender= "domogik-scene.%s" %self.get_sanitized_hostname()
+            sender= "domogik-scene0.%s" %self.get_sanitized_hostname()
             msg.set_source(sender)
             msg.set_type('xpl-trig')
             msg.add_data({'number':message.data['number']})

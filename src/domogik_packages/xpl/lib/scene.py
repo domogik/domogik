@@ -147,7 +147,7 @@ class Mscene():
       msg1.set_source(self.senderplug)
       msg1.set_type('xpl-trig')
       msg1.add_data({'number': self.number})
-      msg1.add_data({'run':'start'})
+      msg1.add_data({'run':'init'})
       msg1.add_data({'statue':'unknow'})
       self.myxpl.send(msg1)
       print "fin de l'init lib envoie du XPl"
@@ -172,10 +172,11 @@ class Mscene():
     def cmd_scene(self,message):
        print "reception d'un message scene: '%s'" %message
        print "command = %s" %message.data['command']
-       if message.data['command']=='start':
-          self.start()
-       elif message.data['command']=='stop':
-          self.stop()
+       if message.type == "xpl-cmnd":
+          if message.data['command']=='start':
+             self.start()
+          elif message.data['command']=='stop':
+             self.stop()
 
     def start(self):
        print 'start'
@@ -183,6 +184,7 @@ class Mscene():
        self.key_stat1 = self.device1['key_stat']
 
        if self.device2['id'] != '':
+          print("device 2 id: %s") %self.device2['id']
           self.key_stat2 = self.device2['key_stat']
 
       #initialise les device_stat1 et 2 via un rinor et cree les listeners referant a cmd_device1 et cmd_device2
@@ -197,8 +199,8 @@ class Mscene():
        print "stat device 1 : %s" %self.device1_stat
        self.listener1 = ['','','','','','','','','','']
        for i in range(len(self.device1['listener'])):
-          self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig'}) #,self.device1['listener'][i]['device']:self.device1['address']})
-          print "listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s" %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
+          self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig',self.device1['listener'][i]['device']:self.device1['address']})
+          print("listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s") %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
        if self.device2["id"] != '' and self.device2["key_stat"] != '':
           the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor,self.device2['id'], self.device2['key_stat'])
           req = urllib2.Request(the_url)
