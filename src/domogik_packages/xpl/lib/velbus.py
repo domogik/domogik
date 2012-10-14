@@ -310,10 +310,10 @@ class VelbusDev:
         for data_byte in data:
             __checksum += ord(data_byte)
         __checksum = -(__checksum % 256) + 256
-	try:
+        try:
             __checksum = chr(__checksum)
         except ValueError:
-	    __checksum = chr(0) 
+            __checksum = chr(0) 
         return __checksum
 
     def _parser(self, data):
@@ -412,18 +412,18 @@ class VelbusDev:
            LONG = long pressed
         """
         device = str(ord(data[2]))
-        chanPres = self._byte_to_channels(data[5])
-        chanRel = self._byte_to_channels(data[6])
-        chanLPres = self._byte_to_channels(data[7])
-        for c in chanPres:
+        chanpres = self._byte_to_channels(data[5])
+        chanrel = self._byte_to_channels(data[6])
+        chanlpres = self._byte_to_channels(data[7])
+        for chan in chanpres:
             self._callback("sensor.basic",
-               {"device": str(device) + "-" + str(c), "type": "input", "current": "HIGH" })
-        for c in chanLPres:
+               {"device": str(device) + "-" + str(chan), "type": "input", "current": "HIGH" })
+        for chan in chanlpres:
             self._callback("sensor.basic",
-               {"device": str(device) + "-" + str(c), "type": "input", "current": "LONG" })
-        for c in chanRel:
+               {"device": str(device) + "-" + str(chan), "type": "input", "current": "LONG" })
+        for chan in chanrel:
             self._callback("sensor.basic",
-               {"device": str(device) + "-" + str(c), "type": "input", "current": "LOW" })
+               {"device": str(device) + "-" + str(chan), "type": "input", "current": "LOW" })
 
     def _process_236(self, data):
         """
@@ -451,7 +451,7 @@ class VelbusDev:
             if 8 in status:
                 command = "down"
         else:
-           command = "off"
+            command = "off"
         if command == "":
             self._callback("shutter.device",
                {"device" : device + "-" + chan,
@@ -465,11 +465,11 @@ class VelbusDev:
            Resolution: 0.0625 degree celcius
         """
         device = str(ord(data[2]))
-	cur = ord(data[5]) << 8;
+        cur = ord(data[5]) << 8
         cur = ((cur | ord(data[6])) / 32 ) * 0.0625
-	low = ord(data[7]) << 8;
+        low = ord(data[7]) << 8
         low = ((low | ord(data[8])) / 32 ) * 0.0625
-	high = ord(data[9]) << 8;
+        high = ord(data[9]) << 8
         high = ((high | ord(data[10])) / 32 ) * 0.0625
         self._callback("sensor.basic",
                {"device": device, "type": "temp", "units": "c",
