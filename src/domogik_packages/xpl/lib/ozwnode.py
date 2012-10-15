@@ -66,6 +66,7 @@ class ZWaveNode:
         self._capabilities = set()
         self._commandClasses = set()
         self._neighbors = set()
+        self._nodeInfos = None
         self._values = dict()  # voir la class ZWaveValueNode
         self._name = ''
         self._location = ''
@@ -91,12 +92,17 @@ class ZWaveNode:
     values = property(lambda self:self._values)
     manufacturer = property(lambda self: self._manufacturer.name if self._manufacturer else '')
     groups = property(lambda self:self._groups)
-    isSleeping = property(lambda self: self._sleeping)
+    isSleeping = property(lambda self: self._isSleeping())
     isLocked = property(lambda self: self._getIsLocked())
     level = property(lambda self: self._getLevel())
     isOn = property(lambda self: self._getIsOn())
     batteryLevel = property(lambda self: self._getBatteryLevel())
     signalStrength = property(lambda self: self._getSignalStrength())
+    basic = property(lambda self:  BasicDeviceType[self._nodeInfos.basic] if self._nodeInfos else None)
+    generic = property(lambda self:  GenericDeviceType[self._nodeInfos.generic] if self._nodeInfos else None)
+    specific = property(lambda self:  SpecificDeviceType[self._nodeInfos.generic][self._nodeInfos.specific] if self._nodeInfos else None)
+    security = property(lambda self: self._nodeInfos.security if self._nodeInfos else None)
+    version = property(lambda self:  self._nodeInfos.version if self._nodeInfos else None)
 
     def _getIsLocked(self):
         return False
@@ -210,9 +216,13 @@ class ZWaveNode:
     
     def _updateCapabilities(self):
         """Mise à jour des capabilities set du node"""
+  #      Capabilities = ['Routing', 'Listening', 'Beanning', 'Security', 'FLiRS']
         nodecaps = set()
-        if self._manager.isNodeListeningDevice(self._homeId, self._nodeId): nodecaps.add('listening')
-        if self._manager.isNodeRoutingDevice(self._homeId, self._nodeId): nodecaps.add('routing')
+        if self._manager.isNodeRoutingDevice(self._homeId, self._nodeId): nodecaps.add('Routing')
+        if self._manager.isNodeListeningDevice(self._homeId, self._nodeId): nodecaps.add('Listening')
+        if self._manager.isNodeBeamingDevice(self._homeId, self._nodeId): nodecaps.add('Beaming')
+        if self._manager.isNodeSecurityDevice(self._homeId, self._nodeId): nodecaps.add('Security')
+        if self._manager.isNodeFrequentListeningDevice(self._homeId, self._nodeId): nodecaps.add('FLiRS')
         self._capabilities = nodecaps
         self._ozwmanager._log.debug('Node [%d] capabilities are: %s', self._nodeId, self._capabilities)
         
@@ -232,14 +242,26 @@ class ZWaveNode:
         self._manufacturer = NamedPair(id=self._manager.getNodeManufacturerId(self._homeId, self._nodeId), name=self._manager.getNodeManufacturerName(self._homeId, self._nodeId))
         self._product = NamedPair(id=self._manager.getNodeProductId(self._homeId, self._nodeId), name=self._manager.getNodeProductName(self._homeId, self._nodeId))
         self._productType = NamedPair(id=self._manager.getNodeProductType(self._homeId, self._nodeId), name=self._manager.getNodeType(self._homeId, self._nodeId))
-        self._nodeInfo = NodeInfo(
+        self._nodeInfos = NodeInfo(
             generic = self._manager.getNodeGeneric(self._homeId, self._nodeId),
             basic = self._manager.getNodeBasic(self._homeId, self._nodeId),
             specific = self._manager.getNodeSpecific(self._homeId, self._nodeId),
             security = self._manager.getNodeSecurity(self._homeId, self._nodeId),
             version = self._manager.getNodeVersion(self._homeId, self._nodeId)
         )
-        
+    
+    def  _isSleeping(self):
+        "Interroge le node pour voir son etat"
+        # TODO: A perfectionner, pour l'instant uniquement basé sur la capacité du node et non son etat réel
+        if 'Listening' in self._capabilities : retval = False
+        else : 
+            if (time.time() - self.lastUpdate) > 30 :
+                retval = True
+            else :  retval = False
+        print '+++++ Is Sleeping ? :', retval, ' ++++'
+        print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
+        return retval        
+    
     def _updateNeighbors(self):
         """Mise à jour de la liste des nodes voisins"""
         # TODO: I believe this is an OZW bug, but sleeping nodes report very odd (and long) neighbor lists
@@ -284,6 +306,15 @@ class ZWaveNode:
 #        self._updateConfig()
         
 # Traitement spécifique
+    def _getbasic(self):
+        values = self._getValuesForCommandClass(0x20)   # COMMAND_CLASS_BASIC
+        if values:
+            for value in values:
+                vdic = value.valueData
+                if vdic and vdic.has_key('type') and vdic['type'] == 'Byte' and vdic.has_key('value'):
+                    return int(vdic['value'])
+        return 0
+
     def _getLevel(self):
         values = self._getValuesForCommandClass(0x26)  # COMMAND_CLASS_SWITCH_MULTILEVEL
         if values:
@@ -330,7 +361,7 @@ class ZWaveNode:
         self._updateCommandClasses()
         retval["HomeID"] ="0x%.8x" % self.homeId
         retval["Model"]= self.manufacturer + " -- " + self.product
-        retval["State sleeping"] = 'true' if self.isSleeping else 'false'
+        retval["State sleeping"] = True if self.isSleeping else False
         retval["Node"] = self.nodeId
         retval["Name"] = self.name if self.name else 'Undefined'
         retval["Location"] = self.location if self.location else 'Undefined'
@@ -346,6 +377,7 @@ class ZWaveNode:
         retval['Values'] = []
         for value in self.values.keys():
             retval['Values'].append(self.values[value].getInfos())
+            print self.values[value].getHelp()
         print  retval['Values']
         return retval
         
@@ -358,16 +390,78 @@ class ZWaveNode:
         """"Change la localisation du node"""
         self._manager.setNodeLocation(self.homeId, self.id, loc)   
         self._ozwmanager._log.debug('Requesting setNodeLocation for node {0} with new location {1}'.format(self.id, loc))
+
+    def refresh(self):
+        """Rafraichis le node, util dans le cas d'un reveil si le node dormait lors de l''init """
+        self._manager.refreshNodeInfo(self.homeId, self.id)
+        self._ozwmanager._log.debug('Requesting refresh for node {0}'.format(node.id))
         
+    def setOn(self):
+        """Set node on pour commandclass basic"""
+        self._manager.setNodeOn(self.homeId, self.id)
+        self._ozwmanager._log.debug('Requesting setNodeOn for node {0}'.format(self.id))
+
+    def setOff(self):
+        """Set node off pour commandclass basic"""
+        self._manager.setNodeOff(self.homeId, self.id)
+        self._ozwmanager._log.debug('Requesting setNodeOff for node {0}'.format(self.id))
+
+    def setLevel(self, level):
+        """Set node level pour commandclass basic"""
+        self._manager.setNodeLevel(self.homeId, self.id, level)
+        self._ozwmanager._log.debug('Requesting setNodeLevel for node {0} with new level {1}'.format(self.id, level))
+
+    def createValue(self, valueId):
+        """Crée la valueNode valueId du node si besoin et renvoie l'object valueNode."""
+        vid = valueId['id']
+        if self._values.has_key(vid):
+            self._values[vid].updateData(valueId)
+            retval = self._values[vid]
+        else:
+            retval = ZWaveValueNode(self, valueId)
+            self._ozwmanager._log.debug('Created new value node with homeId %0.8x, nodeId %d, valueId %s', self.homeId, self.nodeId, valueId)
+            self._values[vid] = retval
+            print ('Created new value node with homeId %0.8x, nodeId %d, valueId %s', self.homeId, self.nodeId, valueId)
+        return retval 
+   
+    def getValue(self, valueId):
+        """Renvoi la valueNode valueId du node."""
+        vid = valueId['id']
+        retval= None
+        if self._values.has_key(vid):
+            retval = self._values[vid]
+        else:
+            raise OZwaveNodeException('Value get received before creation (homeId %.8x, nodeId %d, valueid %s)' % (self.homeId, self.nodeId,  valueId))
+        return retval
+        
+    def sendCmdBasic(self, instance,  command,  opt):
+        """Envoie une commande au node"""
+        if (opt != "") and (opt != 'None'):
+            opt = int(opt)
+        else : opt = 0
+        if instance == 1 :
+            if command == 'level':
+                self.setLevel(opt)
+            elif command == 'on':
+                self.setOn()
+            elif command == 'off':
+                self.setOff()
+            else : 
+                self._ozwmanager._log.info("xPL to ozwave unknown command : %s , nodeId : %d",  command,  self.nodeId)
+        else : # instance secondaire, utilisation de set value
+            print ("instance secondaire")
+            cmdsClass= ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY','COMMAND_CLASS_SWITCH_MULTILEVEL']
+            for value in self.values.keys() :
+                val = self.values[value].valueData
+                print ("valeur : " + val['commandClass'])
+                if (val['commandClass'] in cmdsClass)  and val['instance'] == instance :                 
+                    if command=='on' : opt = 255
+                    elif command=='off' : opt = 0
+                    self.values[value].setValue(opt)
+                    break
+        print ("commande transmise")
         
     def __str__(self):
         return 'homeId: [{0}]  nodeId: [{1}] product: {2}  name: {3}'.format(self._homeId, self._nodeId, self._product, self._name)
 
-        # decorator?
-        #self._batteryLevel = None # if COMMAND_CLASS_BATTERY
-        #self._level = None # if COMMAND_CLASS_SWITCH_MULTILEVEL - maybe state? off - ramped - on?
-        #self._powerLevel = None # hmm...
-        # sensor multilevel?  instance/index
-        # meter?
-        # sensor binary?
         

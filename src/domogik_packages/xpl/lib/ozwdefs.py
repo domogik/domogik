@@ -43,12 +43,14 @@ import os.path
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.1b2"
+OZWPLuginVers = "0.1b3"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
 NodeInfo = namedtuple('NodeInfo', ['generic','basic','specific','security','version'])
 GroupInfo = namedtuple('GroupInfo', ['index','label','maxAssociations','members'])
+
+Capabilities = ['Routing', 'Listening', 'Beaming', 'Security', 'FLiRS']
 
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
@@ -58,6 +60,80 @@ CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COM
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
                                 'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
                                 'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
+
+BasicDeviceType = {1: 'TYPE_CONTROLLER', 2: 'TYPE_STATIC_CONTROLLER', 3: 'TYPE_SLAVE', 4 :'TYPE_ROUTING_SLAVE'}
+GenericDeviceType = { 0x00:'TYPE_SPECIFIC_TYPE_NOT_USED', 0x01: 'TYPE_CONTROLLER', 
+                                0x02: 'TYPE_STATIC_CONTROLLER', 0x03: 'TYPE_AV_CONTROL_POINT', 
+                                0x04: 'TYPE_DISPLAY',
+                                0x07: 'GENERIC_TYPE_GARAGE_DOOR',
+                                0x08: 'TYPE_THERMOSTAT',  0x09: 'TYPE_WINDOW_COVERING',
+                                0x0f :'TYPE_REPEATER_SLAVE',  
+                                0x10: 'TYPE_SWITCH_BINARY', 0x11: 'TYPE_SWITCH_MULTILEVEL', 
+                                0x12: 'TYPE_REMOTE_SWITCH', 0x13: 'TYPE_SWITCH_TOGGLE',
+                                0x14: 'TYPE_ZIP_GATEWAY',  
+                                0x15: 'TYPE_ZIP_NODE', 
+                                0xa1: 'TYPE_SENSOR_ALARM', 0x20: 'TYPE_SENSOR_BINARY', 
+                                0x21: 'TYPE_SENSOR_MULTILEVEL', 0x22:'GENERIC_TYPE_WATER_CONTROL',
+                                0x30: 'TYPE_METER_PULSE', 0x31: 'TYPE_METER', 
+                                0x40 : 'TYPE_ENTRY_CONTROL', 0x50: 'TYPE_SEMI_INTEROPERABLE', 
+                                0xff: 'TYPE_NON_INTEROPERABLE'}
+
+SpecificDeviceType = { 0x00:{0x00:'SPECIFIC_TYPE_NOT_USED'}, 
+                                0x01:{0x00:'SPECIFIC_TYPE_NOT_USED',                                #TYPE_CONTROLLER
+                                         0x01:'SPECIFIC_TYPE_PORTABLE_REMOTE_CONTROLLER', 
+                                         0x02:'SPECIFIC_TYPE_PORTABLE_SCENE_CONTROLLER'}, 
+                                0x02:{0x00:'SPECIFIC_TYPE_NOT_USED',                               # TYPE_STATIC_CONTROLLER
+                                         0x01:'SPECIFIC_TYPE_PC_CONTROLLER', 
+                                         0x02:'SPECIFIC_TYPE_SCENE_CONTROLLER'}, 
+                                0x03:{0x03:'SPECIFIC_TYPE_UPNP_NETWORKED'},                   # TYPE_AV_CONTROL_POINT
+                                0x04:{0x00:'SPECIFIC_TYPE_NOT_USED',                              # TYPE_DISPLAY
+                                         0x01:'SPECIFIC_TYPE_SIMPLE_DISPLAY'}, 
+                                0x07:{0x00:'SPECIFIC_TYPE_NOT_USED',                              #  GENERIC_TYPE_GARAGE_DOOR
+                                         0x01:'SPECIFIC_TYPE_SIMPLE_GARAGE_DOOR'},
+                                0x08:{0x00:'SPECIFIC_TYPE_NOT_USED',                              # TYPE_THERMOSTAT
+                                         0x01:'SPECIFIC_TYPE_THERMOSTAT_HEATING',
+                                         0x02:'SPECIFIC_TYPE_THERMOSTAT_GENERAL'}, 
+                                0x09:{0x00:'SPECIFIC_TYPE_NOT_USED',                              # TYPE_WINDOW_COVERING
+                                         0x01:'SPECIFIC_TYPE_SIMPLE_WINDOW_COVERING'},  
+                                0x0f :{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_REPEATER_SLAVE
+                                         0x01:'SPECIFIC_TYPE_REPEATER_SLAVE'}, 
+                                0x10:{0x00:'SPECIFIC_TYPE_NOT_USED',                              #TYPE_SWITCH_BINARY
+                                         0x01:'SPECIFIC_TYPE_POWER_SWITCH_BINARY', 
+                                         0x03:'SPECIFIC_TYPE_POWER_SWITCH_BINARY_V2', 
+                                         0x02:'SPECIFIC_TYPE_SCENE_SWITCH_BINARY'},                               
+                                0x11:{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_SWITCH_MULTILEVEL
+                                         0x01:'SPECIFIC_TYPE_POWER_SWITCH_MULTILEVEL',
+                                         0x03:'SPECIFIC_TYPE_MOTOR_MULTIPOSITION', 
+                                         0x02:'SPECIFIC_TYPE_SCENE_SWITCH_MULTILEVEL'},     
+                                0x12:{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_REMOTE_SWITCH'
+                                         0x04:'SPECIFIC_TYPE_SWITCH_REMOTE_TOGGLE_MULTILEVEL', 
+                                         0x01:'SPECIFIC_TYPE_SWITCH_REMOTE_BINARY', 
+                                         0x03:'SPECIFIC_TYPE_SWITCH_REMOTE_TOGGLE_BINARY', 
+                                         0x02:'SPECIFIC_TYPE_SWITCH_REMOTE_MULTILEVEL'}, 
+                                0x13:{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_SWITCH_TOGGLE
+                                          0x01:'SPECIFIC_TYPE_SWITCH_TOGGLE_BINARY',
+                                          0x02:'SPECIFIC_TYPE_SWITCH_TOGGLE_MULTILEVEL'}, 
+                                0x14:{0x00:'SPECIFIC_TYPE_NOT_USED'},                            # TYPE_ZIP_GATEWAY
+                                0x15:{0x00:'SPECIFIC_TYPE_NOT_USED'},                            # TYPE_ZIP_NODE
+                                0xa1:{0x00:'SPECIFIC_TYPE_NOT_USED'},                            # TYPE_SENSOR_ALARM
+                                0x20:{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_SENSOR_BINARY'
+                                        0x01:'SPECIFIC_TYPE_ROUTING_SENSOR_BINARY'}, 
+                                0x21:{0x00:'SPECIFIC_TYPE_NOT_USED',                              # TYPE_SENSOR_MULTILEVEL
+                                         0x01:'SPECIFIC_TYPE_ROUTING_SENSOR_MULTILEVEL',
+                                         0x02:'SPECIFIC_TYPE_CHIMNEY_FAN_SENSOR_MULTILEVEL'}, 
+                                0x22:{0x00:'SPECIFIC_TYPE_NOT_USED',                              # GENERIC_TYPE_WATER_CONTROL
+                                         0x01:'SPECIFIC_TYPE_POWER_SHOWER'},
+                                0x30:{0x00:'SPECIFIC_TYPE_NOT_USED'},                             #  TYPE_METER_PULSE
+                                0x31:{0x00:'SPECIFIC_TYPE_NOT_USED'},                             # TYPE_METER
+                                
+                                0x40:{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_ENTRY_CONTROL
+                                         0x01:'SPECIFIC_TYPE_DOOR_LOCK'}, 
+                                0x50:{0x00:'SPECIFIC_TYPE_NOT_USED',                             # TYPE_SEMI_INTEROPERABLE
+                                         0x01:'SPECIFIC_TYPE_ENERGY_PRODUCTION'},
+                                0xff: {0x00:'SPECIFIC_TYPE_NOT_USED'}                             # TYPE_NON_INTEROPERABLE
+                                }
+
+
 
 class OZwaveException(Exception):
     """"Zwave generic exception class.
