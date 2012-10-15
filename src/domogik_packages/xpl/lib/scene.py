@@ -104,8 +104,8 @@ class Scene:
         ligne=int(valeur,10)-1
         print ligne
         for i in range(len(o)):
-           if i<>ligne:
-              if o[i]<>"":
+           if i!=ligne:
+              if o[i]!="":
                  f.write(o[i]+"\n")
               else:
                  print "ligne a supprimer:|%s|" %o[ligne]
