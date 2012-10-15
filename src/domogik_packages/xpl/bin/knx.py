@@ -118,7 +118,7 @@ class KNXManager(XplPlugin):
         filetoopen= filetoopen+"/knx.txt"
         fichier=open(filetoopen,"r")
         for ligne in fichier:
-           if ligne[:1]<>"#":
+           if ligne[:1]!="#":
               listknx.append(ligne)
               print ligne
         fichier.close
@@ -150,7 +150,7 @@ class KNXManager(XplPlugin):
         val = 'None'
         msg_type = 'None'
         command = 'None'
-        if sender<>"pageinatio":
+        if sender!="pageinatio":
            print "emetteur |%s|" %sender
            command = data[0:4]  
            lignetest=""
@@ -169,7 +169,7 @@ class KNXManager(XplPlugin):
                  test=lignetest[lignetest.find('datatype:')+9:]
                  datatype=test[:test.find(' ')]
                  if typeadr=="stat":
-                    if lignetest.find('dpt_stat')<>-1:
+                    if lignetest.find('dpt_stat')!=-1:
                        test=lignetest[lignetest.find('dpt_stat:')+9:]
                        datatype=test[:test.find(' ')]
                  test=lignetest[lignetest.find('adr_dmg:')+8:]
@@ -178,7 +178,7 @@ class KNXManager(XplPlugin):
                  msg=XplMessage()
                  msg.set_schema('knx.basic')
 
-                 if command <> 'Read':
+                 if command != 'Read':
                     val=data[data.find(':')+1:-1]
                     val = val.strip()
                     print "valeur=|%s|" %val
@@ -196,19 +196,19 @@ class KNXManager(XplPlugin):
                     if command == 'Resp':
                        print("knx Response xpl-stat")
                        command = 'Response'
-                       if sender<>"0.0.0":
+                       if sender!="0.0.0":
                           msg.set_type("xpl-stat")
                        else:
                           msg.set_type("xpl-trig")
 
                  if command == 'Read':
                     print("knx Read xpl-cmnd")
-                    if sender<>"0.0.0":
+                    if sender!="0.0.0":
                        msg.set_type("xpl-cmnd")
                     else:
                        msg.set_type("xpl-trig")
 
-                 if sender<>"0.0.0":
+                 if sender!="0.0.0":
                     msg.add_data({'command' : command+' bus'})
                  else:
                     msg.add_data({'command': command+' ack'})
@@ -234,7 +234,7 @@ class KNXManager(XplPlugin):
         print "ligne test=|%s|" %lignetest
 
            #si wirte groups_cmd/si read, groups stat
-        if lignetest<>"":
+        if lignetest!="":
            datatype=lignetest[lignetest.find('datatype:')+9:lignetest.find(' adr_dmg')]
            cmdadr=lignetest[lignetest.find('adr_cmd:')+8:lignetest.find(' adr_stat')]
            command=""
@@ -271,7 +271,7 @@ class KNXManager(XplPlugin):
                  command="groupsresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
               if data_type=="l":
                  command="groupresponse ip:127.0.0.1 %s %s" %(cmdadr,valeur)
-           if command<>"":
+           if command!="":
               print "envoie de la command %s" %command
               subp=subprocess.Popen(command, shell=True)
            if command=="":
@@ -319,8 +319,8 @@ class KNXManager(XplPlugin):
               ligne=int(valeur,10)-1
               print ligne
               for i in range(len(o)):
-                 if i<>ligne:
-                    if o[i]<>"":
+                 if i!=ligne:
+                    if o[i]!="":
                        f.write(o[i]+"\n")
                     else:
                        print "ligne a supprimer:|%s|" %o[ligne]

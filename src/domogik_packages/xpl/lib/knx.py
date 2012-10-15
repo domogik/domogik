@@ -39,7 +39,7 @@ import subprocess
 
 ###decodage des valeurs en fonction du datapoint type
 def decodeKNX(datatype, val):
-   if datatype <> '' and val<>'':
+   if datatype != '' and val!='':
 
   ### Decode the data function of the datapoint type
       if datatype == "1.001": #DT_switch
@@ -268,7 +268,7 @@ def encodeKNX(datatype,val):
    if datatype == '5.001':
       data_type="l"
       print 'envoie d un pourcent'
-      if val<>"None":
+      if val!="None":
          val = int(valeur)*255/100
          valeur=hex(val)[2:]
       else:
@@ -333,7 +333,7 @@ def encodeKNX(datatype,val):
       if len(binaireX)<=12:
          for i in range(12-len(binaireX)):
             binaireX="0"+binaireX
-      if len(binairey)<>4:
+      if len(binairey)!=4:
          for i in range(4-len(binairey)):
             binairey="0"+binairey
       valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
