@@ -1480,6 +1480,7 @@ class CronAPI:
         if 'caller' in message.data:
             caller = message.data['caller']
         data = message.data['data']
+        data = data.replace('|','')
         self.log.debug("cronAPI._command_start_alarm : data %s" % data)
         data = "{" + data + "}"
         data = ast.literal_eval(data)
