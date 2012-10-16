@@ -340,7 +340,7 @@ function update_user_config_db {
         db_port=$(grep "^db_port" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
         db_name=$(grep "^db_name" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
         db_host=$(grep "^db_host" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        if ["$db_type" = "mysql"];then
+        if [ "$db_type" = "mysql" ];then
             echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
         else
             psql -h $db_host -p $db_port -U $db_user -d $db_name -c "SELECT 1;" > /dev/null
