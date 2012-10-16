@@ -163,15 +163,13 @@ class OZWavemanager(threading.Thread):
         self._manager.addDriver(self._device)  # ajout d'un driver dans le manager
         
     def stop(self):
-        """ Stop class OZWManager
-        """
+        """ Stop class OZWManager."""
         self._manager.removeDriver(self.device)
         self._ready = False
 
     def run(self, stop):
-        """ Maintient la class OZWManager pour le fonctionnement du plugin
-        @param stop : an Event to wait for stop request
-        """
+        """ Maintient la class OZWManager pour le fonctionnement du plugin.
+        @param stop : an Event to wait for stop request."""
         # tant que le plugins est en cours mais pas lancer pour l'instant, vraiment util ?
         self._log.info("Start plugin listenner")
         print ("Start plugin listenner")
@@ -184,7 +182,7 @@ class OZWavemanager(threading.Thread):
         print ("Stop plugin listener")
             
     def _getPyOZWLibVersion(self):
-        """Renvoi les versions des librairies py-openzwave ainsi que la version d'openzwave"""
+        """Renvoi les versions des librairies py-openzwave ainsi que la version d'openzwave."""
         try :
             self._pyOzwlibVersion = self._manager.getPythonLibraryVersion ()
         except :
@@ -200,7 +198,7 @@ class OZWavemanager(threading.Thread):
             return 'Unknown'
             
     def _getSleepingNodeCount(self):
-        """ Renvoi le nombre de node en veille """
+        """ Renvoi le nombre de node en veille."""
         retval = 0
         for node in self._nodes.itervalues():
             if node.isSleeping:
@@ -323,21 +321,6 @@ class OZWavemanager(threading.Thread):
         node._lastUpdate = time.time()
         self._log.info ('Node %d as add (homeId %.8x)' , args['nodeId'],  args['homeId'])
 
-    def _getValueNode(self, homeId, nodeId, valueId):
-        """Renvoi la valueNode du node"""
-        node = self._getNode(homeId, nodeId)
-        if node is None:
-           raise OZwaveManagerException('Value notification received before node creation (homeId %.8x, nodeId %d)' % (homeId, nodeId))
-        vid = valueId['id']
-        if node._values.has_key(vid):
-            retval = node._values[vid]
-        else:
-            retval = ZWaveValueNode(homeId, nodeId, valueId)
-            self._log.debug('Created new value node with homeId %0.8x, nodeId %d, valueId %s', homeId, nodeId, valueId)
-            print ('Created new value node with homeId %0.8x, nodeId %d, valueId %s', homeId, nodeId, valueId)
-            node._values[vid] = retval
-        return retval 
-
     def _handleValueAdded(self, args):
         """Un valueNode est ajouté au node depuis le réseaux zwave"""
         homeId = args['homeId']
@@ -345,8 +328,7 @@ class OZWavemanager(threading.Thread):
         valueId = args['valueId']
         node = self._fetchNode(homeId, activeNodeId)
         node._lastUpdate = time.time()
-        valueNode = self._getValueNode(homeId, activeNodeId, valueId)
-        valueNode.update(args) 
+        node.createValue(valueId)
        
     def _handleValueChanged(self, args):
         """"Un valuenode à changé sur le réseaux zwave"""
@@ -355,10 +337,10 @@ class OZWavemanager(threading.Thread):
         activeNodeId= args['nodeId']
         valueId = args['valueId']
         node = self._fetchNode(homeId, activeNodeId)
-        node._sleeping = False # TODO: pas sur que le device soit réèlement sortie du mode spleeping
+   #     node._sleeping = False # TODO: pas sur que le device soit réèlement sortie du mode spleeping
         node._lastUpdate = time.time()
-        valueNode = self._getValueNode(homeId, activeNodeId, valueId)
-        valueNode.update(args) 
+        valueNode = node.getValue(valueId)
+        valueNode.updateData(valueId) 
         print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
@@ -377,14 +359,14 @@ class OZWavemanager(threading.Thread):
         Elle est aussi envoyée dans le cas d'une commande locale d'un device. """
         CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
                                              'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
-                                              'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
+                                            'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
         sendxPL = False
         homeId = args['homeId']
         activeNodeId= args['nodeId']
         # recherche de la valueId qui a envoyée le NodeEvent
         node = self._fetchNode(homeId, activeNodeId)
         values = node.getValuesForCommandClass('COMMAND_CLASS_BASIC')
-        print("*************** Node event handle *******")
+        print "*************** Node event handle *******"
         print node.productType
         if len(node.commandClasses) == 0 : node._updateCommandClasses()
         print node.commandClasses 
@@ -398,15 +380,15 @@ class OZWavemanager(threading.Thread):
                 args2['valueId'] = valuebasic[0].valueData
                 args2['notificationType'] = 'ValueChanged'
                 break
-        print("Valeur event :" ,  args['event'])
+        print "Valeur event :" ,  args['event']
         for value in values :
-            print("-- Value :")
-            print(value)
+            print "-- Value :"
+            print value
         if args2 :
-                print("Event transmit à ValueChanged :")
-                print(args2)
+                print "Event transmit à ValueChanged :"
+                print args2
                 self._handleValueChanged(args2)
-                print("********** Node event handle fin du traitement ******"        )
+                print"********** Node event handle fin du traitement ******"        
                 
     def _handleInitializationComplete(self, args):
         # La séquence d'initialisation est terminée
@@ -424,22 +406,6 @@ class OZWavemanager(threading.Thread):
         self._log.info("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         #self._manager.writeConfig(self._homeId)
 
-    def refresh(self, node):
-        self._log.debug('Requesting refresh for node {0}'.format(node.id))
-        self._manager.refreshNodeInfo(node.homeId, node.id)
-
-    def setNodeOn(self, node):
-        self._log.debug('Requesting setNodeOn for node {0}'.format(node.id))
-        self._manager.setNodeOn(node.homeId, node.id)
-
-    def setNodeOff(self, node):
-        self._log.debug('Requesting setNodeOff for node {0}'.format(node.id))
-        self._manager.setNodeOff(node.homeId, node.id)
-
-    def setNodeLevel(self, node, level):
-        self._log.debug('Requesting setNodeLevel for node {0} with new level {1}'.format(node.id, level))
-        self._manager.setNodeLevel(node.homeId, node.id, level)
-    
     def getCommandClassName(self, commandClassCode):
         return PyManager.COMMAND_CLASS_DESC[commandClassCode]
 
@@ -449,6 +415,15 @@ class OZWavemanager(threading.Thread):
                 return k
         return None
         
+    def _getValue(self, valueId):
+        """Return l'objet Value correspondant au valueId"""
+        retval= None
+        for node in self._nodes.values():
+            if node._values.has_key(valueId):
+                retval = node._values[valueId]
+                break
+        return retval
+       
     def getNetworkInfo(self):
         """ Retourne les infos principales du réseau zwave (dict) """
         retval={}
@@ -480,7 +455,7 @@ class OZWavemanager(threading.Thread):
         """Enregistre le configuration au format xml"""
         retval = {}
         self._manager.writeConfig(self.homeId)
-        print("config sauvée")
+        print "config sauvée"
         retval["File"] ="confirmed"
         return retval
 
@@ -490,10 +465,10 @@ class OZWavemanager(threading.Thread):
         ids = addresseTy.split('.')
         retval ={}
         retval['homeId'] = self._nameAssoc[ids[0]] if self._nameAssoc[ids[0]]  else self.homeId
-        if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO : gérer un message pour l'utilisateur pour erreur de config.
+        if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO: gérer un message pour l'utilisateur pour erreur de config.
         retval['nodeId']  = int(ids[1])
         retval['instance']  = int(ids[2])
-        print("getZWRefFromxPL : ", retval)
+        print "getZWRefFromxPL : ", retval
         return retval
         
     def sendNetworkZW(self, command,  addresseTy, opt =""):
@@ -505,38 +480,8 @@ class OZWavemanager(threading.Thread):
             nodeID = int(addrZW['nodeId'])
             homeId = addrZW['homeId'] # self.homeId
             instance = addrZW['instance']
-            print('homeId: %d' % homeId)
-	    if (opt != "") and (opt != 'None'):
-	        opt = int(opt)
-            if (opt == 'None') :
-                opt = 0
-            if instance == 1 :
-                if command == 'level':
-                    self._manager.setNodeLevel(self.homeId, nodeID, opt)
-                elif command == 'on':
-                    self._manager.setNodeOn(homeId, nodeID)
-                elif command == 'off':
-                    self._manager.setNodeOff(homeId, nodeID)
-                else : 
-                    self._log.info("xPL to ozwave unknown command : %s , nodeID : %d",  command,  nodeID)
-            else : # instance secondaire, utilisation de set value
-                print ("instance secondaire")
-                node = self._getNode(self.homeId,  nodeID)
-                cmdsClass= ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY']
-                for value in node.values.keys() :
-                    val = node.values[value].valueData
-                    print ("valeur : " + val['commandClass'])
-                    if (val['commandClass'] in cmdsClass)  and val['instance'] == instance :
-                        if command=='on' : opt = 255
-                        elif command=='off' : opt = 0
-                        print ("setValue de %s, instance :%d, value : %d, on valueId : %d" %(val['commandClass'], instance,  opt, val['id']))                        
-                        if not self._manager.setValue(val['id'], opt)  : 
-                            self._log.error ("setValue return bad type : %s, instance :%d, value : %d, on valueId : %d" %(val['commandClass'], instance,  opt, val['id']))
-                            print("return bad type value")
-                        break
-            print ("commande transmise")
-            print ("Request demande Type : " + self._manager.getNodeType(homeId,  nodeID))
-            print ("Manufact node : "+ self._manager.getNodeManufacturerName(homeId,nodeID))
+            node = self._getNode(homeId,  nodeID)
+            node.sendCmdBasic(instance, command, opt)
 
     def getNodeInfos(self,  nodeID):
         """ Retourne les informations d'un device, format dict{} """
@@ -545,13 +490,32 @@ class OZWavemanager(threading.Thread):
             return node.getInfos()
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeID}
         
-    def getNodeValuesInfo(self,  nodeID):
+    def getNodeValuesInfos(self,  nodeID):
         """ Retourne les informations de values d'un device, format dict{} """
         retval={}
         if self.ready :
             node = self._getNode(self.homeId,  nodeID)
             return node.getValuesInfos()
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
+        
+    def getValueInfos(self,  valId):
+        """ Retourne les informations d'une value d'un device, format dict{} """
+        retval={}
+        if self.ready :
+            value = self._getValue(valId)
+            if value :
+                retval = value.getInfos()
+                retval['error'] = ""
+                return retval
+            else : return {"error" : "Unknown value %d" %valId}
+        else : return {"error" : "Zwave network not ready, can't find value %d" %valId}
+        
+    def getValueTypes(self):
+        """Retourne la liste des type de value possible et la doc"""
+        retval ={}
+        for elem in  libopenzwave.PyValueTypes :
+            retval[elem] = elem.__doc__ 
+        return retval
            
     def setUINodeNameLoc(self,  nodeID,  newname, newloc):
         """Change le nom et/ou le localisation du node dans OZW et dans le decive si celui-ci le supporte """
@@ -564,3 +528,14 @@ class OZWavemanager(threading.Thread):
             return node.getInfos()                                
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
         
+    def setValue(self,  valueId,  newValue):
+        """Envoie la valeur a l'objet value"""
+        retval={}
+        if self.ready :
+            value = self._getValue(valueId)
+            if value :
+                retval['value'] = value.setValue(newValue)
+                retval['error'] = ""
+                return retval
+            else : return {"error" : "Unknown value %d" %valId}
+        else : return {"error" : "Zwave network not ready, can't find value %d" %valId}     
