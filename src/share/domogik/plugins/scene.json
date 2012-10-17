@@ -48,19 +48,24 @@
     "description": "Scene stat",
     "id": "scene.stat",
     "name": "scene"
-},
+    },
     {
     "description": "Fake device",
     "id": "scene.fake",
     "name": "Fake Device"
-} 
-],
+    } 
+  ],
     "files": [
+           "/src/share/domogik/design/plugin/scene/icon.png",
            "/src/share/domogik/plugins/scene.json",
            "/src/domogik_packages/xpl/bin/scene.py",
            "/src/domogik_pakages/xpl/lib/scene.py",
            "/src/share/domogik/stats/scene/basic.scene.xml",
-           "/src/share/domogik/data/scene/scene.txt",
+           "/src/share/domogik/url2xpl/scene/stop.xml",
+           "/src/share/domogik/url2xpl/scene/start.xml",
+           "/src/share/domogik/url2xpl/scene/Read.xml",
+           "/src/share/domogik/url2xpl/scene/true.xml",
+           "/src/share/domogik/url2xpl/scene/false.xml",
            "/src/share/domogik/url2xpl/scene/Create.xml"
 ],
     "identity": {
@@ -74,7 +79,7 @@
         "domogik_min_version": "0.2.0",
         "id": "scene",
         "type": "plugin",
-        "version": "0.1a1"
+        "version": "0.1a2"
     },
     "json_version": 2,
     "technology": {
