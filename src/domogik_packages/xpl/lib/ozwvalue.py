@@ -217,4 +217,4 @@ class ZWaveValueNode:
         else : return None
        
     def __str__(self):
-        return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self._homeId, self._nodeId, self._valueData)
+        return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self._valueData['homeId'], self._valueData['nodeId'], self._valueData)
