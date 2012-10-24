@@ -54,7 +54,7 @@ class SceneException(Exception):
 
     def __str__(self):
         return repr(self.value)
- 
+
 class Scene:
 
     def __init__(self, log, callback):
@@ -120,319 +120,200 @@ class Scene:
         fichier.write(ligne)
 
 class Mscene():
-    number='0'
-    device1 =''
-    device2 =''
-    gaction_true = ''
-    gaction_false  = ''
-    key_stat1 = ''
-    key_stat2 = ''
-    etat_scene= 'sleep'
-    device1_stat = ''
-    device2_stat = ''
-    grinor=''
-    listener1 = ['','','','','','','','','','']
-    listener2 = ['','','','','','','','','','']
-    glistener = ''
    
-    def __init__(self,number,xplmanager,device1,device2,condition,Action_true,Action_false,rinor,host):
-      print "number = %s" %number
+### devices is a dictionnary with all device
+##### device is a dictionnary with keys: name, id, address,techno, key_stat, op, value, filters
+####### filters is a list with filter
+
+### Conditions beetwen 2 devices need define how...
+
+### Action_true is a list with all action in dictionnary form, dictionnary key is address,techno, command and value
+### Action_false is same as Action_true but for else case
+
+    def __init__(self,number,xplmanager,devices,condition,Action_true,Action_false,rinor,host):
+      #initialise les variables global
       self.number="scene_%s" %number
       self.myxpl=xplmanager
-      print "myxpl=%s" %self.myxpl
       self.senderscene = "domogik-scene%s.%s" %(number,host)
-      self.senderplug = "domogik-scene.%s" %host  
-      msg1=XplMessage()
-      msg1.set_schema('scene.basic')
-      msg1.set_source(self.senderplug)
-      msg1.set_type('xpl-trig')
-      msg1.add_data({'number': self.number})
-      msg1.add_data({'run':'init'})
-      msg1.add_data({'statue':'unknow'})
-      self.myxpl.send(msg1)
-      print "fin de l'init lib envoie du XPl"
-#      XplPlugin.__init__(self, name = 'send', daemonize = False, parser = None, nohub = True)
-
-     # number is the ref of the scene
-     # device1 and 2 are dictionnary where found {address, id, key_stat, listener:[{schema,device field}]}
-     # condition is dicationnary where can found {test1, value1, test2,value2, test_global}
-     # Action_true and false are dictionnary where found {id, command, value}
-     # rinor is a string 'rinor_ip:port'
-
-      #initialise les variables global
-      self.device2=device2
-      self.device1=device1
+      self.senderplug = "domogik-scene.%s" %host
+      self.devices_stat={}
+      self.devices_test={}
       self.gaction_true=Action_true
       self.gaction_false=Action_false
       self.gcondition=condition
       self.grinor= rinor
-
-      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})
+      condition_formulate()
+      for device in devices:
+         self.devices_stat[device]=''
+      send_msg_plugin(self, "Stop", 'None'):
+      self.initstat='1' #this variable enable or desable the launch command as init
+      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})  #listerner of the scene
 
     def cmd_scene(self,message):
-       print "reception d'un message scene: '%s'" %message
-       print "command = %s" %message.data['command']
        if message.type == "xpl-cmnd":
           if message.data['command']=='start':
-             self.start()
+             self.scene_start()
           elif message.data['command']=='stop':
-             self.stop()
+             self.scene_stop()
+          elif message.data['command']=='delete':
+             self.scene_delete()
 
-    def start(self):
-       print 'start'
-       print self.device1
-       self.key_stat1 = self.device1['key_stat']
+    def send_msg_plugin(self, run, stats):
+### send a message with the plugin name as source
+       msg=XplMessage()
+       msg.set_source(self.senderplug)
+       msg.set_schema('scene.basic')
+       msg.set_type('xpl-trig')
+       msg.add_data({'number': self.number})
+       msg.add_data({'run':run})
+       msg.add_data({'stats':stats})
+       self.myxpl.send(msg)
 
-       if self.device2['id'] != '':
-          print("device 2 id: %s") %self.device2['id']
-          self.key_stat2 = self.device2['key_stat']
+    def send_msg_scene(self,type, run, stats):
+### send a message with the scene name as source
+       msg=XplMessage()
+       msg.set_source(self.senderscene)
+       msg.set_schema('scene.basic')
+       msg.set_type(type)
+       msg.add_data({'number': self.number})
+       msg.add_data({'run':run})
+       msg.add_data({'stats':stats})
+       self.myxpl.send(msg)
 
-      #initialise les device_stat1 et 2 via un rinor et cree les listeners referant a cmd_device1 et cmd_device2
-
-       the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor, self.device1['id'], self.device1['key_stat'])
-       print the_url
-       req = urllib2.Request(the_url)
-       handle = urllib2.urlopen(req)
-       resp1 = handle.read()
-       print resp1
-       self.device1_stat= ast.literal_eval(resp1)['stats'][0]['value']
-       print "stat device 1 : %s" %self.device1_stat
-       self.listener1 = ['','','','','','','','','','']
-       for i in range(len(self.device1['listener'])):
-          self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig',self.device1['listener'][i]['device']:self.device1['address']})
-          print("listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s") %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
-       if self.device2["id"] != '' and self.device2["key_stat"] != '':
-          the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor,self.device2['id'], self.device2['key_stat'])
+    def get_stat(self):
+### get last stat for a device, argument need is a device_id and the device_keystat
+       for device in devices:
+          the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor, self.devices[device]['id'], self.devices[devices]['key_stat'])
           req = urllib2.Request(the_url)
           handle = urllib2.urlopen(req)
-          resp2 = handle.read()
-          self.device2_stat= ast.literal_eval(resp2)['stats'][0]['value']
-          print "stat device 2 : %s" %self.device2_stat
-          self.listener2 = ['','','','','','','','','','']
-          for i in range(len(self.device2['listener'])):
-             self.listener2[i]=Listener(self.cmd_device2,self.myxpl,{'schema':self.device2['listener'][i]['schema'],'xpltype':'xpl-trig',self.device2['listener'][i]['device']:self.device2['address']})
-       msg1=XplMessage()
-       msg1.set_source(self.senderplug)
-       msg1.set_schema('scene.basic')
-       msg1.set_type('xpl-trig')
-       msg1.add_data({'number': self.number})
-       msg1.add_data({'run':'start'})
-       msg1.add_data({'stats':'None'})
-       self.myxpl.send(msg1)
+          resp = handle.read()
+          self.devices_stat[device]= ast.literal_eval(resp)['stats'][0]['value']
+
+    def start_listerner(self):
+       for device in devices:
+          for i in range(len(self.devices[device]['filters']):
+             list=Listener(self.cmd_device,self.myxpl,{'schema':self.devices[device]['filters'][i]['schema'],'xpltype':'xpl-trig',self.devices[device]['filters'][i]['device']:self.devices[device]['address']})
+
+
+    def scene_start(self):
+###initialise all device_stat et les listerners
+       self.get_stat()
+       self.start_listerner()
+ 
+       send_msg_plugin(self, 'start', 'None')
 
        self.etat_scene = self.test()
        
+    def scene_delete(self):
+### stop device listerner and del scene listerner
+        self.stop()
+        self.myxpl.del_listener(self.glistener)
+        #TODO add delete file and rinor delete device scene if exist
 
-    def stop(self):
-       for j in range(len(self.listener1)):
-          if self.listener1[j] != '':
-             self.myxpl.del_listener(self.listener1[j])
-          if self.listener2[j] != '':
-             self.myxpl.del_listener(self.listener2[j])
-       msg1=XplMessage()
-       msg1.set_schema('scene.basic')
-       msg1.set_source(self.senderplug)
-       msg1.set_type('xpl-trig')
-       msg1.add_data({'number': self.number})
-       msg1.add_data({'run':'stop'})
-       msg1.add_data({'stats':'None'})
-       self.myxpl.send(msg1)
+    def scene_stop(self):
+### del all devices listerner
+       for element in self.listener:
+          self.myxpl.del_listener(element)
 
-    def cmd_device1(self, message):
-       print "%s message for device1" %self.number
-       for i in self.device1['listener']:
-           print i
-           if i['xpl_stat'] in message.data:
-               print "%s message for device1" %self.number
-               self.device1_stat=message.data[i['xpl_stat']]
-               print 'new value for device 1 = %s' %self.device1_stat
-               self.etat_scene = self.test()
+       self.send_msg_plugin('stop','None')
 
-    def cmd_device2(self, message):
-       print "%s message for device2" %self.number
-       for i in self.device2['listener']:
-           print i
-           if i['xpl_stat'] in message.data:
-               self.device2_stat=message.data[i['xpl_stat']]
-               print 'new value for device 2 = %s' %self.device2_stat
-               self.etat_scene = self.test()
+    def cmd_device(self, message):
+### get the stat of message and place it in devices_stat
+       for device in self.devices:
+           if devices[device]['xpl_stat'] in message.data and device[device['adr']] in message.data:
+              self.devices_stat[device]=message.data[device['xpl_stat']]
 
-
-    def test(self):
-       # function was call when an xpl-trig for on of device was receve
-       last_value = self.etat_scene
-       condition = 'none'
-       condition1= 'none'
-       condition2= 'none'
-       print 'condition test device1 %s %s' %(self.gcondition['test1'],self.gcondition['value1'])
-       if self.gcondition['test1'] != '' and self.gcondition['value1'] != '' :
-          if self.gcondition['test1']=='=':
-             if self.device1_stat == self.gcondition['value1']:
-                condition1='true'
-             else:
-                condition1='false'
-          elif self.gcondition['test1']=='<':
-             print 'Test <'
-             print self.gcondition['value1']
-             print self.device1_stat
-             if float(self.device1_stat) < float(self.gcondition['value1']):
-                condition1='true'
-             else:
-                condition1='false'
-          elif self.gcondition['test1']=='>':
-             print 'test >'
-             print 'condition:%s' %self.gcondition['value1']
-             print 'stat:%s' %self.device1_stat
-             print '%s > %s' %(self.device1_stat,self.gcondition['value1'])
-             if float(self.device1_stat) > float(self.gcondition['value1']):
-                condition1='true'
-             else:
-                condition1='false'
-          elif self.gcondition['test1']=='!=':
-             if self.device1_stat != self.gcondition['value1']:
-                condition1='true'
-             else:
-                condition1='false'
-       print "condition1:%s" %condition1
-
-       print 'condition test device2 %s %s' %(self.gcondition['test2'],self.gcondition['value2'])
-       if self.gcondition['test2'] != '' and self.gcondition['value2'] != '' :
-          if self.gcondition['test2']== '=':
-             if self.device2_stat == self.gcondition['value2']:
-                condition2='true'
-             else:
-                condition2='false'
-          elif self.gcondition['test2']== '<':
-             if float(self.device2_stat) < float(self.gcondition['value2']):
-                condition2='true'
-             else:
-                condition2='false'
-          elif self.gcondition['test2']== '>':
-             if float(self.device2_stat) > float(self.gcondition['value2']):
-                condition2='true'
-             else:
-                condition2='false'
-          elif self.gcondition['test2']== '!=':
-             if self.device2_stat != self.gcondition['value2']:
-                condition2='true'
-             else:
-                condition2='false'
-       print "condition2 : %s" %condition2
-       print "Global test %s" %self.gcondition['test_global']
-       if self.gcondition['test_global'] != '':
-          if self.gcondition['test_global']=='=':
-             if self.device1_stat == self.device2_stat:
-                condition = 'true'
-             else:
-                condition = 'false'
-          elif self.gcondition['test_global']== '<':
-             if self.device1_stat <  self.device2_stat:
-                condition = 'true'
-             else:
-                condition = 'false'
-          elif self.gcondition['test_global']== '>':
-             if float(self.device1_stat) > float(self.device2_stat):
-                condition = 'true'
-             else:
-                condition = 'false'
-          elif self.gcondition['test_global']== '!=':
-             if self.device1_stat !=  self.device2_stat:
-                condition2 = 'true'
-             else:
-                condition2 = 'false'
-          elif self.gcondition['test_global']== 'And':
-             if condition1 == 'true' and condition2 == 'true':
-                condition = 'true'
-             else:
-                condition = 'false'
-          elif self.gcondition['test_global']== 'Or':
-             if condition1 == 'true' or condition2 == 'true':
-                condition = 'true'
-             else:
-                condition = 'false'
-          # cas d'un ou exclusif l'un ou l'autre mais pas les 2
-          elif self.gcondition['test_global']== '!or':
-             if (condition1 == 'true' and condition2 == 'false') or (condition1 == 'false' and condition2 == 'true'):
-                condition = 'true'
-             else:
-                condition = 'false'
-       else:
-          condition=condition1
-
-       if condition == 'true' and condition != last_value and self.gaction_true != '':
-          print ' envoie de la commande true'
-#         http://ip:port/command/<technology>/<address>/<command>/command [/...]
-          print 'techno: %s, address: %s,command: %s,value:%s' %(self.gaction_true['techno'], self.gaction_true['address'],self.gaction_true['command'], self.gaction_true['value'])
-
-          if self.gaction_true['techno'] == 'command' and self.gaction_true['address']== 'command' and self.gaction_true['command']=='command':
+    def send_command(self, actions):
+### send to rinor all actions define in 'actions'
+       for action in actions:
+          if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
              subp = subprocess.Popen(self.gaction_true['value'], shell=True) 
+          if actions[action]['techno'] != 'send-xpl':
+             send_action_xpl(actions[action])
+          if actions[action]['techno'] != 'command' and actions[action]['techno'] != 'send-xpl':
+             self.rinor_command(actions[action])
+          
+    def send_action_xpl(self, action):
+### Send an xpl message define in scene action
+     ### action['type_message'] =xpl-type
+     ### action['schema'] = xpl schema
+     ### action['value'] = xpl val
+       msg=XplMessage()
+       msg.set_source(self.senderscene)
+       msg.set_schema(action['schema'])
+       msg.set_type(action['type_message'])
+       msg.add_data(action['value'])
+       self.myxpl.send(msg)
 
-          if self.gaction_true['techno'] != '' and self.gaction_true['techno'] != 'command' and self.gaction_true['address'] != 'command':
-             if self.gaction_true['command']=='':
-                the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['value'])
-             else:
-              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['command'],self.gaction_true['value'])
-             req = urllib2.Request(the_url)
-             handle = urllib2.urlopen(req)
-             resp1 = handle.read()
-          msg=XplMessage()
-          msg.set_source(self.senderscene)
-          msg.set_schema('scene.basic')
-          msg.set_type('xpl-trig')
-          msg.add_data({'number': self.number})
-          msg.add_data({'run':'start'})
-          msg.add_data({'stats':'true'})
-          self.myxpl.send(msg)
+    def rinor_command(self,action):
+### send rinot action
+        if actions[action]['command']=='':
+           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, actions[action]['techno'], actions[action]['address'], actions[action]['value'])
+        else:
+           the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], actions[action]['address'],actions[action]['command'],actions[action]['value'])
 
-       if condition == 'false' and condition != last_value:
-          print 'envoie de la commande false'
+         if self.initstat != '1':
+            req = urllib2.Request(the_url)
+            handle = urllib2.urlopen(req)
+            resp1 = handle.read()
 
-          if self.gaction_false['techno'] == 'command' and self.gaction_false['address']== 'command' and self.gaction_false['command']=='command':
-             subp = subprocess.Popen(self.gaction_false['value'], shell=True) 
 
-          if self.gaction_false['techno'] != '' and self.gaction_false['techno'] != 'command' and self.gaction_false['address'] != 'command':
-             if self.gaction_false['command']== '':
-                the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['value'])
-             else:
-                the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['command'],self.gaction_false['value'])
-             req = urllib2.Request(the_url)
-             handle = urllib2.urlopen(req)
-             resp1 = handle.read()
-          msg=XplMessage()
-          msg.set_source(self.senderscene)
-          msg.set_schema('scene.basic')
-          msg.set_type('xpl-trig')
-          msg.add_data({'number': self.number})
-          msg.add_data({'run':'start'})
-          msg.add_data({'stats':'false'})
-          self.myxpl.send(msg)
-          print msg
+    def device_test(self):
+### test devices value and evaluate result
+        for device in self.devices:
+           if self.devices[device]['op'] != '':
+              if self.devices[device]['op'] == '=':
+                 if self.devices_stat[device] == self.devices[device]['value']
+                    self.devices_test[device]= True
+                 else:
+                    self.devices_test[device]= False
+              elif self.devices[device]['op'] == '>':
+                 if self.devices_stat[device] > self.devices[device]['value']
+                    self.devices_test[device]= True
+                 else:
+                    self.devices_test[device]= False
+              elif self.devices[device]['op'] == '<':
+                 if self.devices_stat[device] < self.devices[device]['value']
+                    self.devices_test[device]= True         
+                 else:
+                    self.devices_test[device]= False
+           else:
+              self.devices_test[device]=self.devices_stat[device]
 
-       if condition == last_value:
-          msg=XplMessage()
-          msg.set_source(self.senderscene)
-          msg.set_schema('scene.basic')
-          msg.set_type('xpl-stat')
-          msg.add_data({'number': self.number})
-          msg.add_data({'run':'start'})
-          msg.add_data({'stats': condition})
-          self.myxpl.send(msg)
+        last_value=self.gcondition
+        new_value = eval(self.gcondition)
 
+        if last_value != new_value:
+           if new_value == True:
+              ### TODO send command and xpl-trig
+           if new_value == False:
+              ### TODO send command and xpl-trig
+        else:
+           if new_value == True:
+              ### TODO send xpl-stat
+           if new_value == False:
+              ### TODO send xpl-stat
+
+   def condition_formulate(self,condition):
+### correction of condition test to do a correct test
+       condition = condition.lower()
+       condition = condition.replace('(', ' ( ')
+       condition = condition.replace(')', ' ) ')
+       condition = " "+ condition + " "
+       condition = condition.replace('<=', ' <= ')
+       condition = condition.replace('==', ' == ')
+       condition = condition.replace('>=', ' >= ')
+       condition = condition.replace('!=', ' != ')
+       condition = condition.replace('<>', ' != ')
+       condition = condition.replace('xor', ' ^ ')
+       condition = condition.replace('nand', ' and not ')
+       condition = condition.replace('nor', ' or not ')
+       condition = condition.replace(' = ',' == ')
+
+       for i in range(100):
+          device_av = "device%s " %i
+          device_ap = "devices_test[device%s] " %i
+          condition = condition.replace(device_av, device_ap)
+
+       " ".join(conditon.split())
        return condition
-
-def decode(message):
-    """ dédage du message
-    """
-    print "%s" % message
-
-if __name__ == "__main__":                                                      
-                                                     
-    obj = Scene(None, decode)
-    obj.open()
-    obj.listen()           
-
-
-    
-       
-
-
