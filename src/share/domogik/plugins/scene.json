@@ -79,7 +79,7 @@
         "domogik_min_version": "0.2.0",
         "id": "scene",
         "type": "plugin",
-        "version": "0.1a2"
+        "version": "0.2"
     },
     "json_version": 2,
     "technology": {
