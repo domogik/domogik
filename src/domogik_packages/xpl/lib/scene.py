@@ -66,58 +66,53 @@ class Scene:
         """ open
             @param device :
         """
-        print "ouverture du plugin"
+        print("ouverture du plugin")
 
     def close(self):
         """ close t
         """
-        print "fermeture du plugin"
+        print("fermeture du plugin")
 
     def listen(self):
         """close
         """
-        print "demarage du listen"
+        print("demarage du listen")
         self._read = True
         
     def stop_listen(self):
         """ rien du tout
         """
-        print "arret du listen"
+        print("arret du listen")
         self._read = False
 
 
-    def read_scene(self,filetoopen):
+    def read_all(self,Path):
         """ read all ligne in scene file
         """
-        e=open(filetoopen,"r")
-        o=e.read().split("\n")
-        e.close()
-        return o
+        all_scene={}
+        for file in glob.iglob(Path+"/*.scn") :
+            config = ConfigParser.ConfigParser()
+            config.read(file)
+            scene={}
+            scene_numb= "scene_" + config.get('Scene','name')
+            for section in config.section():
+               data={}
+               for option in config.options(section):
+                  data[option] = config.get(section, option)
+               scene[section]=data
+            all_scene[scene_numb]=scene
+        return all_scene
         
-    def delete_scene(self,filetoopen, ligne):
+    def delete_scene(self,file):
         """ Add ligne to scene file
         """
-        e=open(filetoopen,"w")
-        o=e.read().split("\n")
-        e.close()
-        f=open(filetoopen,"w")
-        ligne=int(valeur,10)-1
-        print ligne
-        for i in range(len(o)):
-           if i!=ligne:
-              if o[i]!="":
-                 f.write(o[i]+"\n")
-              else:
-                 print "ligne a supprimer:|%s|" %o[ligne]
-                 testy=str(o[ligne])+"\n"
-              print o[i]
-        f.close()
-
-    def add_scene(self,filetoopen,ligne):
+        os.remove(file)
+        
+    def add_scene(self):
         """ Add a ligne to scene fle
         """
-        fichier=open(filetoopen,"a")
-        fichier.write(ligne)
+        print("add new scene")
+
 
 class Mscene():
    
@@ -130,27 +125,33 @@ class Mscene():
 ### Action_true is a list with all action in dictionnary form, dictionnary key is address,techno, command and value
 ### Action_false is same as Action_true but for else case
 
-    def __init__(self,number,xplmanager,devices,condition,Action_true,Action_false,rinor,host):
+    def __init__(self,scene,xplmanager,devices,Action,rinor,host):
       #initialise les variables global
-      self.number="scene_%s" %number
+      self.number="scene_%s" %scene['name']
+      self.file = scene['file']
+      self.gcondition=self.condition_formulate(scene['condition'])
       self.myxpl=xplmanager
       self.senderscene = "domogik-scene%s.%s" %(number,host)
       self.senderplug = "domogik-scene.%s" %host
+      self.gaction=Action
+      self.grinor= rinor
+     
+      self.initstat='1' #this variable enable or desable the launch command as init
       self.devices_stat={}
       self.devices_test={}
-      self.gaction_true=Action_true
-      self.gaction_false=Action_false
-      self.gcondition=condition
-      self.grinor= rinor
-      condition_formulate()
+      
+      ### init stat and test dictionnaries
       for device in devices:
          self.devices_stat[device]=''
-      send_msg_plugin(self, "Stop", 'None'):
-      self.initstat='1' #this variable enable or desable the launch command as init
-      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})  #listerner of the scene
+         self.devices_test[device]=''
+      self.send_msg_plugin(self, "Stop", 'None')
+
+      
+      ### creat a listerner for scene cmnd
+      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})
 
     def cmd_scene(self,message):
-       if message.type == "xpl-cmnd":
+       if message.type == "xpl-cmnd" and 'command' in message.data:
           if message.data['command']=='start':
              self.scene_start()
           elif message.data['command']=='stop':

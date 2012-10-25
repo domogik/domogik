@@ -9,6 +9,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.scene import *
 from urllib import *
+import ConfigParser
 import glob
 from xml.dom import minidom
 import threading
@@ -22,10 +23,10 @@ class SceneManager(XplPlugin):
    globalscene=[]
    def __init__(self):
       XplPlugin.__init__(self, name = 'scene')
-      ### Create Mini_Scene object
       print ("manager= %s" %self.myxpl)
       self.manager= self.myxpl
       print (self.manager)
+      
       try:
           self.scene = Scene(self.log, self.send_xpl)
           self.log.info("Start Scene")
@@ -57,53 +58,101 @@ class SceneManager(XplPlugin):
       self.log.info("Creating listener for KNX")
       Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
       self.enable_hbeat()
-      self.filetoopen=self.get_data_files_directory()
-      path = self.get_data_files_directory()
-      if os.path.exists(path)== False:
-         os.mkdir(path)
-         print "Création du répertoire %s" %path
-      self.filetoopen= self.filetoopen+"/scene.txt"
-      if os.path.exists(self.filetoopen)== False:
-         fichier= open(self.filetoopen,'w')
-         fichier.write('')
-         fichier.close()
-         print "Création du fichier de stockage %s" %self.filetoopen
-      mem = self.scene.read_scene(self.filetoopen)
+      
+      self.SceneCount = self.init_file()
 
-      self.sceneCount=0
-      for i in range(len(mem)):
-         liste=str(mem[i])
-         print "maliste:%s" %liste
-         msg=XplMessage()
-         msg.set_schema('scene.basic')
-         msg.set_type('xpl-cmnd')
-         if liste !='':
-            liste=ast.literal_eval(liste)
-            print liste
-            self.mem_scene(liste) 
-            for _truc in liste:
-               print "%s : %s" %(_truc,liste[_truc])
+      all_scene = self.scene.read_all(path)
+      
+      for scene in all_scene:
+         self.mem_scene(scene)
 
       self.log.info("Plugin ready :)")
 
-   def mem_scene(self, ligne):
-   ### create a scene for init plugin
-   ### msg="{'scene':'%s','device1':%s,'device2':%s,'condition':%s,'action_true':%s,'action_false':%s,'rinor':'%s'}\n" %(self.sceneC,device1,device2,condition,action_true,action_false,rinor)
-      if 'option_start' in ligne:
-         option_start=ligne['option_start']
+   def init_file(self):
+### init the file system
+       path = self.get_data_files_directory()
+       initfile = path+'init_scene.ini'      
+       if os.path.exists(path) == False:
+          os.mkdir(path, 0770)
+
+       if os.path.exists(initfile)== False:
+          file=ConfigParser.ConfigParser()
+          file.add_section('Init')
+          file.set('Init','number','0')
+          number = 0
+       else:
+          file=ConfigParser.ConfigParser()
+          file.read(initfile)
+          number = file.get('Init','number')
+      return number
+      
+   def mem_scene(self, scene):
+### init scene one by one
+
+      Mini_scene = Mscene(scene['scene'],self.manager,scene['devices'],scene['condition'],scene['action'],scene['rinor'],self.get_sanitized_hostname())
+
+      if 'option_start' in scene:
+         option_start=scene['option_start']
       else:
-         option_start='true'
+         option_start=True
 
-      self.sceneCount = int(ligne['scene'])#self.sceneCount + 1
-      Mini_scene = Mscene(ligne['scene'],self.manager,ligne['device1'],ligne['device2'],ligne['condition'],ligne['action_true'],ligne['action_false'],ligne['rinor'],self.get_sanitized_hostname())
-
-      if option_start=='true':
+      if option_start==True:
          Mini_scene.start()
 
    def scene_cmd(self, message):
-      """ routine lorsque le plugin recoit un message xpl
-      """
-      print "message recu: %s" %message
+### function call when plugin receive a message
+      if 'command' in message.data and 'data' in message.data:
+         if message.data['command'] == 'Create':
+            self.Create_scene_msg(message.data)
+   
+   def Create_scene_msg(self, data)
+       devices = {}
+       actions = {}
+       data = data.replace('|','')
+       data = data.replace(':',":'")
+       data = data.replace(',',"',")
+       data = "{" + data + "'}"
+       data = ast.literal_eval(data)
+       
+       
+       Scene_section = {'name':self.SceneCount}
+       Scene_section['id'] = ''
+       Scene_section['file'] = 'scene'+ self.SceneCount + '.scn'
+       Scene_section['description'] = 'description'
+       Scene_section['condition'] = data['condition']
+       
+       for i in range(100):
+          devices_text = "device" + i
+          if devices_test in message.data:
+             device = {}
+             device['type'] = 'devices'
+             device['adr'] = data[devices_text+'adr']
+             device['id'] = data[devices_text+'id']
+             device['key'] = data[devices_text+'key']
+             device['tech'] = data[devices_text+'tech']
+             device['op']= data[devices_text+'op']
+             device['value']= data[devices_text+'val']
+             if device1_tech != '' and device1_key !='':
+                device['filters'] = self.search_filter(device1_tech, device1_key)
+             devices[devices_text]= device
+          action_text = 'action'+i
+          
+          if action_text in data:
+             action = {}
+             action['type'] = data[action_text+'type']
+             action['address'] = data[action_text+'adr']
+             action['command'] = data[action_text+'cmd']
+             action['value']= data[action_text+'val']
+             actions[action_text]= action
+
+          Rinor = {'addressport':data['rinor']} 
+          Other = {'run':data['start_run'], 'init_test':''}
+          
+          New_Scene = Mscene(scene,self.manager,devices,action,Rinor,self.get_sanitized_hostname())
+          
+          
+   def vielle_fonction(self):
+
       if "data" in message.data:
           data = message.data['data']
           if message.data['data']!="Read all scene":
@@ -112,19 +161,26 @@ class SceneManager(XplPlugin):
              data = data.replace(',',"',")
              data = "{" + data + "'}"
              data = ast.literal_eval(data)
+
           if "actiontrueval" in message.data:
               data['actiontrueval'] = data['actiontrueval'].replace("%#",",")
           if "actionfalseval" in message.data:
               data['actionfalseval'] = data['actionfalseval'].replace("%#",",")
 
-          print data 
           if message.data['command']=="Create" and message.data['scene'] =='0':
+             if "actiontrueval" in message.data:
+                 data['actiontrueval'] = data['actiontrueval'].replace("%#",",")
+             if "actionfalseval" in message.data:
+                 data['actionfalseval'] = data['actionfalseval'].replace("%#",",")
+             new_scene=ConfigParser.ConfigParser()
              msg=''
              self.sceneCount = self.sceneCount + 1
+
              if 'scene' not in data:
                 self.sceneC = self.sceneCount
              else:
                 self.sceneC = message
+
              device1_id = ''
              device1_adr = ''
              device1_tech = ''
@@ -218,8 +274,6 @@ class SceneManager(XplPlugin):
              self.scene.add_scene(self.filetoopen,msg)
              print "message to file: %s" %msg
 #         the_url="http://%s/base/device/add/name/%s/address/%s/usage_id/scene/description/scene_plugin/reference/Mscene" %(self.Mscene,self.Mscene)
-             if option_start=='true':
-                Mini_scene.start()
 
              print "création d'une scene"
              msg=XplMessage()
@@ -230,9 +284,66 @@ class SceneManager(XplPlugin):
              msg.add_data({'command':'Create-ack'})
              msg.add_data({'scene':'0'})
              scene_number= 'scene_%s OK' %self.sceneC
-             msg.add_data({'data':scene_number}) 
+             msg.add_data({'data':scene_number})
 
              self.myxpl.send(msg)
+
+             new_file=ConfigParser.ConfigParser()
+             new_file.add_section('Scene')
+             new_file.set('Scene', 'name',self.sceneC)
+             new_file.set('Scene', 'id','')
+             new_file.set('Scene', 'Description',descrip)
+
+             new_file.add_section('Device1')
+             new_file.set('Device1','name')
+             new_file.set('Device1','id',device1_id)
+             new_file.set('Device1','adr',device1_adr)
+             new_file.set('Device1','tech',device1_tech)
+             new_file.set('Device1','key',device1_key)
+             new_file.set('Device1','op',device1_op)
+             new_file.set('Device1','value',device1_value)
+             new_file.set('Device1','filter',filter_device1)
+
+             new_file.add_section('Test')
+             new_file.set('Test','op_global',op_global)
+
+             new_file.add_section('Device2')
+             new_file.set('Device2','name','')
+             new_file.set('Device2','id',device2_id)
+             new_file.set('Device2','adr',device2_adr)
+             new_file.set('Device2','tech',device2_tech)
+             new_file.set('Device2','key',device2_key)
+             new_file.set('Device2','op',device2_op)
+             new_file.set('Device2','value',device2_value)
+             new_file.set('Device2','filter',filter_device2)
+
+             new_file.add_section('Rinor')
+             new_file.set('Rinor','addressport',rinor)
+
+             new_file.add_section('Action_True')
+             new_file.set('Action_True','address',action_true_adr)
+             new_file.set('Action_True','techno',action_true_techno)
+             new_file.set('Action_True','command',action_true_cmd)
+             new_file.set('Action_True','value',action_true_value)
+
+             new_file.add_section('Action_False')
+             new_file.set('Action_False','address', action_false_adr)
+             new_file.set('Action_False','techno', action_false_techno)
+             new_file.set('Action_False','command',action_false_cmd)
+             new_file.set('Action_False','value', action_false_value)
+
+             new_file.add_section('Other')
+             new_file.set('Other','start_up',option_start)
+             new_file.set('Other','stats','false')
+             new_file.set('Other','Run','stop')
+
+             if option_start=='true':
+                Mini_scene.start()
+
+             fullname=self.get_data_files_directory()+ "/scene%s.scn" %self.sceneC
+             with open(fullname, 'w') as fich:
+                new_file.write(fich)
+             fich.close
 
           if message.data['command']=="Read" and message.data['scene'] =='0':
              mem = self.scene.read_scene(self.filetoopen)
@@ -299,14 +410,8 @@ class SceneManager(XplPlugin):
             msg.add_data({'stats':'false'})
             self.myxpl.send(msg)
 
-
-
-   def send_xpl(self,data):
-       """boucle d'envoie d'une message xpl
-       """
-       print "send_xpl"
-
    def search_filter(self, techno, key_stat):
+### open all xml file to find xpl schema and parametrer for create correct listerner
       device_list=[]
       filetoopen= self.get_stats_files_directory()
       filetoopen= filetoopen[:filetoopen.find('stats')+6]
@@ -344,9 +449,10 @@ class SceneManager(XplPlugin):
                               test["device"]="%s" %(device)
                               test["xpl_stat"]="%s" %(mapping[i]['name'])
                               device_list.append(test)
-      print "device_list: %s" %device_list
       return device_list
 
+   def send_xpl(self):
+      print("send xpl...")
 
 
    def get_schemas_and_types(self, node):
