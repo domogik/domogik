@@ -4,6 +4,7 @@
 # PUB-SUB emitter
 
 import zmq
+import json
 from random import choice
 from time import sleep
 
@@ -22,9 +23,12 @@ categories = {
 while True:
     category = choice(categories.keys())
     action = choice(categories[category])
-    message = "%s.%s.%s" %(category, action, MSG_VERSION)
-    print("Sending message : %s" % message)
-    socket.send(message)
+    message_id = "%s.%s.%s" %(category, action, MSG_VERSION)
+    message_content = json.dumps({"content" : "This is the message content"})
+    #message = json.dumps({message_id : message_content})
+    print("Sending message : %s : %s" % (message_id, message_content))
+    socket.send(message_content)
+    socket.send(message_id, zmq.SNDMORE)
     sleep(1)
     
     
