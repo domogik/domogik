@@ -104,6 +104,13 @@ class ZWaveValueNode:
         """Retourne la valeur du dict valueData correspondant à key"""
         return self.valueData[key] if self._valueData.has_key(key) else None
     
+    def getOZWValue(self):
+        """Retourne la valeur réelle lut par openzwave"""
+        retval = self._node._manager.getValue(self.valueData['id'])
+        self._valueData['value'] = retval
+        self._lastUpdate = time.time()
+        return retval
+        
     def setValue(self, val):
         """Envois sur le réseau zwave le 'changement' de valeur à la valueNode"""
         print type (val)
@@ -125,7 +132,10 @@ class ZWaveValueNode:
             self._node._ozwmanager._log.error ("setValue return bad type : %s, instance :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['instance'],  val, self.valueData['id']))
             print("return bad type value")
             return False
-        else : return val
+        else : 
+            self._valueData['value'] = val
+            self._lastUpdate = time.time()
+            return val
             
     def updateData(self, valueData):
         """Mise à jour de valueData depuis les arguments du callback """
@@ -217,4 +227,4 @@ class ZWaveValueNode:
         else : return None
        
     def __str__(self):
-        return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self._valueData['homeId'], self._valueData['nodeId'], self._valueData)
+        return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self._homeId, self._nodeId, self._valueData)

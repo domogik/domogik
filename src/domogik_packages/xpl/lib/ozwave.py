@@ -535,6 +535,7 @@ class OZWavemanager(threading.Thread):
             value = self._getValue(valueId)
             if value :
                 retval['value'] = value.setValue(newValue)
+          #      print ('SetValue, relecture de la valeur : ',  value.getOZWValue())
                 retval['error'] = ""
                 return retval
             else : return {"error" : "Unknown value %d" %valId}
