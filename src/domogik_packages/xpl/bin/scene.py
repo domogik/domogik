@@ -61,18 +61,18 @@ class SceneManager(XplPlugin):
       
       self.SceneCount = self.init_file()
 
-      all_scene = self.scene.read_all(path)
+      all_scene = self.scene.read_all(self.path)
       
       for scene in all_scene:
-         self.mem_scene(scene)
+         self.mem_scene(all_scene[scene])
 
       self.log.info("Plugin ready :)")
 
    def init_file(self):
 ### init the file system
-       path = self.get_data_files_directory()
-       initfile = path+'init_scene.ini'      
-       if os.path.exists(path) == False:
+       self.path = self.get_data_files_directory()
+       initfile = self.path+'init_scene.ini'      
+       if os.path.exists(self.path) == False:
           os.mkdir(path, 0770)
 
        if os.path.exists(initfile)== False:
@@ -84,12 +84,21 @@ class SceneManager(XplPlugin):
           file=ConfigParser.ConfigParser()
           file.read(initfile)
           number = file.get('Init','number')
-      return number
+       return number
       
    def mem_scene(self, scene):
 ### init scene one by one
-
-      Mini_scene = Mscene(scene['scene'],self.manager,scene['devices'],scene['condition'],scene['action'],scene['rinor'],self.get_sanitized_hostname())
+      print(scene)
+      devices={}
+      actions={}
+      for section in scene:
+         if 'type' in scene[section]:
+            if scene[section]['type']=='devices':
+               devices[section]=scene[section]
+            if scene[section]['type']=='Action True' or scene[section]['type']=='Action False':
+               actions[section]=scene[section]
+               
+      Mini_scene = Mscene(scene['Scene'],self.manager,devices,actions,scene['Rinor']['addressport'],self.get_sanitized_hostname())
 
       if 'option_start' in scene:
          option_start=scene['option_start']
@@ -97,7 +106,7 @@ class SceneManager(XplPlugin):
          option_start=True
 
       if option_start==True:
-         Mini_scene.start()
+         Mini_scene.scene_start()
 
    def scene_cmd(self, message):
 ### function call when plugin receive a message
@@ -105,7 +114,7 @@ class SceneManager(XplPlugin):
          if message.data['command'] == 'Create':
             self.Create_scene_msg(message.data)
    
-   def Create_scene_msg(self, data)
+   def Create_scene_msg(self, data):
        devices = {}
        actions = {}
        data = data.replace('|','')
@@ -117,7 +126,7 @@ class SceneManager(XplPlugin):
        
        Scene_section = {'name':self.SceneCount}
        Scene_section['id'] = ''
-       Scene_section['file'] = 'scene'+ self.SceneCount + '.scn'
+       Scene_section['file'] = self.patch+'/scene'+ self.SceneCount + '.scn'
        Scene_section['description'] = 'description'
        Scene_section['condition'] = data['condition']
        
