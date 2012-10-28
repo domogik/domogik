@@ -109,9 +109,39 @@ class Scene:
         """
         os.remove(file)
         
-    def add_scene(self):
+    def add_scene(self,data):
         """ Add a ligne to scene fle
         """
+        file=ConfigParser.ConfigParser()
+        scene_file = data['Scene']['file']
+        
+        file.add_section('Scene')
+        for value in data['Scene']:
+           file.set('Scene',value, data['Scene'][value])
+        for device in data['devices']:
+           file.add_section(str(device))
+           for value in data['devices'][device]:
+              file.set(str(device),str(value),str(data['devices'][device][value]))
+        file.add_section('Rinor')
+        file.set('Rinor','addressport',str(data['Rinor']['addressport']))
+        for action in data['actions']:
+           print data['actions'][action]
+           file.add_section(str(action))
+           for value in data['actions'][action]:
+              file.set(str(action),str(value),str(data['actions'][action][value]))
+        file.add_section('Other')
+        for value in data['Other']:
+           file.set('Other',str(value), str(data['Other'][value]))
+        
+#        new_file.add_section('Action_True')
+#        new_file.set('Action_True','address',action_true_adr)
+
+
+        with open(scene_file, 'w') as fich:
+           file.write(fich)
+        fich.close
+        
+        
         print("add new scene")
 
 
@@ -128,15 +158,16 @@ class Mscene():
 
     def __init__(self,scene,xplmanager,devices,Actions,rinor,host):
        #initialise les variables global
+       print('initialisation d une scene')
        self.number= "scene_%s" %scene['name']
        self.file = scene['file']
-       self.scene_id_device = scene['id']
        self.gcondition=self.condition_formulate(scene['condition'])
        self.myxpl=xplmanager
        self.senderscene = "domogik-scene%s.%s" %(scene['name'],host)
        self.senderplug = "domogik-scene.%s" %host
        self.gaction_true = {}
        self.gaction_false ={}
+       print 'initilisation des actions'
        for action in Actions:
           if Actions[action]["type"] == 'True':
              self.gaction_true[action]=Actions[action]
@@ -149,9 +180,11 @@ class Mscene():
        self.initstat='1' #this variable enable or desable the launch command as init
        self.devices_stat={}
        self.devices_test={}
-      
+       print 'initilisation des stats'
+       print 'liste des devices: %s' %devices
        ### init stat and test dictionnaries
        for device in devices:
+          print device
           self.devices_stat[device]=''
           self.devices_test[device]=''
        self.send_msg_plugin("Stop", 'None')
@@ -195,6 +228,7 @@ class Mscene():
 ### get last stat for a device, argument need is a device_id and the device_keystat
        for device in self.devices:
           the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor, self.devices[device]['id'], self.devices[device]['key'])
+          print 'the_url is: %s' %the_url
           req = urllib2.Request(the_url)
           handle = urllib2.urlopen(req)
           resp = handle.read()
@@ -202,17 +236,16 @@ class Mscene():
 
     def start_listerner(self):
        for device in self.devices:
+          if str(type(self.devices[device]['filters']))=="<type 'list'>":
+             self.devices[device]['filters']=str(self.devices[device]['filters'])
           for i in range(len(eval(self.devices[device]['filters']))):
              list=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
-
 
     def scene_start(self):
 ###initialise all device_stat et les listerners
        self.get_stat()
        self.start_listerner()
- 
        self.send_msg_plugin('start', 'None')
-
        self.etat_scene = self.device_test()
        
     def scene_delete(self):
@@ -304,9 +337,9 @@ class Mscene():
               self.devices_test[device]=self.devices_stat[device]
 
         last_value=self.gcondition
-        print self.gcondition
-        print self.devices_test
-        print self.devices_stat
+        print 'conditon: %s' %self.gcondition
+        print 'self.devices_test: %s' %self.devices_test
+        print 'self.devices_stat: %s' %self.devices_stat
         new_value = eval(self.gcondition)
 
         if last_value != new_value:
@@ -347,5 +380,6 @@ class Mscene():
           device_ap = "self.devices_test['device%s'] " %i
           condition = condition.replace(device_av, device_ap)
 
-       " ".join(condition.split())
+       condition = " ".join(condition.split())
+       print 'nouvelle condition : %s' %condition
        return condition
