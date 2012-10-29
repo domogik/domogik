@@ -160,6 +160,7 @@ class Mscene():
        #initialise les variables global
        print('initialisation d une scene')
        self.number= "scene_%s" %scene['name']
+       print("scene name= %s" %self.number)
        self.file = scene['file']
        self.gcondition=self.condition_formulate(scene['condition'])
        self.myxpl=xplmanager
@@ -167,11 +168,15 @@ class Mscene():
        self.senderplug = "domogik-scene.%s" %host
        self.gaction_true = {}
        self.gaction_false ={}
-       print 'initilisation des actions'
+       print 'initilisation des actions: %s' %Actions
        for action in Actions:
-          if Actions[action]["type"] == 'True':
+          print 'initilisation de l actions: %s' %Actions[action]
+          print 'actiontype = %s' %Actions[action]["type"]
+          if Actions[action]["type"] == 'Action True':
+             print 'Gaction_true'
              self.gaction_true[action]=Actions[action]
-          if  Actions[action]["type"] == 'False':
+          if  Actions[action]["type"] == 'Action False':
+             print 'Gaction_false'
              self.gaction_false[action]=Actions[action]
           
        self.grinor= rinor
@@ -280,13 +285,19 @@ class Mscene():
 
     def send_command(self, actions):
 ### send to rinor all actions define in 'actions'
-       for action in actions:
-          if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
-             subp = subprocess.Popen(self.gaction_true['value'], shell=True) 
-          if actions[action]['techno'] != 'send-xpl':
-             send_action_xpl(actions[action])
-          if actions[action]['techno'] != 'command' and actions[action]['techno'] != 'send-xpl':
-             self.rinor_command(actions[action])
+       print ("type de action:%s" %type(actions))
+       if self.initstat != '1':
+          for action in actions:
+             if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
+                subp = subprocess.Popen(self.gaction_true['value'], shell=True) 
+             if actions[action]['techno'] == 'send-xpl':
+                self.send_action_xpl(actions[action])
+             if actions[action]['techno'] != 'command' and actions[action]['techno'] != 'send-xpl':
+                self.rinor_command(actions[action])
+       else:
+          print ('1 test pour rien')
+          self.initstat = 0
+
           
     def send_action_xpl(self, action):
 ### Send an xpl message define in scene action
@@ -302,15 +313,13 @@ class Mscene():
 
     def rinor_command(self,action):
 ### send rinot action
-        if actions[action]['command']=='':
-           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, actions[action]['techno'], actions[action]['address'], actions[action]['value'])
+        if action['command']=='':
+           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, action['techno'], action['address'], action['value'])
         else:
-           the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], actions[action]['address'],actions[action]['command'],actions[action]['value'])
-
-        if self.initstat != '1':
-           req = urllib2.Request(the_url)
-           handle = urllib2.urlopen(req)
-           resp1 = handle.read()
+           the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],actions[action]['value'])
+        req = urllib2.Request(the_url)
+        handle = urllib2.urlopen(req)
+        resp1 = handle.read()
 
 
     def device_test(self):
@@ -346,17 +355,21 @@ class Mscene():
            if new_value == True:
               ### TODO send command and xpl-trig
               self.send_msg_scene('xpl-trig', 'OK','True')
+              print("xpl-trig and gaction:%s" %self.gaction_true)
               self.send_command(self.gaction_true)
            if new_value == False:
               ### TODO send command and xpl-trig
               self.send_msg_scene('xpl-trig', 'OK','False')
+              print("xpl-trig and gaction:%s" %self.gaction_false)
               self.send_command(self.gaction_false)
         else:
            if new_value == True:
               ### TODO send xpl-stat
               self.send_msg_scene('xpl-stat', 'OK','True')
+              print("xpl-stat")
            if new_value == False:
               ### TODO send xpl-stat
+              print("xpl-stat")
               self.send_msg_scene('xpl-stat', 'OK','False')
 
     def condition_formulate(self,condition):

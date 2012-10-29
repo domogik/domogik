@@ -186,6 +186,7 @@ class SceneManager(XplPlugin):
              action['address'] = data['action'][action_text]['address']
              action['command'] = data['action'][action_text]['command']
              action['value']= data['action'][action_text]['value']
+             action['techno']= data['action'][action_text]['techno']
              actions[action_text]= action
 
        Rinor = {'addressport':data['rinor']}
@@ -194,8 +195,9 @@ class SceneManager(XplPlugin):
        New_Scene = Mscene(Scene_section,self.manager,devices,actions,data['rinor'],self.get_sanitized_hostname())
        Scene_write={'Scene':Scene_section,'devices':devices,'actions':actions,'Rinor':Rinor,'Other':Other }
        self.scene.add_scene(Scene_write)
+       self.send_xpl('scene_%s' %self.SceneCount)
        self.increase_scene()
-       self.send_xpl('OK')
+       
        
        
        if data['start_run']=='True':
