@@ -199,6 +199,7 @@ class Mscene():
        self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})
 
     def cmd_scene(self,message):
+       print ('command for %s' %self.number)
        if message.type == "xpl-cmnd" and 'command' in message.data:
           if message.data['command']=='start':
              self.scene_start()
@@ -240,14 +241,19 @@ class Mscene():
           self.devices_stat[device]= ast.literal_eval(resp)['stats'][0]['value']
 
     def start_listerner(self):
+       self.listener = {}
+       liste = 1
        for device in self.devices:
           if str(type(self.devices[device]['filters']))=="<type 'list'>":
              self.devices[device]['filters']=str(self.devices[device]['filters'])
           for i in range(len(eval(self.devices[device]['filters']))):
-             list=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
+             self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
+             liste= liste+1
 
     def scene_start(self):
 ###initialise all device_stat et les listerners
+       print('start scene')
+       self.initstat='1'
        self.get_stat()
        self.start_listerner()
        self.send_msg_plugin('start', 'None')
@@ -255,15 +261,18 @@ class Mscene():
        
     def scene_delete(self):
 ### stop device listerner and del scene listerner
-        self.stop()
-        self.myxpl.del_listener(self.glistener)
+        print('delete scene')
+        self.scene_stop()
+        #self.myxpl.del_listener(self.glistener)
         os.remove(self.file)
            
     def scene_stop(self):
 ### del all devices listerner
+       print('stop scene')
        for element in self.listener:
-          self.myxpl.del_listener(element)
-
+          print self.listener[element]
+          self.myxpl.del_listener(self.listener[element])
+          self.listener = {}
        self.send_msg_plugin('stop','None')
 
     def cmd_device(self, message):
