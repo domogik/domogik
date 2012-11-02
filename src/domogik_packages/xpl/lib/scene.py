@@ -256,8 +256,8 @@ class Mscene():
        self.initstat='1'
        self.get_stat()
        self.start_listerner()
-       self.send_msg_plugin('start', 'None')
-       self.etat_scene = self.device_test()
+       #self.send_msg_plugin('start', 'None')
+       self.device_test()
        
     def scene_delete(self):
 ### stop device listerner and del scene listerner
