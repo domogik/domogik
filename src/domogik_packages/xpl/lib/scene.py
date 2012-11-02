@@ -272,7 +272,7 @@ class Mscene():
        for element in self.listener:
           print self.listener[element]
           self.myxpl.del_listener(self.listener[element])
-          self.listener = {}
+       self.listener = {}
        self.send_msg_plugin('stop','None')
 
     def cmd_device(self, message):

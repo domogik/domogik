@@ -199,8 +199,8 @@ class SceneManager(XplPlugin):
        self.increase_scene()
        
        
-       
-       if data['start_run']=='True':
+       print ('start_run:%s' %data['start_run'])
+       if data['start_run']=='true':
           New_Scene.scene_start()
 
    def increase_scene(self):
