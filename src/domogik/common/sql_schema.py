@@ -553,6 +553,22 @@ class XplStat(Base):
     reference = Column(Unicode(255))
     device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
     params = relationship("XplStatParam")
+    
+    def __init__(self, schema, reference, device_id):
+        self.schema = ucode(schema)
+        self.reference = ucode(reference)
+        self.device_id = device_id
+   
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplStat(id=%s schema='%s' reference='%s', device_id=%s, params=%s)>"\
+               % (self.name, self.schema, self.reference, self.device_id, self.params)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplStat.__tablename__
+
 
 class XplStatParam(Base):
     __tablename__ = '%s_xplstat_params' % _db_prefix
@@ -560,6 +576,23 @@ class XplStatParam(Base):
     key = Column(Unicode(32), primary_key=True)
     value = Column(Unicode(255))
     static = Column(Boolean)
+
+    def __init__(self, xplstat_id, key, value, static):
+        self.xplstat_id = xplstat_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+        self.static = static
+    
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplStatParam(stat_id=%s key='%s' value='%s', static=%s)>"\
+               % (self.xplstat_id, self.key, self.value, self.static)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplStatParam.__tablename__
+
 
 class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
@@ -570,12 +603,45 @@ class XplCommand(Base):
     stat_id = Column(Integer, ForeignKey(XplStat.__tablename__ + ".id"))
     params = relationship("XplCommandParam")
 
+    def __init__(self, schema, reference, device_id, stat_id):
+        self.schema = ucode(schema)
+        self.reference = ucode(reference)
+        self.device_id = device_id
+        self.stat_id = stat_id
+    
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplCommand(id=%s schema='%s' reference='%s', device_id=%s, stat_id=%s, params=%s)>"\
+               % (self.name, self.schema, self.reference, self.device_id, self.stat_id, self.params)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplCommand.__tablename__
+
+
 class XplCommandParam(Base):
     __tablename__ = '%s_xplcommand_params' % _db_prefix
     xplstat_id = Column(Integer, ForeignKey(XplCommand.__tablename__ + ".id"), primary_key=True) 
     key = Column(Unicode(32), primary_key=True)
     value = Column(Unicode(255))
     static = Column(Boolean)
+
+    def __init__(self, xplstat_id, key, value, static):
+        self.xplstat_id = xplstat_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+        self.static = static
+    
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplCommandParam(stat_id=%s key='%s' value='%s', static=%s)>"\
+               % (self.xplstat_id, self.key, self.value, self.static)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplCommandParam.__tablename__
 
 
 

@@ -152,6 +152,9 @@ class ProcessRequest():
         'command': {
 	    '^/command.*$':                                                                      'rest_command',
         },
+        'ncommand': {
+            '^/ncommand/(?P<dev>[0-9]+)/(?P<cmd>[0-9]+)/.*$':                                    'rest_ncommand',
+        },
         # /event
         'events': {
             '^/events/domogik/new$':						                 '_rest_events_domogik_new',
@@ -706,6 +709,21 @@ class ProcessRequest():
         """ Tell crawlers to go away
         """
         self.send_http_response_ok("# go away\nUser-agent: *\nDisallow: /\n")
+
+######
+# /command processing
+######
+
+    def rest_ncommand(self, dev, cmd):
+        """ New command processing
+            dev = the device_id frim the 'core_device' table
+            cmd = the xpl_command id form the core_xplcommand table
+        """
+        self.log.debug("Process /ncommand")
+
+
+
+
 
 ######
 # /command processing
