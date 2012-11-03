@@ -54,7 +54,8 @@ from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, Page
+        UserAccount, SENSOR_VALUE_TYPE_LIST, Page,
+        XplCommand, XplStat
 )
 
 
@@ -2118,6 +2119,15 @@ class DbHelper():
             except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return ui_item_config_list
+
+###################
+# xplcommand
+###################
+    def get_xpl_command(self, p_id):
+        return self.__session.query(XplCommand).filter_by(id=p_id).first()
+
+    def get_xpl_stat(self, p_id):
+        return self.__session.query(XplStat).filter_by(id=p_id).first()
 
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
         """Raise a DbHelperException and log it

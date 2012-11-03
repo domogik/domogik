@@ -153,7 +153,7 @@ class ProcessRequest():
 	    '^/command.*$':                                                                      'rest_command',
         },
         'ncommand': {
-            '^/ncommand/(?P<dev>[0-9]+)/(?P<cmd>[0-9]+)/.*$':                                    'rest_ncommand',
+            '^/ncommand/(?P<dev>[0-9]+)/(?P<cmd_id>[0-9]+)/.*$':                                    'rest_ncommand',
         },
         # /event
         'events': {
@@ -714,17 +714,55 @@ class ProcessRequest():
 # /command processing
 ######
 
-    def rest_ncommand(self, dev, cmd):
+    def rest_ncommand(self, dev, cmd_id):
         """ New command processing
             dev = the device_id frim the 'core_device' table
             cmd = the xpl_command id form the core_xplcommand table
         """
         self.log.debug("Process /ncommand")
-        # get the xplcommand
+        # get the xplcommand and xplstat from db
+        cmd = self._db.get_xpl_command(cmd_id)
+        stat = self._db.get_xpl_stat(cmd.stat_id)
+        # cmd will have all needed info now
+        msg = XplMessage()
+        msg.set_type("xpl-cmnd")
+        msg.set_schema( cmd.schema)
+        for p in cmd.params:
+            if p.static:
+                msg.add_data({p.key : p.value})
+            else:
+                if self.get_parameters(p.key):
+                   msg.add_data({p.key : self.get_parameters(p.key)})
+        # send out the msg
+        self.myxpl.send(msg)   
+        ### Wait for answer
+        stat_msg = None
+        if stat != None:
+            filters = {}
+            for p in stat.params:
+                filters[p.key] = p.value
+            # get xpl message from queue
+            try:
+                self.log.debug("Command : wait for answer...")
+                stat_msg = self._get_from_queue(self._queue_command, 'xpl-trig', stat.schema, filters)
+            except Empty:
+                json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
+                json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+                json_data.set_data_type("response")
+                self.send_http_response_ok(json_data.get())
+                return
+            self.log.debug("Command : message received : %s" % str(msg_cmd))
+        else:
+            # no listener defined in xml : don't wait for an answer
+            self.log.debug("Command : no listener defined : not waiting for an answer")
 
-
-
-
+        ### REST processing finished and OK
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("response")
+        if stat_msg != None:
+            json_data.add_data({"xpl" : str(stat_msg)})
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
 
 ######
 # /command processing

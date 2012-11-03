@@ -562,7 +562,7 @@ class XplStat(Base):
     def __repr__(self):
         """Return an internal representation of the class"""
         return "<XplStat(id=%s schema='%s' reference='%s', device_id=%s, params=%s)>"\
-               % (self.name, self.schema, self.reference, self.device_id, self.params)
+               % (self.id, self.schema, self.reference, self.device_id, self.params)
 
     @staticmethod
     def get_tablename():
@@ -612,7 +612,7 @@ class XplCommand(Base):
     def __repr__(self):
         """Return an internal representation of the class"""
         return "<XplCommand(id=%s schema='%s' reference='%s', device_id=%s, stat_id=%s, params=%s)>"\
-               % (self.name, self.schema, self.reference, self.device_id, self.stat_id, self.params)
+               % (self.id, self.schema, self.reference, self.device_id, self.stat_id, self.params)
 
     @staticmethod
     def get_tablename():
