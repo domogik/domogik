@@ -35,15 +35,12 @@ Implements
 - class Device
 - class DeviceFeature
 - class DeviceFeatureAssociation
-- class DeviceConfig
 - class DeviceStats
-- class Trigger
 - class Person
 - class UserAccount
 - class SystemStats(Base):
 - class SystemStatsValue
 - class UIItemConfig
-- class SystemConfig
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2012 Domogik project
@@ -266,7 +263,6 @@ class Device(Base):
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     device_stats = relation("DeviceStats", backref=__tablename__, cascade="all, delete")
-    device_configs = relation("DeviceConfig", backref=__tablename__, cascade="all, delete")
     device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
@@ -389,38 +385,6 @@ class DeviceFeature(Base):
         """Return the table name associated to the class"""
         return DeviceFeature.__tablename__
 
-
-class DeviceConfig(Base):
-    """Device configuration"""
-
-    __tablename__ = '%s_device_config' % _db_prefix
-    key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
-    device = relation(Device)
-
-    def __init__(self, key, device_id, value):
-        """Class constructor
-
-        @param key : configuration item
-        @param value : configuration value
-        @param device_id : device id
-
-        """
-        self.key = ucode(key)
-        self.value = ucode(value)
-        self.device_id = device_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceConfig(('%s', '%s'), device=%s)>" % (self.key, self.value, self.device)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceConfig.__tablename__
-
-
 class DeviceStats(Base):
     """Device stats (values that were associated to the device)"""
 
@@ -472,39 +436,6 @@ class DeviceStats(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return DeviceStats.__tablename__
-
-
-class Trigger(Base):
-    """Trigger : execute commands when conditions are met"""
-
-    __tablename__ = '%s_trigger' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    description = Column(UnicodeText())
-    rule = Column(UnicodeText(), nullable=False)
-    result = Column(UnicodeText(), nullable=False)
-
-    def __init__(self, rule, result, description=None):
-        """Class constructor
-
-        @param rule : formatted trigger rule
-        @param result : list of xpl message to send when the rule is met
-        @param description : long description of the rule, optional
-
-        """
-        self.rule = ucode(rule)
-        self.result = ucode(result)
-        self.description = ucode(description)
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>"\
-               % (self.id, self.description, self.rule, self.result)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return Trigger.__tablename__
-
 
 class Person(Base):
     """Persons registered in the app"""
@@ -614,57 +545,3 @@ class UIItemConfig(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return UIItemConfig.__tablename__
-
-
-class SystemInfo(Base):
-    """General information about the system"""
-
-    __tablename__ = '%s_system_info' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    app_version = Column(Unicode(30))
-
-    def __init__(self, app_version=None):
-        """Class constructor
-
-        @param app_version : version of the application
-
-        """
-        self.app_version = app_version
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SystemInfo(db_version='%s')>" % (self.app_version)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return SystemInfo.__tablename__
-
-
-class SystemConfig(Base):
-    """Configuration parameters for the system. This object contains only one record"""
-
-    __tablename__ = '%s_system_config' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    simulation_mode = Column(Boolean, nullable=False, default=False)
-    debug_mode = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, simulation_mode, debug_mode):
-        """Class constructor
-
-        @param simulation_mode : if we are running the app in simulation mode
-        @param admin_mode : if we are running the app in administrator mode
-        @param debug_mode : if we are running the app in debug mode
-
-        """
-        self.simulation_mode = simulation_mode
-        self.debug_mode = debug_mode
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SystemConfig(id=%s, simulation=%s, debug=%s)>" % (self.id, self.simulation_mode, self.debug_mode)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return SystemConfig.__tablename__

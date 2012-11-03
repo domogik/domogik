@@ -117,8 +117,6 @@ def add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
 
-    _db.update_system_config()
-
     # Create a default user account
     _db.add_default_user_account()
 
@@ -217,7 +215,7 @@ def install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
     print("Using database", _db.get_db_type())
     #TODO: improve this test
-    if not sql_schema.SystemConfig.__table__.exists(bind=_engine):
+    if not sql_schema.Device.__table__.exists(bind=_engine):
         print("It appears that your database doesn't contain the required tables.")
         answer = raw_input("Should they be created? [Y/n] ")
         if answer == "n":
