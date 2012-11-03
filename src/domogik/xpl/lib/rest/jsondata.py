@@ -152,11 +152,11 @@ class JSonHelper():
 
         # define data types
         db_type = ("DeviceFeature", "Area", "Device", "DeviceUsage", \
-                   "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
+                   "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
-                   "SensorReferenceData", "Person", "SystemConfig", \
-                   "SystemStats", "SystemStatsValue", "Trigger", \
+                   "SensorReferenceData", "Person", \
+                   "SystemStats", "SystemStatsValue", \
                    "DeviceFeatureAssociation", "DeviceFeatureModel", "Page") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")

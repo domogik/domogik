@@ -77,11 +77,6 @@ class GenericTestCase(unittest.TestCase):
         for dty in db.list_device_types():
             db.del_device_type(dty.id, cascade_delete=True)
 
-    def remove_all_device_config(self):
-        device_list = db.list_devices()
-        for device in device_list:
-            db.del_device_config(device.id)
-
     def remove_all_device_feature_models(self):
         for af in db.list_actuator_feature_models():
             db.del_actuator_feature_model(af.id)
@@ -99,10 +94,6 @@ class GenericTestCase(unittest.TestCase):
     def remove_all_device_stats(self):
         for device in db.list_devices():
             db.del_device_stats(device.id)
-
-    def remove_all_triggers(self):
-        for trigger in db.list_triggers():
-            db.del_trigger(trigger.id)
 
     def remove_all_persons(self):
         for person in db.list_persons():
@@ -554,79 +545,6 @@ class DeviceTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-
-class DeviceConfigTestCase(GenericTestCase):
-    """Test Device config"""
-
-    def __create_sample_device(self, device_name, device_technology_name, id=1):
-        dt = db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
-        # Using id avoids duplicate keys
-        du = db.add_device_usage('lighting'+str(id), 'Lighting'+str(id))
-        dty = db.add_device_type(dty_id='x10.switch'+str(id), dty_name='Switch'+str(id),
-                                 dty_description='desc1', dt_id=dt.id)
-        area = db.add_area('area1','description 1')
-        room = db.add_room('room1', area.id)
-        device = db.add_device(d_name=device_name, d_address = "A1", d_type_id=dty.id, d_usage_id=du.id)
-        return device
-
-    def setUp(self):
-        self.remove_all_device_usages()
-        self.remove_all_device_config()
-        self.remove_all_device_technologies()
-
-    def tearDown(self):
-        self.remove_all_device_usages()
-        self.remove_all_device_config()
-        self.remove_all_device_technologies()
-
-    def test_empty_list(self):
-        assert len(db.list_all_device_config()) == 0
-
-    def test_add(self):
-        device1 = self.__create_sample_device('device1', 'dt1', 1)
-        device2 = self.__create_sample_device('device2', 'dt2', 2)
-        device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
-        print(device_config1_1)
-        assert device_config1_1.key == 'key1_1'
-        assert device_config1_1.value == 'val1_1'
-        device_config2_1 = db.set_device_config('key2_1', 'val2_1', device1.id)
-        device_config3_1 = db.set_device_config('key3_1', 'val3_1', device1.id)
-        device_config1_2 = db.set_device_config('key1_2', 'val1_2', device2.id)
-        device_config2_2 = db.set_device_config('key2_2', 'val2_2', device2.id)
-        assert len(db.list_device_config(device1.id)) == 3
-        assert len(db.list_device_config(device2.id)) == 2
-
-    def test_update(self):
-        device1 = self.__create_sample_device('device1', 'dt1')
-        device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
-        device_config1_1 = db.set_device_config('key1_1', 'val1_1_u', device1.id)
-        assert device_config1_1.value == 'val1_1_u'
-
-    def test_get(self):
-        device1 = self.__create_sample_device('device1', 'dt1', 1)
-        device2 = self.__create_sample_device('device2', 'dt2', 2)
-        device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
-        device_config2_1 = db.set_device_config('key2_1', 'val2_1', device1.id)
-        device_config3_1 = db.set_device_config('key3_1', 'val3_1', device1.id)
-        device_config1_2 = db.set_device_config('key1_2', 'val1_2', device2.id)
-        device_config2_2 = db.set_device_config('key2_2', 'val2_2', device2.id)
-        assert db.get_device_config_by_key('key3_1', device1.id).value == 'val3_1'
-        assert db.get_device_config_by_key('key1_2', device2.id).value == 'val1_2'
-
-    def test_del(self):
-        device1 = self.__create_sample_device('device1', 'dt1', 1)
-        device2 = self.__create_sample_device('device2', 'dt2', 2)
-        device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
-        device_config2_1 = db.set_device_config('key2_1', 'val2_1', device1.id)
-        device_config3_1 = db.set_device_config('key3_1', 'val3_1', device1.id)
-        device_config1_2 = db.set_device_config('key1_2', 'val1_2', device2.id)
-        device_config2_2 = db.set_device_config('key2_2', 'val2_2', device2.id)
-        assert len(db.del_device_config(device1.id)) == 3
-        assert len(db.list_all_device_config()) == 2
-        assert len(db.del_device_config(device2.id)) == 2
-        assert len(db.list_all_device_config()) == 0
-
-
 class DeviceStatsTestCase(GenericTestCase):
     """Test device stats"""
 
@@ -979,57 +897,6 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(db.list_device_stats(device2.id)) == 1
         assert db.list_device_stats(device2.id)[0].value == '40'
 
-
-class TriggersTestCase(GenericTestCase):
-    """Test triggers"""
-
-    def setUp(self):
-        self.remove_all_triggers()
-
-    def tearDown(self):
-        self.remove_all_triggers()
-
-    def test_empty_list(self):
-        assert len(db.list_triggers()) == 0
-
-    def test_add(self):
-        trigger1 = db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
-                                  t_result=['x10_on("a3")', '1wire()'])
-        print(trigger1)
-        assert trigger1.description == 'desc1'
-        assert trigger1.rule == 'AND(x,OR(y,z))'
-        trigger2 = db.add_trigger(t_description = 'desc2', t_rule='OR(x,AND(y,z))',
-                                  t_result=['x10_on("a2")', '1wire()'])
-        assert len(db.list_triggers()) == 2
-        assert db.get_trigger(trigger1.id).description == 'desc1'
-
-    def test_update(self):
-        trigger = db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
-                                 t_result=['x10_on("a3")', '1wire()'])
-        trigger_u = db.update_trigger(t_id=trigger.id, t_description='desc2', t_rule='OR(x,AND(y,z))',
-                                      t_result=['x10_on("a2")', '1wire()'])
-        assert trigger_u.description == 'desc2'
-        assert trigger_u.rule == 'OR(x,AND(y,z))'
-        assert trigger_u.result == 'x10_on("a2");1wire()'
-
-    def test_del(self):
-        trigger1 = db.add_trigger(t_description = 'desc1', t_rule = 'AND(x,OR(y,z))',
-                                  t_result= ['x10_on("a3")', '1wire()'])
-        trigger2 = db.add_trigger(t_description = 'desc2', t_rule = 'OR(x,AND(y,z))',
-                                       t_result= ['x10_on("a2")', '1wire()'])
-        for trigger in db.list_triggers():
-            trigger_id = trigger.id
-            trigger_del = trigger
-            db.del_trigger(trigger.id)
-            assert trigger_del.id == trigger.id
-        assert len(db.list_triggers()) == 0
-        try:
-            db.del_trigger(12345678910)
-            TestCase.fail(self, "Trigger does not exist, an exception should have been raised")
-        except DbHelperException:
-            pass
-
-
 class PersonAndUserAccountsTestCase(GenericTestCase):
     """Test person and user accounts"""
 
@@ -1259,38 +1126,6 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(ui_item_list) == 1
         assert ui_item_list[0].key == 'pr1'
         assert len(db.del_ui_item_config(ui_item_name='room', ui_item_key='icon2')) == 0
-
-
-class SystemInfoTestCase(GenericTestCase):
-    """Test system information"""
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_get(self):
-        assert db.get_app_version() is None
-
-class SystemConfigTestCase(GenericTestCase):
-    """Test system config"""
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_update(self):
-        system_config = db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
-        print(system_config)
-        assert system_config.simulation_mode
-        assert system_config.debug_mode
-        system_config = db.update_system_config(s_simulation_mode=False)
-        assert not system_config.simulation_mode
-        system_config = db.get_system_config()
-        assert system_config.debug_mode
 
 
 if __name__ == "__main__":

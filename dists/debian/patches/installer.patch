@@ -36,7 +36,7 @@
      return True
 @@ -212,7 +217,8 @@
      #TODO: improve this test
-     if not sql_schema.SystemConfig.__table__.exists(bind=_engine):
+     if not sql_schema.Device.__table__.exists(bind=_engine):
          print("It appears that your database doesn't contain the required tables.")
 -        answer = raw_input("Should they be created? [Y/n] ")
 +        #answer = raw_input("Should they be created? [Y/n] ")

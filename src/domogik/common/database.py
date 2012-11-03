@@ -52,9 +52,9 @@ from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
-        DeviceUsage, DeviceConfig, DeviceStats,
+        DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, SystemInfo, Trigger, Page
+        UserAccount, SENSOR_VALUE_TYPE_LIST, Page
 )
 
 
@@ -1263,93 +1263,6 @@ class DbHelper():
         return device
 
 ####
-# Device config
-####
-    def list_all_device_config(self):
-        """List all device config parameters
-
-        @return A list of DeviceConfig objects
-
-        """
-        return self.__session.query(DeviceConfig).all()
-
-    def list_device_config(self, dc_device_id):
-        """List all config keys of a device
-
-        @param dc_device_id : device id
-        @return A list of DeviceConfig objects
-
-        """
-        return self.__session.query(
-                        DeviceConfig
-                    ).filter_by(device_id=dc_device_id
-                    ).all()
-
-    def get_device_config_by_key(self, dc_key, dc_device_id):
-        """Get a key of a device configuration
-
-        @param dc_key : key name
-        @param dc_device_id : device id
-        @return A DeviceConfig object
-
-        """
-        return self.__session.query(
-                        DeviceConfig
-                    ).filter_by(key=ucode(dc_key), device_id=dc_device_id
-                    ).first()
-
-    def set_device_config(self, dc_key, dc_value, dc_device_id):
-        """Add / update an device config key
-
-        @param dc_key : key name
-        @param dc_value : associated value
-        @param dc_device_id : device id
-        @return : the added/updated DeviceConfig object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        device_config = self.__session.query(
-                                DeviceConfig
-                            ).filter_by(key=ucode(dc_key), device_id=dc_device_id
-                            ).first()
-        if device_config is None:
-            device_config = DeviceConfig(key=dc_key, value=dc_value, device_id=dc_device_id)
-        else:
-            device_config.value = ucode(dc_value)
-        self.__session.add(device_config)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_config
-
-    def del_device_config(self, dc_device_id):
-        """Delete a device configuration key
-
-        @param dc_device_id : device id
-        @return The DeviceConfig object which was deleted
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dc_list = self.__session.query(
-                            DeviceConfig
-                        ).filter_by(device_id=dc_device_id
-                        ).all()
-        if dc_list is None:
-            self.__raise_dbhelper_exception("Couldnt delete device config for device id %s : it doesn't exist" % dc_device_id)
-        dc_list_d = []
-        for device_config in dc_list:
-            dc_list_d.append(device_config)
-            self.__session.delete(device_config)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dc_list_d
-
-####
 # Device stats
 ####
     def list_device_stats(self, ds_device_id=None,ds_skey=None,ds_number=None):
@@ -1745,97 +1658,6 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_stats_l
 
-
-
-
-####
-# Triggers
-####
-    def list_triggers(self):
-        """Return a list of all triggers
-
-        @return a list of Trigger objects
-
-        """
-        return self.__session.query(Trigger).all()
-
-    def get_trigger(self, t_id):
-        """Return a trigger information from id
-
-        @param t_id : trigger id
-        @return a Trigger object
-
-        """
-        return self.__session.query(Trigger).filter_by(id=t_id).first()
-
-    def add_trigger(self, t_description, t_rule, t_result):
-        """Add a trigger
-
-        @param t_description : trigger description
-        @param t_rule : trigger rule
-        @param t_result : trigger result (list of strings)
-        @return the new Trigger object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        trigger = Trigger(description=t_description, rule=t_rule, result=';'.join(t_result))
-        self.__session.add(trigger)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return trigger
-
-    def update_trigger(self, t_id, t_description=None, t_rule=None, t_result=None):
-        """Update a trigger
-
-        @param dt_id : trigger id to be updated
-        @param t_description : trigger description
-        @param t_rule : trigger rule
-        @param t_result : trigger result (list of strings)
-        @return a Trigger object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        trigger = self.__session.query(Trigger).filter_by(id=t_id).first()
-        if trigger is None:
-            self.__raise_dbhelper_exception("Trigger with id %s couldn't be found" % t_id)
-        if t_description is not None:
-            if t_description == '':
-                t_description = None
-            trigger.description = ucode(t_description)
-        if t_rule is not None:
-            trigger.rule = ucode(t_rule)
-        if t_result is not None:
-            trigger.result = ucode(';'.join(t_result))
-        self.__session.add(trigger)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return trigger
-
-    def del_trigger(self, t_id):
-        """Delete a trigger
-
-        @param t_id : trigger id
-        @return the deleted Trigger object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        trigger = self.__session.query(Trigger).filter_by(id=t_id).first()
-        if trigger:
-            self.__session.delete(trigger)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return trigger
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete trigger with id %s : it doesn't exist" % t_id)
 
 ####
 # User accounts
@@ -2296,66 +2118,6 @@ class DbHelper():
             except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return ui_item_config_list
-
-###
-# SystemInfo
-###
-
-    def get_system_info(self):
-        """Get current system information
-
-        @return a SystemInfo object
-
-        """
-        return self.__session.query(SystemInfo).first()
-
-    def get_app_version(self):
-        """Get the current version of the application (that is stored in the database)"""
-        sys_info = self.__session.query(SystemInfo).first()
-        if sys_info is None:
-            return None
-        return sys_info.app_version
-
-###
-# SystemConfig
-###
-    def get_system_config(self):
-        """Get current system configuration
-
-        @return a SystemConfig object
-
-        """
-        try:
-            return self.__session.query(SystemConfig).one()
-        except MultipleResultsFound:
-            self.__raise_dbhelper_exception("Error : SystemConfig has more than one line")
-        except NoResultFound:
-            pass
-
-    def update_system_config(self, s_simulation_mode=None, s_debug_mode=None):
-        """Update (or create) system configuration
-
-        @param s_simulation_mode : True if the system is running in simulation mode (optional)
-        @param s_debug_mode : True if the system is running in debug mode (optional)
-        @return a SystemConfig object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        system_config = self.__session.query(SystemConfig).first()
-        if system_config is not None:
-            if s_simulation_mode is not None:
-                system_config.simulation_mode = s_simulation_mode
-            if s_debug_mode is not None:
-                system_config.debug_mode = s_debug_mode
-        else:
-            system_config = SystemConfig(simulation_mode=s_simulation_mode, debug_mode=s_debug_mode)
-        self.__session.add(system_config)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return system_config
 
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
         """Raise a DbHelperException and log it
