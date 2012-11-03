@@ -720,6 +720,7 @@ class ProcessRequest():
             cmd = the xpl_command id form the core_xplcommand table
         """
         self.log.debug("Process /ncommand")
+        # get the xplcommand
 
 
 
