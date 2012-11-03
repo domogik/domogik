@@ -3,7 +3,7 @@
     <schema>scene.basic</schema>
     <command-key>command</command-key>
     <address-key>number</address-key>
-    <command-xpl-value>fake-false</command-xpl-value>
+    <command-xpl-value>false</command-xpl-value>
     <parameters>                
     </parameters>
   </command>

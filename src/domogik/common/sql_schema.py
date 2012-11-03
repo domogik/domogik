@@ -58,7 +58,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relation, backref, relationship
+from sqlalchemy.orm import relation, backref
 
 from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
@@ -545,37 +545,3 @@ class UIItemConfig(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return UIItemConfig.__tablename__
-
-class XplStat(Base):
-    __tablename__ = '%s_xplstat' % _db_prefix
-    id = Column(Integer, primary_key=True) 
-    schema = Column(Unicode(32))
-    reference = Column(Unicode(255))
-    device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
-    params = relationship("XplStatParam")
-
-class XplStatParam(Base):
-    __tablename__ = '%s_xplstat_params' % _db_prefix
-    xplstat_id = Column(Integer, ForeignKey(XplStat.__tablename__ + ".id"), primary_key=True) 
-    key = Column(Unicode(32), primary_key=True)
-    value = Column(Unicode(255))
-    static = Column(Boolean)
-
-class XplCommand(Base):
-    __tablename__ = '%s_xplcommand' % _db_prefix
-    id = Column(Integer, primary_key=True) 
-    schema = Column(Unicode(32))
-    reference = Column(Unicode(255))
-    device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
-    stat_id = Column(Integer, ForeignKey(XplStat.__tablename__ + ".id"))
-    params = relationship("XplCommandParam")
-
-class XplCommandParam(Base):
-    __tablename__ = '%s_xplcommand_params' % _db_prefix
-    xplstat_id = Column(Integer, ForeignKey(XplCommand.__tablename__ + ".id"), primary_key=True) 
-    key = Column(Unicode(32), primary_key=True)
-    value = Column(Unicode(255))
-    static = Column(Boolean)
-
-
-
