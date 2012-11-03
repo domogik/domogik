@@ -77,9 +77,9 @@ def test_imports():
                 downloads and install pyOpenSSL correctly.")
         good = False
     try:
-        import MySQLdb
+        import sqlalchemy
     except ImportError:
-        warning("Can't import MySQLdb, please install one of them (depend of your setup) by hand or exec ./setup.py develop or ./setup.py install")
+        warning("Can't import sqlalchemy, please install it")
         good = False
     try:
         import httplib

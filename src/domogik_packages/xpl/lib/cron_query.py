@@ -93,10 +93,10 @@ class CronQuery():
                 pass
         if 'error' not in self._result:
             if extkey != None:
-                #print "extkey=%s"%extkey
-                #print "result=%s"%self._result
+                #print("extkey=%s"%extkey)
+                #print("result=%s"%self._result)
                 if extkey in self._result:
-                    #print "extkey=%s"%self._result[extkey]
+                    #print("extkey=%s"%self._result[extkey])
                     return self._result[extkey]
                 else:
                     return False
@@ -117,7 +117,7 @@ class CronQuery():
         device = None
         if 'device' in message.data:
             device = message.data['device']
-        #print "result=%s"%result
+        #print("result=%s"%result)
         for resp in self._keys:
             if resp in result:
                 self.log.debug("Timer value received : device=%s" % (device))

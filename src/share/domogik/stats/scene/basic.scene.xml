@@ -6,9 +6,9 @@
                 <filter/>
             </listener>
             <mapping>
-                <device field="scene"/>
+                <device field="number"/>
                 <value field="command"/>
-                <value field="runing"/>
+                <value field="run"/>
                 <value field="data"/>
                 <value field="stats"/>
             </mapping>

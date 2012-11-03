@@ -151,7 +151,7 @@ def add_data(start_p, end_p, insert_step, key):
         conn.execute(ins)
         """
         if (count % 50000 == 0):
-            print "\t%s values inserted, date = %s" % (count, datetime.datetime.utcfromtimestamp(cur_date)),
+            print("\t%s values inserted, date = %s" % (count, datetime.datetime.utcfromtimestamp(cur_date)),)
         """
     print("\t%s values inserted" % count)
     print("\tExecution time = %s" % (time.time() - start_t))

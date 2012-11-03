@@ -8,14 +8,15 @@
         </ul>
         <ul id='dmgsections'>
             <li><a title="Domogik news, project and more" href="http://www.domogik.org">Home</a></li>
-            <li><a title="User Documentation" href="http://wiki.domogik.org/End_user_documentation">Documentation</a></li>
+            <li><a title="User Documentation" href="http://docs.domogik.org">Documentation</a></li>
             <li><a title="Community documentation" href="http://wiki.domogik.org">Wiki</a></li>
             <li><a title="Report and track bugs" href="http://tracker.domogik.org/projects/domogik">Tracker</a></li>
             <li><a title="Community forums" href="http://forum.domogik.org">Forums</a></li>
             <li><a title="Get Domogik" href="http://wiki.domogik.org/Download">Download</a></li>
+            <li><a title="List Packages" href="http://repo.domogik.org/package">Packages</a></li>
         </ul>
     </div>
-    <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'index' else '' }}{% endblock %}">
+    <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'indexDESACTIVATED' else '' }}{% endblock %}">
         <div id="hd">
             <h1><a href="{{ pathto('index') }}">{{ docstitle }}</a></h1>
             <div id="global-nav">
@@ -39,7 +40,7 @@
                 </div>
             </div>
         {% block sidebarwrapper %}
-        {% if pagename != 'index' %}
+        {% if pagename != 'indexDESACTIVATED' %}
             <div class="yui-b" id="sidebar">
             {{ sidebar() }}
             {%- if last_updated %}

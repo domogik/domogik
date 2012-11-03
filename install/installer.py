@@ -117,8 +117,6 @@ def add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
 
-    _db.update_system_config()
-
     # Create a default user account
     _db.add_default_user_account()
 
@@ -165,6 +163,11 @@ def add_initial_data():
                          du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Closed&quot;, &quot;state1&quot;:&quot;Open&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
     _db.add_device_usage(du_id='security_camera', du_name='Security camera', du_description='Security camera',
                          du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
+    _db.add_device_usage(du_id='door', du_name='Door', du_description='Portal',
+                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Closed&quot;, &quot;state1&quot;:&quot;Open&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
+    _db.add_device_usage(du_id='window', du_name='Window', du_description='Portal',
+                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Closed&quot;, &quot;state1&quot;:&quot;Open&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
+
     _db.add_page(name='ROOT', parentId=None, descr='', icon='')
 
     # Set sqlalchemy migrate version to the latest one
@@ -212,7 +215,7 @@ def install_or_upgrade():
     """Initialize the databases (install new one or upgrade it)"""
     print("Using database", _db.get_db_type())
     #TODO: improve this test
-    if not sql_schema.SystemConfig.__table__.exists(bind=_engine):
+    if not sql_schema.Device.__table__.exists(bind=_engine):
         print("It appears that your database doesn't contain the required tables.")
         answer = raw_input("Should they be created? [Y/n] ")
         if answer == "n":

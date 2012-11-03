@@ -60,7 +60,7 @@ class zalarmsAPI:
                 device = self.config.query('zalarms', 'device-%s' % str(num))
                 if device!=None:
                     self._devices.add(device)
-                    #print "status=%s"%self._cron_query.statusJob(device,extkey="current")
+                    #print("status=%s"%self._cron_query.statusJob(device,extkey="current"))
                     alarmtype = self.config.query('zalarms', 'alarmtype-%s' % str(num))
                     if self._cron_query.status_job(device,extkey="current")!="halted":
                         self._cron_query.halt_job(device)

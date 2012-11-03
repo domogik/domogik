@@ -78,15 +78,6 @@ class OZwave(XplPlugin):
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
                                                  'xpltype': 'xpl-cmnd'})
-        
-        # run du plugin
-        #ozwave_process = threading.Thread(None,
-         #                          self.myzwave.run,
-          #                         "ozw-process-reader",
-            #                       (self.get_stop(),),
-               #                    {})
-        #self.register_thread(ozwave_process)
-        #ozwave_process.start()
         # Validation avant l'ouverture du controleur, la découverte du réseaux zwave prends trop de temps -> RINOR Timeout
         self.enable_hbeat()
         # Ouverture du controleur principal
@@ -163,7 +154,7 @@ class OZwave(XplPlugin):
                                     'node' : request['node'], 
                                     'data': info})
             elif  request['request'] == 'GetNodeValuesInfo':
-                info =self.myzwave.getNodeValuesInfo(request['node'])
+                info =self.myzwave.getNodeValuesInfos(request['node'])
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : request['node'], 
@@ -172,7 +163,31 @@ class OZwave(XplPlugin):
                 for inf in info['Values']:
                     mess.add_data({'value%d' %i :  self.getUIdata2dict(inf)})
                     i = i +1
+            elif  request['request'] == 'GetValueInfos':
+                valId = long(request['valueid']) # Pour javascript type string
+                info =self.getUIdata2dict(self.myzwave.getValueInfos(valId))
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'valueid' : request['valueid'], 
+                                    'data': info})
                 print mess
+            elif  request['request'] == 'GetValueTypes':
+                info = self.getUIdata2dict(self.myzwave.getValueTypes())
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'listetypes' : 'valuestype', 
+                                    'data': info})               
+                print mess
+            elif  request['request'] == 'setValue':
+                valId = long(request['valueid']) # Pour javascript type string
+                newvalue = request['newValue']
+                info = self.getUIdata2dict(self.myzwave.setValue(valId, newvalue))
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'listetypes' : 'valuestype', 
+                                    'data': info})               
+                print mess
+                
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 

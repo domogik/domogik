@@ -1,0 +1,19 @@
+<technology id="scene">
+  <command name="Read">
+    <schema>scene.basic</schema>
+    <command-key>command</command-key>
+    <address-key>scene</address-key>
+    <command-xpl-value>Read</command-xpl-value>
+    <parameters>                
+      <parameter key="data" location="1"/>
+    </parameters>
+  </command>
+  <listener>
+    <schema>scene.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+     <key name="command" value="Read-ack"/>
+     <key name="scene" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

@@ -1,0 +1,17 @@
+<technology id="scene">
+  <command name="true">
+    <schema>scene.basic</schema>
+    <command-key>command</command-key>
+    <address-key>number</address-key>
+    <command-xpl-value>true</command-xpl-value>
+    <parameters>                
+    </parameters>
+  </command>
+  <listener>
+    <schema>scene.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+     <key name="number" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

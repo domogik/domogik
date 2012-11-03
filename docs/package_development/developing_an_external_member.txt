@@ -1,0 +1,19 @@
+=============================
+Developing an external member
+=============================
+
+External member name
+====================
+The external member name must have a maxium size of 8 characters. This restriction is linked to xPL.
+
+Files
+=====
+At least, an external member consist of the following file :
+
+* :doc:`src/share/domogik/plugins/myplg.json <json_file>` : a json file which describe the external member and the features it handles.
+
+Then, an external member should have at least one file on one of the following folders :
+
+* :doc:`src/share/domogik/stats/ <stats_files>` : in this folder are stored the xml files that describes the way data in xPL messages are inserted in the database.
+* :doc:`src/share/domogik/url2xpl/ <url2xpl_files>` : in this folder are stored the xml files that describes how the rest server will create and send a xPL message when it receives a command from a user interface.
+

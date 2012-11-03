@@ -444,7 +444,7 @@ class XplHlpPlugin(XplPlugin):
     def enable_helper(self):
         """
         """
-        #print "active=%s" % self._helper.isActive()
+        #print("active=%s" % self._helper.isActive())
         if self.__helper.is_active():
             Listener(self.__helper.request_cmnd_listener, self.myxpl,
                     {'schema': 'helper.request', 'xpltype': 'xpl-cmnd'})

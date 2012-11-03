@@ -39,7 +39,7 @@ import subprocess
 
 ###decodage des valeurs en fonction du datapoint type
 def decodeKNX(datatype, val):
-   if datatype <> '' and val<>'':
+   if datatype != '' and val!='':
 
   ### Decode the data function of the datapoint type
       if datatype == "1.001": #DT_switch
@@ -204,7 +204,7 @@ def decodeKNX(datatype, val):
 
       if datatype == "DT_HVACEib":
          val=int(val.replace(" ",""),16)
-         print "reception DT_HVAC %s" %val
+         print("reception DT_HVAC %s" %val)
          value="DT_HVACEib"
          if val==2 or val==19:
             value="HVACeco"
@@ -268,7 +268,7 @@ def encodeKNX(datatype,val):
    if datatype == '5.001':
       data_type="l"
       print 'envoie d un pourcent'
-      if val<>"None":
+      if val!="None":
          val = int(valeur)*255/100
          valeur=hex(val)[2:]
       else:
@@ -286,7 +286,7 @@ def encodeKNX(datatype,val):
    if datatype[:2] == "6.": #8bit signed integer (EIS14) 
       data_type="l"
       val=int(val)
-      print "|%s|" %val
+      print("|%s|" %val)
       if val<=127 and val>=-128:
          if val<0:
             val=256+val
@@ -302,7 +302,7 @@ def encodeKNX(datatype,val):
             for i in range(4-len(val)):
                val="0"+val
          valeur=val[:2]+" "+val[2:4]                      
-         print "Valeur 16 bit unsigned val=|%s|" %valeur
+         print("Valeur 16 bit unsigned val=|%s|" %valeur)
 
    if datatype[:2] == "8.": #16bit signed integer (EIS14) 
       data_type="l"
@@ -333,7 +333,7 @@ def encodeKNX(datatype,val):
       if len(binaireX)<=12:
          for i in range(12-len(binaireX)):
             binaireX="0"+binaireX
-      if len(binairey)<>4:
+      if len(binairey)!=4:
          for i in range(4-len(binairey)):
             binairey="0"+binairey
       valeur=str(binaireX)[0:1]+" "+str(binairey)+" "+str(binaireX)[1:]
@@ -409,10 +409,10 @@ def encodeKNX(datatype,val):
      
    if datatype == "14.001": #IEE754 floating
       data_type="l"
-      print "valeur 14.001 %s" %val
+      print("valeur 14.001 %s" %val)
       val=float(val)
       valeur=hexlify(pack('>f',val))
-      print "IEE754 %s" %valeur
+      print("IEE754 %s" %valeur)
       if len(valeur)==8:
          valeur=valeur[0:2]+" "+valeur[2:4]+" "+valeur[4:6]+" "+valeur[6:8]
 
@@ -500,7 +500,7 @@ class KNX:
         """
         #subp = subprocess.Popen("kill -9 %s" % self.eibd_pid, shell=True)
         subp = subprocess.Popen("pkill groupsock*", shell=True)
-        print "pkill groupsock"
+        print("pkill groupsock")
         # TODOD : add check and kill -9 if necessary
 
     def listen(self):

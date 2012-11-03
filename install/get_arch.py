@@ -38,7 +38,8 @@ def get_path(dir_only=False):
         'x86_64' : 'src/domogik/xpl/tools/64bit/',
         'i686' : 'src/domogik/xpl/tools/32bit/',
         'arm' : 'src/domogik/xpl/tools/arm/',
-        'armv5tel' : 'src/domogik/xpl/tools/arm/'
+        'armv5tel' : 'src/domogik/xpl/tools/arm/',
+        'armv6l' : 'src/domogik/xpl/tools/arm/'
     }
     if arch not in hub.keys():
         return None

@@ -1,0 +1,16 @@
+==========
+Data files
+==========
+
+Purpose
+=======
+Sometimes, a plugin could need some additionnal data files (external resources needed by a plugin, cache, ...)
+
+How to use the data files ?
+===========================
+If your plugin need some files (data files, cache files, ...) you can store them in a dedicated folder. You will get this folder location by using the get_data_files_directory() function. Example : ::
+
+    XplPlugin.__init__(self, name='foo')
+    self.data_files_dir = self.get_data_files_directory()
+
+In development, the linked directory is **src/share/domogik/data/<plugin name>/**.

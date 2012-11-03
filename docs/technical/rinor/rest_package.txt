@@ -1,0 +1,289 @@
+=============
+REST /package
+=============
+
+Purpose
+=======
+
+The following commands are used to list packages, update packages cache and install packages on hosts.
+
+/package/get-mode
+=================
+If normal mode (packages are installed from repositories and stored in $HOME/.domogik/): ::
+
+    {"status" : "OK", "code" : 0, "description" : "None", "mode" : ["normal"]}
+
+If development mode (for developping plugins from sources): ::
+
+    {"status" : "OK", "code" : 0, "description" : "None", "mode" : ["development"]}
+
+Normal mode is setted when **package_path** option is defined in **domogik.cfg** config file. Else, you are in development mode.
+
+/package/list-repo
+==================
+List all repositories on all hosts. 
+
+Return: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "repository" : [
+            {
+                "url" : "http://192.168.1.30/fritz/repo1",
+                "priority" : "500"
+            },
+            {
+                "url" : "http://192.168.1.30/fritz/repo2",
+                "priority" : "500"
+            }
+        ]
+    }    
+
+/package/update-cache
+=====================
+Update cache
+
+Return: ::
+
+    {
+        "status" : "OK", 
+        "code" : 0, 
+        "description" : "None", 
+        "cache" : []
+    }
+
+
+/package/available/<host>/<package type>
+========================================
+Get list of available packages of a type on a host (listed in cache)
+
+Return: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "package": [
+            {
+                "category": "notification",
+                "documentation": "http://wiki.domogik.org/plugin_apushnot",
+                "description": "Android notification system base on external service provide by notifry",
+                "author": "Kriss",
+                "author_email": "Kriss@domogik.org",
+                "changelog": "0.1\n- plugin creation",
+                "domogik_min_version": "0.1.0",
+                "archive_url": "http://repo.domogik.org/repository/nightly/download/plugin/apushnot/0.1a0.dev20120508",
+                "priority": "100",
+                "source": "http://repo.domogik.org/repository/nightly",
+                "generated": "2012-05-08 13:39:35.862026",
+                "dependencies": [
+                    {
+                        "type": "python",
+                        "id": "cjson"
+                    }
+                ],
+                "version": "0.1a0.dev20120508",
+                "fullname": "plugin-apushnot",
+                "type": "plugin",
+                "id": "apushnot",
+                "name": "apushnot"
+            },
+        ]
+    }
+
+domogik-min-release
+*******************
+This tells which minimum Domogik version is needed for plugin. Any UI should compare this value with the "Domogik release" in REST's / request: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "rest": [
+            {
+                "info": {
+                    "SSL" : "False",
+                    "REST API release" : "0.1",
+                    "Domogik release" : "0.1.1"
+                },
+                ...
+            }
+        ]
+    }
+
+/package/installed/<host>/<type>
+================================
+Ask for list of installed packages on a host for a type
+
+Return: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "package": [
+            {
+                "enabled": "False",
+                "version": "0.2a0.dev20120507",
+                "updates": "",
+                "fullname": "plugin-cidmodem",
+                "type": "plugin",
+                "id": "cidmodem"
+            },
+            {
+                "enabled": "True",
+                "version": "0.2.dev20120502",
+                "updates": "",
+                "fullname": "plugin-wol_ping",
+                "type": "plugin",
+                "id": "wol_ping"
+            }
+        ]
+    }
+
+/package/dependency/<host>/<type>/<id>/<release number>
+=======================================================
+Notice: this command is optionnal and its goal is to give an information to user about dependencies status for the package. By the way, you should use it ;)
+
+Json response if OK and a python dependency is already installed: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "dependency": [
+            {
+                "id" : "pyserial (>=2.5)",
+                "type" : "python",
+                "installed": "True",
+                "version": "2.5",
+                "cmd_line": "",
+                "candidate": "",
+                "error" : ""
+            }
+        ]
+    }
+
+Json response if OK and a python dependency is not present (and is installable): ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "dependency": [
+            {
+                "id" : "pyserial (>=2.5)",
+                "type" : "python",
+                "installed": "False",
+                "version": "",
+                "cmd_line": "sudo easy_install pyserial==2.5",
+                "candidate": "2.5",
+                "error" : "error"
+            }
+        ]
+    }
+
+Json response if no python dependency is required by package: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "dependency": []
+    }
+
+Json response for a plugin dependency: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "dependency": [
+            {
+                "name": "xpl_time",
+                "candidate": "",
+                "error": "",
+                "installed": "False",
+                "cmd_line": "Install from Domogik Administration",
+                "version": "",
+                "type": "plugin"
+            }
+        ]
+    }
+
+Notice : if **error** field is filled for a dependency, you must display it!
+
+/package/install/<host>/<package type>/<package id>/<release number>
+====================================================================
+
+Notice: this command must also be used for updating a package. Manager will check if the action is a new install or an update and do the appropriate stuff.
+
+Json response if OK: ::
+
+    {
+        "status" : "OK", 
+        "code" : 0,
+        "description" : "None",
+    }
+
+Json response if KO: ::
+
+    {
+        "status" : "ERROR", 
+        "code" : 0,
+        "description" : "Error : ....",
+    }
+
+/package/install_from_path/<host>?filename=<package file name>
+==============================================================
+This url is used to upload a package directly to rest and to install it.
+Use the PUT method to send the file. Example with curl command: ::
+    $ curl -T /home/fritz/plugin-diskfree-0.1a0.dev20120525.tgz http://192.168.1.10:40405/package/install_from_path/darkstar?filename=plugin-diskfree-0.1a0.dev20120525.tgz
+    {"status" : "OK", "code" : 0, "description" : "None", "install" : []}
+
+Json response if OK: ::
+
+    {
+        "status" : "OK", 
+        "code" : 0,
+        "description" : "None",
+    }
+
+Json response if KO: ::
+
+    {
+        "status" : "ERROR", 
+        "code" : 0,
+        "description" : "Error : ....",
+    }
+
+/package/uninstall/<host>/<package type>/<package id>
+=====================================================
+You need to use fullname for package : plugin-onewire, hardware-rfxcom, etc (and NOT onewire, rfxcom, etc)
+
+Json response if OK: ::
+
+    {
+        "status" : "OK", 
+        "code" : 0,
+        "description" : "None",
+    }
+
+Json response if KO: ::
+
+    {
+        "status" : "ERROR", 
+        "code" : 0,
+        "description" : "Error : ....",
+    }
+
+/package/icon/available/<type>/<id>/<release>
+=============================================
+Download png icon file for the package in cache
+
+/package/icon/installed/<type>/<id>
+===================================
+Download png icon file for the package installed (install mode) or in source (dev mode)
+

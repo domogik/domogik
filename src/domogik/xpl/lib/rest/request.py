@@ -306,6 +306,7 @@ class ProcessRequest():
 
         self._hosts_list = self.handler_params[0]._hosts_list
         self.get_installed_packages = self.handler_params[0].get_installed_packages
+        self._get_installed_packages_from_manager = self.handler_params[0]._get_installed_packages_from_manager
 
         # global init
         self.jsonp = False
@@ -680,7 +681,7 @@ class ProcessRequest():
         """
         domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
         #subp = Popen("cd %s ; hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
-        subp = Popen("cd %s ; hg branch | xargs hg log -l1 --template '{branch}.{rev} ({latesttag}) - {date|isodate}' -b" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
+        subp = Popen("cd %s ; hg branch | xargs hg log -l1 --template '{branch}.{rev} - {date|isodate}' -b" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
         (stdout, stderr) = subp.communicate()
         # if hg id has no error, we are using source  repository
         if subp.returncode == 0:
@@ -3831,6 +3832,7 @@ target=*
             self.send_http_response_error(999, "Error while updating cache",
                                           self.jsonp, self.jsonp_cb)
         else:
+            self._get_installed_packages_from_manager()
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("cache")

@@ -52,12 +52,12 @@ import traceback
 try :
     from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
 except :
-    print "Cant load helper plugin : "
-    print traceback.format_exc()
+    print("Cant load helper plugin : ")
+    print(traceback.format_exc())
 try :
     from domogik_packages.xpl.lib.lightplugin import LightingExtension
 except :
-    print "Cant load lighting extension (not a problem if you don't use it) : "
+    print("Cant load lighting extension (not a problem if you don't use it) : ")
     print traceback.format_exc()
 import os.path
 import traceback

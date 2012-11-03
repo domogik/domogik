@@ -1,0 +1,334 @@
+=================
+Package json file
+=================
+
+.. |yes| image:: yes.png
+.. |no|  image:: no.png
+
+Purpose
+=======
+The Json file describe the package and the features of the package. There is one common part which is the same for all packages type and some optionnal parts that depends on the package type.
+
+.. warning ::
+   In json, you must write *\\n* each time you want to create a newline in the data.
+
+The common part
+===============
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
+
+The common part is like this : 
+
+Example
+-------
+
+::
+
+    {
+        "json_version": 1,
+        "identity": {
+            "type": "plugin",
+            "id": "onwire",
+            "category": "onewire",
+            "version": "0.1",
+            "domogik_min_version": "0.2.0",
+            "documentation": 'http://wiki.domogik.org/plugin_onewire',
+            "description": 'Manage 1-wire devices...',
+            "author": 'Domogik',
+            "author_email": 'xx@xxx.fr',
+            "changelog" : "0.1\n-Create plugin",
+            "dependencies": [
+                {  
+                    "id": "owfs (>=2.8.4)",
+                    "type": "other"
+                }
+            ],
+         },
+        "files": [
+            "src/share/domogik/design/plugin/onewire/icon.png",
+            "src/share/domogik/plugins/onewire.json",
+            ...
+        ],
+    }
+
+Description
+-----------
+
+* json_version : version of the json file for this particular element type.
+
+  * identity : element identity.
+
+    * type : the type id for the element:
+
+      * plugin.
+      * external.
+
+    * id : package id (name).
+    * category : package category (for a plugin, it will be its technology).
+    * version : package version.
+    * domogik_min_version : minimum Domogik version required by the package.
+    * description : package description.
+    * author : Name or surname of the developper.
+    * author_email : email the developper.
+    * documentation : link to the specification page.
+    * changelog : changelog. For each version you must indicate the fixes/upgrades.
+    * dependencies : table of dependencies needed by the package :
+
+      * type : type of the dependency
+
+        python : a python dependency (distutils2 format). Ex : 'pyserial (>=2.5)', 'foo (>1.0, <1.8)', ...
+
+        plugin : a Domogik plugin dependency : another plugin must run in order this one could be functionnal.
+
+        other : another dependency (example : owfs for onewire, which need a manual installation).
+
+  * files : list of the files included in the package.
+
+Optionnal parts
+===============
+You must add the following parts in the json file when developping a package.
+
+Technology
+----------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "technology": {
+            "description": "1-wire",
+            "id": "onewire",
+            "name": "1-wire"
+        },
+
+Description
+***********
+These data will be inserted in database during the package installation.
+
+* technology : description of the package technology
+
+  * id : technilogy id.
+  * name : tehcnology name.
+  * description : short description of the technology.
+
+
+Device types
+------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "device_types": [
+            {
+                "description": "Thermometer",
+                "id": "onewire.thermometer",
+                "name": "Thermometer"
+            },
+            ...
+        ]
+
+Description
+***********
+These data will be inserted in database during the package installation.
+
+* device_types : list of the device types allowed by the package
+
+  * id : device type id
+  * name : device type name
+  * description :  short description of the device type
+
+
+Device feature models
+---------------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "device_feature_models": [
+            {
+                "device_type_id": "onewire.thermometer",
+                "id": "onewire.thermometer.temperature",
+                "name": "Temperature",
+                "feature_type": "sensor",
+                "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}",
+                "return_confirmation": "0",
+                "stat_key": "temperature",
+                "value_type": "number"
+            },
+            ...
+        ]
+
+Description
+***********
+These data will be inserted in database during the package installation.
+
+* device_feature_models : list of the device features models allowed by the package
+
+  * device_type_id : device type to which the model is related to.
+  * id : device feature model id
+  * name : name of the device feature model.
+  * feature_type : *sensor* or *actuator* : type of the feature.
+  * parameters : parameters of the feature. 
+  * return_confirmation: *0* or *1* : does the device will give a confirmation after an action has been request ?
+  * stat_key : associated stat key in database (this is related to the key defined in :doc:`the stat files <stats_files>`.
+  * value_type : *number*, *string*, *boolean*, *binary*. The type of the value.
+
+.. todo::
+    Give more details about parameters
+
+Configuration elements
+----------------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |no|
+========================================== ======= =========
+
+These data are read by the manager.
+
+Example
+*******
+::
+
+        "configuration": [
+            {  
+                "id": "0",
+                "interface": "no",
+                "key": "startup-plugin",
+                "type": "boolean",
+                "options": [],
+                "default": "False",
+                "description": "Automatically start plugin at Domogik startup",
+                "optionnal": "no",
+            },
+            ...
+        ]
+
+Description
+***********
+
+* configuration : list of the configuration parameters of a plugin
+
+  * id : number of the configuration item. The display order will be related to the id.
+  * interface : *yes* or *no*. If *yes*, group with all the following keys with *interface = yes*. This group of keys allow to configure N iterations of these keys. 
+  * type : the type of the value to set for the key. 
+
+    * string : the default type
+    * number : a number
+    * boolean : True, False
+    * enum : a list of options. Example: ::
+
+        "type" : "enum",
+        "options": [
+            "ipx800v1",
+            "ipx800pro",
+            "ipx800v2",
+            "ipx800v3"
+        ],
+
+
+  * options : if *type = enum*, list the available options in this table.
+  * default : suggested value.
+  * description : parameter short description.
+  * optionnal : *yes* or *no* : is the parameter optionnal or not ? It is used only for notification in the user interface.
+
+
+.. todo:: 
+    detail enum
+
+
+Udev rules
+----------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|   |no|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "udev-rules": [
+            {  
+                "description": "Usb DS9490R adaptator",
+                "filename": "onewire.rules",
+                "model": "DS9490R",
+                "rule": "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"04fa\", ATTRS{idProduct}==\"2490\", SYMLINK+=\"onewire\", MODE=\"0666\""
+            }
+        ]
+
+Description
+***********
+
+* udev-rules : list of the suggested udev rules.
+  * description : short desciption of the rule. Indicate the related device model here.
+  * filename : suggested filename to use for the rule.
+  * model : related device model.
+  * rule : the udev rule.
+
+
+
+
+
+External members identification
+-------------------------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |no|    |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+        "external": {
+            "device_id": "rgb",
+            "vendor_id": "arduino"
+        },
+
+Description
+***********
+
+* external : description of the vendor and device id of the external member. This is used to identify a specific external member model.
+  * device_id : device id.
+  * vendor_id : vendor id.
+
+How to insert the data in database
+==================================
+
+*This action is only for developpers!*
+
+If you want to manually insert the data of the json in the database, launch this command : ::
+
+    cd src/tools/packages
+    ./insert_data.py ../../share/domogik/plugins/<your plugin name>.json
+

@@ -53,11 +53,10 @@ class OZwaveValueException(OZwaveException):
 
 class ZWaveValueNode:
     """ Représente une des valeurs du node """
-    def __init__(self, homeId, nodeId, valueData):
+    def __init__(self, node, valueData):
         '''
         Initialise la valeur du node
-        @param homeid: ID du réseaux home/controleur
-        @param nodeid: ID du node
+        @param node: ZWaveNode node 'parent'
         @param valueData: valueId dict (voir libopenzwave.pyx)
             ['valueId'] = {
                     'homeId' : uint32, # Id du réseaux
@@ -90,15 +89,14 @@ class ZWaveValueNode:
                     'readOnly': manager.IsValueReadOnly(v),  # Type d'accès lecture/ecriture
                     }   
         '''
-        self._homeId = homeId
-        self._nodeId = nodeId
+        self._node = node
         self._valueData = valueData
-        self._lastUpdate = None
+        self._lastUpdate = time.time()
         
     # On accède aux attributs uniquement depuis les property
   
-    homeId = property(lambda self: self._homeId)
-    nodeId = property(lambda self: self._nodeId)
+    homeId = property(lambda self: self._node._homeId)
+    nodeId = property(lambda self: self._node.Id)
     lastUpdate = property(lambda self: self._lastUpdate)
     valueData = property(lambda self: self._valueData)
 
@@ -106,19 +104,81 @@ class ZWaveValueNode:
         """Retourne la valeur du dict valueData correspondant à key"""
         return self.valueData[key] if self._valueData.has_key(key) else None
     
-    def update(self, args):
+    def getOZWValue(self):
+        """Retourne la valeur réelle lut par openzwave"""
+        retval = self._node._manager.getValue(self.valueData['id'])
+        self._valueData['value'] = retval
+        self._lastUpdate = time.time()
+        return retval
+        
+    def setValue(self, val):
+        """Envois sur le réseau zwave le 'changement' de valeur à la valueNode"""
+        print type (val)
+        if self.valueData['type'] == 'Bool':
+            value = False if val in [False, 'FALSE', 'False',  'false', '',  0,  0.0, (),  [],  {},  None ] else True
+            v = bool(val)
+            print type(value), value,   "----",  type(v),  v
+        elif self.valueData['type'] == 'Byte' : value = int(val)
+        elif self.valueData['type'] == 'Decimal' : value= float(val)
+        elif self.valueData['type'] == 'Int' : value = int(val)
+        elif self.valueData['type'] == 'List' : value = str(val)
+        elif self.valueData['type'] == 'Schedule' : value = int(val)  # TODO: Corriger le type schedule dans setvalue
+        elif self.valueData['type'] == 'Short' : value = short(val)
+        elif self.valueData['type'] == 'String ' : value = str(val)
+        elif self.valueData['type'] == 'Button ' : value = object(val) # TODO: type button set value ?
+        else : value = val        
+        print ("setValue de ", self.valueData['commandClass'], ", instance :", self.valueData['instance'], ", value : ",  value, ", on valueId :" , self.valueData['id'])                      
+        if not self._node._manager.setValue(self.valueData['id'], value)  : 
+            self._node._ozwmanager._log.error ("setValue return bad type : %s, instance :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['instance'],  val, self.valueData['id']))
+            print("return bad type value")
+            return False
+        else : 
+            self._valueData['value'] = val
+            self._lastUpdate = time.time()
+            return val
+            
+    def updateData(self, valueData):
         """Mise à jour de valueData depuis les arguments du callback """
-        self._valueData = args['valueId']
+        self._valueData = valueData
         self._lastUpdate = time.time()
 
     def getInfos(self):
         """ Retourne les informations de la value , format dict{} """
         retval={}
-        retval = self.valueData
+        retval = dict(self.valueData)
+        nameAssoc = self._node._ozwmanager._nameAssoc
         retval['homeId'] = int(retval['homeId']) # Pour etre compatible avec javascript
-        retval['id'] = int(retval['id']) # Pour etre compatible avec javascript
-        retval['domogikdevice']  = True if (retval['commandClass'] in  CmdsClassAvailable) else False
+        retval['id'] = str(retval['id']) # Pour etre compatible avec javascript
+        addressety = "%s.%d.%d" %(nameAssoc.keys()[nameAssoc.values().index(retval['homeId'])] , self._node.nodeId,retval['instance'])
+        retval['domogikdevice']  = addressety if (retval['commandClass'] in  CmdsClassAvailable) else ""
+        retval['help'] =self.getHelp()
+        retval['listElems'] = list(self.getListItems()) if (self.valueData['type'] == 'List')  else None
         return retval
+    
+    def getValueItemStr(self):
+        """Retourne la string selectionnée dans la liste des valeurs possible pour le type list"""
+        retval = ""
+        if self.valueData['type'] == 'List':
+            retval = self._node._manager.getValueListSelectionStr(self.valueData['id'])           
+        return retval
+        
+    def getValueItemNum(self):
+        """Retourne la string selectionnée dans la liste des valeurs possible pour le type list"""
+        retval = None
+        if self.valueData['type'] == 'List':
+            retval = self._node._manager.getValueListSelectionNum(self.valueData['id'])           
+        return retval
+          
+    def getListItems(self):
+        """Retourne la liste des valeurs possible pour le type list"""
+        retval = set()
+        if self.valueData['type'] == 'List':
+            retval = self._node._manager.getValueListItems(self.valueData['id'])           
+        return retval
+        
+    def getHelp(self):
+        """Retourne l'aide utilisateur concernant la fonctionnalité du device"""
+        return self._node._manager.getValueHelp(self.valueData['id'])
         
     def valueToxPLTrig(self, msgtrig):
         """Renvoi le message xPL à trigger en fonction de la command_class de la value

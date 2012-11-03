@@ -371,7 +371,7 @@ class DMGWindow(xbmcgui.Window):
         self.ratio = float(self.getHeight()) / float(ratio)
 
     def onAction(self, action):
-#        print "FOCUS ON : %s" % self.getFocus()
+#        print("FOCUS ON : %s" % self.getFocus())
         if action == ACTION_PREVIOUS_MENU:
             print('action recieved: previous')
             self.close()

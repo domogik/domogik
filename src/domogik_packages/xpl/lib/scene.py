@@ -33,7 +33,6 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
 import subprocess
 import urllib2
 import time
@@ -105,8 +104,8 @@ class Scene:
         ligne=int(valeur,10)-1
         print ligne
         for i in range(len(o)):
-           if i<>ligne:
-              if o[i]<>"":
+           if i!=ligne:
+              if o[i]!="":
                  f.write(o[i]+"\n")
               else:
                  print "ligne a supprimer:|%s|" %o[ligne]
@@ -135,18 +134,22 @@ class Mscene():
     listener1 = ['','','','','','','','','','']
     listener2 = ['','','','','','','','','','']
     glistener = ''
-
-    def __init__(self,number,xplmanager,device1,device2,condition,Action_true,Action_false,rinor):
+   
+    def __init__(self,number,xplmanager,device1,device2,condition,Action_true,Action_false,rinor,host):
+      print "number = %s" %number
       self.number="scene_%s" %number
       self.myxpl=xplmanager
       print "myxpl=%s" %self.myxpl
-      msg=XplMessage()
-      msg.set_schema('scene.basic')
-      msg.set_type('xpl-trig')
-      msg.add_data({'number': self.number})
-      msg.add_data({'run':'Start'})
-      msg.add_data({'statue':'unknow'})
-      self.myxpl.send(msg)
+      self.senderscene = "domogik-scene%s.%s" %(number,host)
+      self.senderplug = "domogik-scene.%s" %host  
+      msg1=XplMessage()
+      msg1.set_schema('scene.basic')
+      msg1.set_source(self.senderplug)
+      msg1.set_type('xpl-trig')
+      msg1.add_data({'number': self.number})
+      msg1.add_data({'run':'init'})
+      msg1.add_data({'statue':'unknow'})
+      self.myxpl.send(msg1)
       print "fin de l'init lib envoie du XPl"
 #      XplPlugin.__init__(self, name = 'send', daemonize = False, parser = None, nohub = True)
 
@@ -164,13 +167,16 @@ class Mscene():
       self.gcondition=condition
       self.grinor= rinor
 
-      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','scene':self.number})
+      self.glistener = Listener(self.cmd_scene,self.myxpl,{'schema':'scene.basic','xpltype':'xpl-cmnd','number':self.number})
 
     def cmd_scene(self,message):
-       if message.data['command']=='start':
-          self.start()
-       elif message.data['command']=='stop':
-          self.stop()
+       print "reception d'un message scene: '%s'" %message
+       print "command = %s" %message.data['command']
+       if message.type == "xpl-cmnd":
+          if message.data['command']=='start':
+             self.start()
+          elif message.data['command']=='stop':
+             self.stop()
 
     def start(self):
        print 'start'
@@ -178,6 +184,7 @@ class Mscene():
        self.key_stat1 = self.device1['key_stat']
 
        if self.device2['id'] != '':
+          print("device 2 id: %s") %self.device2['id']
           self.key_stat2 = self.device2['key_stat']
 
       #initialise les device_stat1 et 2 via un rinor et cree les listeners referant a cmd_device1 et cmd_device2
@@ -193,7 +200,7 @@ class Mscene():
        self.listener1 = ['','','','','','','','','','']
        for i in range(len(self.device1['listener'])):
           self.listener1[i] = Listener(self.cmd_device1,self.myxpl,{'schema':self.device1['listener'][i]['schema'],'xpltype':'xpl-trig',self.device1['listener'][i]['device']:self.device1['address']})
-          print "listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s" %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
+          print("listener(self.cmd_device1,self.myxpl,{'schema':%s,'xpltype':xpl-trig, %s : %s") %(self.device1['listener'][i]['schema'],self.device1['listener'][i]['device'],self.device1['address'])
        if self.device2["id"] != '' and self.device2["key_stat"] != '':
           the_url = 'http://%s/stats/%s/%s/latest' %(self.grinor,self.device2['id'], self.device2['key_stat'])
           req = urllib2.Request(the_url)
@@ -204,15 +211,17 @@ class Mscene():
           self.listener2 = ['','','','','','','','','','']
           for i in range(len(self.device2['listener'])):
              self.listener2[i]=Listener(self.cmd_device2,self.myxpl,{'schema':self.device2['listener'][i]['schema'],'xpltype':'xpl-trig',self.device2['listener'][i]['device']:self.device2['address']})
-       msg=XplMessage()
-       msg.set_schema('scene.basic')
-       msg.set_type('xpl-trig')
-       msg.add_data({'number': self.number})
-       msg.add_data({'run':'Start'})
-       msg.add_data({'statue':'None'})
-       self.myxpl.send(msg)
-       self.etat_scene = self.test()
+       msg1=XplMessage()
+       msg1.set_source(self.senderplug)
+       msg1.set_schema('scene.basic')
+       msg1.set_type('xpl-trig')
+       msg1.add_data({'number': self.number})
+       msg1.add_data({'run':'start'})
+       msg1.add_data({'stats':'None'})
+       self.myxpl.send(msg1)
 
+       self.etat_scene = self.test()
+       
 
     def stop(self):
        for j in range(len(self.listener1)):
@@ -220,25 +229,34 @@ class Mscene():
              self.myxpl.del_listener(self.listener1[j])
           if self.listener2[j] != '':
              self.myxpl.del_listener(self.listener2[j])
-       msg=XplMessage()
-       msg.set_schema('scene.basic')
-       msg.set_type('xpl-trig')
-       msg.add_data({'number': self.number})
-       msg.add_data({'run':'Stop'})
-       msg.add_data({'statue':'None'})
-       self.myxpl.send(msg)
+       msg1=XplMessage()
+       msg1.set_schema('scene.basic')
+       msg1.set_source(self.senderplug)
+       msg1.set_type('xpl-trig')
+       msg1.add_data({'number': self.number})
+       msg1.add_data({'run':'stop'})
+       msg1.add_data({'stats':'None'})
+       self.myxpl.send(msg1)
 
     def cmd_device1(self, message):
        print "%s message for device1" %self.number
-       self.device1_stat=message.data[self.key_stat1]
-       print 'new value for device 1 = %s' %self.device1_stat
-       self.etat_scene = self.test()
+       for i in self.device1['listener']:
+           print i
+           if i['xpl_stat'] in message.data:
+               print "%s message for device1" %self.number
+               self.device1_stat=message.data[i['xpl_stat']]
+               print 'new value for device 1 = %s' %self.device1_stat
+               self.etat_scene = self.test()
 
     def cmd_device2(self, message):
        print "%s message for device2" %self.number
-       self.device2_stat=message.data[self.key_stat2]
-       print 'new value for device 2 = %s' %self.device2_stat
-       self.etat_scene = self.test()
+       for i in self.device2['listener']:
+           print i
+           if i['xpl_stat'] in message.data:
+               self.device2_stat=message.data[i['xpl_stat']]
+               print 'new value for device 2 = %s' %self.device2_stat
+               self.etat_scene = self.test()
+
 
     def test(self):
        # function was call when an xpl-trig for on of device was receve
@@ -346,7 +364,10 @@ class Mscene():
 #         http://ip:port/command/<technology>/<address>/<command>/command [/...]
           print 'techno: %s, address: %s,command: %s,value:%s' %(self.gaction_true['techno'], self.gaction_true['address'],self.gaction_true['command'], self.gaction_true['value'])
 
-          if self.gaction_true['techno'] != '':
+          if self.gaction_true['techno'] == 'command' and self.gaction_true['address']== 'command' and self.gaction_true['command']=='command':
+             subp = subprocess.Popen(self.gaction_true['value'], shell=True) 
+
+          if self.gaction_true['techno'] != '' and self.gaction_true['techno'] != 'command' and self.gaction_true['address'] != 'command':
              if self.gaction_true['command']=='':
                 the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_true['techno'], self.gaction_true['address'], self.gaction_true['value'])
              else:
@@ -355,16 +376,21 @@ class Mscene():
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
           msg=XplMessage()
+          msg.set_source(self.senderscene)
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
-          msg.add_data({'number': 'scene_' + self.number})
-          msg.add_data({'run':'OK'})
+          msg.add_data({'number': self.number})
+          msg.add_data({'run':'start'})
           msg.add_data({'stats':'true'})
           self.myxpl.send(msg)
 
        if condition == 'false' and condition != last_value:
           print 'envoie de la commande false'
-          if self.gaction_false['techno'] != '':
+
+          if self.gaction_false['techno'] == 'command' and self.gaction_false['address']== 'command' and self.gaction_false['command']=='command':
+             subp = subprocess.Popen(self.gaction_false['value'], shell=True) 
+
+          if self.gaction_false['techno'] != '' and self.gaction_false['techno'] != 'command' and self.gaction_false['address'] != 'command':
              if self.gaction_false['command']== '':
                 the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, self.gaction_false['techno'], self.gaction_false['address'], self.gaction_false['value'])
              else:
@@ -373,19 +399,22 @@ class Mscene():
              handle = urllib2.urlopen(req)
              resp1 = handle.read()
           msg=XplMessage()
+          msg.set_source(self.senderscene)
           msg.set_schema('scene.basic')
           msg.set_type('xpl-trig')
-          msg.add_data({'number': 'scene_' + self.number})
-          msg.add_data({'run':'OK'})
+          msg.add_data({'number': self.number})
+          msg.add_data({'run':'start'})
           msg.add_data({'stats':'false'})
           self.myxpl.send(msg)
+          print msg
 
        if condition == last_value:
           msg=XplMessage()
+          msg.set_source(self.senderscene)
           msg.set_schema('scene.basic')
           msg.set_type('xpl-stat')
-          msg.add_data({'number': 'scene_' + self.number})
-          msg.add_data({'run':'OK'})
+          msg.add_data({'number': self.number})
+          msg.add_data({'run':'start'})
           msg.add_data({'stats': condition})
           self.myxpl.send(msg)
 

@@ -1,5 +1,74 @@
-.. _index:
+=======
+Domogik
+=======
 
-=====================
-Domogik documentation
-=====================
+Overview
+========
+
+* :doc:`Quick </overview/index>` 
+* :doc:`Detailed </overview/detailed>`
+
+End User Documentation
+======================
+
+* :doc:`Release 0.2.0 </releases/0.2.0>`
+* :doc:`Domogik requirements </enduser/requirements>`
+* **Installation:**
+
+  * :doc:`Standard Installation </enduser/installation/index>` (*)
+  * :doc:`Repositories configuration </enduser/installation/repositories>` (*)
+  * :doc:`Configure external access to Domogik </enduser/installation/external>`
+  
+  Now, install Domoweb (the Domogik web user interface) before starting the following parts.
+
+* **First steps:**
+
+  * :doc:`First Use </enduser/configuration/index>` (*)
+  * :doc:`Create and configure your house </enduser/configuration/house>` (*)
+
+    * :doc:`House management </enduser/administration/house>` (*)
+    * :doc:`Areas management </enduser/administration/area>` (*)
+    * :doc:`Rooms management </enduser/administration/room>` (*)
+
+  * :doc:`Accounts management </enduser/administration/account>`
+
+* **Packages:**
+
+  * :doc:`Repositories </enduser/packages/repositories>`
+  * :doc:`Installing a package </enduser/packages/installation>` (*)
+  * :doc:`Plugin configuration and startup </enduser/packages/plugin_configuration_and_startup>` (*)
+  * :doc:`Plugin helpers </enduser/packages/plugin_helpers>` (*)
+
+* **Devices:**
+
+  * :doc:`Devices management </enduser/administration/device>` (*)
+  * :doc:`Set up your devices </enduser/configuration/devices>` (*)
+ 
+Technical Documentation
+=======================
+* :doc:`Actuators </technical/actuator>`
+* :doc:`Sensors </technical/sensor>`
+* :doc:`Device types, features and usages  </technical/device_feature_usage>`
+* **Database:**
+  :doc:`Model </technical/database>`
+* **RINOR:**
+  :doc:`Overview </technical/rinor/index>` |
+  :doc:`Statistics Manager </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
+  
+    * :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (area, rooms, devices, events, etc)
+    * :doc:`REST /command </technical/rinor/rest_command>`: Send commands to devices
+    * :doc:`REST /events </technical/rinor/rest_events>`: Get events
+    * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
+    * :doc:`REST /account </technical/rinor/rest_account>`: List accounts, login, etc
+    * :doc:`REST /plugin </technical/rinor/rest_plugin>`: Start, stop xPL plugins
+    * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
+    * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
+    * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
+    * :doc:`REST /package </technical/rinor/rest_package>`: Packages
+* **Packages:**
+  :doc:`Packages overview </technical/packages>`
+
+
+Developers Documentation
+========================
+* :doc:`Developing a package </package_development/index>`

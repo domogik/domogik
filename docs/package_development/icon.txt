@@ -1,0 +1,9 @@
+============
+Package icon
+============
+
+You should create an icon for your package. 
+
+The icon must be located in **src/share/domogik/design/plugin|external/<plugin or external member name>/icon.png**.
+
+The required size is 96*96px. The required format is PNG.

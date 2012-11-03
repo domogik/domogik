@@ -1,0 +1,94 @@
+=============
+Release 0.1.0
+=============
+
+.. image:: 0.1.0a.png
+
+Presentation
+============
+The Domogik team is proud to announce you the first release of its eponym software. This 0.1.0 version had several objectives which were all reached :
+
+* Modular and multi-hosts architecture
+* Use of several simultaneous technologies thanks to the xPL protocol
+* Possibility to create as many UIs as wished. The core of Domogik is totally separated from the graphical part. So all UIs can "talk" to Domogik using a unique entry point
+* The default UI that comes with Domogik uses the latest web technologies
+
+Eight plugins are provided in this version :
+
+* onewire: 1wire technology support (DS18B20, DS18S20 and DS2401).
+* plcbus: PlcBus support.
+* x10_heyu: X10 support (via heyu).
+* ipx800: IPX 800 support (relay cards).
+* teleinfo: recent electricity meters of EDF (french power company) are supported. They allow you to get the electricity consumption.
+* mirror: RFID Mir:ror drive support.
+* cidmodem: "caller id" management with a modem.
+* wol_ping: remote booting of computers and ping.
+
+.. image:: 0.1.0b.png
+
+.. image:: 0.1.0c.png
+
+.. image:: 0.1.0d.png
+
+Android application
+===================
+An Android application called `Domodroid <https://market.android.com/details?id=org.panel&feature=search_result>`_ is available on the Android Market and is fully operationnal with Domogik 0.1.0.
+
+Compatibility
+=============
+
+Server side
+-----------
+All GNU/Linux distribution with Python 2.6 / 2.7 should be fine. Development team users have following distributions :
+
+* Ubuntu
+* Debian
+* Archlinux
+
+Following architecture are supported :
+
+* x86 32bits
+* x86 64bits
+* arm
+
+Client side
+-----------
+One of following browsers is necessary to fully use Domogik web user interface :
+
+* Firefox >= 3.6
+* Chrome >= 5
+
+Others browsers may or may not be able to use all functionnalities (due to some unimplemented HTML 5 features).
+
+Known wish list
+===============
+.. note::
+    Here are listed all unimplemented features, problems or bugs that are known and will be processed in futur releases.
+
+* Scenarios management is not available in this release.
+* Smartphone browsers are not currently fully supported due to advanced html 5 features used by Domogik web UI. Adaptation for smartphone browsers will be made in a next release.
+* French traductions will be made in a following release.
+* Domogik is multi host but the installer is not ready for multi host installations.
+* Some x10 and Plcbus features are not yet implemented (ALL LIGHTS ON and other features like that)
+
+About the future...
+===================
+Now let's talk a little bit about Domogik's future...
+
+Multiple plugins are under development for the following release (SMS sending, Text To Speech, Android and iPhone notifications, Zibase, ...)
+
+About the main graphical user interface : people who follow the project could notice numerous evolutions about items organization in the UI. We tested several screen configurations and found out what we think it is THE solution : it should be flexible and modular and suit to everybody's needs! But... the trouble is that it isn't part of the 0.1.0 version that was just released. This magical solution is still under specifications and development phase so it will appear in a future release of Domogik. So please don't grumble too much about the current UI as the next one will be significantly different (and we hope better)!
+
+Regarding mobile peripherals (pads, smartphones, etc.), the current web user interface is not fully usable. So we are looking for people who would be interested in developing a mobile version of our web UI. By the way developers of Blackberry / Iphone are welcome even if it isn't really urgent. 
+
+Let's talk now about the killing feature missing in Domogik : scenarios. We started thinking about it and implementing them. This feature is in our short list so it should appear in the very next versions.
+
+Regarding the plugins they are bundled within Domogik for the moment. In the future Domogik won't contain any plugins and we will set up a repository (with a tool to easy install or update them).
+
+How to report a bug ?
+=====================
+You just find a bug in this release and want to indicate us : just follow these `instructions to report a bug <http://wiki.domogik.org/ReportABug>`_. 
+
+Plugin development
+==================
+It is currently possible to develop your own plugins for Domogik. There are at the present time several people working on differen plugins. Feel free to join us : you will find help on the irc channel or on the forum.

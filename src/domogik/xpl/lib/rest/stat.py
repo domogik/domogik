@@ -316,7 +316,7 @@ class StatsManager:
                 else:  # oups... something wrong in xml file ?
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
-                #print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
+                #print("Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id))
                 #print("Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id))
             except AttributeError:
                 if self._res["device"] != None:

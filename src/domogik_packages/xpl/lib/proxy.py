@@ -182,7 +182,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if 'Authorization' in self.headers and self.headers['Authorization'][:6] == 'Basic ':
 
                 base64_valid = base64.encodestring('%s:%s' % (username, password))[:-1]
-                #print "base64_valid %s" % base64_valid
+                #print("base64_valid %s" % base64_valid)
                 # Parse given Authorization
                 try:
                     base64_user_raw = self.headers.getfirstmatchingheader('authorization').pop().strip()
@@ -194,7 +194,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     self.server.log.debug("Authenticate %s using method basic" % self.address_string())
                     return True
 
-            #print "self.headers['Authorization'] %s" % self.headers['Authorization']
+            #print("self.headers['Authorization'] %s" % self.headers['Authorization'])
             self.reject_unauthenticated_request()
             return False
         else:
@@ -258,7 +258,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             host_port = netloc[:i], int(netloc[i+1:])
         else:
             host_port = netloc, 80
-        #print "\t" "connect to %s:%d" % host_port
+        #print("\t" "connect to %s:%d" % host_port)
         self.server.log.debug("Connect to %s:%d" % host_port)
         try:
             soc.connect(host_port)
@@ -284,7 +284,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.wfile.write("\r\n")
                 self._read_write(soc, 300)
         finally:
-            #print "\t" "bye"
+            #print("\t" "bye")
             soc.close()
             self.connection.close()
 
@@ -313,7 +313,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 soc.send("\r\n")
                 self._read_write(soc)
         finally:
-            #print "\t" "bye"
+            #print("\t" "bye")
             soc.close()
             self.connection.close()
 
@@ -322,7 +322,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         @param soc : socket to use
         @param max_idling : counter to stop the connection
         """
-        #print "_read_write %s" % soc
+        #print("_read_write %s" % soc)
         iw = [self.connection, soc]
         ow = []
         count = 0
@@ -342,7 +342,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                         out.send(data)
                         count = 0
             #else:
-            #    print "\t" "idle", count
+            #    print("\t" "idle", count)
             if count == max_idling:
                 #self.server.log.debug("Reach timeout when retrieving %s" % (self.path))
                 break

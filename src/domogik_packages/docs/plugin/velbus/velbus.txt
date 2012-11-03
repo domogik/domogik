@@ -1,0 +1,122 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+This plugin ads support for the velbus home Automation system (http://www.velbus.eu) to domogik. Currently the relays, dimmers shutters and temperature modules are supported.
+
+Velbus
+======
+
+Velbus is a robust and reliable modular home automation system. The Velbus System is a 4-wire Home Automation System perfect for the DIY enthusiast or professional contractor, thanks to it's easy installation. To interconnect the modules a bus or cat5 cable can be used. Only 4 wires are used (2 for power and 2 for data). There is no central unit making the system extremely reliable and simple. Professional home automation is now within everyone.s reach.
+
+Known issues
+============
+
+None that i know of
+
+Dependencies
+============
+
+    * pyserial (>=2.6)
+
+How to plug
+===========
+
+.. todo:: 
+    Explain how to plug the material. If there is nothing to plug, delete this chapter or replace it with the appropriate one (account creation for a web service, ...)
+
+Create the udev rule
+--------------------
+
+You may create a udev rule for this device. The rule and filename are given in the **Requirements** tab of the plugin configuration page.
+
+Plugin configuration
+====================
+
+Configuration
+-------------
+In Domogik administration, go to the velbus configuration page.
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+|startup-plugin | False         | Automatically start plugin at Domogik startup                                                       |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|connection-type| serial        | Defines the connection type to velbus, can be serial or socket                                      |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| velbus-device | /dev/ttyACM0  | Velbus device (/dev/ttyACM0 for serial, or ip:port for socket                                       |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Creating devices for velbus
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| Relay output       | Name              | The name you want to give to the device                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address, consists of a decimal value of the velbus address and a channel number |
+|                    |                   | Example 40-1                                                                               |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Velbus.switch                                                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage                                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Dimmer output      | Name              | The name you want to give to the device                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address, consists of a decimal value of the velbus address and a channel number |
+|                    |                   | Example: 40-1                                                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Velbus.dimmer                                                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage                                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Shutter output     | Name              | The name you want to give to the device                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address, consists of a decimal value of the velbus address and a channel number |
+|                    |                   | Example: 40-1                                                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Velbus.dimmer                                                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage                                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Temperatur Input   | Name              | The name you want to give to the device                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address, consists of a decimal value of the velbus address                      |
+|                    |                   | Example: 40                                                                                |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Velbus.dimmer                                                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage                                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+

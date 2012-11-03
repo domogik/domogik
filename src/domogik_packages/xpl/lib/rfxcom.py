@@ -512,7 +512,7 @@ class RfxcomUsb:
             @param data : data read
         """
         type = data[0] + data[1]
-        print "TYPE = %s" % type
+        print("TYPE = %s" % type)
         try:
             eval("self._process_%s('%s')" % (type, data))
         except AttributeError:

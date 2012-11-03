@@ -1,0 +1,180 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+This plugin aims at communicating with 1-Wire devices.
+
+To work, this plugin needs `OWFS <http://www.owfs.org>`_.
+
+List of actually supported devices :
+
+* `DS18B20 <http://pdfserv.maxim-ic.com/en/ds/DS18B20.pdf>`_
+* `DS18S20 <http://pdfserv.maxim-ic.com/en/ds/DS18S20.pdf>`_
+* `DS2401 <http://datasheets.maxim-ic.com/en/ds/DS2401.pdf>`_
+
+Dependencies
+============
+
+This plugin needs you to manually install **OWFS**.
+
+Debian/Ubuntu installation
+--------------------------
+
+.. note ::
+
+    On Ubuntu or Debian, existing packages on www.owfs.org are old. So, we will get the last version of sources and compile them.
+
+Tools needed to compile OWFS
+****************************
+
+First, we will need a **C compiler** to install OWFS. We will use **gcc**. To see if gcc is available: ::
+
+    $ gcc --version
+
+If gcc is found, it's good, else: ::
+
+    # apt-get install gcc
+
+We also need make and ed: ::
+
+    # apt-get install make ed
+
+Then, we will need **Autoconf** in version 2.57 or greater. To see if it is available: ::
+
+    $ autoconf --version
+
+If not, install it: ::
+
+    # apt-get install autoconf
+    $ autoconf --version
+    version 2.65
+
+
+We will also need USB development librairies: ::
+
+    # apt-get install libusb-dev
+
+And then, install swig: ::
+
+    # apt-get install swig
+
+OWFS
+****
+
+Download OWFS (adapt the following lines to your version) and extract the package: ::
+
+    # cd /usr/src
+    # wget http://downloads.sourceforge.net/project/owfs/owfs/2.8p4/owfs-2.8p4.tar.gz
+    # tar xvzf owfs-2.8p4.tar.gz
+    # cd owfs-2.8p4
+
+Set configuration options with python binding and compile it: ::
+
+    # ./configure --with-python
+    # make
+
+As root / with sudo: ::
+
+    # make install
+
+.. note ::
+
+    You can also download OWFS from repository: ::
+    
+        # sudo apt-get install cvs
+        # cd /usr/src
+        # cvs -z3 -d:pserver:anonymous@owfs.cvs.sourceforge.net:/cvsroot/owfs co owfs
+        # cd owfs
+    
+    
+    Set configuration options with python binding and compile it: ::
+
+        # autoreconf -i
+        # ./configure --with-python
+        # make
+
+    As root / with sudo: ::
+
+        # make install
+    
+OWFS is now installed.
+
+Test OWFS
+*********
+
+To test, you can do this: ::
+
+    $ python
+    >>> import ow
+    >>> print ow.__version__
+    2.8p4-1.18
+
+How to plug
+===========
+
+Wiring standards
+----------------
+
+See `this link <http://owfs.org/index.php?page=wiring-standards>`_.
+
+Onewire interfaces
+------------------
+
+DS9490R
+*******
+
+.. image :: ds9490r.png
+
+The device address to use for this interface will be **u**
+
+Here is the description on this interface connection: 
+
+.. image :: ds9490r_rj11.jpg
+
+Create the udev rule
+--------------------
+
+You may create a udev rule for this device. The rule and filename are given in the **Requirements** tab of the plugin configuration page.
+
+Plugin configuration
+====================
+
+Configuration - common parameters
+---------------------------------
+
+.. note ::
+
+    Each type of component manager by this plugin has its own parameters. You will find them in the dedicated component pages.
+
+In Domogik administration, go to the onewire configuration page.
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| device        | u             | The 1wire device address. The available values are : **u** (usb interface), **/dev/ttySO** (example |
+|               |               | for a serial interface), **remote_system:3003** (address of a OWSERVER).                            |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| cache         | true          | Checked : use the cache. Unchecked : don't use the cache. Reading data on 1 wire netowrk is a slow  |
+|               |               | operation, so if you read a lot of data, it could be a good idea to use cache. More informations on |
+|               |               | http://owfs.sourceforge.net/caching.html                                                            |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Component dedicated pages
+-------------------------
+
+* :doc:`DS18B20 <ds18b20>`
+* :doc:`DS18S20 <ds18s20>`
+* :doc:`DS2401 <ds2401>`
+
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+

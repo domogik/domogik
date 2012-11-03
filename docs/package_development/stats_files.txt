@@ -1,0 +1,5 @@
+===========
+Stats files
+===========
+
+:doc:`See this page </technical/rinor/statmgr>`.

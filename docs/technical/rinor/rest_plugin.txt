@@ -1,0 +1,362 @@
+============
+REST /plugin
+============
+
+Purpose
+=======
+
+**/plugin** entry is used to start, stop, list, get detail and configure plugins.
+For start, stop, list and detail features, a xPL dialog is made with manager and plugins.
+For configuration, REST works directly with databse.
+
+xPL Schema 
+==========
+The :doc:`domogik.system </technical/xpl_domogik_system>` xPL schema is used to manage plugins by sending commands and gettings informations from the :doc:`manager </technical/manager>`. 
+
+List plugins
+============
+
+/plugin/list
+------------
+List all the plugins on all available Domogik hosts.
+
+Result when OK: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "plugin": [
+            {
+                "host": "<host name>",
+                "list": [
+                    {
+                        "status" : "<on/off>",
+                        "host" : "<hostname>",
+                        "technology" : "<technology>",
+                        "id" : "<name>",
+                        "type" : "<type : hardware, plugin>",
+                    },
+                    ...
+                ]
+            },
+            {
+                "host": "<host name>",
+                "list": [...]
+            }
+        ]
+    }
+
+When KO: ::
+
+    {
+        "status" : "ERROR",
+        "code" : 999,
+        "description" : "Timeout on getting plugin list",
+        "plugin" : []
+    }
+
+Get details on a plugin
+=======================
+
+/plugin/detail/<hostname>/<name>
+--------------------------------
+Get details about a plugin.
+
+Result example for a plugin with two configuration keys: ::
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "plugin" : [
+            {
+                "status" : "<on/off>",
+                "host" : "<hostname>",
+                "type" : "plugin",
+                "version" : "<plugin version>",
+                "id" : "<plugin name>",
+                "configuration" : [
+                    {
+                        "element-type" : "item",
+                        "optionnal" : <yes / no>,
+                        "id" : <order id>,
+                        "key" : "<key name>",
+                        "type" : "<key type>",
+                        "description" : "<key description>" 
+                        "default" : "<default value>",
+                        "list-values" : "<list of values. Ex : 'value1,value2'>"
+                    },
+                    {
+                        "element-type" : "item",
+                        "optionnal" : <yes / no>,
+                        "id" : <order id>,
+                        "key" : "<key name>",
+                        "type" : "<key type>",
+                        "description" : "<key description>" 
+                        "default" : "<default value>",
+                        "list-values" : "<list of values. Ex : 'value1,value2'>"
+                    }
+                ],
+                "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
+                "technology" : "service",
+                "description" : "Get power consumption with teleinfo" 
+            } 
+        ]
+    }
+
+**Important notice for multi interface : key 'nb-int' is used to register number of defined interfaces for UI display and xpl usage. See /plugin/config for setting this value.**
+
+Result example for a plugin with 3 configuration keys and a group of 2 keys: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "plugin" : [
+            {
+                "status" : "<on/off>",
+                "type" : "plugin",
+                "host" : "<hostname>",
+                "version" : "<plugin version>",
+                "name" : "<plugin name>",
+                "configuration" : [
+                    {
+                        "element-type" : "item",
+                        "optionnal" : <yes / no>,
+                        "id" : <order id>,
+                        "key" : "<key name>",
+                        "type" : "<key type>",
+                        "description" : "<key description>",
+                        "default" : "<default value>",
+                        "list-values" : "<list of values. Ex : 'value1,value2'>"
+                    },
+                    {
+                        "element-type" : "group",
+                        "elements" : [
+                            {
+                                "optionnal" : <yes / no>,
+                                "id" : <order id>,
+                                "key" : "<key name>",
+                                "type" : "<key type>",
+                                "description" : "<key description>",
+                                "default" : "<default value>",
+                                "list-values" : "<list of values. Ex : 'value1,value2'>"
+                            },
+                            {
+                                "optionnal" : <yes / no>,
+                                "id" : <order id>,
+                                "key" : "<key name>",
+                                "type" : "<key type>",
+                                "description" : "<key description>",
+                                "default" : "<default value>",
+                                "list-values" : "<list of values. Ex : 'value1,value2'>"
+                            }
+                        ]
+                    }
+                ],
+                "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
+                "technology" : "service",
+                "description" : "Get power consumption with teleinfo" 
+            } 
+        ]
+    }
+
+Result for an external member: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "plugin" : [
+            {
+                "status" : "<on/off>",
+                "type" : "hardware",
+                "host" : "<hostname>",
+                "version" : "<plugin version>",
+                "name" : "<plugin name>",
+                "configuration" : [
+                    {
+                        "id" : <order id>,
+                        "key" : "<key name>",
+                        "value" : "<value>",
+                    }
+                ],
+                "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
+                "technology" : "service",
+                "description" : "Get power consumption with teleinfo" 
+            } 
+        ]
+    }
+
+
+Result KO (example for 'cidmodem' here): ::
+
+    {
+        "status" : "ERROR",
+        "code" : 999,
+        "description" : "Timeout on getting plugin detail for cidmodem",
+        "plugin" : []
+    }
+
+Enable and disable a plugin
+===========================
+
+/plugin/enable/<hostname>/<plugin name>
+---------------------------------------
+Enable a plugin.
+
+Result when OK: ::
+
+    {"status" : "OK", "code" : 0, "description" : "None"}
+
+When KO: ::
+
+    {"status" : "ERROR", "code" : 999, "description" : "The error description"}
+
+/plugin/disable/<hostname>/<plugin name>
+----------------------------------------
+Disable a plugin.
+
+Result when OK: ::
+
+    {"status" : "OK", "code" : 0, "description" : "None"}
+
+When KO: ::
+
+    {"status" : "ERROR", "code" : 999, "description" : "The error description"}
+
+Start and stop a plugin
+=======================
+
+/plugin/start/<hostname>/<plugin name>
+--------------------------------------
+Start a plugin.
+
+Result when OK: ::
+    {"status" : "OK", "code" : 0, "description" : "None"}
+
+When component already running (plugin : mirror, host : darkstar): ::
+
+    {"status" : "ERROR", "code" : 999, "description" : "Component mirror is already running on darkstar"}
+
+When component doesn't exists (plugin : foo, host : darkstar): ::
+
+    {"status" : "ERROR", "code" : 999, "description" : "Component foo doesn't exists on darkstar"}
+
+/plugin/stop/<hostname>/<plugin name>
+-------------------------------------
+Stop a plugin.
+
+Result when OK : ::
+
+    {"status" : "OK", "code" : 0, "description" : "None"}
+
+When component already shutdown (plugin : wol, host : darkstar) or when component doesn't exists ::
+
+    {"status" : "ERROR", "code" : 999, "description" : "Component wol is not running on darkstar"}
+
+There may be others error messages depanding on problems that occurs. Only the description will change in json return.
+
+Configuration
+=============
+Important notice : key 'nb-int' is used to register number of defined interfaces for UI display and xpl usage.
+
+/plugin/config/list
+-------------------
+List all the plugin configuraion values in database.
+
+Result: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "config" : [
+            {
+                "key" : "startup-plugin",
+                "value" : "False",
+                "name" : "mirror",
+                "hostname" : "darkstar"
+            },
+            {
+                "key" : "device",
+                "value" : "/dev/mirror",
+                "name" : "mirror",
+                "hostname" : "darkstar"
+            },
+    		...
+        ]
+    }
+
+/plugin/config/list/by-name/<hostname>/<plugin name>
+----------------------------------------------------
+Get all the configuration values for a plugin on a host.
+
+Result : same than /list with items filtered.
+
+/plugin/config/list/by-name/<hostname>/<plugin name>/by-key/<key>
+-----------------------------------------------------------------
+Get a configuration value for the key of a plugin on a host.
+
+Result : same than /list with items filtered.
+
+/plugin/config/set/hostname/<hostname>/name/<plugin name>/key/<key>/value/<value>
+---------------------------------------------------------------------------------
+Set a  configuration value for the key of a plugin on a host.
+
+Result : same than /list with item added or updated.
+
+/plugin/config/del/<hostname>/<plugin name>
+-------------------------------------------
+Delete all the configuration values for a plugin on a host.
+
+Result : same than /list with items deleted.
+
+/plugin/config/del/<hostname>/<plugin name>/by-key/<key>
+--------------------------------------------------------
+Delete a configuration value for the key of a plugin on a host.
+
+Result : same than /list with items deleted.
+
+Dependencies and udev rules
+===========================
+
+/plugin/dependency/<host>/<id>
+------------------------------
+This command will get the plugin dependencies and their status.  It will return the same data as :doc:`/package/dependency <rest_package>`.
+
+/plugin/udev-rule/<host>/<id>
+-----------------------------
+This command will get the udev rules needed by a plugin
+
+Result example: ::
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "udev-rule": [
+            {
+                "model": "modem",
+                "description": "Example for a common modem",
+                "rule": "UBSYSTEMS==\"usb\", ATTRS|idVendor|==\"067b\", ATTRS|idProduct|==\"2303\", SYMLINK+=\"modem\", MODE=\"0666\"",
+                "filename": "modem.rules"
+            }
+        ]
+    }
+
+Developper Notes
+================
+
+List and get details for a plugin
+---------------------------------
+
+.. image:: list_and_detail.png
+
+Starting and stoping a plugin
+-----------------------------
+
+.. image:: start_and_stop.png
+
+
+
+

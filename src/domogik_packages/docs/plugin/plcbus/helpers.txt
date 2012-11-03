@@ -1,0 +1,17 @@
+=======
+Helpers
+=======
+
+plcbus all
+==========
+
+To check if your device are correctly plugged or if your interface is able to see them, you may use this helper. This helper may take a few seconds (10) to give you the result.
+
+.. code-block:: none
+
+    $ plcbus all A 00
+    A1 on
+    A2 on
+    A3 off
+    A4 off
+

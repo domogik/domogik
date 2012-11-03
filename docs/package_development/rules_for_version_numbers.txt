@@ -1,0 +1,19 @@
+=========================================
+Rules for version numbers of the packages
+=========================================
+
+Global rule
+===========
+Here is the main way to choose the version of a Domogik package : *<major>.<minor>*.
+If needed, you may use alpha and beta notations : *1.0a1*, *1.0b3*.
+In all cases, the version number must respect the `PEP 386 <http://www.python.org/dev/peps/pep-0386/>`_.
+
+First release of the package
+============================
+The first release of your package should be named **0.1**. The following releases should also be named "0.x" until the package is fully functionnal : then you will switch to **1.0** version number. You may want to use some alpha, beta or candidates releases like *1.0a1*, *1.0b3*, *1.0c1* before using the final *1.0* version number.
+
+Next releases of the package
+============================
+After the *1.0* has been published, if you need to make bugfixes or little evolutions, you may use *1.1*, *1.2*, ... If you want, you can also use alpha, beta and candidates : *1.1c1*.
+
+If you have have to make big evolutions in your package, you may switch to the next major version : *2.0*.

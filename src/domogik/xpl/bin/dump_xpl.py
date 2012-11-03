@@ -101,7 +101,7 @@ class Sniffer(XplPlugin):
                 print("  %s=%s" % (elt, message.data[elt]))
                 idx += 1
                 if idx == 4:
-                    print "  ..."
+                    print("  ...")
                     return
 
     def _format(self, number):

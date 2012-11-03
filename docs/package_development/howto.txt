@@ -1,0 +1,62 @@
+=======================
+How to create a package
+=======================
+
+First, what type of package do you want to create ?
+===================================================
+There are several types of packages :
+
+* Plugins
+* External members
+
+Plugins
+-------
+Plugin is the main package type in Domogik. It allows you to use some devices (x10 gateway, Zwave stick, ...) or some software (web service, ...) in Domogik.
+
+A plugin is made of :
+
+* A json file which describes the plugin, the features, ...
+* Some xml files to describe the way the database and the user interfaces will communicate with the xPL network.
+* Some python files.
+
+External members
+----------------
+An external member is a xPL client not linked to Domogik. It can be a product like :
+
+* The RFXCOM xPL.
+* A sqeezebox.
+* An diy or arduino board with an ethernet shield and a sketch which communicate xPL.
+* A xPL program made outside of Domogik (xpl-perl for example).
+
+To interact with Domogik, some files must be created for an external member :
+
+* A json file which describes the member and the features of the external member.
+* Some xml files to describe the way the database and the user interfaces will speak with the xPL network.
+
+.. warning ::
+    Currently, for each external member you have to create some json and xml files. We will create a generic external member with some common features in order to handle some external members with classic features (temperature, ...). So, people won't have to create a package for each external client.
+
+Then, how to create a package ?
+===============================
+
+Before creating the package
+---------------------------
+
+* Check if there is not already an existing (or in development) package for what you want to do.
+* Look into :doc:`the packages life cycle <packages_lifecycle>`.
+
+Create the package
+------------------
+
+.. image:: packages_lifecycle.png
+
+Download :download:`SVG source file <packages_lifecycle.svg>`.
+
+#. :doc:`Make specification <specifications>` for your package on the wiki. You can create a page wiki.domogik.org/<package type>/<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin.
+#. :doc:`Start developing the package <developing>`.
+#. Write the :doc:`package documentation <documentation>` at the same time.
+#. Write some :doc:`test cases <test_cases>` for the package. 
+#. :doc:`Test your package <test_the_package>`.
+#. :doc:`Generate the package <generate_the_package>` and send a request to upload it on a repository. 
+
+

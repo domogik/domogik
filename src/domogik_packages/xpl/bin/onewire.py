@@ -220,7 +220,7 @@ class OneWireManager(XplPlugin):
         if 'data' in message.data:
             data = message.data['data']
 
-        print "Message XPL %s" %message
+        print("Message XPL %s" %message)
         if (switch != None and device != None and data != None):
             r = self.ow.write(device, switch, data)
             mess = XplMessage()
@@ -229,7 +229,7 @@ class OneWireManager(XplPlugin):
             mess.add_data({"device" :  device})
             mess.add_data({"command" :  "switch"+switch})
             self.myxpl.send(mess)
-            print "Setting PIO "+switch+"="+data+" for device "+device
+            print("Setting PIO "+switch+"="+data+" for device "+device)
 
             mess2 = XplMessage()
             mess2.set_type("xpl-trig")

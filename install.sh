@@ -295,16 +295,43 @@ function update_rest_config_for_secondary_host {
 
 
 function update_user_config_db {
-            
+           
+    # if keep == n
+    #  => select the db type (mysql or postgresql
+    #  => display auth depenting on the DB type
+    # db_ok = false
+    # if keep === y
+    #  => test the connection based on the config
+    #  => set db_ok to result
+    # while db_ok == false
+    #  => request info comman to all dbs
+    #  => test the connection based on the config
+    #  => set db_ok to result
+    # write out to the file
+ 
     if [ "$keep" = "n" -o "$keep" = "N" ];then
-        #Mysql config 
-        echo "You need to have a working Mysql server with a domogik user and database."
-        echo "You can create it using these commands (as mysql admin user) :"
-        echo " > CREATE DATABASE domogik;"
-        echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@127.0.0.1 IDENTIFIED BY 'randompassword';"
+        # request what db to use
+        read -p "Db Type (mysql or postgresql) [mysql] :" db_type
+        if [ "$db_type" = "" ];then 
+	    db_type="mysql"
+        fi
+        #Display config config
+        if [ "$db_type" = "mysql" ];then 
+            echo "You need to have a working Mysql server with a domogik user and database."
+            echo "You can create it using these commands (as mysql admin user) :"
+            echo " > CREATE DATABASE domogik;"
+            echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@127.0.0.1 IDENTIFIED BY 'randompassword';"
+        else
+            echo "You need to have a working Postgresql server with a domogik user and database."
+            echo "You can create it using these commands (as postgresql admin user) :"
+            echo " > su - postgres"
+            echo " > createdb domogik"
+            echo " > createuser --no-createdb --no-adduser --no-createrole -P domogik"
+            echo " > exit"
+        fi
         read -p "Press Enter to continue the installation when your setup is ok. "
     fi
-    mysql_ok=
+    db_ok=
 
     if [ "$keep" = "y" -o "$keep" = "Y" ];then
         db_user=$(grep "^db_user" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
@@ -313,27 +340,33 @@ function update_user_config_db {
         db_port=$(grep "^db_port" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
         db_name=$(grep "^db_name" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
         db_host=$(grep "^db_host" $DMG_ETC/domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        mysql_client=$(which mysql)
-        while [ ! -f "$mysql_client" ];do
-            read -p "Mysql client not installed, please install it and press Enter."
-            mysql_client=$(which mysql)
-        done
-        echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+        if [ "$db_type" = "mysql" ];then
+            echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+        else
+            psql -h $db_host -p $db_port -U $db_user -d $db_name -c "SELECT 1;" > /dev/null
+        fi
         if [ $? -ne 0 ];then
             read -p "Something was wrong, can't access to the database, please check your setup and press Enter to retry."
         else
-            mysql_ok=true
+            db_ok=true
         fi
     fi
-    while [ ! $mysql_ok ];do 
-        echo "Please set your mysql parameters."
+    while [ ! $db_ok ];do 
+        echo "Please set your database parameters."
         read -p "Username : " db_user
         stty -echo echonl
         read -p "Password : " db_password
         stty echo
-        read -p "Port [3306] : " db_port
-        if [ "$db_port" = "" ];then 
-            db_port=3306 
+        if [ "$db_type" = "mysql" ];then
+            read -p "Port [3306] : " db_port
+            if [ "$db_port" = "" ];then 
+                db_port=3306 
+            fi
+        else
+            read -p "Port [5432] : " db_port
+            if [ "$db_port" = "" ];then 
+                db_port=5432 
+            fi
         fi
         read -p "Host [127.0.0.1] :" db_host
         if [ "$db_host" = "" ];then 
@@ -343,18 +376,17 @@ function update_user_config_db {
         if [ "$db_name" = "" ];then 
             db_name="domogik"
         fi
-        mysql_client=$(which mysql)
-        while [ ! -f "$mysql_client" ];do
-            read -p "Mysql client not installed, please install it and press Enter."
-            mysql_client=$(which mysql)
-        done
-        echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+        if [ "$db_type" = "mysql" ];then
+            echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+        else 
+            psql -h $db_host -p $db_port -U $db_user -d $db_name -c "SELECT 1;" > /dev/null
+        fi
         if [ $? -ne 0 ];then
             read -p "Something was wrong, can't access to the database, please check your setup and press Enter to retry."
         else
-            mysql_ok=true
+            db_ok=true
             echo "Connection test OK"
-            sed -i "s;^db_type.*$;db_type = mysql;" $DMG_ETC/domogik.cfg
+            sed -i "s;^db_type.*$;db_type = $db_type;" $DMG_ETC/domogik.cfg
             sed -i "s;^db_user.*$;db_user = $db_user;" $DMG_ETC/domogik.cfg
             sed -i "s;^db_password.*$;db_password = $db_password;" $DMG_ETC/domogik.cfg
             sed -i "s;^db_port.*$;db_port = $db_port;" $DMG_ETC/domogik.cfg

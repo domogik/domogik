@@ -1,0 +1,27 @@
+================
+Test the package
+================
+
+Purpose
+=======
+Several types of tests should be done for a release of a package :
+* unit tests during the development.
+* functionnal tests (based on :doc:`test cases<test_cases>`).
+* stability tests.
+
+
+Unit tests
+==========
+
+
+Functionnal tests
+=================
+When a new release of a package is ready, a test campaign must be launched on this package. This campaign uses the :doc:`test cases<test_cases>`. 
+
+Stability tests
+===============
+Before going in the *stable* repository a package must be tested for several days without restarting it! This is very important for :
+* detecting memory leaks.
+* checking if the package doesn't crash after some time.
+* ...
+

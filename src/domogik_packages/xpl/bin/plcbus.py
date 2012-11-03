@@ -147,8 +147,8 @@ class PlcBusMain(XplPlugin):
                     del self._probe_status[code]
         elif f["d_command"] == "GET_ALL_ON_ID_PULSE":
             data = "%s%s" % (bin(f["d_data1"])[2:].zfill(8), bin(f["d_data2"])[2:].zfill(8))
-            print "f : %s" % f
-            print "data : %s" % data
+            print("f : %s" % f)
+            print("data : %s" % data)
             house = f["d_home_unit"][0]
             item = 16
             for c in data:
