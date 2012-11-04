@@ -751,7 +751,7 @@ class ProcessRequest():
                 json_data.set_data_type("response")
                 self.send_http_response_ok(json_data.get())
                 return
-            self.log.debug("Command : message received : %s" % str(msg_cmd))
+            self.log.debug("Command : message received : %s" % str(stat_msg))
         else:
             # no listener defined in xml : don't wait for an answer
             self.log.debug("Command : no listener defined : not waiting for an answer")
