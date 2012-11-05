@@ -82,6 +82,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 #from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
+import time
 
 READ_NETWORK_TIMEOUT = 2
 
@@ -141,6 +142,7 @@ class Manager:
         self._status = 0
 	# status (starting, config, started)
         self._lock_status = threading.Semaphore()
+
         # hbeat detected
         self._foundhub = threading.Event()
         if nohub == True:
@@ -163,6 +165,11 @@ class Manager:
             self.p.log.debug("xPL plugin %s socket bound to %s, port %s" \
                             % (self.p.get_plugin_name(), self._ip, self._port))
             self._h_timer = None
+
+            msg = "HUB discovery > starting"
+            self.p.log.info(msg)
+            print(msg)
+
             self._SendHeartbeat()
             #And finally we start network listener in a thread
             self._stop_thread = False
@@ -180,8 +187,9 @@ class Manager:
         random hbeat timeout between 3 and 10 seconds, and sends HBEAT
         """
         if not self._foundhub.is_set():
-            msg = "Start HUB discovery"
-            self.p.log.debug(msg)
+            # This log info will be written in another function because here, it is sometimes written *after* the hub is discovered
+            #msg = "HUB discovery > starting"
+            #self.p.log.info(msg)
             # random send hbeat (between 3 and 10 seconds)
             rnd = random.randrange(3, 10)
             self._h_timer = XplTimer(rnd, self._SendHeartbeat, self)
@@ -190,8 +198,9 @@ class Manager:
     def foundhub(self):
         """ resets the timer to the default timeout
         """
-        msg = "Received HBEAT echo, HUB detected"
-        self.p.log.debug(msg)
+        msg = "HUB discovery > Received HBEAT echo, HUB detected"
+        self.p.log.info(msg)
+        print(msg)
         self._foundhub.set()
         self.update_status(1)
         if self._h_timer != None:
@@ -283,6 +292,21 @@ class Manager:
         mesg.add_single_data( "port", self.port )
         mesg.add_single_data( "remote-ip", self._ip )
         if schema != 'hbeat.end':
+            if self._status == 0:
+                msg = "HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!"
+                self.p.log.info(msg)
+                print(msg)
+            elif self._status == 1:
+                msg = "HUB discovery > hub found, configuration in progress"
+                self.p.log.info(msg)
+                print(msg)
+            elif self._status == 2:
+                pass
+            else:
+                msg = "Oops! Wrong status for the hbeat message : %s. Please create a bug report for this!" % self._status
+                self.p.log.warning(msg)
+                print(msg)
+
             mesg.add_single_data( "status", self._status )
         if self is not None:
             self.send( mesg )
