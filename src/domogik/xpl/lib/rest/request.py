@@ -42,6 +42,7 @@ from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, ICON_CACHE_DIR 
 from domogik.common.packagexml import PackageException
+from domogik.common.packagejson import PackageJson
 import time
 import urllib
 import urlparse
@@ -147,6 +148,10 @@ class ProcessRequest():
             '^/base/ui-config/del/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':               '_rest_base_ui_item_config_del',
             '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':   '_rest_base_ui_item_config_del',
             '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
+            # xpl-command
+            # xpl-command-params
+            # xpl-stat
+            # xpl-stat-params
         },
         # /command
         'command': {
@@ -186,6 +191,7 @@ class ProcessRequest():
         # /plugin
         'plugin': {
             '^/plugin/list$':                                                                        '_rest_plugin_list',
+            '^/plugin/json/(?P<id>[a-z]+)$':                                                         '_rest_plugin_json',
             '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
             '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
             '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
@@ -2419,8 +2425,18 @@ target=*
             return
 
 
+    def _rest_plugin_json(self, id):
+        self.log.debug("Plugin : ask for plugin json")
 
-
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("pluginJson")
+        try:
+            pjson = PackageJson(id)
+            json_data.add_data(pjson.json)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
 
     def _rest_plugin_list(self):
         """ Send a xpl message to manager to get plugin list

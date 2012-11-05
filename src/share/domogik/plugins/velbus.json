@@ -34,6 +34,132 @@
             "type": "string"
         }
     ], 
+    "xpl_commands": [
+        {
+            "reference": "switch_on",
+            "schema": "lighting.basic",
+            "parameters": [
+                {
+                    "static": [
+                        {
+                            "key": "level",
+                            "value": "255",
+                        },
+                     ],
+                     "device": [
+                        {
+                             "key": "channel",
+                             "description": "The channel number",
+                             "type": "integer",
+                             "max_value": 4,
+                             "min_value": 1,
+                        },
+                        {
+                             "key": "address",
+                             "description": "The decimal address",
+                             "type": "integer",
+                             "max_value": 0,
+                             "min_value": 255,
+                        },
+                    ],
+                    "dynamic": [],
+                }
+            ]
+         },
+         {
+            "reference": "switch_off",
+            "schema": "lighting.basic",
+            "parameters": [
+                {               
+                    "static": [
+                        {
+                            "key": "level",
+                            "value": "0",
+                        },
+                     ],
+                     "device": [
+                        {
+                             "key": "channel",
+                             "description": "The channel number",
+                             "type": "integer",
+                             "max_value": 4,
+                             "min_value": 1,
+                        },
+                        {
+                             "key": "address",
+                             "description": "The decimal address",
+                             "type": "integer",
+                             "max_value": 0,
+                             "min_value": 255,
+                        },
+                    ],
+                    "dynamic": [],
+                }
+            ]
+         },
+         {
+            "reference": "set_level",
+            "schema": "lighting.basic",
+            "parameters": [
+                {
+                    "static": [],
+                    "device": [
+                        {
+                            "key": "channel",
+                            "description": "The channel number",
+                            "type": "integer",
+                            "max_value": 4,
+                            "min_value": 1,
+                        },
+                        {
+                            "key": "address",
+                            "description": "The decimal address",
+                            "type": "integer",
+                            "max_value": 0,
+                            "min_value": 255,
+                        },
+                    ],
+                    "dynamic": [
+                        {
+                             "key": "level",
+                        },
+                    ],
+                }
+            ]
+         }
+    ]
+    "xpl_stats": [
+       {
+            "name": "get_level",
+            "schema": "lighting.device",
+            "parameters": [
+                {
+                    "static": [],
+                     "device": [
+                        {
+                            "key": "channel",
+                            "description": "The channel number",
+                            "type": "integer",
+                            "max_value": 4,
+                            "min_value": 1,
+                        },
+                        {
+                            "key": "address",
+                            "description": "The decimal address",
+                            "type": "integer",
+                            "max_value": 0,
+                            "min_value": 255,
+                        },
+                    ],
+                    "dynamic": [
+                        {
+                             "key": "level",
+                        },
+                    ],
+                },
+            ]
+       }
+    ],
     "device_feature_models": [
         {
             "device_type_id": "velbus.relay", 
