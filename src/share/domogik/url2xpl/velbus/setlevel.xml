@@ -10,7 +10,6 @@
     <schema>lighting.device</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-       <key name="level" value="50"/>
        <key name="device" value="@address@"/>
     </filter>
   </listener>
