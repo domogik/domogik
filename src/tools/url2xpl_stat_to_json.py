@@ -1,0 +1,104 @@
+from domogik.common.packagejson import PackageJson
+import os
+import json
+from xml.dom import minidom
+
+def url2xpl_stat_to_json(techno):
+    # loda the json file
+    pjson = PackageJson(techno)
+    jsn = pjson.json
+    jsn["xpl_commands"] = []
+    jsn["xpl_stats"] = []
+    path = '/opt/domo/domogik'
+    # find all *.xml files
+    for fname in jsn["files"]:
+    	if fname.endswith('.xml'):
+            print "handling file %s" % (fname)
+            # parse the files
+            xml_data = minidom.parse(path+'/'+fname)
+            if xml_data.getElementsByTagName("command") == []:
+                # We have a stats file
+                xml_schema = xml_data.getElementsByTagName("schema")
+                for schema in xml_data.getElementsByTagName("schema"):
+                    stat = {}
+                    stat["parameters"] = {}
+                    stat["parameters"]["static"] = []
+                    stat["parameters"]["device"] = []
+                    stat["parameters"]["dynamic"] = []
+                    stat["reference"] = fname
+                    stat["schema"] = schema.attributes.get("name").value
+                    xml_mapping = schema.getElementsByTagName("mapping")
+                    # device inside mapping
+                    item = {}
+                    
+                    # each value field
+                    jsn["xpl_stats"].append(stat)
+            else:
+                cmd = {}
+                cmd["parameters"] = {}
+                cmd["parameters"]["static"] = []
+                cmd["parameters"]["device"] = []
+                cmd["parameters"]["dynamic"] = []
+                stat = {}
+                stat["parameters"] = {}
+                stat["parameters"]["static"] = []
+                stat["parameters"]["device"] = []
+                stat["parameters"]["dynamic"] = []
+                #=== Do the command part
+                xml_command = xml_data.getElementsByTagName("command")[0]
+                xml_parameters = xml_command.getElementsByTagName("parameters")[0]
+                #   command name => reference
+                cmd["reference"] = str(xml_data.getElementsByTagName("command")[0].attributes.get("name").value)
+                #   schema => schema
+                cmd["schema"] = str(xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue)
+                #   not all files have a command 
+                if xml_command.getElementsByTagName("command-xpl-value") != []:
+                    static = {}
+                    #command-key => parameters static
+                    static["key"] = str(xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue)
+         	        #command-xpl-value => parameter static value
+                    static["value"] = str(xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue)
+                    cmd["parameters"]["static"].append(static)
+       	        #   address-key => parameters device
+                cmd["parameters"]["device"].append({'key': xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue})
+	        #   parameters => dynamic
+                for param in xml_parameters.getElementsByTagName("parameter"):
+                #   loc = param.attributes.get("location")
+                    value = param.attributes.get("value")
+                    item = {}
+                    item["key"] = param.attributes.get("key").value
+                    if value is not None:
+                        item["value"] = value.value
+                        cmd["parameters"]["static"].append(item)
+                    else:
+                       cmd["parameters"]["dynamic"].append(item)
+                #=== Do the stat part
+                xml_listener = xml_data.getElementsByTagName("listener")[0]
+                xml_filter = xml_listener.getElementsByTagName("filter")[0]
+                #   command name => reference
+                stat["reference"] = xml_data.getElementsByTagName("command")[0].attributes.get("name").value
+                #   schema => schema
+                stat["schema"] = xml_listener.getElementsByTagName("schema")[0].firstChild.nodeValue
+                #   keys
+                for key in xml_filter.getElementsByTagName("key"):
+                    item = {}
+                    item["key"] = key.attributes.get("name").value
+                    value = key.attributes.get("value").value
+                    if value.startswith('@') and value.endswith('@'):
+                        stat["parameters"]["device"].append(item)
+                    else:
+                        item["value"] = value
+                        stat["parameters"]["static"].append(item)
+                #   link the stat with the cmd
+                cmd["stat_reference"] = stat["reference"]
+         	#   insert into json
+                jsn["xpl_commands"].append(cmd)
+                jsn["xpl_stats"].append(stat)
+    # rewrite the json file
+    print json.dumps(jsn["xpl_commands"])
+    print ""
+    print json.dumps(jsn["xpl_stats"])
+    
+
+if __name__ == "__main__":
+    url2xpl_stat_to_json('velbus')
