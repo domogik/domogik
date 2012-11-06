@@ -12,27 +12,41 @@ def url2xpl_stat_to_json(techno):
     path = '/opt/domo/domogik'
     # find all *.xml files
     for fname in jsn["files"]:
-    	if fname.endswith('.xml'):
+        if fname.endswith('.xml'):
             print "handling file %s" % (fname)
             # parse the files
             xml_data = minidom.parse(path+'/'+fname)
             if xml_data.getElementsByTagName("command") == []:
                 # We have a stats file
-                xml_schema = xml_data.getElementsByTagName("schema")
                 for schema in xml_data.getElementsByTagName("schema"):
-                    stat = {}
-                    stat["parameters"] = {}
-                    stat["parameters"]["static"] = []
-                    stat["parameters"]["device"] = []
-                    stat["parameters"]["dynamic"] = []
-                    stat["reference"] = fname
-                    stat["schema"] = schema.attributes.get("name").value
-                    xml_mapping = schema.getElementsByTagName("mapping")
-                    # device inside mapping
-                    item = {}
-                    
-                    # each value field
-                    jsn["xpl_stats"].append(stat)
+                    # values
+                    for value in schema.getElementsByTagName("value"):
+	                stat = {}
+                        stat["parameters"] = {}
+                        stat["parameters"]["static"] = []
+                        stat["parameters"]["device"] = []
+                        stat["parameters"]["dynamic"] = []
+                        stat["schema"] = schema.attributes.get("name").value
+                        stat["reference"] = fname
+                        # device inside mapping = device
+                        stat["parameters"]["device"].append({'key': schema.getElementsByTagName("device")[0].attributes.get("field").value})
+                        #<value field="current" new_name="gust" 
+                        #   filter_key="type" filter_value="gust" />
+                        # filter_key + filter_value => static
+                        if value.attributes.get("filter_key") is not None and value.attributes.get("filter_value") is not None:
+                            item = {}
+                            item["key"] = value.attributes.get("filter_key").value
+                            item["value"] = value.attributes.get("filter_value").value
+                            stat["parameters"]["static"].append(item)
+                        # new_name => 
+                        # field = dynamic
+                        item = {}
+                        item["key"] = value.attributes.get("field").value
+                        if value.attributes.get("new_name") is not None:
+                            item["new_name"] = value.attributes.get("new_name").value
+                        stat["parameters"]["dynamic"].append(item)
+                        # each value field
+                        jsn["xpl_stats"].append(stat)
             else:
                 cmd = {}
                 cmd["parameters"] = {}
@@ -71,7 +85,7 @@ def url2xpl_stat_to_json(techno):
                         item["value"] = value.value
                         cmd["parameters"]["static"].append(item)
                     else:
-                       cmd["parameters"]["dynamic"].append(item)
+                        cmd["parameters"]["dynamic"].append(item)
                 #=== Do the stat part
                 xml_listener = xml_data.getElementsByTagName("listener")[0]
                 xml_filter = xml_listener.getElementsByTagName("filter")[0]
@@ -95,10 +109,8 @@ def url2xpl_stat_to_json(techno):
                 jsn["xpl_commands"].append(cmd)
                 jsn["xpl_stats"].append(stat)
     # rewrite the json file
-    print json.dumps(jsn["xpl_commands"])
-    print ""
-    print json.dumps(jsn["xpl_stats"])
+    print json.dumps(jsn, sort_keys=True, indent=4)
     
 
 if __name__ == "__main__":
-    url2xpl_stat_to_json('velbus')
+    url2xpl_stat_to_json('rfxcom')
