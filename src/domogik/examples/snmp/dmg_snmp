@@ -8,6 +8,7 @@ REQ="$2"
 
 PIDDIR=/var/run/domogik
 CFG=/etc/domogik/domogik.cfg
+CACHETIME=40
 
 function pidof {
     [ ! -f $PIDDIR/$1.pid ] && \
@@ -25,7 +26,6 @@ function psinfo {
     #ps -p `cat /var/run/domogik/manager.pid` -o etime= -o time= -o pcpu= -o size= -o rss= -o pmem=
     DATA=`ps -p $PID -o $2=`
     [ "u$DATA" == "u" ] && DATA=0
-    #echo $DATA>>/tmp/dmg_snmp.debug
     #echo `echo $DATA \* 100 | bc` >>/tmp/dmg_snmp.debug
     case "$2" in
 #        "pcpu")         echo `echo $DATA \* 10 | bc` ;;
@@ -36,22 +36,96 @@ function psinfo {
     esac
 }
 
+function pidinfo {
+    PID=$1
+    if [ "$PID" = "0" ]; then
+        echo 0
+        exit 0
+    fi
+    DATA=`ps -p $PID -o $2=`
+    [ "u$DATA" == "u" ] && DATA=0
+    #echo `echo $DATA \* 100 | bc` >>/tmp/dmg_snmp.debug
+    case "$2" in
+#        "pcpu")         echo `echo $DATA \* 10 | bc` ;;
+#        "pmem")         echo `echo $DATA \* 10 | bc` ;;
+        "etime")        echo 0 ;;
+        "time")         echo 0 ;;
+        *)              echo $DATA ;;
+    esac
+}
+
+function ls_in_cache {
+    LIST=`cd /var/run/domogik/ && ls *.pid 2>/dev/null| sed -e "s/.pid//g"`
+    NEWLIST=""
+    NEWPIDS=""
+    for L in $LIST; do
+        PID=`pidof $L`
+        DATA=`ps -p $PID -o pmem=`
+        [ "u$DATA" != "u" ] && NEWLIST="$NEWLIST $L" && NEWPIDS="$NEWPIDS $PID"
+    done
+    echo $NEWLIST > /tmp/domogik_process.snmp
+    echo $NEWPIDS > /tmp/domogik_pids.snmp
+}
+
+
 function lsplugins {
-    echo `cd /var/run/domogik/ && ls *.pid 2>/dev/null| sed -e "s/.pid//g"`
+    if [ ! -f /tmp/domogik_process.snmp ]; then
+        ls_in_cache
+        PLUGINS=`cat /tmp/domogik_process.snmp`
+        #echo "Create cache - plugins=" $PLUGINS >>/tmp/debug.log
+    else
+        NOW=`date +%s`
+        DATF=`date -r /tmp/domogik_process.snmp +%s`
+        EDATF=`echo $DATF + $CACHETIME|bc`
+        if [ $NOW -gt $EDATF ]; then
+            ls_in_cache
+            PLUGINS=`cat /tmp/domogik_process.snmp`
+            #echo "Not from cache - plugins=" $PLUGINS >>/tmp/debug.log
+        else
+            PLUGINS=`cat /tmp/domogik_process.snmp`
+            #echo "From cache - plugins=" $PLUGINS >>/tmp/debug.log
+        fi
+    fi
+    echo $PLUGINS
+}
+
+function lspids {
+    if [ ! -f /tmp/domogik_pids.snmp ]; then
+        ls_in_cache
+        PIDS=`cat /tmp/domogik_pids.snmp`
+        echo "Create cache - pids=" $PIDS >>/tmp/debug.log
+    else
+        NOW=`date +%s`
+        DATF=`date -r /tmp/domogik_pids.snmp +%s`
+        EDATF=`echo $DATF + $CACHETIME|bc`
+        #echo "cache pids $NOW>$EDATF">>/tmp/debug.log
+        if [ $NOW -gt $EDATF ]; then
+            ls_in_cache
+            PIDS=`cat /tmp/domogik_pids.snmp`
+            #echo "Not from cache - pids=" $PIDS >>/tmp/debug.log
+        else
+            PIDS=`cat /tmp/domogik_pids.snmp`
+            #echo "From cache - pids=" $PIDS >>/tmp/debug.log
+        fi
+    fi
+    echo $PIDS
 }
 
 function countplugins {
     I=0
+    #echo "countplugins - lsplugins=" `lsplugins` >>/tmp/debug.log
     for L in `lsplugins`; do
+        #echo "countplugins : $L" >>/tmp/debug.log
         I=`echo $I + 1|bc`
     done
+    #echo "countplugins : $I" >>/tmp/debug.log
     echo $I
 }
 
 function sizeplugins {
     I=0
-    for L in `lsplugins`; do
-        MEM=`psinfo $L size`
+    for L in `lspids`; do
+        MEM=`pidinfo $L size`
         I=`echo $I + $MEM|bc`
     done
     echo $I
@@ -59,8 +133,8 @@ function sizeplugins {
 
 function rssplugins {
     I=0
-    for L in `lsplugins`; do
-        MEM=`psinfo $L rss`
+    for L in `lspids`; do
+        MEM=`pidinfo $L rss`
         I=`echo $I + $MEM|bc`
     done
     echo $I
@@ -68,8 +142,8 @@ function rssplugins {
 
 function pcpuplugins {
     I=0
-    for L in `lsplugins`; do
-        MEM=`psinfo $L pcpu`
+    for L in `lspids`; do
+        MEM=`pidinfo $L pcpu`
         I=`echo $I + $MEM|bc`
     done
     echo $I
@@ -77,16 +151,33 @@ function pcpuplugins {
 
 function pmemplugins {
     I=0
-    for L in `lsplugins`; do
-        MEM=`psinfo $L pmem`
+    for L in `lspids`; do
+        MEM=`pidinfo $L pmem`
         I=`echo $I + $MEM|bc`
     done
     echo $I
 }
 
 function dmgversion {
-    [ ! -f /tmp/dmgversion.snmp ] && `dmg_manager --version >/tmp/dmgversion.snmp`
-    echo `cat /tmp/dmgversion.snmp`
+    #if [ ! -f /tmp/domogik_version.snmp ]; then
+    #    echo `dmg_manager --version` >/tmp/domogik_version.snmp 2>&1
+    #    VERSION=`cat /tmp/domogik_version.snmp`
+    #    echo "Create cache - version=" $VERSION >>/tmp/debug.log
+    #else
+    #    NOW=`date +%s`
+    #    DATF=`date -r /tmp/domogik_version.snmp +%s`
+    #    EDATF=`echo $CACHETIME * 10 + $DATF|bc`
+    #    if [ $NOW -gt $EDATF ]; then
+    #        echo `dmg_manager --version` >/tmp/domogik_version.snmp
+    #        VERSION=`cat /tmp/domogik_version.snmp`
+    #        echo "Not from cache - version=" $VERSION >>/tmp/debug.log
+    #    else
+    #        VERSION=`cat /tmp/domogik_version.snmp`
+    #        echo "From cache - version=" $VERSION >>/tmp/debug.log
+    #    fi
+    #fi
+    VERSION=0.3.0
+    echo "Domogik $VERSION"
 }
 
 #
