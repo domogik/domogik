@@ -117,6 +117,7 @@ class SceneManager(XplPlugin):
          if message.data['command'] == 'Create':
             self.Create_scene_msg(message.data)
       if 'command' in message.data:
+         print('command receive')
          if 'fake' in message.data['command']:
             print 'fake command'
             self.cmd_fake(message)
