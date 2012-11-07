@@ -1,0 +1,8 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`SNMP configuration </domogik_snmp>`
+* :doc:`Cacti configuration </domogik_cacti>`

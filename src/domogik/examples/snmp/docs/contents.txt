@@ -1,0 +1,11 @@
+.. _toc:
+
+================
+Table Of Content
+================
+
+.. toctree::
+
+    /index
+    /domogik_snmp
+    /domogik_cacti

@@ -1,9 +1,9 @@
 <technology id="scene">
-  <command name="true">
+  <command name="delete">
     <schema>scene.basic</schema>
     <command-key>command</command-key>
     <address-key>number</address-key>
-    <command-xpl-value>fake-true</command-xpl-value>
+    <command-xpl-value>delete</command-xpl-value>
     <parameters>                
     </parameters>
   </command>
