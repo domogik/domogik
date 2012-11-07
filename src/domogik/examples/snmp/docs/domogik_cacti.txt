@@ -25,6 +25,9 @@ Screenshots
 .. |domogik_percent| image:: domogik_percent.png
     :width: 550px
 
+.. |domogik_nbplugins| image:: domogik_nbplugins.png
+    :width: 550px
+
 .. |domogik_memory| image:: domogik_memory.png
     :width: 550px
 
@@ -33,6 +36,10 @@ Screenshots
 
 .. |rest_memory| image:: rest_memory.png
     :width: 550px
+
+Numbers of plugins :
+
+|domogik_nbplugins|
 
 pcpu/pmem for domogik (all plugins) :
 
@@ -53,11 +60,11 @@ and for rest only :
 Knwon bugs
 ==========
 
-	- rss and size are represented in kilo, but values are in mega
-	- pcpu is not shown in 0.x format but in milli
+    - rss and size are represented in kilo, but values are in mega
+    - pcpu is not shown in 0.x format but in milli
 
 To do
 =====
 
-	- To represent data on the same screen in cacti, we must develop templates.
+    - To represent data on the same screen in cacti, we must develop templates.
 
