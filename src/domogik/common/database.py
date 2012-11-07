@@ -55,7 +55,7 @@ from domogik.common.sql_schema import (
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
         UserAccount, SENSOR_VALUE_TYPE_LIST, Page,
-        XplCommand, XplStat
+        XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
 
@@ -2139,7 +2139,7 @@ class DbHelper():
     def del_xpl_command(self, id):
         self.__session.expire_all()
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
-        if person is not None:
+        if cmd is not None:
             self.__session.delete(cmd)
             try:
                 self.__session.commit()
@@ -2147,7 +2147,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return cmd
         else:
-            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+            self.__raise_dbhelper_exception("Couldn't delete xpl-command with id %s : it doesn't exist" % id)
 
     def update_xpl_command(self, id, schema=None, reference=None, device_id=None, stat_id=None):
         """Update a xpl_stat
@@ -2156,7 +2156,7 @@ class DbHelper():
         self.__session.expire_all()
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
         if cmd is None:
-            self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % p_id)
+            self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % id)
         if schema is not None:
             cmd.schema = ucode(schema)
         if reference is not None:
@@ -2192,7 +2192,7 @@ class DbHelper():
     def del_xpl_stat(self, id):
         self.__session.expire_all()
         stat = self.__session.query(XplStat).filter_by(id=id).first()
-        if person is not None:
+        if stat is not None:
             self.__session.delete(stat)
             try:
                 self.__session.commit()
@@ -2200,7 +2200,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return stat
         else:
-            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+            self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
     
     def update_xpl_stat(self, id, schema=None, reference=None, device_id=None):
         """Update a xpl_stat
@@ -2209,7 +2209,7 @@ class DbHelper():
         self.__session.expire_all()
         stat = self.__session.query(XplStat).filter_by(id=id).first()
         if stat is None:
-            self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % p_id)
+            self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % id)
         if schema is not None:
             stat.schema = ucode(schema)
         if reference is not None:
@@ -2236,11 +2236,11 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_command_param(self, id, key=None, value=None, static=None):
+    def update_xpl_command_param(self, id, key, value=None, static=None):
         self.__session.expire_all()
-        param = self.__session.query(XplCommandParam).filter_by(id=id).first()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).first()
         if param is None:
-            self.__raise_dbhelper_exception("XplCommandParam with id %s couldn't be found" % p_id)
+            self.__raise_dbhelper_exception("XplCommandParam with id %s couldn't be found" % id)
         if key is not None:
             param.key = ucode(key)
         if value is not None:
@@ -2254,9 +2254,9 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def del_xpl_command_param(self, id):
+    def del_xpl_command_param(self, id, key):
         self.__session.expire_all()
-        param = self.__session.query(XplCommandParam).filter_by(id=id).first()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).first()
         if param is not None:
             self.__session.delete(param)
             try:
@@ -2265,7 +2265,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return param
         else:
-            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+            self.__raise_dbhelper_exception("Couldn't delete xpl-command-param with id %s : it doesn't exist" % id)
 
 ###################
 # XplStatParam
@@ -2280,11 +2280,11 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_stat_param(self, id, key=None, value=None, static=None):
+    def update_xpl_stat_param(self, id, key, value=None, static=None):
         self.__session.expire_all()
-        param = self.__session.query(XplStatParam).filter_by(id=id).first()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=id).first()
         if param is None:
-            self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % p_id)
+            self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % id)
         if key is not None:
             param.key = ucode(key)
         if value is not None:
@@ -2298,9 +2298,9 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def del_xpl_stat_param(self, id):
+    def del_xpl_stat_param(self, id, key):
         self.__session.expire_all()
-        param = self.__session.query(XplStatParam).filter_by(id=id).first()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=id).first()
         if param is not None:
             self.__session.delete(param)
             try:
@@ -2309,7 +2309,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return param
         else:
-            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+            self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id %s : it doesn't exist" % id)
          
 ###################
 # helper functions

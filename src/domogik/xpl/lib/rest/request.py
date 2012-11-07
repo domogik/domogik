@@ -149,16 +149,28 @@ class ProcessRequest():
             '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':   '_rest_base_ui_item_config_del',
             '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
             # xpl-command
+            '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
+            '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
+            '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
             # xpl-command-params
+            '^/base/xpl-command-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_xplcommandparam_del',
+            '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
+            '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
             # xpl-stat
+            '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
+            '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
+            '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
             # xpl-stat-params
+            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
+            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
+            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
         },
         # /command
         'command': {
 	    '^/command.*$':                                                                      'rest_command',
         },
         'ncommand': {
-            '^/ncommand/(?P<dev>[0-9]+)/(?P<cmd_id>[0-9]+)/.*$':                                    'rest_ncommand',
+            '^/ncommand/(?P<dev>[0-9]+)/(?P<cmd_id>[0-9]+)/.*$':                                 'rest_ncommand',
         },
         # /event
         'events': {
@@ -4641,3 +4653,71 @@ target=*
         shutil.copyfileobj(my_file, self.wfile)
         my_file.close()
 
+    def _rest_base_xplcommand_del(self, id):
+        """ delete xplcommand
+            @param id : cmd id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("xplcommand")
+        try:
+            cmd = self._db.del_xpl_command(id)
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplstat_del(self, id):
+        """ delete xplstats
+            @param id : stat id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("xplstat")
+        try:
+            stat = self._db.del_xpl_stat(id)
+            json_data.add_data(stat)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplstatparam_del(self, id, key):
+        """ delete xplstatparam
+            @param id : statparam id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("xplstat")
+        try:
+            stat = self._db.del_xpl_stat_param(id, key)
+            json_data.add_data(stat)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplcommandparam_del(self, id, key):
+        """ delete xplcommandparam
+            @param id : commanparam id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("xplcommand")
+        try:
+            stat = self._db.del_xpl_command_param(id, key)
+            json_data.add_data(stat)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+# xpl-command
+#'^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
+#'^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
+# xpl-command-params
+#'^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
+#'^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
+# xpl-stat
+#'^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
+#'^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
+# xpl-stat-params
+#'^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
+#'^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',

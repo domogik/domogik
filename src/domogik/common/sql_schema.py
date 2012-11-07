@@ -622,7 +622,7 @@ class XplCommand(Base):
 
 class XplCommandParam(Base):
     __tablename__ = '%s_xplcommand_params' % _db_prefix
-    xplstat_id = Column(Integer, ForeignKey(XplCommand.__tablename__ + ".id"), primary_key=True) 
+    xplcmd_id = Column(Integer, ForeignKey(XplCommand.__tablename__ + ".id"), primary_key=True) 
     key = Column(Unicode(32), primary_key=True)
     value = Column(Unicode(255))
     static = Column(Boolean)
