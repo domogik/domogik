@@ -2126,9 +2126,194 @@ class DbHelper():
     def get_xpl_command(self, p_id):
         return self.__session.query(XplCommand).filter_by(id=p_id).first()
 
+    def add_xpl_command(self, schema, reference, device_id, stat_id):
+        self.__session.expire_all()
+        cmd = XplCommand(schema=schema, reference=reference, device_id=device_id, stat_id=stat_id)
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+    def del_xpl_command(self, id):
+        self.__session.expire_all()
+        cmd = self.__session.query(XplCommand).filter_by(id=id).first()
+        if person is not None:
+            self.__session.delete(cmd)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return cmd
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+
+    def update_xpl_command(self, id, schema=None, reference=None, device_id=None, stat_id=None):
+        """Update a xpl_stat
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        cmd = self.__session.query(XplCommand).filter_by(id=id).first()
+        if cmd is None:
+            self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % p_id)
+        if schema is not None:
+            cmd.schema = ucode(schema)
+        if reference is not None:
+            cmd.reference = ucode(reference)
+        if device_id is not None:
+            cmd.device_id = device_id
+        if stat_id is not None:
+            cmd.stat_id = stat_id
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+
+###################
+# xplstat
+###################
     def get_xpl_stat(self, p_id):
         return self.__session.query(XplStat).filter_by(id=p_id).first()
 
+    def add_xpl_stat(self, schema, reference, device_id):
+        self.__session.expire_all()
+        stat = XplStat(schema=schema, reference=reference, device_id=device_id)
+        self.__session.add(stat)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return stat
+
+    def del_xpl_stat(self, id):
+        self.__session.expire_all()
+        stat = self.__session.query(XplStat).filter_by(id=id).first()
+        if person is not None:
+            self.__session.delete(stat)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return stat
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+    
+    def update_xpl_stat(self, id, schema=None, reference=None, device_id=None):
+        """Update a xpl_stat
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        stat = self.__session.query(XplStat).filter_by(id=id).first()
+        if stat is None:
+            self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % p_id)
+        if schema is not None:
+            stat.schema = ucode(schema)
+        if reference is not None:
+            stat.reference = ucode(reference)
+        if device_id is not None:
+            stat.device_id = device_id
+        self.__session.add(stat)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return stat
+
+###################
+# XplCommandParam
+###################
+    def add_xpl_command_param(self, key, value, static):
+        self.__session.expire_all()
+        param = XplCommandParam(key=key, value=value, static=static)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def update_xpl_command_param(self, id, key=None, value=None, static=None):
+        self.__session.expire_all()
+        param = self.__session.query(XplCommandParam).filter_by(id=id).first()
+        if param is None:
+            self.__raise_dbhelper_exception("XplCommandParam with id %s couldn't be found" % p_id)
+        if key is not None:
+            param.key = ucode(key)
+        if value is not None:
+            param.value = ucode(value)
+        if static is not None:
+            param.static = static
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def del_xpl_command_param(self, id):
+        self.__session.expire_all()
+        param = self.__session.query(XplCommandParam).filter_by(id=id).first()
+        if param is not None:
+            self.__session.delete(param)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return param
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+
+###################
+# XplStatParam
+###################
+    def add_xpl_stat_param(self, key, value, static):
+        self.__session.expire_all()
+        param = XplStatParam(key=key, value=value, static=static)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def update_xpl_stat_param(self, id, key=None, value=None, static=None):
+        self.__session.expire_all()
+        param = self.__session.query(XplStatParam).filter_by(id=id).first()
+        if param is None:
+            self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % p_id)
+        if key is not None:
+            param.key = ucode(key)
+        if value is not None:
+            param.value = ucode(value)
+        if static is not None:
+            param.static = static
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def del_xpl_stat_param(self, id):
+        self.__session.expire_all()
+        param = self.__session.query(XplStatParam).filter_by(id=id).first()
+        if param is not None:
+            self.__session.delete(param)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return param
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
+         
+###################
+# helper functions
+###################
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
         """Raise a DbHelperException and log it
 
