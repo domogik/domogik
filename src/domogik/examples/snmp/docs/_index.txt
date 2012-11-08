@@ -1,0 +1,2 @@
+* :doc:`SNMP configuration </domogik_snmp>`
+* :doc:`Cacti configuration </domogik_cacti>`

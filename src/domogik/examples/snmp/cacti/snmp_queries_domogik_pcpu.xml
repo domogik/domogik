@@ -1,0 +1,36 @@
+<interface>
+        <name>Domogik CPU use</name>
+        <index_order_type>numeric</index_order_type>
+        <oid_index>.1.3.6.1.4.1.8072.2.255.2.2</oid_index>
+
+        <fields>
+                <dmgDomogikCpu>
+                        <name>Domogik</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.8072.2.255.2.2</oid>
+                </dmgDomogikCpu>
+                <dmgManagerCpu>
+                        <name>Manager</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.8072.2.255.3.2</oid>
+                </dmgManagerCpu>
+                <dmgDbmgrCpu>
+                        <name>Dbmgr</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.8072.2.255.4.2</oid>
+                </dmgDbmgrCpu>
+                <dmgRestCpu>
+                        <name>Rest</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.8072.2.255.5.2</oid>
+                </dmgRestCpu>
+        </fields>
+</interface>

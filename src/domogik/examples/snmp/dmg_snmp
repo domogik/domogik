@@ -1,0 +1,314 @@
+#!/bin/bash -f
+
+# NET-SNMP-PASS-MIB::netSnmpPassExamples
+# Need to request a MIB for Domogik
+PLACE=".1.3.6.1.4.1.8072.2.255"
+# Requested OID
+REQ="$2"
+
+PIDDIR=/var/run/domogik
+CFG=/etc/domogik/domogik.cfg
+CACHETIME=40
+
+function pidof {
+    [ ! -f $PIDDIR/$1.pid ] && \
+        echo 0 &&
+        exit 0
+    cat $PIDDIR/$1.pid 2>/dev/null
+}
+
+function psinfo {
+    PID=`pidof $1`
+    if [ "$PID" = "0" ]; then
+        echo 0
+        exit 0
+    fi
+    #ps -p `cat /var/run/domogik/manager.pid` -o etime= -o time= -o pcpu= -o size= -o rss= -o pmem=
+    DATA=`ps -p $PID -o $2=`
+    [ "u$DATA" == "u" ] && DATA=0
+    #echo `echo $DATA \* 100 | bc` >>/tmp/dmg_snmp.debug
+    case "$2" in
+#        "pcpu")         echo `echo $DATA \* 10 | bc` ;;
+#        "pmem")         echo `echo $DATA \* 10 | bc` ;;
+        "etime")        echo 0 ;;
+        "time")         echo 0 ;;
+        *)              echo $DATA ;;
+    esac
+}
+
+function pidinfo {
+    PID=$1
+    if [ "$PID" = "0" ]; then
+        echo 0
+        exit 0
+    fi
+    DATA=`ps -p $PID -o $2=`
+    [ "u$DATA" == "u" ] && DATA=0
+    #echo `echo $DATA \* 100 | bc` >>/tmp/dmg_snmp.debug
+    case "$2" in
+#        "pcpu")         echo `echo $DATA \* 10 | bc` ;;
+#        "pmem")         echo `echo $DATA \* 10 | bc` ;;
+        "etime")        echo 0 ;;
+        "time")         echo 0 ;;
+        *)              echo $DATA ;;
+    esac
+}
+
+function ls_in_cache {
+    LIST=`cd /var/run/domogik/ && ls *.pid 2>/dev/null| sed -e "s/.pid//g"`
+    NEWLIST=""
+    NEWPIDS=""
+    for L in $LIST; do
+        PID=`pidof $L`
+        DATA=`ps -p $PID -o pmem=`
+        [ "u$DATA" != "u" ] && NEWLIST="$NEWLIST $L" && NEWPIDS="$NEWPIDS $PID"
+    done
+    echo $NEWLIST > /tmp/domogik_process.snmp
+    echo $NEWPIDS > /tmp/domogik_pids.snmp
+}
+
+
+function lsplugins {
+    if [ ! -f /tmp/domogik_process.snmp ]; then
+        ls_in_cache
+        PLUGINS=`cat /tmp/domogik_process.snmp`
+        #echo "Create cache - plugins=" $PLUGINS >>/tmp/debug.log
+    else
+        NOW=`date +%s`
+        DATF=`date -r /tmp/domogik_process.snmp +%s`
+        EDATF=`echo $DATF + $CACHETIME|bc`
+        if [ $NOW -gt $EDATF ]; then
+            ls_in_cache
+            PLUGINS=`cat /tmp/domogik_process.snmp`
+            #echo "Not from cache - plugins=" $PLUGINS >>/tmp/debug.log
+        else
+            PLUGINS=`cat /tmp/domogik_process.snmp`
+            #echo "From cache - plugins=" $PLUGINS >>/tmp/debug.log
+        fi
+    fi
+    echo $PLUGINS
+}
+
+function lspids {
+    if [ ! -f /tmp/domogik_pids.snmp ]; then
+        ls_in_cache
+        PIDS=`cat /tmp/domogik_pids.snmp`
+        echo "Create cache - pids=" $PIDS >>/tmp/debug.log
+    else
+        NOW=`date +%s`
+        DATF=`date -r /tmp/domogik_pids.snmp +%s`
+        EDATF=`echo $DATF + $CACHETIME|bc`
+        #echo "cache pids $NOW>$EDATF">>/tmp/debug.log
+        if [ $NOW -gt $EDATF ]; then
+            ls_in_cache
+            PIDS=`cat /tmp/domogik_pids.snmp`
+            #echo "Not from cache - pids=" $PIDS >>/tmp/debug.log
+        else
+            PIDS=`cat /tmp/domogik_pids.snmp`
+            #echo "From cache - pids=" $PIDS >>/tmp/debug.log
+        fi
+    fi
+    echo $PIDS
+}
+
+function countplugins {
+    I=0
+    #echo "countplugins - lsplugins=" `lsplugins` >>/tmp/debug.log
+    for L in `lsplugins`; do
+        #echo "countplugins : $L" >>/tmp/debug.log
+        I=`echo $I + 1|bc`
+    done
+    #echo "countplugins : $I" >>/tmp/debug.log
+    echo $I
+}
+
+function sizeplugins {
+    I=0
+    for L in `lspids`; do
+        MEM=`pidinfo $L size`
+        I=`echo $I + $MEM|bc`
+    done
+    echo $I
+}
+
+function rssplugins {
+    I=0
+    for L in `lspids`; do
+        MEM=`pidinfo $L rss`
+        I=`echo $I + $MEM|bc`
+    done
+    echo $I
+}
+
+function pcpuplugins {
+    I=0
+    for L in `lspids`; do
+        MEM=`pidinfo $L pcpu`
+        I=`echo $I + $MEM|bc`
+    done
+    echo $I
+}
+
+function pmemplugins {
+    I=0
+    for L in `lspids`; do
+        MEM=`pidinfo $L pmem`
+        I=`echo $I + $MEM|bc`
+    done
+    echo $I
+}
+
+function dmgversion {
+    #if [ ! -f /tmp/domogik_version.snmp ]; then
+    #    echo `dmg_manager --version` >/tmp/domogik_version.snmp 2>&1
+    #    VERSION=`cat /tmp/domogik_version.snmp`
+    #    echo "Create cache - version=" $VERSION >>/tmp/debug.log
+    #else
+    #    NOW=`date +%s`
+    #    DATF=`date -r /tmp/domogik_version.snmp +%s`
+    #    EDATF=`echo $CACHETIME * 10 + $DATF|bc`
+    #    if [ $NOW -gt $EDATF ]; then
+    #        echo `dmg_manager --version` >/tmp/domogik_version.snmp
+    #        VERSION=`cat /tmp/domogik_version.snmp`
+    #        echo "Not from cache - version=" $VERSION >>/tmp/debug.log
+    #    else
+    #        VERSION=`cat /tmp/domogik_version.snmp`
+    #        echo "From cache - version=" $VERSION >>/tmp/debug.log
+    #    fi
+    #fi
+    VERSION=0.3.0
+    echo "Domogik $VERSION"
+}
+
+#
+#  Process SET requests by simply logging the assigned value
+#      Note that such "assignments" are not persistent,
+#      nor is the syntax or requested value validated
+#
+if [ "$1" = "-s" ]; then
+  echo $* >> /tmp/passtest.log
+  exit 0
+fi
+
+#
+#  GETNEXT requests - determine next valid instance
+#
+if [ "$1" = "-n" ]; then
+  case "$REQ" in
+    $PLACE|         \
+    $PLACE.0|       \
+    $PLACE.0.*|     \
+    $PLACE.1)       RET=$PLACE.1.0 ;;
+    $PLACE.1.0|     \
+    $PLACE.1.0.*)   RET=$PLACE.1.1 ;;
+    $PLACE.1.1|     \
+    $PLACE.2)       RET=$PLACE.2.0 ;;
+    $PLACE.2.0|     \
+    $PLACE.2.0.*)   RET=$PLACE.2.1 ;;
+    $PLACE.2.1|     \
+    $PLACE.2.1.*)   RET=$PLACE.2.2 ;;
+    $PLACE.2.2|     \
+    $PLACE.2.2.*)   RET=$PLACE.2.3 ;;
+    $PLACE.2.3|     \
+    $PLACE.2.3.*)   RET=$PLACE.2.4 ;;
+    $PLACE.2.4|     \
+    $PLACE.2.4.*)   RET=$PLACE.2.5 ;;
+    $PLACE.2.5|     \
+    $PLACE.2.5.*|   \
+    $PLACE.3)       RET=$PLACE.3.0 ;;
+    $PLACE.3.0|     \
+    $PLACE.3.0.*)   RET=$PLACE.3.1 ;;
+    $PLACE.3.1|     \
+    $PLACE.3.1.*)   RET=$PLACE.3.2 ;;
+    $PLACE.3.2|     \
+    $PLACE.3.2.*)   RET=$PLACE.3.3 ;;
+    $PLACE.3.3|     \
+    $PLACE.3.3.*)   RET=$PLACE.3.4 ;;
+    $PLACE.3.4|     \
+    $PLACE.3.4.*)   RET=$PLACE.3.5 ;;
+    $PLACE.3.5|     \
+    $PLACE.3.5.*|   \
+    $PLACE.4)       RET=$PLACE.4.0 ;;
+    $PLACE.4.0|     \
+    $PLACE.4.0.*)   RET=$PLACE.4.1 ;;
+    $PLACE.4.1|     \
+    $PLACE.4.1.*)   RET=$PLACE.4.2 ;;
+    $PLACE.4.2|     \
+    $PLACE.4.2.*)   RET=$PLACE.4.3 ;;
+    $PLACE.4.3|     \
+    $PLACE.4.3.*)   RET=$PLACE.4.4 ;;
+    $PLACE.4.4|     \
+    $PLACE.4.4.*)   RET=$PLACE.4.5 ;;
+    $PLACE.4.5|     \
+    $PLACE.4.5.*|   \
+    $PLACE.5)       RET=$PLACE.5.0 ;;
+    $PLACE.5.0|     \
+    $PLACE.5.0.*)   RET=$PLACE.5.1 ;;
+    $PLACE.5.1|     \
+    $PLACE.5.1.*)   RET=$PLACE.5.2 ;;
+    $PLACE.5.2|     \
+    $PLACE.5.2.*)   RET=$PLACE.5.3 ;;
+    $PLACE.5.3|     \
+    $PLACE.5.3.*)   RET=$PLACE.5.4 ;;
+    $PLACE.5.4|     \
+    $PLACE.5.4.*)   RET=$PLACE.5.5 ;;
+    *)              exit 0 ;;
+  esac
+else
+#
+#  GET requests - check for valid instance
+#
+  case "$REQ" in
+    $PLACE.1.0|$PLACE.1.1|   \
+    $PLACE.2.0|$PLACE.2.1|$PLACE.2.2|$PLACE.2.3|$PLACE.2.4|$PLACE.2.5| \
+    $PLACE.3.0|$PLACE.3.1|$PLACE.3.2|$PLACE.3.3|$PLACE.3.4|$PLACE.3.5|     \
+    $PLACE.4.0|$PLACE.4.1|$PLACE.4.2|$PLACE.4.3|$PLACE.4.4|$PLACE.4.5|     \
+    $PLACE.5.0|$PLACE.5.1|$PLACE.5.2|$PLACE.5.3|$PLACE.5.4|$PLACE.5.5)     RET=$REQ ;;
+    *)              exit 0 ;;
+  esac
+fi
+
+#
+#  "Process" GET* requests - return hard-coded value
+#
+echo "$RET"
+case "$RET" in
+  # The main application stats
+  $PLACE.1.0)     echo "string";    echo "Domogik" `dmgversion`; exit 0 ;;
+  #$PLACE.1.1)     echo "string";    echo `grep bind_interface $CFG|sed -e 's/ //g'|cut -f2 -d'='`;     exit 0 ;;
+  $PLACE.1.1)     echo "ipaddress";    echo "0.0.0.0";     exit 0 ;;
+
+  # The number of plugins
+  # The plugins
+  $PLACE.2.0)     echo "string";     echo `lsplugins`;                         exit 0 ;;
+  $PLACE.2.1)     echo "integer";   echo `countplugins`;                       exit 0 ;;
+  $PLACE.2.2)     echo "string";   echo `pcpuplugins`;                          exit 0 ;;
+  $PLACE.2.3)     echo "string";   echo `pmemplugins`;                          exit 0 ;;
+  $PLACE.2.4)     echo "string";   echo `rssplugins`;                         exit 0 ;;
+  $PLACE.2.5)     echo "string";   echo `sizeplugins`;                        exit 0 ;;
+  # The manager process
+  # $PLACE.3.0)     echo "timeticks"; echo "363136200";                          exit 0 ;;
+  $PLACE.3.0)     echo "string"; echo "manager";                               exit 0 ;;
+  $PLACE.3.1)     echo "integer"; echo `pidof manager`;                        exit 0 ;;
+  $PLACE.3.2)     echo "string"; echo `psinfo manager pcpu`;                    exit 0 ;;
+  $PLACE.3.3)     echo "string"; echo `psinfo manager pmem`;                    exit 0 ;;
+  $PLACE.3.4)     echo "string"; echo `psinfo manager rss`;                   exit 0 ;;
+  $PLACE.3.5)     echo "string"; echo `psinfo manager size`;                  exit 0 ;;
+  # The dbmgr process
+  #$PLACE.4.0)     echo "ipaddress"; echo "127.0.0.1";                          exit 0 ;;
+  $PLACE.4.0)     echo "string"; echo "dbmgr";                               exit 0 ;;
+  $PLACE.4.1)     echo "integer"; echo `pidof dbmgr`;                        exit 0 ;;
+  $PLACE.4.2)     echo "string"; echo `psinfo dbmgr pcpu`;                    exit 0 ;;
+  $PLACE.4.3)     echo "string"; echo `psinfo dbmgr pmem`;                    exit 0 ;;
+  $PLACE.4.4)     echo "string"; echo `psinfo dbmgr rss`;                   exit 0 ;;
+  $PLACE.4.5)     echo "string"; echo `psinfo dbmgr size`;                  exit 0 ;;
+  # The rest process
+  #$PLACE.5.0)     echo "counter";   echo "42";                                 exit 0 ;;
+  $PLACE.5.0)     echo "string"; echo "rest";                               exit 0 ;;
+  $PLACE.5.1)     echo "integer"; echo `pidof rest`;                        exit 0 ;;
+  $PLACE.5.2)     echo "string"; echo `psinfo rest pcpu`;                    exit 0 ;;
+  $PLACE.5.3)     echo "string"; echo `psinfo rest pmem`;                    exit 0 ;;
+  $PLACE.5.4)     echo "string"; echo `psinfo rest rss`;                   exit 0 ;;
+  $PLACE.5.5)     echo "string"; echo `psinfo rest size`;                  exit 0 ;;
+  *)              echo "string";    echo "ack... $RET $REQ";                   exit 0 ;;  # Should not happen
+esac
