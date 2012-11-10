@@ -18,13 +18,57 @@ Features
 xPL message
 -----------
 
-The thermometer feature is related to the __sensor.basic__ message: ::
+The thermometer feature is related to the **sensor.basic** message: 
 
 * xpl-stat or xpl-trig: ::
 
     sensor.basic
     {
     type=temp
+    device=<device address>
+    current=<value>
+    }
+
+Humidity
+========
+
+Features
+--------
+
+* humidity
+
+xPL message
+-----------
+
+The humidity feature is related to the **sensor.basic** message: 
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=humidity
+    device=<device address>
+    current=<value>
+    }
+
+Pressure
+========
+
+Features
+--------
+
+* pressure
+
+xPL message
+-----------
+
+The pressure feature is related to the **sensor.basic** message:
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=pressure
     device=<device address>
     current=<value>
     }
@@ -52,12 +96,134 @@ Features
 xPL Message
 -----------
 
+* xpl-stat: ::
+
+    TELEINFO.BASIC
+    {
+    ADCO=<Adresse du compteur>
+    OPTARIF=<Option tarifaire>
+    ISOUSC=<Intensité souscrite>
+    BASE=<Index option base>
+    IINST=<Intensité instantanée>
+    IMAX=<Intensité maximale appelée>
+    MOTDETAT=<Mot d'état du compteur>
+    [HCHC=<Heures|creuses>]
+    [HCHP=<Heures|pleines>]
+    [EJPHN=<Heures|normales>]
+    [EJPHPM=<Heures|de pointe>]
+    [BBRHCJB=<Heures|creuses jours bleus>]
+    [BBRHPJB=<Heures|pleines jours bleus>]
+    [BBRHCJW=<Heures|creuses jours blancs>]
+    [BBRHPJW=<Heures|pleines jours blancs>]
+    [BBRHCJR=<Heures|creuses jours rouges>]
+    [BBRHPJR=<Heures|pleines jours rouges>]
+    [PEJP=<Préavis|début EJP (30min)>]
+    [PTEC=<Période|tarifaire actuelle>]
+    [DEMAIN=<Couleur|du lendemain>]
+    [ADPS=<Avertissement|de dépassement>]
+    [PAPP=<Puissance|apparente>]
+    [HHPHC=<Horaire|heure pleine/heure creuse>]
+    [PPOT=<Présence|des potentiels>]
+    [IINST1=<Intensité|instantanée phase 1>]
+    [IINST2=<Intensité|instantanée phase 2>]
+    [IINST3=<Intensité|instantanée phase 3>]
+    [IMAX1=<Intensité|maximale phase 1>]
+    [IMAX2=<Intensité|maximale phase 2>]
+    [IMAX3=<Intensité|maximale phase 3>]
+    [PMAX=<Puissance|maximale triphasée>]
+    }
 
 
+    TELEINFO.BASIC
+    {
+    ADIR1=<Dépassement d'intensité sur la phase 1>
+    ADIR2=<Dépassement d'intensité sur la phase 2>
+    ADIR3=<Dépassement d'intensité sur la phase 3>
+    ADCO=<Adresse du compteur>
+    IINST1=<Intensité instantanée phase 1>
+    IINST2=<Intensité instantanée phase 2>
+    IINST3=<Intensité instantanée phase 3>
+    }
 
 
+Tank level
+==========
 
+Features
+--------
 
+* level (%)
+* distance (distance between the level and the top of the tank)
+
+xPL message
+-----------
+
+The **level** feature is related to the **sensor.basic** message:
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=percent
+    device=<device address>
+    current=<value>
+    }
+
+The **distance** feature is related to the **sensor.basic** message:
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=distance
+    device=<device address>
+    current=<value>
+    }
+
+RGB leds
+========
+
+Features
+--------
+
+* color (set the leds color)
+* switch (switch on/off the leds)
+
+xPL message
+-----------
+
+The **color** and **switch** features are related to the **arduino.rgb** message:
+
+* xpl-cmnd: ::
+
+    arduino.rgb
+    {
+    device=<device address>
+    command=setcolor
+    color=<value>
+    }
+
+  The Values for **color** can be :
+
+  * on : to switch on the leds
+  * off : to switch off the leds
+  * #ffffff : a RGB color code to set a color (if off, this should also switch on the leds)
+
+* xpl-stat or xpl-trig: ::
+
+    arduino.rgb
+    {
+    device=<device address>
+    command=setcolor
+    color=<value>
+    }
+
+  The Values for **color** can be :
+
+  * off : to switch off the leds
+  * #ffffff : a RGB color code to set a color (if off, this should also switch on the leds)
+
+  Notice that there is no **on** value for color as when the leds are switched on, we assume the color code is sent as the color value.
 
 
 
