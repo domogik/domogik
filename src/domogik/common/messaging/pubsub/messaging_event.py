@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Utility class to send / receive message
+# Utility class to send / receive events
 
 import zmq
 from time import sleep
