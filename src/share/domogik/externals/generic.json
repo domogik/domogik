@@ -52,6 +52,26 @@
             "value_type": "number"
         },
         {
+            "device_type_id": "generic.humidity", 
+            "feature_type": "sensor", 
+            "id": "generic.humidity.humidity", 
+            "name": "Humidity", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        },
+        {
+            "device_type_id": "generic.pressure", 
+            "feature_type": "sensor", 
+            "id": "generic.pressure.pressure", 
+            "name": "Pressure", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "pressure", 
+            "value_type": "number"
+        },
+        {
             "device_type_id": "generic.teleinfo", 
             "feature_type": "sensor", 
             "id": "generic.teleinfo.max_power", 
@@ -199,6 +219,16 @@
             "name": "Thermometer"
         },
         {
+            "description": "Humidity", 
+            "id": "generic.humidity", 
+            "name": "Humidity"
+        },
+        {
+            "description": "Pressure", 
+            "id": "generic.pressure", 
+            "name": "Pressure"
+        },
+        {
             "description": "Teleinfo", 
             "id": "generic.teleinfo", 
             "name": "Teleinfo"
@@ -212,10 +242,14 @@
     "files": [
         "src/share/domogik/design/external/generic/icon.png", 
         "src/share/domogik/externals/generic.json", 
-        "src/share/domogik/stats/arduino/sensor.basic-generic-tank.xml",
         "src/share/domogik/url2xpl/generic/setcolor.xml", 
         "src/share/domogik/stats/generic/arduino.rgb-generic.xml",
-        "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml"
+        "src/share/domogik/stats/arduino/sensor.basic-generic-tank.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-humidity.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-pressure.xml",
+        "src/share/domogik/stats/generic/teleinfo.basic-teleinfo.xml",
+        "src/share/domogik/stats/generic/teleinfo.short-teleinfo.xml"
     ], 
     "identity": {
         "author": "Fritz", 
