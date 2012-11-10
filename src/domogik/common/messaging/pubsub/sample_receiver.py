@@ -19,7 +19,7 @@ def main(category_filter, action_filter):
     sub_event = MessagingEventSub(category_filter, action_filter)
 
     while True:
-        msg = sub_event.wait_for_message()
+        msg = sub_event.wait_for_event()
         print(msg)
         '''
         print("Message id : %s" % message_id)

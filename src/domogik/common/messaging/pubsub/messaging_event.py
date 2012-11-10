@@ -20,7 +20,7 @@ class MessagingEventPub(MessagingEvent):
         self.s_send = self.context.socket(zmq.PUB)
         self.s_send.connect(PORT_PUB)
     
-    def send_message(self, category, action, content):
+    def send_event(self, category, action, content):
         msg_id = "%s.%s.%s" %(category, action, MSG_VERSION)
         self.s_send.send(content)
         self.s_send.send(msg_id, zmq.SNDMORE)
@@ -40,7 +40,7 @@ class MessagingEventSub(MessagingEvent):
         print("Topic filter : %s" % topic_filter)
         self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
-    def wait_for_message(self):
+    def wait_for_event(self):
         message_id = self.s_recv.recv()
         print("Message id : %s" % message_id)
         more = self.s_recv.getsockopt(zmq.RCVMORE)
