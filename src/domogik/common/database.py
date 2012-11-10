@@ -54,7 +54,7 @@ from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, Page
+        UserAccount, SENSOR_VALUE_TYPE_LIST
 )
 
 
@@ -178,120 +178,6 @@ class DbHelper():
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()
-####
-# Pages
-####
-    def add_page(self, name, parentId, descr=None, icon=None):
-        """Add a page
-
-        @param name : page name
-        @param parentId : the parent page id (to define the new lft/right values
-        @param desc : page description
-        @param icon : page icon
-        @return a Page object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        p = Page(name=name, description=descr, icon=icon)
-        if parentId != None:
-            parent = self.__session.query(Page).filter_by(id=parentId).first()
-	    p.left = int(parent.left) + 1
-            p.right = int(parent.left) + 2
-	    self.__session.query(Page).filter(Page.right > parent.left).update({Page.right: Page.right + 2})
-	    self.__session.query(Page).filter(Page.left > parent.left).update({Page.left: Page.left + 2})
-        else:
-            p.left = 1
-            p.right = 2
-        self.__session.add(p)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return p
-    
-    def update_page(self, id, name=None, parent=0, descr=None, icon=None):
-        """Update an page
-
-        @param id : page id to be updated
-        @param name : page name (optional)
-        @param parent : page parent (optional)
-        @param descr : page detailed description (optional)
-        @param parent : page icon (optional)
-        @return an Page object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        p = self.__session.query(Page).filter_by(id=id).first()
-        if p is None:
-            self.__raise_dbhelper_exception("Page with id %s couldn't be found" % id)
-        if name is not None:
-            p.name = ucode(name)
-        if icon is not None:
-            p.icon = ucode(icon)
-        if descr is not None:
-            if descr == '': description = None
-            p.description = ucode(descr)
-        self.__session.add(p)
-        #if parent != 0:
-            # TODO UPDATE lft and rgt
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return p
-
-    def del_page(self, pid):
-        """Delete a page record
-
-        @param pid : id of the page to delete
-        @return the deleted Page object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        print pid
-        if pid == '1':
-            self.__raise_dbhelper_exception("Can not delete the root page", True)
-        else:
-            p = self.__session.query(Page).filter_by(id=pid).first()
-            if p:
-            # chek if there are no children
-                if p.left + 1 != p.right:
-                    self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
-                else:
-                    dl = p.right - p.left + 1
-		    self.__session.query(Page).filter(Page.right > p.right).update({Page.right: Page.right - dl})
-		    self.__session.query(Page).filter(Page.left > p.right).update({Page.left: Page.left - dl})
-                    self.__session.delete(p)
-                    try:
-                        self.__session.commit()
-                    except Exception, sql_exception:
-                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-                    return p
-            else:
-                self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % pid)
-
-    def view_page(self, id):
-        self.__session.expire_all()
-        p = self.__session.query(Page).filter_by(id=id).first()
-        return p 
-
-    def tree_page(self, id):
-        self.__session.expire_all()
-        if id==0:
-            ret = self.__session.query(Page).order_by(sqlalchemy.asc(Page.left)).all()
-        else:
-            p = self.__session.query(Page).filter_by(id=id).first()
-            ret = self.__session.query(Page).filter(Page.left >= p.left).filter(Page.left <= p.right).order_by(sqlalchemy.asc(Page.left)).all()
-        return ret 
-
-    def path_page(self, id):
-        self.__session.expire_all()
-        p = self.__session.query(Page).filter_by(id=id).first()
-        ret = self.__session.query(Page).filter(Page.left <= p.left).filter(Page.right >= p.right).order_by(sqlalchemy.asc(Page.left)).all()
-        return ret 
 
 ####
 # Device usage

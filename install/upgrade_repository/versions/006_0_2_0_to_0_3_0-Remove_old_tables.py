@@ -34,3 +34,5 @@ def upgrade(migrate_engine):
     migrate_engine.execute("DROP table core_system_config")
     # core_trigger
     migrate_engine.execute("DROP table core_trigger") 
+    # core_ui_page
+    migrate_engine.execute("DROP table core_ui_page") 
