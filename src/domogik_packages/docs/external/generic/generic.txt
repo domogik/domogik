@@ -1,0 +1,105 @@
+=============================
+External member documentation
+=============================
+
+Purpose
+=======
+This external member is dedicated to be used by everyone with a xPL client (DIY or commercial product). It allows to use some generic features (temperature, teleinfo, ...) without needing to create a dedicated external member for the xPL client.
+
+
+Thermometer
+===========
+
+Features
+--------
+
+* temperature
+
+xPL message
+-----------
+
+The thermometer feature is related to the __sensor.basic__ message: ::
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=temp
+    device=<device address>
+    current=<value>
+    }
+
+Teleinfo
+========
+
+Features
+--------
+
+* Max power
+* Instant power
+* Off peak hours
+* Peak hours
+* Tariff period
+* Apparent power
+* Hourly group
+* Instant power 1
+* Instant power 2
+* Instant power 3
+* Max power 1
+* Max power 2
+* Max power 3
+
+xPL Message
+-----------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Creating devices for generic
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+Feature 1
+*********
+
+.. todo:: 
+    Update the screenshot
+    Describe the data to set in each field of the device creation box
+
+.. |example_feature1| image:: example_feature1.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |example_feature1| | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : ...                                                                   |
+|                    |                   | Example for ... : ...                                                                      |
+|                    |                   |                                                                                            |
+|                    |                   | .. todo::                                                                                  |
+|                    |                   |     For some packages, you need to use a helper command to get the devices addresses.      |
+|                    |                   |     If this is the case, mention it here.                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | xxx.yyy                                                                                    |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (...)                                                                 |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="generic">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="pressure"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="description" new_name="pressure-desc"
+                       filter_key="type" filter_value="pressure" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

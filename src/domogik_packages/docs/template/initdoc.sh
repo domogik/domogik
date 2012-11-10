@@ -11,7 +11,7 @@ function usage(){
 
 # check parameters
 [[ $# -ne 2 ]] && usage && exit 1
-[ $1 != "plugin" -a $1 != "package" ] && usage && exit 2
+[ $1 != "plugin" -a $1 != "external" ] && usage && exit 2
 
 
 # set variables
