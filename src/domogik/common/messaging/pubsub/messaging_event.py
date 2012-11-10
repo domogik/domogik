@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# PUB-SUB emitter
+# Utility class to send / receive message
 
 import zmq
-import json
-from random import choice
 from time import sleep
 
 MSG_VERSION = "0_1"
+PORT_PUB = "tcp://localhost:5559"
+PORT_SUB = "tcp://localhost:5560"
 
 class MessagingEvent:
     def __init__(self):
@@ -16,40 +16,38 @@ class MessagingEvent:
 
 class MessagingEventPub(MessagingEvent):
     def __init__(self):
-        self.socket = context.socket(zmq.PUB)
-        self.socket.connect("tcp://localhost:5559")
+        MessagingEvent.__init__(self)
+        self.s_send = self.context.socket(zmq.PUB)
+        self.s_send.connect(PORT_PUB)
     
     def send_message(self, category, action, content):
         msg_id = "%s.%s.%s" %(category, action, MSG_VERSION)
-        msg_content = json.dumps({"content" : "%s" % content})
-        self.socket.send(msg_content)
-        self.socket.send(msg_id, zmq.SNDMORE)
+        self.s_send.send(content)
+        self.s_send.send(msg_id, zmq.SNDMORE)
+        print("Message sent : %s : %s" % (msg_id, content))
         sleep(1)
 
 class MessagingEventSub(MessagingEvent):
-    def __init__(self):
-        pass
-
-print("PUB-SUB emitter")
-context = zmq.Context()
-socket = context.socket(zmq.PUB)
-socket.connect("tcp://localhost:5559")
-
-categories = {
-    'package' : ['installed', 'uninstalled'],
-    'plugin' : ['enabled', 'disabled'],
-}
-
-while True:
-    category = choice(categories.keys())
-    action = choice(categories[category])
-    message_id = "%s.%s.%s" %(category, action, MSG_VERSION)
-    message_content = json.dumps({"content" : "This is the message content"})
-    #message = json.dumps({message_id : message_content})
-    print("Sending message : %s : %s" % (message_id, message_content))
-    socket.send(message_content)
-    socket.send(message_id, zmq.SNDMORE)
-    sleep(1)
+    def __init__(self, category_filter=None, action_filter=None):
+        MessagingEvent.__init__(self)
+        self.s_recv = self.context.socket(zmq.SUB)
+        self.s_recv.connect(PORT_SUB)
+        topic_filter = ''
+        if category_filter is not None and len(str(category_filter)) > 0:
+            topic_filter = category_filter
+            if action_filter is not None and len(str(action_filter)) > 0:
+                topic_filter += "." + action_filter
+        print("Topic filter : %s" % topic_filter)
+        self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
-    
-
+    def wait_for_message(self):
+        message_id = self.s_recv.recv()
+        print("Message id : %s" % message_id)
+        more = self.s_recv.getsockopt(zmq.RCVMORE)
+        if more:
+            message_content = self.s_recv.recv(zmq.RCVMORE)
+            #print("Message content : %s" % message_content)
+            return message_content
+        else:
+            print("nothing more")
+        

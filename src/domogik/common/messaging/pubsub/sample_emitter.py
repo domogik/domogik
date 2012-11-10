@@ -3,33 +3,25 @@
 
 # PUB-SUB emitter
 
-import zmq
 import json
+from messaging_event import MessagingEventPub
 from random import choice
 from time import sleep
 
-MSG_VERSION = "0_1"
-
-print("PUB-SUB emitter")
-context = zmq.Context()
-socket = context.socket(zmq.PUB)
-socket.connect("tcp://localhost:5559")
+print("PUB-SUB emitter sample")
 
 categories = {
     'package' : ['installed', 'uninstalled'],
     'plugin' : ['enabled', 'disabled'],
 }
 
+content = ["Domogik is really cool", "I like Domoweb", "Domogik is magic"]
+
+pub_event = MessagingEventPub()
+
 while True:
     category = choice(categories.keys())
     action = choice(categories[category])
-    message_id = "%s.%s.%s" %(category, action, MSG_VERSION)
-    message_content = json.dumps({"content" : "This is the message content"})
-    #message = json.dumps({message_id : message_content})
-    print("Sending message : %s : %s" % (message_id, message_content))
-    socket.send(message_content)
-    socket.send(message_id, zmq.SNDMORE)
-    sleep(1)
-    
-    
+    j_content = json.dumps({"content" : "%s" % choice(content)})
+    pub_event.send_message(category, action, j_content)
 
