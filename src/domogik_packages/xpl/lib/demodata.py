@@ -38,6 +38,9 @@ from urllib2 import urlopen
 from pprint import pprint
 import datetime
 
+# for DemoUi
+import BaseHTTPServer
+
 
 class DemoData():
 
@@ -197,6 +200,62 @@ class DemoData():
         diff_day = timedelta.days 
         return diff_day
 
+
+class DemoUI:
+
+    def __init__(self, server_address = ('', 40406)):
+        self.web_server = BaseHTTPServer.HTTPServer(server_address, UIHandler)
+        self.web_server.handle_request() # serve_forever
+
+
+class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
+
+    server_version= "DemoUI/1.1"
+
+    # display the pages
+    def do_GET( self ):
+        self.log_message( "Command: %s Path: %s Headers: %r"
+                          % ( self.command, self.path, self.headers.items() ) )
+        if self.path == "/":
+            self._display_home()
+
+    # actions
+    def do_POST( self ):
+        self.log_message( "Command: %s Path: %s Headers: %r"
+                          % ( self.command, self.path, self.headers.items() ) )
+        if self.headers.has_key('content-length'):
+            length= int( self.headers['content-length'] )
+            self.dumpReq( self.rfile.read( length ) )
+        else:
+            self.dumpReq( None )
+
+    def dumpReq( self, formInput=None ):
+        response= "<html><head></head><body>"
+        response+= "<p>HTTP Request</p>"
+        response+= "<p>self.command= <tt>%s</tt></p>" % ( self.command )
+        response+= "<p>self.path= <tt>%s</tt></p>" % ( self.path )
+        response+= "</body></html>"
+        self.sendPage( "text/html", response )
+
+    def sendPage( self, type, body ):
+        self.send_response( 200 )
+        self.send_header( "Content-type", type )
+        self.send_header( "Content-length", str(len(body)) )
+        self.end_headers()
+        self.wfile.write( body )
+
+    def _display_home(self):
+        print("Display home")
+        body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-gb" xml:lang="en-gb"><head><title>Domogik Demodata UI</title></head>'
+        body += '<body>'
+        body += '<h1>Demodata UI</h1>'
+        body += self._display_rgb_controller()
+        body += '</body></html>'
+        self.sendPage("text/html", body)
+
+    def _display_rgb_controller(self):
+        ctrl = '<h2>RGB controller</h2>'
+        return ctrl
 
 class DummyLog:
 

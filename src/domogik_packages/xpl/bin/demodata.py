@@ -39,7 +39,7 @@ from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
-from domogik_packages.xpl.lib.demodata import DemoData
+from domogik_packages.xpl.lib.demodata import DemoData, DemoUI
 import threading
 import datetime
 
@@ -68,6 +68,9 @@ class DemoDataManager(XplPlugin):
         self._teleinfo_thr.start()
 
         self.enable_hbeat()
+
+        # Launch the web UI
+        demo_ui = DemoUI()
 
     def send_sensor_basic(self, device, type, current, units = None):
         """ Send sensor.basic xPL schema
