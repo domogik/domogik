@@ -40,6 +40,12 @@ import datetime
 
 # for DemoUi
 import BaseHTTPServer
+import os
+import mimetypes
+import shutil
+
+JQUERY = "jquery-1.8.2.min.js"
+
 
 
 class DemoData():
@@ -208,13 +214,12 @@ class DemoData():
         return diff_day
 
 
-class DemoUI:
-
-    def __init__(self, server_address = ('', 40406)):
-        self.web_server = BaseHTTPServer.HTTPServer(server_address, UIHandler)
-        while True:
-            self.web_server.handle_request() # serve_forever
-
+#class DemoUI:
+#
+#    def __init__(self, server_address = ('', 40406)):
+#        self.web_server = BaseHTTPServer.HTTPServer(server_address, UIHandler)
+#        while True:
+#            self.web_server.handle_request() # serve_forever
 
 class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
 
@@ -224,19 +229,61 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
     def do_GET( self ):
         self.log_message( "Command: %s Path: %s Headers: %r"
                           % ( self.command, self.path, self.headers.items() ) )
-        if self.path == "/":
+
+        # split path and args
+        buf = self.path.split("?")
+        path = buf[0]
+        # manage pages
+        if path == "/":
             self._display_home()
+        elif path == "/%s" % JQUERY:
+            self._get_jquery()
+        else:
+            self._send_http_response(404)
 
     # actions
     def do_POST( self ):
         self.log_message( "Command: %s Path: %s Headers: %r"
                           % ( self.command, self.path, self.headers.items() ) )
-        if self.headers.has_key('content-length'):
-            length= int( self.headers['content-length'] )
-            self.dumpReq( self.rfile.read( length ) )
-        else:
-            self.dumpReq( None )
+        # split path and args
+        buf = self.path.split("?")
+        path = buf[0]
+        if len(buf) == 2:
+            args = buf[1].split("&")
 
+        # get args
+        if self.headers.has_key("content-length"):
+            post_length = int(self.headers['content-length'])
+            post_data = self.rfile.read(post_length)
+            post_tab = post_data.split("&")
+            args = {}
+            for arg in post_tab:
+                tmp_arg = arg.split("=")
+                args[tmp_arg[0]] = tmp_arg[1]
+
+        # manage actions
+        if path == "/rgb":
+            print args
+            self.server.handler_params[0].send_arduino_rgb('demo_rgb_led', 'setcolor', args['color'])
+            self._send_http_response(200)
+        else:
+            self._send_http_response(404)
+
+    def _send_http_response(self, number):
+        """ Send a xxx error
+        """
+        try:
+            self.send_response(number)
+            self.send_header("Content-Type","text/html")
+            self.end_headers()
+            self.wfile.write("%s - Not found" % number)
+        except IOError as err:
+            if err.errno == errno.EPIPE:
+                # [Errno 32] Broken pipe : client closed connexion
+                pass
+            else:
+                raise err
+ 
     def dumpReq( self, formInput=None ):
         response= "<html><head></head><body>"
         response+= "<p>HTTP Request</p>"
@@ -252,18 +299,67 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         self.end_headers()
         self.wfile.write( body )
 
+    def _get_jquery(self):
+        # get the resources folder
+        res_dir = self.server.handler_params[0].get_data_files_directory()
+        jquery_file = "%s/%s" % (res_dir, JQUERY)
+        self._download_file(jquery_file)
+
     def _display_home(self):
-        print("Display home")
-        body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-gb" xml:lang="en-gb"><head><title>Domogik Demodata UI</title></head>'
-        body += '<body>'
-        body += '<h1>Demodata UI</h1>'
-        body += self._display_rgb_controller()
-        body += '</body></html>'
-        self.sendPage("text/html", body)
+        # get the resources folder
+        res_dir = self.server.handler_params[0].get_data_files_directory()
+        home_file = "%s/index.html" % res_dir
+        print home_file
+        self._download_file(home_file)
+
 
     def _display_rgb_controller(self):
         ctrl = '<h2>RGB controller</h2>'
         return ctrl
+ 
+    def _download_file(self, file_name):
+        """ Download a file
+        """
+        # Check file opening
+        try:
+            my_file = open("%s" % (file_name), "rb")
+        except IOError:
+            self._send_http_response(404)
+            return
+
+        # Get informations on file
+        ctype = None
+        file_stat = os.fstat(my_file.fileno())
+        #last_modified = os.stat("%s" % (file_name))[stat.ST_MTIME]
+        last_modified = os.path.getmtime(file_name)
+
+        # Get mimetype information
+        if not mimetypes.inited:
+            mimetypes.init()
+        extension_map = mimetypes.types_map.copy()
+        extension_map.update({
+                '' : 'application/octet-stream', # default
+                '.py' : 'text/plain'})
+        basename, extension = os.path.splitext(file_name)
+        if extension in extension_map:
+            ctype = extension_map[extension]
+        else:
+            extension = extension.lower()
+            if extension in extension_map:
+                ctype = extension_map[extension]
+            else:
+                ctype = extension_map['']
+    
+        # Send file
+        self.send_response(200)
+        self.send_header("Content-type", ctype)
+        self.send_header("Content-Length", str(file_stat[6]))
+        self.send_header("Last-Modified", last_modified)
+        self.end_headers()
+        shutil.copyfileobj(my_file, self.wfile)
+        my_file.close()
+
+
 
 class DummyLog:
 

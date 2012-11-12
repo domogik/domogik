@@ -1,0 +1,59 @@
+<html>                                                                  
+  <head>                                                                  
+    <script type="text/javascript" src="jquery-1.8.2.min.js"></script>          
+    <script type="text/javascript">
+    $(document).ready(function() {
+        /* RGB controller */
+        $('#rgb_setcolor').click(function(event) {
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: './rgb',
+                data: 'color='+$('#color').val(),
+                success: function(msg) {
+                    alert('ok');
+                }
+            });
+            event.stopPropagation();
+        });
+        $('#rgb_off').click(function(event) {
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: './rgb',
+                data: 'color=#000000',
+                success: function(msg) {
+                    alert('ok');
+                }
+            });
+            event.stopPropagation();
+        });
+        $('#rgb_on').click(function(event) {
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: './rgb',
+                data: 'color=#ffffff',
+                success: function(msg) {
+                    alert('ok');
+                }
+            });
+            event.stopPropagation();
+        });
+    });         
+    </script>
+  </head>                                                                 
+  <body>                                                                  
+    <h1>Demodata UI</h1>
+    <h2>RGB controller</h2>
+    <p>
+      <button id="rgb_setcolor"><span>Set the color</span></button>
+      <input id="color" type="text"/> 
+    </p>
+    <p>
+      <button id="rgb_off"><span>Switch the leds off</span></button>
+      <button id="rgb_on"><span>Switch the leds on (white : #ffffff)</span></button>
+    </p>
+    <div id="boxContentId"></div>
+  </body>                                                                 
+</html>
