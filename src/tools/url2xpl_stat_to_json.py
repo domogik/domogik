@@ -1,4 +1,5 @@
 from domogik.common.packagejson import PackageJson
+from domogik.common.configloader import Loader
 import os
 import json
 from xml.dom import minidom
@@ -9,7 +10,14 @@ def url2xpl_stat_to_json(techno):
     jsn = pjson.json
     jsn["xpl_commands"] = []
     jsn["xpl_stats"] = []
-    path = '/opt/domo/domogik'
+    cfg = Loader('domogik')
+    config = cfg.load()
+    conf = dict(config[1])
+    if conf.has_key('package_path'):
+        path = conf['package_path']
+    else:
+        path = '/opt/domo/domogik'
+
     # find all *.xml files
     for fname in jsn["files"]:
         if fname.endswith('.xml'):
@@ -114,3 +122,6 @@ def url2xpl_stat_to_json(techno):
 
 if __name__ == "__main__":
     url2xpl_stat_to_json('rfxcom')
+    url2xpl_stat_to_json('velbus')
+    url2xpl_stat_to_json('knx')
+    url2xpl_stat_to_json('bluez')

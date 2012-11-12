@@ -2226,9 +2226,9 @@ class DbHelper():
 ###################
 # XplCommandParam
 ###################
-    def add_xpl_command_param(self, key, value, static):
+    def add_xpl_command_param(self, cmd_id, key, value, static):
         self.__session.expire_all()
-        param = XplCommandParam(key=key, value=value, static=static)
+        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value, static=static)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2236,13 +2236,11 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_command_param(self, id, key, value=None, static=None):
+    def update_xpl_command_param(self, cmd_id, key, value=None, static=None):
         self.__session.expire_all()
-        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).first()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=cmd_id).filter_by(key=key).first()
         if param is None:
-            self.__raise_dbhelper_exception("XplCommandParam with id %s couldn't be found" % id)
-        if key is not None:
-            param.key = ucode(key)
+            self.__raise_dbhelper_exception("XplCommandParam with id %s and key %s couldn't be found" % (cmd_id, key))
         if value is not None:
             param.value = ucode(value)
         if static is not None:
@@ -2256,7 +2254,7 @@ class DbHelper():
 
     def del_xpl_command_param(self, id, key):
         self.__session.expire_all()
-        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).first()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).filter_by(key=key).first()
         if param is not None:
             self.__session.delete(param)
             try:
@@ -2270,9 +2268,9 @@ class DbHelper():
 ###################
 # XplStatParam
 ###################
-    def add_xpl_stat_param(self, key, value, static):
+    def add_xpl_stat_param(self, statid, key, value, static):
         self.__session.expire_all()
-        param = XplStatParam(key=key, value=value, static=static)
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2280,13 +2278,11 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_stat_param(self, id, key, value=None, static=None):
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None):
         self.__session.expire_all()
-        param = self.__session.query(XplStatParam).filter_by(xplstat_id=id).first()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is None:
             self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % id)
-        if key is not None:
-            param.key = ucode(key)
         if value is not None:
             param.value = ucode(value)
         if static is not None:
@@ -2298,9 +2294,9 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def del_xpl_stat_param(self, id, key):
+    def del_xpl_stat_param(self, stat_id, key):
         self.__session.expire_all()
-        param = self.__session.query(XplStatParam).filter_by(xplstat_id=id).first()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is not None:
             self.__session.delete(param)
             try:
