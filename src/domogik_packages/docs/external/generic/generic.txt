@@ -7,7 +7,7 @@ Purpose
 This external member is dedicated to be used by everyone with a xPL client (DIY or commercial product). It allows to use some generic features (temperature, teleinfo, ...) without needing to create a dedicated external member for the xPL client.
 
 
-Thermometer
+Temperature
 ===========
 
 Features
@@ -18,7 +18,7 @@ Features
 xPL message
 -----------
 
-The thermometer feature is related to the **sensor.basic** message: 
+The temperature feature is related to the **sensor.basic** message: 
 
 * xpl-stat or xpl-trig: ::
 
