@@ -50,6 +50,156 @@
             "return_confirmation": "0", 
             "stat_key": "temperature", 
             "value_type": "number"
+        },
+        {
+            "device_type_id": "generic.humidity", 
+            "feature_type": "sensor", 
+            "id": "generic.humidity.humidity", 
+            "name": "Humidity", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "humidity", 
+            "value_type": "number"
+        },
+        {
+            "device_type_id": "generic.pressure", 
+            "feature_type": "sensor", 
+            "id": "generic.pressure.pressure", 
+            "name": "Pressure", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "pressure", 
+            "value_type": "number"
+        },
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.max_power", 
+            "name": "Maximum power", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.instant_power", 
+            "name": "Instant power", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.off_peak_hours", 
+            "name": "Off peak hours", 
+            "parameters": "{&quot;unit&quot;:&quot;Wh&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "hchc", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.peak_hours", 
+            "name": "Peak hours", 
+            "parameters": "{&quot;unit&quot;:&quot;Wh&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "hchp", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.tariff_period", 
+            "name": "Tariff period", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "ptec", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.apparent_power", 
+            "name": "Apparent power", 
+            "parameters": "{&quot;unit&quot;:&quot;Va&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "papp", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.hourly_group", 
+            "name": "Hourly group", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "hhphc", 
+            "value_type": "string"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.instant_power_1", 
+            "name": "Instant power on phasis 1", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst1", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.instant_power_2", 
+            "name": "Instant power on phasis 2", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst2", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.instant_power_3", 
+            "name": "Instant power on phasis 3", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "iinst3", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.max_power_1", 
+            "name": "Maximum power on phasis 1", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax1", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.max_power_2", 
+            "name": "Maximum power on phasis 2", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax2", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "generic.teleinfo", 
+            "feature_type": "sensor", 
+            "id": "generic.teleinfo.max_power_3", 
+            "name": "Maximum power on phasis 3", 
+            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "imax3", 
+            "value_type": "number"
         }
     ], 
     "device_types": [
@@ -67,7 +217,23 @@
             "description": "Thermometer", 
             "id": "generic.thermometer", 
             "name": "Thermometer"
+        },
+        {
+            "description": "Humidity", 
+            "id": "generic.humidity", 
+            "name": "Humidity"
+        },
+        {
+            "description": "Pressure", 
+            "id": "generic.pressure", 
+            "name": "Pressure"
+        },
+        {
+            "description": "Teleinfo", 
+            "id": "generic.teleinfo", 
+            "name": "Teleinfo"
         }
+    ], 
     ], 
     "external": {
         "device_id": "none", 
@@ -76,10 +242,14 @@
     "files": [
         "src/share/domogik/design/external/generic/icon.png", 
         "src/share/domogik/externals/generic.json", 
-        "src/share/domogik/stats/arduino/sensor.basic-generic-tank.xml",
         "src/share/domogik/url2xpl/generic/setcolor.xml", 
         "src/share/domogik/stats/generic/arduino.rgb-generic.xml",
-        "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml"
+        "src/share/domogik/stats/arduino/sensor.basic-generic-tank.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-humidity.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-pressure.xml",
+        "src/share/domogik/stats/generic/teleinfo.basic-teleinfo.xml",
+        "src/share/domogik/stats/generic/teleinfo.short-teleinfo.xml"
     ], 
     "identity": {
         "author": "Fritz", 

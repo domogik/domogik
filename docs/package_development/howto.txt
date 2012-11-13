@@ -52,7 +52,7 @@ Create the package
 
 Download :download:`SVG source file <packages_lifecycle.svg>`.
 
-#. :doc:`Make specification <specifications>` for your package on the wiki. You can create a page wiki.domogik.org/<package type>/<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin.
+#. :doc:`Make specification <specifications>` for your package on the wiki. You can create a page wiki.domogik.org/<package type>_<package name>. Example : http://wiki.domogik.org/plugin_ipx800 for the *ipx800* plugin.
 #. :doc:`Start developing the package <developing>`.
 #. Write the :doc:`package documentation <documentation>` at the same time.
 #. Write some :doc:`test cases <test_cases>` for the package. 
