@@ -552,7 +552,7 @@ class XplStat(Base):
     schema = Column(Unicode(32))
     reference = Column(Unicode(255))
     device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
-    #params = relationship("XplStatParam")
+    params = relationship("XplStatParam")
     
     def __init__(self, schema, reference, device_id):
         self.schema = ucode(schema)

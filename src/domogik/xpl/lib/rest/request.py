@@ -168,10 +168,6 @@ class ProcessRequest():
             # device-params
             '^/base/deviceparams/(?P<dev_type_id>[\.a-z0-9]+)$':                                   '_rest_base_deviceparams',
         },
-        # /command
-        'command': {
-	    '^/command.*$':                                                                      'rest_command',
-        },
         'ncommand': {
             '^/ncommand/(?P<cmd_id>[0-9]+)/.*$':                                 		 'rest_ncommand',
         },
@@ -293,8 +289,6 @@ class ProcessRequest():
         self._package_path = self.handler_params[0]._package_path
         self._src_prefix = self.handler_params[0]._src_prefix
         self._design_dir = self.handler_params[0]._design_dir
-        self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
-        self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
         self.repo_dir = self.handler_params[0].repo_dir
         self.use_ssl = self.handler_params[0].use_ssl
         self.get_exception = self.handler_params[0].get_exception
@@ -321,10 +315,6 @@ class ProcessRequest():
 
         self._event_dmg =  self.handler_params[0]._event_dmg
         self._event_requests =  self.handler_params[0]._event_requests
-
-        self.xml =  self.handler_params[0].xml
-        self.xml_ko =  self.handler_params[0].xml_ko
-        self.xml_date =  self.handler_params[0].xml_date
 
         self.stat_mgr =  self.handler_params[0].stat_mgr
 
@@ -555,22 +545,6 @@ class ProcessRequest():
         info["REST_API_release"] = self._rest_api_version
         info["Domogik_release"] = self.rest_status_dmg_version()
         info["Sources_release"] = self.rest_status_src_version()
-
-
-        # Xml command files
-        #command = {}
-        #xml_info = []
-        #for key in self.xml:
-        #    xml_info.append(key)
-        #command["XML_files_loaded"] = xml_info
-        #command["XML_files_KO"] = self.xml_ko
-        #command["XML_files_last_load"] = self.xml_date
-
-        # Xml stat files
-        #stats = {}
-        #stats["XML_files_loaded"] = self.stat_mgr.get_xml_list()
-        #stats["XML_files_KO"] = self.stat_mgr.get_xml_ko_list()
-        #stats["XML_files_last_load"] = self.stat_mgr.get_load_date()
 
         # Queues stats
         queues = {}
@@ -807,202 +781,6 @@ class ProcessRequest():
             json_data.add_data({"xpl" : str(stat_msg)})
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json_data.get())
-
-######
-# /command processing
-######
-
-    def rest_command(self):
-        """ Process /command url
-            - decode request
-            - call a xml parser for the technology (self.rest_request[0])
-           - send appropriate xPL message on network
-        """
-        self.log.debug("Process /command")
-
-        ### Check url length
-        if len(self.rest_request) < 3:
-            json_data = JSonHelper("ERROR", 999, "Url too short for /command")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            self.send_http_response_ok(json_data.get())
-            return
-
-        ### Get parameters
-        techno = self.rest_request[0]
-        address = self.rest_request[1]
-        command = self.rest_request[2]
-        if len(self.rest_request) > 3:
-            params = self.rest_request[3:]
-        else:
-            params = None
-
-        self.log.debug("Techno  : %s" % techno)
-        self.log.debug("Address : %s" % address)
-        self.log.debug("Command : %s" % command)
-        self.log.debug("Params  : %s" % str(params))
-
-        ### Get message 
-        message = self._rest_command_get_message(techno, address, command, params)
-
-        ### Get listener
-        (schema, xpl_type, filters) = self._rest_command_get_listener(techno, address, command)
-
-        ### Send xpl message
-        self.myxpl.send(XplMessage(message))
-
-        ### Wait for answer
-        if schema != None:
-            # get xpl message from queue
-            try:
-                self.log.debug("Command : wait for answer...")
-                msg_cmd = self._get_from_queue(self._queue_command, xpl_type, schema, filters)
-            except Empty:
-                self.log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
-                json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
-                json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-                json_data.set_data_type("response")
-                self.send_http_response_ok(json_data.get())
-                return
-    
-            self.log.debug("Command : message received : %s" % str(msg_cmd))
-
-        else:
-            # no listener defined in xml : don't wait for an answer
-            self.log.debug("Command : no listener defined : not waiting for an answer")
-
-        ### REST processing finished and OK
-        json_data = JSonHelper("OK")
-        json_data.set_data_type("response")
-        if schema != None:
-            json_data.add_data({"xpl" : str(msg_cmd)})
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_command_get_message(self, techno, address, command, params):
-        """ Generate xpl message for /command
-        """ 
-        ref = "%s/%s.xml" % (techno, command)
-        try:
-            xml_data = self.xml[ref]
-        except KeyError:
-            self.send_http_response_error(999, "No xml file for '%s'" % ref, \
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        ### Check xml validity
-        if xml_data.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
-            self.send_http_response_error(999, "'technology' attribute in xml file must be '%s'" % techno, \
-                                          self.jsonp, self.jsonp_cb)
-            return
-        if xml_data.getElementsByTagName("command")[0].attributes.get("name").value != command:
-            self.send_http_response_error(999, "'command' attribute in xml file must be '%s'" % command, \
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        ### Get only <command...> part
-        xml_command = xml_data.getElementsByTagName("command")[0]
-
-        ### Get data from xml
-        # Schema
-        schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        if xml_command.getElementsByTagName("command-xpl-value") == []:
-            has_command_key = False
-        else:
-            # command key name 
-            has_command_key = True
-            command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
-            # real command value in xpl message
-            command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
-
-        if xml_command.getElementsByTagName("address-key") == []:
-            has_address_key = False
-        else:
-            #address key name (device)
-            has_address_key = True
-            address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
-
-        # Parameters
-        #get and count parameters in xml file
-        parameters = xml_command.getElementsByTagName("parameters")[0]
-        #do the association between url and xml
-        parameters_value = {}
-        for param in parameters.getElementsByTagName("parameter"):
-            key = param.attributes.get("key").value
-            loc = param.attributes.get("location")
-            static_value = param.attributes.get("value")
-            if static_value is None:
-                if loc is None:
-                    loc.value = 0
-                if params == None:
-                    value = None
-                else:
-                    value = params[int(loc.value) - 1]
-            else:
-                value = static_value.value
-            if type(value).__name__ == "str":
-                value = unicode(urllib.unquote(value), "UTF-8")
-            parameters_value[key] = value
-
-        ### Create xpl message
-        msg = """xpl-cmnd
-{
-hop=1
-source=xpl-rest.domogik
-target=*
-}
-%s
-{
-""" % (schema)
-        if has_command_key == True:
-            msg += "%s=%s\n" % (command_key, command_xpl_value)
-        if has_address_key == True:
-            msg += "%s=%s\n" % (address_key, address)
-        for m_param in parameters_value.keys():
-            msg += "%s=%s\n" % (m_param, parameters_value[m_param])
-        msg += "}"
-        return msg
-
-
-
-
-    def _rest_command_get_listener(self, techno, address, command):
-        """ Create listener for /command 
-        """
-        xml_data = self.xml["%s/%s.xml" % (techno, command)]
-
-        ### Get only <command...> part
-        # nothing to do, tests have be done in get_command
-
-        xml_listener = xml_data.getElementsByTagName("listener")[0]
-
-        ### Get data from xml
-        # Schema
-        try:
-            schema = xml_listener.getElementsByTagName("schema")[0].firstChild.nodeValue
-        except IndexError:
-            # no schema data : we suppose we have <listener/>
-            # TODO : do it in a better way than using try: except:
-            return None, None, None
-
-        # xpl type
-        xpl_type = xml_listener.getElementsByTagName("xpltype")[0].firstChild.nodeValue
-
-        # Filters
-        filters = xml_listener.getElementsByTagName("filter")[0]
-        filters_value = {}
-        for my_filter in filters.getElementsByTagName("key"):
-            name = my_filter.attributes.get("name").value
-            value = my_filter.attributes.get("value").value
-            if value == "@address@":
-                value = address
-            filters_value[name] = value
-
-        return schema, xpl_type, filters_value
-
-
 
 
 ######

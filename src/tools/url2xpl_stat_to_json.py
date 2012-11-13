@@ -1,6 +1,5 @@
 from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
-import os
 import json
 from xml.dom import minidom
 
@@ -13,23 +12,24 @@ def url2xpl_stat_to_json(techno):
     cfg = Loader('domogik')
     config = cfg.load()
     conf = dict(config[1])
-    if conf.has_key('package_path'):
-        path = conf['package_path']
-    else:
-        path = '/opt/domo/domogik'
-
+    if not conf.has_key('package_path'):
+        print "This script should only be launched in DEV mode, exiting"
+        return
+    if not conf.has_key('src_prefix'):
+        print "src_prefix is not defined, exiting"
+        return
     # find all *.xml files
     for fname in jsn["files"]:
         if fname.endswith('.xml'):
             print "handling file %s" % (fname)
             # parse the files
-            xml_data = minidom.parse(path+'/'+fname)
+            xml_data = minidom.parse(conf['src_prefix'] + '/' + fname)
             if xml_data.getElementsByTagName("command") == []:
                 # We have a stats file
                 for schema in xml_data.getElementsByTagName("schema"):
                     # values
                     for value in schema.getElementsByTagName("value"):
-	                stat = {}
+                        stat = {}
                         stat["parameters"] = {}
                         stat["parameters"]["static"] = []
                         stat["parameters"]["device"] = []
@@ -37,14 +37,19 @@ def url2xpl_stat_to_json(techno):
                         stat["schema"] = schema.attributes.get("name").value
                         stat["reference"] = fname
                         # device inside mapping = device
-                        stat["parameters"]["device"].append({'key': schema.getElementsByTagName("device")[0].attributes.get("field").value})
+                        stat["parameters"]["device"].append(
+                            {'key': 
+                            schema.getElementsByTagName("device")[0].attributes.get("field").value})
                         #<value field="current" new_name="gust" 
                         #   filter_key="type" filter_value="gust" />
                         # filter_key + filter_value => static
-                        if value.attributes.get("filter_key") is not None and value.attributes.get("filter_value") is not None:
+                        if value.attributes.get("filter_key") is not None and \
+                            value.attributes.get("filter_value") is not None:
                             item = {}
-                            item["key"] = value.attributes.get("filter_key").value
-                            item["value"] = value.attributes.get("filter_value").value
+                            item["key"] = \
+                                value.attributes.get("filter_key").value
+                            item["value"] = \
+                                value.attributes.get("filter_value").value
                             stat["parameters"]["static"].append(item)
                         # new_name => 
                         # field = dynamic
@@ -82,7 +87,8 @@ def url2xpl_stat_to_json(techno):
                     static["value"] = str(xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue)
                     cmd["parameters"]["static"].append(static)
        	        #   address-key => parameters device
-                cmd["parameters"]["device"].append({'key': xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue})
+                cmd["parameters"]["device"].append({'key': \
+                    xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue})
 	        #   parameters => dynamic
                 for param in xml_parameters.getElementsByTagName("parameter"):
                 #   loc = param.attributes.get("location")
