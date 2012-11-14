@@ -54,7 +54,7 @@ from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, Page,
+        UserAccount, SENSOR_VALUE_TYPE_LIST,
         XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
@@ -551,6 +551,16 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeature).filter_by(id=df_id).first()
 
+    def get_device_feature_by_type(self, d_type):
+        """Return a device feature
+
+        @param df_id : device feature id
+        @return a DeviceFeature object
+
+        """
+        return self.__session.query(DeviceFeature).filter_by(device_type_id=d_type).first()
+
+
     def list_device_features(self):
         """List device features
 
@@ -600,6 +610,16 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureModel).filter_by(id=dtf_id).first()
 
+    def get_device_feature_model_by_device_type(self, dt):
+        """Return information about a model for a device type feature
+
+        @param dtf_id : model id
+        @return a DeviceFeatureModel object
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dt)).first()
+
+
 ####
 # Actuator feature model
 ####
@@ -628,7 +648,7 @@ class DbHelper():
                     ).first()
 
     def add_actuator_feature_model(self, af_id, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
-                                   af_parameters=None, af_stat_key=None):
+                                   af_xpl_command=None, af_value_field=None, af_values=None, af_stat_key=None):
         """Add a model for an actuator feature
 
         @param af_id : actuator id
@@ -651,8 +671,8 @@ class DbHelper():
                                        % af_device_type_id)
         device_feature_m = DeviceFeatureModel(id=ucode(af_id), name=ucode(af_name), feature_type=u'actuator',
                                               device_type_id=af_device_type_id, value_type=af_value_type,
-                                              return_confirmation=af_return_confirmation,
-                                              parameters=af_parameters, stat_key=af_stat_key)
+                                              xpl_command=af_xpl_command, values=af_values,
+                                              value_field=af_value_field, stat_key=af_stat_key)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -661,7 +681,7 @@ class DbHelper():
         return device_feature_m
 
     def update_actuator_feature_model(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
-                                      af_return_confirmation=None, af_stat_key=None):
+                                      af_xpl_command=None, af_value_field=None, af_values=None, af_stat_key=None):
         """Update a model for an actuator feature
 
         @param af_id : actuator feature model id
@@ -687,19 +707,21 @@ class DbHelper():
             device_feature_m.id = ucode(af_id)
         if af_name is not None:
             device_feature_m.name = ucode(af_name)
-        if af_parameters is not None:
-            if af_parameters == '':
-                af_parameters = None
-            device_feature_m.parameters = ucode(af_parameters)
         if af_value_type is not None:
             if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
                 self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
                                            % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
             device_feature_m.value_type = ucode(af_value_type)
-        if af_return_confirmation is not None:
-            device_feature_m.return_confirmation = af_return_confirmation
         if af_stat_key is not None:
             device_feature_m.stat_key = ucode(af_stat_key)
+        if af_xpl_command is not None:
+            device_feature_m.xpl_command = ucode(af_xpl_command)
+        if af_value_type is not None:
+            device_feature_m.value_type = ucode(af_value_type)
+        if af_value_field is not None:
+            device_feature_m.value_field = ucode(af_value_field)
+        if af_values is not None:
+            device_feature_m.values = ucode(af_values)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -757,8 +779,8 @@ class DbHelper():
                     ).filter_by(feature_type=u'sensor'
                     ).first()
 
-    def add_sensor_feature_model(self, sf_id, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None,
-                                 sf_stat_key=None):
+    def add_sensor_feature_model(self, sf_id, sf_name, sf_device_type_id, sf_value_type,
+                                 sf_stat_key=None, sf_unit=None):
         """Add a model for sensor feature
 
         @param sf_id : sensor feature id
@@ -779,7 +801,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("Can't add sensor : device type id '%s' doesn't exist" % sf_device_type_id)
         device_feature_m = DeviceFeatureModel(id=ucode(sf_id), name=ucode(sf_name), feature_type=u'sensor',
                                               device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
-                                              parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
+                                              stat_key=ucode(sf_stat_key), unit=ucode(sf_unit))
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -787,8 +809,8 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_m
 
-    def update_sensor_feature_model(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None,
-                                    sf_stat_key=None):
+    def update_sensor_feature_model(self, sf_id, sf_name=None, sf_value_type=None,
+                                    sf_stat_key=None, sf_unit=None):
         """Update a model for a sensor feature
 
         @param sf_id : sensor feature model id
@@ -812,10 +834,6 @@ class DbHelper():
             device_feature_m.id = ucode(sf_id)
         if sf_name is not None:
             device_feature_m.name = ucode(sf_name)
-        if sf_parameters is not None:
-            if sf_parameters == '':
-                sf_parameters = None
-            device_feature_m.parameters = ucode(sf_parameters)
         if sf_value_type is not None:
             if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
                 self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
@@ -823,6 +841,8 @@ class DbHelper():
             device_feature_m.value_type = ucode(sf_value_type)
         if sf_stat_key is not None:
             device_feature_m.stat_key = ucode(sf_stat_key)
+        if sf_unit is not None:
+            device_feature_m.unit = ucode(sf_unit)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()

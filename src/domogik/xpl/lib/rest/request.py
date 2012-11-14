@@ -64,6 +64,7 @@ from threading import Event
 from Queue import Empty
 import sys
 from subprocess import Popen, PIPE
+import json
 
 
 # Time we wait for answers after a multi host list command
@@ -4461,7 +4462,6 @@ class ProcessRequest():
                                          self.get_parameters("key"), \
                                          self.get_parameters("value"), \
                                          self.get_parameters("static"))
-            print cmd
             json_data.add_data(cmd)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
@@ -4472,18 +4472,20 @@ class ProcessRequest():
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("deviceparams")
         try:
-            # getthe plugin for this device_type
             # select device_technology_id FROM core_device_type WHERE id=dev_type_id
-            pid = self._db.get_device_type_by_name(dev_type_id)
-            # read the json for this plugin
-            pjson = PackageJson(pid.device_tecnology_id)
+            dt = self._db.get_device_type_by_id(dev_type_id)
             # find the xpl commands that are neede for this feature
-            #select parameters from core_device_feature_model where device_type_id=dev_type_id
+            dtf = self._db.get_device_feature_model_by_device_type(dev_type_id)
+            dtf.parameters = dtf.parameters.replace('&quot;', '\"')
+            params = json.loads(dtf.parameters)
+            print params
+            #dtfj = dict(dtf.parameters)
+            #print dtfj
             # parse the parameters to et the xpl cmd names
             # for each xpl_cmd select the device parameters
             # for each xpl_cmd select the stats mesaage
             # for each stat_msg select dthe device params
-            json_data.add_data(pjson.json)
+            #json_data.add_data(pjson.json)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         # return the info

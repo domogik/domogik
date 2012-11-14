@@ -269,14 +269,18 @@ class DeviceFeatureModel(Base):
     feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
-    parameters = Column(UnicodeText())
+    #parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
     stat_key = Column(Unicode(30))
-    return_confirmation = Column(Boolean, nullable=False)
+    #return_confirmation = Column(Boolean, nullable=False)
+    xpl_command = Column(Unicode(255), nullable=True)
+    value_field = Column(Unicode(32), nullable=True)
+    values = Column(Unicode(255), nullable=True)
+    unit = Column(Unicode(32), nullable=True)
     device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
-    def __init__(self, id, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
-                return_confirmation=False):
+    def __init__(self, id, name, feature_type, device_type_id, value_type, stat_key=None, \
+                xpl_command=None, value_field=None, values=None):
         """Class constructor
 
         @param id : device feature id
@@ -284,11 +288,11 @@ class DeviceFeatureModel(Base):
         @param feature_type : device feature type (actuator / sensor)
         @param device_type_id : device type id
         @param value_type : value type the actuator can accept / the sensor can return
-        @param parameters : parameters about the command or the returned data associated to the device, optional
         @param stat_key : key reference in the core_device_stats table, optional
-        @param return_confirmation : True if the device returns a confirmation after having executed a command, optional (default False)
-                                     Only relevant for actuators
-
+        Parameters only for actuators
+            @xpl_command
+            @value_field
+            @values
         """
         self.id = ucode(id)
         self.name = ucode(name)
@@ -303,15 +307,16 @@ class DeviceFeatureModel(Base):
                             % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
         self.value_type = ucode(value_type)
-        self.parameters = ucode(parameters)
         self.stat_key = ucode(stat_key)
-        self.return_confirmation = return_confirmation
+        self.xpl_command = ucode(xpl_command)
+        self.value_field = ucode(value_field)
+        self.values = ucode(values)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceFeatureModel(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>"\
-               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type,\
-                  self.stat_key, self.return_confirmation)
+        return "<DeviceFeatureModel(%s, %s, device_type=%s, value_type=%s, stat_key=%s, xpl_command=%s, value_field=%s, values=%s)>"\
+               % (self.id, self.feature_type, self.device_type, self.value_type,\
+                  self.stat_key, self.xpl_command, self.value_field, self.values)
 
     @staticmethod
     def get_tablename():
