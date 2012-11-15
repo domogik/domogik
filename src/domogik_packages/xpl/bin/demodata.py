@@ -66,6 +66,13 @@ class DemoDataManager(XplPlugin):
             'xpltype': 'xpl-cmnd',
         })
 
+        # Switch
+        # Dimmer
+        Listener(self.cmd_lighting_basic, self.myxpl, {
+            'schema': 'lighting.basic',
+            'xpltype': 'xpl-cmnd',
+        })
+
 
         ### Call the data creators
         demo = DemoData(self.log, self.send_sensor_basic, \
@@ -138,6 +145,7 @@ class DemoDataManager(XplPlugin):
             msg.add_data({ key : frame[key] })
         self.myxpl.send(msg)
 
+    # RGB controller
     def cmd_arduino_rgb(self, message):
         device = message.data['device']
         command = message.data['command']
@@ -154,6 +162,30 @@ class DemoDataManager(XplPlugin):
         msg.add_data({ 'command' : command })
         msg.add_data({ 'color' : color })
         self.myxpl.send(msg)
+
+    # Switch
+    # Dimmer
+    def cmd_lighting_basic(self, message):
+        device = message.data['device']
+        command = message.data['command']
+        if message.data.has_key('level'):
+            level = message.data['level']
+        else: 
+            level = None
+        # send symetric answer to simulate the device
+        self.send_lighting_basic(device, command, level)
+
+    def send_lighting_basic(self, device, command, level = None):
+        print("lighting.basic : device=%s, command=%s, level=%s" % (device, command, level))
+        msg = XplMessage()
+        msg.set_type("xpl-trig")
+        msg.set_schema("lighting.basic")
+        msg.add_data({ 'device' : device })
+        msg.add_data({ 'command' : command })
+        if level != None:
+            msg.add_data({ 'level' : level })
+        self.myxpl.send(msg)
+
 
     
 class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):

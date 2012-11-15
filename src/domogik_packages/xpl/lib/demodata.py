@@ -269,8 +269,10 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
 
         # manage actions
         if path == "/rgb":
-            print args
             self.server.handler_params[0].send_arduino_rgb('demo_rgb_led', 'setcolor', args['color'])
+            self._send_http_response(200)
+        elif path == "/switch":
+            self.server.handler_params[0].send_lighting_basic('demo_switch', 'toggle', args['level'])
             self._send_http_response(200)
         else:
             self._send_http_response(404)
@@ -318,11 +320,6 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         print home_file
         self._download_file(home_file)
 
-
-    def _display_rgb_controller(self):
-        ctrl = '<h2>RGB controller</h2>'
-        return ctrl
- 
     def _download_file(self, file_name):
         """ Download a file
         """
