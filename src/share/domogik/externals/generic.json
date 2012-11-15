@@ -42,9 +42,9 @@
             "value_type": "binary"
         },
         {
-            "device_type_id": "generic.thermometer", 
+            "device_type_id": "generic.temperature", 
             "feature_type": "sensor", 
-            "id": "generic.thermometer.temperature", 
+            "id": "generic.temperature.temperature", 
             "name": "Temperature", 
             "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
             "return_confirmation": "0", 
@@ -214,9 +214,9 @@
             "name": "RGB leds controller"
         },
         {
-            "description": "Thermometer", 
-            "id": "generic.thermometer", 
-            "name": "Thermometer"
+            "description": "Temperature", 
+            "id": "generic.temperature", 
+            "name": "Temperature"
         },
         {
             "description": "Humidity", 
@@ -233,7 +233,6 @@
             "id": "generic.teleinfo", 
             "name": "Teleinfo"
         }
-    ], 
     ], 
     "external": {
         "device_id": "none", 

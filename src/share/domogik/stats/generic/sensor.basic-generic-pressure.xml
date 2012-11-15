@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <statistic technology="generic">
     <schema name="sensor.basic">
-        <xpltype type="xpl-trig">
+        <xpltype type="*">
             <listener>
                 <filter>
                     <key name="type" value="pressure"/>
@@ -9,7 +9,7 @@
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="description" new_name="pressure-desc"
+                <value field="current" new_name="pressure"
                        filter_key="type" filter_value="pressure" />
             </mapping>
         </xpltype>
