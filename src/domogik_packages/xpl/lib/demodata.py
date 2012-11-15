@@ -44,7 +44,9 @@ import os
 import mimetypes
 import shutil
 
-JQUERY = "jquery-1.8.2.min.js"
+#JQUERY = "jquery-1.8.2.min.js"
+#JQUERY_UI = "jquery-ui-1.9.1.min.js"
+#JQUERY_CSS = "jquery-ui.css"
 
 
 
@@ -233,11 +235,15 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         # split path and args
         buf = self.path.split("?")
         path = buf[0]
+        path_elts = path.split("/")
+        print path_elts
         # manage pages
         if path == "/":
             self._display_home()
-        elif path == "/%s" % JQUERY:
-            self._get_jquery()
+        elif path_elts[1] == "js":
+            self._get_file(path)
+        elif path_elts[1] == "css":
+            self._get_file(path)
         else:
             self._send_http_response(404)
 
@@ -299,11 +305,11 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         self.end_headers()
         self.wfile.write( body )
 
-    def _get_jquery(self):
+    def _get_file(self, filename):
         # get the resources folder
         res_dir = self.server.handler_params[0].get_data_files_directory()
-        jquery_file = "%s/%s" % (res_dir, JQUERY)
-        self._download_file(jquery_file)
+        the_file = "%s/%s" % (res_dir, filename)
+        self._download_file(the_file)
 
     def _display_home(self):
         # get the resources folder

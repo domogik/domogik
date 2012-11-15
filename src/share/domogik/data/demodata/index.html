@@ -1,17 +1,36 @@
 <html>                                                                  
   <head>                                                                  
-    <script type="text/javascript" src="jquery-1.8.2.min.js"></script>          
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/excite-bike/jquery-ui-1.9.1.custom.css" />
+    <link rel="stylesheet" type="text/css" href="css/ui.notify.css" />
+    <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>          
+    <script type="text/javascript" src="js/jquery-ui-1.9.1.min.js"></script>          
+    <script type="text/javascript" src="js/jquery.notify.js"></script>          
     <script type="text/javascript">
     $(document).ready(function() {
+        /* Accordion */
+        $('#accordion').accordion({
+            heightStyle: "content"
+        });
+
+        /* Notifications */
+        $("#container").notify();
+
         /* RGB controller */
+        $('#rgb_setcolor').button();
+        $('#rgb_on').button();
+        $('#rgb_off').button();
         $('#rgb_setcolor').click(function(event) {
             $.ajax({
                 type: 'POST',
                 cache: false,
                 url: './rgb',
-                data: 'color='+$('#color').val(),
+                data: 'color='+$('#rgb_color').val(),
                 success: function(msg) {
-                    alert('ok');
+                    $("#container").notify("create", {
+                        title: 'RGB controller',
+                        text: 'Command sended.'
+                    });
                 }
             });
             event.stopPropagation();
@@ -23,7 +42,10 @@
                 url: './rgb',
                 data: 'color=#000000',
                 success: function(msg) {
-                    alert('ok');
+                    $("#container").notify("create", {
+                        title: 'RGB controller',
+                        text: 'Command sended.'
+                    });
                 }
             });
             event.stopPropagation();
@@ -35,7 +57,10 @@
                 url: './rgb',
                 data: 'color=#ffffff',
                 success: function(msg) {
-                    alert('ok');
+                    $("#container").notify("create", {
+                        title: 'RGB controller',
+                        text: 'Command sended.'
+                    });
                 }
             });
             event.stopPropagation();
@@ -45,15 +70,38 @@
   </head>                                                                 
   <body>                                                                  
     <h1>Demodata UI</h1>
-    <h2>RGB controller</h2>
-    <p>
-      <button id="rgb_setcolor"><span>Set the color</span></button>
-      <input id="color" type="text"/> 
-    </p>
-    <p>
-      <button id="rgb_off"><span>Switch the leds off</span></button>
-      <button id="rgb_on"><span>Switch the leds on (white : #ffffff)</span></button>
-    </p>
-    <div id="boxContentId"></div>
+    <div id="accordion">
+      <h2>RGB controller</h2>
+      <div>
+        Color : 
+        <input id="rgb_color" type="text"/> 
+        <button id="rgb_setcolor"><span>set</span></button>
+        <br/>
+        Switch the leds : <button id="rgb_off"><span>off</span></button>
+        <button id="rgb_on"><span>on (#ffffff)</span></button>
+      </div>
+      <h2>Switch controller</h2>
+      <div>
+        TODO
+      </div>
+    </div>
+
+    <div id="container" style="display:none">
+      <!-- 
+      Later on, you can choose which template to use by referring to the 
+      ID assigned to each template.  Alternatively, you could refer
+      to each template by index, so in this example, "basic-tempate" is
+      index 0 and "advanced-template" is index 1.
+      -->
+      <div id="basic-template">
+          <a class="ui-notify-cross ui-notify-close" href="#">x</a>
+          <h1>#{title}</h1>
+          <p>#{text}</p>
+      </div>
+   
+      <div id="advanced-template">
+          <!-- ... you get the idea ... -->
+      </div>
+    </div>
   </body>                                                                 
 </html>
