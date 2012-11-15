@@ -36,8 +36,9 @@
     ], 
     "xpl_commands": [
          {
-            "reference": "set_level",
+            "reference": "setlevel",
             "schema": "lighting.basic",
+            "stat_reference": "get_level",
             "parameters": [
                 {
                     "static": [],
@@ -71,7 +72,7 @@
     ],
     "xpl_stats": [
        {
-            "name": "get_level",
+            "reference": "get_level",
             "schema": "lighting.device",
             "parameters": [
                 {

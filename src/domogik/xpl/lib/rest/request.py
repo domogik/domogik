@@ -4418,7 +4418,6 @@ class ProcessRequest():
                                          self.get_parameters("key"), \
                                          self.get_parameters("value"), \
                                          self.get_parameters("static"))
-            print cmd
             json_data.add_data(cmd)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
@@ -4474,18 +4473,34 @@ class ProcessRequest():
         try:
             # select device_technology_id FROM core_device_type WHERE id=dev_type_id
             dt = self._db.get_device_type_by_id(dev_type_id)
+            if dt == None: 
+                json_data.set_error(code = 999, description = "This device type does not exists")
+                self.send_http_response_ok(json_data.get())
+                return
+            # get the json
+            pjson = PackageJson(dt.device_technology_id).json
             # find the xpl commands that are neede for this feature
             dtf = self._db.get_device_feature_model_by_device_type(dev_type_id)
-            dtf.parameters = dtf.parameters.replace('&quot;', '\"')
-            params = json.loads(dtf.parameters)
-            print params
-            #dtfj = dict(dtf.parameters)
-            #print dtfj
-            # parse the parameters to et the xpl cmd names
-            # for each xpl_cmd select the device parameters
-            # for each xpl_cmd select the stats mesaage
-            # for each stat_msg select dthe device params
-            #json_data.add_data(pjson.json)
+            cmd = None
+	    for xcmd  in pjson['xpl_commands']:
+                if xcmd['reference'] == dtf.xpl_command:
+                    cmd = xcmd
+                    break
+            if cmd is None:
+                json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
+                self.send_http_response_ok(json_data.get())
+                return
+            # finc the xpl_stat message
+            stat = None
+            if 'stat_reference' in cmd:
+	        for xcmd  in pjson['xpl_stats']:
+                    if xcmd['reference'] == cmd['stat_reference']:
+                        stat = xcmd
+                        break
+            ret = {}
+            ret['cmd'] = cmd
+            ret['stat'] = stat
+            json_data.add_data(ret)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         # return the info
