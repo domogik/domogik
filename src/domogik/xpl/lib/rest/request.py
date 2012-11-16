@@ -1898,7 +1898,6 @@ class ProcessRequest():
         json_data.set_data_type("device")
         try:
             device = self._db.add_device(self.get_parameters("name"), \
-                                         self.get_parameters("address"), \
                                          self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
@@ -1920,7 +1919,6 @@ class ProcessRequest():
         try:
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
-                                         self.get_parameters("address"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
@@ -4466,19 +4464,30 @@ class ProcessRequest():
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
-    def _rest_base_deviceparams(self, dev_type_id):
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("deviceparams")
+    def _rest_base_deviceparams(self, dev_type_id, json=True):
+        if json:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("deviceparams")
         try:
             # select device_technology_id FROM core_device_type WHERE id=dev_type_id
             dt = self._db.get_device_type_by_id(dev_type_id)
-            if dt == None: 
-                json_data.set_error(code = 999, description = "This device type does not exists")
-                self.send_http_response_ok(json_data.get())
-                return
+            if dt == None:
+                if json:
+                    json_data.set_error(code = 999, description = "This device type does not exists")
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
             # get the json
             pjson = PackageJson(dt.device_technology_id).json
+            if pjson['json_version'] < 2:
+                if json:
+                    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
             # find the xpl commands that are neede for this feature
             dtf = self._db.get_device_feature_model_by_device_type(dev_type_id)
             cmd = None
@@ -4487,9 +4496,12 @@ class ProcessRequest():
                     cmd = xcmd
                     break
             if cmd is None:
-                json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
-                self.send_http_response_ok(json_data.get())
-                return
+                if json:
+                    json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
             # finc the xpl_stat message
             stat = None
             if 'stat_reference' in cmd:
@@ -4498,10 +4510,67 @@ class ProcessRequest():
                         stat = xcmd
                         break
             ret = {}
-            ret['cmd'] = cmd
-            ret['stat'] = stat
-            json_data.add_data(ret)
+            if json:
+                ret['xpl_cmd'] = cmd['parameters']['device']
+                ret['xpl_stat'] = stat['parameters']['device']
+                json_data.add_data(ret)
+            else:
+                ret['cmd'] = cmd
+                ret['stat'] = stat
         except:
-            json_data.set_error(code = 999, description = self.get_exception())
+            if json:
+                json_data.set_error(code = 999, description = self.get_exception())
+            else:
+                return None
         # return the info
+        if json:
+            self.send_http_response_ok(json_data.get())
+        else:
+            return ret
+
+    def _rest_base_device_xpladd(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        devParams = ['name', 'type_id', 'usage_id', 'description', 'reference']
+        if self.get_parameters("type_id") == None:
+            json_data.set_error(code = 999, description = "type_id is required")
+            self.send_http_response_ok(json_data.get())
+            return
+        xpl = self._rest_base_deviceparams(self.get_parameters("type_id"), False)
+        # first add the device itself
+        try:
+            device = self._db.add_device(d_name=self.get_parameters("name"), \
+                                         d_type_id=self.get_parameters("type_id"), \
+                                         d_usage_id=self.get_parameters("usage_id"), \
+                                         d_description=self.get_parameters("description"), \
+                                         d_reference=self.get_parameters("reference"))
+            # add the xplstat
+            xplstat = self._db.add_xpl_stat(schema=xpl['stat']['schema'], reference=xpl['stat']['reference'], device_id=device.id)
+            # add the xplstatparams
+            for i in xpl['stat']['parameters']['static']:
+                p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=i['value'], static=True, stat_key=None)
+            for i in xpl['stat']['parameters']['dynamic']:
+                p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=None, static=False, stat_key=i['stat_key'])
+            for i in xpl['stat']['parameters']['device']:
+                # value should be provided in the url
+                if self.get_parameters("stat_%s" % (i['key'])) is not None:
+                   p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True, stat_key=None)
+            # add the xplcommand
+            xplcommand = self._db.add_xpl_command(schema=xpl['cmd']['schema'], reference=xpl['stat']['reference'], device_id=device.id, stat_id=xplstat.id)
+            # add the xplcommandparams
+            for i in xpl['cmd']['parameters']['static']:
+                p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=i['value'], static=True)
+            for i in xpl['cmd']['parameters']['dynamic']:
+                p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=None, static=False)
+            for i in xpl['cmd']['parameters']['device']:
+                # value should be provided in the url
+                if self.get_parameters("stat_%s" % (i['key'])) is not None:
+                   p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True)
+            # return the device
+            device.xplcommandid = xplcommand.id
+            json_data.add_data(device)
+        except:
+            
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())

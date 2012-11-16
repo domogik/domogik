@@ -1183,11 +1183,10 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(usage_id=du_id).all()
 
-    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_description=None, d_reference=None):
+    def add_device(self, d_name, d_type_id, d_usage_id, d_description=None, d_reference=None):
         """Add a device item
 
         @param d_name : name of the device
-        @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage_id : usage id (ex. temperature)
         @param d_description : extended device description, optional
@@ -1201,9 +1200,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % d_type_id)
         if not self.__session.query(DeviceUsage).filter_by(id=d_usage_id).first():
             self.__raise_dbhelper_exception("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
-        if self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==d_type_id).count() != 0:
-            self.__raise_dbhelper_exception("Couldn't add device, same device with adress %s and type %s already exists" % (d_address,d_type_id))
-        device = Device(name=d_name, address=d_address, description=d_description, reference=d_reference,
+        device = Device(name=d_name, description=d_description, reference=d_reference, \
                         device_type_id=d_type_id, device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
@@ -1222,14 +1219,13 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None, d_usage_id=None, d_description=None, d_reference=None):
+    def update_device(self, d_id, d_name=None, d_usage_id=None, d_description=None, d_reference=None):
         """Update a device item
 
         If a param is None, then the old value will be kept
 
         @param d_id : Device id
         @param d_name : device name (optional)
-        @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
         @param d_description : Extended item description (optional)
         @param d_usage : Item usage id (optional)
         @return the updated Device object
@@ -2196,6 +2192,9 @@ class DbHelper():
 ###################
 # xplstat
 ###################
+    def get_all_xpl_stat(self):
+        return self.__session.query(XplStat).all()
+
     def get_xpl_stat(self, p_id):
         return self.__session.query(XplStat).filter_by(id=p_id).first()
 
@@ -2246,9 +2245,9 @@ class DbHelper():
 ###################
 # XplCommandParam
 ###################
-    def add_xpl_command_param(self, cmd_id, key, value, static):
+    def add_xpl_command_param(self, cmd_id, key, value, static, stat_key):
         self.__session.expire_all()
-        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value, static=static)
+        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value, static=static, stat_key=stat_key)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2288,9 +2287,9 @@ class DbHelper():
 ###################
 # XplStatParam
 ###################
-    def add_xpl_stat_param(self, statid, key, value, static):
+    def add_xpl_stat_param(self, statid, key, value, static, stat_key):
         self.__session.expire_all()
-        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static)
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, stat_key=key)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2298,7 +2297,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_stat_param(self, stat_id, key, value=None, static=None):
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, stat_key=None):
         self.__session.expire_all()
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is None:
@@ -2307,6 +2306,8 @@ class DbHelper():
             param.value = ucode(value)
         if static is not None:
             param.static = static
+        if stat_key is not None:
+            param.stat_key = stat_key
         self.__session.add(param)
         try:
             self.__session.commit()

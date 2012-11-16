@@ -531,8 +531,8 @@ class PackageManager():
             # exernal/* are installed on rinor host
             if package_part == PKG_PART_RINOR:
                 copytree("%s/src/share/domogik/design/" % pkg_dir, "%s/design/" % plg_path, self.log)
-                copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
-                copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
+                #copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
+                #copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
                 copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
         except:
             msg = "Error while copying %s files : %s" % (pkg_type, traceback.format_exc())

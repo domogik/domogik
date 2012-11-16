@@ -39,8 +39,7 @@
             "reference": "setlevel",
             "schema": "lighting.basic",
             "stat_reference": "get_level",
-            "parameters": [
-                {
+            "parameters": {
                     "static": [],
                     "device": [
                         {
@@ -67,15 +66,13 @@
                         }
                     ]
                 }
-            ]
          }
     ],
     "xpl_stats": [
        {
             "reference": "get_level",
             "schema": "lighting.device",
-            "parameters": [
-                {
+            "parameters": {
                     "static": [],
                      "device": [
                         {
@@ -95,11 +92,11 @@
                     ],
                     "dynamic": [
                         {
-                             "key": "level"
+                             "key": "level",
+                             "stat_key": "level"
                         }
                     ]
                 }
-            ]
        }
     ],
     "device_feature_models": [
