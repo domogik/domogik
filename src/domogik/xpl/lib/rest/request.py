@@ -42,6 +42,7 @@ from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, ICON_CACHE_DIR 
 from domogik.common.packagexml import PackageException
+from domogik.common.packagejson import PackageJson
 import time
 import urllib
 import urlparse
@@ -63,6 +64,7 @@ from threading import Event
 from Queue import Empty
 import sys
 from subprocess import Popen, PIPE
+import json
 
 
 # Time we wait for answers after a multi host list command
@@ -103,6 +105,7 @@ class ProcessRequest():
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
             '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
+            '^/base/device/xpladd/.*$':                                                          '_rest_base_device_xpladd',
             # /base/device_technology
             '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
             '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
@@ -139,10 +142,27 @@ class ProcessRequest():
             '^/base/ui-config/del/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':               '_rest_base_ui_item_config_del',
             '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':   '_rest_base_ui_item_config_del',
             '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
+            # xpl-command
+            '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
+            '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
+            '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
+            # xpl-command-params
+            '^/base/xpl-command-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_xplcommandparam_del',
+            '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
+            '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
+            # xpl-stat
+            '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
+            '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
+            '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
+            # xpl-stat-params
+            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
+            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
+            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
+            # device-params
+            '^/base/deviceparams/(?P<dev_type_id>[\.a-z0-9]+)$':                                   '_rest_base_deviceparams',
         },
-        # /command
-        'command': {
-	    '^/command.*$':                                                                      'rest_command',
+        'ncommand': {
+            '^/ncommand/(?P<cmd_id>[0-9]+)/.*$':                                 		 'rest_ncommand',
         },
         # /event
         'events': {
@@ -175,6 +195,7 @@ class ProcessRequest():
         # /plugin
         'plugin': {
             '^/plugin/list$':                                                                        '_rest_plugin_list',
+            '^/plugin/json/(?P<id>[a-z]+)$':                                                         '_rest_plugin_json',
             '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
             '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
             '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
@@ -261,8 +282,6 @@ class ProcessRequest():
         self._package_path = self.handler_params[0]._package_path
         self._src_prefix = self.handler_params[0]._src_prefix
         self._design_dir = self.handler_params[0]._design_dir
-        self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
-        self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
         self.repo_dir = self.handler_params[0].repo_dir
         self.use_ssl = self.handler_params[0].use_ssl
         self.get_exception = self.handler_params[0].get_exception
@@ -289,10 +308,6 @@ class ProcessRequest():
 
         self._event_dmg =  self.handler_params[0]._event_dmg
         self._event_requests =  self.handler_params[0]._event_requests
-
-        self.xml =  self.handler_params[0].xml
-        self.xml_ko =  self.handler_params[0].xml_ko
-        self.xml_date =  self.handler_params[0].xml_date
 
         self.stat_mgr =  self.handler_params[0].stat_mgr
 
@@ -524,22 +539,6 @@ class ProcessRequest():
         info["Domogik_release"] = self.rest_status_dmg_version()
         info["Sources_release"] = self.rest_status_src_version()
 
-
-        # Xml command files
-        command = {}
-        xml_info = []
-        for key in self.xml:
-            xml_info.append(key)
-        command["XML_files_loaded"] = xml_info
-        command["XML_files_KO"] = self.xml_ko
-        command["XML_files_last_load"] = self.xml_date
-
-        # Xml stat files
-        stats = {}
-        stats["XML_files_loaded"] = self.stat_mgr.get_xml_list()
-        stats["XML_files_KO"] = self.stat_mgr.get_xml_ko_list()
-        stats["XML_files_last_load"] = self.stat_mgr.get_load_date()
-
         # Queues stats
         queues = {}
         queues["package_usage"] = "%s/%s" \
@@ -658,8 +657,6 @@ class ProcessRequest():
             ] 
 
         data = {"info" : info, 
-                "command" : command,
-                "stats" : stats,
                 "queue" : queues, 
                 "event" : events,
                 "configuration" : conf}
@@ -703,60 +700,69 @@ class ProcessRequest():
 # /command processing
 ######
 
-    def rest_command(self):
-        """ Process /command url
-            - decode request
-            - call a xml parser for the technology (self.rest_request[0])
-           - send appropriate xPL message on network
+    def rest_ncommand(self, cmd_id):
+        """ New command processing
+            cmd = the xpl_command id form the core_xplcommand table
         """
-        self.log.debug("Process /command")
-
-        ### Check url length
-        if len(self.rest_request) < 3:
-            json_data = JSonHelper("ERROR", 999, "Url too short for /command")
+        self.log.debug("Process /ncommand")
+        self.set_parameters(1)
+        # get the xplcommand and xplstat from db
+        cmd = self._db.get_xpl_command(cmd_id)
+        if cmd == None:
+            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
-
-        ### Get parameters
-        techno = self.rest_request[0]
-        address = self.rest_request[1]
-        command = self.rest_request[2]
-        if len(self.rest_request) > 3:
-            params = self.rest_request[3:]
-        else:
-            params = None
-
-        self.log.debug("Techno  : %s" % techno)
-        self.log.debug("Address : %s" % address)
-        self.log.debug("Command : %s" % command)
-        self.log.debug("Params  : %s" % str(params))
-
-        ### Get message 
-        message = self._rest_command_get_message(techno, address, command, params)
-
-        ### Get listener
-        (schema, xpl_type, filters) = self._rest_command_get_listener(techno, address, command)
-
-        ### Send xpl message
-        self.myxpl.send(XplMessage(message))
-
+        stat = self._db.get_xpl_stat(cmd.stat_id)
+        if stat == None:
+            json_data = JSonHelper("ERROR", 999, "stat %s does not exists" % cmd.stat_id)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+            return
+        # cmd will have all needed info now
+        msg = XplMessage()
+        msg.set_type("xpl-cmnd")
+        msg.set_schema( cmd.schema)
+        for p in cmd.params:
+            if p.static:
+                msg.add_data({p.key : p.value})
+            else:
+                if self.get_parameters(p.key):
+                   msg.add_data({p.key : self.get_parameters(p.key)})
+                else:
+		    json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device command msg is not provided in the url" % p.key)
+		    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+		    self.send_http_response_ok(json_data.get())
+		    return
+        # send out the msg
+        self.myxpl.send(msg)   
+        print msg
         ### Wait for answer
-        if schema != None:
+        stat_msg = None
+        if stat != None:
+            filters = {}
+            for p in stat.params:
+                if p.static:
+                    filters[p.key] = p.value
+                else:
+                    if self.get_parameters(p.key):
+                        filters[p.key] = self.get_parameters(p.key)
+                    else:
+		        json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device stats msg is not provided in the url" % p.key)
+		        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+		        self.send_http_response_ok(json_data.get())
+		        return
             # get xpl message from queue
             try:
                 self.log.debug("Command : wait for answer...")
-                msg_cmd = self._get_from_queue(self._queue_command, xpl_type, schema, filters)
+                stat_msg = self._get_from_queue(self._queue_command, 'xpl-trig', stat.schema, filters)
             except Empty:
-                self.log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
                 json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
                 json_data.set_jsonp(self.jsonp, self.jsonp_cb)
                 json_data.set_data_type("response")
                 self.send_http_response_ok(json_data.get())
                 return
-    
-            self.log.debug("Command : message received : %s" % str(msg_cmd))
-
+            self.log.debug("Command : message received : %s" % str(stat_msg))
         else:
             # no listener defined in xml : don't wait for an answer
             self.log.debug("Command : no listener defined : not waiting for an answer")
@@ -764,136 +770,10 @@ class ProcessRequest():
         ### REST processing finished and OK
         json_data = JSonHelper("OK")
         json_data.set_data_type("response")
-        if schema != None:
-            json_data.add_data({"xpl" : str(msg_cmd)})
+        if stat_msg != None:
+            json_data.add_data({"xpl" : str(stat_msg)})
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_command_get_message(self, techno, address, command, params):
-        """ Generate xpl message for /command
-        """ 
-        ref = "%s/%s.xml" % (techno, command)
-        try:
-            xml_data = self.xml[ref]
-        except KeyError:
-            self.send_http_response_error(999, "No xml file for '%s'" % ref, \
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        ### Check xml validity
-        if xml_data.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
-            self.send_http_response_error(999, "'technology' attribute in xml file must be '%s'" % techno, \
-                                          self.jsonp, self.jsonp_cb)
-            return
-        if xml_data.getElementsByTagName("command")[0].attributes.get("name").value != command:
-            self.send_http_response_error(999, "'command' attribute in xml file must be '%s'" % command, \
-                                          self.jsonp, self.jsonp_cb)
-            return
-
-        ### Get only <command...> part
-        xml_command = xml_data.getElementsByTagName("command")[0]
-
-        ### Get data from xml
-        # Schema
-        schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        if xml_command.getElementsByTagName("command-xpl-value") == []:
-            has_command_key = False
-        else:
-            # command key name 
-            has_command_key = True
-            command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
-            # real command value in xpl message
-            command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
-
-        if xml_command.getElementsByTagName("address-key") == []:
-            has_address_key = False
-        else:
-            #address key name (device)
-            has_address_key = True
-            address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
-
-        # Parameters
-        #get and count parameters in xml file
-        parameters = xml_command.getElementsByTagName("parameters")[0]
-        #do the association between url and xml
-        parameters_value = {}
-        for param in parameters.getElementsByTagName("parameter"):
-            key = param.attributes.get("key").value
-            loc = param.attributes.get("location")
-            static_value = param.attributes.get("value")
-            if static_value is None:
-                if loc is None:
-                    loc.value = 0
-                if params == None:
-                    value = None
-                else:
-                    value = params[int(loc.value) - 1]
-            else:
-                value = static_value.value
-            if type(value).__name__ == "str":
-                value = unicode(urllib.unquote(value), "UTF-8")
-            parameters_value[key] = value
-
-        ### Create xpl message
-        msg = """xpl-cmnd
-{
-hop=1
-source=xpl-rest.domogik
-target=*
-}
-%s
-{
-""" % (schema)
-        if has_command_key == True:
-            msg += "%s=%s\n" % (command_key, command_xpl_value)
-        if has_address_key == True:
-            msg += "%s=%s\n" % (address_key, address)
-        for m_param in parameters_value.keys():
-            msg += "%s=%s\n" % (m_param, parameters_value[m_param])
-        msg += "}"
-        return msg
-
-
-
-
-    def _rest_command_get_listener(self, techno, address, command):
-        """ Create listener for /command 
-        """
-        xml_data = self.xml["%s/%s.xml" % (techno, command)]
-
-        ### Get only <command...> part
-        # nothing to do, tests have be done in get_command
-
-        xml_listener = xml_data.getElementsByTagName("listener")[0]
-
-        ### Get data from xml
-        # Schema
-        try:
-            schema = xml_listener.getElementsByTagName("schema")[0].firstChild.nodeValue
-        except IndexError:
-            # no schema data : we suppose we have <listener/>
-            # TODO : do it in a better way than using try: except:
-            return None, None, None
-
-        # xpl type
-        xpl_type = xml_listener.getElementsByTagName("xpltype")[0].firstChild.nodeValue
-
-        # Filters
-        filters = xml_listener.getElementsByTagName("filter")[0]
-        filters_value = {}
-        for my_filter in filters.getElementsByTagName("key"):
-            name = my_filter.attributes.get("name").value
-            value = my_filter.attributes.get("value").value
-            if value == "@address@":
-                value = address
-            filters_value[name] = value
-
-        return schema, xpl_type, filters_value
-
-
 
 
 ######
@@ -2018,7 +1898,6 @@ target=*
         json_data.set_data_type("device")
         try:
             device = self._db.add_device(self.get_parameters("name"), \
-                                         self.get_parameters("address"), \
                                          self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
@@ -2040,7 +1919,6 @@ target=*
         try:
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
-                                         self.get_parameters("address"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
@@ -2196,8 +2074,18 @@ target=*
             return
 
 
+    def _rest_plugin_json(self, id):
+        self.log.debug("Plugin : ask for plugin json")
 
-
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("pluginJson")
+        try:
+            pjson = PackageJson(id)
+            json_data.add_data(pjson.json)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
 
     def _rest_plugin_list(self):
         """ Send a xpl message to manager to get plugin list
@@ -4402,3 +4290,287 @@ target=*
         shutil.copyfileobj(my_file, self.wfile)
         my_file.close()
 
+##########
+# Xpl from DB part
+##########
+# XPL command
+    def _rest_base_xplcommand_del(self, id):
+        """ delete xplcommand
+            @param id : cmd id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommand")
+        try:
+            cmd = self._db.del_xpl_command(id)
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplcommand_add(self):
+        """ add person
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommand")
+        try:
+            cmd = self._db.add_xpl_command(self.get_parameters("schema"), \
+                                         self.get_parameters("reference"), \
+                                         self.get_parameters("device_id"), \
+                                         self.get_parameters("stat_id"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplcommand_update(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommand")
+        try:
+            cmd = self._db.update_xpl_command(self.get_parameters("id"), \
+                                         self.get_parameters("schema"), \
+                                         self.get_parameters("reference"), \
+                                         self.get_parameters("device_id"), \
+                                         self.get_parameters("stat_id"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+# XPL stat
+    def _rest_base_xplstat_del(self, id):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStat")
+        try:
+            stat = self._db.del_xpl_stat(id)
+            json_data.add_data(stat)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplstat_add(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStat")
+        try:
+            cmd = self._db.add_xpl_stat(self.get_parameters("schema"), \
+                                         self.get_parameters("reference"), \
+                                         self.get_parameters("device_id"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+     
+    def _rest_base_xplstat_update(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStat")
+        try:
+            cmd = self._db.update_xpl_stat(self.get_parameters("id"), \
+                                         self.get_parameters("schema"), \
+                                         self.get_parameters("reference"), \
+                                         self.get_parameters("device_id"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+# XPL stat param
+    def _rest_base_xplstatparam_del(self, id, key):
+        """ delete xplstatparam
+            @param id : statparam id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStatParam")
+        try:
+            stat = self._db.del_xpl_stat_param(id, key)
+            json_data.add_data(stat)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplstatparam_add(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStatParam")
+        try:
+            cmd = self._db.add_xpl_stat_param(self.get_parameters("stat-id"), \
+                                         self.get_parameters("key"), \
+                                         self.get_parameters("value"), \
+                                         self.get_parameters("static"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+     
+    def _rest_base_xplstatparam_update(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStatParam")
+        try:
+            cmd = self._db.update_xpl_stat_param(self.get_parameters("stat-id"), \
+                                         self.get_parameters("key"), \
+                                         self.get_parameters("value"), \
+                                         self.get_parameters("static"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+# XPL command param
+    def _rest_base_xplcommandparam_del(self, id, key):
+        """ delete xplcommandparam
+            @param id : commanparam id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommandParam")
+        try:
+            stat = self._db.del_xpl_command_param(id, key)
+            json_data.add_data(stat)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_xplcommandparam_add(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommandParam")
+        try:
+            cmd = self._db.add_xpl_command_param(self.get_parameters("cmd-id"), \
+                                         self.get_parameters("key"), \
+                                         self.get_parameters("value"), \
+                                         self.get_parameters("static"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+     
+    def _rest_base_xplcommandparam_update(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommandParam")
+        try:
+            cmd = self._db.update_xpl_command_param(self.get_parameters("cmd-id"), \
+                                         self.get_parameters("key"), \
+                                         self.get_parameters("value"), \
+                                         self.get_parameters("static"))
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_deviceparams(self, dev_type_id, json=True):
+        if json:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("deviceparams")
+        try:
+            # select device_technology_id FROM core_device_type WHERE id=dev_type_id
+            dt = self._db.get_device_type_by_id(dev_type_id)
+            if dt == None:
+                if json:
+                    json_data.set_error(code = 999, description = "This device type does not exists")
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
+            # get the json
+            pjson = PackageJson(dt.device_technology_id).json
+            if pjson['json_version'] < 2:
+                if json:
+                    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
+            # find the xpl commands that are neede for this feature
+            dtf = self._db.get_device_feature_model_by_device_type(dev_type_id)
+            cmd = None
+	    for xcmd  in pjson['xpl_commands']:
+                if xcmd['reference'] == dtf.xpl_command:
+                    cmd = xcmd
+                    break
+            if cmd is None:
+                if json:
+                    json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
+            # finc the xpl_stat message
+            stat = None
+            if 'stat_reference' in cmd:
+	        for xcmd  in pjson['xpl_stats']:
+                    if xcmd['reference'] == cmd['stat_reference']:
+                        stat = xcmd
+                        break
+            ret = {}
+            if json:
+                ret['xpl_cmd'] = cmd['parameters']['device']
+                ret['xpl_stat'] = stat['parameters']['device']
+                json_data.add_data(ret)
+            else:
+                ret['cmd'] = cmd
+                ret['stat'] = stat
+        except:
+            if json:
+                json_data.set_error(code = 999, description = self.get_exception())
+            else:
+                return None
+        # return the info
+        if json:
+            self.send_http_response_ok(json_data.get())
+        else:
+            return ret
+
+    def _rest_base_device_xpladd(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        devParams = ['name', 'type_id', 'usage_id', 'description', 'reference']
+        if self.get_parameters("type_id") == None:
+            json_data.set_error(code = 999, description = "type_id is required")
+            self.send_http_response_ok(json_data.get())
+            return
+        xpl = self._rest_base_deviceparams(self.get_parameters("type_id"), False)
+        # first add the device itself
+        try:
+            device = self._db.add_device(d_name=self.get_parameters("name"), \
+                                         d_type_id=self.get_parameters("type_id"), \
+                                         d_usage_id=self.get_parameters("usage_id"), \
+                                         d_description=self.get_parameters("description"), \
+                                         d_reference=self.get_parameters("reference"))
+            # add the xplstat
+            xplstat = self._db.add_xpl_stat(schema=xpl['stat']['schema'], reference=xpl['stat']['reference'], device_id=device.id)
+            # add the xplstatparams
+            for i in xpl['stat']['parameters']['static']:
+                p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=i['value'], static=True, stat_key=None)
+            for i in xpl['stat']['parameters']['dynamic']:
+                p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=None, static=False, stat_key=i['stat_key'])
+            for i in xpl['stat']['parameters']['device']:
+                # value should be provided in the url
+                if self.get_parameters("stat_%s" % (i['key'])) is not None:
+                   p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True, stat_key=None)
+            # add the xplcommand
+            xplcommand = self._db.add_xpl_command(schema=xpl['cmd']['schema'], reference=xpl['stat']['reference'], device_id=device.id, stat_id=xplstat.id)
+            # add the xplcommandparams
+            for i in xpl['cmd']['parameters']['static']:
+                p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=i['value'], static=True)
+            for i in xpl['cmd']['parameters']['dynamic']:
+                p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=None, static=False)
+            for i in xpl['cmd']['parameters']['device']:
+                # value should be provided in the url
+                if self.get_parameters("stat_%s" % (i['key'])) is not None:
+                   p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True)
+            # return the device
+            device.xplcommandid = xplcommand.id
+            json_data.add_data(device)
+        except:
+            
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())

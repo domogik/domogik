@@ -75,7 +75,7 @@ import calendar
 import tempfile
 from threading import Semaphore
 
-REST_API_VERSION = "0.6"
+REST_API_VERSION = "0.7"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
 ### parameters that can be overidden by Domogik config file
@@ -186,16 +186,12 @@ class Rest(XplPlugin):
                 self.log.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
                 self._design_dir = "%s/domogik_packages/design/" % self._package_path
-                self._xml_cmd_dir = "%s/domogik_packages/url2xpl/" % self._package_path
-                self._xml_stat_dir = "%s/domogik_packages/stats/" % self._package_path
                 self.package_mode = True
             else:
                 self.log.info("No package path defined in config file")
                 self._package_path = None
                 self._src_prefix = conf['src_prefix']
                 self._design_dir = "%s/share/domogik/design/" % conf['src_prefix']
-                self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['src_prefix']
-                self._xml_stat_dir = "%s/share/domogik/stats/" % conf['src_prefix']
                 self.package_mode = False
     
             # HTTP server ip and port
@@ -384,33 +380,6 @@ class Rest(XplPlugin):
    
             self._discover_hosts()
             
-            # Load xml files for /command
-            self.xml = {}
-            self.xml_date = None
-            self.load_xml()
-
-            # inotify for command files
-            wm = pyinotify.WatchManager() # Watch manager
-            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
-            notify_handler = EventHandler()
-            notify_handler.set_callback(self.load_xml)
-            notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
-            notifier.setName("thread_notifier")
-            notifier.start()
-            wdd = wm.add_watch(self._xml_cmd_dir, mask, rec = True)
-            self.add_stop_cb(notifier.stop)
-
-            # inotify for stat files
-            wm_stat = pyinotify.WatchManager() # Watch manager
-            mask_stat = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_DELETE | pyinotify.IN_CREATE # watched events
-            notify_handler_stat = EventHandler()
-            notify_handler_stat.set_callback(self.reload_stats)
-            notifier_stat = pyinotify.ThreadedNotifier(wm_stat, notify_handler_stat)
-            notifier_stat.setName("thread_notifier_stat")
-            notifier_stat.start()
-            wdd_stat = wm_stat.add_watch(self._xml_stat_dir, mask_stat, rec = True)
-            self.add_stop_cb(notifier_stat.stop)
-
             # Enable hbeat
             self.enable_hbeat()
 
@@ -756,35 +725,6 @@ class Rest(XplPlugin):
         print("Reload Stats")
         self.log.info("Reloading statistics manager. Its logs will be in a dedicated log file")
         self.stat_mgr.load()
-
-
-
-
-    def load_xml(self):
-        """ Load XML files for /command
-        """
-        # list technologies folders
-        time.sleep(1)
-        self.xml = {}
-        self.xml_ko = [] ## to list bad xml files
-        for root, dirs, files in os.walk(self._xml_cmd_dir):
-            for techno in dirs:
-                for command in os.listdir(self._xml_cmd_dir + "/" + techno):
-                    try:
-                        xml_file = self._xml_cmd_dir + "/" + techno + "/" + command
-                        if xml_file[-4:] == ".xml":
-                            self.log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
-                            self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
-                    except:
-                        msg = "Error while loading url2xpl files : %s" % traceback.format_exc()
-                        print(msg)
-                        self.log.error(msg)
-                        self.xml_ko.append("%s/%s" % (techno, command))
-                    
-        self.xml_date = datetime.datetime.now()
-
-
-
 
     def get_exception(self):
         """ Get exception and display it on stdout
