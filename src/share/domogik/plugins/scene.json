@@ -72,16 +72,16 @@
         "author": "Basilic",
         "author_email": "Basilic3@hotmail.com",
         "category": "Scene",
-        "changelog": "0.2\n- plugin creation",
+        "changelog": "0.2\n- plugin",
         "dependencies": [],
         "description": "Creation smal scene",
         "documentation": "http://wiki.domogik.org/",
         "domogik_min_version": "0.2.0",
         "id": "scene",
         "type": "plugin",
-        "version": "0.1a2"
+        "version": "0.2"
     },
-    "json_version": 2,
+    "json_version": 1,
     "technology": {
         "description": "Mini Scenario Project",
         "id": "scene",
