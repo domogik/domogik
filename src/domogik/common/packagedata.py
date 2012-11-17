@@ -60,6 +60,10 @@ class PackageData():
         if self.pkg["identity"]["type"] not in ["plugin", "external"]:
             print("Error : this package type is not recognized")
             exit()
+        # check if json version is at least 2
+        if self.pkg['json_version'] < 2:
+            print("Error : this package is to old for this version of domogik")
+            exit()
 
     def insert(self):
         """ Insert data for plugin
