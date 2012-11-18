@@ -31,4 +31,5 @@ The ports from this range could be freely used by plugins or anything else relat
 Application            Port
 ====================== =====
 Plugin : demodata      40440
+Plugin : proxy         40444
 ====================== =====
