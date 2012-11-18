@@ -39,17 +39,19 @@ The devices full description can be found in the **generic** external member doc
 Simulated devices 
 *****************
 
-===================== ====================== ===========================
-Feature               Device address         Remark
-===================== ====================== ===========================
-Temperature           demo_temperature       The values come from Paris
---------------------- ---------------------- ---------------------------
-Humidity              demo_humidity          The values come from Paris
---------------------- ---------------------- ---------------------------
-Pressure              demo_pressure          The values come from Paris
---------------------- ---------------------- ---------------------------
-Teleinfo              demo_teleingo          Fake generated values
-===================== ====================== ===========================
+===================== ===================================== ===========================
+Feature               Device address                        Remark
+===================== ===================================== ===========================
+Temperature           demo_temperature                      The values come from Paris
+--------------------- ------------------------------------- ---------------------------
+Humidity              demo_humidity                         The values come from Paris
+--------------------- ------------------------------------- ---------------------------
+Pressure              demo_pressure                         The values come from Paris
+--------------------- ------------------------------------- ---------------------------
+Teleinfo              demo_teleingo                         Fake generated values
+--------------------- ------------------------------------- ---------------------------
+Webcam                http://127.0.0.1:40406/webcam.jpg     640x480 jpg pictures
+===================== ===================================== ===========================
 
 Web controlled devices
 **********************
