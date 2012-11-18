@@ -234,6 +234,13 @@ class PackageManager():
             self.log("There is no file defined : the package won't be created")
             return
 
+        # check doc files exist
+        doc_path = DOC_PATH + "/external/%s/" % id
+        doc_fullpath = SRC_PATH + doc_path
+        if not os.path.isdir(doc_fullpath):
+            self.log("There is no documentation files in '%s' : the package won't be created" % doc_fullpath)
+            return
+
         if force == False:
             self.log("\nAre these informations OK ?")
             resp = raw_input("[o/N]")
@@ -255,7 +262,8 @@ class PackageManager():
                             output_dir,
                             pkg_json["all_files"], 
                             json_tmp_file,
-                            pkg_json["identity"]["icon_file"])
+                            pkg_json["identity"]["icon_file"],
+                            doc_fullpath)
 
 
     def _create_tar_gz(self, name, output_dir, files, info_file = None, icon_file = None, doc_path = None):

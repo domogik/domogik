@@ -1,0 +1,72 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+The demodata plugin has 2 main goals :
+
+* it simulates some virtual devices (temperature, teleinfo, ...)
+* it offers a web user interface in order you can simulate some physical devices (switch, rgb leds, ...)
+
+Alone this plugin is useless as it uses the **generic** external member features.
+
+With this plugin, you can test Domogik without having any hardware.
+
+After installation, the web user interface is available on http://127.0.0.1:40406
+
+.. todo:: 
+    Screenshot
+
+Dependencies
+============
+
+* Domogik external member **generic**.
+
+Plugin configuration
+====================
+
+.. todo:: 
+    There is actually nothing to configure.
+
+Creating devices for demodata
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+The devices full description can be found in the **generic** external member documentation. Here, we will list only the device address you must use for each feature :
+
+Simulated devices 
+*****************
+
+===================== ===================================== ===========================
+Feature               Device address                        Remark
+===================== ===================================== ===========================
+Temperature           demo_temperature                      The values come from Paris
+--------------------- ------------------------------------- ---------------------------
+Humidity              demo_humidity                         The values come from Paris
+--------------------- ------------------------------------- ---------------------------
+Pressure              demo_pressure                         The values come from Paris
+--------------------- ------------------------------------- ---------------------------
+Teleinfo              demo_teleingo                         Fake generated values
+--------------------- ------------------------------------- ---------------------------
+Webcam                http://127.0.0.1:40406/webcam.jpg     640x480 jpg pictures
+===================== ===================================== ===========================
+
+Web controlled devices
+**********************
+
+===================== ====================== ===========================
+Feature               Device address         Remark
+===================== ====================== ===========================
+RGB leds              demo_rgb_led           
+===================== ====================== ===========================
+
+Start the plugin
+----------------
+You can now start the plugin (start button) and use the created devices.
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place the widgets of your devices features on Domoweb.
+

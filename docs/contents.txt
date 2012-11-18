@@ -32,6 +32,7 @@ Table Of Content
     /technical/sensor
     /technical/device_feature_usage
     /technical/database
+    /technical/network_ports
     /technical/rinor/index
     /technical/rinor/statmgr
     /technical/rinor/rest_base
