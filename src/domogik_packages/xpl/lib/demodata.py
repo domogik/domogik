@@ -216,13 +216,6 @@ class DemoData():
         return diff_day
 
 
-#class DemoUI:
-#
-#    def __init__(self, server_address = ('', 40406)):
-#        self.web_server = BaseHTTPServer.HTTPServer(server_address, UIHandler)
-#        while True:
-#            self.web_server.handle_request() # serve_forever
-
 class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
 
     server_version= "DemoUI/1.1"
@@ -244,6 +237,8 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             self._get_file(path)
         elif path_elts[1] == "css":
             self._get_file(path)
+        elif path_elts[1] == "webcam.jpg":
+            self._display_webcam()
         else:
             self._send_http_response(404)
 
@@ -319,6 +314,17 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         home_file = "%s/index.html" % res_dir
         print home_file
         self._download_file(home_file)
+
+    def _display_webcam(self):
+        # get the resources folder
+        res_dir = self.server.handler_params[0].get_data_files_directory()
+        num = 0
+        now = datetime.datetime.now()
+        second = (now - now.replace(hour=0,minute=0,second=0)).seconds
+        num = second % 10
+        cam_file = "%s/webcam/webcam-%s.jpg" % (res_dir, num)
+        print cam_file
+        self._download_file(cam_file)
 
     def _download_file(self, file_name):
         """ Download a file
