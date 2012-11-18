@@ -4560,13 +4560,13 @@ class ProcessRequest():
             xplcommand = self._db.add_xpl_command(schema=xpl['cmd']['schema'], reference=xpl['stat']['reference'], device_id=device.id, stat_id=xplstat.id)
             # add the xplcommandparams
             for i in xpl['cmd']['parameters']['static']:
-                p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=i['value'], static=True)
+                p = self._db.add_xpl_command_param(cmd_id=xplcommand.id, key=i['key'], value=i['value'], static=True)
             for i in xpl['cmd']['parameters']['dynamic']:
-                p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=None, static=False)
+                p = self._db.add_xpl_command_param(cmd_id=xplcommand.id, key=i['key'], value=None, static=False)
             for i in xpl['cmd']['parameters']['device']:
                 # value should be provided in the url
                 if self.get_parameters("stat_%s" % (i['key'])) is not None:
-                   p = self._db.add_xpl_command_param(cmdid=xplstat.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True)
+                   p = self._db.add_xpl_command_param(cmd_id=xplcommand.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True)
             # return the device
             device.xplcommandid = xplcommand.id
             json_data.add_data(device)

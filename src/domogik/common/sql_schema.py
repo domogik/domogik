@@ -222,6 +222,7 @@ class Device(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
+    address = Column(Unicode(255), nullable=False)
     device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
