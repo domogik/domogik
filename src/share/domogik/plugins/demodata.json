@@ -36,7 +36,7 @@
     "technology": {
         "description": "Demo data",
         "id": "demodata", 
-        "name": "Demo data",
+        "name": "Demo data"
     }, 
     "udev-rules": []
 }
