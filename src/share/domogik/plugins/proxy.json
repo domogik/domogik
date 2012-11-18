@@ -21,7 +21,7 @@
             "type": "string"
         },
         {
-            "default": "40406",
+            "default": "40444",
             "description": "Port used by the proxy",
             "id": "2",
             "interface": "no",
