@@ -401,13 +401,16 @@ class DbHelper():
 ####
 # Device type
 ####
-    def list_device_types(self):
+    def list_device_types(self, plugin=None):
         """Return a list of device types
 
         @return a list of DeviceType objects
 
         """
-        return self.__session.query(DeviceType).all()
+        if plugin is not None:
+            return self.__session.query(DeviceType).filter_by(device_technology_id=ucode(plugin)).all()
+        else:
+            return self.__session.query(DeviceType).all()
 
     def get_device_type_by_name(self, dty_name):
         """Return information about a device type

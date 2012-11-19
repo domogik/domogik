@@ -114,6 +114,7 @@ class ProcessRequest():
             '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
             # /base/device_type
             '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
+            '^/base/device_type/list/by-plugin/(?P<name>[a-z0-9]+)$':			         '_rest_base_device_type_list_by_plugin',
             '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
             '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
             '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
@@ -159,7 +160,7 @@ class ProcessRequest():
             '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
             '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
             # device-params
-            '^/base/deviceparams/(?P<dev_type_id>[\.a-z0-9]+)$':                                   '_rest_base_deviceparams',
+            '^/base/deviceparams/(?P<dev_type_id>[\.a-z0-9]+)$':                                 '_rest_base_deviceparams',
         },
         'ncommand': {
             '^/ncommand/(?P<cmd_id>[0-9]+)/.*$':                                 		 'rest_ncommand',
@@ -1717,6 +1718,16 @@ class ProcessRequest():
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_type")
         for device_type in self._db.list_device_types():
+            json_data.add_data(device_type)
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_device_type_list_by_plugin(self, name):
+        """ list device types
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device_type")
+        for device_type in self._db.list_device_types(name):
             json_data.add_data(device_type)
         self.send_http_response_ok(json_data.get())
 
