@@ -1,0 +1,35 @@
+=============
+Network ports
+=============
+
+List of ports used by Domogik and related softwares
+===================================================
+
+Core range : 40400..40439 and 3865
+----------------------------------
+
+The ports from this range are dedicated to Domogik (and user interfaces) core features
+
+====================== ===========
+Application            Port
+====================== ===========
+xPL hub                3865
+---------------------- -----------
+Domogik : REST/Rinor   40405
+---------------------- -----------
+Domoweb UI             40404
+---------------------- -----------
+Zero MQ                40410~40413
+====================== ===========
+
+Plugin and other usages ranges : 40440..40499
+---------------------------------------------
+
+The ports from this range could be freely used by plugins or anything else related to Domogik. If you use a new port for some usage, please send it over the mailing list in order we could update this page.
+    
+====================== =====
+Application            Port
+====================== =====
+Plugin : demodata      40440
+Plugin : proxy         40444
+====================== =====

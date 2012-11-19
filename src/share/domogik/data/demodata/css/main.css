@@ -1,0 +1,7 @@
+body {
+    font-size: 11px;
+}
+
+.ok:after {
+    content: "foo";
+}

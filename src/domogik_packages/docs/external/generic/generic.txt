@@ -1,0 +1,375 @@
+=============================
+External member documentation
+=============================
+
+Purpose
+=======
+This external member is dedicated to be used by everyone with a xPL client (DIY or commercial product). It allows to use some generic features (temperature, teleinfo, ...) without needing to create a dedicated external member for the xPL client.
+
+
+Temperature
+===========
+
+Features
+--------
+
+* temperature
+
+.. |demo_temperature| image:: demo_temperature.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_temperature| | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Temperature                                                                        |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (temperature)                                                         |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+
+xPL message
+-----------
+
+The temperature feature is related to the **sensor.basic** message: 
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=temp
+    device=<device address>
+    current=<value>
+    }
+
+Humidity
+========
+
+Features
+--------
+
+* humidity
+
+.. |demo_humidity| image:: demo_humidity.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_humidity|    | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Humidity                                                                           |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage                                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+xPL message
+-----------
+
+The humidity feature is related to the **sensor.basic** message: 
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=humidity
+    device=<device address>
+    current=<value>
+    }
+
+Pressure
+========
+
+Features
+--------
+
+* pressure
+
+.. |demo_pressure| image:: demo_pressure.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_pressure|    | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Pressure                                                                           |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage                                                                       |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+xPL message
+-----------
+
+The pressure feature is related to the **sensor.basic** message:
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=pressure
+    device=<device address>
+    current=<value>
+    }
+
+Teleinfo
+========
+
+Features
+--------
+
+* Max power
+* Instant power
+* Off peak hours
+* Peak hours
+* Tariff period
+* Apparent power
+* Hourly group
+* Instant power 1
+* Instant power 2
+* Instant power 3
+* Max power 1
+* Max power 2
+* Max power 3
+
+.. |demo_teleinfo| image:: demo_teleinfo.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_teleinfo|    | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Teleinfo                                                                           |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (electricity)                                                         |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+xPL Message
+-----------
+
+* xpl-stat: ::
+
+    TELEINFO.BASIC
+    {
+    ADCO=<Adresse du compteur>
+    OPTARIF=<Option tarifaire>
+    ISOUSC=<Intensité souscrite>
+    BASE=<Index option base>
+    IINST=<Intensité instantanée>
+    IMAX=<Intensité maximale appelée>
+    MOTDETAT=<Mot d'état du compteur>
+    [HCHC=<Heures|creuses>]
+    [HCHP=<Heures|pleines>]
+    [EJPHN=<Heures|normales>]
+    [EJPHPM=<Heures|de pointe>]
+    [BBRHCJB=<Heures|creuses jours bleus>]
+    [BBRHPJB=<Heures|pleines jours bleus>]
+    [BBRHCJW=<Heures|creuses jours blancs>]
+    [BBRHPJW=<Heures|pleines jours blancs>]
+    [BBRHCJR=<Heures|creuses jours rouges>]
+    [BBRHPJR=<Heures|pleines jours rouges>]
+    [PEJP=<Préavis|début EJP (30min)>]
+    [PTEC=<Période|tarifaire actuelle>]
+    [DEMAIN=<Couleur|du lendemain>]
+    [ADPS=<Avertissement|de dépassement>]
+    [PAPP=<Puissance|apparente>]
+    [HHPHC=<Horaire|heure pleine/heure creuse>]
+    [PPOT=<Présence|des potentiels>]
+    [IINST1=<Intensité|instantanée phase 1>]
+    [IINST2=<Intensité|instantanée phase 2>]
+    [IINST3=<Intensité|instantanée phase 3>]
+    [IMAX1=<Intensité|maximale phase 1>]
+    [IMAX2=<Intensité|maximale phase 2>]
+    [IMAX3=<Intensité|maximale phase 3>]
+    [PMAX=<Puissance|maximale triphasée>]
+    }
+
+
+    TELEINFO.BASIC
+    {
+    ADIR1=<Dépassement d'intensité sur la phase 1>
+    ADIR2=<Dépassement d'intensité sur la phase 2>
+    ADIR3=<Dépassement d'intensité sur la phase 3>
+    ADCO=<Adresse du compteur>
+    IINST1=<Intensité instantanée phase 1>
+    IINST2=<Intensité instantanée phase 2>
+    IINST3=<Intensité instantanée phase 3>
+    }
+
+
+Tank level
+==========
+
+Features
+--------
+
+* level (%)
+* distance (distance between the level and the top of the tank)
+
+.. |demo_tank| image:: demo_tank.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_tank|        | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Tank                                                                               |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (water tank)                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+xPL message
+-----------
+
+The **level** feature is related to the **sensor.basic** message:
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=percent
+    device=<device address>
+    current=<value>
+    }
+
+The **distance** feature is related to the **sensor.basic** message:
+
+* xpl-stat or xpl-trig: ::
+
+    sensor.basic
+    {
+    type=distance
+    device=<device address>
+    current=<value>
+    }
+
+RGB leds
+========
+
+Features
+--------
+
+* color (set the leds color)
+* switch (switch on/off the leds)
+
+.. |demo_rgb_led| image:: demo_rgb_led.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_rgb_led|     | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.RGB leds controller                                                                |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (light)                                                               |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+xPL message
+-----------
+
+The **color** and **switch** features are related to the **arduino.rgb** message:
+
+* xpl-cmnd: ::
+
+    arduino.rgb
+    {
+    device=<device address>
+    command=setcolor
+    color=<value>
+    }
+
+  The Values for **color** can be :
+
+  * on : to switch on the leds
+  * off : to switch off the leds
+  * #ffffff : a RGB color code to set a color (if off, this should also switch on the leds)
+
+* xpl-stat or xpl-trig: ::
+
+    arduino.rgb
+    {
+    device=<device address>
+    command=setcolor
+    color=<value>
+    }
+
+  The Values for **color** can be :
+
+  * off : to switch off the leds
+  * #ffffff : a RGB color code to set a color (if off, this should also switch on the leds)
+
+  Notice that there is no **on** value for color as when the leds are switched on, we assume the color code is sent as the color value.
+
+
+Webcam
+======
+
+.. warning ::
+
+    This feature is present in the **generic** external member to allow the creation of webcam devices with the **demodata** plugin in order to simulate a camera. If you just need a camera feature, please install the **webcam** plugin.
+
+Features
+--------
+
+* webcam
+
+.. |demo_webcam| image:: demo_webcam.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_webcam|      | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device : http://ip:port/path/to/picture.jpg                             |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Webcam                                                                             |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (security camera)                                                     |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+

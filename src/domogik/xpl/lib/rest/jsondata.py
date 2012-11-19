@@ -39,7 +39,7 @@ import re
 import json
 
 
-MAX_DEPTH = 4
+MAX_DEPTH = 10
 
 
 class JSonHelper():
@@ -157,7 +157,7 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", \
                    "SystemStats", "SystemStatsValue", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel", "Page") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")

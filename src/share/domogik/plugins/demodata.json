@@ -1,0 +1,42 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "description": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }
+    ], 
+    "device_feature_models": [],
+    "device_types": [],
+    "files": [
+        "src/share/domogik/design/plugin/demodata/icon.png", 
+        "src/share/domogik/plugins/demodata.json", 
+        "src/domogik_packages/xpl/bin/demodata.py", 
+        "src/domogik_packages/xpl/lib/demodata.py"
+    ], 
+    "identity": {
+        "author": "Fritz", 
+        "author_email": "fritz.smh at gmail.com", 
+        "category": "demodata", 
+        "changelog": "0.1\n- plugin creation",
+        "dependencies": [],
+        "description": "Sends demo data over the xPL network to simulate some devives",
+        "documentation": "http://wiki.domogik.org/plugin_demodata", 
+        "domogik_min_version": "0.2.0", 
+        "id": "demodata", 
+        "type": "plugin", 
+        "version": "0.1a1"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "Demo data",
+        "id": "demodata", 
+        "name": "Demo data"
+    }, 
+    "udev-rules": []
+}
