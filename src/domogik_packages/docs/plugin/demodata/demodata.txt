@@ -14,7 +14,7 @@ Alone this plugin is useless as it uses the **generic** external member features
 
 With this plugin, you can test Domogik without having any hardware.
 
-After installation, the web user interface is available on http://127.0.0.1:40406
+After installation, the web user interface is available on http://127.0.0.1:40440
 
 .. todo:: 
     Screenshot
@@ -50,7 +50,7 @@ Pressure              demo_pressure                         The values come from
 --------------------- ------------------------------------- ---------------------------
 Teleinfo              demo_teleingo                         Fake generated values
 --------------------- ------------------------------------- ---------------------------
-Webcam                http://127.0.0.1:40406/webcam.jpg     640x480 jpg pictures
+Webcam                http://127.0.0.1:40440/webcam.jpg     640x480 jpg pictures
 ===================== ===================================== ===========================
 
 Web controlled devices

@@ -99,7 +99,7 @@ class DemoDataManager(XplPlugin):
         self.add_stop_cb(self.stop_http)
         self.server = None
         self.server_ip = ''
-        self.server_port = 40406
+        self.server_port = 40440
         self.start_http()
 
     def start_http(self):
