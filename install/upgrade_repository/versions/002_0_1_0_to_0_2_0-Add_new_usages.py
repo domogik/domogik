@@ -49,6 +49,12 @@ def upgrade(migrate_engine):
                    default_options='{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Closed&quot;, &quot;state1&quot;:&quot;Open&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
     insert.execute(id='security_camera', name='Security camera', description='Security camera',
                    default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
+    
+    #1490
+    if core_device_usage.select(whereclause="id='scene'").execute().fetchone() is None:
+        insert.execute(id='scene', name='Scene', description='Special for Scene plugin',
+                       default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;False&quot;, &quot;state1&quot;:&quot;True&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }')
+                   
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
@@ -58,3 +64,7 @@ def downgrade(migrate_engine):
     core_device_usage.delete(whereclause="id='christmas_tree'").execute()
     core_device_usage.delete(whereclause="id='portal'").execute()
     core_device_usage.delete(whereclause="id='security_camera'").execute()
+    
+    #1490
+    core_device_usage = Table(DeviceUsage.__tablename__, meta, autoload=True)
+    core_device_usage.delete(whereclause="id='scene'").execute()    
