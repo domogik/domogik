@@ -25,7 +25,7 @@ class MessagingReq(MessagingReqRep):
         self.s_req.connect(PORT_REQ)
     
     def send_request(self, category, action, request_content):
-        request_id = "%s.%s.%s.%s.%s" %(REQ_PREFIX, str(time.time()).replace('.','_'), category, action, MSG_VERSION)
+        request_id = "%s.%s.%s.%s.%s" %(REQ_PREFIX, category, action, str(time.time()).replace('.','_'), MSG_VERSION)
         request = {'id': request_id, 'content': request_content}
         self.s_req.send(json.dumps(request))
         print("\nRequest sent : %s, waiting for reply..." % request)
