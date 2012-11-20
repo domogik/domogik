@@ -30,6 +30,17 @@ categories = {
                                         ]
                                     }
                     ]
+    },
+    'database' : {
+                    'action' : ['insert'],
+                    'content' : [
+                                    {
+                                        'source': 'core_device', 
+                                        'data': [
+                                            {'id': '14', 'name': 'My device'}
+                                        ]
+                                    }
+                    ]
     },    
 }
 
