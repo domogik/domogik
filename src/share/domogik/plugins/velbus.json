@@ -57,6 +57,7 @@
                             "min_value": 0
                         }
                     ],
+                    "feature": [],
                     "dynamic": [
                         {
                             "key": "level",
@@ -86,10 +87,11 @@
                             "key": "address",
                             "description": "The decimal address",
                             "type": "integer",
-                            "max_value": 0,
-                            "min_value": 255
+                            "max_value": 255,
+                            "min_value": 0
                         }
                     ],
+                    "feature": [],
                     "dynamic": [
                         {
                              "key": "level",

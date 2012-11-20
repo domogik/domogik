@@ -184,14 +184,23 @@ class ProcessRequest():
         },
         # /log
         'log': {
-            # TODO
+            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
+            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
         },
         # /package
         'package': {
             '^/package/get-mode$':								 '_rest_package_get_mode',
             '^/package/list-repo$':							         '_rest_package_list_repo',
             '^/package/update-cahce$':								 '_rest_package_update_cache',
-            # TODO
+            '^/package/icon/available/(?P<type>[a-z]+)/(?P<id>[a-z]+)/(?P<version>[a-z0-9\.]+)$': '_rest_package_icon_available',
+            '^/package/icon/installed/(?P<type>[a-z]+)/(?P<id>[a-z]+)$':                         '_rest_package_icon_installed',
+            '^/package/available/(?P<host>[a-z]+)/(?P<pkg_type>[a-z]+)$':                        '_rest_package_available',
+            '^/package/installed/(?P<host>[a-z]+)/(?P<pkg_type>[a-z]+)$':	                 '_rest_package_installed',
+            '^/package/dependency/(?P<host>[a-z]+)/(?P<type>[a-z]+)/(?P<id>[a-z]+)/(?P<version>[a-z0-9\.]+)$': '_rest_package_dependency',
+            '^/package/install/(?P<host>[a-z]+)/(?P<type>[a-z]+)/(?P<id>[a-z]+)/(?P<version>[a-z0-9\.]+)$': '_rest_package_install',
+            '^/package/install_from_path/(?P<host>[a-z]+)$':    				 '_rest_package_install_from_path',
+            '^/package/uninstall/(?P<host>[a-z]+)/(?P<type>[a-z]+)/(?P<id>[a-z]+)$':		 '_rest_package_uninstall',
+            '^/package/download/(?P<type>[a-z]+)/(?P<id>[a-z]+)/(?P<version>[a-z0-9\.]+)$':	 '_rest_package_download',
         },
         # /plugin
         'plugin': {
@@ -206,10 +215,12 @@ class ProcessRequest():
             '^/plugin/config/list/by-name/(?P<hostname>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$': '_rest_plugin_config_list',
             '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                             '_rest_plugin_config_del',
             '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
-	    '^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
+	    '^/plugin/config/set/.*$':								     '_rest_plugin_config_set',
         },
 	# /queuecontent
-        # TODO
+        'queuecontent': {
+            '^/queuecontent/.*$':                                                                    'rest_queuecontent',
+        },
         # /repo
         'repo': {
             '^/repo/put$':                                                                           '_rest_repo_put',
@@ -4484,60 +4495,71 @@ class ProcessRequest():
             # select device_technology_id FROM core_device_type WHERE id=dev_type_id
             dt = self._db.get_device_type_by_id(dev_type_id)
             if dt == None:
-                if json:
-                    json_data.set_error(code = 999, description = "This device type does not exists")
-                    self.send_http_response_ok(json_data.get())
-                    return
-                else:
-                    return None
+                json_data.set_error(code = 999, description = "This device type does not exists")
+                self.send_http_response_ok(json_data.get())
+                return
             # get the json
             pjson = PackageJson(dt.device_technology_id).json
             if pjson['json_version'] < 2:
-                if json:
-                    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
-                    self.send_http_response_ok(json_data.get())
-                    return
-                else:
-                    return None
-            # find the xpl commands that are neede for this feature
-            dtf = self._db.get_device_feature_model_by_device_type(dev_type_id)
-            cmd = None
-	    for xcmd  in pjson['xpl_commands']:
-                if xcmd['reference'] == dtf.xpl_command:
-                    cmd = xcmd
-                    break
-            if cmd is None:
-                if json:
+                json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
+                self.send_http_response_ok(json_data.get())
+                return
+            ret = {}
+            ret['global'] = []
+            ret['xpl_stat'] = []
+            ret['xpl_cmd'] = []
+            # find all features for this device
+            for dtf in self._db.get_device_feature_model_by_device_type(dev_type_id):
+                # find the xpl commands that are neede for this feature
+                cmd = None
+    	        for xcmd in pjson['xpl_commands']:
+                    if xcmd['reference'] == dtf.xpl_command:
+                        cmd = xcmd
+                        break
+                if cmd is None:
                     json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
                     self.send_http_response_ok(json_data.get())
                     return
-                else:
-                    return None
-            # finc the xpl_stat message
-            stat = None
-            if 'stat_reference' in cmd:
-	        for xcmd  in pjson['xpl_stats']:
-                    if xcmd['reference'] == cmd['stat_reference']:
-                        stat = xcmd
-                        break
-            ret = {}
-            if json:
-                ret['xpl_cmd'] = cmd['parameters']['device']
-                ret['xpl_stat'] = stat['parameters']['device']
-                json_data.add_data(ret)
-            else:
-                ret['cmd'] = cmd
-                ret['stat'] = stat
+                # finc the xpl_stat message
+                stat = None
+                if 'stat_reference' in cmd:
+	            for xcmd in pjson['xpl_stats']:
+                        if xcmd['reference'] == cmd['stat_reference']:
+                            stat = xcmd
+                            break
+                    if stat is None:
+                        json_data.set_error(code = 999, description = "Can not find the correct xpl stat (%s) in the plugin json" % (cmd['stat_reference']) )
+                        self.send_http_response_ok(json_data.get())
+                        return
+                # append deviceprams
+                for p in cmd['parameters']['device']:
+                    ret['global'].append( p )
+                if stat is not None:
+                    for p in stat['parameters']['device']:
+                        ret['global'].append( p )
+                # append the xpl_cmd stuff
+                ft = {}
+                ft['name'] = dtf.name
+                ft['id'] = dtf.id
+                ft['params'] = []
+                for p in cmd['parameters']['feature']:
+                    ft['params'].append( p )
+                ret['xpl_cmd'].append(ft)
+                # append the xpl_stat stuff
+                if stat is not None:
+                    ft = {}
+                    ft['name'] = dtf.name
+                    ft['id'] = dtf.id
+                    ft['params'] = []
+                    for p in stat['parameters']['feature']:
+                        ft['params'].append( p )
+                    ret['xpl_stat'].append(ft)
+            ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
+            json_data.add_data(ret)
         except:
-            if json:
-                json_data.set_error(code = 999, description = self.get_exception())
-            else:
-                return None
+            json_data.set_error(code = 999, description = self.get_exception())
         # return the info
-        if json:
-            self.send_http_response_ok(json_data.get())
-        else:
-            return ret
+        self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_xpladd(self):
         json_data = JSonHelper("OK")
@@ -4556,6 +4578,12 @@ class ProcessRequest():
                                          d_usage_id=self.get_parameters("usage_id"), \
                                          d_description=self.get_parameters("description"), \
                                          d_reference=self.get_parameters("reference"))
+            dev = {}
+            dev['name'] = self.get_parameters("name")
+            dev['type_id'] = self.get_parameters("type_id")
+            dev['usage_id'] = self.get_parameters("usage_id")
+            dev['description'] = self.get_parameters("description")
+            dev['reference'] = self.get_parameters("reference")
             # add the xplstat
             xplstat = self._db.add_xpl_stat(schema=xpl['stat']['schema'], reference=xpl['stat']['reference'], device_id=device.id)
             # add the xplstatparams

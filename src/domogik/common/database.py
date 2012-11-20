@@ -620,7 +620,7 @@ class DbHelper():
         @return a DeviceFeatureModel object
 
         """
-        return self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dt)).first()
+        return self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dt)).all()
 
 
 ####
