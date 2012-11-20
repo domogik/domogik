@@ -11,8 +11,26 @@ from time import sleep
 print("PUB-SUB emitter sample")
 
 categories = {
-    'package' : ['installed', 'uninstalled'],
-    'plugin' : ['enabled', 'disabled'],
+    'package' : {
+                    'action' : ['installed', 'uninstalled'], 
+                    'content': ['package1', 'package2']
+    },
+    'plugin' : {
+                    'action' : ['enabled', 'disabled'],
+                    'content' : ['teleinfo', 'zwave', 'x10', 'plcbus']
+    },
+    'device' : {
+                    'action' : ['send_value'],
+                    'content' : [
+                                    {
+                                        'source': 'rfxcom', 
+                                        'device_id': 3, 
+                                        'data': [
+                                            {'value': '13', 'key': 'temperature'}
+                                        ]
+                                    }
+                    ]
+    },    
 }
 
 content = ["Domogik is really cool", "I like Domoweb", "Domogik is magic"]
@@ -21,7 +39,7 @@ pub_event = MessagingEventPub()
 
 while True:
     category = choice(categories.keys())
-    action = choice(categories[category])
-    j_content = json.dumps({"content" : "%s" % choice(content)})
+    action = choice(categories[category]['action'])
+    j_content = json.dumps({"content" : "%s" % choice(categories[category]['content'])})
     pub_event.send_event(category, action, j_content)
 
