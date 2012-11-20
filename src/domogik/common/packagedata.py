@@ -60,6 +60,10 @@ class PackageData():
         if self.pkg["identity"]["type"] not in ["plugin", "external"]:
             print("Error : this package type is not recognized")
             exit()
+        # check if json version is at least 2
+        if self.pkg['json_version'] < 2:
+            print("Error : this package is to old for this version of domogik")
+            exit()
 
     def insert(self):
         """ Insert data for plugin
@@ -100,41 +104,41 @@ class PackageData():
         ### Device feature model
         for device_feature_model in self.pkg["device_feature_models"]:
             print("Device feature model %s" % device_feature_model["id"])
-            print("M.P=%s" % device_feature_model["parameters"])
             if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:
                 # add if not exists
                 print("add...")
                 if device_feature_model["feature_type"] == "sensor":
-                    self._db.add_sensor_feature_model(device_feature_model["id"],
-                                                      device_feature_model["name"],
-                                                      device_feature_model["device_type_id"],
-                                                      device_feature_model["value_type"],
-                                                      device_feature_model["parameters"],
-                                                      device_feature_model["stat_key"])
+                    self._db.add_sensor_feature_model(sf_id = device_feature_model["id"],
+                                                      sf_name = device_feature_model["name"],
+                                                      sf_device_type_id = device_feature_model["device_type_id"],
+                                                      sf_value_type = device_feature_model["value_type"],
+                                                      sf_unit= device_feature_model["unit"])
                 elif device_feature_model["feature_type"] == "actuator":
-                    self._db.add_actuator_feature_model(device_feature_model["id"],
-                                                        device_feature_model["name"],
-                                                        device_feature_model["device_type_id"],
-                                                        device_feature_model["value_type"],
-                                                        device_feature_model["return_confirmation"],
-                                                        device_feature_model["parameters"],
-                                                        device_feature_model["stat_key"])
+                    self._db.add_actuator_feature_model(af_id = device_feature_model["id"],
+                                                        af_name = device_feature_model["name"],
+                                                        af_device_type_id = device_feature_model["device_type_id"],
+                                                        af_value_type = device_feature_model["value_type"],
+                                                        af_xpl_command = device_feature_model["xpl_command"],
+                                                        af_value_field = device_feature_model["value_field"],
+                                                        af_values = device_feature_model["values"],
+                                                        af_stat_key = af_device_feature_model["stat_key"])
             else:
                 # update if exists
                 print("update...")
                 if device_feature_model["feature_type"] == "sensor":
-                    self._db.update_sensor_feature_model(device_feature_model["id"],
-                                                      device_feature_model["name"],
-                                                      device_feature_model["parameters"],
-                                                      device_feature_model["value_type"],
-                                                      device_feature_model["stat_key"])
+                    self._db.update_sensor_feature_model(sf_id = device_feature_model["id"],
+                                                      sf_name = device_feature_model["name"],
+                                                      sf_value_type = device_feature_model["value_type"],
+                                                      sf_stat_key = device_feature_model["stat_key"],
+                                                      sf_unit= device_feature_model["unit"])
                 elif device_feature_model["feature_type"] == "actuator":
-                    self._db.update_actuator_feature_model(device_feature_model["id"],
-                                                        device_feature_model["name"],
-                                                        device_feature_model["parameters"],
-                                                        device_feature_model["value_type"],
-                                                        device_feature_model["return_confirmation"],
-                                                        device_feature_model["stat_key"])
+                    self._db.update_actuator_feature_model(af_id = device_feature_model["id"],
+                                                        af_name = device_feature_model["name"],
+                                                        af_value_type = device_feature_model["value_type"],
+                                                        af_xpl_command = device_feature_model["xpl_command"],
+                                                        af_value_field = device_feature_model["value_field"],
+                                                        af_values = device_feature_model["values"],
+                                                        af_stat_key = device_feature_model["stat_key"])
         
         
        

@@ -34,86 +34,154 @@
             "type": "string"
         }
     ], 
+    "xpl_commands": [
+         {
+            "reference": "setlevel",
+            "schema": "lighting.basic",
+            "stat_reference": "get_level",
+            "parameters": {
+                    "static": [],
+                    "device": [
+                        {
+                            "key": "channel",
+                            "description": "The channel number",
+                            "type": "integer",
+                            "max_value": 4,
+                            "min_value": 1
+                        },
+                        {
+                            "key": "address",
+                            "description": "The decimal address",
+                            "type": "integer",
+                            "max_value": 255,
+                            "min_value": 0
+                        }
+                    ],
+                    "feature": [],
+                    "dynamic": [
+                        {
+                            "key": "level",
+                            "type": "integer",
+                            "max_value": 255,
+                            "min_value": 0
+                        }
+                    ]
+                }
+         }
+    ],
+    "xpl_stats": [
+       {
+            "reference": "get_level",
+            "schema": "lighting.device",
+            "parameters": {
+                    "static": [],
+                     "device": [
+                        {
+                            "key": "channel",
+                            "description": "The channel number",
+                            "type": "integer",
+                            "max_value": 4,
+                            "min_value": 1
+                        },
+                        {
+                            "key": "address",
+                            "description": "The decimal address",
+                            "type": "integer",
+                            "max_value": 255,
+                            "min_value": 0
+                        }
+                    ],
+                    "feature": [],
+                    "dynamic": [
+                        {
+                             "key": "level",
+                             "stat_key": "level"
+                        }
+                    ]
+                }
+       }
+    ],
     "device_feature_models": [
         {
             "device_type_id": "velbus.relay", 
             "feature_type": "actuator", 
             "id": "velbus.relay.switch", 
             "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}", 
-            "return_confirmation": "1", 
             "stat_key": "level", 
-            "value_type": "binary"
+            "value_type": "binary",
+            "xpl_command": "setlevel",
+            "value_field": "level",
+            "values": [0, 255]
         }, 
         {
             "device_type_id": "velbus.dimmer", 
             "feature_type": "actuator", 
             "id": "velbus.dimmer.switch", 
             "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}", 
-            "return_confirmation": "1", 
             "stat_key": "level", 
-            "value_type": "binary"
+            "value_type": "binary",
+            "xpl_command": "setlevel",
+            "value_field": "level",
+            "values": [0, 255]
         }, 
         {
             "device_type_id": "velbus.dimmer", 
             "feature_type": "actuator", 
             "id": "velbus.dimmer.change", 
             "name": "Dimmer", 
-            "parameters": "{&quot;command&quot;:&quot;setlevel&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:255}", 
-            "return_confirmation": "1", 
             "stat_key": "level", 
-            "value_type": "range"
+            "value_type": "range",
+            "xpl_command": "setlevel",
+            "value_field": "",
+            "values": ""
         }, 
         {
             "device_type_id": "velbus.shutter", 
             "feature_type": "actuator", 
             "id": "velbus.shutter.switch", 
             "name": "Shutter", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}", 
-            "return_confirmation": "1", 
             "stat_key": "command", 
-            "value_type": "binary"
+            "value_type": "binary",
+            "xpl_command": "setlevel",
+            "value_field": "level",
+            "values": ["up", "down"]
         },
         {
             "device_type_id": "velbus.temp", 
             "feature_type": "sensor", 
             "id": "velbus.temp.current", 
             "name": "Current temperature", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
             "stat_key": "current", 
-            "value_type": "number"
+             "value_type": "number",
+            "unit": "C"
         }, 
         {
             "device_type_id": "velbus.temp", 
             "feature_type": "sensor", 
             "id": "velbus.temp.lowest", 
             "name": "Lowest temperature", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "lowest", 
-            "value_type": "number"
-        }, 
+            "stat_key": "current", 
+            "value_type": "number",
+            "unit": "C"
+        },
         {
+        
             "device_type_id": "velbus.temp", 
             "feature_type": "sensor", 
             "id": "velbus.temp.highest", 
             "name": "Highest temperature", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
             "stat_key": "highest", 
-            "value_type": "number"
+            "value_type": "number",
+            "unit": "C"
  	},
         {
             "device_type_id": "velbus.input", 
             "feature_type": "sensor", 
             "id": "velbus.input.state", 
             "name": "State of a velbus input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
             "stat_key": "current", 
-            "value_type": "string"
+            "value_type": "string",
+            "unit": ""
         } 
     ], 
     "device_types": [
@@ -176,7 +244,7 @@
         "type": "plugin", 
         "version": "0.5.0"
     }, 
-    "json_version": 1, 
+    "json_version": 2, 
     "technology": {
         "description": "Velbus http://www.velbus.eu", 
         "id": "velbus", 

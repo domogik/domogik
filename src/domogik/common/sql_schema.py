@@ -58,7 +58,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relation, backref, relationship
 
 from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
@@ -221,8 +221,8 @@ class Device(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
-    address = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(30))
+    address = Column(Unicode(255), nullable=False)
     device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
@@ -230,7 +230,7 @@ class Device(Base):
     device_stats = relation("DeviceStats", backref=__tablename__, cascade="all, delete")
     device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
-    def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
+    def __init__(self, name, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
 
         @param name : short name of the device
@@ -242,7 +242,6 @@ class Device(Base):
 
         """
         self.name = ucode(name)
-        self.address = ucode(address)
         self.reference = ucode(reference)
         self.device_type_id = device_type_id
         self.device_usage_id = device_usage_id
@@ -250,8 +249,8 @@ class Device(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>"\
-               % (self.id, self.name, self.address, self.description, self.reference,\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s)>"\
+               % (self.id, self.name, self.description, self.reference,\
                   self.device_type, self.device_usage)
 
     @staticmethod
@@ -269,14 +268,18 @@ class DeviceFeatureModel(Base):
     feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
-    parameters = Column(UnicodeText())
+    #parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
     stat_key = Column(Unicode(30))
-    return_confirmation = Column(Boolean, nullable=False)
+    #return_confirmation = Column(Boolean, nullable=False)
+    xpl_command = Column(Unicode(255), nullable=True)
+    value_field = Column(Unicode(32), nullable=True)
+    values = Column(Unicode(255), nullable=True)
+    unit = Column(Unicode(32), nullable=True)
     device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
-    def __init__(self, id, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
-                return_confirmation=False):
+    def __init__(self, id, name, feature_type, device_type_id, value_type, stat_key=None, \
+                xpl_command=None, value_field=None, values=None):
         """Class constructor
 
         @param id : device feature id
@@ -284,11 +287,11 @@ class DeviceFeatureModel(Base):
         @param feature_type : device feature type (actuator / sensor)
         @param device_type_id : device type id
         @param value_type : value type the actuator can accept / the sensor can return
-        @param parameters : parameters about the command or the returned data associated to the device, optional
         @param stat_key : key reference in the core_device_stats table, optional
-        @param return_confirmation : True if the device returns a confirmation after having executed a command, optional (default False)
-                                     Only relevant for actuators
-
+        Parameters only for actuators
+            @xpl_command
+            @value_field
+            @values
         """
         self.id = ucode(id)
         self.name = ucode(name)
@@ -303,15 +306,16 @@ class DeviceFeatureModel(Base):
                             % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
         self.value_type = ucode(value_type)
-        self.parameters = ucode(parameters)
         self.stat_key = ucode(stat_key)
-        self.return_confirmation = return_confirmation
+        self.xpl_command = ucode(xpl_command)
+        self.value_field = ucode(value_field)
+        self.values = ucode(values)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceFeatureModel(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>"\
-               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type,\
-                  self.stat_key, self.return_confirmation)
+        return "<DeviceFeatureModel(%s, %s, device_type=%s, value_type=%s, stat_key=%s, xpl_command=%s, value_field=%s, values=%s)>"\
+               % (self.id, self.feature_type, self.device_type, self.value_type,\
+                  self.stat_key, self.xpl_command, self.value_field, self.values)
 
     @staticmethod
     def get_tablename():
@@ -510,3 +514,107 @@ class UIItemConfig(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return UIItemConfig.__tablename__
+
+class XplStat(Base):
+    __tablename__ = '%s_xplstat' % _db_prefix
+    id = Column(Integer, primary_key=True) 
+    schema = Column(Unicode(32))
+    reference = Column(Unicode(255))
+    device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
+    params = relationship("XplStatParam")
+    
+    def __init__(self, schema, reference, device_id):
+        self.schema = ucode(schema)
+        self.reference = ucode(reference)
+        self.device_id = device_id
+   
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplStat(id=%s schema='%s' reference='%s', device_id=%s, params=%s)>"\
+               % (self.id, self.schema, self.reference, self.device_id, self.params)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplStat.__tablename__
+
+
+class XplStatParam(Base):
+    __tablename__ = '%s_xplstat_params' % _db_prefix
+    xplstat_id = Column(Integer, ForeignKey(XplStat.id), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value = Column(Unicode(255))
+    static = Column(Boolean)
+    stat_key = Column(Unicode(32))
+    UniqueConstraint('xplstat_id', 'key', name='uix_1')
+
+    def __init__(self, xplstat_id, key, value, static, stat_key):
+        self.xplstat_id = xplstat_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+        self.static = static
+        self.stat_key = ucode(stat_key)
+    
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplStatParam(stat_id=%s key='%s' value='%s', static=%s)>"\
+               % (self.xplstat_id, self.key, self.value, self.static)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplStatParam.__tablename__
+
+
+class XplCommand(Base):
+    __tablename__ = '%s_xplcommand' % _db_prefix
+    id = Column(Integer, primary_key=True) 
+    schema = Column(Unicode(32))
+    reference = Column(Unicode(255))
+    device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
+    stat_id = Column(Integer, ForeignKey(XplStat.__tablename__ + ".id"))
+    params = relationship("XplCommandParam")
+
+    def __init__(self, schema, reference, device_id, stat_id):
+        self.schema = ucode(schema)
+        self.reference = ucode(reference)
+        self.device_id = device_id
+        self.stat_id = stat_id
+    
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplCommand(id=%s schema='%s' reference='%s', device_id=%s, stat_id=%s, params=%s)>"\
+               % (self.id, self.schema, self.reference, self.device_id, self.stat_id, self.params)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplCommand.__tablename__
+
+
+class XplCommandParam(Base):
+    __tablename__ = '%s_xplcommand_params' % _db_prefix
+    xplcmd_id = Column(Integer, ForeignKey(XplCommand.id), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value = Column(Unicode(255))
+    static = Column(Boolean)
+    UniqueConstraint('xplcmd_id', 'key', name='uix_1')
+
+    def __init__(self, cmd_id, key, value, static):
+        self.xplcmd_id = cmd_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+        self.static = static
+    
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplCommandParam(cmd_id=%s key='%s' stat_key='%s' value='%s', static=%s)>"\
+               % (self.xplcmd_id, self.key, self.stat_key, self.value, self.static)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return XplCommandParam.__tablename__
+
+
+
