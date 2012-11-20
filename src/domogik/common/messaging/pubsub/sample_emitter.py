@@ -53,4 +53,5 @@ while True:
     action = choice(categories[category]['action'])
     j_content = json.dumps({"content" : "%s" % choice(categories[category]['content'])})
     pub_event.send_event(category, action, j_content)
+    sleep(1)
 

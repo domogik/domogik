@@ -25,7 +25,6 @@ class MessagingEventPub(MessagingEvent):
         self.s_send.send(content)
         self.s_send.send(msg_id, zmq.SNDMORE)
         print("Message sent : %s : %s" % (msg_id, content))
-        sleep(1)
 
 class MessagingEventSub(MessagingEvent):
     def __init__(self, category_filter=None, action_filter=None):
