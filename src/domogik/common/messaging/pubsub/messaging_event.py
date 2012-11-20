@@ -41,12 +41,11 @@ class MessagingEventSub(MessagingEvent):
     
     def wait_for_event(self):
         message_id = self.s_recv.recv()
-        print("Message id : %s" % message_id)
         more = self.s_recv.getsockopt(zmq.RCVMORE)
         if more:
+            print("Message id : %s" % message_id)
             message_content = self.s_recv.recv(zmq.RCVMORE)
-            #print("Message content : %s" % message_content)
             return message_content
         else:
-            print("nothing more")
-        
+            print("Message not complete!")
+            return None
