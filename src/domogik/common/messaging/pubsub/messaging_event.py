@@ -4,7 +4,7 @@
 # Utility class to publish / subscribe pattern
 
 import zmq
-from time import sleep
+from time import sleep, time
 
 MSG_VERSION = "0_1"
 PORT_PUB = "tcp://localhost:5559"
@@ -21,7 +21,7 @@ class MessagingEventPub(MessagingEvent):
         self.s_send.connect(PORT_PUB)
     
     def send_event(self, category, action, content):
-        msg_id = "%s.%s.%s" %(category, action, MSG_VERSION)
+        msg_id = "%s.%s.%s.%s" %(category, action, str(time()).replace('.','_'), MSG_VERSION)
         self.s_send.send(content)
         self.s_send.send(msg_id, zmq.SNDMORE)
         print("Message sent : %s : %s" % (msg_id, content))
