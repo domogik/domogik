@@ -43,6 +43,7 @@ from types import DictType
 
 import json
 import sqlalchemy
+from sqlalchemy import Table, MetaData
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker,scoped_session
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
@@ -1141,6 +1142,14 @@ class DbHelper():
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
+        
+        # Use this method rather than cascade deletion (much faster)
+        meta = MetaData(bind=DbHelper.__engine)
+        t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
+        result = self.__session.execute(
+            t_stats.delete().where(t_stats.c.device_id == d_id)
+        )
+        
         self.__session.delete(device)
         try:
             self.__session.commit()
