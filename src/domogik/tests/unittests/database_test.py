@@ -442,8 +442,6 @@ class DeviceTestCase(GenericTestCase):
         assert len(db.list_devices()) == 0
 
     def test_add(self):
-        area1 = db.add_area('area1','description 1')
-        room1 = db.add_room('room1', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         du1 = db.add_device_usage('du1_id', 'du1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
@@ -464,9 +462,6 @@ class DeviceTestCase(GenericTestCase):
         assert len(db.list_devices()) == 2
 
     def test_list_and_get(self):
-        area1 = db.add_area('Basement','description 1')
-        room1 = db.add_room('Kitchen', area1.id)
-        room2 = db.add_room('Bathroom', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('appliance', 'Appliance')
@@ -486,9 +481,6 @@ class DeviceTestCase(GenericTestCase):
         assert search_dev2 == None
 
     def test_update(self):
-        area1 = db.add_area('area1','description 1')
-        room1 = db.add_room('room1', area1.id)
-        room2 = db.add_room('room2', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1_id', 'du1')
@@ -511,10 +503,6 @@ class DeviceTestCase(GenericTestCase):
         assert device1.device_usage_id == du2.id
 
     def test_del(self):
-        area1 = db.add_area('area1','description 1')
-        area2 = db.add_area('area2','description 2')
-        room1 = db.add_room('room1', area1.id)
-        room2 = db.add_room('room2', area2.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1_id', 'du1')
@@ -573,8 +561,6 @@ class DeviceStatsTestCase(GenericTestCase):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
-        area1 = db.add_area('area1','description 1')
-        room1 = db.add_room('room1', area1.id)
 
         # Add device stats
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
@@ -663,8 +649,6 @@ class DeviceStatsTestCase(GenericTestCase):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
-        area1 = db.add_area('area1','description 1')
-        room1 = db.add_room('room1', area1.id)
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = db.add_device(d_name='device2', d_address = "A2", d_type_id = dty1.id, d_usage_id = du1.id)
 
@@ -872,8 +856,6 @@ class DeviceStatsTestCase(GenericTestCase):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
-        area1 = db.add_area('area1','description 1')
-        room1 = db.add_room('room1', area1.id)
         device1 = db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
         device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
 
