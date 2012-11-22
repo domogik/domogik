@@ -32,7 +32,7 @@ Bugs
 ====
 1 -
 In cronAPI.send_xpl_job : the call to rinor freeze the system until the response is received.
-This causes the list of plugin to disappear ... sometimes for a log time
+This causes the list of plugin to disappear ... sometimes for a long time
 This may occur when using an old devices and plugin is disabled
 2 - Done
 When parsing an alarm, ... and when the error is detected, the job is created but no aps jobs are created
@@ -111,7 +111,8 @@ import traceback
 
 class Cron(XplHlpPlugin):
     '''
-    Manage
+    The plugin itself.
+
     '''
     def __init__(self):
         """
@@ -139,15 +140,15 @@ class Cron(XplHlpPlugin):
 
         self.helpers =   \
            {
-#             "list" :
-#              {
-#                "cb" : self._cron.helpers.helper_list,
-#                "desc" : "List devices (cron jobs) or apschechuler jobs (for debugging).",
-#                "usage" : "list devices | aps]",
-#                "min-args" : 1,
-#                "param-list" : "which",
-#                "which" : "devices : show the plugin cron jobs | aps : show the APScheduler jobs (for debugging)",
-#              },
+             "list" :
+              {
+                "cb" : self._cron.helpers.helper_list,
+                "desc" : "List devices (cron jobs) or apschechuler jobs (for debugging).",
+                "usage" : "list [devices | aps]",
+                "min-args" : 1,
+                "param-list" : "which",
+                "which" : "devices : show the plugin cron jobs | aps : show the APScheduler jobs (for debugging)",
+              },
              "memory" :
               {
                 "cb" : self._cron.helpers.helper_memory,
@@ -195,12 +196,15 @@ class Cron(XplHlpPlugin):
         self.enable_helper()
         self.enable_hbeat()
         self.add_stop_cb(self._cron.jobs.stop_scheduler)
+        self.add_stop_cb(self._cron.stop_timer)
         self.log.info("Plugin cron correctly started.")
 
     def request_cmnd_cb(self, message):
         """
         General callback for timer.request messages
+
         @param message : an XplMessage object
+
         """
         self.log.debug("request_cmnd_cb() : Start ...")
         self._cron.request_listener(message)
@@ -209,7 +213,9 @@ class Cron(XplHlpPlugin):
     def basic_cmnd_cb(self, message):
         """
         General callback for timer.basic messages
+
         @param message : an XplMessage object
+
         """
         self.log.debug("basic_cmnd_cb() : Start ...")
         self._cron.basic_listener(message)

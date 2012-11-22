@@ -28,7 +28,6 @@ Implements
 class CronQuery
 
 @author: Sebastien GALLET <sgallet@gmail.com>
-@author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -64,15 +63,15 @@ class CronQuery():
 
     def query(self, device, configmess, extkey=None):
         '''
-        Ask the config system for the value. Calling this function will make
+        Ask the cron system for a device(job). Calling this function will make
         your program wait until it got an answer
 
-        @param technology : the technology of the item requesting the value,
-        must exists in the config database
-        @param element : the name of the element which requests config, None if
+        @param device : the device to query
+        @param configmess : the name of the job which requests config, None if \
         it's a technolgy global parameter
-        @param key : the key to fetch corresponding value, if it's an empty string,
+        @param extkey : the key to fetch corresponding value, if it's an empty string, \
         all the config items for this technology will be fetched
+
         '''
         liste = Listener(self._query_cb, self.__myxpl, {'schema': 'timer.basic',
                                                     'xpltype': 'xpl-trig',

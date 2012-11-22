@@ -67,6 +67,10 @@ class CronStore():
     def __init__(self, log, data_dir):
         """
         Initialise the store engine. Create the directory if necessary.
+
+        @param log : the logger
+        @param data_dir : the data directory where store the cron files
+
         """
         self._log = log
         self._data_files_dir = data_dir
@@ -82,6 +86,9 @@ class CronStore():
         Load all jobs from the filesystem. Parse all the *.job files
         in directory and call the callback ùethod to add it to the cron
         jobs.
+
+        @param add_job_cb : callback to the function who add the job to CronJobs
+
         """
         for jobfile in glob.iglob(self._data_files_dir+"/*.job") :
             config = ConfigParser.ConfigParser()
@@ -93,6 +100,9 @@ class CronStore():
                 data[option] = config.get('Job', option)
             for option in config.options('Stats'):
                 data[option] = config.get('Stats', option)
+            if config.has_section('Sensor'):
+                for option in config.options('Sensor'):
+                    data['sensor_'+option] = config.get('Sensor', option)
             if config.has_section('Timers'):
                 timers = set()
                 for option in config.options('Timers'):
@@ -111,6 +121,9 @@ class CronStore():
     def _get_jobfile(self, job):
         """
         Return the filename associated to a job.
+
+        @param job : the job name
+
         """
         return os.path.join(self._data_files_dir, job + ".job")
 
@@ -118,6 +131,10 @@ class CronStore():
         """
         Must be called when a job is started. Is also ( indirectly)
         called when a job is resumed.
+
+        @param job : the job name
+        @param data : a dict() containing the parameters of the job
+
         """
         try:
             self._log.debug("cronJobs.store_on_start : job %s" % \
@@ -151,6 +168,10 @@ class CronStore():
                         for al in data[key] :
                             config.set('Alarms', str(alarm_idx), al)
                             alarm_idx = alarm_idx + 1
+                elif key.startswith("sensor_") :
+                    if not config.has_section('Sensor'):
+                        config.add_section('Sensor')
+                    config.set('Sensor', key[7:], data[key])
                 elif key in self._statfields:
                     if key == "createtime":
                         config.set('Stats', key, data[key])
@@ -177,6 +198,9 @@ class CronStore():
         """
         Must be called when a job is halted. It deletes the file
         associated to the job.
+
+        @param job : the job name
+
         """
         try:
             self._log.debug("cronJobs.store_on_halt : job %s" % \
@@ -192,6 +216,12 @@ class CronStore():
     def on_stop(self, job, uptime, runtime, runs):
         """
         Must be called when a job is stopped.
+
+        @param job : the job name
+        @param uptime : the uptime of the job
+        @param runtime : the runtime of the job
+        @param runs : the number of job's run
+
         """
         try:
             self._log.debug("cronJobs.store_on_stop : job %s" % \
@@ -217,7 +247,33 @@ class CronStore():
     def on_resume(self, job):
         """
         Must be called when a job is resumed.
+
+        @param job : the job name
+
         """
+
+    def on_fire(self, job, status):
+        """
+        Must be called when a job is fired.
+
+        @param job : the job name
+        @param status : the status of the sensor associated to the job
+
+        """
+        try:
+            self._log.debug("cronJobs.store_on_fire : job %s" % \
+                job)
+            config = ConfigParser.ConfigParser()
+            config.read(self._get_jobfile(job))
+            config.set('Sensor', "status", status)
+            with open(self._get_jobfile(job), 'w') as configfile:
+                config.write(configfile)
+                configfile.close
+            return ERROR_NO
+        except:
+            self._log.error("cronJobs.store_on_fire : " + \
+                traceback.format_exc())
+            return ERROR_STORE
 
 class CronTools():
     """
@@ -226,8 +282,10 @@ class CronTools():
     def is_valid_hour(self, hour):
         """
         Test the format of an hour. Valid format is HH:MM
-        @parameter hour The hour to test
-        @return True if hour is valid
+
+        @parameter hour: The hour to test
+        @return: True if hour is valid
+
         """
         try:
             #t = datetime.time(int(hour[0:2]), int(hour[3:5]))
@@ -240,8 +298,10 @@ class CronTools():
     def is_valid_int(self, number):
         """
         Test if number is an integer
-        @parameter number The number to test
-        @return True if number is an integer
+
+        @parameter number: The number to test
+        @return: True if number is an integer
+
         """
         try:
             t = int(number)
@@ -253,8 +313,10 @@ class CronTools():
         """
         Tranform an XPL date "yyyymmddhhmmss" to datetime
         form
-        @parameter xpldate The xpldate to transform
-        @return A datetime object if everything went fine. None otherwise.
+
+        @parameter xpldate: The xpldate to transform
+        @return: A datetime object if everything went fine. None otherwise.
+
         """
         try:
             y = int(xpldate[0:4])
@@ -270,10 +332,12 @@ class CronTools():
     def date_to_xpl(self, sdate):
         """
         Tranform an datetime date to an xpl one "yyyymmddhhmmss"
-        form
-        @parameter sdate The datetime to transform
-        @return A string representing the xpl date if everything \
+        form.
+
+        @parameter sdate: The datetime to transform
+        @return: A string representing the xpl date if everything \
             went fine. None otherwise.
+
         """
         try:
             h = "%.2i" % sdate.hour
@@ -289,7 +353,12 @@ class CronTools():
 
     def delta_hour(self, h1, h2):
         """
-        Return the delta between 2 hours
+        Calculate the delta between 2 hours.
+
+        @param h1: the first hour
+        @param h2: the second hour
+        @return: the delta between 2 hours
+
         """
         dummy_date = datetime.date(1, 1, 1)
         full_h1 = datetime.datetime.combine(dummy_date, \
@@ -303,7 +372,12 @@ class CronTools():
 
     def add_hour(self, h, s):
         """
-        Add an seconds to an hour
+        Add seconds to an hour.
+
+        @param h: the hour
+        @param h2: the seconds to add
+        @return: the new hour
+
         """
         dummy_date = datetime.date(1, 1, 1)
         full_h = datetime.datetime.combine(dummy_date, \
@@ -314,6 +388,10 @@ class CronTools():
     def error(self, code):
         """
         Return the error text of an error code
+
+        @param code: the error code
+        @return: the message corresponding to error code
+
         """
         errorcode = code
         error = CRONERRORS[code]
