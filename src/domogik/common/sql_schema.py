@@ -279,7 +279,7 @@ class DeviceFeatureModel(Base):
     device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, id, name, feature_type, device_type_id, value_type, stat_key=None, \
-                xpl_command=None, value_field=None, values=None):
+                xpl_command=None, value_field=None, values=None, unit=None):
         """Class constructor
 
         @param id : device feature id
@@ -310,6 +310,7 @@ class DeviceFeatureModel(Base):
         self.xpl_command = ucode(xpl_command)
         self.value_field = ucode(value_field)
         self.values = ucode(values)
+        self.unit = ucode(unit)
 
     def __repr__(self):
         """Return an internal representation of the class"""

@@ -121,7 +121,7 @@ class PackageData():
                                                         af_xpl_command = device_feature_model["xpl_command"],
                                                         af_value_field = device_feature_model["value_field"],
                                                         af_values = device_feature_model["values"],
-                                                        af_stat_key = af_device_feature_model["stat_key"])
+                                                        af_stat_key = device_feature_model["stat_key"])
             else:
                 # update if exists
                 print("update...")
