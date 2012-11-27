@@ -25,28 +25,28 @@
         {
             "device_type_id": "cron.job",
             "feature_type": "actuator",
-            "id": "cron.job.switch",
-            "name": "Switch",
+            "id": "cron.job.run",
+            "name": "Run",
             "parameters": "{&quot;action&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;resume&quot;}",
-            "return_confirmation": "0",
-            "stat_key": "current",
-            "value_type": "binary"
-        },
-        {
-            "device_type_id": "cron.job",
-            "feature_type": "actuator",
-            "id": "cron.job.halt",
-            "name": "Halt",
-            "parameters": "{&quot;action&quot;:&quot;&quot;,&quot;value0&quot;:&quot;halt&quot;, &quot;value1&quot;:&quot;resume&quot;}",
-            "return_confirmation": "0",
-            "stat_key": "current",
+            "return_confirmation": "1",
+            "stat_key": "state",
             "value_type": "binary"
         },
         {
             "device_type_id": "cron.job",
             "feature_type": "sensor",
-            "id": "cron.job.status",
-            "name": "Sensor",
+           "id": "cron.job.started",
+            "name": "Started",
+            "parameters": "{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stopped&quot;, &quot;value1&quot;:&quot;started&quot;}",
+            "return_confirmation": "0",
+            "stat_key": "state",
+            "value_type": "boolean"
+        },
+        {
+            "device_type_id": "cron.job",
+            "feature_type": "sensor",
+            "id": "cron.job.fired",
+            "name": "Fired",
             "parameters": "{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}",
             "return_confirmation": "0",
             "stat_key": "current",
@@ -87,7 +87,7 @@
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "cron",
-        "changelog": "0.2a1\n - Add UI commands\n0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
+        "changelog": "0.3\n - Add device auto-creation\n0.2a1\n - Add UI commands\n0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
         "dependencies": [
             {
                 "id": "apscheduler (>=2.0.2)",

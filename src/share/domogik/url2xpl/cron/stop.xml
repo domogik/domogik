@@ -10,7 +10,7 @@
     <schema>timer.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="current" value="stopped" />
+      <key name="state" value="stopped" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>

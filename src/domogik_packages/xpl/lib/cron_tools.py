@@ -38,6 +38,9 @@ import traceback
 import ConfigParser
 import os
 import glob
+import json
+import urllib2
+import urllib
 
 ERROR_NO = 0
 ERROR_PARAMETER = 1
@@ -47,7 +50,8 @@ ERROR_DEVICE_NOT_STARTED = 12
 ERROR_DEVICE_NOT_STOPPED = 13
 ERROR_SCHEDULER = 20
 ERROR_STORE = 30
-ERROR_NOT_IMPLEMENTED = 40
+ERROR_REST = 40
+ERROR_NOT_IMPLEMENTED = 50
 
 CRONERRORS = { ERROR_NO: 'No error',
                ERROR_PARAMETER: 'Missing or wrong parameter',
@@ -57,7 +61,120 @@ CRONERRORS = { ERROR_NO: 'No error',
                ERROR_DEVICE_NOT_STOPPED: "Device/alarm is not stopped",
                ERROR_SCHEDULER: 'Error with the scheduler (APS)',
                ERROR_STORE: 'Error with the store',
+               ERROR_REST: 'Error with REST',
                }
+
+class CronRest():
+    """
+    Manipulate Domogik's devices associated to the cron jobs through the rest interface
+    """
+    def __init__(self, rest_ip, rest_port, log):
+        #self._rest_ip = rest_ip
+        #self._rest_port = rest_port
+        self._log = log
+        self._rest = "http://%s:%s" % (rest_ip, rest_port)
+
+    def list(self):
+        """
+        List all Domogik's devices associated to cron jobs
+
+        The associated rest url is :
+        http://192.168.14.167:40405/base/device/list
+
+        @ return None or a dict
+
+        """
+        the_url = "%s/base/device/list" % (self._rest)
+        req = urllib2.Request(the_url)
+        handle = urllib2.urlopen(req)
+        devices = handle.read()
+        ret = json.loads(devices)
+        self._log.debug("CronRest.list : %s" % ret)
+        if ret["status"] == "OK" :
+            #self._log.debug("CronRest.list : type ret['device'] = %s" % type(ret["device"]))
+            return ret["device"]
+        else :
+            return None
+
+    def _get_id(self, job):
+        """
+        Return the id of a Domogik's device associated to a cron job
+
+        @param job : the cron job
+        @ return None or the Domogik's device id
+
+        """
+        devices = self.list()
+        if devices != None :
+            for device in devices :
+                if device["name"] == job["device"] \
+                  and device["address"] == job["device"] \
+                  and device["device_type"]["device_technology_id"] == "cron" :
+                    return device["id"]
+            return None
+        else :
+            return None
+
+    def add(self, job, label):
+        """
+        Add the Domogik's device associated to a cron job
+
+        The associated rest url is :
+        http://192.168.14.167:40405/base/device/add/name/dname/address/daddress/type_id/cron.job/usage_id/light/description/desc/reference/ref
+
+        @param job : the cron job
+        @return True if delete successfull, False otherwise
+
+        """
+        try:
+            name = job["device"]
+            address = job["device"]
+            device_type = "cron.job"
+            usage = "light"
+            ref = urllib.quote("Cron job %s" % job["devicetype"])
+            desc = urllib.quote("%s" % label)
+            the_url = "%s/base/device/add/name/%s/address/%s/type_id/%s/usage_id/%s/description/%s/reference/%s//" % \
+                (self._rest, name, address, device_type, usage, desc, ref)
+            req = urllib2.Request(the_url)
+            handle = urllib2.urlopen(req)
+            rest_ret = handle.read()
+            #self._log.debug("CronRest.add : rest_ret=%s" % rest_ret)
+            ret = json.loads(rest_ret)
+            self._log.debug("CronRest.add : ret=%s" % ret)
+            if ret["status"] == "OK" :
+                return True
+            else :
+                return False
+        except:
+            self._log.error("rest.add : " + \
+                traceback.format_exc())
+            return False
+
+    def delete(self, job):
+        """
+        Delete a Domogik's device associated to cron job
+
+        The associated rest url is :
+        http://192.168.14.167:40405/base/device/del/device_id
+
+        @param job : the cron job
+        @return True if delete successfull, False otherwise
+
+        """
+        the_id = self._get_id(job)
+        if the_id != None :
+            the_url = "%s/base/device/del/%s" % (self._rest, the_id)
+            req = urllib2.Request(the_url)
+            handle = urllib2.urlopen(req)
+            rest_ret = handle.read()
+            ret = json.loads(rest_ret)
+            self._log.debug("CronRest.delete : %s" % ret)
+            if ret["status"] == "OK" :
+                return True
+            else :
+                return False
+        else :
+            return False
 
 class CronStore():
     """
@@ -79,7 +196,7 @@ class CronStore():
         if not os.path.isdir(self._data_files_dir):
             os.mkdir(self._data_files_dir, 0770)
         self._badfields = ["action", "starttime", "uptime", "runtime"]
-        self._statfields = ["current", "runs", "createtime"]
+        self._statfields = ["current", "state", "runs", "createtime"]
 
     def load_all(self, add_job_cb):
         """
@@ -155,6 +272,7 @@ class CronStore():
                         config.add_section('Timers')
                     if type(data[key])==type(""):
                         config.set('Timers', str(timer_idx), data[key])
+                        timer_idx = timer_idx + 1
                     else:
                         for tim in data[key] :
                             config.set('Timers', str(timer_idx), tim)
@@ -164,6 +282,7 @@ class CronStore():
                         config.add_section('Alarms')
                     if type(data[key])==type(""):
                         config.set('Alarms', str(alarm_idx), data[key])
+                        alarm_idx = alarm_idx + 1
                     else:
                         for al in data[key] :
                             config.set('Alarms', str(alarm_idx), al)
@@ -183,7 +302,7 @@ class CronStore():
                     config.set('Job', key, data[key])
             if not config.has_section('Stats'):
                 config.add_section('Stats')
-            config.set('Stats', "current", "started")
+            config.set('Stats', "state", "started")
             with open(self._get_jobfile(job), 'w') \
                     as configfile:
                 config.write(configfile)
@@ -228,7 +347,7 @@ class CronStore():
                 job)
             config = ConfigParser.ConfigParser()
             config.read(self._get_jobfile(job))
-            config.set('Stats', "current", "stopped")
+            config.set('Stats', "state", "stopped")
             config.set('Stats', "runs", runs)
             #oldruntime = 0
             #if config.has_option('Stats','runtime'):
