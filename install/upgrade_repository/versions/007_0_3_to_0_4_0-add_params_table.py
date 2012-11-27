@@ -1,6 +1,6 @@
 from sqlalchemy import *
 from migrate import *
-from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, DeviceFeatureModel
+from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, DeviceFeatureModel, Device
 from domogik.common import database_utils
 
 def upgrade(migrate_engine):
@@ -41,6 +41,10 @@ def upgrade(migrate_engine):
     if database_utils.column_exists(migrate_engine, DeviceFeatureModel.__tablename__, 'return_confirmation'):
         c = Column('return_confimation', Boolean, nullable=False)
         c.drop(table) 
+
+    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'address'):
+        dev= Table(Device.__tablename__, meta, autoload=True)
+        dev.c.address.alter(nullable=True)
 
 def downgrade(migrate_engine):
     # bind the engine

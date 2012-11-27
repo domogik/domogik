@@ -4495,15 +4495,21 @@ class ProcessRequest():
             # select device_technology_id FROM core_device_type WHERE id=dev_type_id
             dt = self._db.get_device_type_by_id(dev_type_id)
             if dt == None:
-                json_data.set_error(code = 999, description = "This device type does not exists")
-                self.send_http_response_ok(json_data.get())
-                return
+                if json:
+                    json_data.set_error(code = 999, description = "This device type does not exists")
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
             # get the json
             pjson = PackageJson(dt.device_technology_id).json
             if pjson['json_version'] < 2:
-                json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
-                self.send_http_response_ok(json_data.get())
-                return
+                if json:
+                    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
+                    self.send_http_response_ok(json_data.get())
+                    return
+                else:
+                    return None
             ret = {}
             ret['global'] = []
             ret['xpl_stat'] = []
@@ -4517,9 +4523,12 @@ class ProcessRequest():
                         cmd = xcmd
                         break
                 if cmd is None:
-                    json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
-                    self.send_http_response_ok(json_data.get())
-                    return
+                    if json:
+                        json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
+                        self.send_http_response_ok(json_data.get())
+                        return
+                    else:
+                        return None
                 # finc the xpl_stat message
                 stat = None
                 if 'stat_reference' in cmd:
@@ -4528,9 +4537,12 @@ class ProcessRequest():
                             stat = xcmd
                             break
                     if stat is None:
-                        json_data.set_error(code = 999, description = "Can not find the correct xpl stat (%s) in the plugin json" % (cmd['stat_reference']) )
-                        self.send_http_response_ok(json_data.get())
-                        return
+                        if json:
+                            json_data.set_error(code = 999, description = "Can not find the correct xpl stat (%s) in the plugin json" % (cmd['stat_reference']) )
+                            self.send_http_response_ok(json_data.get())
+                            return
+                        else:
+                            return None
                 # append deviceprams
                 for p in cmd['parameters']['device']:
                     ret['global'].append( p )
@@ -4541,6 +4553,7 @@ class ProcessRequest():
                 ft = {}
                 ft['name'] = dtf.name
                 ft['id'] = dtf.id
+                ft['schema'] = cmd['schema']
                 ft['params'] = []
                 for p in cmd['parameters']['feature']:
                     ft['params'].append( p )
@@ -4550,16 +4563,23 @@ class ProcessRequest():
                     ft = {}
                     ft['name'] = dtf.name
                     ft['id'] = dtf.id
+                    ft['schema'] = stat['schema']
                     ft['params'] = []
                     for p in stat['parameters']['feature']:
                         ft['params'].append( p )
                     ret['xpl_stat'].append(ft)
             ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
-            json_data.add_data(ret)
+            if json:
+                json_data.add_data(ret)
         except:
-            json_data.set_error(code = 999, description = self.get_exception())
+            if json:
+                json_data.set_error(code = 999, description = self.get_exception())
+            else:
+                return None
         # return the info
-        self.send_http_response_ok(json_data.get())
+        if json:
+            self.send_http_response_ok(json_data.get())
+        return ret
 
     def _rest_base_device_xpladd(self):
         json_data = JSonHelper("OK")
