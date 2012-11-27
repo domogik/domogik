@@ -454,6 +454,27 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id).all()
 
+    def list_device_feature_by_device_id(self, df_device_id):
+        """List device features for a given device id
+
+        @param df_device_id : device id
+        @return a list of DeviceFeature objects
+
+        """
+        return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id).all()
+
+    def list_device_feature_by_device_feature_model_id(self, df_device_feature_model_id):
+        """List device features for a given device id
+
+        @param df_device_feature_model_id : device feature model id
+        @return a list of DeviceFeature objects
+
+        """
+        return self.__session.query(
+                        DeviceFeature
+                    ).filter_by(device_feature_model_id=df_device_feature_model_id
+                    ).all()        
+
 ####
 # Device feature models
 ####
@@ -738,34 +759,6 @@ class DbHelper():
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dfm
-
-####
-# Device Feature
-####
-    def list_device_features(self):
-        """List all device features"""
-        return self.__session.query(DeviceFeature).all()
-
-    def list_device_feature_by_device_id(self, df_device_id):
-        """List device features for a given device id
-
-        @param df_device_id : device id
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id).all()
-
-    def list_device_feature_by_device_feature_model_id(self, df_device_feature_model_id):
-        """List device features for a given device id
-
-        @param df_device_feature_model_id : device feature model id
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(
-                        DeviceFeature
-                    ).filter_by(device_feature_model_id=df_device_feature_model_id
-                    ).all()
 
 ####
 # Device technology
