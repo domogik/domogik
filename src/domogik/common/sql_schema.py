@@ -227,7 +227,8 @@ class Device(Base):
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
-    device_stats = relation("DeviceStats", backref=__tablename__, cascade="all, delete")
+    # No cascade deletion here : done "manually" in database.py when removing a device
+    device_stats = relation("DeviceStats", backref=__tablename__)
     device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
