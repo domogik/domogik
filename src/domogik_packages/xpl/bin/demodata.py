@@ -99,7 +99,7 @@ class DemoDataManager(XplPlugin):
         self.add_stop_cb(self.stop_http)
         self.server = None
         self.server_ip = ''
-        self.server_port = 40440
+        self.server_port = 40406
         self.start_http()
 
     def start_http(self):
@@ -168,15 +168,19 @@ class DemoDataManager(XplPlugin):
     def cmd_lighting_basic(self, message):
         device = message.data['device']
         command = message.data['command']
+        if message.data.has_key('fade-rate'):
+            fade_rate = message.data['fade-rate']
+        else: 
+            fade_rate = None
         if message.data.has_key('level'):
             level = message.data['level']
         else: 
             level = None
         # send symetric answer to simulate the device
-        self.send_lighting_basic(device, command, level)
+        self.send_lighting_basic(device, command, level, fade_rate)
 
-    def send_lighting_basic(self, device, command, level = None):
-        print("lighting.basic : device=%s, command=%s, level=%s" % (device, command, level))
+    def send_lighting_basic(self, device, command, level = None, fade_rate = None):
+        print("lighting.basic : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate))
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema("lighting.basic")
@@ -184,6 +188,8 @@ class DemoDataManager(XplPlugin):
         msg.add_data({ 'command' : command })
         if level != None:
             msg.add_data({ 'level' : level })
+        if fade_rate != None:
+            msg.add_data({ 'fade-rate' : fade_rate })
         self.myxpl.send(msg)
 
 
