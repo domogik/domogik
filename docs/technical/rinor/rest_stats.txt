@@ -225,13 +225,37 @@ Example json response: ::
                 "value" : "HIGH",
                 "key" : "ping",
                 "date" : "2010-07-21 16:02:14",
-                "device_id" : 3
+                "device_id" : 3,
+                "exists" : "True"
             },        {
                 "timestamp" : 1286566868,
                 "value" : "LOG",
                 "key" : "command",
                 "date" : "2010-07-22 16:02:14",
                 "device_id" : 5
+                "exists" : "True"
+            },
+            ...
+        ]
+    }
+
+Example json response with a device which not exists: ::
+
+    {
+        "status" : "OK",
+        "code" : 0,
+        "description" : "None",
+        "stats" : [
+            {
+                "timestamp" : 1286226868,
+                "value" : "HIGH",
+                "key" : "ping",
+                "date" : "2010-07-21 16:02:14",
+                "device_id" : 3,
+                "exists" : "True"
+            },        {
+                "device_id" : 666,
+                "exists" : "False"
             },
             ...
         ]

@@ -99,6 +99,61 @@
             });
             event.stopPropagation();
         });
+
+        /* Dimmer */
+        $('#dimmer_on').button();
+        $('#dimmer_off').button();
+        $('#dimmer_off').click(function(event) {
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: './dimmer',
+                data: 'level=0',
+                success: function(msg) {
+                    $("#container").notify("create", {
+                        title: 'Dimmer',
+                        text: 'Command sended.'
+                    });
+                }
+            });
+            event.stopPropagation();
+        });
+        $('#dimmer_on').click(function(event) {
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: './dimmer',
+                data: 'level=100',
+                success: function(msg) {
+                    $("#container").notify("create", {
+                        title: 'Dimmer',
+                        text: 'Command sended.'
+                    });
+                }
+            });
+            event.stopPropagation();
+        });
+        $( "#dimmer_value" ).slider({
+            value:100,
+            min: 0,
+            max: 100,
+            step: 1,
+            change: function( event, ui ) {
+                console.log($('#dimmer_value').slider("value"));
+                $.ajax({
+                    type: 'POST',
+                    cache: false,
+                    url: './dimmer',
+                    data: 'level='+$('#dimmer_value').slider("value"),
+                    success: function(msg) {
+                        $("#container").notify("create", {
+                            title: 'Dimmer',
+                            text: 'Level sended : ' + $('#dimmer_value').slider("value")
+                        });
+                    }
+                });
+            }
+        });
     });         
     </script>
   </head>                                                                 
@@ -116,6 +171,7 @@
           <li>Webcam : device = <a href='http://127.0.0.1:40406/webcam.jpg'>http://127.0.0.1:40406/webcam.jpg</a></li>
         </ul>
       </div>
+
       <h2>RGB controller (device : demo_rgb_led)</h2>
       <div>
         Color : 
@@ -125,10 +181,20 @@
         Switch the leds : <button id="rgb_off"><span>off</span></button>
         <button id="rgb_on"><span>on (#ffffff)</span></button>
       </div>
+
       <h2>Switch (device : demo_switch)</h2>
       <div>
         Set the switch : <button id="switch_off"><span>off</span></button>
         <button id="switch_on"><span>on</span></button>
+      </div>
+
+      <h2>Dimmer (device : demo_dimmer)</h2>
+      <div>
+        Set the dimmer : <button id="dimmer_off"><span>off</span></button>
+        <button id="dimmer_on"><span>on</span></button>
+        <br/>
+        Set the level : 
+        <div id="dimmer_value"></div>
       </div>
     </div>
 
