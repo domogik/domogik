@@ -22,9 +22,8 @@ class MessagingEventPub(MessagingEvent):
     
     def send_event(self, category, action, content):
         msg_id = "%s.%s.%s.%s" %(category, action, str(time()).replace('.','_'), MSG_VERSION)
-        # Messages are sent using LIFO : so msg_id will we received first!
-        self.s_send.send(content)
         self.s_send.send(msg_id, zmq.SNDMORE)
+        self.s_send.send(content)
         print("Message sent : %s : %s" % (msg_id, content))
 
 class MessagingEventSub(MessagingEvent):
