@@ -33,7 +33,7 @@ Result: ::
             {
                 "timestamp" : 1286226868,
                 "value" : "HIGH",
-                "key" : "ping",
+                "skey" : "ping",
                 "date" : "2010-07-21 16:02:14",
                 "device_id" : 3
             },
@@ -101,27 +101,27 @@ Example
                     {
                         "timestamp" : 1286226868,
                         "value" : "22.6875",
-                        "key" : "temperature",
+                        "skey" : "temperature",
                         "date" : "2010-10-04 23:14:28",
                         "device_id" : 4
                     },
                     {
                         "timestamp" : 1286226884,
                         "value" : "22.6875",
-                        "key" : "temperature",
+                        "skey" : "temperature",
                         "date" : "2010-10-04 23:14:44",
                         "device_id" : 4
                     },
                     {
                         "timestamp" : 1286226899,
                         "value" : "22.6875",
-                        "key" : "temperature",
+                        "skey" : "temperature",
                         "date" : "2010-10-04 23:14:59",
                         "device_id" : 4
                     },
                     ...
                 ],
-                "key" : "temperature",
+                "skey" : "temperature",
                 "device_id" : "4"
             }
         ]
@@ -203,7 +203,7 @@ Example
                     ],
                     ...
                 ],
-                "key" : "temperature",
+                "skey" : "temperature",
                 "device_id" : "4"
             }
         ]
@@ -223,14 +223,14 @@ Example json response: ::
             {
                 "timestamp" : 1286226868,
                 "value" : "HIGH",
-                "key" : "ping",
+                "skey" : "ping",
                 "date" : "2010-07-21 16:02:14",
                 "device_id" : 3,
                 "exists" : "True"
             },        {
                 "timestamp" : 1286566868,
                 "value" : "LOG",
-                "key" : "command",
+                "skey" : "command",
                 "date" : "2010-07-22 16:02:14",
                 "device_id" : 5
                 "exists" : "True"
@@ -249,7 +249,7 @@ Example json response with a device which not exists: ::
             {
                 "timestamp" : 1286226868,
                 "value" : "HIGH",
-                "key" : "ping",
+                "skey" : "ping",
                 "date" : "2010-07-21 16:02:14",
                 "device_id" : 3,
                 "exists" : "True"
