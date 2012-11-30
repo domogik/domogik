@@ -103,6 +103,7 @@ class ProcessRequest():
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
+            '^/base/device/addglobal/.*$':		 	                                 '_rest_base_device_addglobal',
             '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
             '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
             '^/base/device/xpladd/.*$':                                                          '_rest_base_device_xpladd',
@@ -1910,7 +1911,11 @@ class ProcessRequest():
             json_data.add_data(device, exclude=['device_stats'])
         self.send_http_response_ok(json_data.get())
 
-
+    def _rest_base_device_addglobal(self):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_add(self):
         """ add devices
@@ -1924,7 +1929,23 @@ class ProcessRequest():
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
-            json_data.add_data(device)
+            js = self._rest_base_deviceparams(self.get_parameters("type_id"), json=False)
+            ret = {}
+            ret["device"] = device
+            ret["stats"] = []
+            ret["cmds"] = []
+            for stat in js['xpl_stat']:
+                xplstat = self._db.add_xpl_stat(schema=stat['schema'], reference=stat['reference'], device_id=device.id)
+                ret["stats"].append( {'reference': stat['reference'], 'id': xplstat.id} )
+            for cmd in js['xpl_cmd']:
+                ststid = None
+                if cmd['stat_reference'] is not None:
+                    for stat in ret["stats"]:
+                        if stat['reference'] == cmd['stat_reference']:
+                            statid = stat['id']
+                xplcommand = self._db.add_xpl_command(schema=cmd['schema'], reference=cmd['reference'], device_id=device.id, stat_id=statid)
+                ret["cmds"].append( {'reference': cmd['reference'], 'id': xplcommand.id} )
+            json_data.add_data(ret)
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
         except:
@@ -4554,6 +4575,11 @@ class ProcessRequest():
                 ft['name'] = dtf.name
                 ft['id'] = dtf.id
                 ft['schema'] = cmd['schema']
+                ft['reference'] = cmd['reference']
+                if stat is not None:
+                    ft['stat_reference'] = stat['reference']
+                else:
+                    ft['stat_reference'] = None
                 ft['params'] = []
                 for p in cmd['parameters']['feature']:
                     ft['params'].append( p )
@@ -4564,6 +4590,7 @@ class ProcessRequest():
                     ft['name'] = dtf.name
                     ft['id'] = dtf.id
                     ft['schema'] = stat['schema']
+                    ft['reference'] = stat['reference']
                     ft['params'] = []
                     for p in stat['parameters']['feature']:
                         ft['params'].append( p )
