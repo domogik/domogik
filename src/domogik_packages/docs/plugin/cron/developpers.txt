@@ -52,35 +52,35 @@ Where :
 
 5) Manage the job
 
-    Stop a job. You can resume a job after stopping it.
+Stop a job. You can resume a job after stopping it.
 
 .. code-block:: none
 
         ret = self._cronQuery.stop_job(device,'state')
 
 
-    Resume a job. You can resume a stopped job.
+Resume a job. You can resume a stopped job.
 
 .. code-block:: none
 
         ret = self._cronQuery.resume_job(device,'state')
 
 
-    You can retrieve the state of a job using the following command. It returns "started","stopped" and "halted".
+You can retrieve the state of a job using the following command. It returns "started","stopped" and "halted".
 
 .. code-block:: none
 
         ret = self._cronQuery.resume_job(device,'state')
 
 
-    You can kill (and delete) it using :
+You can kill (and delete) it using :
 
 .. code-block:: none
 
         ret = self._cronQuery.halt_job(device,'state')
 
 
-    A robust way to use cron jobs is always halt a job before create it.
+A robust way to use cron jobs is always halt a job before create it.
 
 .. code-block:: none
 
