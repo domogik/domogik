@@ -49,6 +49,8 @@ from domogik.xpl.common.xplconnector import Listener
 import SocketServer
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
+DEFAULT_PORT=40440
+
 
 class DemoDataManager(XplPlugin):
     """ Sends demo data over xPL
@@ -58,6 +60,14 @@ class DemoDataManager(XplPlugin):
         """ Init plugin
         """
         XplPlugin.__init__(self, name='demodata')
+
+        ### Get config
+        self._config = Query(self.myxpl, self.log)
+        port = self._config.query('demodata', 'port')
+        if port == None:
+            port = DEFAULT_PORT 
+        else:
+            port = int(port)
 
         ### Create listeners for the fake actuator devices
         # RGB controller
@@ -90,16 +100,25 @@ class DemoDataManager(XplPlugin):
                                      self.myxpl)
         self._teleinfo_thr.start()
 
+        # tank data each 1min
+        self._tank_thr = XplTimer(60, \
+                                  demo.tank_data, \
+                                  self.myxpl)
+        self._tank_thr.start()
+
 
 
         self.enable_hbeat()
 
         # Launch the web UI
         #demo_ui = DemoUI()
+        msg = "Launch the Web UI on port %s" % port
+        print(msg)
+        self.log.info(msg)
         self.add_stop_cb(self.stop_http)
         self.server = None
         self.server_ip = ''
-        self.server_port = 40440
+        self.server_port = port
         self.start_http()
 
     def start_http(self):
