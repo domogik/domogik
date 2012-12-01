@@ -37,6 +37,7 @@ from json import load
 from urllib2 import urlopen
 from pprint import pprint
 import datetime
+import math
 
 # for DemoUi
 import BaseHTTPServer
@@ -207,6 +208,25 @@ class DemoData():
         except:
             self.log.error("Error while creating teleinfo data")
       
+    # tank
+    # level and distance 
+    def tank_data(self):
+        try:
+            now = datetime.datetime.now()
+            minute = (now - now.replace(hour=0,minute=0,second=0)).seconds / 60
+            minute += 0.0  # to make minutes as a float
+            # factor to expand 2pi to 1440 minutes
+            factor = 1440/math.pi       
+
+            level = (math.cos(minute/factor)+1)*100  # level in %
+            print "level=%s, minute=%s, factor=%s" % (level, minute, factor)
+            #level
+            self.cb_send_sensor_basic("demo_tank", "percent", level)
+            #distance : we assume distance = 100-level (a 1m tank)
+            self.cb_send_sensor_basic("demo_tank", "distance", 100-level)
+        except:
+            self.log.error("Error while creating tank data")
+
 
     def _get_number_of_days(self, date_from, date_to):
         """Returns a float equals to the timedelta between two dates given as string."""
@@ -236,6 +256,8 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         elif path_elts[1] == "js":
             self._get_file(path)
         elif path_elts[1] == "css":
+            self._get_file(path)
+        elif path_elts[1] == "img":
             self._get_file(path)
         elif path_elts[1] == "webcam.jpg":
             self._display_webcam()
@@ -267,10 +289,10 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             self.server.handler_params[0].send_arduino_rgb('demo_rgb_led', 'setcolor', args['color'])
             self._send_http_response(200)
         elif path == "/switch":
-            self.server.handler_params[0].send_lighting_basic('demo_switch', 'goto', args['level'])
+            self.server.handler_params[0].send_lighting_device('demo_switch', 'goto', args['level'])
             self._send_http_response(200)
         elif path == "/dimmer":
-            self.server.handler_params[0].send_lighting_basic('demo_dimmer', 'goto', args['level'])
+            self.server.handler_params[0].send_lighting_device('demo_dimmer', 'goto', args['level'])
             self._send_http_response(200)
         else:
             self._send_http_response(404)

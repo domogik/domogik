@@ -49,6 +49,8 @@ from domogik.xpl.common.xplconnector import Listener
 import SocketServer
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
+DEFAULT_PORT=40440
+
 
 class DemoDataManager(XplPlugin):
     """ Sends demo data over xPL
@@ -58,6 +60,14 @@ class DemoDataManager(XplPlugin):
         """ Init plugin
         """
         XplPlugin.__init__(self, name='demodata')
+
+        ### Get config
+        self._config = Query(self.myxpl, self.log)
+        port = self._config.query('demodata', 'port')
+        if port == None:
+            port = DEFAULT_PORT 
+        else:
+            port = int(port)
 
         ### Create listeners for the fake actuator devices
         # RGB controller
@@ -90,16 +100,25 @@ class DemoDataManager(XplPlugin):
                                      self.myxpl)
         self._teleinfo_thr.start()
 
+        # tank data each 1min
+        self._tank_thr = XplTimer(60, \
+                                  demo.tank_data, \
+                                  self.myxpl)
+        self._tank_thr.start()
+
 
 
         self.enable_hbeat()
 
         # Launch the web UI
         #demo_ui = DemoUI()
+        msg = "Launch the Web UI on port %s" % port
+        print(msg)
+        self.log.info(msg)
         self.add_stop_cb(self.stop_http)
         self.server = None
         self.server_ip = ''
-        self.server_port = 40406
+        self.server_port = port
         self.start_http()
 
     def start_http(self):
@@ -177,13 +196,13 @@ class DemoDataManager(XplPlugin):
         else: 
             level = None
         # send symetric answer to simulate the device
-        self.send_lighting_basic(device, command, level, fade_rate)
+        self.send_lighting_device(device, command, level, fade_rate)
 
-    def send_lighting_basic(self, device, command, level = None, fade_rate = None):
-        print("lighting.basic : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate))
+    def send_lighting_device(self, device, command, level = None, fade_rate = None):
+        print("lighting.device : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate))
         msg = XplMessage()
         msg.set_type("xpl-trig")
-        msg.set_schema("lighting.basic")
+        msg.set_schema("lighting.device")
         msg.add_data({ 'device' : device })
         msg.add_data({ 'command' : command })
         if level != None:

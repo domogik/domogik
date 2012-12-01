@@ -9,6 +9,16 @@
             "optionnal": "no", 
             "options": [], 
             "type": "boolean"
+        },
+        {
+            "default": "40440",
+            "description": "Port of the Web UI",
+            "id": "1", 
+            "interface": "no", 
+            "key": "port", 
+            "optionnal": "yes", 
+            "options": [], 
+            "type": "string"
         }
     ], 
     "device_feature_models": [],
