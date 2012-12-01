@@ -193,7 +193,7 @@ class CronQuery():
         return self.start_job(device, configmess, nstmess)
 
     def start_interval_job( self, device, nstmess, weeks=0, days=0, hours=0,
-                          minutes=0, seconds=0, startdate=None):
+                          minutes=0, seconds=0, duration=0, startdate=None):
         '''
         Add and start a job to the cron plugin
         @param device : the name of the timer
@@ -203,6 +203,7 @@ class CronQuery():
         @param hours: number of hours to wait
         @param minutes: number of minutes to wait
         @param seconds: number of seconds to wait
+        @param duration: Resend the same message after duration seconds.
         @param startdate: when to first execute the job and start the
                counter (default is after the given interval)
         '''
@@ -464,3 +465,20 @@ class CronQuery():
             self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
+    def status_server(self):
+        """
+        Get the status of the cron plugin.
+        @param device : the name of the timer
+        @return : True if the server can respond. False in an error occured.
+        """
+        configmess = XplMessage()
+        configmess.set_type("xpl-cmnd")
+        configmess.set_schema("timer.basic")
+        configmess.add_data({"action" : "status"})
+        configmess.add_data({"device" : "cron"})
+        try:
+            res = self.query("cron", configmess, "state")
+            return True
+        except:
+            self.log.error("cron_query : %s" % (traceback.format_exc()))
+            return False

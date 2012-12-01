@@ -132,71 +132,29 @@ class Cron(XplHlpPlugin):
             self.log.error("__init__ : "+error)
             raise CronException(error)
 
+        self.helpers =   \
+           {
+             "memory" :
+              {
+                "cb" : self._cron.helpers.helper_memory,
+                "desc" : "Show memory usage of variables. Experimental.",
+                "usage" : "memory",
+              }
+            }
+
+        self.enable_helper()
+
         self.log.debug("__init__ : Try to create listeners")
         Listener(self.request_cmnd_cb, self.myxpl,
                  {'schema': 'timer.request', 'xpltype': 'xpl-cmnd'})
         Listener(self.basic_cmnd_cb, self.myxpl,
                  {'schema': 'timer.basic', 'xpltype': 'xpl-cmnd'})
 
-        self.helpers =   \
-           {
-             "list" :
-              {
-                "cb" : self._cron.helpers.helper_list,
-                "desc" : "List devices (cron jobs) or apschechuler jobs (for debugging).",
-                "usage" : "list [devices | aps]",
-                "min-args" : 1,
-                "param-list" : "which",
-                "which" : "devices : show the plugin cron jobs | aps : show the APScheduler jobs (for debugging)",
-              },
-             "memory" :
-              {
-                "cb" : self._cron.helpers.helper_memory,
-                "desc" : "Show memory usage of variables. Experimental.",
-                "usage" : "memory",
-              },
-             "info" :
-              {
-                "cb" : self._cron.helpers.helper_info,
-                "desc" : "Display device information",
-                "usage" : "info device",
-                "param-list" : "device",
-                "device" : "the device name (cron job)",
-                "min-args" : 1,
-              },
-#             "stop" :
-#              {
-#                "cb" : self._cron.helpers.helper_stop,
-#                "desc" : "Stop a device (a cron job). The device could be resumed.",
-#                "usage" : "stop device",
-#                "min-args" : 1,
-#                "param-list" : "device",
-#                "device" : "the device name (cron job)",
-#              },
-#             "halt" :
-#              {
-#                "cb" : self._cron.helpers.helper_halt,
-#                "desc" : "Halt a device (a cron job). The device is removed fron store.",
-#                "usage" : "halt device",
-#                "min-args" : 1,
-#                "param-list" : "device",
-#                "device" : "the device name (cron job)",
-#              },
-#             "resume" :
-#              {
-#                "cb" : self._cron.helpers.helper_resume,
-#                "desc" : "Resume a device (a cron job). Restart a previously stopped device.",
-#                "usage" : "resume device",
-#                "min-args" : 1,
-#                "param-list" : "device",
-#                "device" : "the device name (cron job)",
-#              },
-            }
+        self.add_stop_cb(self._cron.stop_all)
 
-        self.enable_helper()
+        self.log.debug("__init__ : Enable the heartbeat")
         self.enable_hbeat()
-        self.add_stop_cb(self._cron.jobs.stop_scheduler)
-        self.add_stop_cb(self._cron.stop_timer)
+
         self.log.info("Plugin cron correctly started.")
 
     def request_cmnd_cb(self, message):

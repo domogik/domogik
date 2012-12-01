@@ -12,8 +12,18 @@
         },
         {
             "default": "300",
-            "description": "The delay between 2 stat's messages when sending status of the job(device).",
+            "description": "The delay in seconds between two status messages. 0 to disable.",
             "id": "1",
+            "interface": "no",
+            "key": "delay-sensor",
+            "optionnal": "no",
+            "options": [],
+            "type": "int"
+        },
+        {
+            "default": "2",
+            "description": "The delay in seconds between 2 stat's messages when sending sensors status. 2 by default.",
+            "id": "2",
             "interface": "no",
             "key": "delay-stat",
             "optionnal": "no",
@@ -68,6 +78,7 @@
         "src/share/domogik/url2xpl/cron/create-alarm.xml",
         "src/share/domogik/url2xpl/cron/create-dawnalarm.xml",
         "src/share/domogik/url2xpl/cron/create-date.xml",
+        "src/share/domogik/url2xpl/cron/create-interval.xml",
         "src/share/domogik/url2xpl/cron/resume.xml",
         "src/share/domogik/url2xpl/cron/stop.xml",
         "src/share/domogik/url2xpl/cron/halt.xml",
@@ -87,7 +98,7 @@
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "cron",
-        "changelog": "0.3\n - Add device auto-creation\n0.2a1\n - Add UI commands\n0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
+        "changelog": "0.3\n - Add user input verifications. Add device auto-creation. Multiple date in alarm and dawnalarm\n0.2a1\n - Add UI commands\n0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
         "dependencies": [
             {
                 "id": "apscheduler (>=2.0.2)",
@@ -102,12 +113,12 @@
                 "type": "python"
             }
         ],
-        "description": "Add a cron like server to the XPL network.\nDevelopment release. Use with caution.",
+        "description": "Add a cron like server to the XPL network.\nDevelopment release.",
         "documentation": "http://wiki.domogik.org/plugin_cron",
         "domogik_min_version": "0.2.0",
         "id": "cron",
         "type": "plugin",
-        "version": "0.2a1"
+        "version": "0.3b1"
     },
     "json_version": 1,
     "technology": {

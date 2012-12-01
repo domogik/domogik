@@ -54,14 +54,14 @@ ERROR_REST = 40
 ERROR_NOT_IMPLEMENTED = 50
 
 CRONERRORS = { ERROR_NO: 'No error',
-               ERROR_PARAMETER: 'Missing or wrong parameter',
-               ERROR_DEVICE_EXIST: 'Device/alarm already exist',
-               ERROR_DEVICE_NOT_EXIST: 'Device/alarm does not exist',
-               ERROR_DEVICE_NOT_STARTED: "Device/alarm is not started",
-               ERROR_DEVICE_NOT_STOPPED: "Device/alarm is not stopped",
-               ERROR_SCHEDULER: 'Error with the scheduler (APS)',
-               ERROR_STORE: 'Error with the store',
-               ERROR_REST: 'Error with REST',
+               ERROR_PARAMETER: 'Missing or wrong parameter.',
+               ERROR_DEVICE_EXIST: 'Device/alarm already exist.',
+               ERROR_DEVICE_NOT_EXIST: 'Device/alarm does not exist.',
+               ERROR_DEVICE_NOT_STARTED: "Device/alarm is not started.",
+               ERROR_DEVICE_NOT_STOPPED: "Device/alarm is not stopped.",
+               ERROR_SCHEDULER: 'Error with the scheduler (APS).',
+               ERROR_STORE: 'Error with the store.',
+               ERROR_REST: 'Error with REST. But job is created.',
                }
 
 class CronRest():
@@ -81,7 +81,7 @@ class CronRest():
         The associated rest url is :
         http://192.168.14.167:40405/base/device/list
 
-        @ return None or a dict
+        @return None or a dict
 
         """
         the_url = "%s/base/device/list" % (self._rest)
@@ -101,7 +101,7 @@ class CronRest():
         Return the id of a Domogik's device associated to a cron job
 
         @param job : the cron job
-        @ return None or the Domogik's device id
+        @return None or the Domogik's device id
 
         """
         devices = self.list()
@@ -195,8 +195,8 @@ class CronStore():
                 self._data_files_dir)
         if not os.path.isdir(self._data_files_dir):
             os.mkdir(self._data_files_dir, 0770)
-        self._badfields = ["action", "starttime", "uptime", "runtime"]
-        self._statfields = ["current", "state", "runs", "createtime"]
+        self._badfields = ["action", "starttime", "uptime", ]
+        self._statfields = ["current", "state", "runs", "createtime", "runtime"]
 
     def load_all(self, add_job_cb):
         """
@@ -225,6 +225,12 @@ class CronStore():
                 for option in config.options('Timers'):
                     timers.add(config.get('Timers', option))
                 data['timer'] = timers
+            #Will be implement in the future
+            if config.has_section('Dates'):
+                timers = set()
+                for option in config.options('Dates'):
+                    timers.add(config.get('Dates', option))
+                data['date'] = timers
             if config.has_section('Alarms'):
                 alarms = set()
                 for option in config.options('Alarms'):
@@ -262,6 +268,7 @@ class CronStore():
                 config.read(self._get_jobfile(job))
             timer_idx = 1
             alarm_idx = 1
+            date_idx = 1
             if not config.has_section('Job'):
                 config.add_section('Job')
             if not config.has_section('Stats'):
@@ -287,6 +294,17 @@ class CronStore():
                         for al in data[key] :
                             config.set('Alarms', str(alarm_idx), al)
                             alarm_idx = alarm_idx + 1
+                #Will be implement in the future
+                elif key.startswith("date") :
+                    if not config.has_section('Dates'):
+                        config.add_section('Dates')
+                    if type(data[key])==type(""):
+                        config.set('Dates', str(date_idx), data[key])
+                        date_idx = date_idx + 1
+                    else:
+                        for al in data[key] :
+                            config.set('Dates', str(date_idx), al)
+                            date_idx = date_idx + 1
                 elif key.startswith("sensor_") :
                     if not config.has_section('Sensor'):
                         config.add_section('Sensor')
@@ -294,6 +312,7 @@ class CronStore():
                 elif key in self._statfields:
                     if key == "createtime":
                         config.set('Stats', key, data[key])
+                        #We do nothing, this jobs may not be updated as the jobs where stopped
                     else:
                         config.set('Stats', key, data[key])
                 elif key in self._badfields:
@@ -338,7 +357,7 @@ class CronStore():
 
         @param job : the job name
         @param uptime : the uptime of the job
-        @param runtime : the runtime of the job
+        @param runtime : the cumulative runtime of the job
         @param runs : the number of job's run
 
         """
@@ -349,10 +368,6 @@ class CronStore():
             config.read(self._get_jobfile(job))
             config.set('Stats', "state", "stopped")
             config.set('Stats', "runs", runs)
-            #oldruntime = 0
-            #if config.has_option('Stats','runtime'):
-            #    oldruntime = config.getfloat('Stats','runtime')
-            #config.set('Stats', "runtime", oldruntime+runtime)
             config.set('Stats', "runtime", runtime)
             with open(self._get_jobfile(job), 'w') as configfile:
                 config.write(configfile)
@@ -360,6 +375,32 @@ class CronStore():
             return ERROR_NO
         except:
             self._log.error("cronJobs.store_on_stop : " + \
+                traceback.format_exc())
+            return ERROR_STORE
+
+    def on_close(self, job, uptime, runtime, runs):
+        """
+        Must be called when a job is closed : the plugin is stopped.
+
+        @param job : the job name
+        @param uptime : the uptime of the job
+        @param runtime : the runtime of the job
+        @param runs : the number of job's run
+
+        """
+        try:
+            self._log.debug("cronJobs.store_on_close : job %s" % \
+                job)
+            config = ConfigParser.ConfigParser()
+            config.read(self._get_jobfile(job))
+            config.set('Stats', "runs", runs)
+            config.set('Stats', "runtime", runtime)
+            with open(self._get_jobfile(job), 'w') as configfile:
+                config.write(configfile)
+                configfile.close
+            return ERROR_NO
+        except:
+            self._log.error("cronJobs.store_on_close : " + \
                 traceback.format_exc())
             return ERROR_STORE
 
@@ -371,12 +412,15 @@ class CronStore():
 
         """
 
-    def on_fire(self, job, status):
+    def on_fire(self, job, status, uptime, runtime, runs):
         """
         Must be called when a job is fired.
 
         @param job : the job name
         @param status : the status of the sensor associated to the job
+        @param uptime : the uptime of the job
+        @param runtime : the cumulative runtime of the job
+        @param runs : the number of job's run
 
         """
         try:
@@ -385,6 +429,7 @@ class CronStore():
             config = ConfigParser.ConfigParser()
             config.read(self._get_jobfile(job))
             config.set('Sensor', "status", status)
+            config.set('Stats', "runs", runs)
             with open(self._get_jobfile(job), 'w') as configfile:
                 config.write(configfile)
                 configfile.close
@@ -480,10 +525,12 @@ class CronTools():
 
         """
         dummy_date = datetime.date(1, 1, 1)
+        hour,minute = h1.split(":")
         full_h1 = datetime.datetime.combine(dummy_date, \
-            datetime.time(int(h1[0:2]), int(h1[3:5])))
+            datetime.time(int(hour), int(minute)))
+        hour,minute = h2.split(":")
         full_h2 = datetime.datetime.combine(dummy_date, \
-            datetime.time(int(h2[0:2]), int(h2[3:5])))
+            datetime.time(int(hour), int(minute)))
         elapsed = full_h1-full_h2
         res = elapsed.days*86400 + elapsed.seconds + \
             elapsed.microseconds / 1000000.0
@@ -499,8 +546,9 @@ class CronTools():
 
         """
         dummy_date = datetime.date(1, 1, 1)
+        hour,minute = h.split(":")
         full_h = datetime.datetime.combine(dummy_date, \
-            datetime.time(int(h[0:2]), int(h[3:5])))
+            datetime.time(int(hour), int(minute)))
         res = full_h + datetime.timedelta(seconds=s)
         return res.hour, res.minute
 
