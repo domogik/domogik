@@ -1,9 +1,3 @@
-.. _index:
-
-================
-Table of content
-================
-
 * :doc:`Plugin documentation </cron>`
 * :doc:`Admin documentation </admin>`
 * :doc:`Helpers documentation </helpers>`

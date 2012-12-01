@@ -26,6 +26,7 @@ help:
 	@echo "  htmlhelp   to make HTML files and a HTML help project"
 	@echo "  qthelp     to make HTML files and a qthelp project"
 	@echo "  devhelp    to make HTML files and a Devhelp project"
+	@echo "  joomla     to make HTML files in Joomla format"
 	@echo "  epub       to make an epub"
 	@echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  latexpdf   to make LaTeX files and run them through pdflatex"
@@ -71,6 +72,11 @@ htmlhelp:
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in $(BUILDDIR)/htmlhelp."
+
+joomla:
+	$(SPHINXBUILD) -b html -D html_theme="joomla" -D html_add_permalinks="" $(ALLSPHINXOPTS) $(BUILDDIR)/joomla
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/joomla."
 
 qthelp:
 	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) $(BUILDDIR)/qthelp

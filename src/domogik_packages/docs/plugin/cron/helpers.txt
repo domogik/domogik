@@ -2,16 +2,23 @@
 Helpers
 =======
 
-.. todo::
-    For each helper create a chapter which describes it.
+The helper is available in the admin pages.
 
-cron first_helper_command
-=================================
+.. |helper_helper| image:: helper_helper.png
+    :width: 600px
 
-**cron first_helper_command** helper will do.....
+helper
+======
+Click on help
 
-.. code-block:: none
+|helper_helper|
 
-    $ cron first_helper_command
-    Result of the helper command.....
+.. |helper_log| image:: helper_log.png
+    :width: 600px
+
+Logs
+====
+Select a number of log lines and click
+
+|helper_log|
 

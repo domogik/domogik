@@ -1,0 +1,144 @@
+===========
+Developpers
+===========
+
+The cron plugin also contains a client library : cron_query.
+It allows you to manipulate cron jobs directly in your plugin.
+That can be usefull if you want to add a time line or implement a time based state machine
+
+A job is persistent : it will save its full state when stopping/starting
+the cron plugin.
+
+Add a cron job
+==============
+
+1) Import the library in you plugin
+
+.. code-block:: none
+
+    from domogik.xpl.lib.cron_query import cronQuery
+
+2) Initialize the class
+
+.. code-block:: none
+
+    self._cronQuery = cronQuery(self.myxpl,self.log)
+
+3) Create the message you want to receive. For the scene plugin. Your plugin
+must "listen" for this message.
+
+.. code-block:: none
+
+    nstMess = XplMessage()
+    nstMess.set_type("xpl-trig")
+    nstMess.set_schema("scene.basic")
+    nstMess.add_data({"hello" : "world"})
+    nstMess.add_data({"mystatus" :  "Ok"})
+
+4) And create the cron job
+
+.. code-block:: none
+
+    ret = self._cronQuery.start_timer_job(self, device, nstmess, frequence, duration=0)
+
+Where :
+
+    device : the name of the cron job. No domogik device is created when
+    using the cron query.
+    nstMess : the previous message.
+    frequence : the number of seconds between message
+    duration : the number of heart beats. After that you must stop/resume the job to enable it.
+
+5) Manage the job
+
+    Stop a job. You can resume a job after stopping it.
+
+.. code-block:: none
+
+        ret = self._cronQuery.stop_job(device,'state')
+
+    Resume a job. You can resume a stopped job.
+
+.. code-block:: none
+
+        ret = self._cronQuery.resume_job(device,'state')
+
+    You can retrieve the state of a job using the following command. It returns "started","stopped" and "halted".
+
+.. code-block:: none
+
+        ret = self._cronQuery.resume_job(device,'state')
+
+    You can kill (and delete) it using :
+
+.. code-block:: none
+
+        ret = self._cronQuery.halt_job(device,'state')
+
+    A robust way to use cron jobs is always halt a job before create it.
+
+.. code-block:: none
+
+        ret = self._cronQuery.halt_job(device,'state')
+        ret = self._cronQuery.start_timer_job(self, device, nstmess, frequence, duration=0)
+
+
+6) At last, update your listener to trap the nstMessage defined previously.
+
+You can also create many other types of job, look at the cron_query source and documentation.
+
+
+Develop an UI admin page
+========================
+
+You can use it adding :
+
+.. code-block:: none
+
+    <script type="text/javascript" src="{{ static_design_url}}/admin/js/page-admin-cron.js"></script>
+
+Index of UI functions
+=====================
+
+function plugin_is_running() {
+    // Check that the plugin is running
+
+function check_job_name(name) {
+    // Check that the job name is valid
+
+function check_days_of_week(dow) {
+    // Check that the days_of_week is correct : MoTuWeThFrSaSu
+
+function check_dow_overlapped(dow1,dow2) {
+    // Check that 2 days_of_week doesn't overlappes : ie MoTuWeThFrSaSu and Mo
+
+function check_number(num) {
+    // Check that a number is valid
+
+function check_dim_levels(levels) {
+    // Check that the dim levels are valid : 10,20,30,...
+
+function check_time(hour) {
+    // Check that a time is valid : 10:30 or 8:00
+
+function check_xpldate(date) {
+    // Check that an xpldate is valid : 20121201203000
+
+function check_year(year) {
+    // Check that a year is valid : 2012
+
+function check_month(year,month) {
+    // Check that a year/month is valid : 2012,1-12
+
+function check_day(year,month,day) {
+    // Check that a year/month/day is valid : 2012,1-12,0-(28,29,30,31)
+
+function check_hour(hour) {
+    // Check that a hour is valid : 0..23
+
+function check_minute(minute) {
+    // Check that a minute is valid : 0..59
+
+function check_second(second) {
+    // Check that a second is valid : 0..59
+

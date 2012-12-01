@@ -1,0 +1,8 @@
+cron_query API
+==============
+
+.. toctree::
+    :maxdepth: 2
+
+.. automodule:: cron_query
+    :members: CronQuery

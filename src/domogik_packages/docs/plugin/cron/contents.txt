@@ -8,5 +8,8 @@ Table Of Content
 
     /index
     /cron
+    /admin
     /helpers
+    /developpers
+    /cron_query
 
