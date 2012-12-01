@@ -267,10 +267,10 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             self.server.handler_params[0].send_arduino_rgb('demo_rgb_led', 'setcolor', args['color'])
             self._send_http_response(200)
         elif path == "/switch":
-            self.server.handler_params[0].send_lighting_basic('demo_switch', 'goto', args['level'])
+            self.server.handler_params[0].send_lighting_device('demo_switch', 'goto', args['level'])
             self._send_http_response(200)
         elif path == "/dimmer":
-            self.server.handler_params[0].send_lighting_basic('demo_dimmer', 'goto', args['level'])
+            self.server.handler_params[0].send_lighting_device('demo_dimmer', 'goto', args['level'])
             self._send_http_response(200)
         else:
             self._send_http_response(404)

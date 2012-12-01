@@ -177,13 +177,13 @@ class DemoDataManager(XplPlugin):
         else: 
             level = None
         # send symetric answer to simulate the device
-        self.send_lighting_basic(device, command, level, fade_rate)
+        self.send_lighting_device(device, command, level, fade_rate)
 
-    def send_lighting_basic(self, device, command, level = None, fade_rate = None):
-        print("lighting.basic : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate))
+    def send_lighting_device(self, device, command, level = None, fade_rate = None):
+        print("lighting.device : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate))
         msg = XplMessage()
         msg.set_type("xpl-trig")
-        msg.set_schema("lighting.basic")
+        msg.set_schema("lighting.device")
         msg.add_data({ 'device' : device })
         msg.add_data({ 'command' : command })
         if level != None:

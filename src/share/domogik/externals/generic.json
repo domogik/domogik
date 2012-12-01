@@ -210,6 +210,36 @@
             "return_confirmation": "0", 
             "stat_key": "none", 
             "value_type": "string"
+        },
+        {
+            "device_type_id": "generic.relay", 
+            "feature_type": "actuator", 
+            "id": "generic.relay.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;100&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "generic.dimmer", 
+            "feature_type": "actuator", 
+            "id": "generic.dimmer.switch", 
+            "name": "Switch", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;100&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "generic.dimmer", 
+            "feature_type": "actuator", 
+            "id": "generic.dimmer.change", 
+            "name": "Dimmer", 
+            "parameters": "{&quot;command&quot;:&quot;setlevel&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
+            "return_confirmation": "1", 
+            "stat_key": "level", 
+            "value_type": "range"
         }
     ], 
     "device_types": [
@@ -247,6 +277,16 @@
             "description": "Generic Webcam support", 
             "id": "generic.webcam", 
             "name": "Generic webcam"
+        }, 
+        {
+            "description": "Switch",
+            "id": "generic.relay", 
+            "name": "Switch"
+        }, 
+        {
+            "description": "Dimmer",
+            "id": "generic.dimmer", 
+            "name": "Dimmer"
         } 
     ], 
     "external": {
