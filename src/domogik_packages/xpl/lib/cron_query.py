@@ -2,6 +2,8 @@
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
+.. module:: cron_query
+
 License
 =======
 
@@ -23,23 +25,45 @@ Plugin purpose
 
 A client librairy to speak with the cron plugin, via xpl language
 
+.. moduleauthor:: bibi21000 <bibi21000@gmail.com>
+.. copyright:: (C) 2007-2012 Domogik project
+.. license:: GPL(v3)
+.. organization:: Domogik
+
 Implements
 ==========
 class CronQuery
 
-@author: Sebastien GALLET <sgallet@gmail.com>
-@copyright: (C) 2007-2012 Domogik project
-@license: GPL(v3)
-@organization: Domogik
-"""
 
+"""
+import datetime
 from threading import Event
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 import traceback
-from domogik_packages.xpl.lib.cron_tools import CronTools
-from domogik_packages.xpl.lib.cron_tools import ERROR_PARAMETER
 
+
+def date_to_xpl(sdate):
+    """
+    Tranform an datetime date to an xpl one "yyyymmddhhmmss"
+    form.
+
+    @parameter sdate: The datetime to transform
+    @return: A string representing the xpl date if everything \
+        went fine. None otherwise.
+
+    """
+    try:
+        h = "%.2i" % sdate.hour
+        m = "%.2i" % sdate.minute
+        s = "%.2i" % sdate.second
+        y = sdate.year
+        mo = "%.2i" % sdate.month
+        d = "%.2i" % sdate.day
+        xpldate = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
+        return xpldate
+    except:
+        return None
 
 class CronQuery():
     '''
@@ -48,15 +72,14 @@ class CronQuery():
     def __init__(self, xpl, log):
         '''
         Init the query system and connect it to xPL network
-        @param xpl : the XplManager instance (usually self.myxpl)
-        @param log : a Logger instance (usually took from self.log))
+        :param xpl: the XplManager instance (usually self.myxpl)
+        :param log: a Logger instance (usually took from self.log))
         '''
         self.log = log
         self.__myxpl = xpl
         self.log.debug("Init config query instance")
         self._keys = {}
         self._listens = {}
-        self._tools = CronTools()
         self._result = None
         self.parameters = ["parameter0", "parameter1"]
         self.values = ["valueon", "valueoff"]
@@ -66,11 +89,9 @@ class CronQuery():
         Ask the cron system for a device(job). Calling this function will make
         your program wait until it got an answer
 
-        @param device : the device to query
-        @param configmess : the name of the job which requests config, None if \
-        it's a technolgy global parameter
-        @param extkey : the key to fetch corresponding value, if it's an empty string, \
-        all the config items for this technology will be fetched
+        :param device: the device to query
+        :param configmess: the name of the job which requests config, None if it's a technolgy global parameter
+        :param extkey: the key to fetch corresponding value, if it's an empty string, all the config items for this technology will be fetched
 
         '''
         liste = Listener(self._query_cb, self.__myxpl, {'schema': 'timer.basic',
@@ -110,7 +131,7 @@ class CronQuery():
     def _query_cb(self, message):
         '''
         Callback to receive message after a query() call
-        @param message : the message received
+        :param  message: the message received
         '''
         result = message.data
         device = None
@@ -130,16 +151,28 @@ class CronQuery():
     def nested_key(self, key):
         '''
         Callback to receive message after a query() call
-        @param message : the message received
+
+        :param key: the key to change
+        :type key: the key to change
+        :return: the corresponding nested key
+        :rtype: str
+
         '''
         return "nst-%s" % key
 
     def start_job(self, device, configmess, nstmess):
         '''
         Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param configmess : the XPL configuration message to send to the plugin
-        @param nstMess : the XPL message which will be sent by the cron job
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         '''
         if configmess == None or nstmess == None or device == None:
             return False
@@ -157,9 +190,21 @@ class CronQuery():
     def start_timer_job(self, device, nstmess, frequence, duration=0):
         '''
         Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param frequence : the frequence of the signal (in seconds).
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param  nstMess : the XPL message which will be sent by the cron job
+        :param  frequence : int
+        :type  frequence : the frequence of the signal (in seconds).
+        :param  duration : the number of pulse to live.
+        :type  duration : int
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         '''
         if frequence == 0:
             return False
@@ -176,10 +221,19 @@ class CronQuery():
 
     def start_date_job(self, device, nstmess, sdate):
         '''
-        Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param sdate : the date/time to run the job at
+        Add and start a date job to the cron plugin
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param  sdate : the date/time to run the job
+        :type  sdate : datetime
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         '''
         if sdate == None:
             return False
@@ -189,23 +243,35 @@ class CronQuery():
         configmess.add_data({"devicetype" : "date"})
         configmess.add_data({"device" : device})
         configmess.add_data({"action" : "start"})
-        configmess.add_data({"date" : self._tools.date_to_xpl(sdate)})
+        configmess.add_data({"date" : date_to_xpl(sdate)})
         return self.start_job(device, configmess, nstmess)
 
     def start_interval_job( self, device, nstmess, weeks=0, days=0, hours=0,
                           minutes=0, seconds=0, duration=0, startdate=None):
         '''
-        Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param weeks: number of weeks to wait
-        @param days: number of days to wait
-        @param hours: number of hours to wait
-        @param minutes: number of minutes to wait
-        @param seconds: number of seconds to wait
-        @param duration: Resend the same message after duration seconds.
-        @param startdate: when to first execute the job and start the
-               counter (default is after the given interval)
+        Add and start an interval job to the cron plugin
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param  weeks: number of weeks to wait
+        :type  weeks: int
+        :param  days: number of days to wait
+        :type  days: int
+        :param  hours: number of hours to wait
+        :type  hours: int
+        :param  minutes: number of minutes to wait
+        :type  minutes: int
+        :param  seconds: number of seconds to wait
+        :type  seconds: int
+        :param  startdate: the job will be start at this date/time
+        :type startdate: datetime
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         '''
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -230,9 +296,9 @@ class CronQuery():
             configmess.add_data({"seconds" : seconds})
             cont = True
         if startdate != None:
-            configmess.add_data({"startdate" : self._tools.date_to_xpl(startdate)})
+            configmess.add_data({"startdate" : date_to_xpl(startdate)})
         if cont == False:
-            return ERROR_PARAMETER
+            return "Halted"
         return self.start_job(device, configmess, nstmess)
 
     def start_cron_job( self, device, nstmess, year=None, month=None,
@@ -241,17 +307,32 @@ class CronQuery():
 
         '''
         Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param year: year to run on
-        @param month: month to run on
-        @param day: day of month to run on
-        @param week: week of the year to run on
-        @param dayofweek: weekday to run on (0 = Monday)
-        @param hour: hour to run on
-        @param second: second to run on
-        @param startdate: when to first execute the job and start the
-               counter (default is after the given interval)
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param  year: year to run on
+        :type  year: int
+        :param  month: month to run on
+        :type  month: int
+        :param  day: day of month to run on
+        :type  day: int
+        :param  week: week of the year to run on
+        :type  week: int
+        :param  dayofweek: weekday to run on (0 = Monday)
+        :type  dayofweek: int
+        :param  hour: hour to run on
+        :type  hour: int
+        :param  second: second to run on
+        :type  second: int
+        :param  startdate: the job will be start at this date/time
+        :type startdate: datetime
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
        '''
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -285,18 +366,28 @@ class CronQuery():
             configmess.add_data({"second" : second})
             cont = True
         if startdate != None:
-            configmess.add_data({"startdate" : self._tools.date_to_xpl(startdate)})
+            configmess.add_data({"startdate" : date_to_xpl(startdate)})
         if cont == False:
-            return ERROR_PARAMETER
+            return "Halted"
         return self.start_job(device, configmess, nstmess)
 
     def start_hvac_job( self, device, nstmess, params={}, timers={}):
         '''
         Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param params : parameters in a dict with valueon and valueoff fields
-        @param timers: the list of timers to use
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param params: parameters in a dict with valueon and valueoff fields
+        :type params: dict()
+        :param timers: the list of timers to use
+        :param timers: list()
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
        '''
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -322,16 +413,26 @@ class CronQuery():
         else:
             cont = False
         if cont == False:
-            return ERROR_PARAMETER
+            return "Halted"
         return self.start_job(device, configmess, nstmess)
 
     def start_alarm_job( self, device, nstmess, params={}, alarms=list()):
         '''
         Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param params : parameters in a dict with valueon and valueoff fields
-        @param alarms : the list of alarms to use
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param params: parameters in a dict with valueon and valueoff fields
+        :type params: dict()
+        :param alarms: the list of alarms to use
+        :param alarms: list()
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
        '''
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -357,16 +458,26 @@ class CronQuery():
         else:
             cont = False
         if cont == False:
-            return ERROR_PARAMETER
+            return "Halted"
         return self.start_job(device, configmess, nstmess)
 
     def start_dawn_alarm_job( self, device, nstmess, params={}, alarms=list()):
         '''
         Add and start a job to the cron plugin
-        @param device : the name of the timer
-        @param nstMess : the XPL message which will be sent by the cron job
-        @param params : parameters in a dict with valueon and valueoff fields
-        @param alarms : the list of alarms to use
+
+        :param device: the device/job to start
+        :type device: str
+        :param configmess: the XPL configuration message to send to the plugin
+        :type configmess: XplMessage
+        :param nstMess: the XPL message which will be sent by the cron job
+        :type nstMess: XplMessage
+        :param params: parameters in a dict with valueon and valueoff fields
+        :type params: dict()
+        :param alarms: the list of alarms to use
+        :param alarms: list()
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
        '''
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -392,14 +503,21 @@ class CronQuery():
         else:
             cont = False
         if cont == False:
-            return ERROR_PARAMETER
+            return "Halted"
         return self.start_job(device, configmess, nstmess)
 
-    def stop_job(self, device, extkey=None):
+    def stop_job(self, device, extkey="state"):
         """
         Stop a job to the cron plugin. The cron job could be restarted via a
         resume command.
-        @param device : the name of the timer
+
+        :param device: the device/job to stop
+        :type device: str
+        :param  extkey: the message key to look for ("state" by default)
+        :type  extkey: str
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         """
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -413,10 +531,17 @@ class CronQuery():
             self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def resume_job(self, device, extkey=None):
+    def resume_job(self, device, extkey="state"):
         """
         Resume a previous stopped job to the cron plugin.*
-        @param device : the name of the timer
+
+        :param device: the device/job to resume
+        :type device: str
+        :param  extkey: the message key to look for ("state" by default)
+        :type  extkey: str
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         """
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -430,10 +555,17 @@ class CronQuery():
             self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def halt_job(self, device, extkey=None):
+    def halt_job(self, device, extkey="state"):
         """
-        Stop a job and delete the device.
-        @param device : the name of the timer
+        Stop a job and delete the device. Job is permanently deleted.
+
+        :param device: the device/job to halt
+        :type device: str
+        :param  extkey: the message key to look for ("state" by default)
+        :type  extkey: str
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         """
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -448,10 +580,17 @@ class CronQuery():
             self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def status_job(self, device, extkey=None):
+    def status_job(self, device, extkey="state"):
         """
         Get the status of a job to the cron plugin.
-        @param device : the name of the timer
+
+        :param device: the device/job to get status
+        :type device: str
+        :param  extkey: the message key to look for ("state" by default)
+        :type  extkey: str
+        :return: the state sent by cron plugin : "started"|"stopped"|"halted"
+        :rtype: str
+
         """
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
@@ -465,11 +604,13 @@ class CronQuery():
             self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
-    def status_server(self):
+    def is_running_server(self):
         """
-        Get the status of the cron plugin.
-        @param device : the name of the timer
-        @return : True if the server can respond. False in an error occured.
+        Check that the cron plugin is running. We simply get status of an arbitray job. Cron will reposnd that this job is halted.
+
+        :return: the state of the cron plugin
+        :rtype: bool
+
         """
         configmess = XplMessage()
         configmess.set_type("xpl-cmnd")
