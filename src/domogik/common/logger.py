@@ -55,10 +55,8 @@ class Logger():
         '''
         Get a logger with provided parameters and set config
         @param component_name : component name to log
-        @param level : min level of the message to record, can be one of
-        'debug', 'info', 'warning', 'error', 'critical'
         '''
-        if component_name not in self.__class__.logger:
+        if component_name not in self.logger:
             LEVELS = {'debug': logging.DEBUG,
                   'info': logging.INFO,
                   'warning': logging.WARNING,
