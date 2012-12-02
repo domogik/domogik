@@ -57,11 +57,13 @@ class Logger():
         @param component_name : component name to log
         '''
         if component_name not in self.logger:
-            LEVELS = {'debug': logging.DEBUG,
-                  'info': logging.INFO,
-                  'warning': logging.WARNING,
-                  'error': logging.ERROR,
-                  'critical': logging.CRITICAL}
+            LEVELS = {
+                        'debug': logging.DEBUG,
+                        'info': logging.INFO,
+                        'warning': logging.WARNING,
+                        'error': logging.ERROR,
+                        'critical': logging.CRITICAL
+            }
 
             cfg = Loader()
             config = cfg.load()[0]
