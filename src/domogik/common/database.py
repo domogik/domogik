@@ -47,6 +47,7 @@ from sqlalchemy import Table, MetaData
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker,scoped_session
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.pool import QueuePool
 
 from domogik.common.utils import ucode
 from domogik.common import logger
@@ -138,7 +139,8 @@ class DbHelper():
             if engine != None:
                 DbHelper.__engine = engine
             else:
-                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', pool_recycle=7200)
+                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', 
+                                                             pool_recycle=7200, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
             DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
         self.__session = DbHelper.__session_object()
