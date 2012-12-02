@@ -141,7 +141,6 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', pool_recycle=7200)
         if DbHelper.__session_object == None:
             DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
-        #if not self.__session:
         self.__session = DbHelper.__session_object()
 
     def get_engine(self):
@@ -1442,7 +1441,7 @@ class DbHelper():
         """
         return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
 
-    def _get_duplicated_devicestats_id(self,device_id,key,value):
+    def _get_duplicated_devicestats_id(self, device_id, key, value):
         """Check if the data is duplicated with older values
         
         @param device_id : device id
@@ -1460,25 +1459,25 @@ class DbHelper():
             db_round_filter = json.loads(db_round)
         
         self.log.debug("after read")
-        last_values = my_db.list_last_n_stats_of_device(device_id,key,ds_number=2)
+        last_values = my_db.list_last_n_stats_of_device(device_id, key, ds_number=2)
         if last_values and len(last_values)>=2:
             # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
             # Ex: db_round_filter = {"12" : { "total_space" : 1048576, "free_space" : 1048576, "percent_used" : 0.5, "used_space": 1048576 },"13" : { "hchp" : 500, "hchc" : 500, "papp" : 200 }}
-            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value,last_values[0].value,last_values[1].value,id))
+            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value, last_values[0].value, last_values[1].value,id))
             if db_round_filter and str(last_values[1].device.id) in db_round_filter and key in db_round_filter[str(last_values[1].device.id)]:
                     round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
                     rvalue = int(float(value) / round_value) * round_value
                     val0 = int(float(last_values[0].value) / round_value) * round_value
                     val1 = int(float(last_values[1].value) / round_value) * round_value
                     self.log.debug("rvalue=%s" % rvalue)
-                    self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue,value,val0,val1))
+                    self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue, value, val0, val1))
             else:
                 rvalue = value
                 val0 = last_values[0].value
                 val1 = last_values[1].value
             
             if val0 == val1 and val0 == rvalue:
-                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id,last_values[1].device.id,key))
+                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id, last_values[1].device.id,key))
                 return last_values[1].id
         
         return None
