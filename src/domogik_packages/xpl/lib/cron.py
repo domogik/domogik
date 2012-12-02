@@ -1719,6 +1719,11 @@ class CronAPI:
                     actions[action](self.myxpl, device, message)
                 elif command != None :
                     commands[command](self.myxpl, device, message)
+            except:
+                self.log.error("action/command error.")
+                error = "Exception : %s" %  \
+                         (traceback.format_exc())
+                self.log.debug("cronAPI.basicCmndListener : "+error)
             finally :
                 self._jobs_lock.release()
         except:
