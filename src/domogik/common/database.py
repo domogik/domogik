@@ -2142,6 +2142,9 @@ class DbHelper():
     def get_xpl_command(self, p_id):
         return self.__session.query(XplCommand).filter_by(id=p_id).first()
 
+    def get_xpl_command_by_device_id(self, d_id):
+        return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
+
     def add_xpl_command(self, schema, reference, device_id, stat_id):
         self.__session.expire_all()
         cmd = XplCommand(schema=schema, reference=reference, device_id=device_id, stat_id=stat_id)
@@ -2197,6 +2200,9 @@ class DbHelper():
 
     def get_xpl_stat(self, p_id):
         return self.__session.query(XplStat).filter_by(id=p_id).first()
+    
+    def get_xpl_stat_by_device_id(self, d_id):
+        return self.__session.query(XplStat).filter_by(device_id=d_id).all()
 
     def add_xpl_stat(self, schema, reference, device_id):
         self.__session.expire_all()
