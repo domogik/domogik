@@ -1496,7 +1496,11 @@ class DbHelper():
         duplicated_id = self._get_duplicated_devicestats_id(ds_device_id,ds_key,ds_value)
         if duplicated_id:
             old_stat = self.__session.query(DeviceStats).filter_by(id=duplicated_id).first()
-            self.__session.delete(old_stat)
+            if old_stat:
+                self.__session.delete(old_stat)
+            else:
+                # FIXME : shouldn't occur (just for debug purposes related to bug #1503)
+                self.log.error("Can't delete stats for device id '%s' : it doesn't exist" % duplicated_id) 
 
         if not self.__session.query(Device).filter_by(id=ds_device_id).first():
             self.__raise_dbhelper_exception("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
