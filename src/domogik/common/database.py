@@ -1435,8 +1435,14 @@ class DbHelper():
         """
         return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
 
-    # check if the data is duplicated with older values
     def _get_duplicated_devicestats_id(self,device_id,key,value):
+        """Check if the data is duplicated with older values
+        
+        @param device_id : device id
+        @param key : stat key
+        @value : stat value
+        
+        """
         my_db = DbHelper()
         
         db_round_filter = None
