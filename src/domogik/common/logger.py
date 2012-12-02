@@ -51,11 +51,12 @@ class Logger():
 
     logger = {}
 
-    def __init__(self, component_name, domogik_prefix=True):
+    def __init__(self, component_name, domogik_prefix=True, use_filename=None):
         '''
         Get a logger with provided parameters and set config
         @param component_name : component name to log
         @param domogik_prefix : if logger name should be prefixed by 'domogik-'
+        @param use_filename : if set tells the logger to use this file name (otherwise takes 'component_name')
         '''
         if component_name not in self.logger:
             LEVELS = {
@@ -68,7 +69,10 @@ class Logger():
 
             cfg = Loader()
             config = cfg.load()[0]
-            filename = "%s/%s.log" % (config['log_dir_path'], component_name)
+            if use_filename is None:
+                filename = "%s/%s.log" % (config['log_dir_path'], component_name)
+            else:
+                filename = "%s/%s.log" % (config['log_dir_path'], use_filename)
             level = config['log_level']
 
             if level not in LEVELS:
