@@ -120,9 +120,15 @@ class DbHelper():
         """
         l = logger.Logger('db_api')
         self.log = l.get_logger('db_api')
+        
         cfg = Loader('database')
         config = cfg.load()
         self.__db_config = dict(config[1])
+        
+        if config[0]['log_level'] == 'debug':
+            logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
+            logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
+            logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
 
         url = self.get_url_connection_string()
         if use_test_db:
@@ -135,6 +141,7 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', pool_recycle=7200)
         if DbHelper.__session_object == None:
             DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
+        #if not self.__session:
         self.__session = DbHelper.__session_object()
 
     def get_engine(self):
