@@ -216,9 +216,9 @@ class DemoData():
             minute = (now - now.replace(hour=0,minute=0,second=0)).seconds / 60
             minute += 0.0  # to make minutes as a float
             # factor to expand 2pi to 1440 minutes
-            factor = 1440/math.pi       
+            factor = 720/math.pi       
 
-            level = (math.cos(minute/factor)+1)*100  # level in %
+            level = (math.cos(minute/factor)+1)*50  # level in %
             print "level=%s, minute=%s, factor=%s" % (level, minute, factor)
             #level
             self.cb_send_sensor_basic("demo_tank", "percent", level)
