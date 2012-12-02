@@ -51,10 +51,11 @@ class Logger():
 
     logger = {}
 
-    def __init__(self, component_name):
+    def __init__(self, component_name, domogik_prefix=True):
         '''
         Get a logger with provided parameters and set config
         @param component_name : component name to log
+        @param domogik_prefix : if logger name should be prefixed by 'domogik-'
         '''
         if component_name not in self.logger:
             LEVELS = {
@@ -74,7 +75,10 @@ class Logger():
                 raise ValueError("level must be one of 'debug','info','warning',"\
                         "'error','critical'. Check your config.")
 
-            my_logger = logging.getLogger('domogik-%s' % component_name)
+            if domogik_prefix:
+                my_logger = logging.getLogger('domogik-%s' % component_name)
+            else:
+                my_logger = logging.getLogger(component_name)
             hdlr = logging.FileHandler(filename)
             formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
             hdlr.setFormatter(formatter)
