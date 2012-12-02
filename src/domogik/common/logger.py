@@ -74,14 +74,14 @@ class Logger():
                 raise ValueError("level must be one of 'debug','info','warning',"\
                         "'error','critical'. Check your config.")
 
-            logger = logging.getLogger('domogik-%s' % component_name)
+            my_logger = logging.getLogger('domogik-%s' % component_name)
             hdlr = logging.FileHandler(filename)
             formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
             hdlr.setFormatter(formatter)
-            logger.addHandler(hdlr)
-            logger.setLevel(LEVELS[level])
+            my_logger.addHandler(hdlr)
+            my_logger.setLevel(LEVELS[level])
 
-            self.__class__.logger[component_name] = logger
+            self.logger[component_name] = my_logger
 
     def get_logger(self, logger_name = None):
         '''
