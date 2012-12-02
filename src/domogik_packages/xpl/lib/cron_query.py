@@ -132,6 +132,7 @@ class CronQuery():
         '''
         Callback to receive message after a query() call
         :param  message: the message received
+        :type  message: XplMessage
         '''
         result = message.data
         device = None
@@ -197,11 +198,10 @@ class CronQuery():
         :type configmess: XplMessage
         :param nstMess: the XPL message which will be sent by the cron job
         :type nstMess: XplMessage
-        :param  nstMess : the XPL message which will be sent by the cron job
-        :param  frequence : int
-        :type  frequence : the frequence of the signal (in seconds).
-        :param  duration : the number of pulse to live.
-        :type  duration : int
+        :param frequence: int
+        :type frequence: the frequence of the signal (in seconds).
+        :param duration: the number of pulse to live.
+        :type duration: int
         :return: the state sent by cron plugin : "started"|"stopped"|"halted"
         :rtype: str
 
@@ -229,8 +229,8 @@ class CronQuery():
         :type configmess: XplMessage
         :param nstMess: the XPL message which will be sent by the cron job
         :type nstMess: XplMessage
-        :param  sdate : the date/time to run the job
-        :type  sdate : datetime
+        :param  sdate: the date/time to run the job
+        :type  sdate: datetime
         :return: the state sent by cron plugin : "started"|"stopped"|"halted"
         :rtype: str
 
@@ -513,8 +513,8 @@ class CronQuery():
 
         :param device: the device/job to stop
         :type device: str
-        :param  extkey: the message key to look for ("state" by default)
-        :type  extkey: str
+        :param extkey: the message key to look for ("state" by default)
+        :type extkey: str
         :return: the state sent by cron plugin : "started"|"stopped"|"halted"
         :rtype: str
 
