@@ -26,10 +26,10 @@ Manage logs
 Implements
 ==========
 
-- Logger.__init__(self, plugin_name = None)
+- Logger.__init__(self, component_name = None)
 - Logger.__getattr__(self, attr)
 - Logger.__setattr__(self, attr, value)
-- Logger.__init__(self, plugin_name)
+- Logger.__init__(self, component_name)
 - Logger.get_logger(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -44,21 +44,21 @@ from domogik.common.configloader import Loader
 
 class Logger():
     '''
-    Logger for the xPL system.
+    Logger for Domogik
     Define main config parameters to help scripts to use logging facilities
     with a minimum of config
     '''
 
     logger = {}
 
-    def __init__(self, plugin_name):
+    def __init__(self, component_name):
         '''
         Get a logger with provided parameters and set config
-        @param file : the file to record logs into with the path
+        @param component_name : component name to log
         @param level : min level of the message to record, can be one of
         'debug', 'info', 'warning', 'error', 'critical'
         '''
-        if plugin_name not in self.__class__.logger:
+        if component_name not in self.__class__.logger:
             LEVELS = {'debug': logging.DEBUG,
                   'info': logging.INFO,
                   'warning': logging.WARNING,
@@ -67,21 +67,21 @@ class Logger():
 
             cfg = Loader()
             config = cfg.load()[0]
-            filename = "%s/%s.log" % (config['log_dir_path'], plugin_name)
+            filename = "%s/%s.log" % (config['log_dir_path'], component_name)
             level = config['log_level']
 
             if level not in LEVELS:
                 raise ValueError("level must be one of 'debug','info','warning',"\
                         "'error','critical'. Check your config.")
 
-            logger = logging.getLogger('domogik-%s' % plugin_name)
+            logger = logging.getLogger('domogik-%s' % component_name)
             hdlr = logging.FileHandler(filename)
             formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
             hdlr.setFormatter(formatter)
             logger.addHandler(hdlr)
             logger.setLevel(LEVELS[level])
 
-            self.__class__.logger[plugin_name] = logger
+            self.__class__.logger[component_name] = logger
 
     def get_logger(self, logger_name = None):
         '''
