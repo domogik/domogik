@@ -157,7 +157,8 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", \
                    "SystemStats", "SystemStatsValue", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel", "Page", \
+                   "XplCommandParam", "XplStatParam", "XplCommand", "XplStat") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
