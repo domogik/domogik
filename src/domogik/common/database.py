@@ -56,7 +56,8 @@ from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST
+        UserAccount, SENSOR_VALUE_TYPE_LIST,
+        XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
 
@@ -187,6 +188,120 @@ class DbHelper():
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()
+####
+# Pages
+####
+    def add_page(self, name, parentId, descr=None, icon=None):
+        """Add a page
+
+        @param name : page name
+        @param parentId : the parent page id (to define the new lft/right values
+        @param desc : page description
+        @param icon : page icon
+        @return a Page object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        p = Page(name=name, description=descr, icon=icon)
+        if parentId != None:
+            parent = self.__session.query(Page).filter_by(id=parentId).first()
+	    p.left = int(parent.left) + 1
+            p.right = int(parent.left) + 2
+	    self.__session.query(Page).filter(Page.right > parent.left).update({Page.right: Page.right + 2})
+	    self.__session.query(Page).filter(Page.left > parent.left).update({Page.left: Page.left + 2})
+        else:
+            p.left = 1
+            p.right = 2
+        self.__session.add(p)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return p
+    
+    def update_page(self, id, name=None, parent=0, descr=None, icon=None):
+        """Update an page
+
+        @param id : page id to be updated
+        @param name : page name (optional)
+        @param parent : page parent (optional)
+        @param descr : page detailed description (optional)
+        @param parent : page icon (optional)
+        @return an Page object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        if p is None:
+            self.__raise_dbhelper_exception("Page with id %s couldn't be found" % id)
+        if name is not None:
+            p.name = ucode(name)
+        if icon is not None:
+            p.icon = ucode(icon)
+        if descr is not None:
+            if descr == '': description = None
+            p.description = ucode(descr)
+        self.__session.add(p)
+        #if parent != 0:
+            # TODO UPDATE lft and rgt
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return p
+
+    def del_page(self, pid):
+        """Delete a page record
+
+        @param pid : id of the page to delete
+        @return the deleted Page object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        print pid
+        if pid == '1':
+            self.__raise_dbhelper_exception("Can not delete the root page", True)
+        else:
+            p = self.__session.query(Page).filter_by(id=pid).first()
+            if p:
+            # chek if there are no children
+                if p.left + 1 != p.right:
+                    self.__raise_dbhelper_exception("Can not delete page %s, it still has children" % p, True)
+                else:
+                    dl = p.right - p.left + 1
+		    self.__session.query(Page).filter(Page.right > p.right).update({Page.right: Page.right - dl})
+		    self.__session.query(Page).filter(Page.left > p.right).update({Page.left: Page.left - dl})
+                    self.__session.delete(p)
+                    try:
+                        self.__session.commit()
+                    except Exception, sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                    return p
+            else:
+                self.__raise_dbhelper_exception("Couldn't delete page with id %s : it doesn't exist" % pid)
+
+    def view_page(self, id):
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        return p 
+
+    def tree_page(self, id):
+        self.__session.expire_all()
+        if id==0:
+            ret = self.__session.query(Page).order_by(sqlalchemy.asc(Page.left)).all()
+        else:
+            p = self.__session.query(Page).filter_by(id=id).first()
+            ret = self.__session.query(Page).filter(Page.left >= p.left).filter(Page.left <= p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        return ret 
+
+    def path_page(self, id):
+        self.__session.expire_all()
+        p = self.__session.query(Page).filter_by(id=id).first()
+        ret = self.__session.query(Page).filter(Page.left <= p.left).filter(Page.right >= p.right).order_by(sqlalchemy.asc(Page.left)).all()
+        return ret 
 
 ####
 # Device usage
@@ -295,13 +410,16 @@ class DbHelper():
 ####
 # Device type
 ####
-    def list_device_types(self):
+    def list_device_types(self, plugin=None):
         """Return a list of device types
 
         @return a list of DeviceType objects
 
         """
-        return self.__session.query(DeviceType).all()
+        if plugin is not None:
+            return self.__session.query(DeviceType).filter_by(device_technology_id=ucode(plugin)).all()
+        else:
+            return self.__session.query(DeviceType).all()
 
     def get_device_type_by_name(self, dty_name):
         """Return information about a device type
@@ -445,6 +563,16 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeature).filter_by(id=df_id).first()
 
+    def get_device_feature_by_type(self, d_type):
+        """Return a device feature
+
+        @param df_id : device feature id
+        @return a DeviceFeature object
+
+        """
+        return self.__session.query(DeviceFeature).filter_by(device_type_id=d_type).first()
+
+
     def list_device_features(self):
         """List device features
 
@@ -515,6 +643,16 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureModel).filter_by(id=dtf_id).first()
 
+    def get_device_feature_model_by_device_type(self, dt):
+        """Return information about a model for a device type feature
+
+        @param dtf_id : model id
+        @return a DeviceFeatureModel object
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dt)).all()
+
+
 ####
 # Actuator feature model
 ####
@@ -543,7 +681,7 @@ class DbHelper():
                     ).first()
 
     def add_actuator_feature_model(self, af_id, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
-                                   af_parameters=None, af_stat_key=None):
+                                   af_xpl_command=None, af_value_field=None, af_values=None, af_stat_key=None):
         """Add a model for an actuator feature
 
         @param af_id : actuator id
@@ -566,8 +704,8 @@ class DbHelper():
                                        % af_device_type_id)
         device_feature_m = DeviceFeatureModel(id=ucode(af_id), name=ucode(af_name), feature_type=u'actuator',
                                               device_type_id=af_device_type_id, value_type=af_value_type,
-                                              return_confirmation=af_return_confirmation,
-                                              parameters=af_parameters, stat_key=af_stat_key)
+                                              xpl_command=af_xpl_command, values=af_values,
+                                              value_field=af_value_field, stat_key=af_stat_key)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -576,7 +714,7 @@ class DbHelper():
         return device_feature_m
 
     def update_actuator_feature_model(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
-                                      af_return_confirmation=None, af_stat_key=None):
+                                      af_xpl_command=None, af_value_field=None, af_values=None, af_stat_key=None):
         """Update a model for an actuator feature
 
         @param af_id : actuator feature model id
@@ -602,19 +740,21 @@ class DbHelper():
             device_feature_m.id = ucode(af_id)
         if af_name is not None:
             device_feature_m.name = ucode(af_name)
-        if af_parameters is not None:
-            if af_parameters == '':
-                af_parameters = None
-            device_feature_m.parameters = ucode(af_parameters)
         if af_value_type is not None:
             if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
                 self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
                                            % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
             device_feature_m.value_type = ucode(af_value_type)
-        if af_return_confirmation is not None:
-            device_feature_m.return_confirmation = af_return_confirmation
         if af_stat_key is not None:
             device_feature_m.stat_key = ucode(af_stat_key)
+        if af_xpl_command is not None:
+            device_feature_m.xpl_command = ucode(af_xpl_command)
+        if af_value_type is not None:
+            device_feature_m.value_type = ucode(af_value_type)
+        if af_value_field is not None:
+            device_feature_m.value_field = ucode(af_value_field)
+        if af_values is not None:
+            device_feature_m.values = ucode(af_values)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -672,8 +812,8 @@ class DbHelper():
                     ).filter_by(feature_type=u'sensor'
                     ).first()
 
-    def add_sensor_feature_model(self, sf_id, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None,
-                                 sf_stat_key=None):
+    def add_sensor_feature_model(self, sf_id, sf_name, sf_device_type_id, sf_value_type,
+                                 sf_stat_key=None, sf_unit=None):
         """Add a model for sensor feature
 
         @param sf_id : sensor feature id
@@ -694,7 +834,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("Can't add sensor : device type id '%s' doesn't exist" % sf_device_type_id)
         device_feature_m = DeviceFeatureModel(id=ucode(sf_id), name=ucode(sf_name), feature_type=u'sensor',
                                               device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
-                                              parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
+                                              stat_key=ucode(sf_stat_key), unit=ucode(sf_unit))
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -702,8 +842,8 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device_feature_m
 
-    def update_sensor_feature_model(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None,
-                                    sf_stat_key=None):
+    def update_sensor_feature_model(self, sf_id, sf_name=None, sf_value_type=None,
+                                    sf_stat_key=None, sf_unit=None):
         """Update a model for a sensor feature
 
         @param sf_id : sensor feature model id
@@ -727,10 +867,6 @@ class DbHelper():
             device_feature_m.id = ucode(sf_id)
         if sf_name is not None:
             device_feature_m.name = ucode(sf_name)
-        if sf_parameters is not None:
-            if sf_parameters == '':
-                sf_parameters = None
-            device_feature_m.parameters = ucode(sf_parameters)
         if sf_value_type is not None:
             if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
                 self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
@@ -738,6 +874,8 @@ class DbHelper():
             device_feature_m.value_type = ucode(sf_value_type)
         if sf_stat_key is not None:
             device_feature_m.stat_key = ucode(sf_stat_key)
+        if sf_unit is not None:
+            device_feature_m.unit = ucode(sf_unit)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -1050,11 +1188,10 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(usage_id=du_id).all()
 
-    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_description=None, d_reference=None):
+    def add_device(self, d_name, d_type_id, d_usage_id, d_description=None, d_reference=None):
         """Add a device item
 
         @param d_name : name of the device
-        @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage_id : usage id (ex. temperature)
         @param d_description : extended device description, optional
@@ -1068,9 +1205,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % d_type_id)
         if not self.__session.query(DeviceUsage).filter_by(id=d_usage_id).first():
             self.__raise_dbhelper_exception("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
-        if self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==d_type_id).count() != 0:
-            self.__raise_dbhelper_exception("Couldn't add device, same device with adress %s and type %s already exists" % (d_address,d_type_id))
-        device = Device(name=d_name, address=d_address, description=d_description, reference=d_reference,
+        device = Device(name=d_name, description=d_description, reference=d_reference, \
                         device_type_id=d_type_id, device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
@@ -1089,14 +1224,13 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None, d_usage_id=None, d_description=None, d_reference=None):
+    def update_device(self, d_id, d_name=None, d_usage_id=None, d_description=None, d_reference=None, d_address=None):
         """Update a device item
 
         If a param is None, then the old value will be kept
 
         @param d_id : Device id
         @param d_name : device name (optional)
-        @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
         @param d_description : Extended item description (optional)
         @param d_usage : Item usage id (optional)
         @return the updated Device object
@@ -1110,9 +1244,6 @@ class DbHelper():
         if d_name is not None:
             device.name = ucode(d_name)
         if d_address is not None:
-            # only do the check if we update the device address
-            if device.address != ucode(d_address) and self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==device.device_type_id).count() != 0:
-                self.__raise_dbhelper_exception("Couldn't update device, same device with adress %s and type %s already exists" % (d_address,device.device_type_id))
             device.address = ucode(d_address)
         if d_description is not None:
             if d_description == '': d_description = None
@@ -2025,6 +2156,207 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return ui_item_config_list
 
+###################
+# xplcommand
+###################
+    def get_xpl_command(self, p_id):
+        return self.__session.query(XplCommand).filter_by(id=p_id).first()
+
+    def get_xpl_command_by_device_id(self, d_id):
+        return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
+
+    def add_xpl_command(self, schema, reference, device_id, stat_id):
+        self.__session.expire_all()
+        cmd = XplCommand(schema=schema, reference=reference, device_id=device_id, stat_id=stat_id)
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+    def del_xpl_command(self, id):
+        self.__session.expire_all()
+        cmd = self.__session.query(XplCommand).filter_by(id=id).first()
+        if cmd is not None:
+            self.__session.delete(cmd)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return cmd
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-command with id %s : it doesn't exist" % id)
+
+    def update_xpl_command(self, id, schema=None, reference=None, device_id=None, stat_id=None):
+        """Update a xpl_stat
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        cmd = self.__session.query(XplCommand).filter_by(id=id).first()
+        if cmd is None:
+            self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % id)
+        if schema is not None:
+            cmd.schema = ucode(schema)
+        if reference is not None:
+            cmd.reference = ucode(reference)
+        if device_id is not None:
+            cmd.device_id = device_id
+        if stat_id is not None:
+            cmd.stat_id = stat_id
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+
+###################
+# xplstat
+###################
+    def get_all_xpl_stat(self):
+        return self.__session.query(XplStat).all()
+
+    def get_xpl_stat(self, p_id):
+        return self.__session.query(XplStat).filter_by(id=p_id).first()
+    
+    def get_xpl_stat_by_device_id(self, d_id):
+        return self.__session.query(XplStat).filter_by(device_id=d_id).all()
+
+    def add_xpl_stat(self, schema, reference, device_id):
+        self.__session.expire_all()
+        stat = XplStat(schema=schema, reference=reference, device_id=device_id)
+        self.__session.add(stat)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return stat
+
+    def del_xpl_stat(self, id):
+        self.__session.expire_all()
+        stat = self.__session.query(XplStat).filter_by(id=id).first()
+        if stat is not None:
+            self.__session.delete(stat)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return stat
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
+    
+    def update_xpl_stat(self, id, schema=None, reference=None, device_id=None):
+        """Update a xpl_stat
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        stat = self.__session.query(XplStat).filter_by(id=id).first()
+        if stat is None:
+            self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % id)
+        if schema is not None:
+            stat.schema = ucode(schema)
+        if reference is not None:
+            stat.reference = ucode(reference)
+        if device_id is not None:
+            stat.device_id = device_id
+        self.__session.add(stat)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return stat
+
+###################
+# XplCommandParam
+###################
+    def add_xpl_command_param(self, cmd_id, key, value, static):
+        self.__session.expire_all()
+        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value, static=static)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def update_xpl_command_param(self, cmd_id, key, value=None, static=None):
+        self.__session.expire_all()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=cmd_id).filter_by(key=key).first()
+        if param is None:
+            self.__raise_dbhelper_exception("XplCommandParam with id %s and key %s couldn't be found" % (cmd_id, key))
+        if value is not None:
+            param.value = ucode(value)
+        if static is not None:
+            param.static = static
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def del_xpl_command_param(self, id, key):
+        self.__session.expire_all()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).filter_by(key=key).first()
+        if param is not None:
+            self.__session.delete(param)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return param
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-command-param with id %s : it doesn't exist" % id)
+
+###################
+# XplStatParam
+###################
+    def add_xpl_stat_param(self, statid, key, value, static, stat_key):
+        self.__session.expire_all()
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, stat_key=key)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, stat_key=None):
+        self.__session.expire_all()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
+        if param is None:
+            self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % id)
+        if value is not None:
+            param.value = ucode(value)
+        if static is not None:
+            param.static = static
+        if stat_key is not None:
+            param.stat_key = stat_key
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def del_xpl_stat_param(self, stat_id, key):
+        self.__session.expire_all()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
+        if param is not None:
+            self.__session.delete(param)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return param
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id %s : it doesn't exist" % id)
+         
+###################
+# helper functions
+###################
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
         """Raise a DbHelperException and log it
 
