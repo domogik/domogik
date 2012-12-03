@@ -80,7 +80,7 @@ else:
 
 setup(
     name = 'Domogik',
-    version = '0.2.0',
+    version = '0.3.0',
     url = 'http://www.domogik.org/',
     description = 'OpenSource home automation software',
     author = 'Domogik team',
