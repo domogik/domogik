@@ -89,6 +89,8 @@ EXTERNAL_JSON_PATH = "%s/domogik_packages/externals" % INSTALL_PATH
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
 PKG_PART_RINOR = "rinor"
+# plugin json version should at least be ...
+MIN_JSON_VERSION = 2
 
 class PackageManager():
     """ Tool to create packages
@@ -424,6 +426,14 @@ class PackageManager():
         print("%s < %s" % ( pkg_json["identity"]["domogik_min_version"] , dmg.__version__))
         if pkg_json["identity"]["domogik_min_version"] > dmg.__version__:
             msg = "This package needs a Domogik version >= %s. Actual is %s. Installation ABORTED!" % (pkg_json["identity"]["domogik_min_version"], dmg.__version__)
+            self.log(msg)
+            raise PackageException(msg)
+
+        # check the json_version file
+        self.log("Required json version = %s" % MIN_JSON_VERSION )
+        self.log("Package json version = %s" % pkg_json["json_version"])
+        if pkg_json["json_version"] < MIN_JSON_VERSION : 
+            msg = "This package has json_version set to %s, but Domogik needs at least %s" % (pkg_json["json_version"], MIN_JSON_VERSION )
             self.log(msg)
             raise PackageException(msg)
 

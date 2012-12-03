@@ -75,7 +75,7 @@
             "schema": "lighting.device",
             "parameters": {
                     "static": [],
-                     "device": [
+                    "device": [
                         {
                             "key": "channel",
                             "description": "The channel number",
