@@ -176,6 +176,291 @@ class CronRest():
         else :
             return False
 
+class PluginStoreInf():
+    """
+    A class to store plugin data in the file system.
+    We use the ConfigParser to store informations in a config file (also known as Inf files).
+
+    We store multiple keys (set(), dict(), ...) in a section. We will use an integer as key.
+    ie : [alarm,alarm1,alarm2,...] <--> section:[alarm] 0= 1= 2=
+
+    We also manage statistics : "current", "state", "runs", "createtime", "runtime"
+    ie : [stats_createtime,stats_starttime,stats_runs,...] <--> section:[stats] createtime= startime= runs=
+
+    All needed data is stored in the parent container (which is supposed to be a dict).
+    The key will start with the prefix "stats_"
+
+    """
+    def __init__(self, plugin, filext=".dat"):
+        """
+        Initialise the store engine. Create the directory if necessary.
+
+        @param plugin : the plugin
+        @param filext : the file extension used to store data. Must start with a "."
+
+        """
+        self._plugin = plugin
+        data_dir = self.get_data_files_directory()
+        self._plugin.log.debug("Try to use %s to store data." % data_dir)
+        if os.path.exists(data_dir):
+            if not os.access(data_dir, os.W_OK & os.X_OK):
+                raise OSError("Can't write in directory %s" % data_dir)
+        else:
+            try:
+                self._plugin.log.info("cronJobs.store_init : create directory %s." % data_dir)
+                os.mkdir(data_dir, 0770)
+            except:
+                raise IOError("Can't create directory %s." % data_dir)
+        try:
+            tmp_prefix = "write_test";
+            count = 0
+            filename = os.path.join(data_dir, tmp_prefix)
+            while(os.path.exists(filename)):
+                filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix),count)
+                count = count + 1
+            f = open(filename,"w")
+            f.close()
+            os.remove(filename)
+        except :
+            raise IOError("Can't create a file in directory %s." % data_dir)
+        self._data_files_dir = data_dir
+        self._plugin.log.info("Use directory %s to store data." % self._data_files_dir)
+
+        self._filext = filext
+
+        self.badfields = ["action", "starttime", "uptime", ]
+
+        self.statfields = ["current", "state", "runs", "createtime", "runtime"]
+
+    def load_all(self, add_job_cb):
+        """
+        Load all jobs from the filesystem. Parse all the *.job files
+        in directory and call the callback method to add it to the cron
+        jobs.
+
+        @param add_job_cb : callback to the function who add the job to CronJobs
+
+        """
+        for jobfile in glob.iglob(self._data_files_dir+"/*"+self._filext) :
+            config = ConfigParser.ConfigParser()
+            config.read(jobfile)
+            self._plugin.log.debug("store_init : Load job from %s" % jobfile)
+            data = dict()
+            for option in config.options('Job'):
+                data[option] = config.get('Job', option)
+            for option in config.options('Stats'):
+                data[option] = config.get('Stats', option)
+            if config.has_section('Sensor'):
+                for option in config.options('Sensor'):
+                    data['sensor_'+option] = config.get('Sensor', option)
+            if config.has_section('Timers'):
+                timers = set()
+                for option in config.options('Timers'):
+                    timers.add(config.get('Timers', option))
+                data['timer'] = timers
+            #Will be implement in the future
+            if config.has_section('Dates'):
+                timers = set()
+                for option in config.options('Dates'):
+                    timers.add(config.get('Dates', option))
+                data['date'] = timers
+            if config.has_section('Alarms'):
+                alarms = set()
+                for option in config.options('Alarms'):
+                    alarms.add(config.get('Alarms', option))
+                data['alarm'] = alarms
+            err = add_job_cb(data['device'], data['devicetype'], data)
+            if err != ERROR_NO :
+                self._plugin.log.warning("Can't load job from %s : error=%s" % (jobfile,CRONERRORS[err]))
+
+    def _get_filename(self, job):
+        """
+        Return the filename associated to a job.
+
+        @param job : the job name
+
+        """
+        return os.path.join(self._data_files_dir, job + self._filext)
+
+    def on_start(self, job, data):
+        """
+        Must be called when a job is started. Is also (indirectly)
+        called when a job is resumed.
+
+        @param job : the job name
+        @param data : a dict() containing the parameters of the job
+
+        """
+        try:
+            self._plugin.log.debug("on_start : job %s" % job)
+            config = ConfigParser.ConfigParser()
+            if os.path.isfile(self._get_filename(job)):
+                #The file already exists. We are in resume case.
+                config.read(self._get_jobfile(job))
+            timer_idx = 1
+            alarm_idx = 1
+            date_idx = 1
+            if not config.has_section('Job'):
+                config.add_section('Job')
+            if not config.has_section('Stats'):
+                config.add_section('Stats')
+            for key in data:
+                if key.startswith("timer") :
+                    if not config.has_section('Timers'):
+                        config.add_section('Timers')
+                    if type(data[key])==type(""):
+                        config.set('Timers', str(timer_idx), data[key])
+                        timer_idx = timer_idx + 1
+                    else:
+                        for tim in data[key] :
+                            config.set('Timers', str(timer_idx), tim)
+                            timer_idx = timer_idx + 1
+                elif key.startswith("alarm") :
+                    if not config.has_section('Alarms'):
+                        config.add_section('Alarms')
+                    if type(data[key])==type(""):
+                        config.set('Alarms', str(alarm_idx), data[key])
+                        alarm_idx = alarm_idx + 1
+                    else:
+                        for al in data[key] :
+                            config.set('Alarms', str(alarm_idx), al)
+                            alarm_idx = alarm_idx + 1
+                #Will be implement in the future
+                elif key.startswith("date") :
+                    if not config.has_section('Dates'):
+                        config.add_section('Dates')
+                    if type(data[key])==type(""):
+                        config.set('Dates', str(date_idx), data[key])
+                        date_idx = date_idx + 1
+                    else:
+                        for al in data[key] :
+                            config.set('Dates', str(date_idx), al)
+                            date_idx = date_idx + 1
+                elif key.startswith("sensor_") :
+                    if not config.has_section('Sensor'):
+                        config.add_section('Sensor')
+                    config.set('Sensor', key[7:], data[key])
+                elif key in self._statfields:
+                    if key == "createtime":
+                        config.set('Stats', key, data[key])
+                        #We do nothing, this jobs may not be updated as the jobs where stopped
+                    else:
+                        config.set('Stats', key, data[key])
+                elif key in self._badfields:
+                    continue
+                else :
+                    config.set('Job', key, data[key])
+            if not config.has_section('Stats'):
+                config.add_section('Stats')
+            config.set('Stats', "state", "started")
+            with open(self._get_jobfile(job), 'w') \
+                    as configfile:
+                config.write(configfile)
+            configfile.close
+            return ERROR_NO
+        except:
+            self._plugin.log.error("store_on_start : " + traceback.format_exc())
+            return ERROR_STORE
+
+    def on_halt(self, job):
+        """
+        Must be called when a job is halted. It deletes the file
+        associated to the job.
+
+        @param job : the job name
+
+        """
+        try:
+            self._plugin.log.debug("store_on_halt : job %s" % job)
+            if os.path.isfile(self._get_jobfile(job)):
+                os.remove(self._get_jobfile(job))
+            return ERROR_NO
+        except:
+            self._plugin.log.error("store_on_halt : " + traceback.format_exc())
+            return ERROR_STORE
+
+    def on_stop(self, job, uptime, runtime, runs):
+        """
+        Must be called when a job is stopped.
+
+        @param job : the job name
+        @param uptime : the uptime of the job
+        @param runtime : the cumulative runtime of the job
+        @param runs : the number of job's run
+
+        """
+        try:
+            self._plugin.log.debug("store_on_stop : job %s" % job)
+            config = ConfigParser.ConfigParser()
+            config.read(self._get_jobfile(job))
+            config.set('Stats', "state", "stopped")
+            config.set('Stats', "runs", runs)
+            config.set('Stats', "runtime", runtime)
+            with open(self._get_jobfile(job), 'w') as configfile:
+                config.write(configfile)
+                configfile.close
+            return ERROR_NO
+        except:
+            self._plugin.log.error("store_on_stop : " + traceback.format_exc())
+            return ERROR_STORE
+
+    def on_close(self, job, uptime, runtime, runs):
+        """
+        Must be called when a job is closed : the plugin is stopped.
+
+        @param job : the job name
+        @param uptime : the uptime of the job
+        @param runtime : the runtime of the job
+        @param runs : the number of job's run
+
+        """
+        try:
+            self._plugin.log.debug("store_on_close : job %s" % job)
+            config = ConfigParser.ConfigParser()
+            config.read(self._get_jobfile(job))
+            config.set('Stats', "runs", runs)
+            config.set('Stats', "runtime", runtime)
+            with open(self._get_jobfile(job), 'w') as configfile:
+                config.write(configfile)
+                configfile.close
+            return ERROR_NO
+        except:
+            self._plugin.log.error("store_on_close : " + traceback.format_exc())
+            return ERROR_STORE
+
+    def on_resume(self, job):
+        """
+        Must be called when a job is resumed.
+
+        @param job : the job name
+
+        """
+
+    def on_fire(self, job, status, uptime, runtime, runs):
+        """
+        Must be called when a job is fired.
+
+        @param job : the job name
+        @param status : the status of the sensor associated to the job
+        @param uptime : the uptime of the job
+        @param runtime : the cumulative runtime of the job
+        @param runs : the number of job's run
+
+        """
+        try:
+            self._plugin.log.debug("store_on_fire : job %s" % job)
+            config = ConfigParser.ConfigParser()
+            config.read(self._get_jobfile(job))
+            config.set('Sensor', "status", status)
+            config.set('Stats', "runs", runs)
+            with open(self._get_jobfile(job), 'w') as configfile:
+                config.write(configfile)
+                configfile.close
+            return ERROR_NO
+        except:
+            self._plugin.log.error("store_on_fire : " + traceback.format_exc())
+            return ERROR_STORE
+
 class CronStore():
     """
     Store the jobs in the filesystem. We use a ConfigParser file per job.
@@ -190,18 +475,39 @@ class CronStore():
 
         """
         self._log = log
+        self._log.debug("cronJobs.store_init : Try to use %s to store jobs." % \
+                data_dir)
+        if os.path.exists(data_dir):
+            if not os.access(data_dir, os.W_OK & os.X_OK):
+                raise OSError("Can't write in directory %s" % data_dir)
+        else:
+            try:
+                self._log.info("cronJobs.store_init : create directory %s." % data_dir)
+                os.mkdir(data_dir, 0770)
+            except:
+                raise IOError("Can't create directory %s." % data_dir)
+        try:
+            tmp_prefix = "write_test";
+            count = 0
+            filename = os.path.join(data_dir, tmp_prefix)
+            while(os.path.exists(filename)):
+                filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix),count)
+                count = count + 1
+            f = open(filename,"w")
+            f.close()
+            os.remove(filename)
+        except :
+            raise IOError("Can't create a file in directory %s." % data_dir)
         self._data_files_dir = data_dir
-        self._log.debug("cronJobs.store_init : Use directory %s" % \
+        self._log.info("cronJobs.store_init : Use directory %s to store jobs." % \
                 self._data_files_dir)
-        if not os.path.isdir(self._data_files_dir):
-            os.mkdir(self._data_files_dir, 0770)
         self._badfields = ["action", "starttime", "uptime", ]
         self._statfields = ["current", "state", "runs", "createtime", "runtime"]
 
     def load_all(self, add_job_cb):
         """
         Load all jobs from the filesystem. Parse all the *.job files
-        in directory and call the callback ùethod to add it to the cron
+        in directory and call the callback method to add it to the cron
         jobs.
 
         @param add_job_cb : callback to the function who add the job to CronJobs
@@ -236,7 +542,7 @@ class CronStore():
                 for option in config.options('Alarms'):
                     alarms.add(config.get('Alarms', option))
                 data['alarm'] = alarms
-            err=add_job_cb(data['device'], data['devicetype'], data)
+            err = add_job_cb(data['device'], data['devicetype'], data)
             if err != ERROR_NO :
                 self._log.warning("Can't load job from %s : error=%s" % \
                     (jobfile,CRONERRORS[err]))

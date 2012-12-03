@@ -107,6 +107,8 @@ from domogik_packages.xpl.lib.cron import CronAPI
 from domogik_packages.xpl.lib.cron import CronException
 from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
 import traceback
+import time
+
 #import logging
 
 class Cron(XplHlpPlugin):
@@ -122,40 +124,49 @@ class Cron(XplHlpPlugin):
         self.log.debug("__init__ : Start ...")
         self.config = Query(self.myxpl, self.log)
 
+        continue_boot = False
         self.log.debug("__init__ : Try to start the cron API")
         try:
             self._cron = CronAPI(self.log, self.config, self.myxpl, \
-                self.get_data_files_directory())
+                self.get_data_files_directory(), self.get_stop())
+            continue_boot = True
         except:
+            self.force_leave()
             error = "Something went wrong during cronAPI init : %s" %  \
                      (traceback.format_exc())
             self.log.error("__init__ : "+error)
-            raise CronException(error)
+            return
 
-        self.helpers =   \
-           {
-             "memory" :
-              {
-                "cb" : self._cron.helpers.helper_memory,
-                "desc" : "Show memory usage of variables. Experimental.",
-                "usage" : "memory",
-              }
-            }
 
-        self.enable_helper()
+        if continue_boot:
+            self.log.debug("__init__ : Enable heplers")
+            self.helpers =   \
+               {
+                 "memory" :
+                  {
+                    "cb" : self._cron.helpers.helper_memory,
+                    "desc" : "Show memory usage of variables. Experimental.",
+                    "usage" : "memory",
+                  }
+                }
 
-        self.log.debug("__init__ : Try to create listeners")
-        Listener(self.request_cmnd_cb, self.myxpl,
+            self.enable_helper()
+
+            self.log.debug("__init__ : Try to create listeners")
+            Listener(self.request_cmnd_cb, self.myxpl,
                  {'schema': 'timer.request', 'xpltype': 'xpl-cmnd'})
-        Listener(self.basic_cmnd_cb, self.myxpl,
+            Listener(self.basic_cmnd_cb, self.myxpl,
                  {'schema': 'timer.basic', 'xpltype': 'xpl-cmnd'})
 
-        self.add_stop_cb(self._cron.stop_all)
+            self.add_stop_cb(self._cron.stop_all)
 
-        self.log.debug("__init__ : Enable the heartbeat")
-        self.enable_hbeat()
+            self.log.debug("__init__ : Enable the heartbeat")
+            self.enable_hbeat()
 
-        self.log.info("Plugin cron correctly started.")
+            self.log.info("Plugin cron correctly started.")
+#        else:
+#            time.sleep(2)
+#            self.force_leave()
 
     def request_cmnd_cb(self, message):
         """

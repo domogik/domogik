@@ -39,6 +39,7 @@ import datetime
 import time
 import urllib2
 import threading
+from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.xplmessage import XplMessage
 from apscheduler.scheduler import Scheduler
 from domogik_packages.xpl.lib.cron_tools import *
@@ -255,7 +256,7 @@ class CronJobs():
         """
         okk = True
         try:
-            print "data : %s" % self.data[device]
+            #print "data : %s" % self.data[device]
             if 'date' not in self.data[device] and 'date0' not in self.data[device] :
                 okk = False
             parameters = self._extract_parameters(device)
@@ -302,7 +303,7 @@ class CronJobs():
                         sdate, args=[device, parameters, events[d]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("Add a date job %s." % str(jobs))
+                self._api.log.info("Add a date job %s." % device)
         except:
             self._api.log.warning("_start_job_date : " + \
                 traceback.format_exc())
@@ -395,7 +396,6 @@ class CronJobs():
         @param device : the name of the job (=device in xpl)
 
         """
-        self._api.log.info("Add an interval job.")
         try:
             okk = False
             weeks = 0
@@ -447,7 +447,7 @@ class CronJobs():
                     seconds=seconds+duration, start_date=startdate, args=[device, parameters, "valueoff"]))
             self.data[device]['apjobs'] = jobs
             self._job_started(device)
-            self._api.log.info("Add an interval job %s." % str(jobs))
+            self._api.log.info("Add an interval job %s." % device)
         except:
             self._api.log.warning("_start_jobInterval : " + \
                 traceback.format_exc())
@@ -533,7 +533,7 @@ class CronJobs():
                 second=second, start_date=startdate, args=[device])
             self.data[device]['apjob'] = job
             self._job_started(device)
-            self._api.log.info("Add a cron job %s." % str(job))
+            self._api.log.info("Add a cron job %s." % device)
         except:
             self._api.log.warning("_start_jobCron : " + \
                 traceback.format_exc())
@@ -738,7 +738,7 @@ class CronJobs():
                             args=[device, parameters, events[d][h]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("Add an hvac job %s." % str(jobs))
+                self._api.log.info("Add an hvac job %s." % device)
         except:
             self._api.log.warning("_start_jobHvac : " + \
                 traceback.format_exc())
@@ -775,7 +775,6 @@ class CronJobs():
             alarm=SaSu,08:00,18:00
             alarm=MoTuWeThFrSaSu,07:00-08:00,17:00-21:00
          }
-
 
         @param device : the name of the job (=device in xpl)
 
@@ -870,7 +869,7 @@ class CronJobs():
                                 args=[device, parameters, events[d][h]]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("Add an alarm job %s." % str(jobs))
+                self._api.log.info("Add an alarm job %s." % device)
         except:
             self._api.log.warning("_start_jobAlarm : " + \
                 traceback.format_exc())
@@ -1064,7 +1063,7 @@ class CronJobs():
                             args = [device, param_dim, "valueoff"]))
                 self.data[device]['apjobs'] = jobs
                 self._job_started(device)
-                self._api.log.info("Add a dawn alarm job %s." % str(jobs))
+                self._api.log.info("Add a dawn alarm job %s." % device)
         except:
             self._api.log.warning("_start_jobDawnAlarm : " + \
                 traceback.format_exc())
@@ -1497,7 +1496,7 @@ class CronAPI:
     cron API
     """
 
-    def __init__(self, log, config, myxpl, data_dir):
+    def __init__(self, log, config, myxpl, data_dir, stop):
         """
         Constructor
 
@@ -1505,12 +1504,14 @@ class CronAPI:
         @param config : the config object to use
         @param myxpl : the xpl sender to use
         @param data_dir : the data_dir where store the files
+        @param stop : the stop method
 
         """
         self.log = log
         self.myxpl = myxpl
         self.config = config
         self.data_files_dir = data_dir
+        self._stop = stop
         self.tools = CronTools()
         try:
             self.delay_sensor = int(self.config.query('cron', 'delay-sensor'))
@@ -1521,6 +1522,7 @@ class CronAPI:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.error("__init__ : " + error)
+            self.log.error("Continue with default values.")
         self._jobs_lock = threading.Semaphore()
         try :
             self._jobs_lock.acquire()
@@ -1529,16 +1531,11 @@ class CronAPI:
             self._jobs_lock.release()
         self.rest_server_ip = "127.0.0.1"
         self.rest_server_port = "40405"
-        try:
-            cfg_rest = Loader('rest')
-            config_rest = cfg_rest.load()
-            conf_rest = dict(config_rest[1])
-            self.rest_server_ip = conf_rest['rest_server_ip']
-            self.rest_server_port = conf_rest['rest_server_port']
-        except:
-            error = "Can't get configuration from config loader : %s" %  \
-                     (traceback.format_exc())
-            self.log.error("__init__ : " + error)
+        cfg_rest = Loader('rest')
+        config_rest = cfg_rest.load()
+        conf_rest = dict(config_rest[1])
+        self.rest_server_ip = conf_rest['rest_server_ip']
+        self.rest_server_port = conf_rest['rest_server_port']
         self.rest = CronRest(self.rest_server_ip,self.rest_server_port,log)
         self.helpers = CronHelpers(self.log, self.jobs)
         if (self.delay_sensor >0):
@@ -2105,7 +2102,7 @@ class CronAPI:
             for dev in self.jobs.data :
                 if self.jobs.data[dev]["state"] == "started":
                     self._send_sensor_stat(self.myxpl,dev)
-                    time.sleep(self.delay_stat)
+                    self._stop.wait(self.delay_stat)
         finally :
             self._jobs_lock.release()
             self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
@@ -2197,6 +2194,8 @@ class CronAPI:
         """
         Stop the timer and the running jobs.
         """
+        self.log.info("cronAPI.stop_all : close all jobs.")
         self.jobs.close_all()
         self.jobs.stop_scheduler()
-        self.timer_stat.cancel()
+        if (self.delay_sensor >0):
+            self.timer_stat.cancel()

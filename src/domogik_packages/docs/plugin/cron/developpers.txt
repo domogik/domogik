@@ -147,3 +147,87 @@ function check_minute(minute) {
 function check_second(second) {
     // Check that a second is valid : 0..59
 
+About the new device interface
+==============================
+
+A new implementation of the device db model is updated : http://wiki.domogik.org/Spec_xplFromDb
+A side effect is that command use typed fields as parameters.
+So it's impossible to encapsulate anymore
+
+Here is a proposal for the new model :
+{
+    "reference": "start_job_date",
+    "schema": "timer.basic",
+    "parameters": [
+        {
+            "static": [
+                {
+                    "key": "devicetype",
+                    "value": "date",
+                },
+             ],
+             "device": [
+                {
+                     "key": "device",
+                     "description": "The job name",
+                     "type": "string",
+                },
+            ],
+            "dynamic": [
+                {
+                     "key": "date",
+                     "description": "The event date (YYYYMMDDHHMMSS)",
+                     "type": "string",
+                },
+                {
+                     "key": "date[0..]",
+                     "description": "The event date (YYYYMMDDHHMMSS)",
+                     "type": "string",
+                },
+            ],
+            "feature": []
+        }
+    ]
+ },
+{
+    "reference": "start_job_interval",
+    "schema": "timer.basic",
+    "parameters": [
+        {
+            "static": [
+                {
+                    "key": "devicetype",
+                    "value": "interval",
+                },
+             ],
+             "device": [
+                {
+                     "key": "device",
+                     "description": "The job name",
+                     "type": "string",
+                },
+            ],
+            "dynamic": [
+                {
+                     "key": "weeks",
+                     "description": "Every X weeks",
+                     "type": "integer",
+                },
+                {
+                     "key": "days",
+                     "description": "Every X days",
+                     "type": "integer",
+                },
+                {
+                     "key": "hours",
+                     "description": "Every X hours",
+                     "type": "integer",
+                },
+
+            ....
+
+            ],
+            "feature": []
+        }
+    ]
+ },

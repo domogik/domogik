@@ -23,7 +23,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-A client librairy to speak with the cron plugin, via xpl language
+A client library to speak with the cron plugin, via xpl language
 
 .. moduleauthor:: bibi21000 <bibi21000@gmail.com>
 .. copyright:: (C) 2007-2012 Domogik project

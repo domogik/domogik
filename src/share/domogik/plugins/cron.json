@@ -79,14 +79,14 @@
         "src/share/domogik/url2xpl/cron/create-dawnalarm.xml",
         "src/share/domogik/url2xpl/cron/create-date.xml",
         "src/share/domogik/url2xpl/cron/create-interval.xml",
-        "src/share/domogik/url2xpl/cron/resume.xml",
-        "src/share/domogik/url2xpl/cron/stop.xml",
         "src/share/domogik/url2xpl/cron/halt.xml",
+        "src/share/domogik/url2xpl/cron/help.xml",
+        "src/share/domogik/url2xpl/cron/info.xml",
         "src/share/domogik/url2xpl/cron/list.xml",
         "src/share/domogik/url2xpl/cron/log.xml",
-        "src/share/domogik/url2xpl/cron/help.xml",
         "src/share/domogik/url2xpl/cron/memory.xml",
-        "src/share/domogik/url2xpl/cron/info.xml",
+        "src/share/domogik/url2xpl/cron/resume.xml",
+        "src/share/domogik/url2xpl/cron/stop.xml",
         "src/domogik_packages/xpl/bin/cron.py",
         "src/domogik_packages/xpl/lib/cron.py",
         "src/domogik_packages/xpl/lib/cron_query.py",
@@ -113,12 +113,12 @@
                 "type": "python"
             }
         ],
-        "description": "Add a cron like server to the XPL network.\nDevelopment release.",
-        "documentation": "http://wiki.domogik.org/plugin_cron",
+        "description": "Add a cron like server to the XPL network. Manage timers, intervals, alarms, ... . Jobs can be created with the Admin pages or directly by plugin's developpers.",
+        "documentation": "http://docs.domogik.org/plugin/cron/dev/en/",
         "domogik_min_version": "0.2.0",
         "id": "cron",
         "type": "plugin",
-        "version": "0.3b1"
+        "version": "0.3b2"
     },
     "json_version": 1,
     "technology": {
