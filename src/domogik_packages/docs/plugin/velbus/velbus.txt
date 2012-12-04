@@ -88,7 +88,7 @@ In administration, go to Organization > Devices page to create your devices.
 |                    | Address           | The device address, consists of a decimal value of the velbus address and a channel number |
 |                    |                   | Example: 40-1                                                                              |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Feature           | Velbus.dimmer                                                                              |
+|                    | Feature           | Velbus.shutter                                                                             |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Usage             | An appropriate usage                                                                       |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
@@ -101,7 +101,7 @@ In administration, go to Organization > Devices page to create your devices.
 |                    | Address           | The device address, consists of a decimal value of the velbus address                      |
 |                    |                   | Example: 40                                                                                |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Feature           | Velbus.dimmer                                                                              |
+|                    | Feature           | Velbus.temp                                                                                |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Usage             | An appropriate usage                                                                       |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
