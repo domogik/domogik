@@ -2159,6 +2159,9 @@ class DbHelper():
 ###################
 # xplcommand
 ###################
+    def get_all_xpl_command(self):
+        return self.__session.query(XplCommand).all()
+    
     def get_xpl_command(self, p_id):
         return self.__session.query(XplCommand).filter_by(id=p_id).first()
 

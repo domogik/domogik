@@ -145,6 +145,7 @@ class ProcessRequest():
             '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':   '_rest_base_ui_item_config_del',
             '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
             # xpl-command
+            '^/base/xpl-command/list$':                                                          '_rest_base_xplcommand_list',
             '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
             '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
             '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
@@ -153,6 +154,7 @@ class ProcessRequest():
             '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
             '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
             # xpl-stat
+            '^/base/xpl-stat/list$':                                                             '_rest_base_xplstat_list',
             '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
             '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
             '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
@@ -4348,6 +4350,19 @@ class ProcessRequest():
 # Xpl from DB part
 ##########
 # XPL command
+    def _rest_base_xplcommand_list(self):
+        """ list xplcommands
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplCommand")
+        try:
+            cmd = self._db.get_all_xpl_command()
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
     def _rest_base_xplcommand_del(self, id):
         """ delete xplcommand
             @param id : cmd id
@@ -4394,6 +4409,19 @@ class ProcessRequest():
         self.send_http_response_ok(json_data.get())
 
 # XPL stat
+    def _rest_base_xplstat_list(self):
+        """ list xplcommands
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("XplStat")
+        try:
+            cmd = self._db.get_all_xpl_stat()
+            json_data.add_data(cmd)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
     def _rest_base_xplstat_del(self, id):
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
