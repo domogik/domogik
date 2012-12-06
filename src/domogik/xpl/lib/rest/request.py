@@ -4549,34 +4549,30 @@ class ProcessRequest():
             # find all features for this device
             for xpl_cmd in pjson['device_types'][dt.id]['xpl_commands']:
                 # find the xpl commands that are neede for this feature
-                cmd = pjson['xpl_commands'][xpl_cmd]
+                cmd = pjson['xpl_commands'][xpl_cmd].copy()
+                cmd['name'] = xpl_cmd
                 # finc the xpl_stat message
-                stat = pjson['xpl_stats'][cmd['stat_name']]
+                stat = pjson['xpl_stats'][cmd['stat_name']].copy()
+                stat['name'] = cmd['stat_name']
                 # append deviceprams
                 for p in cmd['parameters']['device_type']:
                     ret['global'].append( p )
                 if stat is not None:
                     for p in stat['parameters']['device_type']:
                         ret['global'].append( p )
-                # append the xpl_cmd stuff
-                ft = {}
-                ft['name'] = xpl_cmd
-                ft['schema'] = cmd['schema']
-                ft['reference'] = cmd['reference']
-                ft['params'] = []
-                for p in cmd['parameters']['device']:
-                    ft['params'].append( p )
-                ret['xpl_cmd'].append(ft)
-                # append the xpl_stat stuff
+                if json:
+                    # remove all parameters
+                    cmd['params'] = cmd['parameters']['device']
+                    del cmd['parameters']
+                ret['xpl_cmd'].append(cmd)
                 if stat is not None:
-                    ft = {}
-                    ft['name'] = cmd['stat_name']
-                    ft['schema'] = stat['schema']
-                    ft['reference'] = stat['reference']
-                    ft['params'] = []
-                    for p in stat['parameters']['device']:
-                        ft['params'].append( p )
-                    ret['xpl_stat'].append(ft)
+                    if json:
+                        # remove all parameters
+                        stat['params'] = stat['parameters']['device']
+                        del stat['parameters']
+                    ret['xpl_stat'].append(stat)
+                del stat
+                del cmd
             ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
             if json:
                 json_data.add_data(ret)
@@ -4589,56 +4585,3 @@ class ProcessRequest():
         if json:
             self.send_http_response_ok(json_data.get())
         return ret
-
-    def _rest_base_device_xpladd(self):
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device")
-        devParams = ['name', 'type_id', 'usage_id', 'description', 'reference']
-        if self.get_parameters("type_id") == None:
-            json_data.set_error(code = 999, description = "type_id is required")
-            self.send_http_response_ok(json_data.get())
-            return
-        xpl = self._rest_base_deviceparams(self.get_parameters("type_id"), False)
-        # first add the device itself
-        try:
-            device = self._db.add_device(d_name=self.get_parameters("name"), \
-                                         d_type_id=self.get_parameters("type_id"), \
-                                         d_usage_id=self.get_parameters("usage_id"), \
-                                         d_description=self.get_parameters("description"), \
-                                         d_reference=self.get_parameters("reference"))
-            dev = {}
-            dev['name'] = self.get_parameters("name")
-            dev['type_id'] = self.get_parameters("type_id")
-            dev['usage_id'] = self.get_parameters("usage_id")
-            dev['description'] = self.get_parameters("description")
-            dev['reference'] = self.get_parameters("reference")
-            # add the xplstat
-            xplstat = self._db.add_xpl_stat(schema=xpl['stat']['schema'], reference=xpl['stat']['reference'], device_id=device.id)
-            # add the xplstatparams
-            for i in xpl['stat']['parameters']['static']:
-                p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=i['value'], static=True, stat_key=None)
-            for i in xpl['stat']['parameters']['dynamic']:
-                p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=None, static=False, stat_key=i['stat_key'])
-            for i in xpl['stat']['parameters']['device']:
-                # value should be provided in the url
-                if self.get_parameters("stat_%s" % (i['key'])) is not None:
-                   p = self._db.add_xpl_stat_param(statid=xplstat.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True, stat_key=None)
-            # add the xplcommand
-            xplcommand = self._db.add_xpl_command(schema=xpl['cmd']['schema'], reference=xpl['stat']['reference'], device_id=device.id, stat_id=xplstat.id)
-            # add the xplcommandparams
-            for i in xpl['cmd']['parameters']['static']:
-                p = self._db.add_xpl_command_param(cmd_id=xplcommand.id, key=i['key'], value=i['value'], static=True)
-            for i in xpl['cmd']['parameters']['dynamic']:
-                p = self._db.add_xpl_command_param(cmd_id=xplcommand.id, key=i['key'], value=None, static=False)
-            for i in xpl['cmd']['parameters']['device']:
-                # value should be provided in the url
-                if self.get_parameters("stat_%s" % (i['key'])) is not None:
-                   p = self._db.add_xpl_command_param(cmd_id=xplcommand.id, key=i['key'], value=self.get_parameters("stat_%s" % (i['key'])), static=True)
-            # return the device
-            device.xplcommandid = xplcommand.id
-            json_data.add_data(device)
-        except:
-            
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
