@@ -1935,21 +1935,21 @@ class ProcessRequest():
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device")
         try:
             device = self._db.add_device(self.get_parameters("name"), \
                                          self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
-            js = self._rest_base_deviceparams(self.get_parameters("type_id"), json=False)
+            json_data.set_data_type("device")
+            json_data.add_data(device)
             ret = {}
-            ret["device"] = device
             ret["stats"] = []
-            ret["cmds"] = []
+            ret["commands"] = []
+            js = self._rest_base_deviceparams(self.get_parameters("type_id"), json=False)
             for stat in js['xpl_stat']:
                 xplstat = self._db.add_xpl_stat(schema=stat['schema'], reference=stat['reference'], device_id=device.id)
-                ret["stats"].append( {'reference': stat['reference'], 'id': xplstat.id} )
+                ret["stats"].append({'id': xplstat.id, 'reference': xplstat.reference})
             for cmd in js['xpl_cmd']:
                 ststid = None
                 if cmd['stat_reference'] is not None:
@@ -1957,7 +1957,8 @@ class ProcessRequest():
                         if stat['reference'] == cmd['stat_reference']:
                             statid = stat['id']
                 xplcommand = self._db.add_xpl_command(schema=cmd['schema'], reference=cmd['reference'], device_id=device.id, stat_id=statid)
-                ret["cmds"].append( {'reference': cmd['reference'], 'id': xplcommand.id} )
+                ret["commands"].append({'id': xplcommand.id, 'reference': xplcommand.reference})
+            json_data.set_data_type("dict")
             json_data.add_data(ret)
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
