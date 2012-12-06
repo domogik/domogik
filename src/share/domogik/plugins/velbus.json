@@ -34,14 +34,15 @@
             "type": "string"
         }
     ], 
-    "xpl_commands": [
-         {
-            "reference": "setlevel",
+    "xpl_commands": {
+         "set_level_bin": {
+            "reference": "",
             "schema": "lighting.basic",
-            "stat_reference": "get_level",
+            "stat_name": "get_level",
+            "return_confirmation": 1,
             "parameters": {
                     "static": [],
-                    "device": [
+                    "device_type": [
                         {
                             "key": "channel",
                             "description": "The channel number",
@@ -57,25 +58,57 @@
                             "min_value": 0
                         }
                     ],
-                    "feature": [],
+                    "device": [],
                     "dynamic": [
                         {
                             "key": "level",
+                            "value_type": "binary",
+                            "values": [0, 255]
+                        }
+                    ]
+                }
+         },
+         "set_level_range": {
+            "reference": "",
+            "schema": "lighting.basic",
+            "stat_name": "get_level",
+            "return_confirmation": 1,
+            "parameters": {
+                    "static": [],
+                    "device_type": [
+                        {
+                            "key": "channel",
+                            "description": "The channel number",
+                            "type": "integer",
+                            "max_value": 4,
+                            "min_value": 1
+                        },
+                        {
+                            "key": "address",
+                            "description": "The decimal address",
                             "type": "integer",
                             "max_value": 255,
                             "min_value": 0
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                            "key": "level",
+                            "value_type": "range",
+                            "values": [0, 255]
                         }
                     ]
                 }
          }
-    ],
-    "xpl_stats": [
-       {
+    },
+    "xpl_stats": {
+       "get_level": {
             "reference": "get_level",
             "schema": "lighting.device",
             "parameters": {
                     "static": [],
-                    "device": [
+                    "device_type": [
                         {
                             "key": "channel",
                             "description": "The channel number",
@@ -91,7 +124,7 @@
                             "min_value": 0
                         }
                     ],
-                    "feature": [],
+                    "device": [],
                     "dynamic": [
                         {
                              "key": "level",
@@ -100,128 +133,36 @@
                     ]
                 }
        }
-    ],
-    "device_feature_models": [
-        {
-            "device_type_id": "velbus.relay", 
-            "feature_type": "actuator", 
-            "id": "velbus.relay.switch", 
-            "name": "Switch", 
-            "stat_key": "level", 
-            "value_type": "binary",
-            "xpl_command": "setlevel",
-            "value_field": "level",
-            "values": [0, 255]
-        }, 
-        {
-            "device_type_id": "velbus.dimmer", 
-            "feature_type": "actuator", 
-            "id": "velbus.dimmer.switch", 
-            "name": "Switch", 
-            "stat_key": "level", 
-            "value_type": "binary",
-            "xpl_command": "setlevel",
-            "value_field": "level",
-            "values": [0, 255]
-        }, 
-        {
-            "device_type_id": "velbus.dimmer", 
-            "feature_type": "actuator", 
-            "id": "velbus.dimmer.change", 
-            "name": "Dimmer", 
-            "stat_key": "level", 
-            "value_type": "range",
-            "xpl_command": "setlevel",
-            "value_field": "",
-            "values": ""
-        }, 
-        {
-            "device_type_id": "velbus.shutter", 
-            "feature_type": "actuator", 
-            "id": "velbus.shutter.switch", 
-            "name": "Shutter", 
-            "stat_key": "command", 
-            "value_type": "binary",
-            "xpl_command": "setlevel",
-            "value_field": "level",
-            "values": ["up", "down"]
-        },
-        {
-            "device_type_id": "velbus.temp", 
-            "feature_type": "sensor", 
-            "id": "velbus.temp.current", 
-            "name": "Current temperature", 
-            "stat_key": "current", 
-             "value_type": "number",
-            "unit": "C"
-        }, 
-        {
-            "device_type_id": "velbus.temp", 
-            "feature_type": "sensor", 
-            "id": "velbus.temp.lowest", 
-            "name": "Lowest temperature", 
-            "stat_key": "current", 
-            "value_type": "number",
-            "unit": "C"
-        },
-        {
-        
-            "device_type_id": "velbus.temp", 
-            "feature_type": "sensor", 
-            "id": "velbus.temp.highest", 
-            "name": "Highest temperature", 
-            "stat_key": "highest", 
-            "value_type": "number",
-            "unit": "C"
- 	},
-        {
-            "device_type_id": "velbus.input", 
-            "feature_type": "sensor", 
-            "id": "velbus.input.state", 
-            "name": "State of a velbus input", 
-            "stat_key": "current", 
-            "value_type": "string",
-            "unit": ""
-        } 
-    ], 
-    "device_types": [
-        {
+    },
+    "device_types": {
+        "velbus.relay": {
             "description": "Switch one channel on a device", 
-            "id": "velbus.relay", 
-            "name": "Switch"
+            "name": "Switch",
+            "xpl_commands": ["set_level_bin"]
         }, 
-        {
+        "velbus.dimmer": {
             "description": "Dim one channel on a device", 
             "id": "velbus.dimmer", 
-            "name": "Dimmer"
+            "name": "Dimmer",
+            "xpl_commands": ["set_level_bin", "set_level_range"]
         }, 
-        {
+        "velbus.shutter": {
             "description": "Shutter control (up, down)", 
-            "id": "velbus.shutter", 
-            "name": "Shutter"
+            "name": "Shutter",
+            "xpl_commands": ["set_blind"]
         },
-        {
+        "velbus.temp": {
             "description": "Temperature Sensor", 
-            "id": "velbus.temp", 
             "name": "Temperature"
         },
-        {
+        "velbus.input": {
             "description": "Input contact", 
-            "id": "velbus.input", 
             "name": "Input"
         }
-    ], 
+    }, 
     "files": [
         "src/share/domogik/plugins/velbus.json", 
         "src/share/domogik/design/plugin/velbus/icon.png", 
-	"src/share/domogik/stats/velbus/lighting.device-velbus.xml", 
-        "src/share/domogik/stats/velbus/sensor.basic-velbus.xml",
-        "src/share/domogik/stats/velbus/shutter.device-velbus.xml",
-        "src/share/domogik/url2xpl/velbus/setlevel.xml", 
-        "src/share/domogik/url2xpl/velbus/0.xml", 
-        "src/share/domogik/url2xpl/velbus/255.xml", 
-        "src/share/domogik/url2xpl/velbus/down.xml", 
-        "src/share/domogik/url2xpl/velbus/up.xml", 
         "src/domogik_packages/xpl/bin/velbus.py", 
         "src/domogik_packages/xpl/lib/velbus.py", 
         "src/domogik_packages/xpl/helper/velbus.py"

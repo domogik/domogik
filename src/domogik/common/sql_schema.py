@@ -225,9 +225,11 @@ class Device(Base):
     address = Column(Unicode(255), nullable=True)
     device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
-    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=True)
     device_type = relation(DeviceType)
-    device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
+    """device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")"""
+    device_xpl_commands = relationship("XplCommand")
+    device_xpl_stats = relationship("XplStat")
 
     def __init__(self, name, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
@@ -518,9 +520,13 @@ class UIItemConfig(Base):
 class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
     id = Column(Integer, primary_key=True) 
+    name = Column(Unicode(64))
     schema = Column(Unicode(32))
     reference = Column(Unicode(255))
     device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
+    unit = Column(Unicode(32))
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type = relation(DeviceType)
     params = relationship("XplStatParam")
     
     def __init__(self, schema, reference, device_id):
@@ -546,6 +552,7 @@ class XplStatParam(Base):
     value = Column(Unicode(255))
     static = Column(Boolean)
     stat_key = Column(Unicode(32))
+    value_type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
 
     def __init__(self, xplstat_id, key, value, static, stat_key):
@@ -568,11 +575,15 @@ class XplStatParam(Base):
 
 class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode(64))
     schema = Column(Unicode(32))
     reference = Column(Unicode(255))
     device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
     stat_id = Column(Integer, ForeignKey(XplStat.__tablename__ + ".id"))
+    return_confimation = Column(Boolean)
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type = relation(DeviceType)
     params = relationship("XplCommandParam")
 
     def __init__(self, schema, reference, device_id, stat_id):
@@ -598,6 +609,8 @@ class XplCommandParam(Base):
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     static = Column(Boolean)
+    value_type = Column(Unicode(32), nullable=True)
+    values = Column(Unicode(255), nullable=True)
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')
 
     def __init__(self, cmd_id, key, value, static):

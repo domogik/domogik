@@ -126,15 +126,15 @@ class ProcessRequest():
             '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
             '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
             # /base/feature
-            '^/base/feature/list$':			                                         '_rest_base_feature_list',
-            '^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_base_feature_list',
-            '^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			 '_rest_base_feature_list',
+            #'^/base/feature/list$':			                                         '_rest_base_feature_list',
+            #'^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_base_feature_list',
+            #'^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			 '_rest_base_feature_list',
             # /base/feature_association
-            '^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
-            '^/base/feature_association/by-house$':			                         '_rest_base_feature_association_list_by_house',
-            '^/base/feature_association/by-area/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_area',
-            '^/base/feature_association/by-room/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_room',
-            '^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
+            #'^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
+            #'^/base/feature_association/by-house$':			                         '_rest_base_feature_association_list_by_house',
+            #'^/base/feature_association/by-area/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_area',
+            #'^/base/feature_association/by-room/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_room',
+            #'^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
             # /base/ui-config
             '^/base/ui-config/list$':                                                            '_rest_base_ui_item_config_list',
             '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':              '_rest_base_ui_item_config_list',
@@ -1355,28 +1355,25 @@ class ProcessRequest():
 
 
         ### feature ######################
-        elif self.rest_request[0] == "feature":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_feature_list()
-                elif len(self.rest_request) == 4 and self.rest_request[2] == "by-id":
-                    self._rest_base_feature_list(id = self.rest_request[3])
-                elif len(self.rest_request) == 4 and self.rest_request[2] == "by-device_id":
-                    self._rest_base_feature_list(device_id = self.rest_request[3])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
-
+        #elif self.rest_request[0] == "feature":
+	#
+        #    ### list
+        #    if self.rest_request[1] == "list":
+        #        if len(self.rest_request) == 2:
+        #            self._rest_base_feature_list()
+        #        elif len(self.rest_request) == 4 and self.rest_request[2] == "by-id":
+        #            self._rest_base_feature_list(id = self.rest_request[3])
+        #        elif len(self.rest_request) == 4 and self.rest_request[2] == "by-device_id":
+        #            self._rest_base_feature_list(device_id = self.rest_request[3])
+        #        else:
+        #            self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+        #                                          self.jsonp, self.jsonp_cb)
+	#
+        #    ### others
+        #    else:
+        #        self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+        #                                          self.jsonp, self.jsonp_cb)
+        #        return
         ### device technology ##########################
         elif self.rest_request[0] == "device_technology":
 
@@ -1958,7 +1955,7 @@ class ProcessRequest():
                             statid = stat['id']
                 xplcommand = self._db.add_xpl_command(schema=cmd['schema'], reference=cmd['reference'], device_id=device.id, stat_id=statid)
                 ret["commands"].append({'id': xplcommand.id, 'reference': xplcommand.reference})
-            json_data.set_data_type("dict")
+           # json_data.set_data_type("dict")
             json_data.add_data(ret)
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
@@ -4550,63 +4547,34 @@ class ProcessRequest():
             ret['xpl_stat'] = []
             ret['xpl_cmd'] = []
             # find all features for this device
-            for dtf in self._db.get_device_feature_model_by_device_type(dev_type_id):
+            for xpl_cmd in pjson['device_types'][dt.id]['xpl_commands']:
                 # find the xpl commands that are neede for this feature
-                cmd = None
-    	        for xcmd in pjson['xpl_commands']:
-                    if xcmd['reference'] == dtf.xpl_command:
-                        cmd = xcmd
-                        break
-                if cmd is None:
-                    if json:
-                        json_data.set_error(code = 999, description = "Can not find the correct xpl command (%s) in the plugin json" % (dtf.xpl_command) )
-                        self.send_http_response_ok(json_data.get())
-                        return
-                    else:
-                        return None
+                cmd = pjson['xpl_commands'][xpl_cmd]
                 # finc the xpl_stat message
-                stat = None
-                if 'stat_reference' in cmd:
-	            for xcmd in pjson['xpl_stats']:
-                        if xcmd['reference'] == cmd['stat_reference']:
-                            stat = xcmd
-                            break
-                    if stat is None:
-                        if json:
-                            json_data.set_error(code = 999, description = "Can not find the correct xpl stat (%s) in the plugin json" % (cmd['stat_reference']) )
-                            self.send_http_response_ok(json_data.get())
-                            return
-                        else:
-                            return None
+                stat = pjson['xpl_stats'][cmd['stat_name']]
                 # append deviceprams
-                for p in cmd['parameters']['device']:
+                for p in cmd['parameters']['device_type']:
                     ret['global'].append( p )
                 if stat is not None:
-                    for p in stat['parameters']['device']:
+                    for p in stat['parameters']['device_type']:
                         ret['global'].append( p )
                 # append the xpl_cmd stuff
                 ft = {}
-                ft['name'] = dtf.name
-                ft['id'] = dtf.id
+                ft['name'] = xpl_cmd
                 ft['schema'] = cmd['schema']
                 ft['reference'] = cmd['reference']
-                if stat is not None:
-                    ft['stat_reference'] = stat['reference']
-                else:
-                    ft['stat_reference'] = None
                 ft['params'] = []
-                for p in cmd['parameters']['feature']:
+                for p in cmd['parameters']['device']:
                     ft['params'].append( p )
                 ret['xpl_cmd'].append(ft)
                 # append the xpl_stat stuff
                 if stat is not None:
                     ft = {}
-                    ft['name'] = dtf.name
-                    ft['id'] = dtf.id
+                    ft['name'] = cmd['stat_name']
                     ft['schema'] = stat['schema']
                     ft['reference'] = stat['reference']
                     ft['params'] = []
-                    for p in stat['parameters']['feature']:
+                    for p in stat['parameters']['device']:
                         ft['params'].append( p )
                     ret['xpl_stat'].append(ft)
             ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
