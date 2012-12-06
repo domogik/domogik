@@ -529,15 +529,18 @@ class XplStat(Base):
     device_type = relation(DeviceType)
     params = relationship("XplStatParam")
     
-    def __init__(self, schema, reference, device_id):
+    def __init__(self, name, schema, reference, device_id, unit, device_type_id):
+        self.name = ucode(name)
         self.schema = ucode(schema)
         self.reference = ucode(reference)
         self.device_id = device_id
+        self.unit = ucode(unit)
+        self.device_type_id = ucode(device_type_id)
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStat(id=%s schema='%s' reference='%s', device_id=%s, params=%s)>"\
-               % (self.id, self.schema, self.reference, self.device_id, self.params)
+        return "<XplStat(id=%s name='%s' schema='%s' reference='%s', device_id=%s, unit=%s, device_type_id=%s, params=%s)>"\
+               % (self.id, self.name, self.schema, self.reference, self.device_id, self.unit, self.device_type_id, self.params)
 
     @staticmethod
     def get_tablename():
@@ -555,17 +558,18 @@ class XplStatParam(Base):
     value_type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
 
-    def __init__(self, xplstat_id, key, value, static, stat_key):
+    def __init__(self, xplstat_id, key, value, static, stat_key, value_type):
         self.xplstat_id = xplstat_id
         self.key = ucode(key)
         self.value = ucode(value)
         self.static = static
         self.stat_key = ucode(stat_key)
+        self.value_type = value_type
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s', static=%s)>"\
-               % (self.xplstat_id, self.key, self.value, self.static)
+        return "<XplStatParam(stat_id=%s key='%s' value='%s', static=%s, stat_key=%s, value_type=%s)>"\
+               % (self.xplstat_id, self.key, self.value, self.static, self.stat_key, self.value_type)
 
     @staticmethod
     def get_tablename():
@@ -586,16 +590,19 @@ class XplCommand(Base):
     device_type = relation(DeviceType)
     params = relationship("XplCommandParam")
 
-    def __init__(self, schema, reference, device_id, stat_id):
+    def __init__(self, name, schema, reference, device_id, stat_id, return_confirmation, device_type_id):
+        self.name = ucode(name)
         self.schema = ucode(schema)
         self.reference = ucode(reference)
         self.device_id = device_id
         self.stat_id = stat_id
+        self.return_confimation = return_confimation
+        self.device_type_id = device_type_id
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommand(id=%s schema='%s' reference='%s', device_id=%s, stat_id=%s, params=%s)>"\
-               % (self.id, self.schema, self.reference, self.device_id, self.stat_id, self.params)
+        return "<XplCommand(id=%s name=%s schema='%s' reference='%s', device_id=%s, stat_id=%s, return_confirmation=%s, device_type_id=%s, params=%s)>"\
+               % (self.id, self.name, self.schema, self.reference, self.device_id, self.stat_id, self.return_confimation, self.device_type_id, self.params)
 
     @staticmethod
     def get_tablename():
@@ -613,16 +620,18 @@ class XplCommandParam(Base):
     values = Column(Unicode(255), nullable=True)
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')
 
-    def __init__(self, cmd_id, key, value, static):
+    def __init__(self, cmd_id, key, value, static, value_type, values):
         self.xplcmd_id = cmd_id
         self.key = ucode(key)
         self.value = ucode(value)
         self.static = static
+        self.value_type = value_type
+        self.values = ucode(values)
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommandParam(cmd_id=%s key='%s' stat_key='%s' value='%s', static=%s)>"\
-               % (self.xplcmd_id, self.key, self.stat_key, self.value, self.static)
+        return "<XplCommandParam(cmd_id=%s key='%s' stat_key='%s' value='%s', static=%s, value_type='%s', values='%s')>"\
+               % (self.xplcmd_id, self.key, self.stat_key, self.value, self.static, self.value_type, self.values)
 
     @staticmethod
     def get_tablename():
