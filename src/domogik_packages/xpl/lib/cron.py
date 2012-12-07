@@ -1524,8 +1524,8 @@ class CronAPI:
             self.log.error("__init__ : " + error)
             self.log.error("Continue with default values.")
         self._jobs_lock = threading.Semaphore()
+        self._jobs_lock.acquire()
         try :
-            self._jobs_lock.acquire()
             self.jobs = CronJobs(self)
         finally :
             self._jobs_lock.release()
@@ -1773,22 +1773,15 @@ class CronAPI:
         """
         self.log.debug("cronAPI._command_list : Start ...")
         mess = XplMessage()
-        self.log.debug("cronAPI._command_list : 1")
         mess.set_type("xpl-trig")
-        self.log.debug("cronAPI._command_list : 2")
         mess.set_schema("timer.basic")
-        self.log.debug("cronAPI._command_list : 3")
         caller = None
         if "caller" in message.data:
-            self.log.debug("cronAPI._command_list : caller")
             caller = message.data['caller']
             mess.add_data({"caller" : caller})
-        self.log.debug("cronAPI._command_list : 4")
         mess.add_data({"command" : "list"})
-        self.log.debug("cronAPI._command_list : 5")
         mess.add_data({"devices" : self.jobs.get_list(False)})
         #mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
-        self.log.debug("cronAPI._command_list : 6")
         myxpl.send(mess)
         self.log.debug("cronAPI._command_list : Done :)")
 
@@ -2112,8 +2105,8 @@ class CronAPI:
         Send the sensors stat messages
 
         """
+        self._jobs_lock.acquire()
         try :
-            self._jobs_lock.acquire()
             for dev in self.jobs.data :
                 if self.jobs.data[dev]["state"] == "started":
                     self._send_sensor_stat(self.myxpl,dev)
