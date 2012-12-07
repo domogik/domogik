@@ -1678,19 +1678,19 @@ class CronAPI:
         """
         self.log.debug("cronAPI.basicListener : Start ...")
         actions = {
-            'halt': lambda x,d,m: self._action_halt(x, d),
-            'resume': lambda x,d,m: self._action_resume(x, d),
-            'stop': lambda x,d,m: self._action_stop(x, d),
-            'start': lambda x,d,m: self._action_start(x, d, m),
-            'status': lambda x,d,m: self._action_status(x, d),
-            'list': lambda x,d,m: self._action_list(x, d),
+            'halt': lambda x,d,m : self._action_halt(x, d),
+            'resume': lambda x,d,m : self._action_resume(x, d),
+            'stop': lambda x,d,m : self._action_stop(x, d),
+            'start': lambda x,d,m : self._action_start(x, d, m),
+            'status': lambda x,d,m : self._action_status(x, d),
+            'list': lambda x,d,m : self._action_list(x, d),
         }
 
         commands = {
-            'list': lambda x,d,m: self._command_list(x, d, m),
-            'create-alarm': lambda x,d,m: self._command_start_alarm(x, d, m),
-            'create-dawnalarm': lambda x,d,m: self._command_start_dawn_alarm(x, d, m),
-            'create-date': lambda x,d,m: self._command_start_date(x, d, m),
+            'list': lambda x,d,m : self._command_list(x, d, m),
+            'create-alarm': lambda x,d,m : self._command_start_alarm(x, d, m),
+            'create-dawnalarm': lambda x,d,m : self._command_start_dawn_alarm(x, d, m),
+            'create-date': lambda x,d,m : self._command_start_date(x, d, m),
             'create-interval': lambda x,d,m: self._command_start_interval(x, d, m),
 #            'stop': lambda x,d,m: self._action_stop(x, d),
         }
@@ -1773,15 +1773,22 @@ class CronAPI:
         """
         self.log.debug("cronAPI._command_list : Start ...")
         mess = XplMessage()
+        self.log.debug("cronAPI._command_list : 1")
         mess.set_type("xpl-trig")
+        self.log.debug("cronAPI._command_list : 2")
         mess.set_schema("timer.basic")
+        self.log.debug("cronAPI._command_list : 3")
         caller = None
         if "caller" in message.data:
+            self.log.debug("cronAPI._command_list : caller")
             caller = message.data['caller']
-        mess.add_data({"caller" : caller})
+            mess.add_data({"caller" : caller})
+        self.log.debug("cronAPI._command_list : 4")
         mess.add_data({"command" : "list"})
+        self.log.debug("cronAPI._command_list : 5")
         mess.add_data({"devices" : self.jobs.get_list(False)})
         #mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
+        self.log.debug("cronAPI._command_list : 6")
         myxpl.send(mess)
         self.log.debug("cronAPI._command_list : Done :)")
 
