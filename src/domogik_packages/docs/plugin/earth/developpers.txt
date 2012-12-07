@@ -1,0 +1,120 @@
+=========================
+Developpers documentation
+=========================
+
+This plugin can be extend to new types of events.
+
+Add a new event type
+====================
+
+We will study the case of the classical dawndusk.
+In our model, it is split in 2 event's types : dawn and dusk. And it defines
+two status : daynight and dawndusk.
+
+Earth uses callbacks to add new functionnalities. We must register
+everything in the EarthEvents constructor :
+
+    self.register_type ("dawn", get_next_dawn)
+    self.register_type ("dusk", get_next_dusk)
+    self.register_status (["dawn", "dusk"], "daynight", check_daynight)
+    self.register_status (["dawn", "dusk"], "dawndusk", check_dawndusk)
+    self.register_parameter ("dawndusk", False, check_param)
+
+Look at the full code below to implement the callbacks.
+
+You can also define tests (in domogik_packages/tests/plugin/earth)
+to check your extension.
+
+Full code
+=========
+
+class DawnDusk():
+    """
+    Implements the dawndusk extension.
+    """
+    def __init__(self, events):
+        """
+        Init the DawnDusk extension.
+
+        :param events: the event manager
+        :type events: EartEvents
+
+        """
+        self._events = events
+
+    def get_next_dawn(self, mycity, delay, args = None) :
+        """
+        Return the date and time of the next dawn
+
+        @param city: the city wher calculate the event.
+        @param delay: the delay (in seconds) to the event.
+        @param args: an optional argument.
+        @returns: the next dawn daytime
+
+        """
+        today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
+        mycity.date = today
+        dawn = ephem.localtime(mycity.next_rising(ephem.Sun(), use_center = True))
+        return dawn + datetime.timedelta(seconds=delay)
+
+    def get_next_dusk(self, mycity, delay, args = None) :
+        """
+        Return the date and time of the dusk
+
+        @param city: the city wher calculate the event.
+        @param delay: the delay (in seconds) to the event.
+        @param args: an optional argument.
+        @returns: the next dusk daytime
+
+        """
+        today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
+        mycity.date = today
+        dusk = ephem.localtime(mycity.next_setting(ephem.Sun(), use_center = True))
+        return dusk + datetime.timedelta(seconds=delay)
+
+    def check_daynight(self, etype, message) :
+        """
+        Check that we should or not change the daynight status
+
+        @param etype: the type of the device : dawn or dusk.
+        @param message: the message as a dict().
+        @returns: True if daynight has changed. False otherwise.
+
+        """
+        if "delay" not in message.data or "delay"=="0" :
+            #This is the real event so we can change the status
+            if etype == "dawn":
+                self._events.set_status("daynight", "day")
+            else:
+                self._events.set_status("daynight", "night")
+            return True
+        return False
+
+    def check_dawndusk(self, etype, message) :
+        """
+        Check that we should or not change the dawndusk status
+
+        @param etype: the type of the device : dawn or dusk.
+        @param message: the message as a dict().
+        @returns: True if dawndusk has changed. False otherwise.
+
+        """
+        if "delay" not in message.data or "delay"=="0" :
+            #This is the real event so we can change the status
+            self._events.set_status("dawndusk", etype)
+            return True
+        return False
+
+    def check_param(self, value) :
+        """
+        Check that the new value of the parameter is valid
+
+        @param value: the new value.
+        @returns: True if value is valid. False otherwise.
+
+        """
+        if value == "True" or value == "False" :
+            return True
+        return False
+
+
