@@ -1710,9 +1710,9 @@ class CronAPI:
                 caller = message.data['caller']
             self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action, device))
             self.log.debug("cronAPI.basicListener : command %s received with caller %s" % (command, caller))
+            self.log.debug("cronAPI.basicListener : Try to acquire lock")
+            self._jobs_lock.acquire()
             try :
-                self.log.debug("cronAPI.basicListener : Try to acquire lock")
-                self._jobs_lock.acquire()
                 self.log.debug("cronAPI.basicListener : Lock acquired")
                 if action != None :
                     self.log.debug("cronAPI.basicListener : Action is not None")
