@@ -2021,11 +2021,15 @@ class CronAPI:
 
         """
         self.log.debug("cronAPI._actionHalt : Start ...")
-        ret_rest = self.rest.delete(self.jobs.data[device])
-        ret_cron = self.jobs.halt_job(device)
-        if ret_cron == ERROR_NO :
-            if not ret_rest :
-                ret_cron = ERROR_REST
+        if device in self.jobs.data:
+            ret_rest = self.rest.delete(self.jobs.data[device])
+            ret_cron = self.jobs.halt_job(device)
+            #We don't send rest return anymore as some cron jobs don't have a device.
+            #if ret_cron == ERROR_NO :
+            #    if not ret_rest :
+            #        ret_cron = ERROR_REST
+        else:
+            ret_cron = ERROR_NO
         self._send_xpl_trig(myxpl, device, "halt", ret_cron)
         self.log.debug("Halt job :)")
         self.log.debug("cronAPI._actionHalt : Done :)")

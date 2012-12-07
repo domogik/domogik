@@ -61,7 +61,7 @@ CRONERRORS = { ERROR_NO: 'No error',
                ERROR_DEVICE_NOT_STOPPED: "Device/alarm is not stopped.",
                ERROR_SCHEDULER: 'Error with the scheduler (APS).',
                ERROR_STORE: 'Error with the store.',
-               ERROR_REST: 'Error with REST. But job is created.',
+               ERROR_REST: 'Error with REST.',
                }
 
 class CronRest():
@@ -866,7 +866,9 @@ class CronTools():
         @return: the message corresponding to error code
 
         """
-        errorcode = code
-        error = CRONERRORS[code]
-        res = {'errorcode':errorcode, 'error':error}
-        return res
+        if code != ERROR_NO :
+            errorcode = code
+            error = CRONERRORS[code]
+            res = {'errorcode':errorcode, 'error':error}
+            return res
+        return {}
