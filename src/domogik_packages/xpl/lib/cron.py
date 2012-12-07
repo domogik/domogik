@@ -1517,17 +1517,19 @@ class CronAPI:
             self.delay_sensor = int(self.config.query('cron', 'delay-sensor'))
             self.delay_stat = int(self.config.query('cron', 'delay-stat'))
         except:
-            self.delay_stat = 300
-            self.delay_sensor = 2
+            self.delay_stat = 2
+            self.delay_sensor = 300
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.error("__init__ : " + error)
             self.log.error("Continue with default values.")
         self._jobs_lock = threading.Semaphore()
+        self.log.debug("cronAPI.__init__ : Try to acquire lock")
         self._jobs_lock.acquire()
         try :
             self.jobs = CronJobs(self)
         finally :
+            self.log.debug("cronAPI.__init__ : Release lock")
             self._jobs_lock.release()
         self.rest_server_ip = "127.0.0.1"
         self.rest_server_port = "40405"
@@ -1708,8 +1710,6 @@ class CronAPI:
             caller = None
             if 'caller' in message.data:
                 caller = message.data['caller']
-            self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action, device))
-            self.log.debug("cronAPI.basicListener : command %s received with caller %s" % (command, caller))
             self.log.debug("cronAPI.basicListener : Try to acquire lock")
             self._jobs_lock.acquire()
             try :
@@ -1726,6 +1726,7 @@ class CronAPI:
                          (traceback.format_exc())
                 self.log.debug("cronAPI.basicCmndListener : "+error)
             finally :
+                self.log.debug("cronAPI.basicListener : Release lock")
                 self._jobs_lock.release()
         except:
             self.log.error("action _ %s _ unknown." % (action))
@@ -2105,6 +2106,7 @@ class CronAPI:
         Send the sensors stat messages
 
         """
+        self.log.debug("cronAPI.send_sensors : Try to acquire lock")
         self._jobs_lock.acquire()
         try :
             for dev in self.jobs.data :
@@ -2112,6 +2114,7 @@ class CronAPI:
                     self._send_sensor_stat(self.myxpl,dev)
                     self._stop.wait(self.delay_stat)
         finally :
+            self.log.debug("cronAPI.send_sensors : Release lock")
             self._jobs_lock.release()
             self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
             self.timer_stat.start()
