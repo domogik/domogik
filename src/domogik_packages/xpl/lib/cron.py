@@ -1711,10 +1711,14 @@ class CronAPI:
             self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action, device))
             self.log.debug("cronAPI.basicListener : command %s received with caller %s" % (command, caller))
             try :
+                self.log.debug("cronAPI.basicListener : Try to acquire lock")
                 self._jobs_lock.acquire()
+                self.log.debug("cronAPI.basicListener : Lock acquired")
                 if action != None :
+                    self.log.debug("cronAPI.basicListener : Action is not None")
                     actions[action](self.myxpl, device, message)
                 elif command != None :
+                    self.log.debug("cronAPI.basicListener : Command is not None")
                     commands[command](self.myxpl, device, message)
             except:
                 self.log.error("action/command error.")
@@ -1742,7 +1746,7 @@ class CronAPI:
         @param device : The device to use
 
         """
-        self.log.debug("cronAPI._listStatus : Start ...")
+        self.log.debug("cronAPI._action_list : Start ...")
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
@@ -1751,7 +1755,7 @@ class CronAPI:
         mess.add_data({"devices" : self.jobs.get_list(False)})
         mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
         myxpl.send(mess)
-        self.log.debug("cronAPI._listStatus : Done :)")
+        self.log.debug("cronAPI._action_list : Done :)")
 
     def _command_list(self, myxpl, device, message):
         """
