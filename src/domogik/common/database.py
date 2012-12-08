@@ -57,6 +57,7 @@ from domogik.common.sql_schema import (
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
         UserAccount, SENSOR_VALUE_TYPE_LIST,
+        Command, CommandParam,
         XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
@@ -2157,6 +2158,11 @@ class DbHelper():
         return ui_item_config_list
 
 ###################
+# command
+###################
+    def get_all_command(self):
+        return self.__session.query(Command).all()
+###################
 # xplcommand
 ###################
     def get_all_xpl_command(self):
@@ -2168,9 +2174,9 @@ class DbHelper():
     def get_xpl_command_by_device_id(self, d_id):
         return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
 
-    def add_xpl_command(self, name, schema, reference, device_id, stat_id, return_confiration, device_type_id):
+    def add_xpl_command(self, name, schema, reference, device_id, stat_id, return_confiration=None):
         self.__session.expire_all()
-        cmd = XplCommand(name=nae, schema=schema, reference=reference, device_id=device_id, stat_id=stat_id, return_confiration=return_confiration, device_type_id=device_type_id)
+        cmd = XplCommand(name=name, schema=schema, reference=reference, device_id=device_id, stat_id=stat_id, return_confirmation=return_confiration)
         self.__session.add(cmd)
         try:
             self.__session.commit()
@@ -2191,7 +2197,7 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-command with id %s : it doesn't exist" % id)
 
-    def update_xpl_command(self, id, name=None, schema=None, reference=None, device_id=None, stat_id=None, return_confiration=None, device_type_id=None):
+    def update_xpl_command(self, id, name=None, schema=None, reference=None, device_id=None, stat_id=None, return_confirmation=None):
         """Update a xpl_stat
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -2211,8 +2217,6 @@ class DbHelper():
             cmd.name = name
         if return_confiration is not None:
             cmd.return_confiration = return_confiration
-        if device_type_id is not None:
-            cmd.device_type_id = device_type_id
         self.__session.add(cmd)
         try:
             self.__session.commit()
@@ -2233,9 +2237,9 @@ class DbHelper():
     def get_xpl_stat_by_device_id(self, d_id):
         return self.__session.query(XplStat).filter_by(device_id=d_id).all()
 
-    def add_xpl_stat(self, name, schema, device_id, device_type_id, unit=None, reference=None):
+    def add_xpl_stat(self, name, schema, device_id, unit=None, reference=None):
         self.__session.expire_all()
-        stat = XplStat(name=name, schema=schema, reference=reference, device_id=device_id, unit=unit, device_type_id=device_type_id)
+        stat = XplStat(name=name, schema=schema, reference=reference, device_id=device_id, unit=unit)
         self.__session.add(stat)
         try:
             self.__session.commit()
@@ -2256,7 +2260,7 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
     
-    def update_xpl_stat(self, id, name=None, schema=None, reference=None, device_id=None, unit=None, device_type_id=None):
+    def update_xpl_stat(self, id, name=None, schema=None, reference=None, device_id=None, unit=None):
         """Update a xpl_stat
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -2274,8 +2278,6 @@ class DbHelper():
             stat.name = name
         if unit is not None:
             stat.unit = unit
-        if device_type_id is not None:
-            stat.device_type_id = device_type_id
         self.__session.add(stat)
         try:
             self.__session.commit()

@@ -228,8 +228,10 @@ class Device(Base):
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=True)
     device_type = relation(DeviceType)
     """device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")"""
-    device_xpl_commands = relationship("XplCommand")
-    device_xpl_stats = relationship("XplStat")
+    commands = relationship("Command")
+    xpl_commands = relationship("XplCommand")
+    xpl_stats = relationship("XplStat")
+    
 
     def __init__(self, name, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
@@ -250,9 +252,9 @@ class Device(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s, commands=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type, self.device_usage)
+                  self.device_type, self.device_usage, self.commands)
 
     @staticmethod
     def get_tablename():
@@ -517,30 +519,74 @@ class UIItemConfig(Base):
         """Return the table name associated to the class"""
         return UIItemConfig.__tablename__
 
-class XplStat(Base):
-    __tablename__ = '%s_xplstat' % _db_prefix
+class Command(Base):
+    __tablename__ = '%s_command' % _db_prefix
     id = Column(Integer, primary_key=True) 
-    name = Column(Unicode(64))
-    schema = Column(Unicode(32))
-    reference = Column(Unicode(255))
-    device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
-    unit = Column(Unicode(32))
-    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType)
-    params = relationship("XplStatParam")
-    
-    def __init__(self, name, schema, reference, device_id, unit, device_type_id):
-        self.name = ucode(name)
-        self.schema = ucode(schema)
-        self.reference = ucode(reference)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    name = Column(Unicode(255))
+    reference = Column(Unicode(64))
+    return_confirmation = Column(Boolean)
+    xpl_command = relationship("XplCommand")
+    params = relationship("CommandParam")
+
+    def __init__(self, device_id, name, reference, return_confirmation):
         self.device_id = device_id
-        self.unit = ucode(unit)
-        self.device_type_id = ucode(device_type_id)
+        self.name = ucode(name)
+        self.return_confirmation = return_confirmation
+        self.reference = ucode(reference)
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStat(id=%s name='%s' schema='%s' reference='%s', device_id=%s, unit=%s, device_type_id=%s, params=%s)>"\
-               % (self.id, self.name, self.schema, self.reference, self.device_id, self.unit, self.device_type_id, self.params)
+        return "<Command(id=%s device_id=%s reference='%s' name='%s' return_confirmation=%s params=%s xpl_command=%s)>"\
+               % (self.id, self.device_id, self.reference, self.name, self.return_confirmation, self.params, self.xpl_command)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return Command.__tablename__
+
+class CommandParam(Base):
+    __tablename__ = '%s_command_param' % _db_prefix
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value_type = Column(Unicode(32), nullable=False)
+    values = Column(Unicode(32), nullable=False)
+    UniqueConstraint('cmd_id', 'key', name='uix_1')
+
+    def __init__(self, cmd_id, key, value_type, values):
+        self.cmd_id = cmd_id
+        self.key = ucode(key)
+        self.value_type = ucode(value_type)
+        self.values = values
+   
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<CommandParam(cmd_id=%s key='%s' value_type'%s' values='%s')>"\
+               % (self.cmd_id, self.key, self.value_type, self.values)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return CommandParams.__tablename__
+
+
+class XplStat(Base):
+    __tablename__ = '%s_xplstat' % _db_prefix
+    id = Column(Integer, primary_key=True) 
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    name = Column(Unicode(64))
+    schema = Column(Unicode(32))
+    params = relationship("XplStatParam")
+    
+    def __init__(self, device_id, name, schema):
+        self.device_id = device_id
+        self.name = ucode(name)
+        self.schema = ucode(schema)
+   
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<XplStat(id=%s device_id=%s name='%s' schema='%s' params=%s)>"\
+               % (self.id, self.device_id, self.name, self.schema, self.params)
 
     @staticmethod
     def get_tablename():
@@ -549,27 +595,23 @@ class XplStat(Base):
 
 
 class XplStatParam(Base):
-    __tablename__ = '%s_xplstat_params' % _db_prefix
-    xplstat_id = Column(Integer, ForeignKey(XplStat.id), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    __tablename__ = '%s_xplstat_param' % _db_prefix
+    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     static = Column(Boolean)
-    stat_key = Column(Unicode(32))
-    value_type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
 
-    def __init__(self, xplstat_id, key, value, static, stat_key, value_type):
+    def __init__(self, xplstat_id, key, value, static):
         self.xplstat_id = xplstat_id
         self.key = ucode(key)
         self.value = ucode(value)
         self.static = static
-        self.stat_key = ucode(stat_key)
-        self.value_type = value_type
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s', static=%s, stat_key=%s, value_type=%s)>"\
-               % (self.xplstat_id, self.key, self.value, self.static, self.stat_key, self.value_type)
+        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s)>"\
+               % (self.xplstat_id, self.key, self.value, self.static)
 
     @staticmethod
     def get_tablename():
@@ -580,29 +622,24 @@ class XplStatParam(Base):
 class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
     id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()), primary_key=True)
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
-    reference = Column(Unicode(255))
-    device_id = Column(Integer, ForeignKey(Device.__tablename__ + ".id"))
-    stat_id = Column(Integer, ForeignKey(XplStat.__tablename__ + ".id"))
-    return_confimation = Column(Boolean)
-    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType)
+    stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), nullable=True)
     params = relationship("XplCommandParam")
 
-    def __init__(self, name, schema, reference, device_id, stat_id, return_confirmation, device_type_id):
+    def __init__(self, name, device_id, cmd_id, schema, stat_id):
         self.name = ucode(name)
-        self.schema = ucode(schema)
-        self.reference = ucode(reference)
         self.device_id = device_id
+        self.cmd_id = cmd_id
+        self.schema = ucode(schema)
         self.stat_id = stat_id
-        self.return_confimation = return_confimation
-        self.device_type_id = device_type_id
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommand(id=%s name=%s schema='%s' reference='%s', device_id=%s, stat_id=%s, return_confirmation=%s, device_type_id=%s, params=%s)>"\
-               % (self.id, self.name, self.schema, self.reference, self.device_id, self.stat_id, self.return_confimation, self.device_type_id, self.params)
+        return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' schema='%s' stat_id=%s params=%s)>"\
+               % (self.id, self.device_id, self.cmd_id, self.name, self.schema, self.stat_id, self.params)
 
     @staticmethod
     def get_tablename():
@@ -611,27 +648,21 @@ class XplCommand(Base):
 
 
 class XplCommandParam(Base):
-    __tablename__ = '%s_xplcommand_params' % _db_prefix
-    xplcmd_id = Column(Integer, ForeignKey(XplCommand.id), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    __tablename__ = '%s_xplcommand_param' % _db_prefix
+    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
-    static = Column(Boolean)
-    value_type = Column(Unicode(32), nullable=True)
-    values = Column(Unicode(255), nullable=True)
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')
 
-    def __init__(self, cmd_id, key, value, static, value_type, values):
+    def __init__(self, cmd_id, key, value):
         self.xplcmd_id = cmd_id
         self.key = ucode(key)
         self.value = ucode(value)
-        self.static = static
-        self.value_type = value_type
-        self.values = ucode(values)
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommandParam(cmd_id=%s key='%s' stat_key='%s' value='%s', static=%s, value_type='%s', values='%s')>"\
-               % (self.xplcmd_id, self.key, self.stat_key, self.value, self.static, self.value_type, self.values)
+        return "<XplCommandParam(cmd_id=%s key='%s' value='%s')>"\
+               % (self.xplcmd_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():

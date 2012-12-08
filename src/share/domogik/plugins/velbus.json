@@ -36,10 +36,8 @@
     ], 
     "xpl_commands": {
          "set_level_bin": {
-            "reference": "",
             "schema": "lighting.basic",
-            "stat_name": "get_level",
-            "return_confirmation": 1,
+            "xplstat_name": "get_level",
             "parameters": {
                     "static": [],
                     "device_type": [
@@ -58,21 +56,12 @@
                             "min_value": 0
                         }
                     ],
-                    "device": [],
-                    "dynamic": [
-                        {
-                            "key": "level",
-                            "value_type": "binary",
-                            "values": [0, 255]
-                        }
-                    ]
+                    "device": []
                 }
          },
          "set_level_range": {
-            "reference": "",
             "schema": "lighting.basic",
-            "stat_name": "get_level",
-            "return_confirmation": 1,
+            "xplstat_name": "get_level",
             "parameters": {
                     "static": [],
                     "device_type": [
@@ -91,14 +80,7 @@
                             "min_value": 0
                         }
                     ],
-                    "device": [],
-                    "dynamic": [
-                        {
-                            "key": "level",
-                            "value_type": "range",
-                            "values": [0, 255]
-                        }
-                    ]
+                    "device": []
                 }
          }
     },
@@ -134,28 +116,59 @@
                 }
        }
     },
+    "commands": {
+       "set_level_bin": {
+           "name": "Switch On or Off",
+           "return_confirmation": true,
+           "params": [
+               {
+                   "key": "level",
+                   "value_type": "binary",
+                   "values": [0, 255]
+               }
+           ],
+           "xpl_command": "set_level_bin"
+        },
+        "set_level_range": {
+           "name": "Set to a level",
+           "return_confirmation": true,
+           "params": [
+               {
+                   "key": "level",
+                   "value_type": "range",
+                   "values": [0, 255]
+               }
+           ],
+           "xpl_command": "set_level_bin"
+        }
+    },
     "device_types": {
         "velbus.relay": {
+            "id": "velbus.relay",
             "description": "Switch one channel on a device", 
             "name": "Switch",
-            "xpl_commands": ["set_level_bin"]
+            "commands": ["set_level_bin"]
         }, 
         "velbus.dimmer": {
+            "id": "velbus.dimmer",
             "description": "Dim one channel on a device", 
             "id": "velbus.dimmer", 
             "name": "Dimmer",
-            "xpl_commands": ["set_level_bin", "set_level_range"]
+            "commands": ["set_level_bin", "set_level_range"]
         }, 
         "velbus.shutter": {
+            "id": "velbus.shutter",
             "description": "Shutter control (up, down)", 
             "name": "Shutter",
             "xpl_commands": ["set_blind"]
         },
         "velbus.temp": {
+            "id": "velbus.temp",
             "description": "Temperature Sensor", 
             "name": "Temperature"
         },
         "velbus.input": {
+            "id": "velbus.input",
             "description": "Input contact", 
             "name": "Input"
         }
