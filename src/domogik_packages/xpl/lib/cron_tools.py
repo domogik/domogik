@@ -475,29 +475,6 @@ class CronStore():
 
         """
         self._log = log
-        self._log.debug("cronJobs.store_init : Try to use %s to store jobs." % \
-                data_dir)
-        if os.path.exists(data_dir):
-            if not os.access(data_dir, os.W_OK & os.X_OK):
-                raise OSError("Can't write in directory %s" % data_dir)
-        else:
-            try:
-                self._log.info("cronJobs.store_init : create directory %s." % data_dir)
-                os.mkdir(data_dir, 0770)
-            except:
-                raise IOError("Can't create directory %s." % data_dir)
-        try:
-            tmp_prefix = "write_test";
-            count = 0
-            filename = os.path.join(data_dir, tmp_prefix)
-            while(os.path.exists(filename)):
-                filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix),count)
-                count = count + 1
-            f = open(filename,"w")
-            f.close()
-            os.remove(filename)
-        except :
-            raise IOError("Can't create a file in directory %s." % data_dir)
         self._data_files_dir = data_dir
         self._log.info("cronJobs.store_init : Use directory %s to store jobs." % \
                 self._data_files_dir)
