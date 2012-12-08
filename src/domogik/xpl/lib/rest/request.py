@@ -1940,25 +1940,21 @@ class ProcessRequest():
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
-            json_data.set_data_type("device")
-            json_data.add_data(device)
-            ret = {}
-            ret["stats"] = []
-            ret["commands"] = []
             js = self._rest_base_deviceparams(self.get_parameters("type_id"), json=False)
+            stats = []
             for stat in js['xpl_stat']:
-                xplstat = self._db.add_xpl_stat(schema=stat['schema'], reference=stat['reference'], device_id=device.id)
-                ret["stats"].append({'id': xplstat.id, 'reference': xplstat.reference})
+                xplstat = self._db.add_xpl_stat(name=stat['name'], schema=stat['schema'], reference=stat['reference'], device_id=device.id, unit=None)
+                stats.append( {'id': xplstat.id, 'name': xplstat.name} )
             for cmd in js['xpl_cmd']:
                 ststid = None
-                if cmd['stat_reference'] is not None:
-                    for stat in ret["stats"]:
-                        if stat['reference'] == cmd['stat_reference']:
+                if cmd['stat_name'] is not None:
+                    for stat in stats:
+                        if stat['name'] == cmd['stat_name']:
                             statid = stat['id']
-                xplcommand = self._db.add_xpl_command(schema=cmd['schema'], reference=cmd['reference'], device_id=device.id, stat_id=statid)
-                ret["commands"].append({'id': xplcommand.id, 'reference': xplcommand.reference})
+                xplcommand = self._db.add_xpl_command(name=cmd['name'], schema=cmd['schema'], reference=cmd['reference'], device_id=device.id, stat_id=statid)
            # json_data.set_data_type("dict")
-            json_data.add_data(ret)
+            json_data.set_data_type("device")
+            json_data.add_data(self._db.get_device(device.id))
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
         except:
@@ -4575,13 +4571,37 @@ class ProcessRequest():
             ret['xpl_stat'] = []
             ret['xpl_cmd'] = []
             # find all features for this device
-            for xpl_cmd in pjson['device_types'][dt.id]['xpl_commands']:
+            for c in pjson['device_types'][dt.id]['commands']:
+                if not c in pjson['commands']:
+                    print 'fail 0'
+                    break
+                c = pjson['commands'][c]
+                # we must have an xpl command
+                if not 'xpl_command' in c:
+                    break
+                # we have an xpl_command => find it
+                if not c['xpl_command'] in pjson['xpl_commands']:
+                    if json:
+                        json_data.set_error(code = 999, description = "Command references an unexisting xpl_command")
+                        self.send_http_response_ok(json_data.get())
+                        return
+                    else:
+                        return None
                 # find the xpl commands that are neede for this feature
-                cmd = pjson['xpl_commands'][xpl_cmd].copy()
-                cmd['name'] = xpl_cmd
+                cmd = pjson['xpl_commands'][c['xpl_command']].copy()
+                cmd['name'] = c['xpl_command']
                 # finc the xpl_stat message
-                stat = pjson['xpl_stats'][cmd['stat_name']].copy()
-                stat['name'] = cmd['stat_name']
+                if not 'xplstat_name' in cmd:
+                    break
+                if not cmd['xplstat_name'] in pjson['xpl_stats']:
+                    if json:
+                        json_data.set_error(code = 999, description = "XPL command references an unexisting xpl_stat")
+                        self.send_http_response_ok(json_data.get())
+                        return
+                    else:
+                        return None
+                stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
+                stat['name'] = cmd['xplstat_name']
                 # append deviceprams
                 for p in cmd['parameters']['device_type']:
                     ret['global'].append( p )
