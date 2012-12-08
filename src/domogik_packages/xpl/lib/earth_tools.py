@@ -80,28 +80,6 @@ class EarthStore():
 
         """
         self._log = log
-        self._log.debug("EarthStore.__init__ : Try to use %s to store events." % data_dir)
-        if os.path.exists(data_dir):
-            if not os.access(data_dir, os.W_OK & os.X_OK):
-                raise OSError("Can't write in directory %s" % data_dir)
-        else:
-            try:
-                self._log.info("EarthStore.__init__ : create directory %s." % data_dir)
-                os.mkdir(data_dir, 0770)
-            except:
-                raise IOError("Can't create directory %s." % data_dir)
-        try:
-            tmp_prefix = "write_test";
-            count = 0
-            filename = os.path.join(data_dir, tmp_prefix)
-            while(os.path.exists(filename)):
-                filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix),count)
-                count = count + 1
-            f = open(filename,"w")
-            f.close()
-            os.remove(filename)
-        except :
-            raise IOError("Can't create a file in directory %s." % data_dir)
         self._data_files_dir = data_dir
         self._log.info("EarthStore.__init__ : Use directory %s to store events." % self._data_files_dir)
         self._badfields = ["action", "starttime", "uptime", ]
