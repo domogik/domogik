@@ -13,32 +13,7 @@ If your plugin need some files (data files, cache files, ...) you can store them
     XplPlugin.__init__(self, name='foo')
     self.data_files_dir = self.get_data_files_directory()
 
-A more robust way to use the data directory : ::
-
-    data_dir = self.get_data_files_directory()
-    if os.path.exists(data_dir):
-        if not os.access(data_dir, os.W_OK & os.X_OK):
-            raise OSError("Can't write in directory %s" % data_dir)
-    else:
-        try:
-            os.mkdir(data_dir, 0770)
-        except:
-            raise IOError("Can't create directory %s." % data_dir)
-    try:
-        tmp_prefix = "write_test";
-        count = 0
-        filename = os.path.join(data_dir, tmp_prefix)
-        while(os.path.exists(filename)):
-            filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix),count)
-            count = count + 1
-        f = open(filename,"w")
-        f.close()
-        os.remove(filename)
-    except :
-        raise IOError("Can't create a file in directory %s." % data_dir)
-    self._data_files_dir = data_dir
-
-This script will check that the plugin data directory exists. If not, it creates it. Finally, it tries to create a file in this directory. If something goes wrong, an explicit exception will be raise.
+This will check that the plugin data directory exists. If not, it creates it. Finally, it tries to create a file in this directory. If something goes wrong, an explicit exception will be raise.
 
 In development, the linked directory is **src/share/domogik/data/<plugin name>/**.
 In installation, the linked directory is **/var/lib/domogik/domogik_packages/data/<plugin name>/**.
