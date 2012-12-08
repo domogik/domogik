@@ -20,7 +20,7 @@ Client starting
 
 Admin Pages
 -----------
-Retrievie the event list using command list and retrieve information on
+Retrieve the event list using command list and retrieve information on
 events using the info command.
 Use the actions to interract directly with events.
 
@@ -37,11 +37,15 @@ We will also try to support the dawndusk schema.
 XPL-CMND Structure
 ------------------
 
+.. code-block:: none
+
     dawndusk.basic
     {
     type=dawndusk
     status=dawn|dusk
     }
+
+::
 
     earth.basic
     {
@@ -52,6 +56,8 @@ XPL-CMND Structure
     [args=string]
     }
 
+::
+
     earth.basic
     {
     action=resume|stop|start
@@ -60,56 +66,72 @@ XPL-CMND Structure
     }
 
 Actions :
+^^^^^^^^^
 
-    start : create and start the earth's event.
-    The event is saved in the store. To delete it you must halt it.
+- start : create and start the earth's event. The event is saved in the store. To delete it you must halt it.
 
-        #device : the name. It will be used as device name.
+where :
 
-        type : dawn | dusk | sunrise | fullmoon | ...
+.. code-block:: none
 
-        delay : the message will delayed : "delay" (+ or -) seconds before the real event.
+    device : the name. It will be used as device name.
+    type : dawn | dusk | sunrise | fullmoon | ...
+    delay : the message will delayed : "delay" (+ or -) seconds before the real event.
+    args : a string that will be used as parameters in the callback functions.
 
-        args : a string that will be used as parameters in the callback functions.
 
-    halt : stop and remove the earth's event.
-    The event is removed from the store. You cannot use it anymore.
+- halt : stop and remove the earth's event. The event is removed from the store. You cannot use it anymore.
 
-        type : dawn | dusk | sunrise | fullmoon | ...
+where :
 
-        delay : the message will delayed : "delay" (+ or -) seconds before the real event.
+::
 
-    stop : stop the earth's event.
-    The event is stopped but not removed from store. You can start it again
-    using resume.
+    type : dawn | dusk | sunrise | fullmoon | ...
+    delay : the message will delayed : "delay" (+ or -) seconds before the real event.
 
-        type : dawn | dusk | sunrise | fullmoon | ...
+- stop : stop the earth's event. The event is stopped but not removed from store. You can start it again using resume.
 
-        delay : the message will delayed : "delay" (+ or -) seconds before the real event.
+where :
 
-    resume : resume the earth's event.
-    A previously stopped event can be restarted using resume.
+::
 
-        type : dawn | dusk | sunrise | fullmoon | ...
+    type : dawn | dusk | sunrise | fullmoon | ...
+    delay : the message will delayed : "delay" (+ or -) seconds before the real event.
 
-        delay : the message will delayed : "delay" (+ or -) seconds before the real event.
+- resume : resume the earth's event. A previously stopped event can be restarted using resume.
+
+where :
+
+::
+
+    type : dawn | dusk | sunrise | fullmoon | ...
+    delay : the message will delayed : "delay" (+ or -) seconds before the real event.
 
 XPL-CMND Structure
 ------------------
 
-Request gateway capabilities
+Request gateway capabilities :
+
+.. code-block:: none
+
     earth.request
     {
     command=gateway
     }
 
-Request memory usage
+Request memory usage :
+
+::
+
     earth.request
     {
     command=memory
     }
 
-Change a parameter value
+Change a parameter value :
+
+::
+
     earth.request
     {
     command=set
@@ -117,7 +139,10 @@ Change a parameter value
     value=true
     }
 
-Retrieve a parameter value
+Retrieve a parameter value :
+
+::
+
     earth.request
     {
     command=get
@@ -126,12 +151,18 @@ Retrieve a parameter value
     }
 
 Retrieve the list of events :
+
+::
+
     earth.request
     {
     command=list
     }
 
 Get informations on an event:
+
+::
+
     earth.request
     {
     command=info
@@ -140,7 +171,10 @@ Get informations on an event:
     }
 
 Get a status :
-    earth.request
+
+::
+
+   earth.request
     {
     command=status
     query=daynight
@@ -149,7 +183,9 @@ Get a status :
 XPL-STAT Structure
 ------------------
 
-For dawndusk compatiblity (not implemented yet)
+For dawndusk compatiblity (not implemented yet) :
+
+::
 
     dawndusk.basic
     {
@@ -157,13 +193,18 @@ For dawndusk compatiblity (not implemented yet)
     status=dawn|dusk
     }
 
+::
+
     dawndusk.basic
     {
     type=daynight
     status=day|night
     }
 
-This message is sent when requesting a status.
+This message is sent when requesting a status :
+
+::
+
     earth.basic
     {
     type=daynight
@@ -171,7 +212,10 @@ This message is sent when requesting a status.
     }
 
 This message is sent when the event occurs.
-If delay is defined this is a delayed event. If not or equal to 0, it could be consider as the real event.
+If delay is defined this is a delayed event. If not or equal to 0, it could be consider as the real event :
+
+::
+
     earth.basic
     {
     type=dawn|dusk|fullmoon|...
@@ -179,14 +223,20 @@ If delay is defined this is a delayed event. If not or equal to 0, it could be c
     current=fired
     }
 
-This message is sent when a parameter is changed/requested.
+This message is sent when a parameter is changed/requested :
+
+::
+
     earth.basic
     {
     param=dawndusk
     value=true
     }
 
-This message is sent when requesting memory information.
+This message is sent when requesting memory information :
+
+::
+
     earth.basic
     {
     memory=120000
@@ -195,7 +245,9 @@ This message is sent when requesting memory information.
     }
 
 This message is sent when starting, stopping, .... events. Also returned
-when requesting info on a device
+when requesting info on a device :
+
+::
 
     earth.basic
     {
@@ -211,7 +263,9 @@ when requesting info on a device
     next=<the date of the next event>
     }
 
-This message is sent when requesting a listing events.
+This message is sent when requesting a listing events :
+
+::
 
     earth.basic
     {
@@ -220,7 +274,9 @@ This message is sent when requesting a listing events.
     count=5
     }
 
-This message is sent when requesting gateway capabilities.
+This message is sent when requesting gateway capabilities :
+
+::
 
     earth.basic
     {
@@ -236,6 +292,6 @@ This message is sent when requesting gateway capabilities.
 References
 ==========
 
-http://xplproject.org.uk/wiki/index.php?title=Schema_-_TIMER
-http://xplproject.org.uk/wiki/index.php?title=Schema_-_DAWNDUSK.BASIC
+- Timer XPL `schema <http://xplproject.org.uk/wiki/index.php?title=Schema_-_TIMER>`_
 
+- Dawnduwk XPL `schema <http://xplproject.org.uk/wiki/index.php?title=Schema_-_DAWNDUSK.BASIC>`_

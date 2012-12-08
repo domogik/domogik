@@ -14,7 +14,7 @@ two status : daynight and dawndusk.
 Earth uses callbacks to add new functionnalities. We must register
 everything in the EarthEvents constructor :
 
-.. code-block:: none
+.. code-block:: python
 
     self.register_type ("dawn", get_next_dawn)
     self.register_type ("dusk", get_next_dusk)
@@ -30,7 +30,7 @@ to check your extension.
 Full code
 =========
 
-.. code-block:: none
+::
 
     class DawnDusk():
         """

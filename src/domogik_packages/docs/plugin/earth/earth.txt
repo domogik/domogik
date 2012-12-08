@@ -7,7 +7,7 @@ Purpose
 
 The dawndusk evolution. The purpose of this plugin is to extend (maybe explode) the dawndusk possibilities.
 This plugin use the pyephem extension. So, it's possible to extend it to all star's events managed by this python module.
-See pyephem documentation `here <http://rhodesmill.org/pyephem/>`_ and `developpers`_ for more details.
+Look at pyephem site `here <http://rhodesmill.org/pyephem/>`_ and developpers `documentation <developpers.html>`_ for more details.
 
 Dependencies
 ============
@@ -60,13 +60,15 @@ But you can create and manage events using XPL messages :
 
 To schedule a message 600 seconds after the dawn event :
 
+.. code-block:: none
+
     dmg_send xpl-cmnd earth.basic action=start,type=dawn,delay=+600
 
-You can drop it using :
+You can drop it using : ::
 
     dmg_send xpl-cmnd earth.basic action=halt,type=dawn,delay=+600
 
-To get the full list of supported messages, look at `schema`_.
+To get the full list of supported messages, look at schema `documentation <schema.html>`_.
 
 
 The features
