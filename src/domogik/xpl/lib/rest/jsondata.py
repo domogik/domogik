@@ -42,6 +42,24 @@ import json
 MAX_DEPTH = 10
 
 
+from sqlalchemy.ext.declarative import DeclarativeMeta
+class AlchemyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)
+
 class JSonHelper():
     """ Easy way to create a json or jsonp structure
     """
@@ -164,19 +182,21 @@ class JSonHelper():
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple", "NamedTuple")
-        list_type = ("list", "InstrumentedList")
+        list_type = ("list")
         dict_type = ("dict")
+        jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
 
         data_json = ""
 
         # get data type
         data_type = type(data).__name__
-        print("TYPE=%s" % data_type)
-        print(data)
+        #print("TYPE=%s" % data_type)
+        #print(data)
 
+        if data_type in jsonencoder_types:
+            data_json = json.JSONEncoder().encode(data)
         ### type instance (sql object)
-        if data_type in instance_type:
-            print "===instance_type"
+        elif data_type in instance_type:
             # get <object>._type value
             try:
                 sub_data_type = data._type.lower()
@@ -193,23 +213,22 @@ class JSonHelper():
                 sub_data_key = key
                 sub_data = getattr(data, key)
                 sub_data_type = type(sub_data).__name__
-                print("    DATA KEY : " + str(sub_data_key))
-                print("    DATA : " + str(sub_data))
-                print("    DATA TYPE : " + str(sub_data_type))
+                #print("    DATA KEY : " + str(sub_data_key))
+                #print("    DATA : " + str(sub_data))
+                #print("    DATA TYPE : " + str(sub_data_type))
                 data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth)
             data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : SQL table
-        elif data_type in db_type: 
-            print "=== db_type"
+        elif data_type in db_type:
             data_json += "{" 
             for key in data.__dict__: 
                 sub_data_key = key 
                 sub_data = getattr(data, key)
                 sub_data_type = type(sub_data).__name__ 
-                print("    DATA KEY : " + str(sub_data_key) )
-                print("    DATA : " + unicode(sub_data) )
-                print("    DATA TYPE : " + str(sub_data_type) )
+                #print("    DATA KEY : " + str(sub_data_key) )
+                #print("    DATA : " + unicode(sub_data) )
+                #print("    DATA TYPE : " + str(sub_data_type) )
                 my_buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth) 
                 # if max depth in recursivity, we don't display "foo : {}"
                 if re.match(".*#MAX_DEPTH#.*", my_buffer) is None:
@@ -220,11 +239,11 @@ class JSonHelper():
         elif data_type in list_type:
             # get first data type
             if len(data) == 0:
-                print("DATA vide=%s" % data)
+                #print("DATA vide=%s" % data)
                 data_json = '"%s" : [],' % key
             else:
                 sub_data_elt0_type = type(data[0]).__name__
-                print("DATA=%s" % data)
+                #print("DATA=%s" % data)
                 # start table
                 if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
                     data_json += '"%s" : [' % key
@@ -238,9 +257,9 @@ class JSonHelper():
                 for sub_data in data:
                     sub_data_key  = "NOKEY"
                     sub_data_type = type(sub_data).__name__
-                    print("    DATA KEY : " + str(sub_data_key))
-                    print("    DATA : " + str(sub_data))
-                    print("    DATA TYPE : " + str(sub_data_type))
+                    #print("    DATA KEY : " + str(sub_data_key))
+                    #print("    DATA : " + str(sub_data))
+                    #print("    DATA TYPE : " + str(sub_data_type))
                     data_json += self._process_sub_data(idx + 1, True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type, max_depth)
                 # finish table
                 data_json = data_json[0:len(data_json)-1] + "],"
