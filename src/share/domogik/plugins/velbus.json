@@ -36,6 +36,7 @@
     ], 
     "xpl_commands": {
          "set_level_bin": {
+            "name": "blah",
             "schema": "lighting.basic",
             "xplstat_name": "get_level",
             "parameters": {
@@ -60,6 +61,7 @@
                 }
          },
          "set_level_range": {
+            "name": "set_level_range",
             "schema": "lighting.basic",
             "xplstat_name": "get_level",
             "parameters": {
@@ -86,7 +88,7 @@
     },
     "xpl_stats": {
        "get_level": {
-            "reference": "get_level",
+            "name": "get_level",
             "schema": "lighting.device",
             "parameters": {
                     "static": [],

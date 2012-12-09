@@ -1935,26 +1935,14 @@ class ProcessRequest():
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         try:
-            device = self._db.add_device(self.get_parameters("name"), \
-                                         self.get_parameters("type_id"), \
-                                         self.get_parameters("usage_id"), \
-                                         self.get_parameters("description"), \
-                                         self.get_parameters("reference"))
-            js = self._rest_base_deviceparams(self.get_parameters("type_id"), json=False)
-            stats = []
-            for stat in js['xpl_stat']:
-                xplstat = self._db.add_xpl_stat(name=stat['name'], schema=stat['schema'], reference=stat['reference'], device_id=device.id, unit=None)
-                stats.append( {'id': xplstat.id, 'name': xplstat.name} )
-            for cmd in js['xpl_cmd']:
-                ststid = None
-                if cmd['stat_name'] is not None:
-                    for stat in stats:
-                        if stat['name'] == cmd['stat_name']:
-                            statid = stat['id']
-                xplcommand = self._db.add_xpl_command(name=cmd['name'], schema=cmd['schema'], reference=cmd['reference'], device_id=device.id, stat_id=statid)
-           # json_data.set_data_type("dict")
+            device = self._db.add_device_and_commands( \
+                                         name=self.get_parameters("name"), \
+                                         type_id=self.get_parameters("type_id"), \
+                                         usage_id=self.get_parameters("usage_id"), \
+                                         description=self.get_parameters("description"), \
+                                         reference=self.get_parameters("reference"))
             json_data.set_data_type("device")
-            json_data.add_data(self._db.get_device(device.id))
+            json_data.add_data(device)
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
         except:
@@ -4567,15 +4555,18 @@ class ProcessRequest():
                 else:
                     return None
             ret = {}
+            if not json:
+                ret['commands'] = []
             ret['global'] = []
             ret['xpl_stat'] = []
             ret['xpl_cmd'] = []
             # find all features for this device
             for c in pjson['device_types'][dt.id]['commands']:
                 if not c in pjson['commands']:
-                    print 'fail 0'
                     break
                 c = pjson['commands'][c]
+                if not json:
+                    ret['commands'].append(c)
                 # we must have an xpl command
                 if not 'xpl_command' in c:
                     break

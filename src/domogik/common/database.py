@@ -51,6 +51,7 @@ from sqlalchemy.pool import QueuePool
 
 from domogik.common.utils import ucode
 from domogik.common import logger
+from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
@@ -1189,6 +1190,56 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(usage_id=du_id).all()
 
+    def add_device_and_commands(self, name, type_id, usage_id, description, reference):
+        # first add the device itself
+        if not self.__session.query(DeviceType).filter_by(id=type_id).first():
+            self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % type_id)
+        if not self.__session.query(DeviceUsage).filter_by(id=usage_id).first():
+            self.__raise_dbhelper_exception("Couldn't add device with device usage id %s It does not exist" % usage_id)
+        dt = self.get_device_type_by_id(type_id)
+        self.__session.expire_all()
+        dev = Device(name=name, description=description, reference=reference, \
+                        device_type_id=type_id, device_usage_id=usage_id)
+        self.__session.add(dev)
+        self.__session.flush()
+        # hanle all the commands for this device_type
+        pjson = PackageJson(dt.device_technology_id).json
+        if pjson['json_version'] < 2:
+            self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
+            return None
+        for command_name in pjson['device_types'][dt.id]['commands']:
+            # add the command
+            command = pjson['commands'][command_name]
+            cmd = Command(name=command['name'], \
+                    device_id=dev.id, reference=command_name, return_confirmation=command['return_confirmation'])
+            self.__session.add(cmd)
+            self.__session.flush()
+            if 'xpl_command' in command:
+                xpl_command = pjson['xpl_commands'][command['xpl_command']]
+                # add the xpl_stat
+                if 'xplstat_name' in xpl_command:
+                    xpl_stat = pjson['xpl_stats'][xpl_command['xplstat_name']]
+                    xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id)
+                    self.__session.add(xplstat)
+                    self.__session.flush()
+                    xplstatid = xplstat.id
+                else:
+                    xplstatid = None
+                # add the xpl command
+                xplcommand = XplCommand(cmd_id=cmd.id, \
+                                        name=xpl_command['name'], \
+                                        schema=xpl_command['schema'], \
+                                        device_id=dev.id, stat_id=xplstatid) 
+                self.__session.add(xplcommand)
+                self.__session.flush()
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
+        d = self.get_device(dev.id)
+        print d
+        return d
+
     def add_device(self, d_name, d_type_id, d_usage_id, d_description=None, d_reference=None):
         """Add a device item
 
@@ -2162,6 +2213,17 @@ class DbHelper():
 ###################
     def get_all_command(self):
         return self.__session.query(Command).all()
+    
+    def add_command(self, device_id, name, reference, return_confirmation):
+        self.__session.expire_all()
+        cmd = Command(name=name, device_id=device_id, reference=reference, return_confirmation=return_confirmation)
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
 ###################
 # xplcommand
 ###################
@@ -2174,9 +2236,9 @@ class DbHelper():
     def get_xpl_command_by_device_id(self, d_id):
         return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
 
-    def add_xpl_command(self, name, schema, reference, device_id, stat_id, return_confiration=None):
+    def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id):
         self.__session.expire_all()
-        cmd = XplCommand(name=name, schema=schema, reference=reference, device_id=device_id, stat_id=stat_id, return_confirmation=return_confiration)
+        cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id)
         self.__session.add(cmd)
         try:
             self.__session.commit()
@@ -2197,7 +2259,7 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-command with id %s : it doesn't exist" % id)
 
-    def update_xpl_command(self, id, name=None, schema=None, reference=None, device_id=None, stat_id=None, return_confirmation=None):
+    def update_xpl_command(self, id, cmd_id=None, name=None, schema=None, device_id=None, stat_id=None):
         """Update a xpl_stat
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -2205,18 +2267,16 @@ class DbHelper():
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
         if cmd is None:
             self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % id)
+        if cmd_id is not None:
+            cmd.cmd_id = cmd_id
         if schema is not None:
             cmd.schema = ucode(schema)
-        if reference is not None:
-            cmd.reference = ucode(reference)
         if device_id is not None:
             cmd.device_id = device_id
         if stat_id is not None:
             cmd.stat_id = stat_id
         if name is not None:
             cmd.name = name
-        if return_confiration is not None:
-            cmd.return_confiration = return_confiration
         self.__session.add(cmd)
         try:
             self.__session.commit()
@@ -2237,9 +2297,9 @@ class DbHelper():
     def get_xpl_stat_by_device_id(self, d_id):
         return self.__session.query(XplStat).filter_by(device_id=d_id).all()
 
-    def add_xpl_stat(self, name, schema, device_id, unit=None, reference=None):
+    def add_xpl_stat(self, name, schema, device_id):
         self.__session.expire_all()
-        stat = XplStat(name=name, schema=schema, reference=reference, device_id=device_id, unit=unit)
+        stat = XplStat(name=name, schema=schema, device_id=device_id)
         self.__session.add(stat)
         try:
             self.__session.commit()
@@ -2260,7 +2320,7 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
     
-    def update_xpl_stat(self, id, name=None, schema=None, reference=None, device_id=None, unit=None):
+    def update_xpl_stat(self, id, name=None, schema=None, device_id=None):
         """Update a xpl_stat
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -2270,14 +2330,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % id)
         if schema is not None:
             stat.schema = ucode(schema)
-        if reference is not None:
-            stat.reference = ucode(reference)
         if device_id is not None:
             stat.device_id = device_id
         if name is not None:
             stat.name = name
-        if unit is not None:
-            stat.unit = unit
         self.__session.add(stat)
         try:
             self.__session.commit()
@@ -2288,9 +2344,9 @@ class DbHelper():
 ###################
 # XplCommandParam
 ###################
-    def add_xpl_command_param(self, cmd_id, key, value, static, value_type=None, values=None):
+    def add_xpl_command_param(self, cmd_id, key, value):
         self.__session.expire_all()
-        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value, static=static, value_type=value_type, values=values)
+        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2298,19 +2354,13 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_command_param(self, cmd_id, key, value=None, static=None, value_type=None, values=None):
+    def update_xpl_command_param(self, cmd_id, key, value=None):
         self.__session.expire_all()
         param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=cmd_id).filter_by(key=key).first()
         if param is None:
             self.__raise_dbhelper_exception("XplCommandParam with id %s and key %s couldn't be found" % (cmd_id, key))
         if value is not None:
             param.value = ucode(value)
-        if static is not None:
-            param.static = static
-        if value_type is not None:
-            param.value_type = value_type
-        if values is not None:
-            param.values = values
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2334,9 +2384,9 @@ class DbHelper():
 ###################
 # XplStatParam
 ###################
-    def add_xpl_stat_param(self, statid, key, value, static, stat_key, value_type=None):
+    def add_xpl_stat_param(self, statid, key, value, static):
         self.__session.expire_all()
-        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, stat_key=key, values_type=value_type)
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -2344,7 +2394,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, stat_key=None, value_type=None):
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None):
         self.__session.expire_all()
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is None:
@@ -2353,10 +2403,6 @@ class DbHelper():
             param.value = ucode(value)
         if static is not None:
             param.static = static
-        if stat_key is not None:
-            param.stat_key = stat_key
-        if value_type is not None:
-            param.value_type = value_type
         self.__session.add(param)
         try:
             self.__session.commit()

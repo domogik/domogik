@@ -622,8 +622,8 @@ class XplStatParam(Base):
 class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
     stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), nullable=True)
