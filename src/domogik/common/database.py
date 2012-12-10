@@ -846,6 +846,12 @@ class DbHelper():
                     device_id=dev.id, reference=command_name, return_confirmation=command['return_confirmation'])
             self.__session.add(cmd)
             self.__session.flush()
+            # add the command params
+            for p in pjson['commands'][command_name]['params']:
+                pa = CommandParam(cmd.id, p['key'], p['value_type'], p['values'])
+                self.__session.add(pa)
+                self.__session.flush()
+            # if needed add the xpl* stuff
             if 'xpl_command' in command:
                 xpl_command = pjson['xpl_commands'][command['xpl_command']]
                 # add the xpl_stat
@@ -1855,6 +1861,19 @@ class DbHelper():
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return cmd
+
+###################
+# commandParam
+###################
+    def add_commandparam(self, cmd_id, key, value_type, values): 
+        self.__session.expire_all()
+        p = CommandParam(cmd_id=cmd_id, key=key, value_type=value_type, values=values)
+        self.__session.add(p)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return p
 
 ###################
 # xplcommand

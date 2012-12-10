@@ -1918,13 +1918,12 @@ class ProcessRequest():
     def _rest_base_device_addglobal(self, id):
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device")
-        dev = self._db.get_device(devid) 
+        dev = self._db.get_device(id)
         js = self._rest_base_deviceparams(dev.device_type_id, json=False)
-        for x in self._db.get_xpl_command_by_device_id(devid):
+        for x in self._db.get_xpl_command_by_device_id(id):
             for p in js['global']: 
-                self._db.add_xpl_command_param(cmdid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
-        for x in self._db.get_xpl_stat_by_device_id(devid):
+                self._db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=self.get_parameters(p['key']))
+        for x in self._db.get_xpl_stat_by_device_id(id):
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
         self.send_http_response_ok(json_data.get())

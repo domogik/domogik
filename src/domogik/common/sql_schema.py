@@ -548,7 +548,7 @@ class Command(Base):
 class CommandParam(Base):
     __tablename__ = '%s_command_param' % _db_prefix
     cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
-    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     value_type = Column(Unicode(32), nullable=False)
     values = Column(Unicode(32), nullable=False)
     UniqueConstraint('cmd_id', 'key', name='uix_1')
@@ -557,7 +557,7 @@ class CommandParam(Base):
         self.cmd_id = cmd_id
         self.key = ucode(key)
         self.value_type = ucode(value_type)
-        self.values = values
+        self.values = ucode(values)
    
     def __repr__(self):
         """Return an internal representation of the class"""
