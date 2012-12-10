@@ -40,6 +40,17 @@ import json
 
 MAX_DEPTH = 10
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
+        elif isinstance(obj, datetime.timedelta):
+            return (datetime.datetime.min + obj).time().isoformat()
+        else:
+            return super(DateTimeEncoder, self).default(obj)
+
 class JSonHelper():
     """ Easy way to create a json or jsonp structure
     """
@@ -165,7 +176,9 @@ class JSonHelper():
         tuple_type = ("tuple", "NamedTuple")
         list_type = ("list", "InstrumentedList")
         dict_type = ("dict")
+        # new definitions
         jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
+        datetimeencoder_types = ("date", "datetime")
 
         data_json = ""
 
@@ -176,6 +189,8 @@ class JSonHelper():
 
         if data_type in jsonencoder_types:
             data_json = json.JSONEncoder().encode(data)
+        elif date_type in datetimeencoder_types:
+            date_json = DateTimeEncoder().encode(data)
         ### type instance (sql object)
         elif data_type in instance_type:
             # get <object>._type value
