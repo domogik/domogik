@@ -45,7 +45,7 @@
         {
             "device_type_id": "cron.job",
             "feature_type": "sensor",
-           "id": "cron.job.started",
+            "id": "cron.job.started",
             "name": "Started",
             "parameters": "{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stopped&quot;, &quot;value1&quot;:&quot;started&quot;}",
             "return_confirmation": "0",
@@ -98,7 +98,7 @@
         "author": "Sebastien GALLET",
         "author_email": "sgallet at gmail dot com",
         "category": "cron",
-        "changelog": "0.3\n - Add user input verifications. Add device auto-creation. Multiple date in alarm and dawnalarm\n0.2a1\n - Add UI commands\n0.1a3\n - Store jobs to filesystem\n0.1\n - plugin creation",
+        "changelog": "0.3\n - Add user input verifications. Add device auto-creation. Multiple date in alarm and dawnalarm\n0.2\n - Add UI commands\n0.1\n - Store jobs to filesystem - Plugin creation",
         "dependencies": [
             {
                 "id": "apscheduler (>=2.0.2)",
@@ -118,7 +118,7 @@
         "domogik_min_version": "0.2.0",
         "id": "cron",
         "type": "plugin",
-        "version": "0.3b2"
+        "version": "0.3b3"
     },
     "json_version": 1,
     "technology": {

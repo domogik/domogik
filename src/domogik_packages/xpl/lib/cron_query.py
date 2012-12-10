@@ -105,10 +105,9 @@ class CronQuery():
             try:
                 self._keys['device'].wait(10)
                 if not self._keys['device'].is_set():
-                    self.log.error("No answer received for device=%s" \
-                       % (device))
-                    raise RuntimeError("No answer received for device=%s,  \
-                        check your cron xpl setup" % (device))
+                    self.log.error("No answer received for device=%s" % (device))
+                    raise RuntimeError("No answer received for device=%s," % (device) +
+                        "check your cron xpl setup")
             except KeyError:
                 pass
         if 'error' not in self._result:
@@ -122,9 +121,9 @@ class CronQuery():
                     return False
             return True
         else:
-            self.log.error("Error %s when communicating device=%s" % \
+            self.log.debug("Error %s when communicating device=%s" % \
                 (self._result['errorcode'], device))
-            self.log.error("%s : %s" % \
+            self.log.debug("%s : %s" % \
                 (self._result['errorcode'], self._result['error']))
             return False
 
@@ -185,7 +184,7 @@ class CronQuery():
             res = self.query(device, configmess)
             return res
         except:
-            self.log.error("cron_query : %s" % (traceback.format_exc()))
+            self.log.debug("cron_query : %s" % (traceback.format_exc()))
             return False
 
     def start_timer_job(self, device, nstmess, frequence, duration=0):
@@ -413,7 +412,7 @@ class CronQuery():
         else:
             cont = False
         if cont == False:
-            return "Halted"
+            return "halted"
         return self.start_job(device, configmess, nstmess)
 
     def start_alarm_job( self, device, nstmess, params={}, alarms=list()):
@@ -621,5 +620,4 @@ class CronQuery():
             res = self.query("cron", configmess, "state")
             return True
         except:
-            self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False

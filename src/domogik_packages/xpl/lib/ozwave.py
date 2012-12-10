@@ -126,6 +126,7 @@ class OZWavemanager(threading.Thread):
         self._log.info("Try to run openzwave manager")
         self.options = libopenzwave.PyOptions()
         self.options.create(self._configPath, self._userPath,  opts) 
+     #   self.options.addOptionBool("NotifyTransactions", 'true')
         self.options.lock() # nécessaire pour bloquer les options et autoriser le PyManager à démarrer
         self._manager = libopenzwave.PyManager()
         self._manager.create()
@@ -134,7 +135,6 @@ class OZWavemanager(threading.Thread):
         # self.manager.addDriver(self._device)  # ajout d'un driver dans le manager, fait par self.openDevice() dans class OZwave(XplPlugin):
         print ('user config :',  self._userPath,  " Logging openzwave : ",  opts)
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
-    #    sleep(5)
         
      # On accède aux attributs uniquement depuis les property
     device = property(lambda self: self._device)
@@ -164,6 +164,9 @@ class OZWavemanager(threading.Thread):
         
     def stop(self):
         """ Stop class OZWManager."""
+        print("Stopping plugin, Remove driver from openzwave : %s",  self._device)
+        self._log.info("Stopping plugin, Remove driver from openzwave : %s",  self._device)
+        sleep(1)
         self._manager.removeDriver(self.device)
         self._ready = False
 
@@ -238,10 +241,10 @@ class OZWavemanager(threading.Thread):
 #         NodeNew = 5                       / A new node has been found (not already stored in zwcfg*.xml file)
 #         NodeAdded = 6                     / A new node has been added to OpenZWave's list.  This may be due to a device being added to the Z-Wave network, or because the application is initializing itself.
 #         NodeEvent = 10                    / A node has triggered an event.  This is commonly caused when a node sends a Basic_Set command to the controller.  The event value is stored in the notification.
-#         DriverReady = 17                  / A driver for a PC Z-Wave controller has been added and is ready to use.  The notification will contain the controller's Home ID, which is needed to call most of the Manager methods.
-#         NodeQueriesComplete = 22          / All the initialisation queries on a node have been completed.
-#         AwakeNodesQueried = 23            / All awake nodes have been queried, so client application can expected complete data for these nodes.
-#         AllNodesQueried = 24              / All nodes have been queried, so client application can expected complete data.
+#         DriverReady = 18                  / A driver for a PC Z-Wave controller has been added and is ready to use.  The notification will contain the controller's Home ID, which is needed to call most of the Manager methods.
+#         NodeQueriesComplete = 23          / All the initialisation queries on a node have been completed.
+#         AwakeNodesQueried = 24            / All awake nodes have been queried, so client application can expected complete data for these nodes.
+#         AllNodesQueried = 25              / All nodes have been queried, so client application can expected complete data.
 
 #TODO: notification à implémenter
 #         ValueRemoved = 1                  / A node value has been removed from OpenZWave's list.  This only occurs when a node is removed.
@@ -252,21 +255,24 @@ class OZWavemanager(threading.Thread):
 #         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
 #         PollingDisabled = 11              / Polling of a node has been successfully turned off by a call to Manager::DisablePoll
 #         PollingEnabled = 12               / Polling of a node has been successfully turned on by a call to Manager::EnablePoll
-#         CreateButton = 13                 / Handheld controller button event created 
-#         DeleteButton = 14                 / Handheld controller button event deleted 
-#         ButtonOn = 15                     / Handheld controller button on pressed event
-#         ButtonOff = 16                    / Handheld controller button off pressed event 
-#         DriverFailed = 18                 / Driver failed to load
-#         DriverReset = 19                  / All nodes and values for this driver have been removed.  This is sent instead of potentially hundreds of individual node and value notifications.
-#         MsgComplete = 20                  / The last message that was sent is now complete.
-#         EssentialNodeQueriesComplete = 21 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
-#         Error = 25                        / An error has occured that we need to report.
+#         SceneEvent = 13                 / Scene Activation Set received
+#         CreateButton = 14                 / Handheld controller button event created 
+#         DeleteButton = 15                 / Handheld controller button event deleted 
+#         ButtonOn = 16                     / Handheld controller button on pressed event
+#         ButtonOff = 17                    / Handheld controller button off pressed event 
+#         DriverFailed = 19                 / Driver failed to load
+#         DriverReset = 20                  / All nodes and values for this driver have been removed.  This is sent instead of potentially hundreds of individual node and value notifications.
+#         MsgComplete = 21                  / The last message that was sent is now complete.
+#         EssentialNodeQueriesComplete = 22 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
+#         Error = 26                        / An error has occured that we need to report.
 
         print('\n%s\n[%s]:' % ('-'*20, args['notificationType']))
-        print args        
+        print args
         notifyType = args['notificationType']
         if notifyType == 'DriverReady':
             self._handleDriverReady(args)
+  #      if notifyType == 'NodeProtocolInfo':
+  #          self._handleDriverReady(args)           
         elif notifyType in ('NodeAdded', 'NodeNew'):
             self._handleNodeChanged(args)
         elif notifyType == 'ValueAdded':
@@ -275,12 +281,16 @@ class OZWavemanager(threading.Thread):
             self._handleValueChanged(args)
         elif notifyType == 'NodeEvent':
             self._handleNodeEvent(args)
+        elif notifyType == 'Group':
+            self._handleGroupChanged(args)
         elif notifyType == 'NodeQueriesComplete':
             self._handleNodeQueryComplete(args)
         elif notifyType in ('AwakeNodesQueried', 'AllNodesQueried'):
             self._handleInitializationComplete(args)
 
-        else : self._log.info("zwave callback : %s is not handled yet",  notifyType)
+        else : 
+            self._log.info("zwave callback : %s is not handled yet",  notifyType)
+            self._log.info(args)
     
     def _handleDriverReady(self, args):
         """Appelé une fois que le controleur est déclaré et initialisé dans OZW.
@@ -406,6 +416,11 @@ class OZWavemanager(threading.Thread):
         self._log.info("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         #self._manager.writeConfig(self._homeId)
 
+    def _handleGroupChanged(self, args):
+        """Report de changement d'association au seins d'un groupe"""
+        node = self._fetchNode(args['homeId'], args['nodeId'])
+        node.updateGroup(args['groupIdx'])
+         
     def getCommandClassName(self, commandClassCode):
         return PyManager.COMMAND_CLASS_DESC[commandClassCode]
 
@@ -514,7 +529,7 @@ class OZWavemanager(threading.Thread):
         """Retourne la liste des type de value possible et la doc"""
         retval ={}
         for elem in  libopenzwave.PyValueTypes :
-            retval[elem] = elem.__doc__ 
+            retval[elem] = elem.doc
         return retval
            
     def setUINodeNameLoc(self,  nodeID,  newname, newloc):
@@ -540,3 +555,18 @@ class OZWavemanager(threading.Thread):
                 return retval
             else : return {"error" : "Unknown value %d" %valId}
         else : return {"error" : "Zwave network not ready, can't find value %d" %valId}     
+
+    def setMembersGrps(self,  nodeID,  newGroups):
+        """Envoie les changement des associations de nodes dans les groups d'association."""
+        retval={}
+        if self.ready :
+            node = self._getNode(self.homeId,  nodeID)
+            grp =node.setMembersGrps(newGroups);
+            if grp :
+                retval['groups'] = grp
+                retval['error'] = ""
+                return retval
+            else : return {"error" : "Manager not send association changement on node %d." %nodeID}
+            return 
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeID}
+                

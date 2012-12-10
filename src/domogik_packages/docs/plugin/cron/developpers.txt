@@ -92,6 +92,41 @@ A robust way to use cron jobs is always halt a job before create it.
 
 You can also create many other types of job, look at the cron_query source and documentation.
 
+Update your plugin __init__
+===========================
+Sometimes, it's necessary that the cron plugin is started before your plugin.
+Actually, there is no way to do it using the dependencies.
+The best way to do it, is to add the following script to the constructor of your plugin.
+It will try safely to talk to the cron plugin. If it can't, it will stop your plugin.
+
+.. code-block:: none
+
+        #We try to speak to the cron plugin every 30 seconds
+        delay_cron = 30
+        #We will try to speak 4 times to the cron plugin
+        cont = 3
+        cron = CronQuery(self.myxpl, self.log)
+        cron_started = False
+        while not self.get_stop().isSet() and cont>=0:
+            try :
+                res = cron.is_running_server()
+            except :
+                pass
+            if res :
+                cron_started = True
+                cont = -1
+            else:
+                self.log.debug("Can't talk to cron plugin. Retries=%s" % cont)
+                self.get_stop().wait(delay_cron)
+                cont -= 1
+        if not cron_started :
+            self.force_leave()
+            error = "Can't talk to cron plugin. Exiting ..."
+            self.log.error("__init__ : "+error)
+            return
+        else :
+            self.log.info("Communication with the cron plugin established.")
+
 
 Develop an UI admin page
 ========================

@@ -1,0 +1,84 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+The dawndusk evolution. The purpose of this plugin is to extend (maybe explode) the dawndusk possibilities.
+This plugin use the pyephem extension. So, it's possible to extend it to all star's events managed by this python module.
+Look at pyephem site `here <http://rhodesmill.org/pyephem/>`_ and developpers `documentation <developpers.html>`_ for more details.
+
+Dependencies
+============
+
+plugin cron
+
+
+Plugin configuration
+====================
+
+Configuration
+-------------
+In Domogik administration, go to the cron plugin configuration page:
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| longitude     | 5.043         | The longitude of the house.                                                                         |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| latitude      | 47.352        | The latitude of the house.                                                                          |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay-sensor  | 300           | The delay in seconds between two status messages. 0 to disable.                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay-stat    | 2             | The delay in seconds between 2 stat's messages when sending sensors status.                         |
+|               |               | If you have a slow machine, update this value.                                                      |
+|               |               | Keep in mind that the next timer will be added after all stats messages have ben sent.              |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay-cron    | 30            | The delay to wait the cron plugin. The plugin will try 3 times to connect.                          |
+|               |               | If you have a slow machine, update this value.                                                      |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+Start the plugin
+----------------
+This plugin use the cron one to scheduler it's events. So, you must start it before starting earth.
+You can now start the plugin (start button).
+
+Events
+======
+
+This plugin works with earth'events (dawndusk, moon phases, ...) and can create
+XPL messages related to them. It's also possible to add a delay (before or after)
+to these events.
+For example, it's possible to send an XPL message 600 seconds after dawn
+and 900 before dusk.
+
+There is actually no User Interface to administer this events. This
+will be done later, when the new database model will allow it.
+
+But you can create and manage events using XPL messages :
+
+To schedule a message 600 seconds after the dawn event :
+
+.. code-block:: none
+
+    dmg_send xpl-cmnd earth.basic action=start,type=dawn,delay=+600
+
+You can drop it using : ::
+
+    dmg_send xpl-cmnd earth.basic action=halt,type=dawn,delay=+600
+
+To get the full list of supported messages, look at schema `documentation <schema.html>`_.
+
+
+The features
+------------
+
+A status sensor : binary or string ?
+
+Configure the features widgets on Domoweb
+=========================================
+
+You can now place the widgets of your devices features on Domoweb.
+Will be done in the future.
+

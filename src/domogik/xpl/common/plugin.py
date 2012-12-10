@@ -54,7 +54,7 @@ def load_plugin_library(name, element):
     To do a : from foo import bar
     Do      : bar = load_plugin_library("foo", "bar")
     '''
- 
+
     # Read config files to get mode
     cfg = Loader('domogik')
     config = cfg.load()
@@ -109,7 +109,7 @@ class XplPlugin(BasePlugin):
         # Get pid and write it in a file
         self._pid_dir_path = config['pid_dir_path']
         self._get_pid()
-       
+
         if len(self.get_sanitized_hostname()) > 16:
             self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
             self.force_leave()
@@ -145,7 +145,11 @@ class XplPlugin(BasePlugin):
        return self._config_files
 
     def get_data_files_directory(self):
-       """ Return the directory where a plugin developper can store data files
+       """
+       Return the directory where a plugin developper can store data files.
+       If the directory doesn't exist, try to create it.
+       After that, try to create a file inside it.
+       If something goes wrong, generate an explicit exception.
        """
        cfg = Loader('domogik')
        my_conf = cfg.load()
@@ -154,6 +158,27 @@ class XplPlugin(BasePlugin):
            path = "%s/domogik_packages/data/%s" % (config['package_path'], self._name)
        else:
            path = "%s/share/domogik/data/%s" % (config['src_prefix'], self._name)
+       if os.path.exists(path):
+           if not os.access(path, os.W_OK & os.X_OK):
+               raise OSError("Can't write in directory %s" % path)
+       else:
+           try:
+               os.mkdir(path, 0770)
+               self.log.info("Create directory %s." % path)
+           except:
+               raise OSError("Can't create directory %s." % path)
+       try:
+           tmp_prefix = "write_test";
+           count = 0
+           filename = os.path.join(path, tmp_prefix)
+           while(os.path.exists(filename)):
+               filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
+               count = count + 1
+           f = open(filename,"w")
+           f.close()
+           os.remove(filename)
+       except :
+           raise IOError("Can't create a file in directory %s." % path)
        return path
 
     def get_stats_files_directory(self):
@@ -193,7 +218,7 @@ class XplPlugin(BasePlugin):
         """ Get current pid and write it to a file
         """
         pid = os.getpid()
-        pid_file = os.path.join(self._pid_dir_path, 
+        pid_file = os.path.join(self._pid_dir_path,
                                 self._name + ".pid")
         self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
         fil = open(pid_file, "w")

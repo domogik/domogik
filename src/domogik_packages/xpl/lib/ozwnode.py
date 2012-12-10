@@ -106,7 +106,26 @@ class ZWaveNode:
 
     def _getIsLocked(self):
         return False
-
+    
+    def _getGroupsDict(self):
+        """Retourne les définitions de groups sous forme de dict"""
+        grps = []
+        print('Get groups dict')
+        for grp in self.groups :
+            group = {}
+            group['index'] = grp.index
+            group['label'] = grp.label
+            group['maxAssociations'] = grp.maxAssociations
+            group['members'] = []
+            for m in grp.members:
+                mbr={}
+                mbr['id']=m
+                mbr['status']=grp.members[m]
+                group['members'].append(mbr)
+                print group
+            grps.append(group)
+        return grps
+        
 # Fonction de renvoie des valeurs des valueNode en fonction des Cmd CLASS zwave
 # C'est ici qu'il faut enrichire la prise en compte des fonctions Zwave
 # COMMAND_CLASS implémentées :
@@ -269,24 +288,50 @@ class ZWaveNode:
         if neighbors is None or neighbors == 'None':
             self._neighbors = None
         else:
-           # self._neighbors = sorted([int(i) for i in filter(None, neighborstr.strip('()').split(','))])
             self._neighbors = neighbors
         if self.isSleeping and self._neighbors is not None and len(self._neighbors) > 10:
             self._ozwmanager._log.warning('Probable OZW bug: Node [%d] is sleeping and reports %d neighbors; marking neighbors as none.', self.id, len(self._neighbors))
             self._neighbors = None
         print ('Node [%d] neighbors are: ' %self._nodeId) , self._neighbors
         self._ozwmanager._log.debug('Node [%d] neighbors are: %s', self._nodeId, self._neighbors)
+
+    def updateGroup(self,  groupIdx):
+        """Mise à jour des informations du group/association du node """
+        groups = list()
+        for grp in self._groups :
+            if grp.index == groupIdx : 
+                mbrs = self._manager.getAssociations(self._homeId, self._nodeId, groupIdx)
+                dmembers = {};
+                for m in mbrs :
+                    dmembers[m] = MemberGrpStatus[1]
+                print("Update groupe avant :"),  grp
+                grp= (GroupInfo(
+                    index = groupIdx,
+                    label = self._manager.getGroupLabel(self._homeId, self._nodeId, groupIdx),
+                    maxAssociations = self._manager.getMaxAssociations(self._homeId, self._nodeId, groupIdx),
+                    members = dmembers
+                    ))
+                print("Update groupe après :"),  grp
+                break
+            groups.append(grp)
+        self._groups = groups
+        print ('Node [%d] groups are: ' %self._nodeId) , self._groups
+        self._ozwmanager._log.debug('Node [%d] groups are: %s', self._nodeId, self._groups)        
         
     def _updateGroups(self):
         """Mise à jour des informations de group/associationdu node """
         groups = list()
-        for i in range(0, self._manager.getNumGroups(self._homeId, self._nodeId)):
+        for i in range(1, self._manager.getNumGroups(self._homeId, self._nodeId) + 1):
+            mbrs = self._manager.getAssociations(self._homeId, self._nodeId, i)
+            dmembers = {};
+            for m in mbrs :
+                dmembers[m] = MemberGrpStatus[1]
             groups.append(GroupInfo(
                 index = i,
                 label = self._manager.getGroupLabel(self._homeId, self._nodeId, i),
                 maxAssociations = self._manager.getMaxAssociations(self._homeId, self._nodeId, i),
-                members = self._manager.getAssociations(self._homeId, self._nodeId, i)
-            ))
+                members = dmembers
+                ))
         self._groups = groups
         print ('Node [%d] groups are: ' %self._nodeId) , self._groups
         self._ozwmanager._log.debug('Node [%d] groups are: %s', self._nodeId, self._groups)
@@ -368,6 +413,7 @@ class ZWaveNode:
         retval["Type"] = self.productType
         retval["Last update"] = time.ctime(self.lastUpdate)
         retval["Neighbors"] = list(self.neighbors) if  self.neighbors else 'No one'
+        retval["Groups"] = self._getGroupsDict()
         return retval
         
     def getValuesInfos(self):
@@ -377,8 +423,6 @@ class ZWaveNode:
         retval['Values'] = []
         for value in self.values.keys():
             retval['Values'].append(self.values[value].getInfos())
-            print self.values[value].getHelp()
-        print  retval['Values']
         return retval
         
     def setName(self, name):
@@ -395,6 +439,16 @@ class ZWaveNode:
         """Rafraichis le node, util dans le cas d'un reveil si le node dormait lors de l''init """
         self._manager.refreshNodeInfo(self.homeId, self.id)
         self._ozwmanager._log.debug('Requesting refresh for node {0}'.format(node.id))
+        
+    def addAssociation(self, groupIndex,  targetNodeId):
+        """Ajout l'association du targetNode au groupe du node"""
+        self._manager.addAssociation(self.homeId, self.id, groupIndex,  targetNodeId)
+        self._ozwmanager._log.debug('Requesting for node {0} addAssociation node {1} in group index {2}  '.format(self.id,  targetNodeId, groupIndex))
+
+    def removeAssociation(self, groupIndex,  targetNodeId):
+        """supprime l'association du targetNode au groupe du node"""
+        self._manager.removeAssociation(self.homeId, self.id, groupIndex,  targetNodeId)
+        self._ozwmanager._log.debug('Requesting for node {0} removeAssociation node {1} in group index {2}  '.format(self.id,  targetNodeId, groupIndex))
         
     def setOn(self):
         """Set node on pour commandclass basic"""
@@ -433,6 +487,49 @@ class ZWaveNode:
         else:
             raise OZwaveNodeException('Value get received before creation (homeId %.8x, nodeId %d, valueid %s)' % (self.homeId, self.nodeId,  valueId))
         return retval
+        
+    def setMembersGrps(self,  newGroups):
+        """Envoie les changement des associations de nodes dans les groups d'association."""
+       # groups = self._getGroupsDict()
+        groups = self.groups
+        print ('set members association :'), newGroups
+        print ('Groups actuel : '), groups
+        for gn in newGroups :
+            print
+            print gn
+            for grp in groups :
+                print grp.index
+                if gn['idx'] == grp.index :
+                    for mn in gn['mbs']:
+                        toAdd = True
+                        for m in grp.members:
+                            if mn['id'] == m :
+                                mn['status'] = grp.members[m]
+                                toAdd = False
+                                break
+                        if toAdd : #TODO: vérifier que le status est bien to update
+                            self.addAssociation(grp.index, mn['id'])
+                            mn['status'] = MemberGrpStatus[2]
+                    break
+        print ('set members association add members result :'), newGroups
+        for grp in groups :
+            for gn in newGroups :
+                if grp.index == gn['idx'] :
+                    for m in grp.members:
+                        toRemove = True
+                        for mn in gn['mbs']:
+                            if m == mn['id']:
+                                print ('members not remove: '),  m
+                                mn['status'] =  grp.members[m]
+                                toRemove = False
+                                break
+                        if toRemove : #TODO: vérifier que le status est bien to update
+                            print ('members remove : '),  m
+                            self.removeAssociation(grp.index, m)
+                            grp.members[m] = MemberGrpStatus[2]
+                    break
+        print ('set members association remove members result :'), newGroups 
+        return newGroups
         
     def sendCmdBasic(self, instance,  command,  opt):
         """Envoie une commande au node"""

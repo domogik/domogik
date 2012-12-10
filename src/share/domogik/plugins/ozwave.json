@@ -202,7 +202,7 @@
             "type": "other"
 			}
 		],
-		"version" : "0.1b3.dev20121012",
+		"version" : "0.1b4.dev20121210",
 		"type" : "plugin",
 		"id" : "ozwave"
 	},

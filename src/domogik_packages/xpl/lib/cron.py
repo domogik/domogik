@@ -1517,17 +1517,19 @@ class CronAPI:
             self.delay_sensor = int(self.config.query('cron', 'delay-sensor'))
             self.delay_stat = int(self.config.query('cron', 'delay-stat'))
         except:
-            self.delay_stat = 300
-            self.delay_sensor = 2
+            self.delay_stat = 2
+            self.delay_sensor = 300
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
             self.log.error("__init__ : " + error)
             self.log.error("Continue with default values.")
         self._jobs_lock = threading.Semaphore()
+        self.log.debug("cronAPI.__init__ : Try to acquire lock")
+        self._jobs_lock.acquire()
         try :
-            self._jobs_lock.acquire()
             self.jobs = CronJobs(self)
         finally :
+            self.log.debug("cronAPI.__init__ : Release lock")
             self._jobs_lock.release()
         self.rest_server_ip = "127.0.0.1"
         self.rest_server_port = "40405"
@@ -1678,19 +1680,19 @@ class CronAPI:
         """
         self.log.debug("cronAPI.basicListener : Start ...")
         actions = {
-            'halt': lambda x,d,m: self._action_halt(x, d),
-            'resume': lambda x,d,m: self._action_resume(x, d),
-            'stop': lambda x,d,m: self._action_stop(x, d),
-            'start': lambda x,d,m: self._action_start(x, d, m),
-            'status': lambda x,d,m: self._action_status(x, d),
-            'list': lambda x,d,m: self._action_list(x, d),
+            'halt': lambda x,d,m : self._action_halt(x, d),
+            'resume': lambda x,d,m : self._action_resume(x, d),
+            'stop': lambda x,d,m : self._action_stop(x, d),
+            'start': lambda x,d,m : self._action_start(x, d, m),
+            'status': lambda x,d,m : self._action_status(x, d),
+            'list': lambda x,d,m : self._action_list(x, d),
         }
 
         commands = {
-            'list': lambda x,d,m: self._command_list(x, d, m),
-            'create-alarm': lambda x,d,m: self._command_start_alarm(x, d, m),
-            'create-dawnalarm': lambda x,d,m: self._command_start_dawn_alarm(x, d, m),
-            'create-date': lambda x,d,m: self._command_start_date(x, d, m),
+            'list': lambda x,d,m : self._command_list(x, d, m),
+            'create-alarm': lambda x,d,m : self._command_start_alarm(x, d, m),
+            'create-dawnalarm': lambda x,d,m : self._command_start_dawn_alarm(x, d, m),
+            'create-date': lambda x,d,m : self._command_start_date(x, d, m),
             'create-interval': lambda x,d,m: self._command_start_interval(x, d, m),
 #            'stop': lambda x,d,m: self._action_stop(x, d),
         }
@@ -1708,13 +1710,15 @@ class CronAPI:
             caller = None
             if 'caller' in message.data:
                 caller = message.data['caller']
-            self.log.debug("cronAPI.basicListener : action %s received with device %s" % (action, device))
-            self.log.debug("cronAPI.basicListener : command %s received with caller %s" % (command, caller))
+            self.log.debug("cronAPI.basicListener : Try to acquire lock")
+            self._jobs_lock.acquire()
             try :
-                self._jobs_lock.acquire()
+                self.log.debug("cronAPI.basicListener : Lock acquired")
                 if action != None :
+                    self.log.debug("cronAPI.basicListener : Action is not None")
                     actions[action](self.myxpl, device, message)
                 elif command != None :
+                    self.log.debug("cronAPI.basicListener : Command is not None")
                     commands[command](self.myxpl, device, message)
             except:
                 self.log.error("action/command error.")
@@ -1722,6 +1726,7 @@ class CronAPI:
                          (traceback.format_exc())
                 self.log.debug("cronAPI.basicCmndListener : "+error)
             finally :
+                self.log.debug("cronAPI.basicListener : Release lock")
                 self._jobs_lock.release()
         except:
             self.log.error("action _ %s _ unknown." % (action))
@@ -1742,7 +1747,7 @@ class CronAPI:
         @param device : The device to use
 
         """
-        self.log.debug("cronAPI._listStatus : Start ...")
+        self.log.debug("cronAPI._action_list : Start ...")
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
@@ -1751,7 +1756,7 @@ class CronAPI:
         mess.add_data({"devices" : self.jobs.get_list(False)})
         mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
         myxpl.send(mess)
-        self.log.debug("cronAPI._listStatus : Done :)")
+        self.log.debug("cronAPI._action_list : Done :)")
 
     def _command_list(self, myxpl, device, message):
         """
@@ -1774,7 +1779,7 @@ class CronAPI:
         caller = None
         if "caller" in message.data:
             caller = message.data['caller']
-        mess.add_data({"caller" : caller})
+            mess.add_data({"caller" : caller})
         mess.add_data({"command" : "list"})
         mess.add_data({"devices" : self.jobs.get_list(False)})
         #mess.add_data({"apjobs" : self.jobs.get_ap_list(False)})
@@ -2021,11 +2026,15 @@ class CronAPI:
 
         """
         self.log.debug("cronAPI._actionHalt : Start ...")
-        ret_rest = self.rest.delete(self.jobs.data[device])
-        ret_cron = self.jobs.halt_job(device)
-        if ret_cron == ERROR_NO :
-            if not ret_rest :
-                ret_cron = ERROR_REST
+        if device in self.jobs.data:
+            ret_rest = self.rest.delete(self.jobs.data[device])
+            ret_cron = self.jobs.halt_job(device)
+            #We don't send rest return anymore as some cron jobs don't have a device.
+            #if ret_cron == ERROR_NO :
+            #    if not ret_rest :
+            #        ret_cron = ERROR_REST
+        else:
+            ret_cron = ERROR_NO
         self._send_xpl_trig(myxpl, device, "halt", ret_cron)
         self.log.debug("Halt job :)")
         self.log.debug("cronAPI._actionHalt : Done :)")
@@ -2097,13 +2106,15 @@ class CronAPI:
         Send the sensors stat messages
 
         """
+        self.log.debug("cronAPI.send_sensors : Try to acquire lock")
+        self._jobs_lock.acquire()
         try :
-            self._jobs_lock.acquire()
             for dev in self.jobs.data :
                 if self.jobs.data[dev]["state"] == "started":
                     self._send_sensor_stat(self.myxpl,dev)
                     self._stop.wait(self.delay_stat)
         finally :
+            self.log.debug("cronAPI.send_sensors : Release lock")
             self._jobs_lock.release()
             self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
             self.timer_stat.start()
