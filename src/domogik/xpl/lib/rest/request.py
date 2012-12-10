@@ -125,16 +125,6 @@ class ProcessRequest():
             '^/base/device_usage/add/.*$':		 	                                 '_rest_base_device_usage_add',
             '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
             '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
-            # /base/feature
-            #'^/base/feature/list$':			                                         '_rest_base_feature_list',
-            #'^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_base_feature_list',
-            #'^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			 '_rest_base_feature_list',
-            # /base/feature_association
-            #'^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
-            #'^/base/feature_association/by-house$':			                         '_rest_base_feature_association_list_by_house',
-            #'^/base/feature_association/by-area/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_area',
-            #'^/base/feature_association/by-room/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_room',
-            #'^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
             # /base/ui-config
             '^/base/ui-config/list$':                                                            '_rest_base_ui_item_config_list',
             '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':              '_rest_base_ui_item_config_list',
@@ -721,56 +711,71 @@ class ProcessRequest():
         """
         self.log.debug("Process /ncommand")
         self.set_parameters(1)
-        # get the xplcommand and xplstat from db
-        cmd = self._db.get_xpl_command(cmd_id)
+        # get the command
+        cmd = self._db.get_command(cmd_id)
         if cmd == None:
             json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
-        stat = self._db.get_xpl_stat(cmd.stat_id)
-        if stat == None:
-            json_data = JSonHelper("ERROR", 999, "stat %s does not exists" % cmd.stat_id)
+        if cmd.xpl_command is None:
+            json_data = JSonHelper("ERROR", 999, "Command (%s) has no associated xplcommand" % cmd_id)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the xpl* stuff from db
+        xplcmd = cmd.xpl_command[0]
+        if xplcmd == None:
+            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+            return
+        print xplcmd
+        xplstat = self._db.get_xpl_stat(xplcmd.stat_id) 
+        if xplstat == None:
+            json_data = JSonHelper("ERROR", 999, "stat %s does not exists" % xplcmd.stat_id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
         # cmd will have all needed info now
         msg = XplMessage()
         msg.set_type("xpl-cmnd")
-        msg.set_schema( cmd.schema)
+        msg.set_schema( xplcmd.schema)
+        # static params
+        for p in xplcmd.params:
+            print p
+            msg.add_data({p.key : p.value})
+        # dynamic params
         for p in cmd.params:
-            if p.static:
-                msg.add_data({p.key : p.value})
+            if self.get_parameters(p.key):
+                msg.add_data({p.key : self.get_parameters(p.key)})
             else:
-                if self.get_parameters(p.key):
-                   msg.add_data({p.key : self.get_parameters(p.key)})
-                else:
-		    json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device command msg is not provided in the url" % p.key)
-		    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-		    self.send_http_response_ok(json_data.get())
-		    return
+	        json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device command msg is not provided in the url" % p.key)
+		json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+		self.send_http_response_ok(json_data.get())
+		return
         # send out the msg
         self.myxpl.send(msg)   
         print msg
         ### Wait for answer
         stat_msg = None
-        if stat != None:
+        if xplstat != None:
             filters = {}
-            for p in stat.params:
-                if p.static:
-                    filters[p.key] = p.value
+            for p in xplstat.params:
+                filters[p.key] = p.value
+            for p in cmd.params:
+                if self.get_parameters(p.key):
+                    filters[p.key] = self.get_parameters(p.key)
                 else:
-                    if self.get_parameters(p.key):
-                        filters[p.key] = self.get_parameters(p.key)
-                    else:
-		        json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device stats msg is not provided in the url" % p.key)
-		        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-		        self.send_http_response_ok(json_data.get())
-		        return
+		    json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device stats msg is not provided in the url" % p.key)
+		    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+		    self.send_http_response_ok(json_data.get())
+		    return
+            print stat_msg
             # get xpl message from queue
             try:
                 self.log.debug("Command : wait for answer...")
-                stat_msg = self._get_from_queue(self._queue_command, 'xpl-trig', stat.schema, filters)
+                stat_msg = self._get_from_queue(self._queue_command, 'xpl-trig', xplstat.schema, filters)
             except Empty:
                 json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
                 json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1355,27 +1360,6 @@ class ProcessRequest():
                                                   self.jsonp, self.jsonp_cb)
                 return
 
-
-        ### feature ######################
-        #elif self.rest_request[0] == "feature":
-	#
-        #    ### list
-        #    if self.rest_request[1] == "list":
-        #        if len(self.rest_request) == 2:
-        #            self._rest_base_feature_list()
-        #        elif len(self.rest_request) == 4 and self.rest_request[2] == "by-id":
-        #            self._rest_base_feature_list(id = self.rest_request[3])
-        #        elif len(self.rest_request) == 4 and self.rest_request[2] == "by-device_id":
-        #            self._rest_base_feature_list(device_id = self.rest_request[3])
-        #        else:
-        #            self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-        #                                          self.jsonp, self.jsonp_cb)
-	#
-        #    ### others
-        #    else:
-        #        self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-        #                                          self.jsonp, self.jsonp_cb)
-        #        return
         ### device technology ##########################
         elif self.rest_request[0] == "device_technology":
 
@@ -1798,36 +1782,6 @@ class ProcessRequest():
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
-
-
-
-
-######
-# /base/feature processing
-######
-
-    def _rest_base_feature_list(self, id = None, device_id = None):
-        """ list device type features
-            @param id : feature id
-            @param device_id : id of device 
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature")
-        if id == None and device_id == None:
-            for feature in self._db.list_device_features():
-                json_data.add_data(feature)
-        elif id != None:
-            feature = self._db.get_device_feature_by_id(id)
-            json_data.add_data(feature)
-        elif device_id != None:
-            for feature in self._db.list_device_features_by_device_id(device_id):
-                json_data.add_data(feature)
-        self.send_http_response_ok(json_data.get())
-
-
-
-
 
 ######
 # /base/device_technology processing
@@ -4622,4 +4576,5 @@ class ProcessRequest():
         # return the info
         if json:
             self.send_http_response_ok(json_data.get())
-        return ret
+        else:
+            return ret

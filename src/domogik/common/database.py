@@ -518,19 +518,10 @@ class DbHelper():
             if cascade_delete:
                 for device in self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all():
                     self.del_device(device.id)
-                for df in self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dty.id)).all():
-                    if df.feature_type == 'actuator':
-                        self.del_actuator_feature_model(df.id)
-                    elif df.feature_type == 'sensor':
-                        self.del_sensor_feature_model(df.id)
             else:
                 device_list = self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all()
                 if len(device_list) > 0:
                     self.__raise_dbhelper_exception("Couldn't delete device type %s : there are associated device(s)" % dty_id)
-                df_list = self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dty.id)).all()
-                if len(df_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete device type %s : there are associated device type "
-                                               + "feature(s)" % dty_id)
             self.__session.delete(dty)
             try:
                 self.__session.commit()
@@ -899,16 +890,6 @@ class DbHelper():
                         device_type_id=d_type_id, device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
-            self.__session.commit()
-            # Look up for device feature models according to the device type and create corresponding association
-            # between the device and the device feature model
-            dfm_list = self.__session.query(
-                                DeviceFeatureModel
-                            ).filter_by(device_type_id=device.device_type_id
-                            ).all()
-            for dfm in dfm_list:
-                df = DeviceFeature(device_id=device.id, device_feature_model_id=dfm.id)
-                self.__session.add(df)
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
