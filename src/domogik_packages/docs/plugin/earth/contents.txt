@@ -9,7 +9,6 @@ Table Of Content
     /index
     /earth
     /admin
-    /helpers
     /developpers
     /schema
 

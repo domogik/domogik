@@ -31,9 +31,29 @@
             "type": "string"
         },
         {
+            "default": "-6",
+            "description": "The horizon of the observer (-6 by default, don't change it until you know what you do)",
+            "id": "3",
+            "interface": "no",
+            "key": "horizon",
+            "optionnal": "no",
+            "options": [],
+            "type": "string"
+        },
+        {
+            "default": "1010.0",
+            "description": "The pressure of the observer (1010.0 by default, don't change it until you know what you do)",
+            "id": "4",
+            "interface": "no",
+            "key": "pressure",
+            "optionnal": "no",
+            "options": [],
+            "type": "number"
+        },
+        {
             "default": "300",
             "description": "The delay in seconds between two status messages. 0 to disable.",
-            "id": "3",
+            "id": "5",
             "interface": "no",
             "key": "delay-sensor",
             "optionnal": "no",
@@ -43,7 +63,7 @@
         {
             "default": "2",
             "description": "The delay in seconds between 2 stat's messages when sending sensors status. 2 by default.",
-            "id": "4",
+            "id": "6",
             "interface": "no",
             "key": "delay-stat",
             "optionnal": "no",
@@ -53,7 +73,7 @@
         {
             "default": "30",
             "description": "The delay between 2 trys of joining the cron plugin. Earth will try 3 times to join the cron server.",
-            "id": "5",
+            "id": "7",
             "interface": "no",
             "key": "delay-cron",
             "optionnal": "no",
@@ -81,16 +101,16 @@
                 "type": "plugin"
             }
         ],
-        "description": "Get the earth events (dawn, dusk, zenith, ...) using the geocoordinates.",
-        "documentation": "http://wiki.domogik.org/plugin_earth",
+        "description": "Get the earth events (dawn, dusk, moon phases, ...) using the geocoordinates. ",
+        "documentation": "http://docs.domogik.org/plugin/earth/dev/en/",
         "domogik_min_version": "0.2.0",
         "id": "earth",
         "type": "plugin",
-        "version": "0.1a1"
+        "version": "0.1a2"
     },
     "json_version": 1,
     "technology": {
-        "description": "Earth events (dawn, dusk, zenith, ...) using the geocoordinates",
+        "description": "Earth events.",
         "id": "earth",
         "name": "earth"
     },

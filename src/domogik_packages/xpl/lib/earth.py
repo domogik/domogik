@@ -76,6 +76,13 @@ class EarthEvents():
         self.register_status (["dawn", "dusk"], "dawndusk", self._dawndusk.check_dawndusk)
         self.register_parameter ("dawndusk", True, self._dawndusk.check_param)
 
+        self._moonphases = MoonPhases(self)
+        self.register_type ("fullmoon", self._moonphases.get_next_full_moon)
+        self.register_type ("newmoon", self._moonphases.get_next_new_moon)
+        self.register_type ("firstquarter", self._moonphases.get_next_first_quarter_moon)
+        self.register_type ("lastquarter", self._moonphases.get_next_last_quarter_moon)
+        self.register_status (["fullmoon", "newmoon", "firstquarter", "lastquarter"], "moonphase", self._moonphases.check_moonphase)
+
     def count_events(self):
         '''
         Count he number of events in memory.
@@ -275,6 +282,7 @@ class EarthEvents():
                 self._api.log.warning("Can't stop %s%s." % (event, delay))
             finally :
                 self._api.log.warning("Delete %s%s and it's file." % (event, delay))
+                retcron = True
                 if self._api.cronquery.status_job(self.get_name(event, delay)) != "halted":
                     retcron = self._api.cronquery.halt_job(self.get_name(event, delay))
                 retstore = self.store.on_halt(event, delay)
@@ -333,21 +341,23 @@ class EarthEvents():
             args = self.data[event][delay]["args"]
         #newdate = self.data[event][delay]["callback"](self._api.mycity, int(delay), args)
         newdate = self.device_types[event]["callback"](self._api.mycity, int(delay), args)
-        nstmess = XplMessage()
-        nstmess.set_type("xpl-trig")
-        nstmess.set_schema("earth.basic")
-        nstmess.add_data({"type" : event})
-        if delay != "0":
-            nstmess.add_data({"delay" : delay})
-        nstmess.add_data({"current" :  "fired"})
-        evt = self.get_event(event, delay)
-        evt["next"] = newdate.strftime("%x %X")
-        #Add a cron job
-        ret = self._api.cronquery.status_job(self.get_name(event, delay))
-        if ret != "halted" :
-            self._api.cronquery.halt_job(self.get_name(event, delay))
-        ret = self._api.cronquery.start_date_job(self.get_name(event, delay), nstmess, newdate)
-        return ret
+        if newdate != None :
+            nstmess = XplMessage()
+            nstmess.set_type("xpl-trig")
+            nstmess.set_schema("earth.basic")
+            nstmess.add_data({"type" : event})
+            if delay != "0":
+                nstmess.add_data({"delay" : delay})
+            nstmess.add_data({"current" :  "fired"})
+            evt = self.get_event(event, delay)
+            evt["next"] = newdate.strftime("%x %X")
+            #Add a cron job
+            ret = self._api.cronquery.status_job(self.get_name(event, delay))
+            if ret != "halted" :
+                self._api.cronquery.halt_job(self.get_name(event, delay))
+            ret = self._api.cronquery.start_date_job(self.get_name(event, delay), nstmess, newdate)
+            return ret
+        return ERROR_SCHEDULER
 
     def start_event(self, event, delay):
         """
@@ -641,13 +651,21 @@ class EarthAPI:
             self.delay_stat = int(self.config.query('earth', 'delay-stat'))
             longitude = str(self.config.query('earth', 'longitude'))
             latitude = str(self.config.query('earth', 'latitude'))
+            horizon = str(self.config.query('earth', 'horizon'))
+            pressure = float(self.config.query('earth', 'pressure'))
             if latitude == None:
                 latitude = "47.352"
             if longitude == None:
                 longitude = "5.043"
+            if horizon == None:
+                horizon = "-6"
+            if pressure == None:
+                pressure = "0"
         except:
             latitude = "47.352"
             longitude = "5.043"
+            horizon = "-6"
+            pressure = 1010.0
             self.delay_stat = 300
             self.delay_sensor = 2
             error = "Can't get configuration from XPL : %s" %  (traceback.format_exc())
@@ -656,7 +674,8 @@ class EarthAPI:
         self._events_lock = threading.Semaphore()
         self.mycity = ephem.Observer()
         self.mycity.lat, self.mycity.lon = latitude, longitude
-        self.mycity.horizon = '-6'
+        self.mycity.horizon = horizon
+        self.mycity.pressure = pressure
         try :
             self._events_lock.acquire()
             self.events = EarthEvents(self)
@@ -750,6 +769,7 @@ class EarthAPI:
         """
         self.log.debug("command_listener : Start ...")
         try:
+            self._events_lock.acquire()
             command = None
             if 'command' in message.data:
                 command = message.data['command']
@@ -805,6 +825,8 @@ class EarthAPI:
         except:
             error = "Exception %s" % (traceback.format_exc())
             self.log.error("command_listener : " + error)
+        finally :
+            self._events_lock.release()
 
     def fired_listener(self, myxpl, message):
         """
@@ -820,27 +842,31 @@ class EarthAPI:
 
         """
         self.log.debug("fire_listener : Start ...")
-        event = None
-        if 'type' in message.data:
-            event = message.data['type']
-        if event == None:
-            self.log.error("fire_listener : Event type not found in message %s" % message)
-        delay = "0"
-        if 'delay' in message.data:
-            delay = message.data['delay']
-        evt = self.events.get_event(event, delay)
-        if evt != None :
-            ret = self.events.add_event_to_cron(event, delay)
-            self._send_event_info(myxpl, event, delay)
-            if ret == False:
-                self.log.error("fire_listener : Can't start cron job %s (%s)" % (self.events.get_name(event, delay), ret))
-            #Call check_status callbacks
-            for status in self.events.device_types[event]["status"]:
-                if self.events.device_status[status]["callback"](event, message):
-                    #The status was updated. We send a message.
-                    self._send_event_status(myxpl, status)
-        else:
-            self.log.debug("fire_listener : Can't find event in the event list.")
+        try :
+            self._events_lock.acquire()
+            event = None
+            if 'type' in message.data:
+                event = message.data['type']
+            if event == None:
+                self.log.error("fire_listener : Event type not found in message %s" % message)
+            delay = "0"
+            if 'delay' in message.data:
+                delay = message.data['delay']
+            evt = self.events.get_event(event, delay)
+            if evt != None :
+                ret = self.events.add_event_to_cron(event, delay)
+                self._send_event_info(myxpl, event, delay)
+                if ret == False:
+                    self.log.error("fire_listener : Can't start cron job %s (%s)" % (self.events.get_name(event, delay), ret))
+                #Call check_status callbacks
+                for status in self.events.device_types[event]["status"]:
+                    if self.events.device_status[status]["callback"](event, message):
+                        #The status was updated. We send a message.
+                        self._send_event_status(myxpl, status)
+            else:
+                self.log.debug("fire_listener : Can't find event in the event list.")
+        finally :
+            self._events_lock.release()
         self.log.debug("fire_listener : Done :)")
 
     def action_listener(self, myxpl, message):
@@ -862,6 +888,7 @@ class EarthAPI:
         """
         self.log.debug("action_listener : Start ...")
         try:
+            self._events_lock.acquire()
             action = None
             if 'action' in message.data:
                 action = message.data['action']
@@ -894,6 +921,8 @@ class EarthAPI:
         except:
             error = "Exception %s" % (traceback.format_exc())
             self.log.debug("action_listener : "+error)
+        finally :
+            self._events_lock.release()
 
     def _send_event_list(self, myxpl):
         """
@@ -1208,9 +1237,11 @@ class DawnDusk():
         @param city: the city wher calculate the event.
         @param delay: the delay (in seconds) to the event.
         @param args: an optional argument.
-        @returns: the next dawn daytime
+        @returns: the next dawn daytime or None
 
         """
+        if abs(delay) >= 86400:
+            return None
         today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
         mycity.date = today
         dawn = ephem.localtime(mycity.next_rising(ephem.Sun(), use_center = True))
@@ -1223,9 +1254,11 @@ class DawnDusk():
         @param city: the city wher calculate the event.
         @param delay: the delay (in seconds) to the event.
         @param args: an optional argument.
-        @returns: the next dusk daytime
+        @returns: the next dusk daytime or None
 
         """
+        if abs(delay) >= 86400:
+            return None
         today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
         mycity.date = today
         dusk = ephem.localtime(mycity.next_setting(ephem.Sun(), use_center = True))
@@ -1275,3 +1308,115 @@ class DawnDusk():
         if value == "True" or value == "False" :
             return True
         return False
+
+class MoonPhases():
+    """
+    Implements the MoonPhases extension.
+    """
+
+    def __init__(self, events):
+        """
+        Init the MoonPhases extension.
+
+        :param events: the event manager
+        :type events: EartEvents
+
+        """
+        self._events = events
+
+    def get_next_new_moon(self, mycity, delay, args = None) :
+        """
+        Return the date and time of the next new moon
+
+        @param city: the city wher calculate the event.
+        @param delay: the delay (in seconds) to the event.
+        @param args: an optional argument.
+        @returns: the next new moon daytime or None
+
+        """
+        if abs(delay) >= 86400*28:
+            return None
+        m = ephem.Moon()
+        today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
+        mycity.date = today
+        m.compute(mycity)
+        moon_date = ephem.localtime(ephem.next_new_moon(mycity.date))
+        return moon_date + datetime.timedelta(seconds=delay)
+
+
+    def get_next_first_quarter_moon(self, mycity, delay, args = None) :
+        """
+        Return the date and time of the next first quarter moon
+
+        @param city: the city wher calculate the event.
+        @param delay: the delay (in seconds) to the event.
+        @param args: an optional argument.
+        @returns: the next first quarter moon daytime or None
+
+        """
+        if abs(delay) >= 86400*28:
+            return None
+        m = ephem.Moon()
+        today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
+        mycity.date = today
+        m.compute(mycity)
+        moon_date = ephem.localtime(ephem.next_first_quarter_moon(mycity.date))
+        return moon_date + datetime.timedelta(seconds=delay)
+
+
+    def get_next_full_moon(self, mycity, delay, args = None) :
+        """
+        Return the date and time of the next full moon
+
+        @param city: the city wher calculate the event.
+        @param delay: the delay (in seconds) to the event.
+        @param args: an optional argument.
+        @returns: the next full moon daytime or None
+
+        """
+        if abs(delay) >= 86400*28:
+            return None
+        m = ephem.Moon()
+        today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
+        mycity.date = today
+        m.compute(mycity)
+        moon_date = ephem.localtime(ephem.next_full_moon(mycity.date))
+        return moon_date + datetime.timedelta(seconds=delay)
+
+
+    def get_next_last_quarter_moon(self, mycity, delay, args = None) :
+        """
+        Return the date and time of the next last quarter moon
+
+        @param city: the city wher calculate the event.
+        @param delay: the delay (in seconds) to the event.
+        @param args: an optional argument.
+        @returns: the next last quarter moon daytime or None
+
+        """
+        if abs(delay) >= 86400*28:
+            return None
+        m = ephem.Moon()
+        today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
+        mycity.date = today
+        m.compute(mycity)
+        moon_date = ephem.localtime(ephem.next_last_quarter_moon(mycity.date))
+        return moon_date + datetime.timedelta(seconds=delay)
+
+    def check_moonphase(self, etype, message) :
+        """
+        Check that we should or not change the moon phase
+
+        @param etype: the type of the device : dawn or dusk.
+        @param message: the message as a dict().
+        @returns: True if dawndusk has changed. False otherwise.
+
+        """
+        if "delay" not in message.data or "delay"=="0" :
+            #This is the real event so we can change the status
+            self._events.set_status("moonphase", etype)
+            return True
+        return False
+
+
+

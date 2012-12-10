@@ -158,7 +158,7 @@ class CommandTestCase(PluginTestCase):
         keyvalss = {}
         self.assertTrue(self.query("count",message,keys,keyvalss))
 
-class DawnduskTestCase(PluginTestCase):
+class DawnDuskTestCase(PluginTestCase):
 
     def test_110_add_dawn(self):
         message = XplMessage()
@@ -426,7 +426,31 @@ class DawnduskTestCase(PluginTestCase):
         keyvalss = {"type":"dusk", 'current' : 'halted', 'delay' : '0'}
         self.assertTrue(self.query("type", message, keys, keyvalss))
 
-    def test_950_list(self):
+    def test_920_add_bad_dawn_delay_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "dawn"})
+        bad_delay = 24*60*60 + 10 #More than a day. Will create an error.
+        message.add_data({"delay" :  "-%s" % bad_delay})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"dawn", 'current' : 'started'}
+        self.assertFalse(self.query("type", message, keys, keyvalss))
+
+    def test_930_add_bad_dawn_delay_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "dawn"})
+        bad_delay = 24*60*60 + 10 #More than a day. Will create an error.
+        message.add_data({"delay" :  "+%s" % bad_delay})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"dawn", 'current' : 'started'}
+        self.assertFalse(self.query("type", message, keys, keyvalss))
+
+    def test_980_list(self):
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("earth.request")
@@ -443,17 +467,471 @@ class DawnduskTestCase(PluginTestCase):
         keys = ['memory']
         self.assertTrue(self.query("memory",message,keys))
 
-#    def test_999_add_bad_dawn_delay_moins(self):
-#        message = XplMessage()
-#        message.set_type("xpl-cmnd")
-#        message.set_schema("earth.basic")
-#        message.add_data({"action" :  "start"})
-#        message.add_data({"type" :  "dawn"})
-#        bad_delay = 24*60*60 + 10 #More than a day. Will create an error.
-#        message.add_data({"delay" :  "-%s" % bad_delay})
-#        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
-#        keyvalss = {"type":"dawn", 'current' : 'started'}
-#        self.assertFalse(self.query("type", message, keys, keyvalss))
+class MoonPhasesTestCase(PluginTestCase):
+
+    def test_110_add_full_moon(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "fullmoon"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_130_info(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "info"})
+        message.add_data({"type" :  "fullmoon"})
+        keys = ['delay', 'current', 'uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", "delay":"0"}
+        self.assertTrue(self.query("type",message,keys,keyvalss))
+
+    def test_150_add_new_moon(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "newmoon"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_160_add_first_quarter(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "firstquarter"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_170_add_last_quarter(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "lastquarter"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "lastquarter", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_180_list(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "list"})
+        keys = ['count','evnt-list']
+        keyvalss = {}
+        self.assertTrue(self.query("count",message,keys,keyvalss))
+
+    def test_210_add_full_moon_delay_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "fullmoon"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_220_add_full_moon_delay_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "fullmoon"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_240_add_new_moon_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "newmoon"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_250_add_new_moon_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "newmoon"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_260_add_first_quarter_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "firstquarter"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_270_add_first_quarter_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "firstquarter"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_280_add_last_quarter_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "lastquarter"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "lastquarter", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_290_add_last_quarter_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "lastquarter"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "lastquarter", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_300_list(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "list"})
+        keys = ['count','evnt-list']
+        keyvalss = {}
+        self.assertTrue(self.query("count",message,keys,keyvalss))
+
+    def test_310_memory(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "memory"})
+        keys = ['memory']
+        self.assertTrue(self.query("memory",message,keys))
+
+    def test_400_simulate_fullmoon(self):
+        message = XplMessage()
+        message.set_type("xpl-trig")
+        message.set_schema("earth.basic")
+        message.add_data({"type" :  "fullmoon"})
+        message.add_data({"current" :  "fired"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"fullmoon", 'current' : "started"}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_410_status_moonphase(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "status"})
+        message.add_data({"query" :  "moonphase"})
+        keys = []
+        keyvalss = {'type' : 'moonphase','status':'fullmoon'}
+        self.assertTrue(self.query("type",message,keys,keyvalss))
+
+    def test_420_simulate_firstquarter(self):
+        message = XplMessage()
+        message.set_type("xpl-trig")
+        message.set_schema("earth.basic")
+        message.add_data({"type" :  "firstquarter"})
+        message.add_data({"current" :  "fired"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"firstquarter", 'current' : "started"}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_430_status_moonphase(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "status"})
+        message.add_data({"query" :  "moonphase"})
+        keys = []
+        keyvalss = {'type' : 'moonphase','status':'firstquarter'}
+        self.assertTrue(self.query("type",message,keys,keyvalss))
+
+    def test_440_simulate_newmoon(self):
+        message = XplMessage()
+        message.set_type("xpl-trig")
+        message.set_schema("earth.basic")
+        message.add_data({"type" :  "newmoon"})
+        message.add_data({"current" :  "fired"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"newmoon", 'current' : "started"}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_450_status_moonphase(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "status"})
+        message.add_data({"query" :  "moonphase"})
+        keys = []
+        keyvalss = {'type' : 'moonphase','status':'newmoon'}
+        self.assertTrue(self.query("type",message,keys,keyvalss))
+
+    def test_460_simulate_lastquarter(self):
+        message = XplMessage()
+        message.set_type("xpl-trig")
+        message.set_schema("earth.basic")
+        message.add_data({"type" :  "lastquarter"})
+        message.add_data({"current" :  "fired"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"lastquarter", 'current' : "started"}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_470_status_moonphase(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "status"})
+        message.add_data({"query" :  "moonphase"})
+        keys = []
+        keyvalss = {'type' : 'moonphase','status':'lastquarter'}
+        self.assertTrue(self.query("type",message,keys,keyvalss))
+
+    def test_600_simulate_firstquarter_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-trig")
+        message.set_schema("earth.basic")
+        message.add_data({"type" :  "firstquarter"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        message.add_data({"current" :  "fired"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_610_status_moonphase_not_changed(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "status"})
+        message.add_data({"query" :  "moonphase"})
+        keys = []
+        keyvalss = {'type' : 'moonphase','status':'firstquarter'}
+        self.assertFalse(self.query("type",message,keys,keyvalss))
+
+    def test_620_simulate_firstquarter_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-trig")
+        message.set_schema("earth.basic")
+        message.add_data({"type" :  "firstquarter"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        message.add_data({"current" :  "fired"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'started','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_630_status_moonphase_not_changed(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "status"})
+        message.add_data({"query" :  "moonphase"})
+        keys = []
+        keyvalss = {'type' : 'moonphase','status':'firstquarter'}
+        self.assertFalse(self.query("type",message,keys,keyvalss))
+
+    def test_850_add_new_moon_plus_bad(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "newmoon"})
+        delay = "+%s" % (60*60*24*28+3600)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'started','delay' : delay}
+        self.assertFalse(self.query("type", message, keys, keyvalss))
+
+    def test_860_add_new_moon_moins_bad(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"type" :  "newmoon"})
+        delay = "-%s" % (60*60*24*28+3600)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'started','delay' : delay}
+        self.assertFalse(self.query("type", message, keys, keyvalss))
+
+    def test_900_halt_fullmoon(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "fullmoon"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", 'current' : 'halted', 'delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_903_halt_full_moon_delay_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "fullmoon"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_906_halt_full_moon_delay_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "fullmoon"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "fullmoon", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_910_halt_newmoon(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "newmoon"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'halted', 'delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_913_halt_new_moon_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "newmoon"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_916_halt_new_moon_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "newmoon"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "newmoon", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_920_halt_firstquarter(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "firstquarter"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'halted', 'delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_923_halt_first_quarter_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "firstquarter"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_923_halt_first_quarter_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "firstquarter"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "firstquarter", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_930_halt_lastquarter(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "lastquarter"})
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "lastquarter", 'current' : 'halted', 'delay' : '0'}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_933_halt_last_quarter_plus(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "lastquarter"})
+        delay = "+%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "lastquarter", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_936_halt_last_quarter_moins(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"type" :  "lastquarter"})
+        delay = "-%s" % (60*60*24*7)
+        message.add_data({"delay" : delay })
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type" : "lastquarter", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.query("type", message, keys, keyvalss))
+
+    def test_990_memory(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("earth.request")
+        message.add_data({"command" :  "memory"})
+        keys = ['memory']
+        self.assertTrue(self.query("memory",message,keys))
 
 if __name__ == '__main__':
 
@@ -464,7 +942,8 @@ if __name__ == '__main__':
 
     #unittest.main()
     suite = unittest.TestLoader().loadTestsFromTestCase(CommandTestCase)
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(DawnduskTestCase))
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(DawnDuskTestCase))
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(MoonPhasesTestCase))
     unittest.TextTestRunner(verbosity=3).run(suite)
 
     sendplugin.force_leave()
