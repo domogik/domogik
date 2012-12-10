@@ -38,27 +38,7 @@ JSonHelper object
 import re
 import json
 
-
 MAX_DEPTH = 10
-
-
-from sqlalchemy.ext.declarative import DeclarativeMeta
-class AlchemyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj.__class__, DeclarativeMeta):
-            # an SQLAlchemy class
-            fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-                data = obj.__getattribute__(field)
-                try:
-                    json.dumps(data) # this will fail on non-encodable values, like other classes
-                    fields[field] = data
-                except TypeError:
-                    fields[field] = None
-            # a json-encodable dict
-            return fields
-
-        return json.JSONEncoder.default(self, obj)
 
 class JSonHelper():
     """ Easy way to create a json or jsonp structure
@@ -169,20 +149,21 @@ class JSonHelper():
             return "#MAX_DEPTH# "
 
         # define data types
-        db_type = ("DeviceFeature", "Area", "Device", "DeviceUsage", \
+        db_type = ("DeviceFeature", "Device", "DeviceUsage", \
                    "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
-                   "DeviceType", "UIItemConfig", "Room", "UserAccount", \
+                   "DeviceType", "UIItemConfig", "UserAccount", \
                    "SensorReferenceData", "Person", \
                    "SystemStats", "SystemStatsValue", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel", "Command", \
+                   "DeviceFeatureAssociation", "DeviceFeatureModel", \
+                   "Command", "CommandParam", \
                    "XplCommandParam", "XplStatParam", "XplCommand", "XplStat") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple", "NamedTuple")
-        list_type = ("list")
+        list_type = ("list", "InstrumentedList")
         dict_type = ("dict")
         jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
 
@@ -191,7 +172,7 @@ class JSonHelper():
         # get data type
         data_type = type(data).__name__
         #print("TYPE=%s" % data_type)
-        #print(data)
+        print(data)
 
         if data_type in jsonencoder_types:
             data_json = json.JSONEncoder().encode(data)
