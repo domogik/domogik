@@ -57,7 +57,13 @@
                             "min_value": 0
                         }
                     ],
-                    "device": []
+                    "device": [
+                        {
+                            "key": "dummy",
+                            "description": "a dummy param",
+                            "type": "string"
+                        }
+                    ]
                 }
          },
          "set_level_range": {
