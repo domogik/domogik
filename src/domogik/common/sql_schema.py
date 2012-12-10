@@ -228,9 +228,9 @@ class Device(Base):
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=True)
     device_type = relation(DeviceType)
     """device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")"""
-    commands = relationship("Command")
-    xpl_commands = relationship("XplCommand")
-    xpl_stats = relationship("XplStat")
+    commands = relationship("Command", backref=__tablename__, cascade="all, delete")
+    xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")
+    xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all, delete")
     
 
     def __init__(self, name, reference, device_usage_id, device_type_id, description=None):
@@ -526,8 +526,8 @@ class Command(Base):
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean)
-    xpl_command = relationship("XplCommand")
-    params = relationship("CommandParam")
+    xpl_command = relation("XplCommand", backref=__tablename__, cascade="all, delete")
+    params = relationship("CommandParam", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, device_id, name, reference, return_confirmation):
         self.device_id = device_id
@@ -576,7 +576,7 @@ class XplStat(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
-    params = relationship("XplStatParam")
+    params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete")
     
     def __init__(self, device_id, name, schema):
         self.device_id = device_id
@@ -627,7 +627,8 @@ class XplCommand(Base):
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
     stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), nullable=True)
-    params = relationship("XplCommandParam")
+    stat = relation("XplStat", backref=__tablename__, cascade="all, delete")
+    params = relationship("XplCommandParam", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, name, device_id, cmd_id, schema, stat_id):
         self.name = ucode(name)

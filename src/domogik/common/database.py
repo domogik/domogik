@@ -1852,6 +1852,9 @@ class DbHelper():
     def get_all_command(self):
         return self.__session.query(Command).all()
     
+    def get_command(self, id):
+        return self.__session.query(Command).filter_by(id=id).first()
+    
     def add_command(self, device_id, name, reference, return_confirmation):
         self.__session.expire_all()
         cmd = Command(name=name, device_id=device_id, reference=reference, return_confirmation=return_confirmation)
