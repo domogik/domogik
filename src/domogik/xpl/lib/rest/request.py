@@ -835,8 +835,13 @@ target=*
                 setattr(data, "exists", "True")
                 json_data.add_data(data)
             if data == None:
-                json_data.add_data({"device_id" : self.rest_request[idx], \
-                                    "exists" : False})
+                # first, check if the device exists
+                if self._db.get_device(self.rest_request[idx]):
+                    json_data.add_data({"device_id" : self.rest_request[idx], \
+                                        "exists" : True})
+                else:
+                    json_data.add_data({"device_id" : self.rest_request[idx], \
+                                        "exists" : False})
             idx += 2
         self.send_http_response_ok(json_data.get())
 
