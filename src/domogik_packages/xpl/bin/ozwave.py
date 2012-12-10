@@ -74,7 +74,7 @@ class OZwave(XplPlugin):
             print e.value
             self.force_leave()
             return    
-                 
+        self.add_stop_cb(self.myzwave.stop)
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
                                                  'xpltype': 'xpl-cmnd'})
@@ -85,8 +85,9 @@ class OZwave(XplPlugin):
 
     def ozwave_cmd_cb(self, message):
         """" Envoie la cmd xpl vers le OZWmanager"""
-        print ("commande xpl reçu")
+        print ("commande xpl recue")
         print message
+        self.log.debug(message)
         if 'command' in message.data:
             if 'group'in message.data:
                 # en provenance de l'UI spéciale
@@ -107,15 +108,20 @@ class OZwave(XplPlugin):
                     
     def getdict2UIdata(self, UIdata):
         """ retourne un format dict en provenance de l'UI (passage outre le format xPL)"""
-        retval = UIdata.replace('|', '{').replace('\\', '}')
+#        retval = UIdata.replace('|', '{').replace('\\', '}')
+        retval = UIdata.replace('&quot;', '"').replace("&ouvr;", '{').replace("&ferm;", '}') ;
         try :
-            return  eval(retval.replace(';', ','))
+ #           return  eval(retval.replace(';', ','))
+            return eval(retval)
         except :
+            print retval
             return {'error': 'invalid format'}
             
     def getUIdata2dict(self, ddict):
         """Retourne le dict formatter pour UI (passage outre le format xPL)"""
-        return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None;', "'';")
+  #      return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None', "''")
+        print str(ddict)
+        return str(ddict).replace('{', '&ouvr;').replace('}', '&ferm;').replace('"','&quot;').replace("'",'&quot;').replace('False', 'false').replace('True', 'true').replace('None', '""')
         
     def ui_cmd_cb(self, message):
         """xpl en provenace de l'UI (config/special)"""
@@ -135,12 +141,26 @@ class OZwave(XplPlugin):
                                     'data': info})
                 print "Refresh network info"
             elif request['request'] == 'GetNodeInfo' :
-                info = self.getUIdata2dict(self.myzwave.getNodeInfos(request['node']))
+                info = self.myzwave.getNodeInfos(request['node'])
+                gprs = info['Groups']
+                del info['Groups']
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
-                                    'node' : request['node'], 
-                                    'data': info})
-                print "Refresh node :",  request['node'],  info
+                                    'node' : request['node'],
+                                    'data': self.getUIdata2dict(info), 
+                                    'countgrps': len(gprs)})
+                i=0
+                for gp in gprs :
+                    mbrs=gp['members']
+                    del gp['members']
+                    mess.add_data({'group%d' %i :  self.getUIdata2dict(gp)})
+                    ii=0
+                    for m in mbrs :
+                        print 'insert member'
+                        mess.add_data({'g%dm%d' %(i, ii) : self.getUIdata2dict(m) })
+                        ii=ii+1
+                    i = i +1
+                print "Refresh node :",  request['node'],  mess
             elif  request['request'] == 'SaveConfig':
                 info = self.getUIdata2dict(self.myzwave.saveNetworkConfig())
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -163,6 +183,7 @@ class OZwave(XplPlugin):
                 for inf in info['Values']:
                     mess.add_data({'value%d' %i :  self.getUIdata2dict(inf)})
                     i = i +1
+                print mess
             elif  request['request'] == 'GetValueInfos':
                 valId = long(request['valueid']) # Pour javascript type string
                 info =self.getUIdata2dict(self.myzwave.getValueInfos(valId))
@@ -187,12 +208,18 @@ class OZwave(XplPlugin):
                                     'listetypes' : 'valuestype', 
                                     'data': info})               
                 print mess
-                
+            elif  request['request'] == 'setGroups':
+                info = self.getUIdata2dict(self.myzwave.setMembersGrps(request['node'], request['ngrps']))
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'node' : request['node'], 
+                                    'data': info})               
+                print mess                
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : request['node'], 
-                                    'data': "unknow request"})
+                                    'data': "unknown request"})
                 print "commande inconnue"
             self.myxpl.send(mess)
                                   

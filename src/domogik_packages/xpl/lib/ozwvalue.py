@@ -96,7 +96,7 @@ class ZWaveValueNode:
     # On accède aux attributs uniquement depuis les property
   
     homeId = property(lambda self: self._node._homeId)
-    nodeId = property(lambda self: self._node.Id)
+    nodeId = property(lambda self: self._node._nodeId)
     lastUpdate = property(lambda self: self._lastUpdate)
     valueData = property(lambda self: self._valueData)
 
@@ -106,36 +106,56 @@ class ZWaveValueNode:
     
     def getOZWValue(self):
         """Retourne la valeur réelle lut par openzwave"""
-        retval = self._node._manager.getValue(self.valueData['id'])
-        self._valueData['value'] = retval
-        self._lastUpdate = time.time()
-        return retval
+        if self.valueData['genre'] != 'Config' :
+            retval = self._node._manager.getValue(self.valueData['id'])
+            self._valueData['value'] = retval
+            self._lastUpdate = time.time()
+            return retval
+        else :
+            print "getOZWValue : call requestConfigParam waiting ValueChanged..."
+            self._node._manager.requestConfigParam(self.homeId,  self.nodeId,  self.valueData['index'])
+            return self._valueData['value'] 
         
     def setValue(self, val):
         """Envois sur le réseau zwave le 'changement' de valeur à la valueNode"""
         print type (val)
-        if self.valueData['type'] == 'Bool':
-            value = False if val in [False, 'FALSE', 'False',  'false', '',  0,  0.0, (),  [],  {},  None ] else True
-            v = bool(val)
-            print type(value), value,   "----",  type(v),  v
-        elif self.valueData['type'] == 'Byte' : value = int(val)
-        elif self.valueData['type'] == 'Decimal' : value= float(val)
-        elif self.valueData['type'] == 'Int' : value = int(val)
-        elif self.valueData['type'] == 'List' : value = str(val)
-        elif self.valueData['type'] == 'Schedule' : value = int(val)  # TODO: Corriger le type schedule dans setvalue
-        elif self.valueData['type'] == 'Short' : value = short(val)
-        elif self.valueData['type'] == 'String ' : value = str(val)
-        elif self.valueData['type'] == 'Button ' : value = object(val) # TODO: type button set value ?
-        else : value = val        
-        print ("setValue de ", self.valueData['commandClass'], ", instance :", self.valueData['instance'], ", value : ",  value, ", on valueId :" , self.valueData['id'])                      
-        if not self._node._manager.setValue(self.valueData['id'], value)  : 
-            self._node._ozwmanager._log.error ("setValue return bad type : %s, instance :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['instance'],  val, self.valueData['id']))
-            print("return bad type value")
-            return False
-        else : 
-            self._valueData['value'] = val
-            self._lastUpdate = time.time()
-            return val
+        retval = False
+        if self.valueData['genre'] != 'Config' or self.valueData['type'] == 'List' : # TODO: Pas encore de gestion d'une config en type list, force envoie par setvalue
+            if self.valueData['type'] == 'Bool':
+                value = False if val in [False, 'FALSE', 'False',  'false', '',  0,  0.0, (),  [],  {},  None ] else True
+                v = bool(val)
+                print type(value), value,   "----",  type(v),  v
+            elif self.valueData['type'] == 'Byte' : value = int(val)
+            elif self.valueData['type'] == 'Decimal' : value= float(val)
+            elif self.valueData['type'] == 'Int' : value = int(val)
+            elif self.valueData['type'] == 'List' : value = str(val)
+            elif self.valueData['type'] == 'Schedule' : value = int(val)  # TODO: Corriger le type schedule dans setvalue
+            elif self.valueData['type'] == 'Short' : value = short(val)
+            elif self.valueData['type'] == 'String ' : value = str(val)
+            elif self.valueData['type'] == 'Button ' : value = object(val) # TODO: type button set value ?
+            else : value = val        
+            print ("setValue de ", self.valueData['commandClass'], ", instance :", self.valueData['instance'], ", value : ",  value, ", on valueId :" , self.valueData['id'])                      
+            if not self._node._manager.setValue(self.valueData['id'], value)  : 
+                self._node._ozwmanager._log.error ("setValue return bad type : %s, instance :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['instance'],  val, self.valueData['id']))
+                print("return bad type value")
+                retval = False
+            else : 
+                self._valueData['value'] = val
+                self._lastUpdate = time.time()
+                retval = val
+        else :
+            if not self._node._manager.setConfigParam(self.homeId,  self.nodeId,  self.valueData['index'], int(val))  :
+                self._node._ozwmanager._log.error ("setConfigParam no send message : %s, index :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['index'],  val, self.valueData['id']))
+                print("setConfigParam : no send message")
+                retval = False
+            else : 
+                self._valueData['value'] = val
+                self._lastUpdate = time.time()
+                retval = val
+        if self.valueData['genre'] == 'Config' :
+            self._node._manager.requestConfigParam(self.homeId,  self.nodeId,  self.valueData['index'])
+            print "setValue : call requestConfigParam..."
+        return retval
             
     def updateData(self, valueData):
         """Mise à jour de valueData depuis les arguments du callback """
@@ -227,4 +247,4 @@ class ZWaveValueNode:
         else : return None
        
     def __str__(self):
-        return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self._homeId, self._nodeId, self._valueData)
+        return 'homeId: [{0}]  nodeId: [{1}]  valueData: {2}'.format(self.homeId, self.nodeId, self.valueData)
