@@ -13,7 +13,11 @@ See documentation `here <http://xplproject.org.uk/wiki/index.php?title=Schema_-_
 Dependencies
 ============
 
-apscheduler (>=2.0.2)
+- apscheduler (>=2.0.2)
+
+- tailer (>=0.2.1)
+
+- pympler (>=0.2.1)
 
 Plugin configuration
 ====================
