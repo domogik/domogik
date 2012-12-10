@@ -29,6 +29,12 @@ In Domogik administration, go to the cron plugin configuration page:
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | latitude      | 47.352        | The latitude of the house.                                                                          |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| horizon       | -6            | The horizon of the observer. Do not change it until you know what you do.                           |
+|               |               | Look at pyephem documentation for more details.                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| pressure      | 0             | The pressure of the observer. Do not change it until you know what you do.                          |
+|               |               | Look at pyephem documentation for more details.                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | delay-sensor  | 300           | The delay in seconds between two status messages. 0 to disable.                                     |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | delay-stat    | 2             | The delay in seconds between 2 stat's messages when sending sensors status.                         |

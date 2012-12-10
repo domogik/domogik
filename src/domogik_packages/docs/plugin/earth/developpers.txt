@@ -53,9 +53,11 @@ Full code
             @param city: the city wher calculate the event.
             @param delay: the delay (in seconds) to the event.
             @param args: an optional argument.
-            @returns: the next dawn daytime
+            @returns: the next dawn daytime or None
 
             """
+            if abs(delay) >= 86400:
+                return None
             today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
             mycity.date = today
             dawn = ephem.localtime(mycity.next_rising(ephem.Sun(), use_center = True))
@@ -68,9 +70,11 @@ Full code
             @param city: the city wher calculate the event.
             @param delay: the delay (in seconds) to the event.
             @param args: an optional argument.
-            @returns: the next dusk daytime
+            @returns: the next dusk daytime or None
 
             """
+            if abs(delay) >= 86400:
+                return None
             today = datetime.datetime.today() - datetime.timedelta(seconds=delay+30)
             mycity.date = today
             dusk = ephem.localtime(mycity.next_setting(ephem.Sun(), use_center = True))

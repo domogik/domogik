@@ -6,6 +6,5 @@ Table of content
 
 * :doc:`Plugin documentation </earth>`
 * :doc:`Admin documentation </admin>`
-* :doc:`Helpers documentation </helpers>`
 * :doc:`Developpers </developpers>`
 * :doc:`EARTH.BASIC schema </schema>`
