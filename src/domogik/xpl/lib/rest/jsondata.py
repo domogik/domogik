@@ -38,9 +38,18 @@ JSonHelper object
 import re
 import json
 
-
 MAX_DEPTH = 10
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
+        elif isinstance(obj, datetime.timedelta):
+            return (datetime.datetime.min + obj).time().isoformat()
+        else:
+            return super(DateTimeEncoder, self).default(obj)
 
 class JSonHelper():
     """ Easy way to create a json or jsonp structure
@@ -151,30 +160,40 @@ class JSonHelper():
             return "#MAX_DEPTH# "
 
         # define data types
-        db_type = ("DeviceFeature", "Area", "Device", "DeviceUsage", \
+        db_type = ("DeviceFeature", "Device", "DeviceUsage", \
                    "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
-                   "DeviceType", "UIItemConfig", "Room", "UserAccount", \
+                   "DeviceType", "UIItemConfig", "UserAccount", \
                    "SensorReferenceData", "Person", \
                    "SystemStats", "SystemStatsValue", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel", \
+                   "Command", "CommandParam", \
+                   "XplCommandParam", "XplStatParam", "XplCommand", "XplStat") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple", "NamedTuple")
-        list_type = ("list")
+        list_type = ("list", "InstrumentedList")
         dict_type = ("dict")
+        # new definitions
+        jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
+        jsonencoder_types = ("tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
+        datetimeencoder_types = ("date", "datetime")
 
         data_json = ""
 
         # get data type
         data_type = type(data).__name__
         #print("TYPE=%s" % data_type)
-        #print(data)
+        print(data)
 
+        if data_type in jsonencoder_types:
+            data_json = json.JSONEncoder().encode(data)
+        elif data_type in datetimeencoder_types:
+            date_json = DateTimeEncoder().encode(data)
         ### type instance (sql object)
-        if data_type in instance_type:
+        elif data_type in instance_type:
             # get <object>._type value
             try:
                 sub_data_type = data._type.lower()
@@ -198,7 +217,7 @@ class JSonHelper():
             data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : SQL table
-        elif data_type in db_type: 
+        elif data_type in db_type:
             data_json += "{" 
             for key in data.__dict__: 
                 sub_data_key = key 
