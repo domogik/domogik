@@ -35,7 +35,7 @@ Commands needed
 To cover a maximum of the commands that could be needed, we will analyse
 3 plugins : cron, earth and ozwave.
 
-As mentionned in the previous pictures, cron and erath work together :
+As mentionned in the previous pictures, cron and earth work together :
 the earth events are schedulered using cron jobs : so the cron jobs
 can be updated outside of the UI admin pages.
 This forces us to use a PUB/SUB communication.
@@ -75,7 +75,6 @@ The data needed in the response message:
 - The answer type
 - The answer ack/result
 
-Another implmentation question :
 
 
 REQ/REP
@@ -105,6 +104,34 @@ The process to get jobs will be :
 Possible messages to get joblist :
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+From wiki :
+
+Request messages
+The data needed in the request message:
+
+- The source
+- The destination
+- A identification string (to use in the response)
+- The request timestamp
+- The request type
+- The request command/helper
+
+The data needed in the response message:
+
+- The source
+- The destination
+- The identification string
+- The answer timestamp
+- The answer type
+- The answer ack/result
+
+Routing Key format :
+
+    <category>.<action>.<version>
+
+What is the purpose of the routing key ? : find a plugin (cron) ?,
+find an action (list) ? find a plugin funtionality (admin) ?
+
 The request part :
 
 ::
@@ -112,7 +139,7 @@ The request part :
     plugin.admin.1
     {
     'timestamp': 1352795797,
-    'plugin': 'earth',
+    'plugin': 'cron',
     'command': 'list', #or action
     }
 
@@ -121,12 +148,12 @@ The request part :
     plugin.list.1
     {
     'timestamp': 1352795797,
-    'plugin': 'earth',
+    'plugin': 'cron',
     }
 
 ::
 
-    earth.admin.1
+    cron.admin.1
     {
     'timestamp': 1352795797,
     'command': 'list', #or action
@@ -191,14 +218,14 @@ of the cron job(s).
 Communication and actors
 ========================
 
+
+
 Actors :
 --------
 
 - the plugin
 
-- rest : the domogik interface
-
-- rinor : the domoweb interface to rest
+- rest/rinor
 
 - Admin pages : written in HTML/Javascript
 
