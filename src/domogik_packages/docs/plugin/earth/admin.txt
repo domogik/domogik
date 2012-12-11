@@ -1,0 +1,216 @@
+=====
+Admin
+=====
+
+Theses pages are dedicated to the developpement of the new communication
+protocol between plugins and UI pages.
+
+Today/Tomorrow
+==============
+
+.. |cron_earth_xpl| image:: cron_earth_xpl.png
+    :width: 600px
+
+|cron_earth_xpl|
+
+.. |cron_earth_mq| image:: cron_earth_mq.png
+    :width: 600px
+
+|cron_earth_mq|
+
+REQ/REP vs PUB/SUB
+==================
+
+ZMQ manage many models of communication, we will use 2 of them :
+
+Request / Reply : like RPC, the client send a request and after the server
+send the reply.
+
+Publish / Subscribe : the server open channels to publish information and the
+client subscribe to it. So that, it will receive a "message" when the server
+update informations.
+
+Commands needed
+===============
+To cover a maximum of the commands that could be needed, we will analyse
+3 plugins : cron, earth and ozwave.
+
+As mentionned in the previous pictures, cron and erath work together :
+the earth events are schedulered using cron jobs : so the cron jobs
+can be updated outside of the UI admin pages.
+This forces us to use a PUB/SUB communication.
+
+The problem is even most important for ozwave plugin. Openzwave uses
+notifications (via callbacks function) to send network's updates.
+For example, if a node is added or it's name is updated, you will
+receive a NODE_ADDED or a NODE_UPDATED notification.
+Another important thing to keep in mind is that a ZWave network can add
+many controllers and each of them can be used to add or update nodes.
+Actually, openzwave send more than 25 types of notifications. And new ones
+are added regulary.
+Some of them don't need to be pushed to the UI, but if we want to administer
+the ZWave network using the UI pages we must implement most of them.
+
+Implementation
+==============
+
+This part came from the specs of MQ on wiki and need to be explained ...
+to me :)
+
+The data needed in the request message:
+
+- The source
+- The destination
+- A identification string (to use in the response)
+- The request timestamp
+- The request type
+- The request command/helper
+
+The data needed in the response message:
+
+- The source
+- The destination
+- The identification string
+- The answer timestamp
+- The answer type
+- The answer ack/result
+
+Another implmentation question :
+
+
+REQ/REP
+-------
+
+First, we will try to implement the communication for the list management
+of the cron plugin :
+
+2 possibilities :
+
+- we request a list and the reply will contain the list of jobs and all
+  informations about them.
+
+- we request a list and the reply will contain the list of jobs.
+  To get informations about them, we send request for all jobs in the list.
+  This is my preferred way : no problem with message size and information
+  on an event is returned in only one method.
+
+The process to get jobs will be :
+
+.. code-block:: none
+
+    joblist = request(joblist)
+    for each job in joblist :
+        informations = request (job)
+
+Possible messages to get joblist :
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The request part :
+
+::
+
+    plugin.admin.1
+    {
+    'timestamp': 1352795797,
+    'plugin': 'earth',
+    'command': 'list', #or action
+    }
+
+::
+
+    plugin.list.1
+    {
+    'timestamp': 1352795797,
+    'plugin': 'earth',
+    }
+
+::
+
+    earth.admin.1
+    {
+    'timestamp': 1352795797,
+    'command': 'list', #or action
+    }
+
+The reply part :
+
+::
+
+    plugin.admin.1
+    {
+    'timestamp': 1352795797,
+    'plugin': 'earth',
+    'command': 'list', #or action
+    'data' : ['cron1', 'cron2', 'cron3', ...]
+    or
+    'data' : [{'list' : ['cron1', 'cron2', 'cron3', ...]}]
+    or
+    'list' : ['cron1', 'cron2', 'cron3', ...]
+    }
+
+::
+
+    plugin.list.1
+    {
+    'timestamp': 1352795797,
+    'plugin': 'earth',
+    ...
+    }
+
+::
+
+    earth.admin.1
+    {
+    'timestamp': 1352795797,
+    'command': 'list', #or action
+    ...
+    }
+
+PUB/SUB
+-------
+
+Now this is the time of the PUB/SUB process.
+
+We can managed the list as a global element or manage updates on jobs separatly :
+
+- For the first case, we must create a "channel" : jobs-updated
+
+- For the second, we can define only one, but we must add a field
+  to know what kind of event happened : job-added, job-removed and job-updated.
+
+In all case, we will add some information in the "published" message :
+
+- the job list
+
+- or the job updated, removed or added.
+
+After we will use the previous REQ/REP model to retrieve needed informations
+of the cron job(s).
+
+
+Communication and actors
+========================
+
+Actors :
+--------
+
+- the plugin
+
+- rest : the domogik interface
+
+- rinor : the domoweb interface to rest
+
+- Admin pages : written in HTML/Javascript
+
+And ZMQ : which place for it ?
+
+
+Communications :
+----------------
+
+plugin <--> rest <--> rinor <--> Admin pages
+
+
+What about nullmq ? : javascript zmq
+
+http://avalanche123.com/blog/2012/02/25/interacting-with-zeromq-from-the-browser/
