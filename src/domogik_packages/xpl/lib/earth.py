@@ -277,7 +277,8 @@ class EarthEvents():
         evt = self.get_event(event, delay)
         if evt != None:
             try :
-                self.stop_event(event, delay)
+                if evt['current'] == "started":
+                    self.stop_event(event, delay)
             except :
                 self._api.log.warning("Can't stop %s%s." % (event, delay))
             finally :
@@ -336,9 +337,10 @@ class EarthEvents():
 
         """
         #Calculate the new event
+        evt = self.get_event(event, delay)
         args = None
-        if "args" in self.data[event][delay]:
-            args = self.data[event][delay]["args"]
+        if "args" in evt:
+            args = evt["args"]
         #newdate = self.data[event][delay]["callback"](self._api.mycity, int(delay), args)
         newdate = self.device_types[event]["callback"](self._api.mycity, int(delay), args)
         if newdate != None :
@@ -349,7 +351,6 @@ class EarthEvents():
             if delay != "0":
                 nstmess.add_data({"delay" : delay})
             nstmess.add_data({"current" :  "fired"})
-            evt = self.get_event(event, delay)
             evt["next"] = newdate.strftime("%x %X")
             #Add a cron job
             ret = self._api.cronquery.status_job(self.get_name(event, delay))
@@ -357,7 +358,9 @@ class EarthEvents():
                 self._api.cronquery.halt_job(self.get_name(event, delay))
             ret = self._api.cronquery.start_date_job(self.get_name(event, delay), nstmess, newdate)
             return ret
-        return ERROR_SCHEDULER
+        else :
+            evt["current"] = "halted"
+            return False
 
     def start_event(self, event, delay):
         """
@@ -386,7 +389,7 @@ class EarthEvents():
             #print "ret add_event_to_cron : %s" % ret
             if cronret == True:
                 storeret = self.store.on_start(event, delay, evt)
-            if cronret != True :
+            else :
                 self.halt_event(event, delay)
                 return ERROR_SCHEDULER
             if storeret != ERROR_NO :
