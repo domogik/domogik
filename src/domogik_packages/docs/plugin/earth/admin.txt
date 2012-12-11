@@ -47,35 +47,39 @@ receive a NODE_ADDED or a NODE_UPDATED notification.
 Another important thing to keep in mind is that a ZWave network can add
 many controllers and each of them can be used to add or update nodes.
 Actually, openzwave send more than 25 types of notifications. And new ones
-are added regulary.
+are added regulary. Also, the last updates change notification names.
+
 Some of them don't need to be pushed to the UI, but if we want to administer
 the ZWave network using the UI pages we must implement most of them.
 
 Implementation
 ==============
 
-This part came from the specs of MQ on wiki and need to be explained ...
-to me :)
+Routing Key
+-----------
 
-The data needed in the request message:
+From wiki
+Routing Key format :
 
-- The source
-- The destination
-- A identification string (to use in the response)
-- The request timestamp
-- The request type
-- The request command/helper
+.. code-block:: none
 
-The data needed in the response message:
+<category>.<action>.<version>
 
-- The source
-- The destination
-- The identification string
-- The answer timestamp
-- The answer type
-- The answer ack/result
+What is the purpose of the routing key ? :
 
+- find a plugin (cron) ?,
+- find an action (list) ?
+- find a plugin funtionality (admin part of cron) ?
 
+Will it be used as filter in PUB/SUB process ?
+
+Possible values :
+
+- plugin_onewire.list_device.1
+- plugin.onewire_list_device.1
+- plugin.plugin_name.1
+- plugin_name.admin.1
+- admin.plugin_name.1
 
 REQ/REP
 -------
@@ -101,9 +105,6 @@ The process to get jobs will be :
     for each job in joblist :
         informations = request (job)
 
-Possible messages to get joblist :
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 From wiki :
 
 Request messages
@@ -125,13 +126,6 @@ The data needed in the response message:
 - The answer type
 - The answer ack/result
 
-Routing Key format :
-
-    <category>.<action>.<version>
-
-What is the purpose of the routing key ? : find a plugin (cron) ?,
-find an action (list) ? find a plugin funtionality (admin) ?
-
 The request part :
 
 ::
@@ -141,6 +135,7 @@ The request part :
     'timestamp': 1352795797,
     'plugin': 'cron',
     'command': 'list', #or action
+    ...
     }
 
 ::
@@ -149,6 +144,7 @@ The request part :
     {
     'timestamp': 1352795797,
     'plugin': 'cron',
+    ...
     }
 
 ::
@@ -217,8 +213,6 @@ of the cron job(s).
 
 Communication and actors
 ========================
-
-
 
 Actors :
 --------
