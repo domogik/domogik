@@ -153,10 +153,10 @@ class ProcessRequest():
             # xpl-stat-params
             '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
             '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
-            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add'
+            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
         },
-        'ncommand': {
-            '^/ncommand/(?P<cmd_id>[0-9]+)/.*$':                                 		 'rest_ncommand',
+        'cmd': {
+            '^/cmd/.*$':                         		                                 'rest_ncommand',
         },
         # /event
         'events': {
@@ -705,14 +705,14 @@ class ProcessRequest():
 # /command processing
 ######
 
-    def rest_ncommand(self, cmd_id):
+    def rest_ncommand(self):
         """ New command processing
             cmd = the xpl_command id form the core_xplcommand table
         """
         self.log.debug("Process /ncommand")
         self.set_parameters(1)
         # get the command
-        cmd = self._db.get_command(cmd_id)
+        cmd = self._db.get_command(self.get_parameters('id'))
         if cmd == None:
             json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -730,7 +730,6 @@ class ProcessRequest():
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
-        print xplcmd
         xplstat = self._db.get_xpl_stat(xplcmd.stat_id) 
         if xplstat == None:
             json_data = JSonHelper("ERROR", 999, "stat %s does not exists" % xplcmd.stat_id)
@@ -743,10 +742,11 @@ class ProcessRequest():
         msg.set_schema( xplcmd.schema)
         # static params
         for p in xplcmd.params:
-            print p
             msg.add_data({p.key : p.value})
         # dynamic params
+        print cmd
         for p in cmd.params:
+            print p
             if self.get_parameters(p.key):
                 msg.add_data({p.key : self.get_parameters(p.key)})
             else:
