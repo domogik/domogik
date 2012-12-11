@@ -102,11 +102,13 @@ class ProcessRequest():
         'base': {
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
+            '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
             '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
             '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
-            '^/base/device/xpladd/.*$':                                                          '_rest_base_device_xpladd',
+            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                  '_rest_base_device_addxplcmdparams',
+            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplstatparams',
             # /base/device_technology
             '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
             '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
@@ -151,9 +153,7 @@ class ProcessRequest():
             # xpl-stat-params
             '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
             '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
-            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
-            # device-params
-            '^/base/deviceparams/(?P<dev_type_id>[\.a-z0-9]+)$':                                 '_rest_base_deviceparams',
+            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add'
         },
         'ncommand': {
             '^/ncommand/(?P<cmd_id>[0-9]+)/.*$':                                 		 'rest_ncommand',
@@ -1880,6 +1880,89 @@ class ProcessRequest():
         for x in self._db.get_xpl_stat_by_device_id(id):
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
+        self.send_http_response_ok(json_data.get())
+    
+    def _rest_base_device_addxplcmdparams(self, id):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        # get the command
+        cmd = self._db.get_xpl_command(id)
+        if cmd == None:
+            json_data.set_error(code = 999, description = "This command does not exists")
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the device
+        dev = self._db.get_device(cmd.device_id)
+        if dev == None:
+            json_data.set_error(code = 999, description = "This device does not exists")
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the device_type
+        dt = self._db.get_device_type_by_id(dev.device_type_id)
+        if dt == None:
+            json_data.set_error(code = 999, description = "This device type does not exists")
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the json
+        pjson = PackageJson(dt.device_technology_id).json
+        if pjson['json_version'] < 2:
+	    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
+	    self.send_http_response_ok(json_data.get())
+	    return
+        # get the json device params for this command
+        if pjson['xpl_commands'][cmd.name] is None:
+	    json_data.set_error(code = 999, description = "This command is not ni the plugin json file")
+	    self.send_http_response_ok(json_data.get())
+	    return
+        for p in pjson['xpl_commands'][cmd.name]['parameters']['device']:
+            print p
+            if self.get_parameters(p['key']) is None:
+	        json_data.set_error(code = 999, description = "The param (%s) is not in the url" % (p['key']))
+    	        self.send_http_response_ok(json_data.get())
+	        return
+            # go and add the param
+            self._db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
+        self.send_http_response_ok(json_data.get())
+ 
+    def _rest_base_device_addxplstatparams(self, id):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        # get the command
+        cmd = self._db.get_xpl_stat(id)
+        if cmd == None:
+            json_data.set_error(code = 999, description = "This command does not exists")
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the device
+        dev = self._db.get_device(cmd.device_id)
+        if dev == None:
+            json_data.set_error(code = 999, description = "This device does not exists")
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the device_type
+        dt = self._db.get_device_type_by_id(dev.device_type_id)
+        if dt == None:
+            json_data.set_error(code = 999, description = "This device type does not exists")
+            self.send_http_response_ok(json_data.get())
+            return
+        # get the json
+        pjson = PackageJson(dt.device_technology_id).json
+        if pjson['json_version'] < 2:
+	    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
+	    self.send_http_response_ok(json_data.get())
+	    return
+        # get the json device params for this command
+        if pjson['xpl_stats'][cmd.name] is None:
+	    json_data.set_error(code = 999, description = "This command is not ni the plugin json file")
+	    self.send_http_response_ok(json_data.get())
+	    return
+        for p in pjson['xpl_stats'][cmd.name]['parameters']['device']:
+            if self.get_parameters(p['key']) is None:
+	        json_data.set_error(code = 999, description = "The param (%s) is not in the url" % (p['key']))
+    	        self.send_http_response_ok(json_data.get())
+	        return
+            # go and add the param
+            self._db.add_xpl_stat_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_add(self):
@@ -4462,8 +4545,7 @@ class ProcessRequest():
         try:
             cmd = self._db.add_xpl_command_param(self.get_parameters("cmd-id"), \
                                          self.get_parameters("key"), \
-                                         self.get_parameters("value"), \
-                                         self.get_parameters("static"))
+                                         self.get_parameters("value"))
             json_data.add_data(cmd)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
