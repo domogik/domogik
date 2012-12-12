@@ -1,0 +1,8 @@
+.. _index:
+
+================
+Table of content
+================
+
+* :doc:`Plugin documentation </rfxcom>`
+* :doc:`Helpers documentation </helpers>`
