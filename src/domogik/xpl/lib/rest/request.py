@@ -4604,14 +4604,14 @@ class ProcessRequest():
             for c in pjson['device_types'][dt.id]['commands']:
                 if not c in pjson['commands']:
                     break
-                c = pjson['commands'][c]
+                cm = pjson['commands'][c]
                 if not json:
                     ret['commands'].append(c)
                 # we must have an xpl command
-                if not 'xpl_command' in c:
+                if not 'xpl_command' in cm:
                     break
                 # we have an xpl_command => find it
-                if not c['xpl_command'] in pjson['xpl_commands']:
+                if not cm['xpl_command'] in pjson['xpl_commands']:
                     if json:
                         json_data.set_error(code = 999, description = "Command references an unexisting xpl_command")
                         self.send_http_response_ok(json_data.get())
@@ -4619,8 +4619,8 @@ class ProcessRequest():
                     else:
                         return None
                 # find the xpl commands that are neede for this feature
-                cmd = pjson['xpl_commands'][c['xpl_command']].copy()
-                cmd['name'] = c['xpl_command']
+                cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
+                cmd['name'] = c
                 # finc the xpl_stat message
                 if not 'xplstat_name' in cmd:
                     break
