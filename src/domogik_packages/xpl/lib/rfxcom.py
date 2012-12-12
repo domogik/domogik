@@ -429,6 +429,7 @@ class RfxcomUsb:
             packet = data["packet"]
             trig_msg = data["trig_msg"]
             print("Get from Queue : %s > %s" % (seqnbr, packet))
+            self._log.debug("Get from Queue : %s > %s" % (seqnbr, packet))
             self._rfxcom.write(binascii.unhexlify(packet))
 
             # TODO : read in queue in which has been stored data readen from rfx
@@ -441,6 +442,7 @@ class RfxcomUsb:
                     self._rfxcom.write(binascii.unhexlify(packet))
                 else:
                     print("Command succesfully sent")
+                    self._log.debug("Command succesfully sent")
                     self._cb_send_trig(trig_msg)
                     loop = False
             
@@ -495,13 +497,16 @@ class RfxcomUsb:
         hex_data_len = binascii.hexlify(data_len)
         int_data_len = int(hex_data_len, 16)
         print("----------------------------")
+        self._log.debug("----------------------------")
         print("LENGTH = %s" % int_data_len)
+        self._log.debug("LENGTH = %s" % int_data_len)
 
         if int_data_len != 0:
             # We read data
             data = self._rfxcom.read(int_data_len)
             hex_data = binascii.hexlify(data)
             print("DATA = %s" % hex_data)
+            self._log.debug("DATA = %s" % hex_data)
 
             # Process data
             self._process(hex_data)
@@ -513,6 +518,7 @@ class RfxcomUsb:
         """
         type = data[0] + data[1]
         print("TYPE = %s" % type)
+        self._log.debug("TYPE = %s" % type)
         try:
             eval("self._process_%s('%s')" % (type, data))
         except AttributeError:
@@ -743,7 +749,8 @@ class RfxcomUsb:
         unit_code = int(gh(data, 7), 16)
         cmnd = gh(data, 8)
         level = int(gh(data, 9), 16)
-        battery = int(gh(data, 7)[0], 16) * 10  # percent
+        # no battery : only a filler
+        #battery = int(gh(data, 7)[0], 16) * 10  # percent
         rssi = int(gh(data, 7)[1], 16) * 100/16 # percent
 
         if AC_CMND[cmnd] == "preset":
@@ -758,10 +765,11 @@ class RfxcomUsb:
                         "unit" : unit_code,
                         "command" : AC_CMND[cmnd]})
 
-        self._callback("sensor.basic",
-                       {"device" : address, 
-                        "type" : "battery", 
-                        "current" : battery})
+        # no battery : only a filler
+        #self._callback("sensor.basic",
+        #               {"device" : address, 
+        #                "type" : "battery", 
+        #                "current" : battery})
         self._callback("sensor.basic",
                        {"device" : address, 
                         "type" : "rssi", 

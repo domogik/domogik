@@ -56,7 +56,11 @@ class RfxcomUsbManager(XplPlugin):
         #   - device
         self._config = Query(self.myxpl, self.log)
         device = self._config.query('rfxcom', 'device')
-        #device = "/dev/rfxcom"
+        if device == None:
+            self.log.error('Device is not configured, exiting') 
+            print('Device is not configured, exiting')
+            self.force_leave()
+            return
 
         # Init RFXCOM
         self.rfxcom  = RfxcomUsb(self.log, self.send_xpl, self.send_trig, self.get_stop())
@@ -85,7 +89,7 @@ class RfxcomUsbManager(XplPlugin):
             self.rfxcom.open(device)
         except RfxcomException as e:
             self.log.error(e.value)
-            print e.value
+            print(e.value)
             self.force_leave()
             return
             
@@ -194,6 +198,7 @@ class RfxcomUsbManager(XplPlugin):
         """ Send xPL message on network
         """
         print("schema:%s, data:%s" % (schema, data))
+        self.log.debug("schema:%s, data:%s" % (schema, data))
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema(schema)
