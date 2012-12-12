@@ -118,7 +118,7 @@
                     "dynamic": [
                         {
                              "key": "level",
-                             "stat_key": "level"
+                             "sensor": "level"
                         }
                     ]
                 }
@@ -149,6 +149,14 @@
            ],
            "xpl_command": "set_level_bin"
         }
+    },
+    "sensors": {
+	"level": {
+		"name": "level",
+                "unit": "%",
+                "value_type": "range",
+                "values": [0, 100]
+	}
     },
     "device_types": {
         "velbus.relay": {
