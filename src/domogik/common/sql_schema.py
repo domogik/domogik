@@ -579,6 +579,7 @@ class Sensor(Base):
     value_type = Column(Unicode(32), nullable=False)
     values = Column(Unicode(32), nullable=False)
     unit = Column(Unicode(32), nullable=True)
+    params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete") 
 
     def __init__(self, device_id, name, reference, value_type, values, unit):
         self.device_id = device_id
