@@ -59,6 +59,7 @@ from domogik.common.sql_schema import (
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
         UserAccount, SENSOR_VALUE_TYPE_LIST,
         Command, CommandParam,
+        Sensor,
         XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
@@ -830,6 +831,17 @@ class DbHelper():
         if pjson['json_version'] < 2:
             self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
             return None
+        sensors = {}
+        for sensor_name in pjson['device_types'][dt.id]['sensors']:
+            # add the command
+            sensor = pjson['sensors'][sensor_name]
+            sen = Sensor(name=sensor['name'], \
+                    device_id=dev.id, reference=sensor_name, \
+                    value_type=sensor['value_type'], values=sensor['values'], \
+                    unit=sensor['unit'])
+            self.__session.add(sen)
+            self.__session.flush()
+            sensors[sensor['name']] = sen.id 
         for command_name in pjson['device_types'][dt.id]['commands']:
             # add the command
             command = pjson['commands'][command_name]
@@ -852,6 +864,23 @@ class DbHelper():
                     self.__session.add(xplstat)
                     self.__session.flush()
                     xplstatid = xplstat.id
+                    # add static params
+                    for p in xpl_stat['parameters']['static']:
+                        par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
+                                         key=p['key'], value=p['value'], static=True)           
+                        self.__session.add(par)
+                    # add dynamic params
+                    for p in xpl_stat['parameters']['dynamic']:
+                        sensorid = None
+                        if p['sensor'] is not None: 
+                            if p['sensor'] in sensors:
+                                sensorid = sensors[p['sensor']]
+                            else:
+                                self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
+                                return None
+                        par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
+                                         key=p['key'], value=None, static=False)           
+                        self.__session.add(par)
                 else:
                     xplstatid = None
                 # add the xpl command
@@ -861,6 +890,11 @@ class DbHelper():
                                         device_id=dev.id, stat_id=xplstatid) 
                 self.__session.add(xplcommand)
                 self.__session.flush()
+                # add static params
+	        for p in xpl_command['parameters']['static']:
+                    par = XplCommandParam(cmd_id=xplcommand.id, \
+                                         key=p['key'], value=p['value'])           
+                    self.__session.add(par)
         try:
             self.__session.commit()
         except Exception as sql_exception:
@@ -2021,7 +2055,7 @@ class DbHelper():
 ###################
     def add_xpl_stat_param(self, statid, key, value, static):
         self.__session.expire_all()
-        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static)
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None)
         self.__session.add(param)
         try:
             self.__session.commit()

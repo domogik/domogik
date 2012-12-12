@@ -168,6 +168,7 @@ class JSonHelper():
                    "SystemStats", "SystemStatsValue", \
                    "DeviceFeatureAssociation", "DeviceFeatureModel", \
                    "Command", "CommandParam", \
+                   "Sensor",
                    "XplCommandParam", "XplStatParam", "XplCommand", "XplStat") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")

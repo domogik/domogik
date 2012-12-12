@@ -40,7 +40,12 @@
             "schema": "lighting.basic",
             "xplstat_name": "get_level",
             "parameters": {
-                    "static": [],
+                    "static": [
+                        {
+                            "key": "stat",
+                            "value": "stat"
+                        }
+                    ],
                     "device_type": [
                         {
                             "key": "channel",
@@ -71,7 +76,12 @@
             "schema": "lighting.basic",
             "xplstat_name": "get_level",
             "parameters": {
-                    "static": [],
+                    "static": [
+                        {
+                            "key": "stat",
+                            "value": "stat"
+                        }
+                     ],
                     "device_type": [
                         {
                             "key": "channel",
@@ -97,7 +107,12 @@
             "name": "get_level",
             "schema": "lighting.device",
             "parameters": {
-                    "static": [],
+                    "static": [
+                        {
+                            "key": "stat",
+                            "value": "stat"
+                        }
+                    ],
                     "device_type": [
                         {
                             "key": "channel",
@@ -163,14 +178,16 @@
             "id": "velbus.relay",
             "description": "Switch one channel on a device", 
             "name": "Switch",
-            "commands": ["set_level_bin"]
+            "commands": ["set_level_bin"],
+            "sensors": ["level"]
         }, 
         "velbus.dimmer": {
             "id": "velbus.dimmer",
             "description": "Dim one channel on a device", 
             "id": "velbus.dimmer", 
             "name": "Dimmer",
-            "commands": ["set_level_bin", "set_level_range"]
+            "commands": ["set_level_bin", "set_level_range"],
+            "sensors": ["level"]
         }, 
         "velbus.shutter": {
             "id": "velbus.shutter",

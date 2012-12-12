@@ -229,7 +229,7 @@ class Device(Base):
     device_type = relation(DeviceType)
     """device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")"""
     commands = relationship("Command", backref=__tablename__, cascade="all, delete")
-    commands = relationship("Sensor", backref=__tablename__, cascade="all, delete")
+    sensors = relationship("Sensor", backref=__tablename__, cascade="all, delete")
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all, delete")
     
@@ -253,9 +253,9 @@ class Device(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s, commands=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s, commands=%s, sensors=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type, self.device_usage, self.commands)
+                  self.device_type, self.device_usage, self.commands, self.sensors)
 
     @staticmethod
     def get_tablename():
@@ -573,14 +573,14 @@ class CommandParam(Base):
 class Sensor(Base):
     __tablename__ = '%s_sensor' % _db_prefix
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), index=True)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     value_type = Column(Unicode(32), nullable=False)
     values = Column(Unicode(32), nullable=False)
     unit = Column(Unicode(32), nullable=True)
 
-    def __init__(self, device_id, name, reference, value_types, values, unit):
+    def __init__(self, device_id, name, reference, value_type, values, unit):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
@@ -654,11 +654,12 @@ class XplStatParam(Base):
     sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename()), nullable=True) 
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
 
-    def __init__(self, xplstat_id, key, value, static):
+    def __init__(self, xplstat_id, key, value, static, sensor_id):
         self.xplstat_id = xplstat_id
         self.key = ucode(key)
         self.value = ucode(value)
         self.static = static
+        self.sensor_id = sensor_id
     
     def __repr__(self):
         """Return an internal representation of the class"""
