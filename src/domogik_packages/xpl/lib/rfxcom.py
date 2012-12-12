@@ -522,7 +522,13 @@ class RfxcomUsb:
         try:
             eval("self._process_%s('%s')" % (type, data))
         except AttributeError:
-            self._log.warning("No function for type '%s' with data : '%s'" % (type, data))
+            warning = "No function for type '%s' with data : '%s'" % (type, data)
+            self._log.warning(warning)
+            print(warning)
+        except:
+            error = "Error while processing type %s : %s" % (type, traceback.format_exc())
+            self._log.error(error)
+            print(error)
 
         
     def command_00(self, data):
