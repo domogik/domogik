@@ -2812,7 +2812,7 @@ target=*
             elif self.rest_request[1] == "password":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_account_password()
+                    self._rest_account_user_password()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
     
@@ -2983,7 +2983,7 @@ target=*
 
 
 
-    def _rest_account_password(self):
+    def _rest_account_user_password(self):
         """ update user password
         """
         self.log.info("Try to change password for account id %s" % self.get_parameters("id"))
