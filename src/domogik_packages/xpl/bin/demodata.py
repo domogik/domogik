@@ -204,7 +204,6 @@ class DemoDataManager(XplPlugin):
         msg.set_type("xpl-trig")
         msg.set_schema("lighting.device")
         msg.add_data({ 'device' : device })
-        msg.add_data({ 'command' : command })
         if level != None:
             msg.add_data({ 'level' : level })
         if fade_rate != None:

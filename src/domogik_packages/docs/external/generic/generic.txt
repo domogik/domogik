@@ -473,7 +473,6 @@ The switch and dimmer features are related to the **lighting.basic** and ** lign
 
     lighting.device
     {
-    command=goto
     device=<device address>
     level=<value>
     }
