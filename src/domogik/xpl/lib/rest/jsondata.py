@@ -179,6 +179,7 @@ class JSonHelper():
         # new definitions
         jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
         jsonencoder_types = ("tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
+        jsonencoder_types = ()
         datetimeencoder_types = ("date", "datetime")
 
         data_json = ""
