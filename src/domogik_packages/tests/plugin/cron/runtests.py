@@ -781,6 +781,7 @@ class DawnAlarmTestCase(PluginTestCase):
         message.add_data({"devicetype" :  "dawnalarm"})
         message.add_data({"alarm" :  "MoTuWeThFrSaSu,8:00-10:00-12:00"})
         message.add_data({"device" :  "alarm1"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
         keyvalss = {"device":"alarm1", "devicetype":"dawnalarm", "state":"started"}
         self.assertTrue(self.query("device", message, keys, keyvalss))
@@ -793,6 +794,7 @@ class DawnAlarmTestCase(PluginTestCase):
         message.add_data({"devicetype" :  "dawnalarm"})
         message.add_data({"alarm" :  "MoTuWeThFrSaSu,8:00-10:00"})
         message.add_data({"device" :  "alarm2"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
         keyvalss = {"device":"alarm2", "devicetype":"dawnalarm", "state":"started"}
         self.assertTrue(self.query("device", message, keys, keyvalss))
@@ -808,8 +810,25 @@ class DawnAlarmTestCase(PluginTestCase):
         message.add_data({"alarm" :  "Fr,8:00-8:30"})
         message.add_data({"alarm" :  "SaSu,10:00-11:00"})
         message.add_data({"device" :  "alarm3"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
         keyvalss = {"device":"alarm3", "devicetype":"dawnalarm", "state":"started"}
+        self.assertTrue(self.query("device", message, keys, keyvalss))
+
+    def test_230_add_dawnalarm4_multiple_0123(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("timer.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"devicetype" :  "dawnalarm"})
+        message.add_data({"alarm0" :  "MoTu,8:00-10:00"})
+        message.add_data({"alarm1" :  "WeTh,11:00-12:00"})
+        message.add_data({"alarm2" :  "Fr,8:00-8:30"})
+        message.add_data({"alarm3" :  "SaSu,10:00-11:00"})
+        message.add_data({"device" :  "alarm4"})
+        message.add_data({"nst-device" :  "DIM14"})
+        keys = ['devicetype']
+        keyvalss = {"device":"alarm4", "devicetype":"dawnalarm", "state":"started"}
         self.assertTrue(self.query("device", message, keys, keyvalss))
 
     def test_250_add_duplicate_dawnalarm1(self):
@@ -820,43 +839,59 @@ class DawnAlarmTestCase(PluginTestCase):
         message.add_data({"devicetype" :  "dawnalarm"})
         message.add_data({"alarm" :  self.now_to_xpl()})
         message.add_data({"device" :  "alarm1"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
         keyvalss = {"device":"alarm1", "devicetype":"dawnalarm", "state":"started"}
         self.assertFalse(self.query("device", message, keys, keyvalss))
 
-    def test_260_add_bad_dawnalarm4(self):
+    def test_260_add_bad_dawnalarmX_missing_alarm(self):
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("timer.basic")
         message.add_data({"action" :  "start"})
         message.add_data({"devicetype" :  "dawnalarm"})
-        message.add_data({"device" :  "alarm4"})
+        message.add_data({"device" :  "alarmX"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
-        keyvalss = {"device":"alarm4", "devicetype":"dawnalarm", "state":"started"}
+        keyvalss = {"device":"alarmX", "devicetype":"dawnalarm", "state":"started"}
         self.assertFalse(self.query("device", message, keys, keyvalss))
 
-    def test_280_add_bad_dawnalarm4(self):
+    def test_260_add_bad_dawnalarmX_missing_nst(self):
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("timer.basic")
         message.add_data({"action" :  "start"})
         message.add_data({"devicetype" :  "dawnalarm"})
-        message.add_data({"device" :  "alarm4"})
+        message.add_data({"device" :  "alarmX"})
+        message.add_data({"nst-device" :  "DIM14"})
+        keys = ['devicetype']
+        keyvalss = {"device":"alarmX", "devicetype":"dawnalarm", "state":"started"}
+        self.assertFalse(self.query("device", message, keys, keyvalss))
+
+    def test_280_add_bad_dawnalarmX_missing_end(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("timer.basic")
+        message.add_data({"action" :  "start"})
+        message.add_data({"devicetype" :  "dawnalarm"})
+        message.add_data({"device" :  "alarmX"})
         message.add_data({"alarm" :  "Mo,9:00"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
-        keyvalss = {"device":"alarm4", "devicetype":"dawnalarm", "state":"started"}
+        keyvalss = {"device":"alarmX", "devicetype":"dawnalarm", "state":"started"}
         self.assertFalse(self.query("device", message, keys, keyvalss))
 
-    def test_290_add_bad_dawnalarm4(self):
+    def test_290_add_bad_dawnalarmX_bad_syntax(self):
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("timer.basic")
         message.add_data({"action" :  "start"})
         message.add_data({"devicetype" :  "dawnalarm"})
-        message.add_data({"device" :  "alarm4"})
+        message.add_data({"device" :  "alarmX"})
         message.add_data({"alarm" :  "MO,9:00-12:00"})
+        message.add_data({"nst-device" :  "DIM14"})
         keys = ['devicetype']
-        keyvalss = {"device":"alarm4", "devicetype":"dawnalarm", "state":"started"}
+        keyvalss = {"device":"alarmX", "devicetype":"dawnalarm", "state":"started"}
         self.assertFalse(self.query("device", message, keys, keyvalss))
 
     def test_310_info_dawnalarm1(self):
@@ -925,6 +960,16 @@ class DawnAlarmTestCase(PluginTestCase):
         message.add_data({"device" :  "alarm3"})
         keys = ['device']
         keyvalss = {"device":"alarm3", "state":"halted"}
+        self.assertTrue(self.query("device", message, keys, keyvalss))
+
+    def test_940_halt_dawnalarm4(self):
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("timer.basic")
+        message.add_data({"action" :  "halt"})
+        message.add_data({"device" :  "alarm4"})
+        keys = ['device']
+        keyvalss = {"device":"alarm4", "state":"halted"}
         self.assertTrue(self.query("device", message, keys, keyvalss))
 
 if __name__ == '__main__':

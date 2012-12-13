@@ -125,7 +125,7 @@ class CronJobs():
                     self._scheduler.unschedule_job(\
                         self.data[device]['apjob'])
                 except:
-                    self._api.log.warning("Can't unschedule AP job %s" % \
+                    self._api.log.error("Can't unschedule AP job %s" % \
                         self.data[device]['apjob'])
                 del(self.data[device]['apjob'])
             if 'apjobs' in self.data[device]:
@@ -134,7 +134,7 @@ class CronJobs():
                     try:
                         self._scheduler.unschedule_job(i)
                     except:
-                        self._api.log.warning("Can't unschedule AP job %s" % i)
+                        self._api.log.error("Can't unschedule AP job %s" % i)
                 del (self.data[device]['apjobs'])
             return ERROR_NO
         else:
@@ -189,9 +189,9 @@ class CronJobs():
             try :
                 self.stop_job(device)
             except :
-                self._api.log.warning("Can't stop job %s." % device)
+                self._api.log.error("Can't stop job %s." % device)
             finally :
-                self._api.log.warning("Delete job %s.and it's file." % device)
+                self._api.log.error("Delete job %s.and it's file." % device)
                 try :
                     self._api.log.debug("cronAPI.start_job : Try to acquire lock")
                     self._jobs_lock.acquire()
@@ -286,7 +286,7 @@ class CronJobs():
             parameters = self._extract_parameters(device)
             #print "parameters : %s" % parameters
             if okk == False:
-                self._api.log.warning("_start_job_date : Don't add date job : missing parameters")
+                self._api.log.error("_start_job_date : Don't add date job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
             events = {}
@@ -329,7 +329,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add a date job %s." % device)
         except:
-            self._api.log.warning("_start_job_date : " + traceback.format_exc())
+            self._api.log.error("_start_job_date : " + traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
         if okk:
@@ -361,7 +361,7 @@ class CronJobs():
             if 'duration' in self.data[device]:
                 duration = int(self.data[device]['duration'])
         except:
-            self._api.log.warning("_start_jobTimer : " + \
+            self._api.log.error("_start_jobTimer : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_PARAMETER
@@ -374,7 +374,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add an infinite timer every %s seconds." % frequence)
             except:
-                self._api.log.warning("_start_jobTimer : " + \
+                self._api.log.error("_start_jobTimer : " + \
                     traceback.format_exc())
                 #del(self.data[device])
                 return ERROR_SCHEDULER
@@ -392,7 +392,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add a %s beat timer every %s seconds." % (duration, frequence))
             except:
-                self._api.log.warning("_start_jobTimer : " + \
+                self._api.log.error("_start_jobTimer : " + \
                     traceback.format_exc())
                 #del(self.data[device])
                 return ERROR_SCHEDULER
@@ -446,7 +446,7 @@ class CronJobs():
             if 'duration' in self.data[device]:
                 duration = int(self.data[device]['duration'])
             if okk == False:
-                self._api.log.warning("_start_jobInterval : \
+                self._api.log.error("_start_jobInterval : \
                     Don't add cron job : no parameters given")
                 #del(self.data[device])
                 return ERROR_PARAMETER
@@ -455,7 +455,7 @@ class CronJobs():
                 startdate = self._api.tools.date_from_xpl(\
                     self.data[device]['startdate'])
         except:
-            self._api.log.warning("_start_jobInterval : " + \
+            self._api.log.error("_start_jobInterval : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_PARAMETER
@@ -472,7 +472,7 @@ class CronJobs():
             self._job_started(device)
             self._api.log.info("Add an interval job %s." % device)
         except:
-            self._api.log.warning("_start_jobInterval : " + \
+            self._api.log.error("_start_jobInterval : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -560,7 +560,7 @@ class CronJobs():
                 second = "*"
                 #~ okk = False
             if okk == False:
-                self._api.log.warning("_start_job_cron : Don't add cron job : no parameters given")
+                self._api.log.error("_start_job_cron : Don't add cron job : no parameters given")
                 #del(self.data[device])
                 return ERROR_PARAMETER
             startdate = None
@@ -569,7 +569,7 @@ class CronJobs():
                     self.data[device]['startdate'])
             #parameters = self._extract_parameters(device)
         except:
-            self._api.log.warning("_start_job_cron : " + traceback.format_exc())
+            self._api.log.error("_start_job_cron : " + traceback.format_exc())
             #del(self.data[device])
             return ERROR_PARAMETER
         try:
@@ -581,7 +581,7 @@ class CronJobs():
             self._job_started(device)
             self._api.log.info("Add a cron job %s." % device)
         except:
-            self._api.log.warning("_start_job_cron : " + traceback.format_exc())
+            self._api.log.error("_start_job_cron : " + traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
         return ERROR_NO
@@ -709,11 +709,11 @@ class CronJobs():
                 okk = False
             parameters = self._extract_parameters(device)
             if okk == False:
-                self._api.log.warning("_start_jobHvac : Don't add  hvac job : missing parameters")
+                self._api.log.error("_start_jobHvac : Don't add  hvac job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
         except:
-            self._api.log.warning("_start_jobHvac : " + \
+            self._api.log.error("_start_jobHvac : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_PARAMETER
@@ -785,7 +785,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add an hvac job %s." % device)
         except:
-            self._api.log.warning("_start_jobHvac : " + \
+            self._api.log.error("_start_jobHvac : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -832,7 +832,7 @@ class CronJobs():
             parameters = self._extract_parameters(device)
             #print "parameters : %s" % parameters
             if okk == False:
-                self._api.log.warning("_start_jobAlarm : Don't add alarm job : missing parameters")
+                self._api.log.error("_start_jobAlarm : Don't add alarm job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
             events = {}
@@ -916,7 +916,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add an alarm job %s." % device)
         except:
-            self._api.log.warning("_start_jobAlarm : " + \
+            self._api.log.error("_start_jobAlarm : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -965,7 +965,7 @@ class CronJobs():
                 okk = False
             parameters = self._extract_parameters(device)
             if okk == False:
-                self._api.log.warning("_start_jobDawnAlarm : Don't add alarm job : missing parameters")
+                self._api.log.error("_start_jobDawnAlarm : Don't add alarm job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
             events = {}
@@ -1110,7 +1110,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add a dawn alarm job %s." % device)
         except:
-            self._api.log.warning("_start_jobDawnAlarm : " + \
+            self._api.log.error("_start_jobDawnAlarm : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
