@@ -1748,6 +1748,12 @@ class DbHelper():
         return ui_item_config_list
 
 ###################
+# sensor
+###################
+    def get_all_sensor(self):
+        return self.__session.query(Sensor).all()
+
+###################
 # command
 ###################
     def get_all_command(self):
@@ -1939,6 +1945,9 @@ class DbHelper():
 ###################
 # XplStatParam
 ###################
+    def get_xpl_stat_param_by_sensor(self, sensor_id):
+        return self.__session.query(XplStatParam).filter_by(sensor_id=sensor_id).first()
+
     def add_xpl_stat_param(self, statid, key, value, static):
         self.__session.expire_all()
         param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None)

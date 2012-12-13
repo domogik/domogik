@@ -91,22 +91,21 @@ class StatsManager:
         try:
             # not the first load : clean
             if self.stats != None:
-                for xt in self.stats:
-                    for t in self.stats[xt]:
-                        for s in self.stats[xt][t]:
-                             self.myxpl.del_listener(self.stats[xt][t][s].get_listener())
+                for x in self.stats:
+                    self.myxpl.del_listener(x.get_listener())
 
             ### Load stats
             # key1, key2 = device_type_id, schema
-            self.stats = {}
-            for stat in self._db.get_all_xpl_stat():
+            self.stats = []
+            for sen in self._db.get_all_sensor():
+                self._log_stats.error(sen)
+                statparam = self._db.get_xpl_stat_param_by_sensor(sen.id)
+                stat = self._db.get_xpl_stat(statparam.xplstat_id) 
                 dev = self._db.get_device(stat.device_id)
                 # xpl-trig
-                self.stats['xpl-trig'][dev.id][stat.id] = self._Stat(self.myxpl, dev, stat, \
-                    'xpl-trig', self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
+                self.stats.append(self._Stat(self.myxpl, dev, stat, "xpl-trig", self._log_stats, self._log_stats_unknown, self._db, self._event_requests))
                 # xpl-stat
-                self.stats['xpl-stat'][dev.id][stat.id] = self._Stat(self.myxpl, dev, stat, \
-                    'xpl-stat', self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
+                self.stats.append(self._Stat(self.myxpl, dev, stat, "xpl-stat", self._log_stats, self._log_stats_unknown, self._db, self._event_requests))
         except:
             self._log_stats.error("%s" % traceback.format_exc())
   
@@ -131,12 +130,13 @@ class StatsManager:
             self._stat = stat
             
             ### build the filter
-            params = {'schema': stat.schema, 'xpl-type': xpl_type}
+            params = {'schema': stat.schema, 'xpltype': xpl_type}
             for p in stat.params:
                 if p.static:
                     params[p.key] = p.value
            
             ### start the listener
+            self._log_stats.debug("creating listener for %s" % (params))
             self._listener = Listener(self._callback, xpl, params)
 
         def get_listener(self):
@@ -154,22 +154,15 @@ class StatsManager:
             current_date = calendar.timegm(time.gmtime())
             device_data = []
             try:
-                key = None
-                value = None
                 # find what parameter to store
-                for p in stat.params:
-                    if not p.static:
+                for p in self._stat.params:
+                    if p.sensor_id is not None:
                         if p.key in message.data:
-                            # cehck the stat_key, if not empty => store stats_key
-                            if p.stat_key is not None:
-                                key = p.stat_key
-                            else:
-                                key = p.key
-                            value = message.data[p.key]
-                            break
-                # store it
-                device_data.append({"key" : key, "value" : value})
-                my_db.add_device_stat(current_date, key, value, self._dev.id, hist_size=0)
+                            key = None
+                            value = None
+                            # store it
+                            device_data.append({"key" : key, "value" : value})
+                            #my_db.add_device_stat(current_date, key, value, self._dev.id, hist_size=0)
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
                 print("==== Error in Stats ====")
