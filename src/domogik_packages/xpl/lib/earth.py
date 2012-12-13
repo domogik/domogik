@@ -1420,6 +1420,3 @@ class MoonPhases():
             self._events.set_status("moonphase", etype)
             return True
         return False
-
-
-
