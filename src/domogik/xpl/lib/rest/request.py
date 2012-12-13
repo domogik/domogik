@@ -4598,6 +4598,8 @@ class ProcessRequest():
             if not json:
                 ret['commands'] = []
             ret['global'] = []
+            if 'xpl_params' in pjson['device_types'][dt.id]:
+                ret['global']  = pjson['device_types'][dt.id]['xpl_params']
             ret['xpl_stat'] = []
             ret['xpl_cmd'] = []
             # find all features for this device
@@ -4633,12 +4635,6 @@ class ProcessRequest():
                         return None
                 stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
                 stat['name'] = cmd['xplstat_name']
-                # append deviceprams
-                for p in cmd['parameters']['device_type']:
-                    ret['global'].append( p )
-                if stat is not None:
-                    for p in stat['parameters']['device_type']:
-                        ret['global'].append( p )
                 if json:
                     # remove all parameters
                     cmd['params'] = cmd['parameters']['device']

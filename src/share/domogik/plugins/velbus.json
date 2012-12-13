@@ -46,22 +46,6 @@
                             "value": "stat"
                         }
                     ],
-                    "device_type": [
-                        {
-                            "key": "channel",
-                            "description": "The channel number",
-                            "type": "integer",
-                            "max_value": 4,
-                            "min_value": 1
-                        },
-                        {
-                            "key": "address",
-                            "description": "The decimal address",
-                            "type": "integer",
-                            "max_value": 255,
-                            "min_value": 0
-                        }
-                    ],
                     "device": [
                         {
                             "key": "dummy",
@@ -81,22 +65,6 @@
                             "key": "stat",
                             "value": "stat"
                         }
-                     ],
-                    "device_type": [
-                        {
-                            "key": "channel",
-                            "description": "The channel number",
-                            "type": "integer",
-                            "max_value": 4,
-                            "min_value": 1
-                        },
-                        {
-                            "key": "address",
-                            "description": "The decimal address",
-                            "type": "integer",
-                            "max_value": 255,
-                            "min_value": 0
-                        }
                     ],
                     "device": []
                 }
@@ -111,22 +79,6 @@
                         {
                             "key": "stat",
                             "value": "stat"
-                        }
-                    ],
-                    "device_type": [
-                        {
-                            "key": "channel",
-                            "description": "The channel number",
-                            "type": "integer",
-                            "max_value": 4,
-                            "min_value": 1
-                        },
-                        {
-                            "key": "address",
-                            "description": "The decimal address",
-                            "type": "integer",
-                            "max_value": 255,
-                            "min_value": 0
                         }
                     ],
                     "device": [],
@@ -179,7 +131,23 @@
             "description": "Switch one channel on a device", 
             "name": "Switch",
             "commands": ["set_level_bin"],
-            "sensors": ["level"]
+            "sensors": ["level"],
+            "xpl_params": [
+                {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 4,
+                    "min_value": 1
+                },
+                {
+                    "key": "address",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }, 
         "velbus.dimmer": {
             "id": "velbus.dimmer",
@@ -187,7 +155,23 @@
             "id": "velbus.dimmer", 
             "name": "Dimmer",
             "commands": ["set_level_bin", "set_level_range"],
-            "sensors": ["level"]
+            "sensors": ["level"],
+            "xpl_params": [
+                {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 4,
+                    "min_value": 1
+                },
+                {
+                    "key": "address",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }, 
         "velbus.shutter": {
             "id": "velbus.shutter",
