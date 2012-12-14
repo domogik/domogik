@@ -648,11 +648,15 @@ class DbHelper():
 ###
     def list_devices(self):
         """Return a list of devices
-
-        @return a list of Device objects
-
+        @return a list of Device objects (only the devices that are known by this realease)
         """
-        return self.__session.query(Device).all()
+        return self.__session.query(Device).filter(Device.address==None).all()
+
+    def list_old_devices(self):
+        """Return a list of devices
+        @return a list of Device objects (only the devices that are inot known by this realease)
+        """
+        return self.__session.query(Device).filter(Device.address!=None).all()
 
     def get_device(self, d_id):
         """Return a device by its id

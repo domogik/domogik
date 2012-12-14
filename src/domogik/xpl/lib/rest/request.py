@@ -102,6 +102,7 @@ class ProcessRequest():
         'base': {
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
+            '^/base/device/list-old$':			                                         '_rest_base_device_list_old',
             '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
@@ -1871,6 +1872,16 @@ class ProcessRequest():
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device")
         for device in self._db.list_devices():
+            json_data.add_data(device, exclude=['device_stats'])
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_device_list_old(self):
+        """ list devices
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        for device in self._db.list_old_devices():
             json_data.add_data(device, exclude=['device_stats'])
         self.send_http_response_ok(json_data.get())
 
