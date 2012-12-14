@@ -173,53 +173,57 @@ Features
 xPL Message
 -----------
 
-* xpl-stat: ::
+* xpl-stat
 
-    TELEINFO.BASIC
+  * This is the classic message. Notice that the device identifier corresponds to the ADCO field: ::
+
+    teleinfo.basic
     {
-    ADCO=<Adresse du compteur>
-    OPTARIF=<Option tarifaire>
-    ISOUSC=<Intensité souscrite>
-    BASE=<Index option base>
-    IINST=<Intensité instantanée>
-    IMAX=<Intensité maximale appelée>
-    MOTDETAT=<Mot d'état du compteur>
-    [HCHC=<Heures|creuses>]
-    [HCHP=<Heures|pleines>]
-    [EJPHN=<Heures|normales>]
-    [EJPHPM=<Heures|de pointe>]
-    [BBRHCJB=<Heures|creuses jours bleus>]
-    [BBRHPJB=<Heures|pleines jours bleus>]
-    [BBRHCJW=<Heures|creuses jours blancs>]
-    [BBRHPJW=<Heures|pleines jours blancs>]
-    [BBRHCJR=<Heures|creuses jours rouges>]
-    [BBRHPJR=<Heures|pleines jours rouges>]
-    [PEJP=<Préavis|début EJP (30min)>]
-    [PTEC=<Période|tarifaire actuelle>]
-    [DEMAIN=<Couleur|du lendemain>]
-    [ADPS=<Avertissement|de dépassement>]
-    [PAPP=<Puissance|apparente>]
-    [HHPHC=<Horaire|heure pleine/heure creuse>]
-    [PPOT=<Présence|des potentiels>]
-    [IINST1=<Intensité|instantanée phase 1>]
-    [IINST2=<Intensité|instantanée phase 2>]
-    [IINST3=<Intensité|instantanée phase 3>]
-    [IMAX1=<Intensité|maximale phase 1>]
-    [IMAX2=<Intensité|maximale phase 2>]
-    [IMAX3=<Intensité|maximale phase 3>]
-    [PMAX=<Puissance|maximale triphasée>]
+    adco=<Adresse du compteur>
+    optarif=<Option tarifaire>
+    isousc=<Intensité souscrite>
+    base=<Index option base>
+    iinst=<Intensité instantanée>
+    imax=<Intensité maximale appelée>
+    motdetat=<Mot d'état du compteur>
+    [hchc=<Heures|creuses>]
+    [hchp=<Heures|pleines>]
+    [ejphn=<Heures|normales>]
+    [ejphpm=<Heures|de pointe>]
+    [bbrhcjb=<Heures|creuses jours bleus>]
+    [bbrhpjb=<Heures|pleines jours bleus>]
+    [bbrhcjw=<Heures|creuses jours blancs>]
+    [bbrhpjw=<Heures|pleines jours blancs>]
+    [bbrhcjr=<Heures|creuses jours rouges>]
+    [bbrhpjr=<Heures|pleines jours rouges>]
+    [pejp=<Préavis|début EJP (30min)>]
+    [ptec=<Période|tarifaire actuelle>]
+    [demain=<Couleur|du lendemain>]
+    [adps=<Avertissement|de dépassement>]
+    [papp=<Puissance|apparente>]
+    [hhphc=<Horaire|heure pleine/heure creuse>]
+    [ppot=<Présence|des potentiels>]
+    [iinst1=<Intensité|instantanée phase 1>]
+    [iinst2=<Intensité|instantanée phase 2>]
+    [iinst3=<Intensité|instantanée phase 3>]
+    [imax1=<Intensité|maximale phase 1>]
+    [imax2=<Intensité|maximale phase 2>]
+    [imax3=<Intensité|maximale phase 3>]
+    [pmax=<Puissance|maximale triphasée>]
     }
 
 
-    TELEINFO.BASIC
+  * This is the message sent when for a 3 phasis installation, the max intensity is reached. Notice that the device identifier corresponds to the ADCO field: ::
+
+    teleinfo.short
     {
-    ADIR1=<Dépassement d'intensité sur la phase 1>
-    ADIR2=<Dépassement d'intensité sur la phase 2>
-    ADIR3=<Dépassement d'intensité sur la phase 3>
-    ADCO=<Adresse du compteur>
-    IINST1=<Intensité instantanée phase 1>
-    IINST2=<Intensité instantanée phase 2>
-    IINST3=<Intensité instantanée phase 3>
+    adir1=<Dépassement d'intensité sur la phase 1>
+    adir2=<Dépassement d'intensité sur la phase 2>
+    adir3=<Dépassement d'intensité sur la phase 3>
+    adco=<Adresse du compteur>
+    iinst1=<Intensité instantanée phase 1>
+    iinst2=<Intensité instantanée phase 2>
+    iinst3=<Intensité instantanée phase 3>
     }
 
 

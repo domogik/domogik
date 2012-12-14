@@ -6,14 +6,13 @@
                 <filter/>
             </listener>
             <mapping>
-                <device field="DEVICE"/>
+                <device field="adco"/>
                 <value field="IINST1" />
                 <value field="IINST2" />
                 <value field="IINST3" />
                 <value field="ADIR1" />
                 <value field="ADIR2" />
                 <value field="ADIR3" />
-                <value field="ADCO" />
             </mapping>
         </xpltype>
     </schema>
