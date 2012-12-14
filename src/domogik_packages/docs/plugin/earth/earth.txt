@@ -32,7 +32,7 @@ In Domogik administration, go to the cron plugin configuration page:
 | horizon       | -6            | The horizon of the observer. Do not change it until you know what you do.                           |
 |               |               | Look at pyephem documentation for more details.                                                     |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
-| pressure      | 0             | The pressure of the observer. Do not change it until you know what you do.                          |
+| pressure      | 1010.0        | The pressure of the observer. Do not change it until you know what you do.                          |
 |               |               | Look at pyephem documentation for more details.                                                     |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | delay-sensor  | 300           | The delay in seconds between two status messages. 0 to disable.                                     |
@@ -43,6 +43,13 @@ In Domogik administration, go to the cron plugin configuration page:
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | delay-cron    | 30            | The delay to wait the cron plugin. The plugin will try 3 times to connect.                          |
 |               |               | If you have a slow machine, update this value.                                                      |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| load-dawndusk | True          | Load the dawndusk extensions.                                                                       |
+|               |               | Add events based on the dawn and dusk events.                                                       |
+|               |               | If no extension is loaded, this one will be load event if it is disabled.                           |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|load-moonphases| True          | Load the moon phases extensions.                                                                    |
+|               |               | Add events based on the moon phases.                                                                |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
 Start the plugin
