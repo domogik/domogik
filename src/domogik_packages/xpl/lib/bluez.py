@@ -36,6 +36,8 @@ import traceback
 from domogik.xpl.common.xplmessage import XplMessage
 import bluetooth
 import threading
+from threading import Timer
+
 #import logging
 #logging.basicConfig()
 
@@ -64,12 +66,15 @@ class BluezAPI:
         self._stop = stop
         self._scan_delay = 3
         self._error_delay = 20
+        self.delay_sensor = 300
+        self.delay_stat = 3
         self.listen_adaptator = self._listen_adaptator_lookup
         self._hysteresis = 3
         self._state = "stopped"
         self._device_name = "bluez"
         self._thread = None
         self._targets = dict()
+        self.timer_stat = None
 
     def reload_config(self):
         """
@@ -81,6 +86,9 @@ class BluezAPI:
             self._scan_delay = int(self._config.query('bluez', 'scan-delay'))
             self._error_delay = int(self._config.query('bluez', 'error-delay'))
             self._device_name = str(self._config.query('bluez', 'device-name'))
+            self.delay_sensor = int(self._config.query('bluez', 'delay-sensor'))
+            self.delay_stat = int(self._config.query('bluez', 'delay-stat'))
+
             listen = str(self._config.query('bluez', 'listen-method'))
             methods = {
             'lookup': lambda : self._listen_adaptator_lookup(),
@@ -100,6 +108,9 @@ class BluezAPI:
                     num += 1
                 else:
                     loop = False
+            if (self.delay_sensor > 0):
+                self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
+                self.timer_stat.start()
         except:
             error = "Can't get configuration from XPL : %s" %  \
                      (traceback.format_exc())
@@ -107,6 +118,37 @@ class BluezAPI:
         #self.log.debug("reload_config : _target=%s" % self._targets)
         self.log.info("Found %s bluetooth devices in configuration." % (num-1))
         self.log.debug("reload_config : Done")
+
+    def stop_all(self):
+        """
+        Stop timers and threads.
+        """
+        self.log.info("stop_all : close all timers and threads.")
+        if (self.delay_sensor >0):
+            self.timer_stat.cancel()
+
+    def send_sensors(self):
+        """
+        Send the sensors stat messages
+
+        """
+        try :
+            keys = self._targets.keys()
+            for addr in keys :
+                wait = False
+                if addr in self._targets :
+                    status = self._targets[addr]["status"]
+                    self._trig_detect("xpl-stat", addr, status)
+                if wait :
+                    self._stop.wait(self.delay_stat)
+                if self._stop.isSet() :
+                    break
+        except:
+            error = "traceback : %s" %  (traceback.format_exc())
+            self.log.error("send_sensors : " + error)
+        finally :
+            self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
+            self.timer_stat.start()
 
     def start_adaptator(self):
         """
@@ -153,8 +195,7 @@ class BluezAPI:
                         self._trig_detect("xpl-trig", aaddr, LOW)
                     self._stop.wait(self._error_delay)
             except:
-                self.log.error("_listen_adaptator : Error when calling \
-listen_method")
+                self.log.error("_listen_adaptator : Error when calling listen_method")
                 error = "traceback : %s" %  \
                      (traceback.format_exc())
                 self.log.error("listen_adaptator : " + error)
@@ -178,8 +219,7 @@ listen_method")
                     if aaddr not in nearby_devices:
                         self._targets[aaddr]["count"] = \
                             self._targets[aaddr]["count"] +1
-                        if self._targets[aaddr]["count"] >= \
-                            self._hysteresis:
+                        if self._targets[aaddr]["count"] >= self._hysteresis:
                             self._trig_detect("xpl-trig", aaddr, LOW)
             for bdaddr in nearby_devices:
                 target_name = bluetooth.lookup_name( bdaddr )
@@ -187,12 +227,10 @@ listen_method")
                     self._targets[bdaddr]["count"] = 0
                     if self._targets[bdaddr]["status"] == LOW:
                         self._trig_detect("xpl-trig", bdaddr, HIGH)
-                        self.log.info("Match bluetooth device %s with \
-    address %s" % (target_name, bdaddr))
+                        self.log.info("Match bluetooth device %s with address %s" % (target_name, bdaddr))
             return True
         except:
-            self.log.error("_listen_adaptator : Error with bluetooth \
-adaptator")
+            self.log.error("_listen_adaptator : Error with bluetooth adaptator")
             error = "traceback : %s" %  \
                  (traceback.format_exc())
             self.log.error("listen_adaptator : " + error)
@@ -218,18 +256,15 @@ adaptator")
                         if self._targets[aaddr]["count"] >= \
                             self._hysteresis:
                             self._trig_detect("xpl-trig", aaddr, LOW)
-                            self.log.info("bluetooth device %s with \
-    address %s is gone" % (target_name, aaddr))
+                            self.log.info("bluetooth device %s with address %s is gone" % (target_name, aaddr))
                 else:
                     self._targets[aaddr]["count"] = 0
                     if self._targets[aaddr]["status"] == LOW:
                         self._trig_detect("xpl-trig", aaddr, HIGH)
-                        self.log.info("Match bluetooth device %s with \
-    address %s" % (target_name, aaddr))
+                        self.log.info("Match bluetooth device %s with address %s" % (target_name, aaddr))
             return True
         except:
-            self.log.error("_listen_adaptator : Error with bluetooth \
-adaptator")
+            self.log.error("_listen_adaptator : Error with bluetooth adaptator")
             error = "traceback : %s" %  \
                  (traceback.format_exc())
             self.log.error("listen_adaptator : " + error)
@@ -261,8 +296,7 @@ adaptator")
                 action = None
                 if 'action' in message.data:
                     action = message.data['action']
-                self.log.debug("basic_listener : action %s received \
-for device %s" % (action, device))
+                self.log.debug("basic_listener : action %s received for device %s" % (action, device))
                 actions[action](self.myxpl, device, message)
             except:
                 self.log.error("action _ %s _ unknown." % (action))
@@ -270,8 +304,7 @@ for device %s" % (action, device))
                          (traceback.format_exc())
                 self.log.debug("basic_listener : "+error)
         else:
-            self.log.warning("basic_listener : action %s received \
-for unknown device %s" % (action, device))
+            self.log.warning("basic_listener : action %s received for unknown device %s" % (action, device))
 
     def _action_status(self, myxpl, device):
         """
