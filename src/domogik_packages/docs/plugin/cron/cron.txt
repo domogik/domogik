@@ -43,11 +43,19 @@ You can now start the plugin (start button).
 Cron jobs
 =========
 
-Use the admin pages to manage and create jobs
+Use the `admin pages <admin.html>`_ to manage and create jobs. After a while,
+the job is directly added to the device list.
+If you want to associate it with a scene, it is immediately available.
 
 Configure the features widgets on Domoweb
 =========================================
 
 You can now place the widgets of your devices features on Domoweb.
-Will be done when usage cron will be added
 
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| Run           | To stop and resume the job. Use a "Stateless basic widget" with it.                                                 |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| Started       | The state of the job.                                                                                               |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| Fired         | The job is in fire !!. This means that the job is triggered.                                                        |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+

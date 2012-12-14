@@ -51,9 +51,12 @@ ERROR_EVENT_NOT_STOPPED = 13
 ERROR_SCHEDULER = 20
 ERROR_STORE = 30
 ERROR_REST = 40
-ERROR_NOT_IMPLEMENTED = 50
+ERROR_TYPE_NOT_EXIST = 50
+ERROR_PARAMETER_NOT_EXIST = 51
+ERROR_STATUS_NOT_EXIST = 52
+ERROR_NOT_IMPLEMENTED = 60
 
-CRONERRORS = { ERROR_NO: 'No error',
+EARTHERRORS = { ERROR_NO: 'No error',
                ERROR_PARAMETER: 'Missing or wrong parameter.',
                ERROR_EVENT_EXIST: 'Event already exist.',
                ERROR_EVENT_NOT_EXIST: 'Event does not exist.',
@@ -61,6 +64,9 @@ CRONERRORS = { ERROR_NO: 'No error',
                ERROR_EVENT_NOT_STOPPED: "Event is not stopped.",
                ERROR_SCHEDULER: 'Error with the scheduler.',
                ERROR_STORE: 'Error with the store.',
+               ERROR_TYPE_NOT_EXIST: "Event's type does not exist.",
+               ERROR_PARAMETER_NOT_EXIST: "Event's parameter does not exist.",
+               ERROR_STATUS_NOT_EXIST: "Event's status does not exist.",
                ERROR_REST: 'Error with REST. But Event is created.',
                }
 

@@ -20,13 +20,36 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 Plugin purpose
 ==============
+
 XPL Cron server.
 
 Implements
 ==========
+
 class cronJobs
 class cronException
 class cronAPI
+
+Developpers notes
+=================
+- Some methods (like get_list) can raise an "Collection change exception".
+    Reproduce :
+        Stress and request list refresh in UI
+- Many methods (like get_device_type) can raise an "Key exception" (concurrency stress test).
+
+Should we copy keys and acquire a lock ? catch exceptions ?
+
+When updating code, run the stress test :
+
+    ./stress.sh 10
+    Done
+    ...
+    Done
+    OK :  1660
+    Skipped :  50
+    Failed :  0
+    Error :  0
+    Done
 
 @author: Sébastien Gallet <sgallet@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
@@ -88,10 +111,10 @@ class CronJobs():
         '''
         if which == 0 :
             data = []
-            data.append("api : %s items, %s bytes" % (1, asizeof(self)))
-            data.append("apscheduler : %s items, %s bytes" % (1, asizeof(self._scheduler)))
-            data.append("jobs dict : %s items, %s bytes" % (len(self.data), asizeof(self.data)))
-            data.append("store : %s items, %s bytes" % (1, asizeof(self.store)))
+            data.append("api : %s items, %s kbytes" % (1, asizeof(self)/1024))
+            data.append("apscheduler : %s items, %s kbytes" % (1, asizeof(self._scheduler)/1024))
+            data.append("jobs dict : %s items, %s kbytes" % (len(self.data), asizeof(self.data)/1024))
+            data.append("store : %s items, %s kbytes" % (1, asizeof(self.store)/1024))
             return data
         else:
             if which == MEMORY_PLUGIN:
@@ -361,7 +384,7 @@ class CronJobs():
             if 'duration' in self.data[device]:
                 duration = int(self.data[device]['duration'])
         except:
-            self._api.log.error("_start_jobTimer : " + \
+            self._api.log.error("_start_job_timer : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_PARAMETER
@@ -374,7 +397,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add an infinite timer every %s seconds." % frequence)
             except:
-                self._api.log.error("_start_jobTimer : " + \
+                self._api.log.error("_start_job_timer : " + \
                     traceback.format_exc())
                 #del(self.data[device])
                 return ERROR_SCHEDULER
@@ -392,7 +415,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add a %s beat timer every %s seconds." % (duration, frequence))
             except:
-                self._api.log.error("_start_jobTimer : " + \
+                self._api.log.error("_start_job_timer : " + \
                     traceback.format_exc())
                 #del(self.data[device])
                 return ERROR_SCHEDULER
@@ -446,7 +469,7 @@ class CronJobs():
             if 'duration' in self.data[device]:
                 duration = int(self.data[device]['duration'])
             if okk == False:
-                self._api.log.error("_start_jobInterval : \
+                self._api.log.error("_start_job_interval : \
                     Don't add cron job : no parameters given")
                 #del(self.data[device])
                 return ERROR_PARAMETER
@@ -455,7 +478,7 @@ class CronJobs():
                 startdate = self._api.tools.date_from_xpl(\
                     self.data[device]['startdate'])
         except:
-            self._api.log.error("_start_jobInterval : " + \
+            self._api.log.error("_start_job_interval : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_PARAMETER
@@ -472,7 +495,7 @@ class CronJobs():
             self._job_started(device)
             self._api.log.info("Add an interval job %s." % device)
         except:
-            self._api.log.error("_start_jobInterval : " + \
+            self._api.log.error("_start_job_interval : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -709,7 +732,7 @@ class CronJobs():
                 okk = False
             parameters = self._extract_parameters(device)
             if okk == False:
-                self._api.log.error("_start_jobHvac : Don't add  hvac job : missing parameters")
+                self._api.log.error("_start_job_hvac : Don't add  hvac job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
         except:
@@ -785,7 +808,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add an hvac job %s." % device)
         except:
-            self._api.log.error("_start_jobHvac : " + \
+            self._api.log.error("_start_job_hvac : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -832,7 +855,7 @@ class CronJobs():
             parameters = self._extract_parameters(device)
             #print "parameters : %s" % parameters
             if okk == False:
-                self._api.log.error("_start_jobAlarm : Don't add alarm job : missing parameters")
+                self._api.log.error("_start_job_alarm : Don't add alarm job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
             events = {}
@@ -916,7 +939,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add an alarm job %s." % device)
         except:
-            self._api.log.error("_start_jobAlarm : " + \
+            self._api.log.error("_start_job_alarm : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -965,7 +988,7 @@ class CronJobs():
                 okk = False
             parameters = self._extract_parameters(device)
             if okk == False:
-                self._api.log.error("_start_jobDawnAlarm : Don't add alarm job : missing parameters")
+                self._api.log.error("_start_job_dawn_alarm : Don't add alarm job : missing parameters")
                 #del(self.data[device])
                 return ERROR_PARAMETER
             events = {}
@@ -1110,7 +1133,7 @@ class CronJobs():
                 self._job_started(device)
                 self._api.log.info("Add a dawn alarm job %s." % device)
         except:
-            self._api.log.error("_start_jobDawnAlarm : " + \
+            self._api.log.error("_start_job_dawn_alarm : " + \
                 traceback.format_exc())
             #del(self.data[device])
             return ERROR_SCHEDULER
@@ -1408,7 +1431,10 @@ class CronJobs():
 
     def get_list(self, head):
         """
-        Get the list of jobs
+        Get the list of jobs.
+
+        This method can fail due to a change collection exception
+        Should we acquired a lock ?
 
         @return : The list of jobs
 
@@ -1589,7 +1615,7 @@ class CronAPI:
         self.rest_server_port = conf_rest['rest_server_port']
         self.rest = CronRest(self.rest_server_ip,self.rest_server_port,log)
         self.helpers = CronHelpers(self.log, self.jobs)
-        if (self.delay_sensor >0):
+        if (self.delay_sensor > 0):
             self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
             self.timer_stat.start()
 
@@ -2021,7 +2047,7 @@ class CronAPI:
         @param device : The device to use
 
         """
-        self.log.debug("cronAPI._actionStatus : Start ...")
+        self.log.debug("cronAPI._action_status : Start ...")
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("timer.basic")
@@ -2038,7 +2064,7 @@ class CronAPI:
             mess.add_data({"device" : device})
             mess.add_data({"state" : "halted"})
         myxpl.send(mess)
-        self.log.debug("cronAPI._actionStatus : Done :)")
+        self.log.debug("cronAPI._action_status : Done :)")
 
     def _action_stop(self, myxpl, device):
         """
@@ -2048,10 +2074,10 @@ class CronAPI:
         @param device : The device to use
 
         """
-        self.log.debug("cronAPI._actionStop : Start ...")
+        self.log.debug("cronAPI._action_stop : Start ...")
         self._send_xpl_trig(myxpl, device, "stop", \
             self.jobs.stop_job(device))
-        self.log.debug("cronAPI._actionStop : Done :)")
+        self.log.debug("cronAPI._action_stop : Done :)")
 
     def _action_resume(self, myxpl, device):
         """
@@ -2061,10 +2087,10 @@ class CronAPI:
         @param device : The device to use
 
         """
-        self.log.debug("cronAPI._actionResume : Start ...")
+        self.log.debug("cronAPI._action_resume : Start ...")
         self._send_xpl_trig(myxpl, device, "resume", \
             self.jobs.resume_job(device))
-        self.log.debug("cronAPI._actionResume : Done :)")
+        self.log.debug("cronAPI._action_resume : Done :)")
 
     def _action_halt(self, myxpl, device):
         """
@@ -2157,15 +2183,26 @@ class CronAPI:
         """
         try :
             self.log.debug("cronAPI.send_sensors : Try to acquire lock")
-            self._jobs_lock.acquire()
+            #self.jobs._jobs_lock.acquire()
             self.log.debug("cronAPI.send_sensors : Lock acquired")
-            for dev in self.jobs.data :
-                if self.jobs.data[dev]["state"] == "started":
-                    self._send_sensor_stat(self.myxpl,dev)
-                    self._stop.wait(self.delay_stat)
+            keys = self.jobs.data.keys()
+            for dev in keys :
+                try :
+                    wait = False
+                    self.jobs._jobs_lock.acquire()
+                    if dev in self.jobs.data :
+                        if self.jobs.data[dev]["state"] == "started":
+                            self._send_sensor_stat(self.myxpl,dev)
+                            wait = True
+                finally :
+                    self.jobs._jobs_lock.release()
+                    self.log.debug("cronAPI.send_sensors : Release lock")
+                    if wait :
+                        self._stop.wait(self.delay_stat)
+                    if self._stop.isSet() :
+                        break
         finally :
-            self.log.debug("cronAPI.send_sensors : Release lock")
-            self._jobs_lock.release()
+            #self.jobs._jobs_lock.release()
             self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
             self.timer_stat.start()
 

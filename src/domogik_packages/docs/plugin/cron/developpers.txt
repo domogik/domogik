@@ -42,13 +42,13 @@ Add a cron job
 
 Where :
 
-    device : the name of the cron job. No domogik device is created when using the cron query.
+- device : the name of the cron job. No domogik device is created when using the cron query.
 
-    nstMess : the previous message.
+- nstMess : the previous message.
 
-    frequence : the number of seconds between message
+- frequence : the number of seconds between message
 
-    duration : the number of heart beats. After that you must stop/resume the job to enable it.
+- duration : the number of heart beats. After that you must stop/resume the job to enable it.
 
 5) Manage the job
 
@@ -90,7 +90,7 @@ A robust way to use cron jobs is always halt a job before create it.
 
 6) At last, update your listener to trap the nstMessage defined previously.
 
-You can also create many other types of job, look at the cron_query source and documentation.
+You can also create many other types of job, look at the `cron_query <cron_query.html>`_ source and documentation.
 
 Update your plugin __init__
 ===========================
@@ -131,11 +131,24 @@ It will try safely to talk to the cron plugin. If it can't, it will stop your pl
 Develop an UI admin page
 ========================
 
+A javascript library is available to help you in validating user input.
 You can use it adding :
 
 .. code-block:: none
 
     <script type="text/javascript" src="{{ static_design_url}}/admin/js/page-admin-cron.js"></script>
+
+Here is a way to use it to validate a day of week field : MoTuWe...
+
+.. code-block:: none
+
+     if ((days == null) || (days == "") || (check_days_of_week(days) != true)) {
+         $("#alarmdays"+i).focus();
+         $.notification('error', "{% trans "Bad syntax" %}");
+         return
+     }
+
+Look at cron UI html sources for more examples.
 
 Index of UI functions
 =====================
@@ -190,79 +203,82 @@ A side effect is that command use typed fields as parameters.
 So it's impossible to encapsulate anymore
 
 Here is a proposal for the new model :
-{
-    "reference": "start_job_date",
-    "schema": "timer.basic",
-    "parameters": [
-        {
-            "static": [
-                {
-                    "key": "devicetype",
-                    "value": "date",
-                },
-             ],
-             "device": [
-                {
-                     "key": "device",
-                     "description": "The job name",
-                     "type": "string",
-                },
-            ],
-            "dynamic": [
-                {
-                     "key": "date",
-                     "description": "The event date (YYYYMMDDHHMMSS)",
-                     "type": "string",
-                },
-                {
-                     "key": "date[0..]",
-                     "description": "The event date (YYYYMMDDHHMMSS)",
-                     "type": "string",
-                },
-            ],
-            "feature": []
-        }
-    ]
- },
-{
-    "reference": "start_job_interval",
-    "schema": "timer.basic",
-    "parameters": [
-        {
-            "static": [
-                {
-                    "key": "devicetype",
-                    "value": "interval",
-                },
-             ],
-             "device": [
-                {
-                     "key": "device",
-                     "description": "The job name",
-                     "type": "string",
-                },
-            ],
-            "dynamic": [
-                {
-                     "key": "weeks",
-                     "description": "Every X weeks",
-                     "type": "integer",
-                },
-                {
-                     "key": "days",
-                     "description": "Every X days",
-                     "type": "integer",
-                },
-                {
-                     "key": "hours",
-                     "description": "Every X hours",
-                     "type": "integer",
-                },
 
-            ....
+.. code-block:: none
 
-            ],
-            "feature": []
-        }
-    ]
- },
+    {
+        "reference": "start_job_date",
+        "schema": "timer.basic",
+        "parameters": [
+            {
+                "static": [
+                    {
+                        "key": "devicetype",
+                        "value": "date",
+                    },
+                 ],
+                 "device": [
+                    {
+                         "key": "device",
+                         "description": "The job name",
+                         "type": "string",
+                    },
+                ],
+                "dynamic": [
+                    {
+                         "key": "date",
+                         "description": "The event date (YYYYMMDDHHMMSS)",
+                         "type": "string",
+                    },
+                    {
+                         "key": "date[0..]",
+                         "description": "The event date (YYYYMMDDHHMMSS)",
+                         "type": "string",
+                    },
+                ],
+                "feature": []
+            }
+        ]
+     },
+    {
+        "reference": "start_job_interval",
+        "schema": "timer.basic",
+        "parameters": [
+            {
+                "static": [
+                    {
+                        "key": "devicetype",
+                        "value": "interval",
+                    },
+                 ],
+                 "device": [
+                    {
+                         "key": "device",
+                         "description": "The job name",
+                         "type": "string",
+                    },
+                ],
+                "dynamic": [
+                    {
+                         "key": "weeks",
+                         "description": "Every X weeks",
+                         "type": "integer",
+                    },
+                    {
+                         "key": "days",
+                         "description": "Every X days",
+                         "type": "integer",
+                    },
+                    {
+                         "key": "hours",
+                         "description": "Every X hours",
+                         "type": "integer",
+                    },
+
+                ....
+
+                ],
+                "feature": []
+            }
+        ]
+     },
