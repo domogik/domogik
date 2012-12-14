@@ -48,7 +48,7 @@ Humidity              demo_humidity                         The values come from
 --------------------- ------------------------------------- ---------------------------
 Pressure              demo_pressure                         The values come from Paris
 --------------------- ------------------------------------- ---------------------------
-Teleinfo              demo_teleingo                         Fake generated values
+Teleinfo              012345678901                          Fake generated values
 --------------------- ------------------------------------- ---------------------------
 Tank level            demo_tank                             Fake generated values
 --------------------- ------------------------------------- ---------------------------
