@@ -88,6 +88,7 @@ class BluezAPI:
             self._device_name = str(self._config.query('bluez', 'device-name'))
             self.delay_sensor = int(self._config.query('bluez', 'delay-sensor'))
             self.delay_stat = int(self._config.query('bluez', 'delay-stat'))
+            self._hysteresis = int(self._config.query('bluez', 'hysteresis'))
 
             listen = str(self._config.query('bluez', 'listen-method'))
             methods = {
