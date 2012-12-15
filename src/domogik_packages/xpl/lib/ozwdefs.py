@@ -60,12 +60,12 @@ Capabilities = ['Routing', 'Listening', 'Beaming', 'Security', 'FLiRS']
 
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
-                               'COMMAND_CLASS_SENSOR_MULTILEVEL', 'COMMAND_CLASS_BATTERY']
+                               'COMMAND_CLASS_SENSOR_MULTILEVEL', 'COMMAND_CLASS_BATTERY',  'COMMAND_CLASS_METER']
                                
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
                                 'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
-                                'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
+                                'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL','COMMAND_CLASS_METER' ]
 
 BasicDeviceType = {1: 'TYPE_CONTROLLER', 2: 'TYPE_STATIC_CONTROLLER', 3: 'TYPE_SLAVE', 4 :'TYPE_ROUTING_SLAVE'}
 GenericDeviceType = { 0x00:'TYPE_SPECIFIC_TYPE_NOT_USED', 0x01: 'TYPE_CONTROLLER', 

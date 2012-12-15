@@ -9,6 +9,10 @@
                     <key name="type" value="battery level"/>
                     <key name="type" value="sensor"/>
 					<key name="type" value="status"/>
+					<key name="type" value="power"/>
+					<key name="type" value="energy"/>
+					<key name="type" value="previous reading"/>
+					<key name="type" value="reset"/>
                 </filter>
             </listener>
             <mapping>
@@ -24,6 +28,15 @@
                        filter_key="type" filter_value="sensor" />
                 <value field="current" new_name="status"
                        filter_key="type" filter_value="status" />
+				<value field="current" new_name="power"
+					   filter_key="type" filter_value="power" />
+				<value field="current" new_name="energy"
+					   filter_key="type" filter_value="energy" />
+				<value field="current" new_name="previous reading"
+					   filter_key="type" filter_value="previous reading" />
+				<value field="current" new_name="reset"
+					   filter_key="type" filter_value="reset" />
+
             </mapping>
         </xpltype>
     </schema>

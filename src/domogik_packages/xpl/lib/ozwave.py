@@ -238,6 +238,7 @@ class OZWavemanager(threading.Thread):
     # notification implémentés
 #         ValueAdded = 0                    / A new node value has been added to OpenZWave's list. These notifications occur after a node has been discovered, and details of its command classes have been received.  Each command class may generate one or more values depending on the complexity of the item being represented.
 #         ValueChanged = 2                  / A node value has been updated from the Z-Wave network and it is different from the previous value.
+#         Group = 4                         / The associations for the node have changed. The application should rebuild any group information it holds about the node.
 #         NodeNew = 5                       / A new node has been found (not already stored in zwcfg*.xml file)
 #         NodeAdded = 6                     / A new node has been added to OpenZWave's list.  This may be due to a device being added to the Z-Wave network, or because the application is initializing itself.
 #         NodeEvent = 10                    / A node has triggered an event.  This is commonly caused when a node sends a Basic_Set command to the controller.  The event value is stored in the notification.
@@ -250,7 +251,6 @@ class OZWavemanager(threading.Thread):
 #TODO: notification à implémenter
 #         ValueRemoved = 1                  / A node value has been removed from OpenZWave's list.  This only occurs when a node is removed.
 #         ValueRefreshed = 3                / A node value has been updated from the Z-Wave network.
-#         Group = 4                         / The associations for the node have changed. The application should rebuild any group information it holds about the node.
 #         NodeRemoved = 7                   / A node has been removed from OpenZWave's list.  This may be due to a device being removed from the Z-Wave network, or because the application is closing.
 #         NodeProtocolInfo = 8              / Basic node information has been receievd, such as whether the node is a listening device, a routing device and its baud rate and basic, generic and specific types. It is after this notification that you can call Manager::GetNodeType to obtain a label containing the device description.
 #         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
@@ -309,7 +309,6 @@ class OZWavemanager(threading.Thread):
         """Les requettes d'initialisation du node sont complété."""
         node = self._getNode(self._homeId, args['nodeId'])
         if node :
-            print ("************* updating node *****")
             node.updateNode()
             self._log.info('Z-Wave Device Node {0} is ready.'.format(node.id))
         else :
@@ -320,14 +319,12 @@ class OZWavemanager(threading.Thread):
         """Les requettes essentielles d'initialisation du node sont complétée il peu recevoir des msg."""
         node = self._getNode(self._homeId, args['nodeId'])
         if node :
-            print ("************* EssentialQuery node *****")
          #   node.updateNode()
             self._log.info('Z-Wave Device Node {0} status essential queries ok.'.format(node.id))        
         
 
     def _getNode(self, homeId, nodeId):
         """ Renvoi l'objet node correspondant"""
-        print "**** getNode***",  self._nodes
         if self._nodes.has_key(nodeId) :
             return self._nodes[nodeId] 
         else :
@@ -390,9 +387,9 @@ class OZWavemanager(threading.Thread):
         """Un node à envoyé une Basic_Set command  au controlleur.  
         Cette notification est générée par certains capteur,  comme les decteurs de mouvement type PIR, pour indiquer qu'un événements a été détecter.
         Elle est aussi envoyée dans le cas d'une commande locale d'un device. """
-        CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
-                                             'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
-                                            'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
+  #     CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
+  #                                           'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
+  #                                           'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
         sendxPL = False
         homeId = args['homeId']
         activeNodeId= args['nodeId']
