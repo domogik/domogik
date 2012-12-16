@@ -3,6 +3,7 @@
 
 # PUB-SUB receiver
 
+import json
 import sys
 from messaging_event import MessagingEventSub
 
@@ -11,8 +12,8 @@ def main(category_filter, action_filter):
     sub_event = MessagingEventSub(category_filter, action_filter)
 
     while True:
-        msg = sub_event.wait_for_event()
-        print(msg)
+        msg = json.loads(sub_event.wait_for_event())
+        print("Id : %s - Content : %s" %(msg['id'], msg['content']))
 
 if __name__ == "__main__":
     category_filter = None

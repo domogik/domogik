@@ -3,6 +3,7 @@
 
 # Utility class to publish / subscribe pattern
 
+import json
 import zmq
 from time import sleep, time
 
@@ -21,10 +22,17 @@ class MessagingEventPub(MessagingEvent):
         self.s_send.connect(PORT_PUB)
     
     def send_event(self, category, action, content):
+        """Send an event in JSON format with two keys : 'id' and 'content'
+
+        @param category : category of the message
+        @param action : action corresponding to the message
+        @param content : content of the message : must be in JSON format
+
+        """
         msg_id = "%s.%s.%s.%s" %(category, action, str(time()).replace('.','_'), MSG_VERSION)
-        self.s_send.send(msg_id, zmq.SNDMORE)
-        self.s_send.send(content)
-        print("Message sent : %s : %s" % (msg_id, content))
+        msg = json.dumps({'id': msg_id, 'content': content})
+        self.s_send.send(msg)
+        print("Message sent : %s" % msg)
 
 class MessagingEventSub(MessagingEvent):
     def __init__(self, category_filter=None, action_filter=None):
@@ -40,12 +48,9 @@ class MessagingEventSub(MessagingEvent):
         self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
     def wait_for_event(self):
-        message_id = self.s_recv.recv()
-        more = self.s_recv.getsockopt(zmq.RCVMORE)
-        if more:
-            print("Message id : %s" % message_id)
-            message_content = self.s_recv.recv(zmq.RCVMORE)
-            return message_content
-        else:
-            print("Message not complete!")
-            return None
+        """Receive an event
+
+        @return : event message in JSON format with two keys : 'id' and 'content'
+
+        """        
+        return self.s_recv.recv()

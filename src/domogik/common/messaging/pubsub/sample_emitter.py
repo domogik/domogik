@@ -51,7 +51,7 @@ pub_event = MessagingEventPub()
 while True:
     category = choice(categories.keys())
     action = choice(categories[category]['action'])
-    j_content = json.dumps({"content" : "%s" % choice(categories[category]['content'])})
+    j_content = json.dumps(choice(categories[category]['content']))
     pub_event.send_event(category, action, j_content)
     sleep(2)
 
