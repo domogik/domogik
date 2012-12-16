@@ -7,21 +7,22 @@ import json
 import zmq
 from time import sleep, time
 from domogik.common import logger
+from domogik.common.configloader import Loader
 
 MSG_VERSION = "0_1"
-PORT_PUB = "tcp://localhost:5559"
-PORT_SUB = "tcp://localhost:5560"
 
 class MessagingEvent:
     def __init__(self):
         self.context = zmq.Context()
+        cfg = Loader('messaging').load()
+        self.cfg_messaging = dict(cfg[1])
 
 class MessagingEventPub(MessagingEvent):
     def __init__(self):
         MessagingEvent.__init__(self)
         self.log = logger.Logger('mq_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
-        self.s_send.connect(PORT_PUB)
+        self.s_send.connect("tcp://localhost:%s" % self.cfg_messaging['event_pub_port'])
         # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
         # but is not reliable as it depends on machine/network latency
         sleep(1)
@@ -44,7 +45,7 @@ class MessagingEventSub(MessagingEvent):
         MessagingEvent.__init__(self)
         self.log = logger.Logger('mq_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
-        self.s_recv.connect(PORT_SUB)
+        self.s_recv.connect("tcp://localhost:%s" % self.cfg_messaging['event_sub_port'])
         topic_filter = ''
         if category_filter is not None and len(str(category_filter)) > 0:
             topic_filter = category_filter
