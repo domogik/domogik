@@ -51,7 +51,7 @@ class MessagingEventSub(MessagingEvent):
             topic_filter = category_filter
             if action_filter is not None and len(str(action_filter)) > 0:
                 topic_filter += "." + action_filter
-        print("Topic filter : %s" % topic_filter)
+        self.log.debug("Topic filter : %s" % topic_filter)
         self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
     def wait_for_event(self):
