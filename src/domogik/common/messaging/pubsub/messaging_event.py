@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Utility class to publish / subscribe pattern
+# Utility class for publish / subscribe pattern
 
 import json
 import zmq
