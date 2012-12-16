@@ -20,7 +20,7 @@ class MessagingEvent:
 class MessagingEventPub(MessagingEvent):
     def __init__(self):
         MessagingEvent.__init__(self)
-        self.log = logger.Logger('mq_event_pub').get_logger()
+        self.log = logger.Logger('messaging_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
         self.s_send.connect("tcp://localhost:%s" % self.cfg_messaging['event_pub_port'])
         # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
@@ -43,7 +43,7 @@ class MessagingEventPub(MessagingEvent):
 class MessagingEventSub(MessagingEvent):
     def __init__(self, category_filter=None, action_filter=None):
         MessagingEvent.__init__(self)
-        self.log = logger.Logger('mq_event_sub').get_logger()
+        self.log = logger.Logger('messaging_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
         self.s_recv.connect("tcp://localhost:%s" % self.cfg_messaging['event_sub_port'])
         topic_filter = ''
