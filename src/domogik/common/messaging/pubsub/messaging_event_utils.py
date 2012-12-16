@@ -73,7 +73,6 @@ class MessagingEventPub(MessagingEvent):
 
         """
         msg_id = "%s.%s.%s" %(category, str(time()).replace('.','_'), MSG_VERSION)
-        #msg = json.dumps({'id': msg_id, 'content': content})
         self.s_send.send(msg_id, zmq.SNDMORE)
         self.s_send.send(content)
         self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
@@ -107,5 +106,6 @@ class MessagingEventSub(MessagingEvent):
             self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, msg_content))
             return {'id': msg_id, 'content': msg_content}
         else:
-            self.log.error("Message not complete (content is missing)!")
-            return None
+            msg_error = "Message not complete (content is missing)!, so leaving..."
+            self.log.error(msg_error)
+            raise Exception(msg_error)
