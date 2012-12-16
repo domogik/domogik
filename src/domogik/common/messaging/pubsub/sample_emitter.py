@@ -4,7 +4,7 @@
 # PUB-SUB emitter
 
 import json
-from messaging_event import MessagingEventPub
+from messaging_event_utils import MessagingEventPub
 from random import choice
 from time import sleep
 

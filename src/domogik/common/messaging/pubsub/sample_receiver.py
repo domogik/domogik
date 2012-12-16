@@ -5,7 +5,7 @@
 
 import json
 import sys
-from messaging_event import MessagingEventSub
+from messaging_event_utils import MessagingEventSub
 
 def main(category_filter, action_filter):
     print("PUB-SUB receiver")
