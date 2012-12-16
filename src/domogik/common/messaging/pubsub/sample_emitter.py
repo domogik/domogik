@@ -53,5 +53,6 @@ while True:
     action = choice(categories[category]['action'])
     j_content = json.dumps(choice(categories[category]['content']))
     pub_event.send_event(category, action, j_content)
+    print("Message sent : %s - %s - %s"  % (category, action, j_content))
     sleep(2)
 
