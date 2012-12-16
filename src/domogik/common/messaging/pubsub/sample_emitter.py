@@ -12,15 +12,15 @@ print("PUB-SUB emitter sample")
 
 categories = {
     'package' : {
-                    'action' : ['installed', 'uninstalled'], 
+                    'event' : ['installed', 'uninstalled'], 
                     'content': ['package1', 'package2']
     },
     'plugin' : {
-                    'action' : ['enabled', 'disabled'],
+                    'event' : ['enabled', 'disabled'],
                     'content' : ['teleinfo', 'zwave', 'x10', 'plcbus']
     },
     'device' : {
-                    'action' : ['send_value'],
+                    'event' : ['send_value'],
                     'content' : [
                                     {
                                         'source': 'rfxcom', 
@@ -32,7 +32,7 @@ categories = {
                     ]
     },
     'database' : {
-                    'action' : ['insert'],
+                    'event' : ['insert'],
                     'content' : [
                                     {
                                         'source': 'core_device', 
@@ -49,10 +49,11 @@ content = ["Domogik is really cool", "I like Domoweb", "Domogik is magic"]
 pub_event = MessagingEventPub('sample_emitter')
 
 while True:
-    category = choice(categories.keys())
-    action = choice(categories[category]['action'])
-    j_content = json.dumps(choice(categories[category]['content']))
-    pub_event.send_event(category, action, j_content)
-    print("Message sent : %s - %s - %s"  % (category, action, j_content))
+    category1 = choice(categories.keys()) 
+    category2 = choice(categories[category1]['event'])
+    category = "%s.%s" % (category1, category2)
+    j_content = json.dumps(choice(categories[category1]['content']))
+    pub_event.send_event(category, j_content)
+    print("Message sent : %s - %s"  % (category, j_content))
     sleep(2)
 

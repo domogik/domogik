@@ -61,30 +61,28 @@ class MessagingEventPub(MessagingEvent):
         # but is not reliable as it depends on machine/network latency
         sleep(1)
     
-    def send_event(self, category, action, content):
-        """Send an event in JSON format with two keys : 'id' and 'content'
+    def send_event(self, category, content):
+        """Send an event in in multi-part : first message id and then its content
 
         @param category : category of the message
-        @param action : action corresponding to the message
         @param content : content of the message : must be in JSON format
 
         """
-        msg_id = "%s.%s.%s.%s" %(category, action, str(time()).replace('.','_'), MSG_VERSION)
-        msg = json.dumps({'id': msg_id, 'content': content})
-        self.s_send.send(msg)
-        self.log.debug("%s : %s" % (self.caller_id, msg))
+        msg_id = "%s.%s.%s" %(category, str(time()).replace('.','_'), MSG_VERSION)
+        #msg = json.dumps({'id': msg_id, 'content': content})
+        self.s_send.send(msg_id, zmq.SNDMORE)
+        self.s_send.send(content)
+        self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
 
 class MessagingEventSub(MessagingEvent):
-    def __init__(self, caller_id, category_filter=None, action_filter=None):
+    def __init__(self, caller_id, category_filter=None):
         MessagingEvent.__init__(self, caller_id)
         self.log = logger.Logger('messaging_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
         self.s_recv.connect("tcp://localhost:%s" % self.cfg_messaging['event_sub_port'])
         topic_filter = ''
-        if category_filter is not None and len(str(category_filter)) > 0:
+        if category_filter is not None:
             topic_filter = category_filter
-            if action_filter is not None and len(str(action_filter)) > 0:
-                topic_filter += "." + action_filter
         self.log.debug("%s : topic filter : %s" % (self.caller_id, topic_filter))
         self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
@@ -94,6 +92,13 @@ class MessagingEventSub(MessagingEvent):
         @return : event message in JSON format with two keys : 'id' and 'content'
 
         """
-        event = self.s_recv.recv()
-        self.log.debug("%s : %s" % (self.caller_id, event))
-        return event
+        #event = self.s_recv.recv()
+        msg_id = self.s_recv.recv()
+        more = self.s_recv.getsockopt(zmq.RCVMORE)
+        if more:
+            msg_content = self.s_recv.recv(zmq.RCVMORE)
+            self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, msg_content))
+            return msg_content
+        else:
+            self.log.error("Message not complete (content is missing)!")
+            return None
