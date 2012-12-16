@@ -89,7 +89,7 @@ class MessagingEventSub(MessagingEvent):
     def wait_for_event(self):
         """Receive an event
 
-        @return : event message in JSON format with two keys : 'id' and 'content'
+        @return : a dict with two keys : id and content (which should be in JSON format)
 
         """
         #event = self.s_recv.recv()
@@ -98,7 +98,7 @@ class MessagingEventSub(MessagingEvent):
         if more:
             msg_content = self.s_recv.recv(zmq.RCVMORE)
             self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, msg_content))
-            return msg_content
+            return {'id': msg_id, 'content': msg_content}
         else:
             self.log.error("Message not complete (content is missing)!")
             return None
