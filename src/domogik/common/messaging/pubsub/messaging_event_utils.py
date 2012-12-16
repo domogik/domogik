@@ -22,6 +22,9 @@ class MessagingEventPub(MessagingEvent):
         self.log = logger.Logger('mq_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
         self.s_send.connect(PORT_PUB)
+        # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
+        # but is not reliable as it depends on machine/network latency
+        sleep(1)
     
     def send_event(self, category, action, content):
         """Send an event in JSON format with two keys : 'id' and 'content'
