@@ -9,7 +9,7 @@ from messaging_event_utils import MessagingEventSub
 
 def main(category_filter, action_filter):
     print("PUB-SUB receiver")
-    sub_event = MessagingEventSub(category_filter, action_filter)
+    sub_event = MessagingEventSub('sample_receiver', category_filter, action_filter)
 
     while True:
         msg = json.loads(sub_event.wait_for_event())

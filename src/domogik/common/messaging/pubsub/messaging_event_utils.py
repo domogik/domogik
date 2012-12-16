@@ -12,14 +12,17 @@ from domogik.common.configloader import Loader
 MSG_VERSION = "0_1"
 
 class MessagingEvent:
-    def __init__(self):
+    def __init__(self, caller_id):
+        if caller_id is None:
+            raise Exception("Caller id can't be empty!")
+        self.caller_id = caller_id
         self.context = zmq.Context()
         cfg = Loader('messaging').load()
         self.cfg_messaging = dict(cfg[1])
 
 class MessagingEventPub(MessagingEvent):
-    def __init__(self):
-        MessagingEvent.__init__(self)
+    def __init__(self, caller_id):
+        MessagingEvent.__init__(self, caller_id)
         self.log = logger.Logger('messaging_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
         self.s_send.connect("tcp://localhost:%s" % self.cfg_messaging['event_pub_port'])
@@ -38,11 +41,11 @@ class MessagingEventPub(MessagingEvent):
         msg_id = "%s.%s.%s.%s" %(category, action, str(time()).replace('.','_'), MSG_VERSION)
         msg = json.dumps({'id': msg_id, 'content': content})
         self.s_send.send(msg)
-        self.log.debug("Message sent : %s" % msg)
+        self.log.debug("%s : %s" % (self.caller_id, msg))
 
 class MessagingEventSub(MessagingEvent):
-    def __init__(self, category_filter=None, action_filter=None):
-        MessagingEvent.__init__(self)
+    def __init__(self, caller_id, category_filter=None, action_filter=None):
+        MessagingEvent.__init__(self, caller_id)
         self.log = logger.Logger('messaging_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
         self.s_recv.connect("tcp://localhost:%s" % self.cfg_messaging['event_sub_port'])
@@ -51,7 +54,7 @@ class MessagingEventSub(MessagingEvent):
             topic_filter = category_filter
             if action_filter is not None and len(str(action_filter)) > 0:
                 topic_filter += "." + action_filter
-        self.log.debug("Topic filter : %s" % topic_filter)
+        self.log.debug("%s : topic filter : %s" % (self.caller_id, topic_filter))
         self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
     def wait_for_event(self):
@@ -61,5 +64,5 @@ class MessagingEventSub(MessagingEvent):
 
         """
         event = self.s_recv.recv()
-        self.log.debug("Message received %s" %event)
+        self.log.debug("%s : %s" % (self.caller_id, event))
         return event

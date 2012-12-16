@@ -46,7 +46,7 @@ categories = {
 
 content = ["Domogik is really cool", "I like Domoweb", "Domogik is magic"]
 
-pub_event = MessagingEventPub()
+pub_event = MessagingEventPub('sample_emitter')
 
 while True:
     category = choice(categories.keys())
