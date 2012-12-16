@@ -5,7 +5,9 @@
 Possible values for filter :
 package
 plugin
-package installed
-plugin enabled
+database
+package.installed
+plugin.enabled
+database.insert
 ...
 (See sample_emitter.py)
