@@ -60,7 +60,11 @@ class MessagingEventPub(MessagingEvent):
         # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
         # but is not reliable as it depends on machine/network latency
         sleep(1)
-    
+
+    def __del__(self):
+        # Not sure this is really mandatory
+        self.s_send.close()
+
     def send_event(self, category, content):
         """Send an event in in multi-part : first message id and then its content
 
@@ -86,13 +90,16 @@ class MessagingEventSub(MessagingEvent):
         self.log.debug("%s : topic filter : %s" % (self.caller_id, topic_filter))
         self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
     
+    def __del__(self):
+        # Not sure this is really mandatory
+        self.s_recv.close()
+    
     def wait_for_event(self):
         """Receive an event
 
         @return : a dict with two keys : id and content (which should be in JSON format)
 
         """
-        #event = self.s_recv.recv()
         msg_id = self.s_recv.recv()
         more = self.s_recv.getsockopt(zmq.RCVMORE)
         if more:
