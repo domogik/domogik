@@ -238,10 +238,12 @@ class OZWavemanager(threading.Thread):
     # notification implémentés
 #         ValueAdded = 0                    / A new node value has been added to OpenZWave's list. These notifications occur after a node has been discovered, and details of its command classes have been received.  Each command class may generate one or more values depending on the complexity of the item being represented.
 #         ValueChanged = 2                  / A node value has been updated from the Z-Wave network and it is different from the previous value.
+#         Group = 4                         / The associations for the node have changed. The application should rebuild any group information it holds about the node.
 #         NodeNew = 5                       / A new node has been found (not already stored in zwcfg*.xml file)
 #         NodeAdded = 6                     / A new node has been added to OpenZWave's list.  This may be due to a device being added to the Z-Wave network, or because the application is initializing itself.
 #         NodeEvent = 10                    / A node has triggered an event.  This is commonly caused when a node sends a Basic_Set command to the controller.  The event value is stored in the notification.
 #         DriverReady = 18                  / A driver for a PC Z-Wave controller has been added and is ready to use.  The notification will contain the controller's Home ID, which is needed to call most of the Manager methods.
+#         EssentialNodeQueriesComplete = 22 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
 #         NodeQueriesComplete = 23          / All the initialisation queries on a node have been completed.
 #         AwakeNodesQueried = 24            / All awake nodes have been queried, so client application can expected complete data for these nodes.
 #         AllNodesQueried = 25              / All nodes have been queried, so client application can expected complete data.
@@ -249,7 +251,6 @@ class OZWavemanager(threading.Thread):
 #TODO: notification à implémenter
 #         ValueRemoved = 1                  / A node value has been removed from OpenZWave's list.  This only occurs when a node is removed.
 #         ValueRefreshed = 3                / A node value has been updated from the Z-Wave network.
-#         Group = 4                         / The associations for the node have changed. The application should rebuild any group information it holds about the node.
 #         NodeRemoved = 7                   / A node has been removed from OpenZWave's list.  This may be due to a device being removed from the Z-Wave network, or because the application is closing.
 #         NodeProtocolInfo = 8              / Basic node information has been receievd, such as whether the node is a listening device, a routing device and its baud rate and basic, generic and specific types. It is after this notification that you can call Manager::GetNodeType to obtain a label containing the device description.
 #         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
@@ -263,16 +264,13 @@ class OZWavemanager(threading.Thread):
 #         DriverFailed = 19                 / Driver failed to load
 #         DriverReset = 20                  / All nodes and values for this driver have been removed.  This is sent instead of potentially hundreds of individual node and value notifications.
 #         MsgComplete = 21                  / The last message that was sent is now complete.
-#         EssentialNodeQueriesComplete = 22 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
 #         Error = 26                        / An error has occured that we need to report.
 
         print('\n%s\n[%s]:' % ('-'*20, args['notificationType']))
         print args
         notifyType = args['notificationType']
         if notifyType == 'DriverReady':
-            self._handleDriverReady(args)
-  #      if notifyType == 'NodeProtocolInfo':
-  #          self._handleDriverReady(args)           
+            self._handleDriverReady(args)          
         elif notifyType in ('NodeAdded', 'NodeNew'):
             self._handleNodeChanged(args)
         elif notifyType == 'ValueAdded':
@@ -287,6 +285,8 @@ class OZWavemanager(threading.Thread):
             self._handleNodeQueryComplete(args)
         elif notifyType in ('AwakeNodesQueried', 'AllNodesQueried'):
             self._handleInitializationComplete(args)
+        elif notifyType == 'EssentialNodeQueriesComplete':
+            self._handleNodeReadyToMsg(args)
 
         else : 
             self._log.info("zwave callback : %s is not handled yet",  notifyType)
@@ -308,25 +308,45 @@ class OZWavemanager(threading.Thread):
     def _handleNodeQueryComplete(self, args):
         """Les requettes d'initialisation du node sont complété."""
         node = self._getNode(self._homeId, args['nodeId'])
-        node.updateNode()
-        self._controller = self._getNode(self._homeId, self._ctrlnodeId )
-        self._log.info('Z-Wave Device Node {0} is ready.'.format(node.id))
+        if node :
+            node.updateNode()
+            self._log.info('Z-Wave Device Node {0} is ready.'.format(node.id))
+        else :
+            if args['nodeId']== 255 and not self._ready :
+                self._handleInitializationComplete(args) # TODO :depuis la rev 585 pas de 'AwakeNodesQueried' ou  'AllNodesQueried' ? on force l'init
+        
+    def _handleNodeReadyToMsg(self, args):
+        """Les requettes essentielles d'initialisation du node sont complétée il peu recevoir des msg."""
+        node = self._getNode(self._homeId, args['nodeId'])
+        if node :
+         #   node.updateNode()
+            self._log.info('Z-Wave Device Node {0} status essential queries ok.'.format(node.id))        
+        
 
     def _getNode(self, homeId, nodeId):
         """ Renvoi l'objet node correspondant"""
-        return self._nodes[nodeId] if self._nodes.has_key(nodeId) else None
+        if self._nodes.has_key(nodeId) :
+            return self._nodes[nodeId] 
+        else :
+            print "Z-Wave Device Node {0} isn't register to manager.".format(nodeId)
+            self._log.debug("Z-Wave Device Node {0} isn't register to manager.".format(nodeId))        
+            return None
         
     def _fetchNode(self, homeId, nodeId):
         """ Renvoi et construit un nouveau node s'il n'existe pas et l'enregistre dans le dict """
         retval = self._getNode(homeId, nodeId)
         if retval is None:
             retval = ZWaveNode(self,  homeId, nodeId)
+            print ('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
             self._log.debug('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
             self._nodes[nodeId] = retval
+            if not self._controller : 
+                print("It's the controler node (affected to it)")
+                self._controller = retval
         return retval
 
     def _handleNodeChanged(self, args):
-        """Un node est ajouté ou nouveau"""
+        """Un node est ajouté à changé"""
         node = self._fetchNode(args['homeId'], args['nodeId'])
         node._lastUpdate = time.time()
         self._log.info ('Node %d as add (homeId %.8x)' , args['nodeId'],  args['homeId'])
@@ -367,9 +387,9 @@ class OZWavemanager(threading.Thread):
         """Un node à envoyé une Basic_Set command  au controlleur.  
         Cette notification est générée par certains capteur,  comme les decteurs de mouvement type PIR, pour indiquer qu'un événements a été détecter.
         Elle est aussi envoyée dans le cas d'une commande locale d'un device. """
-        CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
-                                             'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
-                                            'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
+  #     CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
+  #                                           'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
+  #                                           'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
         sendxPL = False
         homeId = args['homeId']
         activeNodeId= args['nodeId']

@@ -298,7 +298,7 @@ class Mscene():
        if self.initstat != '1':
           for action in actions:
              if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
-                subp = subprocess.Popen(self.gaction_true['value'], shell=True) 
+                subp = subprocess.Popen(actions[action]['value'], shell=True)
              if actions[action]['techno'] == 'send-xpl':
                 self.send_action_xpl(actions[action])
              if actions[action]['techno'] != 'command' and actions[action]['techno'] != 'send-xpl':

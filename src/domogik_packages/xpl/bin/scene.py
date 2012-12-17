@@ -138,9 +138,9 @@ class SceneManager(XplPlugin):
           else:
              msg.set_type('xpl-stat')   
           if message.data['command'] == "fake-true":
-              msg.add_data({'stats': 'True'})
+              msg.add_data({'stats': 'true'})
           if message.data['command'] == "fake-false":
-              msg.add_data({'stats': 'False'})
+              msg.add_data({'stats': 'false'})
           msg.add_data({'number': message.data['number']})
          
           self.myxpl.send(msg)

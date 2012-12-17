@@ -4,14 +4,17 @@ Plugin documentation
 
 Purpose
 =======
+
 The purpose of this plugin is to detect your phone over bluetooth.
 
 Dependencies
 ============
+
 pybluez (>=0.18)
 
 Plugin configuration
 ====================
+
 Configuration
 -------------
 In Domogik administration, go to the bluez configuration page:
@@ -26,9 +29,19 @@ In Domogik administration, go to the bluez configuration page:
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | error-delay   | 120           | The delay (in seconds) to wait if a problem with the bluetooth adaptator occurs.                    |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay-sensor  | 300           | The delay in seconds between two status messages. 0 to disable.                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay-stat    | 2             | The delay in seconds between 2 stat's messages when sending sensors status.                         |
+|               |               | If you have a slow machine, update this value.                                                      |
+|               |               | Keep in mind that the next timer will be added after all stats messages have ben sent.              |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| hysteresis    | 3             | The number of negative scans before sending a low trig.                                             |
+|               |               | You can update this value if your phone is sometimes out of range of the bluetooth adaptater.       |
+|               |               | You can set it to 0 if you want more reactivity.                                                    |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | listen-method | lookup        | The method to use to listen for devices (lookup, discovery) :                                       |
-|               |               |   A discovery scan takes approximatively 10 seconds. It only shows the "visible" phones.            |
-|               |               |   The lookup scan takes 3 seconds, it try to retrieve the name of your phone.                       |
+|               |               | - A discovery scan takes approximatively 10 seconds. It only shows the "visible" phones.            |
+|               |               | - The lookup scan takes 3 seconds, it try to retrieve the name of your phone.                       |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
 Now, you need to add the phones you want to monitor :
@@ -39,6 +52,7 @@ Now, you need to add the phones you want to monitor :
 | bt-name       |               | The name of the phone in Domogik (not the bluetooth name).                                          |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | bt-addr       |               | The bluetooth address of the phone you want to monitor.                                             |
+|               |               | You can use "hcitool scan" to find it.                                                              |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
 Creating devices for bluez

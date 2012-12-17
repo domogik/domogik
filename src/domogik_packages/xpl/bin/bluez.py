@@ -68,6 +68,8 @@ class Bluez(XplPlugin):
         Listener(self.basic_cmnd_cb, self.myxpl,
                  {'schema': 'bluez.basic', 'xpltype': 'xpl-cmnd'})
 
+        self.add_stop_cb(self._bluez.stop_all)
+
         #self.enable_helper()
         self.enable_hbeat()
         self._bluez.start_adaptator()

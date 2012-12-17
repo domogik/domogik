@@ -233,7 +233,10 @@ class ZWaveValueNode:
                 sendxPL = True
                 msgtrig['schema'] ='sensor.basic'
                 msgtrig ['genre'] = 'sensor'
-                msgtrig ['value'] = self.valueData['value']
+                if type(self.valueData['value']) ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
+                    msgtrig['value'] = round(self.valueData['value'],2)
+                else:
+                    msgtrig ['value'] = self.valueData['value']
                 msgtrig ['type'] = self.valueData['label'].lower()
                 msgtrig ['units']= self.valueData['units']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_BATTERY' :
@@ -242,6 +245,17 @@ class ZWaveValueNode:
                 msgtrig ['genre'] = 'sensor'
                 msgtrig ['value'] = self.valueData['value']
                 msgtrig ['units']= self.valueData['units']
+        elif self.valueData['commandClass'] == 'COMMAND_CLASS_METER' :
+                sendxPL = True
+                msgtrig['schema'] ='sensor.basic'
+                msgtrig ['genre'] = 'sensor'
+                msgtrig ['type'] = self.valueData['label'].lower()
+                if type(self.valueData['value']) ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
+                    msgtrig['value'] = round(self.valueData['value'],2)
+                else:
+                    msgtrig ['value'] = self.valueData['value']
+                msgtrig ['units']= self.valueData['units']
+                
         if sendxPL :
             return msgtrig
         else : return None

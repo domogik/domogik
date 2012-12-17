@@ -79,7 +79,28 @@
             "optionnal": "no",
             "options": [],
             "type": "int"
+        },
+        {
+            "default": "True",
+            "description": "Load the dawndusk extensions.",
+            "id": "8",
+            "interface": "no",
+            "key": "load-dawndusk",
+            "optionnal": "no",
+            "options": [],
+            "type": "boolean"
+        },
+        {
+            "default": "True",
+            "description": "Load the moon phases extensions.",
+            "id": "9",
+            "interface": "no",
+            "key": "load-moonphases",
+            "optionnal": "no",
+            "options": [],
+            "type": "boolean"
         }
+
     ],
     "device_feature_models": [],
     "device_types": [],

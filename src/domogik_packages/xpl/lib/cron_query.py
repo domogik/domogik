@@ -40,8 +40,9 @@ import datetime
 from threading import Event
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.common.configloader import Loader
 import traceback
-
+import logging
 
 def date_to_xpl(sdate):
     """
@@ -69,7 +70,7 @@ class CronQuery():
     '''
     Query throw xPL network to get a config item
     '''
-    def __init__(self, xpl, log):
+    def __init__(self, xpl, log = None):
         '''
         Init the query system and connect it to xPL network
         :param xpl: the XplManager instance (usually self.myxpl)
@@ -77,12 +78,29 @@ class CronQuery():
         '''
         self.log = log
         self.__myxpl = xpl
-        self.log.debug("Init config query instance")
+        if self.log != None : self.log.debug("Init config query instance")
         self._keys = {}
         self._listens = {}
         self._result = None
         self.parameters = ["parameter0", "parameter1"]
         self.values = ["valueon", "valueoff"]
+        # Check in config file is target is forced
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+        if conf.has_key('query_xpl_timeout'):
+            try:
+                self.query_timeout = int(conf["query_xpl_timeout"])
+                msg = "Set query timeout to '%s' from domogik.cfg" % self.query_timeout
+                if self.log != None : self.log.debug(msg)
+            except ValueError:
+                #There is an error in domogik.cfg. Set it to default.
+                self.query_timeout = 10
+                msg = "Error in domogik.cfg. query_xpl_timeout ('%s') is not an integer." % conf["query_xpl_timeout"]
+                if self.log != None : self.log.error(msg)
+        else:
+            #There is not option in domogik.cfg. Set it to default.
+            self.query_timeout = 10
 
     def query(self, device, configmess, extkey=None):
         '''
@@ -103,9 +121,9 @@ class CronQuery():
         self.__myxpl.send(configmess)
         if 'device' in self._keys:
             try:
-                self._keys['device'].wait(10)
+                self._keys['device'].wait(self.query_timeout)
                 if not self._keys['device'].is_set():
-                    self.log.error("No answer received for device=%s" % (device))
+                    if self.log != None : self.log.error("No answer received for device=%s" % (device))
                     raise RuntimeError("No answer received for device=%s," % (device) +
                         "check your cron xpl setup")
             except KeyError:
@@ -121,9 +139,9 @@ class CronQuery():
                     return False
             return True
         else:
-            self.log.debug("Error %s when communicating device=%s" % \
+            if self.log != None : self.log.debug("Error %s when communicating device=%s" % \
                 (self._result['errorcode'], device))
-            self.log.debug("%s : %s" % \
+            if self.log != None : self.log.debug("%s : %s" % \
                 (self._result['errorcode'], self._result['error']))
             return False
 
@@ -140,7 +158,7 @@ class CronQuery():
         #print("result=%s"%result)
         for resp in self._keys:
             if resp in result:
-                self.log.debug("Timer value received : device=%s" % (device))
+                if self.log != None : self.log.debug("Timer value received : device=%s" % (device))
                 res = self._keys.pop(resp)
                 self._listens[resp].unregister()
                 del self._listens[resp]
@@ -184,7 +202,7 @@ class CronQuery():
             res = self.query(device, configmess)
             return res
         except:
-            self.log.debug("cron_query : %s" % (traceback.format_exc()))
+            if self.log != None : self.log.debug("cron_query : %s" % (traceback.format_exc()))
             return False
 
     def start_timer_job(self, device, nstmess, frequence, duration=0):
@@ -527,7 +545,7 @@ class CronQuery():
             res = self.query(device, configmess, extkey=extkey)
             return res
         except:
-            self.log.error("cron_query : %s" % (traceback.format_exc()))
+            if self.log != None : self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
     def resume_job(self, device, extkey="state"):
@@ -551,7 +569,7 @@ class CronQuery():
             res = self.query(device, configmess, extkey=extkey)
             return res
         except:
-            self.log.error("cron_query : %s" % (traceback.format_exc()))
+            if self.log != None : self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
     def halt_job(self, device, extkey="state"):
@@ -576,7 +594,7 @@ class CronQuery():
             #print res
             return res
         except:
-            self.log.error("cron_query : %s" % (traceback.format_exc()))
+            if self.log != None : self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
     def status_job(self, device, extkey="state"):
@@ -600,7 +618,7 @@ class CronQuery():
             res = self.query(device, configmess, extkey=extkey)
             return res
         except:
-            self.log.error("cron_query : %s" % (traceback.format_exc()))
+            if self.log != None : self.log.error("cron_query : %s" % (traceback.format_exc()))
             return False
 
     def is_running_server(self):

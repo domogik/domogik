@@ -68,7 +68,15 @@ class EarthEvents():
         self.device_types = dict()
         self.device_status = dict()
         self.params = dict()
+        self._dawndusk = None
+        self._moonphases = None
 
+    def ext_dawndusk(self):
+        '''
+        Load the dawndusk extension. Must be called before loading jobs.
+
+        '''
+        self._api.log.info("Load DawnDusk extensions.")
         self._dawndusk = DawnDusk(self)
         self.register_type ("dawn", self._dawndusk.get_next_dawn)
         self.register_type ("dusk", self._dawndusk.get_next_dusk)
@@ -76,6 +84,12 @@ class EarthEvents():
         self.register_status (["dawn", "dusk"], "dawndusk", self._dawndusk.check_dawndusk)
         self.register_parameter ("dawndusk", True, self._dawndusk.check_param)
 
+    def ext_moonphases(self):
+        '''
+        Load the moon phases extension. Must be called before loading jobs.
+
+        '''
+        self._api.log.info("Load MoonPhases extensions.")
         self._moonphases = MoonPhases(self)
         self.register_type ("fullmoon", self._moonphases.get_next_full_moon)
         self.register_type ("newmoon", self._moonphases.get_next_new_moon)
@@ -411,6 +425,8 @@ class EarthEvents():
         """
         if self.get_event(event, delay) != None:
             return ERROR_EVENT_EXIST
+        if event not in self.device_types:
+            return ERROR_TYPE_NOT_EXIST
         if event not in self.data:
             self.data[event] = {}
         if delay == None:
@@ -674,6 +690,22 @@ class EarthAPI:
             error = "Can't get configuration from XPL : %s" %  (traceback.format_exc())
             self.log.error("__init__ : " + error)
             self.log.error("Continue with default values.")
+
+        load_dawndusk = False
+        load_moonphases = False
+        try:
+            if self.config.query('earth', 'load-dawndusk') == "True" :
+                load_dawndusk = True
+            if self.config.query('earth', 'load-moonphases') == "True" :
+                load_moonphases = True
+        except:
+            load_dawndusk = True
+            load_moonphases = True
+            error = "Can't get configuration from XPL : %s" %  (traceback.format_exc())
+            self.log.error("__init__ : " + error)
+            self.log.error("Continue with default values.")
+        if load_moonphases == False :
+            load_dawndusk = True
         self._events_lock = threading.Semaphore()
         self.mycity = ephem.Observer()
         self.mycity.lat, self.mycity.lon = latitude, longitude
@@ -682,6 +714,10 @@ class EarthAPI:
         try :
             self._events_lock.acquire()
             self.events = EarthEvents(self)
+            if load_dawndusk:
+                self.events.ext_dawndusk()
+            if load_moonphases:
+                self.events.ext_moonphases()
             self.events.load_store()
         finally :
             self._events_lock.release()
@@ -794,20 +830,12 @@ class EarthAPI:
                 delay = "0"
                 if 'delay' in message.data:
                     delay = message.data['delay']
-                if event != None:
-                    self._send_event_info(myxpl, event, delay)
-                else:
-                    self.log.debug("command_listener : No event found in message.")
-                    return
+                self._send_event_info(myxpl, event, delay)
             elif command == "status" :
                 status = None
                 if 'query' in message.data:
                     status = message.data['query']
-                if status != None:
-                    self._send_event_status(myxpl, status)
-                else:
-                    self.log.debug("command_listener : No status found in message.")
-                    return
+                self._send_event_status(myxpl, status)
             elif command == "set" or command == "get":
                 param = None
                 if 'param' in message.data:
@@ -818,10 +846,7 @@ class EarthAPI:
                         if 'value' in message.data:
                             value = message.data['value']
                         self.events.set_param(param, value)
-                    self._send_event_parameter(myxpl, param)
-                else:
-                    self.log.debug("command_listener : No param found in message.")
-                    return
+                self._send_event_parameter(myxpl, param)
             else :
                 self.log.debug("command_listener : command %s not found." % command)
             self.log.debug("command_listener : Done :)")
@@ -999,7 +1024,10 @@ class EarthAPI:
         mess.add_data({"type" : etype})
         mess.add_data({"delay" : delay})
         event = self.events.get_event(etype, delay)
-        if event != None:
+        if etype not in self.events.device_types:
+            mess.add_data({"errorcode" : ERROR_TYPE_NOT_EXIST})
+            mess.add_data({"error" : EARTHERRORS[ERROR_TYPE_NOT_EXIST]})
+        elif event != None:
             if "args" in event :
                 mess.add_data({"args" : event['args']})
             mess.add_data({"current" : event['current']})
@@ -1035,15 +1063,17 @@ class EarthAPI:
 
         """
         self.log.debug("_send_event_status : Start ...")
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("earth.basic")
+        mess.add_data({"type" : status})
         if status in self.events.get_list_status():
-            mess = XplMessage()
-            mess.set_type("xpl-trig")
-            mess.set_schema("earth.basic")
-            mess.add_data({"type" : status})
             mess.add_data({"status" :  self.events.device_status[status]["value"]})
-            myxpl.send(mess)
         else :
-            self.log.debug("_send_event_status : Nothing to do.")
+            mess.add_data({"errorcode" : ERROR_STATUS_NOT_EXIST})
+            mess.add_data({"error" : EARTHERRORS[ERROR_STATUS_NOT_EXIST]})
+        myxpl.send(mess)
+        self.log.debug("_send_event_status : Done.")
 
     def _send_event_parameter(self, myxpl, param):
         """
@@ -1062,16 +1092,17 @@ class EarthAPI:
 
         """
         self.log.debug("_send_event_parameter : Start ...")
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("earth.basic")
+        mess.add_data({"param" : param})
         if param in self.events.get_list_params():
-            mess = XplMessage()
-            mess.set_type("xpl-trig")
-            mess.set_schema("earth.basic")
-            mess.add_data({"param" : param})
             mess.add_data({"value" : self.events.params[param]["value"]})
-            myxpl.send(mess)
-            self.log.debug("_send_event_parameter : Done :)")
         else :
-            self.log.debug("_send_event_parameter : Nothing to do.")
+            mess.add_data({"errorcode" : ERROR_PARAMETER_NOT_EXIST})
+            mess.add_data({"error" : EARTHERRORS[ERROR_PARAMETER_NOT_EXIST]})
+        myxpl.send(mess)
+        self.log.debug("_send_event_parameter : Done :)")
 
     def _send_memory(self, myxpl):
         """
@@ -1092,9 +1123,9 @@ class EarthAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("earth.basic")
-        mess.add_data({"memory" : asizeof(self)})
-        mess.add_data({"events" : "%s (%s)" % (asizeof(self.events.data),self.events.count_events())})
-        mess.add_data({"store" : "%s" % (asizeof(self.events.store))})
+        mess.add_data({"memory" : "%s kbytes" % (asizeof(self)/1024)})
+        mess.add_data({"events" : "%s kbytes(%s)" % (asizeof(self.events.data)/1024,self.events.count_events())})
+        mess.add_data({"store" : "%s kbytes" % (asizeof(self.events.store)/1024)})
         mess.add_data({"datafiles" : "%s" % (self.events.store.count_files())})
         myxpl.send(mess)
         self.log.debug("_send_memory : Done :)")
@@ -1420,6 +1451,3 @@ class MoonPhases():
             self._events.set_status("moonphase", etype)
             return True
         return False
-
-
-

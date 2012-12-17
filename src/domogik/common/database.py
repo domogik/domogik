@@ -123,8 +123,7 @@ class DbHelper():
         @param use_test_db : if True use a test database (optional, default False)
         @param engine : an existing engine, if not provided, a new one will be created
         """
-        l = logger.Logger('db_api')
-        self.log = l.get_logger('db_api')
+        self.log = logger.Logger('db_api').get_logger()
         
         cfg = Loader('database')
         config = cfg.load()

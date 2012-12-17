@@ -19,20 +19,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Plugin purpose
-==============
+Purpose
+=======
 
-Send xPL message from the shell
+Regression tests for the earth plugin.
 
-Implements
-==========
+Usage
+=====
 
-- Sender.__init__(self, schema=None, message=None)
-- Sender.parse_parameters(self)
-- Sender.forge_message(self)
-- Sender.usage(self)
+Start plugin and run the tests
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
+@author: bibi21000 <sgallet@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -937,7 +934,7 @@ if __name__ == '__main__':
 
     count_files = 0
 
-    sendplugin = XplPlugin(name = 'testsend', daemonize = False, \
+    sendplugin = XplPlugin(name = 'eartht', daemonize = False, \
             parser = None, nohub = True)
 
     #unittest.main()
