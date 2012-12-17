@@ -233,7 +233,7 @@ class ZWaveValueNode:
                 sendxPL = True
                 msgtrig['schema'] ='sensor.basic'
                 msgtrig ['genre'] = 'sensor'
-                if type(self.valueData['value']) ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
+                if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
                     msgtrig['value'] = round(self.valueData['value'],2)
                 else:
                     msgtrig ['value'] = self.valueData['value']
@@ -250,7 +250,7 @@ class ZWaveValueNode:
                 msgtrig['schema'] ='sensor.basic'
                 msgtrig ['genre'] = 'sensor'
                 msgtrig ['type'] = self.valueData['label'].lower()
-                if type(self.valueData['value']) ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
+                if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
                     msgtrig['value'] = round(self.valueData['value'],2)
                 else:
                     msgtrig ['value'] = self.valueData['value']

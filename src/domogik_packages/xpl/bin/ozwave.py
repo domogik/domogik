@@ -124,7 +124,7 @@ class OZwave(XplPlugin):
         for k in ddict :   # TODO: pour passer les 1452 chars dans RINOR, à supprimer quand MQ OK, 
             if len(str(ddict[k])) >1400 : 
                 ddict[k]=ddict[k][:1400]
-                print("value raccourccie : ", k, ddict[k])
+                print("value raccourccis : ", k, ddict[k])
                 self.log.debug ("Format data to UI : value to large, cut to 1400, key : %s, value : %s" % (str(k), str(ddict[k])))
         return str(ddict).replace('{', '&ouvr;').replace('}', '&ferm;').replace('"','&quot;').replace("'",'&quot;').replace('False', 'false').replace('True', 'true').replace('None', '""')
         
