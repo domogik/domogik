@@ -294,6 +294,9 @@ class UIHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         elif path == "/dimmer":
             self.server.handler_params[0].send_lighting_device('demo_dimmer', 'goto', args['level'])
             self._send_http_response(200)
+        elif path == "/caller_id":
+            self.server.handler_params[0].send_cid_basic('demo_cid', 'inbound', args['phone'])
+            self._send_http_response(200)
         else:
             self._send_http_response(404)
 

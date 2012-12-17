@@ -154,6 +154,24 @@
                 });
             }
         });
+
+        /* Caller id */
+        $('#caller_id_call').button();
+        $('#caller_id_call').click(function(event) {
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: './caller_id',
+                data: 'phone='+$('#caller_id').val(),
+                success: function(msg) {
+                    $("#container").notify("create", {
+                        title: 'Caller id',
+                        text: 'Inbound call from : ' + $('#caller_id').val()
+                    });
+                }
+            });
+            event.stopPropagation();
+        });
     });         
     </script>
   </head>                                                                 
@@ -201,6 +219,14 @@
         Set the level : 
         <div id="dimmer_value"></div>
       </div>
+
+      <h2>Caller id (device : demo_cid)</h2>
+      <div>
+        Inbound number :
+        <input id="caller_id" type="text"/> 
+        <button id="caller_id_call"><span>call!</span></button>
+      </div>
+
     </div>
 
     <div id="container" style="display:none">

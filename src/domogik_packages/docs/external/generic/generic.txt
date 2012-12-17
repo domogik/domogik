@@ -483,3 +483,44 @@ The switch and dimmer features are related to the **lighting.basic** and ** lign
 
 For a **on** command, level=0. For a **off** command, level=100. For a dimmer command, level=1..99
 
+Caller id
+=========
+
+Features
+--------
+
+* number : get the phone number of an inbound call
+
+.. |demo_caller_id| image:: demo_caller_id.png
+    :width: 200px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |demo_caller_id|   | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The address of the device                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Generic.Caller id                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | An appropriate usage (telephony)                                                           |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+
+xPL message
+-----------
+
+The caller id feature is related to the **cid.basic** message: 
+
+* xpl-trig: ::
+
+    cid.basic
+    {
+    calltype=<INBOUND or OUTBOUND>
+    phone=<phone number>
+    }
+

@@ -210,6 +210,16 @@ class DemoDataManager(XplPlugin):
             msg.add_data({ 'fade-rate' : fade_rate })
         self.myxpl.send(msg)
 
+    # Caller id
+    def send_cid_basic(self, device, calltype, phone_number):
+        # Notice that device is not used in this xpl schema
+        print("cid.basic : calltype=%s, phone=%s" % (calltype, phone_number))
+        msg = XplMessage()
+        msg.set_type("xpl-trig")
+        msg.set_schema("cid.basic")
+        msg.add_data({ 'calltype' : calltype })
+        msg.add_data({ 'phone' : phone_number })
+        self.myxpl.send(msg)
 
     
 class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
