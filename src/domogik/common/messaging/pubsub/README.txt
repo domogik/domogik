@@ -5,16 +5,17 @@ event_sub_port = 40411
 
 - Run ./messaging_event_fwd.py
 
-- Run ./sample_receiver.py [filter]
+- Run ./sample_receiver.py [filter1] [filter2] ... [filterN]
 You can ran as many instances as you want.
 
 - Run ./sample_emitter.py
 
 Possible values for filter :
 
+database
 package
 plugin
-database
+package plugin # 2 filters
 package.installed
 plugin.enabled
 database.insert

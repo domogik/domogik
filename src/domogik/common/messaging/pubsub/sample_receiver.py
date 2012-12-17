@@ -7,17 +7,18 @@ import json
 import sys
 from messaging_event_utils import MessagingEventSub
 
-def main(category_filter):
+def main(*category_filters):
     print("PUB-SUB receiver")
-    sub_event = MessagingEventSub('sample_receiver', category_filter)
+    sub_event = MessagingEventSub('sample_receiver', *category_filters)
 
     while True:
         msg = sub_event.wait_for_event()
         print(msg)
 
 if __name__ == "__main__":
-    category_filter = None
+    category_filters = []
     if len(sys.argv) > 1:
-        category_filter = sys.argv[1]
-    main(category_filter)
+        # args are filters
+        category_filters = sys.argv[1:]
+    main(*category_filters)
 

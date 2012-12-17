@@ -80,18 +80,20 @@ class MessagingEventPub(MessagingEvent):
         self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
 
 class MessagingEventSub(MessagingEvent):
-    def __init__(self, caller_id, category_filter=None):
+    def __init__(self, caller_id, *category_filters):
         MessagingEvent.__init__(self, caller_id)
         self.log = logger.Logger('messaging_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
         sub_addr = "tcp://localhost:%s" % self.cfg_messaging['event_sub_port']
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
-        topic_filter = ''
-        if category_filter is not None:
-            topic_filter = category_filter
-        self.log.debug("%s : topic filter : %s" % (self.caller_id, topic_filter))
-        self.s_recv.setsockopt(zmq.SUBSCRIBE, topic_filter)
+
+        for category_filter in category_filters:
+            self.log.debug("%s : category filter : %s" % (self.caller_id, category_filter))
+            self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
+        if len(category_filters) == 0:
+            self.log.debug('No filter')
+            self.s_recv.setsockopt(zmq.SUBSCRIBE, '')
     
     def __del__(self):
         # Not sure this is really mandatory
