@@ -43,12 +43,13 @@ def main():
     
     try:
         context = zmq.Context(1)
+
         # Socket facing emitters
         frontend = context.socket(zmq.SUB)
         # Forwarder subscribes to the emitter *pub* port
         frontend.bind("tcp://*:%s" % cfg_messaging['event_pub_port'])
-        
-        frontend.setsockopt(zmq.SUBSCRIBE, "") # We want to get all messages from emitters
+        # We want to get all messages from emitters
+        frontend.setsockopt(zmq.SUBSCRIBE, "")
         
         # Socket facing receivers
         backend = context.socket(zmq.PUB)
