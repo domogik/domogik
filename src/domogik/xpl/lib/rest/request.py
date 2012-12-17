@@ -715,12 +715,12 @@ class ProcessRequest():
         # get the command
         cmd = self._db.get_command(self.get_parameters('id'))
         if cmd == None:
-            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
+            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd.id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
         if cmd.xpl_command is None:
-            json_data = JSonHelper("ERROR", 999, "Command (%s) has no associated xplcommand" % cmd_id)
+            json_data = JSonHelper("ERROR", 999, "Command (%s) has no associated xplcommand" % cmd.id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return

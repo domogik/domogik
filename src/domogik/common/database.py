@@ -1757,6 +1757,9 @@ class DbHelper():
     def get_all_sensor(self):
         return self.__session.query(Sensor).all()
 
+    def get_sensor_by_device_id(self, did):
+        return self.__session.query(Sensor).filter_by(device_id=did).all()
+
 ###################
 # command
 ###################
