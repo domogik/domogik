@@ -36,10 +36,12 @@ Implements
 
 import zmq
 from domogik.common.configloader import Loader
+from domogik.common import logger
 
 def main():
     cfg = Loader('messaging').load()
     cfg_messaging = dict(cfg[1])
+    log = logger.Logger('messaging_event_fwd').get_logger()
     
     try:
         context = zmq.Context(1)
@@ -47,20 +49,25 @@ def main():
         # Socket facing emitters
         frontend = context.socket(zmq.SUB)
         # Forwarder subscribes to the emitter *pub* port
-        frontend.bind("tcp://*:%s" % cfg_messaging['event_pub_port'])
+        sub_addr = "tcp://*:%s" % cfg_messaging['event_pub_port']
+        frontend.bind(sub_addr)
+        log.debug("Waiting for messages on %s" % sub_addr)
         # We want to get all messages from emitters
         frontend.setsockopt(zmq.SUBSCRIBE, "")
         
         # Socket facing receivers
         backend = context.socket(zmq.PUB)
         # Forwarder publishes to the receiver *sub* port
-        backend.bind("tcp://*:%s" % cfg_messaging['event_sub_port'])
+        pub_addr = "tcp://*:%s" % cfg_messaging['event_sub_port']
+        backend.bind(pub_addr)
+        log.debug("Sending messages to %s" % pub_addr)
         
-        print("Forwarding messages...")
+        log.debug("Forwarding messages...")
         zmq.device(zmq.FORWARDER, frontend, backend)
     except Exception, e:
-        print(e)
-        print("Bringing down ZMQ device")
+        log.error(e)
+        log.error("Bringing down ZMQ device")
+        raise Exception("Error with forwarder device")
     finally:
         pass
         frontend.close()
