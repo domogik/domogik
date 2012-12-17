@@ -19,7 +19,5 @@ if __name__ == "__main__":
     category_filter = None
     if len(sys.argv) > 1:
         category_filter = sys.argv[1]
-    if len(sys.argv) > 2:
-        action_filter = sys.argv[2]
     main(category_filter)
 
