@@ -79,7 +79,7 @@
             "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
             "return_confirmation": "0", 
             "stat_key": "imax", 
-            "value_type": "number"
+            "value_type": "string"
         }, 
         {
             "device_type_id": "generic.teleinfo", 
