@@ -57,6 +57,7 @@ from domogik.xpl.lib.rest.stat import StatsManager
 from domogik.xpl.lib.rest.request import ProcessRequest
 from domogik.common.configloader import Loader
 from domogik.common.packagemanager import PackageManager
+from domogik.common.database import DbHelper, DbHelperException
 from xml.dom import minidom
 import time
 import urllib
@@ -108,6 +109,10 @@ TMP_DIR = tempfile.gettempdir()
 
 # Repository
 DEFAULT_REPO_DIR = TMP_DIR
+
+# Database connection
+DATABASE_CONNECTION_NUM_TRY = 50  # number of try
+DATABASE_CONNECTION_WAIT = 30     # time in second between each try
 
 
 
@@ -411,6 +416,31 @@ class Rest(XplPlugin):
             wdd_stat = wm_stat.add_watch(self._xml_stat_dir, mask_stat, rec = True)
             self.add_stop_cb(notifier_stat.stop)
 
+            # Check for database connexion
+            self._db = DbHelper()
+            nb_test = 0
+            db_ok = False
+            while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
+                nb_test += 1
+                try:
+                    self._db.list_user_accounts()
+                    db_ok = True
+                except:
+                    msg = "The database is not responding. Check your configuration of if the database is up. Test %s/%s" % (nb_test, DATABASE_CONNECTION_NUM_TRY)
+                    print(msg)
+                    self.log.error(msg)
+                    msg = "Waiting for %s seconds" % DATABASE_CONNECTION_WAIT
+                    print(msg)
+                    self.log.info(msg)
+                    time.sleep(DATABASE_CONNECTION_WAIT)
+
+            if nb_test >= DATABASE_CONNECTION_NUM_TRY:
+                msg = "Exiting rest!"
+                print(msg)
+                self.log.error(msg)
+                self.force_leave()
+                return
+
             # Enable hbeat
             self.enable_hbeat()
 
@@ -420,7 +450,7 @@ class Rest(XplPlugin):
             self._installed_packages = {}
             if self.package_mode == True:
                 self._get_installed_packages_from_manager()
-
+            
             # Launch server, stats
             self.log.info("REST Initialisation OK")
             self.add_stop_cb(self.stop_http)

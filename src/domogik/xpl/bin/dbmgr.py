@@ -46,6 +46,10 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
+import time
+
+DATABASE_CONNECTION_NUM_TRY = 50
+DATABASE_CONNECTION_WAIT = 30
 
 class DBConnector(XplPlugin):
     '''
@@ -59,8 +63,36 @@ class DBConnector(XplPlugin):
         '''
         XplPlugin.__init__(self, 'dbmgr')
         self.log.debug("Init database_manager instance")
+
+        # Check for database connexion
+        self._db = DbHelper()
+        nb_test = 0
+        db_ok = False
+        while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
+            nb_test += 1
+            try:
+                self._db.list_user_accounts()
+                db_ok = True
+            except:
+                msg = "The database is not responding. Check your configuration of if the database is up. Test %s/%s" % (nb_test, DATABASE_CONNECTION_NUM_TRY)
+                print(msg)
+                self.log.error(msg)
+                msg = "Waiting for %s seconds" % DATABASE_CONNECTION_WAIT
+                print(msg)
+                self.log.info(msg)
+                time.sleep(DATABASE_CONNECTION_WAIT)
+
+        if nb_test >= DATABASE_CONNECTION_NUM_TRY:
+            msg = "Exiting dbmgr!"
+            print(msg)
+            self.log.error(msg)
+            self.force_leave()
+            return
+
+        msg = "Connected to the database"
+        print(msg)
+        self.log.info(msg)
         try:
-            self._db = DbHelper()
             self._engine = self._db.get_engine()
         except:
             self.log.error("Error while starting database engine : %s" % traceback.format_exc())
