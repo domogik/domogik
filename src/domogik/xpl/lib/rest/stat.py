@@ -294,7 +294,13 @@ class StatsManager:
             self._log_stats.debug("message catcher : %s" % message)
             try:
                 if self._res["device"] != None:
-                    device = message.data[self._res["device"]]
+                    try:
+                        device = message.data[self._res["device"]]
+                    except KeyError:
+                        # key error means that we are trying to get some key from a xpl where there is no such key
+                        # there may be an issue in the xml file!
+                        self._log_stats.error("Key error : %s in the message : %s" % (self._res["device"], message))
+                        return
                     my_device = my_db.get_device_by_technology_and_address(self._technology, \
                         message.data[self._res["device"]])
                     if my_device != None:
