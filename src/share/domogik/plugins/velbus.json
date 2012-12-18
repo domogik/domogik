@@ -40,7 +40,7 @@
             "feature_type": "actuator", 
             "id": "velbus.relay.switch", 
             "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;100&quot;}", 
             "return_confirmation": "1", 
             "stat_key": "level", 
             "value_type": "binary"
@@ -50,7 +50,7 @@
             "feature_type": "actuator", 
             "id": "velbus.dimmer.switch", 
             "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;255&quot;}", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;, &quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;100&quot;}", 
             "return_confirmation": "1", 
             "stat_key": "level", 
             "value_type": "binary"
@@ -60,7 +60,7 @@
             "feature_type": "actuator", 
             "id": "velbus.dimmer.change", 
             "name": "Dimmer", 
-            "parameters": "{&quot;command&quot;:&quot;setlevel&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:255}", 
+            "parameters": "{&quot;command&quot;:&quot;setlevel&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
             "return_confirmation": "1", 
             "stat_key": "level", 
             "value_type": "range"
@@ -151,7 +151,7 @@
         "src/share/domogik/stats/velbus/shutter.device-velbus.xml",
         "src/share/domogik/url2xpl/velbus/setlevel.xml", 
         "src/share/domogik/url2xpl/velbus/0.xml", 
-        "src/share/domogik/url2xpl/velbus/255.xml", 
+        "src/share/domogik/url2xpl/velbus/100.xml", 
         "src/share/domogik/url2xpl/velbus/down.xml", 
         "src/share/domogik/url2xpl/velbus/up.xml", 
         "src/domogik_packages/xpl/bin/velbus.py", 

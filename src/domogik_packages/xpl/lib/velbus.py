@@ -230,6 +230,7 @@ class VelbusDev:
         """ Send dimemr value
             - speed = 1 second
         """
+        level = (255 / 100) * level
         data = chr(0x07) + self._channels_to_byte(channel) + chr(int(level)) + chr(0x00) + chr(0x01)
         self.write_packet(address, data)
 
@@ -370,7 +371,7 @@ class VelbusDev:
             if (ord(data[7]) & 0x03) == 0:
                 level = 0
             if (ord(data[7]) & 0x03) == 1:
-                level = 255
+                level = 100
             if level != -1:
                 self._callback("lighting.device",
                     {"device" : device,
@@ -383,7 +384,7 @@ class VelbusDev:
         """
         device = str(ord(data[2])) + "-" + str(ord(data[5]) - 1)
         level = -1
-        level = ord(data[7])
+        level = (100 / 255 ) * ord(data[7])
         if level != -1:
             self._callback("lighting.device",
                 {"device" : device,
@@ -397,7 +398,7 @@ class VelbusDev:
         for channel in self._byte_to_channels(data[5]):
             device = str(ord(data[2])) + "-" + str(channel)
             level = -1
-            level = ord(data[7])
+            level = (100 / 255 ) * ord(data[7])
             if level != -1:
                 self._callback("lighting.device",
                     {"device" : device,

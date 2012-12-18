@@ -1,5 +1,5 @@
 <technology id="velbus">
-  <command name="255">
+  <command name="100">
     <schema>lighting.basic</schema>
     <command-key>level</command-key>
     <address-key>device</address-key>
@@ -10,7 +10,7 @@
     <schema>lighting.device</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="level" value="255"/>
+      <key name="level" value="100"/>
       <key name="device" value="@address@"/>
     </filter>
   </listener>
