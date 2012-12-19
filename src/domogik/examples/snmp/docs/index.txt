@@ -5,4 +5,6 @@ Table of content
 ================
 
 * :doc:`SNMP configuration </domogik_snmp>`
+* :doc:`Perl agent </snmp_perl>`
 * :doc:`Cacti configuration </domogik_cacti>`
+* :doc:`Bash agent </snmp_bash>`

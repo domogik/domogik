@@ -9,13 +9,17 @@ Cacti installation
 
 You can use a tool like cacti to automatically graph the data.
 
+
+.. code-block:: bash
+
     sudo apt-get install cacti
 
 It's a PHP application running under apache. Connect to http://yourser/cacti.
 
 Create a new device for your host using the "local linux template" as template.
 
-Create a graph using the SNMP - Generic OID template as template. Set the type to GAUGE and the maximum value to 0.
+Create a graph using the SNMP / Generic OID template as template. Set the type to
+GAUGE and the maximum value to 0.
 
 Finally add your host to the graph trees.
 
@@ -60,11 +64,11 @@ and for rest only :
 Knwon bugs
 ==========
 
-    - rss and size are represented in kilo, but values are in mega
-    - pcpu is not shown in 0.x format but in milli
+- SOLVED ? :rss and size are represented in kilo, but values are in mega
+- SOLVED ? : pcpu is not shown in 0.x format but in milli
 
 To do
 =====
 
-    - To represent data on the same screen in cacti, we must develop templates.
+- To represent data on the same screen in cacti, we must develop templates.
 

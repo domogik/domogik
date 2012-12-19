@@ -10,142 +10,62 @@ them. SNMP is a well known service for system monitoring. It's simple to
 implement and need few ressources. But keep in mind, that is will have an
 impact on your computer ressources, specially on a small one ...
 
-This scripts are an extension to the snmpd agent.
+The perl agent uses cache to improve performance. It's possible to tune
+cache performance using the config file.
+It can get tatistics from a file, a python script and a rest connection.
+Perl support ZMQ so it will possible to use it too.
+
+Theses scripts are extensions to the snmpd agent.
 
 Install snmpd
 =============
+
+.. code-block:: bash
 
     sudo apt-get install snmpd
 
 Edit the configuration file :
 
+.. code-block:: bash
+
     sudoedit /etc/snmp/snmpd.conf
 
 Change the address which snmpd must listen to :
+
+.. code-block:: bash
 
     agentAddress  udp:192.168.xxx.yyy:161
 
 Enable the public community to see all parameters. This could be consider
 as a security hole. For advanced security, look at the SNMP V3 specifications :
 
-    # rocommunity public  default    -V systemonly
+.. code-block:: bash
 
+    # rocommunity public  default    -V systemonly
     rocommunity public  default
 
 Add the domogik extension :
+
+.. code-block:: bash
 
     pass .1.3.6.1.4.1.8072.2.255  /bin/bash /usr/sbin/dmg_snmp
 
 This OID is the net-snmp samples one in the MIB. Must be changed in future.
 
+There is a bug in the current package in Ubuntu and Debian.
+
+So you must copy missing MIBS from snmp sources :
+
+.. code-block:: bash
+
+    sudo mkdir /usr/share/mibs/site
+    sudo cp * /usr/share/mibs/site
+
+
 Install domogik agent
 =====================
 
-This script is not installed by default. The simplest way to do it, is to create
-a link from the sources :
+There is 2 agents availables : one in bash and a new one in perl.
 
-    sudo ln -s /home/domogik/devel/domogik/src/domogik/examples/snmp/dmg_snmp /usr/sbin/dmg_snmp
-
-You can now restart the snmpd agent :
-
-    sudo /etc/init.d/snmpd restart
-
-Grab the data
-=============
-
-You need SNMP client tools to test the agent :
-
-    sudo apt-get install snmp
-
-You can get the all available data with the command :
-
-    snmpwalk -Os -c public -v 1 192.168.xxx.yyy .1.3.6.1.4.1.8072.2.255
-
-    - .1.3.6.1.4.1.8072.2.255.1.0 = STRING: "Domogik 0.3.0"
-    - .1.3.6.1.4.1.8072.2.255.1.1 = IpAddress: 0.0.0.0
-    - .1.3.6.1.4.1.8072.2.255.2.0 = STRING: "dbmgr manager rest"
-    - .1.3.6.1.4.1.8072.2.255.2.1 = INTEGER: 3
-    - .1.3.6.1.4.1.8072.2.255.2.2 = STRING: ".5"
-    - .1.3.6.1.4.1.8072.2.255.2.3 = STRING: "2.5"
-    - .1.3.6.1.4.1.8072.2.255.2.4 = INTEGER: 55516
-    - .1.3.6.1.4.1.8072.2.255.2.5 = INTEGER: 254092
-    - .1.3.6.1.4.1.8072.2.255.3.0 = STRING: "manager"
-    - .1.3.6.1.4.1.8072.2.255.3.1 = INTEGER: 24078
-    - .1.3.6.1.4.1.8072.2.255.3.2 = STRING: "0.1"
-    - .1.3.6.1.4.1.8072.2.255.3.3 = STRING: "0.7"
-    - .1.3.6.1.4.1.8072.2.255.3.4 = INTEGER: 15472
-    - .1.3.6.1.4.1.8072.2.255.3.5 = INTEGER: 79356
-    - .1.3.6.1.4.1.8072.2.255.4.0 = STRING: "dbmgr"
-    - .1.3.6.1.4.1.8072.2.255.4.1 = INTEGER: 24103
-    - .1.3.6.1.4.1.8072.2.255.4.2 = STRING: "0.1"
-    - .1.3.6.1.4.1.8072.2.255.4.3 = STRING: "0.6"
-    - .1.3.6.1.4.1.8072.2.255.4.4 = INTEGER: 13628
-    - .1.3.6.1.4.1.8072.2.255.4.5 = INTEGER: 61136
-    - .1.3.6.1.4.1.8072.2.255.5.0 = STRING: "rest"
-    - .1.3.6.1.4.1.8072.2.255.5.1 = INTEGER: 24194
-    - .1.3.6.1.4.1.8072.2.255.5.2 = STRING: "0.3"
-    - .1.3.6.1.4.1.8072.2.255.5.3 = STRING: "1.2"
-    - .1.3.6.1.4.1.8072.2.255.5.4 = INTEGER: 26416
-    - .1.3.6.1.4.1.8072.2.255.5.5 = INTEGER: 113600
-
-MIB explanations
-================
-
-The application parameters
-
-    - .1.0 : The application name and version.
-    - .1.1 : The ip address (does not work)
-
-The all processes data. This is the sum of the values of each plugins (including rest, manager and dbmgr). Eat some ressources when asking for.
-
-    - .2.0 : The running processes of Domogik
-    - .2.1 : The number of processes
-    - .2.2 : The pcpu key : cpu utilization of the process in "##.#" format. Currently, it is the CPU time used divided by the time the process has been running (cputime/realtime ratio), expressed as a percentage. It will not add up to 100% unless you are lucky.
-    - .2.3 : The pmem key : ratio of the process's resident set size to the physical memory on the machine, expressed as a percentage.
-    - .2.4 : The rss key : resident set size, the non-swapped physical memory that a task has used (in kiloBytes).
-    - .2.5 : The size key : approximate amount of swap space that would be required if the process were to dirty all writable pages and then be swapped out. This number is very rough!
-
-The following keys (.3, .4, .5, ..) are for the main processes :
-
-    - .3.0 : The name of the process (manager, rest, ...)
-    - .3.1 : The PID of the the process
-    - .3.2 : The pcpu key : cpu utilization of the process in "##.#" format. Currently, it is the CPU time used divided by the time the process has been running (cputime/realtime ratio), expressed as a percentage. It will not add up to 100% unless you are lucky.
-    - .3.3 : The pmem key : ratio of the process's resident set size to the physical memory on the machine, expressed as a percentage.
-    - .3.4 : The rss key : resident set size, the non-swapped physical memory that a task has used (in kiloBytes).
-    - .3.5 : The size key : approximate amount of swap space that would be required if the process were to dirty all writable pages and then be swapped out. This number is very rough!
-
-You can now use cacti or mrtg to grab data and graph them.
-
-Known bugs
-==========
-
-    - Version is disabled.
-    - IPaddress is disabled.
-
-Developpers notes
-=================
-
-This agent is developped in bash, so it could be interressant to rewrite it in C.
-
-It uses one script which contains many "case" imbrications. It could be a good idea
-to split it in 2 :
-
-    - one for the globals applications parameters
-    - another for each plugins (including rest and the others)
-
-The snmpd conf should seems like :
-
-    pass DOMOGIK_OID.1  /bin/bash /usr/sbin/dmg_snmp_app
-
-    pass DOMOGIK_OID.2  /bin/bash /usr/sbin/dmg_snmp_plg manager
-
-    pass DOMOGIK_OID.3  /bin/bash /usr/sbin/dmg_snmp_plg dbmgr
-
-    pass DOMOGIK_OID.4  /bin/bash /usr/sbin/dmg_snmp_plg rest
-
-    pass DOMOGIK_OID.100.1  /bin/bash /usr/sbin/dmg_snmp_plg bluez
-
-    pass DOMOGIK_OID.100.2  /bin/bash /usr/sbin/dmg_snmp_plg dawndusk
-
-    ...
-
+The bash agent is no more maintained, so please use the new perl agent.
+Look at the corresponding documentation.
