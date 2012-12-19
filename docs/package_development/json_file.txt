@@ -137,68 +137,41 @@ Example
 *******
 ::
 
-        "device_types": [
-            {
+        "device_types": {
+            "onewire.thermometer" {
                 "description": "Thermometer",
                 "id": "onewire.thermometer",
-                "name": "Thermometer"
+                "name": "Thermometer",
+		"commands": ["set_level_bin"],
+		"sensors": ["level"],
+		"xpl_params": [
+			{
+				"key": "channel",
+				"description": "The channel number",
+				"type": "integer",
+			},
+     			...
+		]
             },
             ...
-        ]
+        }
 
 Description
 ***********
 These data will be inserted in database during the package installation.
 
-* device_types : list of the device types allowed by the package
+* device_types : dictionary of device types, indexed on device_type id
 
   * id : device type id
   * name : device type name
   * description :  short description of the device type
-
-
-Device feature models
----------------------
-
-========================================== ======= =========
-Package type :                             Plugin  External 
-========================================== ======= =========
-**Is section required for package type :** |yes|   |yes|
-========================================== ======= =========
-
-Example
-*******
-::
-        "device_feature_models": [
-        {
-            "device_type_id": "velbus.relay",
-            "feature_type": "actuator",
-            "id": "velbus.relay.switch",
-            "name": "Switch",
-            "stat_key": "level",
-            "value_type": "binary",
-            "xpl_command": "setlevel",
-            "value_field": "level",
-            "values": [0, 255]
-        },
-        ]
-
-Description
-***********
-These data will be inserted in database during the package installation.
-
-* device_feature_models : list of the device features models allowed by the package
-
-  * device_type_id : device type to which the model is related to.
-  * id : device feature model id
-  * name : name of the device feature model.
-  * feature_type : *sensor* or *actuator* : type of the feature.
-  * stat_key : associated stat key in database (this is related to the key defined in :doc:`the stat files <stats_files>`.
-  * value_type : *number*, *string*, *boolean*, *binary*. The type of the value.
-  * xpl_command : a reference to an xpl_command (only neede for actuator)
-  * value_field : a reference to a dynamic value inside the xpl command (only neede for actuator)
-  * values : a list of values that can be used for the value_field, this value is moslty used if value_type is set to binary (only neede for actuator)
-  * unit : a display string (only neede for sensor)
+  * commands : list of commands supported by this device type
+  * sensors : list of sensors supported by this device type
+  * xpl_params : list of parameters that are common to ALL xpl messages for this device type
+	* key : the xpl key for the message
+        * description :  short description of this field
+        * type : the value type for this field 
+        * depending on the type the are other posibilitys (like min_value, max_value, ....)
 
 Configuration elements
 ----------------------
@@ -293,10 +266,6 @@ Description
   * model : related device model.
   * rule : the udev rule.
 
-
-
-
-
 External members identification
 -------------------------------
 
@@ -322,8 +291,8 @@ Description
   * device_id : device id.
   * vendor_id : vendor id.
 
-Xpl commands
--------------------------------
+Commands
+--------
 
 ========================================== ======= =========
 Package type :                             Plugin  External 
@@ -334,67 +303,78 @@ Package type :                             Plugin  External
 Example
 *******
 ::
-    "xpl_commands": [
-         {
-            "reference": "set_level",
-            "schema": "lighting.basic",
-            "parameters": [
-                {
-                    "static": [
-                        {
-                            "key": "foo",
-                            "value": "bar"
-                        }
-                    ],
-                    "device": [
-                        {
-                            "key": "channel",
-                            "description": "The channel number",
-                            "type": "integer",
-                            "max_value": 4,
-                            "min_value": 1
-                        },
-                        {
-                            "key": "address",
-                            "description": "The decimal address",
-                            "type": "integer",
-                            "max_value": 255,
-                            "min_value": 0
-                        }
-                    ],
-                    "dynamic": [
-                        {
-                            "key": "level",
-                            "type": "integer",
-                            "max_value": 255,
-                            "min_value": 0
-                        }
-                    ]
-                }
-            ]
-         }
-         ...
-    ],
+ "commands": {
+	"set_level_bin": {
+		"name": "Switch On or Off",
+		"return_confirmation": true,
+		"params": [
+			{
+				"key": "level",
+				"value_type": "binary",
+				"values": [0, 255]
+			}
+		],
+		"xpl_command": "set_level_bin"
+	},
+	...
+ }
+Description
+***********
+
+* Commands : this section describes the commands needed by this plugin, its a dictionary indexed by the command reference
+  * name : the name of this command
+  * return_confirmation : does rinor need to wait for a confirmation
+  * params : the needed params to be able to complete this command (typically these are the values set by the widget)
+      * key : the name of the parameter
+      * value_type : what type of value we can receive
+      * values : the possible values, the format depends on the value_type
+	* value_type = binary : then values is a list containing the off and on value
+        * value_type = range : then values contains a list of min and max value of the range
+  * xpl_command : what xpl command is linked to this command (this field is optional)
+
+Sensors
+-------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|    |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+    "sensors": {
+	"level": {
+		"name": "level",
+                "unit": "%",
+                "value_type": "range",
+                "values": [0, 100]
+	},
+        ...
+    },
 
 Description
 ***********
 
-* xpl_commands/xpl_stats : this section describes the xpl messages to sent on the netwerk
-  * reference : the name of this command, its the same name as the device_feature_model xpl_command value
-  * schema : the xpl_schema to use
-  * xpl_stat : the coresponding xpl response (only needed in xpl_commands)
-  * parameters : the parameters needed for this command, there are 3 types of parameters
-    * static : a static parameter, this only has a key and a value, this parameter is always inside the xpl message with the same value
-      * key : the key inside the xpl message
-      * value : the value for the key
-    * device : a parameter defined on device creation (example address)
-      * key : the key inside the xpl message
-      * value : the value for the key
-      * description : some info to display on the 'add device interface'
-      * type : used to validate the input
-      * min_value : used to validate the input
-      * max_value : used to validate the input
-    * dynamic : a parameter that needs to be filled in on xpl message sending, example the level of a dimmer 
+* Sensors : this section describes the sensors supported by this plugin, its a dictionary indexed by the command reference
+   * name : the name of the sensor
+   * unit : the unit of this value, needed for ui display
+   * value_type: what type of value we can receive
+   * values : the possible values, the format depends on the value_type
+       * value_type = binary : then values is a list containing the off and on value
+       * value_type = range : then values contains a list of min and max value of the range
+
+
+Xpl_commands
+------------
+
+TODO
+
+Xpl_stats
+---------
+
+TODO
 
 How to insert the data in database
 ==================================
