@@ -42,6 +42,10 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 
+QUERY_CONFIG_NUM_TRY = 20
+QUERY_CONFIG_WAIT = 5
+
+
 class Query():
     '''
     Query throw xPL network to get a config item
@@ -106,7 +110,7 @@ class Query():
         mess.add_data({'value': value})
         self.__myxpl.send(mess)
 
-    def query(self, technology, key, element = ''):
+    def query(self, technology, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
         '''
         Ask the config system for the value. Calling this function will make
         your program wait until it got an answer
@@ -118,6 +122,10 @@ class Query():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
+        if nb_test == 0:
+            raise RuntimeError("Maximum tries to get config reached")
+         
+
         msg = "QC : ask > h=%s, t=%s, k=%s" % \
             (self.__myxpl.p.get_sanitized_hostname(), technology, key)
         print(msg)
@@ -145,7 +153,8 @@ class Query():
                 msg = "No answer received for t = %s, k = %s, check your xpl setup" % \
                     (technology, key)
                 self.log.error(msg)
-                raise RuntimeError(msg)
+                #raise RuntimeError(msg)
+                self.query(technology, key, element, nb_test - 1)
         except KeyError:
             pass
 
@@ -166,7 +175,7 @@ class Query():
                     (result["hostname"], result["technology"], r, result[r])
 
             except KeyError:
-                errMsg = "It seems that you received configuration elements from 2 dbmgr components. Please check if you have 2 domogik main hosts on your lan. If so, you should configure 'config_provider' in /etc/domogik/domogik.cfg."
+                errMsg = "It seems that you received configuration elements from 2 dbmgr components. Please check if you have 2 domogik main hosts on your lan. If so, you should configure 'config_provider' in /etc/domogik/domogik.cfg. Waiting for '%s', received '%s'" % (r, result)
                 print errMsg
                 self.log.error(errMsg)
                 return

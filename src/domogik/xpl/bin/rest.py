@@ -246,6 +246,31 @@ class Rest(XplPlugin):
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR
 
+            # Check for database connexion
+            self._db = DbHelper()
+            nb_test = 0
+            db_ok = False
+            while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
+                nb_test += 1
+                try:
+                    self._db.list_user_accounts()
+                    db_ok = True
+                except:
+                    msg = "The database is not responding. Check your configuration of if the database is up. Test %s/%s" % (nb_test, DATABASE_CONNECTION_NUM_TRY)
+                    print(msg)
+                    self.log.error(msg)
+                    msg = "Waiting for %s seconds" % DATABASE_CONNECTION_WAIT
+                    print(msg)
+                    self.log.info(msg)
+                    time.sleep(DATABASE_CONNECTION_WAIT)
+
+            if nb_test >= DATABASE_CONNECTION_NUM_TRY:
+                msg = "Exiting rest!"
+                print(msg)
+                self.log.error(msg)
+                self.force_leave()
+                return
+
             # Gloal Queues config
             self.log.debug("Get queues configuration")
             self._config = Query(self.myxpl, self.log)
@@ -415,31 +440,6 @@ class Rest(XplPlugin):
             notifier_stat.start()
             wdd_stat = wm_stat.add_watch(self._xml_stat_dir, mask_stat, rec = True)
             self.add_stop_cb(notifier_stat.stop)
-
-            # Check for database connexion
-            self._db = DbHelper()
-            nb_test = 0
-            db_ok = False
-            while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
-                nb_test += 1
-                try:
-                    self._db.list_user_accounts()
-                    db_ok = True
-                except:
-                    msg = "The database is not responding. Check your configuration of if the database is up. Test %s/%s" % (nb_test, DATABASE_CONNECTION_NUM_TRY)
-                    print(msg)
-                    self.log.error(msg)
-                    msg = "Waiting for %s seconds" % DATABASE_CONNECTION_WAIT
-                    print(msg)
-                    self.log.info(msg)
-                    time.sleep(DATABASE_CONNECTION_WAIT)
-
-            if nb_test >= DATABASE_CONNECTION_NUM_TRY:
-                msg = "Exiting rest!"
-                print(msg)
-                self.log.error(msg)
-                self.force_leave()
-                return
 
             # Enable hbeat
             self.enable_hbeat()
