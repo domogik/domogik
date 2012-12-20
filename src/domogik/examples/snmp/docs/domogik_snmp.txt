@@ -22,7 +22,7 @@ Install snmpd
 
 .. code-block:: bash
 
-    sudo apt-get install snmpd
+    sudo apt-get install snmpd snmp-mibs-downloader
 
 Edit the configuration file :
 
@@ -44,17 +44,9 @@ as a security hole. For advanced security, look at the SNMP V3 specifications :
     # rocommunity public  default    -V systemonly
     rocommunity public  default
 
-Add the domogik extension :
-
-.. code-block:: bash
-
-    pass .1.3.6.1.4.1.8072.2.255  /bin/bash /usr/sbin/dmg_snmp
-
-This OID is the net-snmp samples one in the MIB. Must be changed in future.
-
 There is a bug in the current package in Ubuntu and Debian.
 
-So you must copy missing MIBS from snmp sources :
+(To de confirmed) So you must copy missing MIBS from snmp sources :
 
 .. code-block:: bash
 

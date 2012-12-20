@@ -43,12 +43,16 @@ use LWP::Simple;
 use JSON qw( decode_json );
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
+#use ZMQ::LibZMQ2;
+#use ZMQ::Constants qw(ZMQ_REQ);
 
 my $configuration_file = "/etc/domogik/snmp.cfg";
 my $domogik_cfg = "/etc/domogik/domogik.cfg";
 my $domogik_pid_dir = "/var/run/domogik/";
 my $rest_ip = "127.0.0.1";
 my $rest_port = "40405";
+my $event_ip = "127.0.0.1";
+my $event_req_port = "6559";
 my $dmg_manager = "/usr/local/bin/dmg_manager";
 
 my $domogik_oid = ".1.3.6.1.4.1.8072.9999.9999";
@@ -70,20 +74,51 @@ my $ttl_rest = 30;
 my $ttl_python = 600;
 my $ttl_conf = 10;
 my $ttl_pid = 120;
+my $ttl_zmq = 120;
 
 my $debug = 0;
 
 our $cache;
 our $agent;
+our $zmq_context;
+
+sub compute_zmq_info {
+    # Compute the zmq informations
+    # Return a hash
+
+    my $HoH_zmq = $cache->get("zmq_info");
+    if ( !defined $HoH_zmq ) {
+        $HoH_zmq->{ "version" } = "unknown";
+#        DEBUG "dmg_snmp.pl : zmq_info NOT IN cache";
+#
+#        # Socket to talk to server
+#        DEBUG 'Connecting to hello world server…';
+#        my $requester = zmq_socket($zmq_context, ZMQ_REQ);
+#        my $trendsurl = sprintf("tcp://%s:%s",$event_ip,$event_req_port );
+#        zmq_connect($requester, $trendsurl);
+#
+#        for my $request_nbr (0..9) {
+#            DEBUG "Sending request $request_nbr…";
+#            zmq_send($requester, 'Hello');
+#            my $reply = zmq_recv($requester);
+#           $HoH_zmq->{ "version" } = "Hello world";
+#            DEBUG "Received reply $request_nbr: [". zmq_msg_data($reply) .']';
+#        }
+        my $delay = sprintf("%ds", $ttl_zmq);
+        $cache->set('zmq_info', $HoH_zmq, $delay );
+    }
+    return $HoH_zmq;
+}
+
 
 sub compute_rest_info {
     # Compute the rest informations
     # Return a hash
 
-    my $HoH = $cache->get("rest_info");
-    if ( !defined $HoH ) {
-        $HoH->{ "rest_version" } = "unknown";
-        $HoH->{ "version" } = "unknown";
+    my $HoH_rest = $cache->get("rest_info");
+    if ( !defined $HoH_rest ) {
+        $HoH_rest->{ "rest_version" } = "unknown";
+        $HoH_rest->{ "version" } = "unknown";
         DEBUG "dmg_snmp.pl : rest_info NOT IN cache";
         my $trendsurl = sprintf("http://%s:%s",$rest_ip,$rest_port );
         my $json = get( $trendsurl );
@@ -107,17 +142,17 @@ sub compute_rest_info {
             for $role ( keys @$restpart ) {
                  #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest = %s", @$restpart[$role]);
                  if ( defined @$restpart[$role]->{'info'}->{'REST_API_version'} ) {
-                    $HoH->{ "rest_version" } = @$restpart[$role]->{'info'}->{'REST_API_version'};
-                    $HoH->{ "version" } = @$restpart[$role]->{'info'}->{'Domogik_version'};
+                    $HoH_rest->{ "rest_version" } = @$restpart[$role]->{'info'}->{'REST_API_version'};
+                    $HoH_rest->{ "version" } = @$restpart[$role]->{'info'}->{'Domogik_version'};
                  }
                  #print "$role=$href->{$role} ";
                  #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest->{'info'}->{'REST_API_version'} = %s", @$restpart[$role]->{'info'}->{'REST_API_version'});
             }
         }
         my $delay = sprintf("%ds", $ttl_rest);
-        $cache->set('rest_info', $HoH, $delay );
+        $cache->set('rest_info', $HoH_rest, $delay );
     }
-    return $HoH
+    return $HoH_rest;
 }
 
 sub compute_plugin_list {
@@ -183,8 +218,8 @@ sub compute_core_order {
     #     1 => 'dbmgr',
     #     ... => ...,
     # )
-    my $HoH = $cache->get("core_order");
-    if ( !defined $HoH ) {
+    my $HoH_core_order = $cache->get("core_order");
+    if ( !defined $HoH_core_order ) {
         DEBUG "dmg_snmp.pl : core_order NOT IN cache";
         my $cfg = new Config::Simple();
         $cfg->read($configuration_file) or die $cfg->error();
@@ -197,15 +232,15 @@ sub compute_core_order {
              my $next_oid = $sub_oid_core.sprintf(".%d", $core+11);
              #DEBUG sprintf("dmg_snmp.pl : compute_core_order first_oid = %s", $first_oid);
              #DEBUG sprintf("dmg_snmp.pl : compute_core_order next_oid = %s", $next_oid);
-             $HoH->{ $core } = { "plugin" => $cores->{ $core },
+             $HoH_core_order->{ $core } = { "plugin" => $cores->{ $core },
                                   "firstoid" => $first_oid,
                                   "nextoid" => $next_oid,
                                 };
              };
         }
         my $delay = sprintf("%ds", $ttl_conf);
-        $cache->set('core_order', $HoH, $delay );
-    return $HoH
+        $cache->set('core_order', $HoH_core_order, $delay );
+    return $HoH_core_order
 }
 
 sub compute_core_pid {
@@ -439,6 +474,11 @@ sub application_handler {
         my $RestInfo = compute_rest_info();
         $request->setValue(ASN_OCTET_STR, $RestInfo->{'rest_version'});
       }
+      elsif ($oid == new NetSNMP::OID($full_oid.".3")) {
+        # The Zmq version
+        my $ZmqInfo = compute_zmq_info();
+        $request->setValue(ASN_OCTET_STR, $ZmqInfo->{'version'});
+      }
       elsif ($oid == new NetSNMP::OID($full_oid.".10.0")) {
         # The number of plugins enabled
         $request->setValue(ASN_INTEGER, $HoH->{'application'}->{'enabcore'} + $HoH->{'application'}->{'enabplug'});
@@ -474,7 +514,12 @@ sub application_handler {
         my $RestInfo = compute_rest_info();
         $request->setValue(ASN_OCTET_STR, $RestInfo->{'rest_version'});
       }
-      elsif ($oid == new NetSNMP::OID($full_oid.".2")) {
+      if ($oid == new NetSNMP::OID($full_oid.".2")) {
+        $request->setOID($full_oid.".3");
+        my $ZmqInfo = compute_zmq_info();
+        $request->setValue(ASN_OCTET_STR, $ZmqInfo->{'version'});
+      }
+      elsif ($oid == new NetSNMP::OID($full_oid.".3")) {
         $request->setOID($full_oid.".10.0");
         $request->setValue(ASN_INTEGER, $HoH->{'application'}->{'enabcore'} + $HoH->{'application'}->{'enabplug'});
       }
@@ -965,6 +1010,7 @@ sub init_parameters {
     $ttl_rest = $Config->{'ttl.rest'};
     $ttl_python = $Config->{'ttl.python'};
     $ttl_conf = $Config->{'ttl.conf'};
+    $ttl_zmq = $Config->{'ttl.zmq'};
     $domogik_cfg = $Config->{'domogik.config'};
     $debug = $Config->{'snmp.debug'};
 
@@ -992,6 +1038,10 @@ $cache = CHI->new(
         root_dir => '/tmp/dmg_snmp.cache',
         l1_cache => { driver => 'Memory', global => 1, max_size => 1024*1024 }
     );
+
+#DEBUG "dmg_snmp.pl : init ZMQ";
+#$zmq_context = zmq_init();
+
 # Init the parameters
 init_parameters();
 # Create the agent

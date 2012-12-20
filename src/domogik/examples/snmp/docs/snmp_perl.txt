@@ -8,11 +8,17 @@ Installation
 
 You must install some Perl modules :
 
-.. code-block:: none
+.. code-block:: bash
 
     sudo apt-get install libchi-perl libnet-snmp-perl libproc-processtable-perl \
     libconfig-simple-perl libsnmp-perl liblog-log4perl-perl \
     liblwp-protocol-https-perl
+
+You need to install the libzmq2 manualy
+
+.. code-block:: bash
+
+    cpan i /zmq2/
 
 Update snmpd.conf
 
@@ -141,4 +147,47 @@ To debug the perl code you need to launch :
 .. code-block:: none
 
     sudo /usr/sbin/snmpd -Lsd -Lf /dev/null -u snmp -g snmp -I -smuxar/run/snmpd.pid -D -f
+
+ZMQ
+===
+For test only. You must uncomment code in source to try it.
+
+Install the missing packages :
+
+sudo apt-get install libzeromq-perl libzmq-dev
+
+There is no package for libzmq2, so you must use cpan to install it :
+
+.. code-block:: bash
+
+    sudo cpan i /AnyEvent/
+    sudo cpan i /Proc::Guard/
+    sudo LANG=C cpan i /libzmq2/
+
+
+Example code :
+
+.. code-block:: perl
+
+    use strict;
+    use warnings;
+    use 5.10.0;
+
+    use ZMQ::LibZMQ2;
+    use ZMQ::Constants qw(ZMQ_REQ);
+
+    my $context = zmq_init();
+
+    # Socket to talk to server
+    say 'Connecting to hello world server…';
+    my $requester = zmq_socket($context, ZMQ_REQ);
+    zmq_connect($requester, 'tcp://localhost:5555');
+
+    for my $request_nbr (0..9) {
+        say "Sending request $request_nbr…";
+        zmq_send($requester, 'Hello');
+        my $reply = zmq_recv($requester);
+        say "Received reply $request_nbr: [". zmq_msg_data($reply) .']';
+    }
+
 
