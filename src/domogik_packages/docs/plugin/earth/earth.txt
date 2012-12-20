@@ -52,6 +52,27 @@ In Domogik administration, go to the cron plugin configuration page:
 |               |               | Add events based on the moon phases.                                                                |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
+About the extensions
+--------------------
+You must load at least one extension. Otherwise the plugin will not start.
+
+If you desactivate an extension and restart the plugin, all your events using
+this extension will be dropped.
+
+An extension add more eventypes and status :
+
++---------------+----------------------------------+-----------------------------------------+----------------------------------------+
+| Extension     | Event types                      | Status                                  | Parameters                             |
++===============+==================================+=========================================+========================================+
+| DawnDusk      | dawn dusk                        | dawndusk daynight                       |                                        |
++---------------+----------------------------------+-----------------------------------------+----------------------------------------+
+| Moonphases    | fullmoon newmoon                 | moonphase                               |                                        |
+|               | firstquarter lastquarter         |                                         |                                        |
++---------------+----------------------------------+-----------------------------------------+----------------------------------------+
+
+This plugin use the powerfull pyphem to calculate events. So many other events can be managed.
+If you interresting in develop one, contact me.
+
 Start the plugin
 ----------------
 This plugin use the cron one to scheduler it's events. So, you must start it before starting earth.
@@ -82,7 +103,6 @@ You can drop it using : ::
     dmg_send xpl-cmnd earth.basic action=halt,type=dawn,delay=+600
 
 To get the full list of supported messages, look at schema `documentation <schema.html>`_.
-
 
 The features
 ------------

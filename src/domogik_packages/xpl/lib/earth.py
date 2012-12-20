@@ -40,6 +40,11 @@ from pympler.asizeof import asizeof
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik_packages.xpl.lib.earth_tools import *
 from domogik_packages.xpl.lib.cron_query import CronQuery
+from domogik.common.messaging.reqrep.messaging_reqrep import MessagingRep
+from domogik.common.messaging.pubsub.messaging_event_utils import MessagingEventPub
+import json
+from random import choice
+from time import sleep
 
 logging.basicConfig()
 
@@ -637,7 +642,13 @@ class EarthException(Exception):
 
 class EarthAPI:
     """
-    Earth API
+    Earth API.
+
+    Provides 2 listeners for xpl : for earth.basic and earth.request schema.
+    Also provide a Fired Listener which listen to Cron events.
+
+    Implement the new ZMQ to communicate with the admin pages
+
     """
 
     def __init__(self, log, config, myxpl, data_dir, stop, hostname):
@@ -665,6 +676,14 @@ class EarthAPI:
         self._stop = stop
         self._hostname = hostname
         self.cronquery = CronQuery(self.myxpl, self.log)
+        self._zmq_reply = MessagingRep()
+        self._zmq_reply_thread = threading.Thread(None,
+                                    self.reply_zmq,
+                                   "zmq_reply_earth",
+                                   (),
+                                   {})
+        self._zmq_reply_thread.start()
+        self._zmq_publish = MessagingEventPub('zmq_publish_earth')
         try:
             self.delay_sensor = int(self.config.query('earth', 'delay-sensor'))
             self.delay_stat = int(self.config.query('earth', 'delay-stat'))
@@ -704,8 +723,8 @@ class EarthAPI:
             error = "Can't get configuration from XPL : %s" %  (traceback.format_exc())
             self.log.error("__init__ : " + error)
             self.log.error("Continue with default values.")
-        if load_moonphases == False :
-            load_dawndusk = True
+        if load_moonphases == False and load_dawndusk == False:
+            raise EarthException("No extension loaded. Exiting ...")
         self._events_lock = threading.Semaphore()
         self.mycity = ephem.Observer()
         self.mycity.lat, self.mycity.lon = latitude, longitude
@@ -752,6 +771,33 @@ class EarthAPI:
 
         """
         return ['gateway', 'memory', 'set', 'get', 'list', 'info', 'status']
+
+    def reply_zmq(self):
+        """
+        Wait for ZMQ request and send reply.
+
+        """
+        self.log.debug("reply_zmq : Listen for messages ...")
+        while not self._stop.isSet():
+            print("ZZZZZZZZZZZZZZZZMQ : Waiting for request...")
+            j_request = self._zmq_reply.wait_for_request()
+            print("ZZZZZZZZZZZZZZZZMQ : Received request %s" % j_request)
+            #print("ZZZZZZZZZZZZZZZZMQ : Processing request...")
+            request = json.loads(j_request)
+            sleep(.5)
+            self._zmq_reply.send_reply("%s : done!" % request['id'])
+
+    def publish_zmq(self):
+        """
+        Publish a message on the ZMQ.
+
+        """
+        self.log.debug("publish_zmq : Start ...")
+        #category1 = choice(categories.keys())
+        #category2 = choice(categories[category1]['event'])
+        #category = "%s.%s" % (category1, category2)
+        #j_content = json.dumps(choice(categories[category1]['content']))
+        #pub_event.send_event(category, j_content)
 
     def command_listener(self, myxpl, message):
         """

@@ -235,3 +235,39 @@ plugin <--> rest <--> rinor <--> Admin pages
 What about nullmq ? : javascript zmq
 
 http://avalanche123.com/blog/2012/02/25/interacting-with-zeromq-from-the-browser/
+
+
+Communications admin pages <-> plugins
+======================================
+
+What about a multihost configuration ?
+
+Plugin
+------
+
+PUB :
+
+job added
+job updated
+job deleted
+
+Return only an id or the full jobs informations. I think we
+could return only the Id. So if the interface is active, it can ask information
+about the job.
+
+proposal for message : host.plugin.earth.admin
+Only the last part should be accessible to plugin developpers
+
+Admin pages
+-----------
+
+REQ :
+
+start jobid : the job type is an argument
+stop jobid
+resume jobid
+halt jobid
+info jobid
+list
+
+

@@ -73,7 +73,7 @@ class PluginTestCase(unittest.TestCase):
         :param testmsg: XPLMessage
         :param dictkeys: The keys that must exist in the returning message
         :type dictkeys: set()
-        :param dictkeyvals: The key:val pairs that mus exist ine the returning message
+        :param dictkeyvals: The key:val pairs that must exist ine the returning message
         :param dictkeyvals: disct()
 
         '''
