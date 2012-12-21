@@ -77,12 +77,6 @@ class GenericTestCase(unittest.TestCase):
         for dty in db.list_device_types():
             db.del_device_type(dty.id, cascade_delete=True)
 
-    def remove_all_device_feature_models(self):
-        for af in db.list_actuator_feature_models():
-            db.del_actuator_feature_model(af.id)
-        for sf in db.list_sensor_feature_models():
-            db.del_sensor_feature_model(sf.id)
-
     def remove_all_plugin_config(self):
         for plc in db.list_all_plugin_config():
             db.del_plugin_config(plc.id, plc.hostname)
@@ -222,100 +216,6 @@ class DeviceTypeTestCase(GenericTestCase):
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-
-class DeviceFeatureModelTestCase(GenericTestCase):
-    """Test device feature models"""
-
-    def setUp(self):
-        self.remove_all_device_feature_models()
-        self.remove_all_device_technologies()
-
-    def tearDown(self):
-        self.remove_all_device_feature_models()
-        self.remove_all_device_technologies()
-
-    def test_empty_list(self):
-        assert len(db.list_device_features()) == 0
-
-    def test_add_get_list(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
-        dty3 = db.add_device_type(dty_id='1wire.temperature', dty_name='Temperature', dty_description='desc3',
-                                  dt_id=dt2.id)
-        afm1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
-                                             af_parameters='myparams1',
-                                             af_value_type='binary', af_return_confirmation=True)
-        print(afm1)
-        assert afm1.name == 'Switch'
-        assert afm1.device_type_id == dty1.id
-        assert afm1.parameters == 'myparams1'
-        assert afm1.value_type == 'binary'
-        assert afm1.return_confirmation
-        assert db.get_device_feature_model_by_id(afm1.id).name == 'Switch'
-        afm2 = db.add_actuator_feature_model(af_id='x10.dimmer.dimmer', af_name='Dimmer', af_device_type_id=dty2.id,
-                                             af_parameters='myparams2',
-                                             af_value_type='number', af_return_confirmation=True)
-        sfm1 = db.add_sensor_feature_model(sf_id='1wire.temperature.thermometer', sf_name='Thermometer',
-                                           sf_device_type_id=dty3.id,
-                                           sf_parameters='myparams3', sf_value_type='number')
-        print(sfm1)
-        assert sfm1.name == 'Thermometer'
-        assert sfm1.device_type_id == dty3.id
-        assert sfm1.parameters == 'myparams3'
-        assert sfm1.value_type == 'number'
-        assert len(db.list_device_feature_models()) == 3
-        assert self.has_item(db.list_device_feature_models(), ['Switch', 'Dimmer', 'Thermometer'])
-        assert len(db.list_actuator_feature_models()) == 2
-        assert db.get_actuator_feature_model_by_id(afm2.id).name == 'Dimmer'
-        assert len(db.list_sensor_feature_models()) == 1
-        assert db.get_sensor_feature_model_by_id(sfm1.id).name == 'Thermometer'
-        assert len(db.list_device_feature_models_by_device_type_id(dty1.id)) == 1
-        assert len(db.list_device_feature_models_by_device_type_id(dty3.id)) == 1
-
-    def test_update(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_id='1wire.Temperature', dty_name='Temp.', dty_description='desc3', dt_id=dt2.id)
-        af1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
-                                            af_value_type='number', af_parameters='myparams1')
-        af1_u = db.update_actuator_feature_model(af_id=af1.id, af_name='Big switch',
-                                                 af_parameters='myparams_u', af_return_confirmation=True)
-        assert af1_u.name == 'Big switch'
-        assert af1_u.parameters == 'myparams_u'
-        assert af1_u.value_type == 'number'
-        assert af1_u.return_confirmation
-        sf1 = db.add_sensor_feature_model(sf_id='1wire.temperature.thermometer', sf_name='Thermometer',
-                                          sf_device_type_id=dty2.id,
-                                          sf_parameters='myparams2', sf_value_type='number')
-        sf1_u = db.update_sensor_feature_model(sf_id=sf1.id, sf_value_type='string')
-        assert sf1_u.value_type == 'string'
-
-    def test_del(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
-        dty3 = db.add_device_type(dty_id='1wire.temperature', dty_name='Temp.', dty_description='desc3', dt_id=dt2.id)
-        af1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
-                                            af_parameters='myparams1',
-                                            af_value_type='binary', af_return_confirmation=True)
-        af2 = db.add_actuator_feature_model(af_id='x10.dimmer.dimmer', af_name='Dimmer', af_device_type_id=dty2.id,
-                                            af_parameters='myparams2',
-                                            af_value_type='number', af_return_confirmation=True)
-        sf1 = db.add_sensor_feature_model(sf_id='1wire.temperature.thermometer', sf_name='Thermometer',
-                                          sf_device_type_id=dty3.id, sf_parameters='myparams3', sf_value_type='number')
-        af_d = db.del_actuator_feature_model(af1.id)
-        assert af_d.id == af1.id
-        assert len(db.list_device_feature_models()) == 2
-        assert len(db.list_actuator_feature_models()) == 1
-        assert len(db.list_sensor_feature_models()) == 1
-        af_d = db.del_actuator_feature_model(af2.id)
-        assert len(db.list_actuator_feature_models()) == 0
-        sf_d = db.del_sensor_feature_model(sf1.id)
-        assert len(db.list_sensor_feature_models()) == 0
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """Test device technologies"""
@@ -526,7 +426,6 @@ class DeviceTestCase(GenericTestCase):
         for dev in db.list_devices():
             assert dev.address in ('A1', 'A3')
         assert device_del.id == device2.id
-        #assert len(db.list_device_feature_association_by_device_id(device_del.id)) == 0
         try:
             db.del_device(12345678910)
             TestCase.fail(self, "Device does not exist, an exception should have been raised")
