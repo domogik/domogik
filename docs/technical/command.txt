@@ -1,121 +1,15 @@
-=========
-Actuators
-=========
+========
+Commands
+========
 
 .. warning ::
 
     All the actuators are not listed in this page. This page purpose is to give some examples.
 
-An actuator is an item to which a command can be sent (this is the opposite of a :doc:`Sensors </technical/sensor>`).
-Note that some items can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
+A command is an action that can be done on a device, like switching it on or off, setting the dimmer value, ...
+The opposit of a command is a :doc:`Sensor </technical/sensor>`.
+Note that some devices can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
 
-Command values 
-==============
-* binary
+A command is defined in the the plugin :doc:`json file </package_development/json_file>`, on device creation the commands devined in the plugin json file and linked to the to create device type will be inserted in the DB. A command can be executed by calling a rest url :doc:`/cmd </technical/rinor/rest_command.txt>`.
 
-    * parameters : ``{command, value0, value1}`` (ex. ``{"command":"", "value0":"off", "value1":"on"}``)
-    * value : one of the 2 values
-
-* range
-
-    * parameters : ``{command, valueMin, valueMax}`` (ex. ``{"command": "dim", "valueMin":0, "valueMax":100}``)
-    * value : value between valueMin and valueMax
-
-* list
-
-    * parameters : ``{command , [value0, value1, ..., valueN] }`` (ex. ``{ "command":"update" , "commandValues": ["off", "eco", "confort"] }``)
-    * value : one of the configured states
-
-* trigger
-
-    * parameters : ``{command, value}`` (ex. ``{"command":"wol",  "value":"X"}``)
-    * value : unique value
-
-* number
-
-    * value : integer or float
-
-* string
-
-    * value : char string
-
-* complex
-
-    * value : json structure
-
-Exemple Features
-================
-
-x10.Switch 
-----------
-
-* AM12 - Appliance Plug-in Module
-* LM15 - Lamp holder Module
-* AD10 - DIN Rail Switch
-* AW12 - Appliance Micro-Module
-* AM12 - Appliance Plug-in Module
-* AD10 - DIN Rail Switch
-* AW12 - Appliance Micro-Module
-
-======= ======= =============================================== =====================
-name    value   parameters                                      confirmation feedback
-======= ======= =============================================== =====================
-Switch  binary  {"command":"", "value0":"off", "value1":"on"}   no
-======= ======= =============================================== =====================
-
-x10.Dimmer 
-----------
-* LM12 - Lamp Dimming Plug-in Module
-* LD11 - DIN Rail Dimmer
-* LW12 - Lamp Dimming Micro-Module
-
-======= ======= ================================================ =====================
-name    value   parameters                                       confirmation feedback
-======= ======= ================================================ =====================
-Dimmer  range   {"command": "dim", "valueMin":0, "valueMax":100} no
-Switch  binary  {"command":"", "value0":"off", "value1":"on"}    no
-======= ======= ================================================ =====================
-
-PLCBus.Switch 
--------------
-* PLCBUS-2026 - Lamp Plug-in Module
-* PLCBUS-2263 - One-Load Lamp Micro-Module
-* PLCBUS-2264 - Two-Load Lamp Micro-Module
-* PLCBUS-2027 - Appliance Plug-in Module
-* PLCBUS-2267 - One-Load Appliance Micro-Module
-* PLCBUS-2268 - Two-Load Appliance Micro-Module
-
-======= ======= =============================================== =====================
-name    value   parameters                                      confirmation feedback
-======= ======= =============================================== =====================
-Switch  binary  {"command":"", "value0":"off", "value1":"on"}   yes
-======= ======= =============================================== =====================
-
-PLCBus.Dimmer 
--------------
-* PLCBUS-2263D - One-Load Lamp Dimming Micro-Module
-* PLCBUS-2264D - Two-Load Lamp Dimming Micro-Module
-
-======= ======= ================================================ =====================
-name    value   parameters                                       confirmation feedback
-======= ======= ================================================ =====================
-Dimmer  range   {"command": "dim", "valueMin":0, "valueMax":100} yes
-Switch  binary  {"command":"", "value0":"off", "value1":"on"}    yes
-======= ======= ================================================ =====================
-
-Computer.Control 
-----------------
-======= ======= =============================================== =====================
-name    value   parameters                                      confirmation feedback
-======= ======= =============================================== =====================
-WOL     trigger {"command":"wol"}                               no
-======= ======= =============================================== =====================
-
-RelayBoard.Relay
-----------------
-======= ======= =============================================== =====================
-name    value   parameters                                      confirmation feedback
-======= ======= =============================================== =====================
-Switch  binary  {"command":"", "value0":"off", "value1":"on"}   yes
-Trigger trigger {"command":"pulse"}                             yes
-======= ======= =============================================== =====================
+A command can have parameters that are required to successfully execute the command, typically the result of a widget.
