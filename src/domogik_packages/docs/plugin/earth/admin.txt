@@ -263,11 +263,23 @@ Admin pages
 
 REQ :
 
-start jobid : the job type is an argument
+start jobid : the job type is an argument in the json
 stop jobid
 resume jobid
 halt jobid
 info jobid
 list
 
+snmp agent
+----------
 
+REQ :
+
+stats
+
+Managing errors
+---------------
+
+Inside content ?
+In a error part ? should be a good idea. If there is an error,
+don't take care about content part.

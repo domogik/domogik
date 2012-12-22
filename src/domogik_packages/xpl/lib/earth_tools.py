@@ -33,14 +33,10 @@ class cronTools
 @organization: Domogik
 """
 
-import datetime
 import traceback
 import ConfigParser
 import os
 import glob
-import json
-import urllib2
-import urllib
 
 ERROR_NO = 0
 ERROR_PARAMETER = 1
@@ -113,7 +109,7 @@ class EarthStore():
             err = add_job_cb(data['type'], data['delay'], data)
             if err != ERROR_NO :
                 self._log.warning("Can't load job from %s : error=%s" % \
-                    (jobfile,CRONERRORS[err]))
+                    (jobfile, EARTHERRORS[err]))
 
     def count_files(self):
         """
@@ -124,7 +120,7 @@ class EarthStore():
 
         """
         cnt = 0
-        for jobfile in glob.iglob(self._data_files_dir+"/*" + self._get_fileext()) :
+        for jobfile in glob.iglob(self._data_files_dir + "/*" + self._get_fileext()) :
             cnt += 1
         return cnt
 
@@ -174,7 +170,7 @@ class EarthStore():
             if os.path.isfile(self._get_filename(event, delay)):
                 #The file already exists. We are in resume case.
                 config.read(self._get_filename(event, delay))
-            delay_idx = 1
+            #delay_idx = 1
             #data['state'] = "started"
             #data['starttime'] = datetime.datetime.today().strftime("%x %X")
             if not config.has_section('Event'):
