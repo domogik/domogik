@@ -164,7 +164,6 @@ There is no package for libzmq2, so you must use cpan to install it :
     sudo cpan i /Proc::Guard/
     sudo LANG=C cpan i /libzmq2/
 
-
 Example code :
 
 .. code-block:: perl
