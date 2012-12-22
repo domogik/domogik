@@ -200,7 +200,7 @@ class PluginStoreInf():
 
         """
         self._plugin = plugin
-        data_dir = self.get_data_files_directory()
+        data_dir = plugin.get_data_files_directory()
         self._plugin.log.debug("Try to use %s to store data." % data_dir)
         if os.path.exists(data_dir):
             if not os.access(data_dir, os.W_OK & os.X_OK):
@@ -212,14 +212,14 @@ class PluginStoreInf():
             except:
                 raise IOError("Can't create directory %s." % data_dir)
         try:
-            tmp_prefix = "write_test";
+            tmp_prefix = "write_test"
             count = 0
             filename = os.path.join(data_dir, tmp_prefix)
             while(os.path.exists(filename)):
-                filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix),count)
+                filename = "{}.{}".format(os.path.join(data_dir, tmp_prefix), count)
                 count = count + 1
-            f = open(filename,"w")
-            f.close()
+            fff = open(filename,"w")
+            fff.close()
             os.remove(filename)
         except :
             raise IOError("Can't create a file in directory %s." % data_dir)
@@ -271,7 +271,7 @@ class PluginStoreInf():
                 data['alarm'] = alarms
             err = add_job_cb(data['device'], data['devicetype'], data)
             if err != ERROR_NO :
-                self._plugin.log.warning("Can't load job from %s : error=%s" % (jobfile,CRONERRORS[err]))
+                self._plugin.log.warning("Can't load job from %s : error=%s" % (jobfile, CRONERRORS[err]))
 
     def _get_filename(self, job):
         """
@@ -296,7 +296,7 @@ class PluginStoreInf():
             config = ConfigParser.ConfigParser()
             if os.path.isfile(self._get_filename(job)):
                 #The file already exists. We are in resume case.
-                config.read(self._get_jobfile(job))
+                config.read(self._get_filename(job))
             timer_idx = 1
             alarm_idx = 1
             date_idx = 1
@@ -322,8 +322,8 @@ class PluginStoreInf():
                         config.set('Alarms', str(alarm_idx), data[key])
                         alarm_idx = alarm_idx + 1
                     else:
-                        for al in data[key] :
-                            config.set('Alarms', str(alarm_idx), al)
+                        for aal in data[key] :
+                            config.set('Alarms', str(alarm_idx), aal)
                             alarm_idx = alarm_idx + 1
                 #Will be implement in the future
                 elif key.startswith("date") :
@@ -333,27 +333,27 @@ class PluginStoreInf():
                         config.set('Dates', str(date_idx), data[key])
                         date_idx = date_idx + 1
                     else:
-                        for al in data[key] :
-                            config.set('Dates', str(date_idx), al)
+                        for aal in data[key] :
+                            config.set('Dates', str(date_idx), aal)
                             date_idx = date_idx + 1
                 elif key.startswith("sensor_") :
                     if not config.has_section('Sensor'):
                         config.add_section('Sensor')
                     config.set('Sensor', key[7:], data[key])
-                elif key in self._statfields:
+                elif key in self.statfields:
                     if key == "createtime":
                         config.set('Stats', key, data[key])
                         #We do nothing, this jobs may not be updated as the jobs where stopped
                     else:
                         config.set('Stats', key, data[key])
-                elif key in self._badfields:
+                elif key in self.badfields:
                     continue
                 else :
                     config.set('Job', key, data[key])
             if not config.has_section('Stats'):
                 config.add_section('Stats')
             config.set('Stats', "state", "started")
-            with open(self._get_jobfile(job), 'w') \
+            with open(self._get_filename(job), 'w') \
                     as configfile:
                 config.write(configfile)
             configfile.close
@@ -372,8 +372,8 @@ class PluginStoreInf():
         """
         try:
             self._plugin.log.debug("store_on_halt : job %s" % job)
-            if os.path.isfile(self._get_jobfile(job)):
-                os.remove(self._get_jobfile(job))
+            if os.path.isfile(self._get_filename(job)):
+                os.remove(self._get_filename(job))
             return ERROR_NO
         except:
             self._plugin.log.error("store_on_halt : " + traceback.format_exc())
@@ -392,11 +392,11 @@ class PluginStoreInf():
         try:
             self._plugin.log.debug("store_on_stop : job %s" % job)
             config = ConfigParser.ConfigParser()
-            config.read(self._get_jobfile(job))
+            config.read(self._get_filename(job))
             config.set('Stats', "state", "stopped")
             config.set('Stats', "runs", runs)
             config.set('Stats', "runtime", runtime)
-            with open(self._get_jobfile(job), 'w') as configfile:
+            with open(self._get_filename(job), 'w') as configfile:
                 config.write(configfile)
                 configfile.close
             return ERROR_NO
@@ -417,10 +417,10 @@ class PluginStoreInf():
         try:
             self._plugin.log.debug("store_on_close : job %s" % job)
             config = ConfigParser.ConfigParser()
-            config.read(self._get_jobfile(job))
+            config.read(self._get_filename(job))
             config.set('Stats', "runs", runs)
             config.set('Stats', "runtime", runtime)
-            with open(self._get_jobfile(job), 'w') as configfile:
+            with open(self._get_filename(job), 'w') as configfile:
                 config.write(configfile)
                 configfile.close
             return ERROR_NO
@@ -450,10 +450,10 @@ class PluginStoreInf():
         try:
             self._plugin.log.debug("store_on_fire : job %s" % job)
             config = ConfigParser.ConfigParser()
-            config.read(self._get_jobfile(job))
+            config.read(self._get_filename(job))
             config.set('Sensor', "status", status)
             config.set('Stats', "runs", runs)
-            with open(self._get_jobfile(job), 'w') as configfile:
+            with open(self._get_filename(job), 'w') as configfile:
                 config.write(configfile)
                 configfile.close
             return ERROR_NO
@@ -574,8 +574,8 @@ class CronStore():
                         config.set('Alarms', str(alarm_idx), data[key])
                         alarm_idx = alarm_idx + 1
                     else:
-                        for al in data[key] :
-                            config.set('Alarms', str(alarm_idx), al)
+                        for aal in data[key] :
+                            config.set('Alarms', str(alarm_idx), aal)
                             alarm_idx = alarm_idx + 1
                 #Will be implement in the future
                 elif key.startswith("date") :
@@ -585,8 +585,8 @@ class CronStore():
                         config.set('Dates', str(date_idx), data[key])
                         date_idx = date_idx + 1
                     else:
-                        for al in data[key] :
-                            config.set('Dates', str(date_idx), al)
+                        for aal in data[key] :
+                            config.set('Dates', str(date_idx), aal)
                             date_idx = date_idx + 1
                 elif key.startswith("sensor_") :
                     if not config.has_section('Sensor'):
@@ -736,8 +736,8 @@ class CronTools():
         """
         try:
             #t = datetime.time(int(hour[0:2]), int(hour[3:5]))
-            hhhh,mmmm = hour.split(":")
-            t = datetime.time(int(hhhh), int(mmmm))
+            hhhh, mmmm = hour.split(":")
+            tttt = datetime.time(int(hhhh), int(mmmm))
         except :
             return False
         return True
@@ -751,7 +751,7 @@ class CronTools():
 
         """
         try:
-            t = int(number)
+            ttt = int(number)
         except :
             return False
         return True
@@ -766,15 +766,16 @@ class CronTools():
 
         """
         try:
-            y = int(xpldate[0:4])
-            mo = int(xpldate[4:6])
-            d = int(xpldate[6:8])
-            h = int(xpldate[8:10])
-            m = int(xpldate[10:12])
-            s = int(xpldate[12:14])
-            return datetime.datetime(y, mo, d, h, m, s)
+            yyy = int(xpldate[0:4])
+            mon = int(xpldate[4:6])
+            ddd = int(xpldate[6:8])
+            hhh = int(xpldate[8:10])
+            mmm = int(xpldate[10:12])
+            sss = int(xpldate[12:14])
+            return datetime.datetime(yyy, mon, ddd, hhh, mmm, sss)
         except:
             return None
+        return None
 
     def date_to_xpl(self, sdate):
         """
@@ -787,18 +788,19 @@ class CronTools():
 
         """
         try:
-            h = "%.2i" % sdate.hour
-            m = "%.2i" % sdate.minute
-            s = "%.2i" % sdate.second
-            y = sdate.year
-            mo = "%.2i" % sdate.month
-            d = "%.2i" % sdate.day
-            xpldate = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
+            hhh = "%.2i" % sdate.hour
+            mmm = "%.2i" % sdate.minute
+            sss = "%.2i" % sdate.second
+            yyy = sdate.year
+            mon = "%.2i" % sdate.month
+            ddd = "%.2i" % sdate.day
+            xpldate = "%s%s%s%s%s%s" % (yyy, mon, ddd, hhh, mmm, sss)
             return xpldate
         except:
             return None
+        return None
 
-    def delta_hour(self, h1, h2):
+    def delta_hour(self, hh1, hh2):
         """
         Calculate the delta between 2 hours.
 
@@ -808,10 +810,10 @@ class CronTools():
 
         """
         dummy_date = datetime.date(1, 1, 1)
-        hour,minute = h1.split(":")
+        hour, minute = hh1.split(":")
         full_h1 = datetime.datetime.combine(dummy_date, \
             datetime.time(int(hour), int(minute)))
-        hour,minute = h2.split(":")
+        hour, minute = hh2.split(":")
         full_h2 = datetime.datetime.combine(dummy_date, \
             datetime.time(int(hour), int(minute)))
         elapsed = full_h1-full_h2
@@ -819,7 +821,7 @@ class CronTools():
             elapsed.microseconds / 1000000.0
         return res
 
-    def add_hour(self, h, s):
+    def add_hour(self, hhh, sss):
         """
         Add seconds to an hour.
 
@@ -829,10 +831,10 @@ class CronTools():
 
         """
         dummy_date = datetime.date(1, 1, 1)
-        hour,minute = h.split(":")
+        hour, minute = hhh.split(":")
         full_h = datetime.datetime.combine(dummy_date, \
             datetime.time(int(hour), int(minute)))
-        res = full_h + datetime.timedelta(seconds=s)
+        res = full_h + datetime.timedelta(seconds=sss)
         return res.hour, res.minute
 
     def error(self, code):
