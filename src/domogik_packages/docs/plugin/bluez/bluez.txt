@@ -10,7 +10,12 @@ The purpose of this plugin is to detect your phone over bluetooth.
 Dependencies
 ============
 
-pybluez (>=0.18)
+* pybluez (>=0.18)
+
+How to plug
+===========
+
+Simply plug a bluetooth adaptator in a usb port of your computer.
 
 Plugin configuration
 ====================
@@ -52,8 +57,25 @@ Now, you need to add the phones you want to monitor :
 | bt-name       |               | The name of the phone in Domogik (not the bluetooth name).                                          |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | bt-addr       |               | The bluetooth address of the phone you want to monitor.                                             |
-|               |               | You can use "hcitool scan" to find it.                                                              |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+You can retrieve the bluetooth address of your phone using hcitool.
+First, you must activate bluetooth and put your phone in "visible state" in
+the bluetooth options.
+After that, type the following command in a terminal :
+
+.. code-block:: bash
+
+    hcitool scan
+
+You will get the name and address of all visible bluetooth around you :
+
+.. code-block:: bash
+
+    Scanning ...
+
+    00:35:AD:FR:8B:BF   ubuntu-0
+    E4:B1:A9:C1:FE:E8   DTVBluetooth
 
 Creating devices for bluez
 -----------------------------
