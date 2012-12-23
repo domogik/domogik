@@ -137,11 +137,11 @@ sub compute_rest_info {
             for $restpart ( @arest ) {
                 #DEBUG sprintf("dmg_snmp.pl : compute_rest_info restpart = %s", $restpart);
                 my $role;
-                for $role ( keys @$restpart ) {
+                for $role ( @$restpart ) {
                      #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest = %s", @$restpart[$role]);
-                     if ( defined @$restpart[$role]->{'info'}->{'REST_API_version'} ) {
-                        $HoH_rest->{ "rest_version" } = @$restpart[$role]->{'info'}->{'REST_API_version'};
-                        $HoH_rest->{ "version" } = @$restpart[$role]->{'info'}->{'Domogik_version'};
+                     if ( defined $role->{'info'}->{'REST_API_version'} ) {
+                        $HoH_rest->{ "rest_version" } = $role->{'info'}->{'REST_API_version'};
+                        $HoH_rest->{ "version" } = $role->{'info'}->{'Domogik_version'};
                      }
                      #print "$role=$href->{$role} ";
                      #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest->{'info'}->{'REST_API_version'} = %s", @$restpart[$role]->{'info'}->{'REST_API_version'});
