@@ -477,6 +477,10 @@ if [ "$(dirname $0)" != "." ];then
     echo "Please run this script from main source directory (as ./install.sh"
     exit 15
 fi
+if [ "$(pwd | cut -d"/" -f2)" == "root" ];then
+    echo "Please use the Domogik package outside of the /root/ folder"
+    exit 20
+fi
 
 #stop_domogik
 check_tools
