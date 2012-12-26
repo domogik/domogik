@@ -37,6 +37,7 @@ class Ipx800(Helper)
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
 from domogik_packages.xpl.lib.ipx800 import IPX
+from domogik_packages.xpl.lib.ipx800 import IPX800_MODELS
 from domogik_packages.xpl.lib.ipx800 import IPXException
 from domogik.common import logger
 
@@ -53,14 +54,14 @@ class Ipx800(Helper):
                { "find" :
                   {
                     "cb" : self.find,
-                    "desc" : "Find IPX 800 relay boards"
+                    "desc" : "Find ipx800 relay boards"
                   },
                  "status" :
                   {
                     "cb" : self.status,
-                    "desc" : "Display all IPX800 elements status",
+                    "desc" : "Display all ipx800 elements status",
                     "min_args" : 1,
-                    "usage" : "status <IPX 800 ip>"
+                    "usage" : "status <ipx800 ip> <ipx800 model : %s>" % IPX800_MODELS
                   }
                 }
 
@@ -91,10 +92,10 @@ class Ipx800(Helper):
         """
             
         ipx = IPX(self._log, None, None)
-        if len(args) == 1:
-            ipx.open("foo", args[0])
-        elif len(args) == 3:
-            ipx.open("foo", args[0], args[1], args[2])
+        if len(args) == 2:
+            ipx.open("foo", args[0], args[1])
+        elif len(args) == 4:
+            ipx.open("foo", args[0], args[1], args[2], args[3])
         else:
             return ["Bad usage of this helper"]
         data = ipx.get_status_for_helper()
