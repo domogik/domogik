@@ -70,11 +70,13 @@ class PlcBusMain(XplPlugin):
         # Create log instance
         self.api = PLCBUSAPI(self.log, device, self._command_cb, self._message_cb)
         self.add_stop_cb(self.api.stop)
-        if self._probe_inter != 0:
-            self._probe_status = {}
-            self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self.myxpl)
-            self._probe_thr.start()
-#            self.register_timer(self._probe_thr)
+        if self._probe_inter == 0:
+            self.log.warning("The probe interval has been set to 0. This is not correct. The plugin will use a probe interval of 5 seconds")
+            self._probe_inter = 5 
+        self._probe_status = {}
+        self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self.myxpl)
+        self._probe_thr.start()
+#       self.register_timer(self._probe_thr)
         self.enable_hbeat()
 
     def _send_probe(self):
