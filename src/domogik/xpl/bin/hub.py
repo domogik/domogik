@@ -62,7 +62,7 @@ import traceback
 
 # config file
 CONFIG_FILE = "/etc/xplhub/xplhub.cfg"
-LOG_FILE = "/var/log/xplhub/xplhub.log"
+#LOG_FILE = "/var/log/xplhub/xplhub.log"
 
 # client status
 ALIVE = "alive"
@@ -78,9 +78,10 @@ class Hub():
     def __init__(self):
         """ Init hub
         """
-        ### Initiate the logger
-        log.startLogging(open(LOG_FILE, "w"))
-        #log.startLogging(stdout)
+
+        print("Domogik xPL Hub (python)")
+        print("Starting...")
+        print("- Reading configuration...")
 
         ### Read hub options
         # read config file
@@ -94,10 +95,17 @@ class Hub():
                     config[k] = v
 
         except:
-            log.err("Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
+            self.log.error("ERROR : Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
             return
-        print config
  
+        ### Initiate the logger
+        print("- Preparing the log files...")
+        self.log = Logger(config['log_level'])
+
+        file_stdout = "%s/xplhub.log" % config['log_dir_path']
+        log.startLogging(open(file_stdout, "w"), setStdout=False)
+        self.log.info("------------------------")
+
         file_clients = "%s/client_list.txt" % config['log_dir_path']
         do_log_bandwidth = config['log_bandwidth']
         file_bandwidth = "%s/bandwidth.csv" % config['log_dir_path']
@@ -107,7 +115,9 @@ class Hub():
         ### Start listening to udp
         # We use listenMultiple=True so that we can run MulticastServer.py and
         # MulticastClient.py on same machine:
-        self.MPP = MulticastPingPong(file_clients = file_clients,
+        print("- Initiating the multicast UDP client...")
+        self.MPP = MulticastPingPong(log = self.log,
+                                     file_clients = file_clients,
                                      do_log_bandwidth = do_log_bandwidth,
                                      file_bandwidth = file_bandwidth,
                                      do_log_invalid_data = do_log_invalid_data,
@@ -115,10 +125,15 @@ class Hub():
         reactor.listenMulticast(3865, self.MPP,
                                 listenMultiple=True)
         reactor.addSystemEventTrigger('during', 'shutdown', self.stop_hub)
+        print("xPL hub started!")
+
+        # following printed lines are in the xplhub.log file
+        self.log.info("xPL hub started")
         reactor.run()
 
     def stop_hub(self):
-        log.msg("Request to stop the xPL hub")
+        print("Request to stop the xPL hub")
+        self.log.info("Request to stop the xPL hub")
         self.MPP.stop_threads()
 
 
@@ -157,12 +172,15 @@ class MulticastPingPong(DatagramProtocol):
 
     """
 
-    def __init__(self, file_clients, do_log_bandwidth, file_bandwidth, do_log_invalid_data, file_invalid_data):
+    def __init__(self, log, file_clients, do_log_bandwidth, file_bandwidth, do_log_invalid_data, file_invalid_data):
         """ Init MulticastPingPong object
         """
+        ### Main log
+        self.log = log
+
         ### Host's IP
         self._ips = self._ip4_addresses()
-        log.msg("The hub will be bind to the following addresses : %s" % self._ips)
+        self.log.info("The hub will be bind to the following addresses : %s" % self._ips)
 
         ### Client list
         self._file_clients = file_clients
@@ -221,7 +239,7 @@ class MulticastPingPong(DatagramProtocol):
     def stop_threads(self):
         """ Stop all threads
         """
-        log.msg("Stopping timers...")
+        self.log.info("Stopping timers...")
         self._stop.set()
         self._timer_dead_clients.join()
         self._timer_write_clients.join()
@@ -258,7 +276,7 @@ class MulticastPingPong(DatagramProtocol):
                 self._dead_client_list.append(client)
                 self._client_list.remove(client)
                 dead_clients = True
-        log.msg(msg)
+        self.log.info(msg)
         if dead_clients:
             self._display_clients()
 
@@ -277,7 +295,7 @@ class MulticastPingPong(DatagramProtocol):
             if client['id'] == client_id:
                 return False
                 break
-        log.msg("New client : %s" % client_id)
+        self.log.info("New client : %s" % client_id)
         return True
 
     def _decode2xpl(self, data):
@@ -288,10 +306,10 @@ class MulticastPingPong(DatagramProtocol):
         """
         try:
             mess = XplMessage(data)
-            log.msg("Valid xPL message")
+            self.log.info("Valid xPL message")
             return True, mess
         except XplMessageError:
-            log.err("Invalid xPL message : %s" % data)
+            self.log.error("Invalid xPL message : %s" % data)
             return False, None
 
     def _is_hbeat(self, xpl):
@@ -299,7 +317,7 @@ class MulticastPingPong(DatagramProtocol):
             @param xpl : xpl message
         """
         if xpl.schema in ('hbeat.app', 'hbeat.basic'):
-            log.msg("Hbeat message")
+            self.log.info("Hbeat message")
             return True
         else:
             return False
@@ -309,7 +327,7 @@ class MulticastPingPong(DatagramProtocol):
             @param xpl : xpl message
         """
         if xpl.schema == 'hbeat.end':
-            log.msg("Hbeat.End message")
+            self.log.info("Hbeat.End message")
             return True
         else:
             return False
@@ -319,7 +337,7 @@ class MulticastPingPong(DatagramProtocol):
             @param ip : ip address
         """
         if ip in self._ips:
-            log.msg("Local xpl client")
+            self.log.info("Local xpl client")
             return True
         return False
 
@@ -348,14 +366,14 @@ class MulticastPingPong(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 if client['alive'] != ALIVE:    # should not happen
-                    log.err("Client %s was not alive and still in alive clients list. Resurrect it.")
+                    self.log.error("Client %s was not alive and still in alive clients list. Resurrect it.")
                 client['interval'] = int(xpl.data['interval'])
                 client['last_seen'] = time()
                 client['alive'] = ALIVE
                 found = True
                 break
         if found == False:
-            log.err("No client to update : %s" % client_id)
+            self.log.error("No client to update : %s" % client_id)
 
     def _remove_client(self, client_id):
         """ Set the client as dead/inactive
@@ -365,7 +383,7 @@ class MulticastPingPong(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 if client['alive'] != ALIVE:   # should not happen
-                    log.err("Client %s was already not alive and still in alive clients list.")
+                    self.log.error("Client %s was already not alive and still in alive clients list.")
                 client['last_seen'] = time()
                 client['alive'] = STOPPED
                 self._dead_client_list.append(client)
@@ -373,7 +391,7 @@ class MulticastPingPong(DatagramProtocol):
                 found = True
                 break
         if found == False:
-            log.err("No client to remove : %s" % client_id)
+            self.log.error("No client to remove : %s" % client_id)
 
     def _get_delivery_addresses(self, xpl):
         """ return the port list of the local client to deliver the xpl message
@@ -391,7 +409,7 @@ class MulticastPingPong(DatagramProtocol):
                 if client['source'] == xpl.target:
                     msg += client['id']
                     addresses.append((client['ip'], client['port']))
-        log.msg(msg)
+        self.log.info(msg)
         return addresses
 
     def _deliver_xpl(self, delivery_addresss, xpl):
@@ -433,7 +451,7 @@ class MulticastPingPong(DatagramProtocol):
     def _display_clients(self):
         """ List all the clients (alives and deads) in the log file
         """
-        log.msg(self._list_clients())
+        self.log.info(self._list_clients())
 
     def _write_clients(self):
         """ Write the client list in a file
@@ -447,7 +465,7 @@ class MulticastPingPong(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 client['nb_valid_messages'] += 1
-                log.msg("Increase number of valid messages for %s to %s" % (client_id, client['nb_valid_messages']))
+                self.log.info("Increase number of valid messages for %s to %s" % (client_id, client['nb_valid_messages']))
                 break
 
     def _inc_invalid_counter(self, client_id):
@@ -457,7 +475,7 @@ class MulticastPingPong(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 client['nb_invalid_messages'] += 1
-                log.msg("Increase number of invalid messages for %s to %s" % (client_id, client['nb_invalid_messages']))
+                self.log.info("Increase number of invalid messages for %s to %s" % (client_id, client['nb_invalid_messages']))
                 break
 
     def _log_bandwidth(self, client_id, xpl):
@@ -484,7 +502,7 @@ class MulticastPingPong(DatagramProtocol):
                               my_item['source'],
                               my_item['schema'],
                               my_item['type'])
-        log.msg(msg)
+        self.log.info(msg)
 
     def _append_bandwidth(self):
         """ Append bandwidth data to a file
@@ -523,7 +541,7 @@ class MulticastPingPong(DatagramProtocol):
             msg += "\ninvalid_data ; %-21s ; %15s ; %s" % (my_item['id'],
                                                 my_item['timestamp'],
                                                 my_item['data'].replace("\n", "\\n"))
-        log.msg(msg)
+        self.log.info(msg)
 
     def _append_invalid_data(self):
         """ Append invalid data to a file
@@ -552,7 +570,7 @@ class MulticastPingPong(DatagramProtocol):
             @param datagram : data received
             @param address : source ip/port
         """        
-        log.msg("Data received from %s : %s" % (repr(address), repr(datagram)))
+        self.log.info("Data received from %s : %s" % (repr(address), repr(datagram)))
         ip = address[0]
         port = address[1]
         client_id = self._get_client_id(ip, port)
@@ -567,6 +585,7 @@ class MulticastPingPong(DatagramProtocol):
             self._inc_invalid_counter(client_id)
             if self._do_log_invalid_data:
                 self._log_invalid_data(client_id, datagram)
+                print("Invalid message : %s" % datagram)
             return
 
         # TODO : needed ????
@@ -620,7 +639,19 @@ class MulticastPingPong(DatagramProtocol):
                 self._cb()
                 self._stop.wait(self._time)
 
+class Logger:
 
+    def __init__(self, log_level):
+        self._log_level = log_level
+
+    def info(self, msg):
+        # log only in 'info' log level
+        if self._log_level == 'info':
+            log.msg(msg)
+
+    def error(self, msg):
+        # log in all log level
+        log.err(msg)
 
 
 if __name__ == "__main__":
