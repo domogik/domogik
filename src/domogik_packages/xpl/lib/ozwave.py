@@ -367,21 +367,21 @@ class OZWavemanager(threading.Thread):
         activeNodeId= args['nodeId']
         valueId = args['valueId']
         node = self._fetchNode(homeId, activeNodeId)
-   #     node._sleeping = False # TODO: pas sur que le device soit réèlement sortie du mode spleeping
         node._lastUpdate = time.time()
         valueNode = node.getValue(valueId)
         valueNode.updateData(valueId) 
-        print node.commandClasses 
+#        print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
                           'addressety' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
+                     #     'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
                           'valuetype':  valueId['type'], 
                           'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
                                                                             # les labels sont listés dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
 #        Le traitement pour chaque command_class s'effectue danqs la ValueNode correspondante.
         msgtrig= valueNode.valueToxPLTrig(msgtrig)
         if msgtrig: self._cb_sendxPL_trig(msgtrig)
-        else : print ('commande non  implémentée vers xPL : %s'  % valueId['commandClass'] )
+        else : print ('commande non  implémentee vers xPL : %s'  % valueId['commandClass'] )
 
     def _handleNodeEvent(self, args):
         """Un node à envoyé une Basic_Set command  au controlleur.  

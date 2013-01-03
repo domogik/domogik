@@ -231,6 +231,7 @@ class ZWaveValueNode:
                 msgtrig ['value'] = self.valueData['value']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
                 sendxPL = True
+            #    msgtrig['typexpl'] ='xpl-stat'
                 msgtrig['schema'] ='sensor.basic'
                 msgtrig ['genre'] = 'sensor'
                 if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.

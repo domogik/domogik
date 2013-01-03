@@ -13,10 +13,13 @@
 					<key name="type" value="energy"/>
 					<key name="type" value="previous reading"/>
 					<key name="type" value="reset"/>
+					<key name="type" value="luminance"/>
+					<key name="type" value="general"/>
+					<key name="type" value="motion"/>
                 </filter>
             </listener>
             <mapping>
-                <device field="addressety"/>
+                <device field="device"/>
                 <value field="units"/>
                 <value field="current" new_name="temperature" 
                        filter_key="type" filter_value="temperature" />
@@ -36,7 +39,12 @@
 					   filter_key="type" filter_value="previous reading" />
 				<value field="current" new_name="reset"
 					   filter_key="type" filter_value="reset" />
-
+				<value field="current" new_name="luminance"
+					   filter_key="type" filter_value="luminance" />
+				<value field="current" new_name="general"
+					   filter_key="type" filter_value="general" />
+				<value field="current" new_name="motion"
+					   filter_key="type" filter_value="motion" />
             </mapping>
         </xpltype>
     </schema>
