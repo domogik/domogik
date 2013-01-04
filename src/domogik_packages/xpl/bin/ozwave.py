@@ -122,10 +122,10 @@ class OZwave(XplPlugin):
   #      return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None', "''")
         print "conversion pour transfertvers UI , " , str(ddict)
         for k in ddict :   # TODO: pour passer les 1452 chars dans RINOR, à supprimer quand MQ OK, 
-            if len(str(ddict[k])) >818 : 
-                ddict[k]=ddict[k][:818]
+            if len(str(ddict[k])) >800 : 
+                ddict[k]=ddict[k][:800]
                 print("value raccourccis : ", k, ddict[k])
-                self.log.debug ("Format data to UI : value to large, cut to 818, key : %s, value : %s" % (str(k), str(ddict[k])))
+                self.log.debug ("Format data to UI : value to large, cut to 800, key : %s, value : %s" % (str(k), str(ddict[k])))
         return str(ddict).replace('{', '&ouvr;').replace('}', '&ferm;').replace('"','&quot;').replace("'",'&quot;').replace('False', 'false').replace('True', 'true').replace('None', '""')
         
     def ui_cmd_cb(self, message):
@@ -243,25 +243,26 @@ class OZwave(XplPlugin):
         elif 'typexpl' in msgtrig:
             print ("send xpl-trig")
             print msgtrig	
-            mess.set_type('xpl-trig') # force xpl-trig
+        #    mess.set_type('xpl-trig') # force xpl-trig
+            mess.set_type(msgtrig['typexpl'])
             mess.set_schema(msgtrig['schema'])
             if msgtrig['genre'] == 'actuator' :
                 if msgtrig['level'] in [0, 'False', False] : cmd ="off"
                 elif msgtrig['level'] in [255, 'True',  True]: cmd ="on"
                 else: cmd ='level'
-                mess.add_data({'addressety' : msgtrig['addressety'],
+                mess.add_data({'device' : msgtrig['addressety'],
                             'command' : cmd,
                             'level': msgtrig['level']})
                 if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
             elif msgtrig['genre'] == 'sensor' :  # tout sensor
                 if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget portal
-                    mess.add_data({'addressety' : msgtrig['addressety'],
+                    mess.add_data({'device' : msgtrig['addressety'],
                             'type' : msgtrig['type'] ,
                             'current' : 'low' if msgtrig['value']   else 'high'})
-                else : mess.add_data({'addressety' : msgtrig['addressety'],  
+                else : mess.add_data({'device' : msgtrig['addressety'],  
                             'type' : msgtrig['type'] ,
                             'current' : msgtrig['value'] })
-            if msgtrig.has_key('units'): mess.add_data({'units' : msgtrig['units'] })
+            if msgtrig.has_key('units') and msgtrig['units'] !='' : mess.add_data({'units' : msgtrig['units'] })
             print mess
             self.myxpl.send(mess)
         elif 'command' in msgtrig and msgtrig['command'] == 'Info':

@@ -1,25 +1,24 @@
 {
-	"files" : [ "src/share/domogik/design/plugin/ozwave/icon.png",
-				"src/share/domogik/plugins/ozwave.json", 
-				"src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml", 
-				"src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml", 
-				"src/share/domogik/url2xpl/ozwave/level.xml", 
-				"src/share/domogik/url2xpl/ozwave/on.xml", 
-				"src/share/domogik/url2xpl/ozwave/off.xml", 
-                "src/share/domogik/url2xpl/ozwave/Refresh.xml",
-                "src/share/domogik/data/ozwave/ozwconfig/*.*",
-				"src/domogik_packages/xpl/bin/ozwave.py", 
-				"src/domogik_packages/xpl/lib/ozwave.py",
-                "src/domogik_packages/xpl/lib/ozwdefs.py",
-                "src/domogik_packages/xpl/lib/ozwvalue.py", 
-                "src/domogik_packages/xpl/lib/ozwnode.py"
-			],
-	"udev-rules" : [
-		{
-			"description": "Zwave controler", 
-            "filename": "98-usbcp210x.rules", 
-            "model": "USB Zwave stick2", 
-            "rule": "DRIVERS==\"usb\", ATTRS{manufacturer}==\"Silicon Labs\", ATTRS{product}==\"CP2102 USB to UART Bridge Controller\", SYMLINK+=\"zwave\", MODE=\"0666\""
+	"files" : ["src/share/domogik/design/plugin/ozwave/icon.png",
+		"src/share/domogik/plugins/ozwave.json",
+		"src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml",
+		"src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml",
+		"src/share/domogik/url2xpl/ozwave/level.xml",
+		"src/share/domogik/url2xpl/ozwave/on.xml",
+		"src/share/domogik/url2xpl/ozwave/off.xml",
+		"src/share/domogik/url2xpl/ozwave/Refresh.xml",
+		"src/share/domogik/data/ozwave/ozwconfig/*.*",
+		"src/domogik_packages/xpl/bin/ozwave.py",
+		"src/domogik_packages/xpl/lib/ozwave.py",
+		"src/domogik_packages/xpl/lib/ozwdefs.py",
+		"src/domogik_packages/xpl/lib/ozwvalue.py",
+		"src/domogik_packages/xpl/lib/ozwnode.py"
+	],
+	"udev-rules" : [{
+			"description" : "Zwave controler",
+			"filename" : "98-usbcp210x.rules",
+			"model" : "USB Zwave stick2",
+			"rule" : "DRIVERS==\"usb\", ATTRS{manufacturer}==\"Silicon Labs\", ATTRS{product}==\"CP2102 USB to UART Bridge Controller\", SYMLINK+=\"zwave\", MODE=\"0666\""
 		}
 	],
 	"device_feature_models" : [{
@@ -50,86 +49,113 @@
 			"id" : "ozwave.dimmer.change",
 			"name" : "Change"
 		}, {
-		    "device_type_id": "ozwave.humidity", 
-		    "feature_type": "sensor", 
-		    "id": "ozwave.humidity.humidity", 
-		    "name": "Humidity", 
-		    "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-		    "return_confirmation": "0", 
-		    "stat_key": "humidity", 
-		    "value_type": "number"
+			"device_type_id" : "ozwave.humidity",
+			"feature_type" : "sensor",
+			"id" : "ozwave.humidity.humidity",
+			"name" : "Humidity",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "humidity",
+			"value_type" : "number"
 		}, {
-            "device_type_id": "ozwave.thermometer", 
-            "feature_type": "sensor", 
-            "id": "ozwave.thermometer.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, {
-            "device_type_id": "ozwave.thermometer",
-            "feature_type": "sensor",
-            "id": "ozwave.thermometer.battery",
-            "name": "Battery",
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "number"
-        }, {
-            "device_type_id": "ozwave.sensor",
-            "feature_type": "sensor",
-            "id": "ozwave.sensor.status",
-            "name": "Status",
-            "parameters": "{}",
-            "return_confirmation": "0",
-            "stat_key": "status",
-            "value_type": "string"
-        }, {
-            "device_type_id": "ozwave.sensor",
-            "feature_type": "sensor",
-            "id": "ozwave.sensor.battery",
-            "name": "Battery",
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "number"
-       },{
-			"device_type_id": "ozwave.powermeter",
-			"feature_type": "sensor",
-			"id": "ozwave.powermeter.power",
-			"name": "Power",
-			"parameters": "{&quot;unit&quot;:&quot;W&quot;}",
-			"return_confirmation": "0",
-			"stat_key": "power",
-			"value_type": "number"
-		},{
-			"device_type_id": "ozwave.powermeter",
-			"feature_type": "sensor",
-			"id": "ozwave.powermeter.energy",
-			"name": "Energy",
-			"parameters": "{&quot;unit&quot;:&quot;kWh&quot;}",
-			"return_confirmation": "0",
-			"stat_key": "energy",
-			"value_type": "number"
-		},{
-			"device_type_id": "ozwave.powermeter",
-			"feature_type": "sensor",
-			"id": "ozwave.powermeter.prevenergy",
-			"name": "Energy previous reading",
-			"parameters": "{&quot;unit&quot;:&quot;kWh&quot;}",
-			"return_confirmation": "0",
-			"stat_key": "previous reading",
-			"value_type": "number"
-		},{
-			"device_type_id": "ozwave.powermeter",
-			"feature_type": "actuator",
-			"id": "ozwave.powermeter.reset",
-			"name": "Reset",
-			"parameters": "{&quot;unit&quot;:&quot;kWh&quot;}",
-			"return_confirmation": "1",
-			"stat_key": "reset",
-			"value_type": "binary"
+			"device_type_id" : "ozwave.thermometer",
+			"feature_type" : "sensor",
+			"id" : "ozwave.thermometer.temperature",
+			"name" : "Temperature",
+			"parameters" : "{&quot;unit&quot;:&quot;\\u00B0C&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "temperature",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.thermometer",
+			"feature_type" : "sensor",
+			"id" : "ozwave.thermometer.battery",
+			"name" : "Battery",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "battery",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.sensor",
+			"feature_type" : "sensor",
+			"id" : "ozwave.sensor.status",
+			"name" : "Status",
+			"parameters" : "{}",
+			"return_confirmation" : "0",
+			"stat_key" : "status",
+			"value_type" : "string"
+		}, {
+			"device_type_id" : "ozwave.sensor",
+			"feature_type" : "sensor",
+			"id" : "ozwave.sensor.battery",
+			"name" : "Battery",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "battery",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.powermeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.powermeter.power",
+			"name" : "Power",
+			"parameters" : "{&quot;unit&quot;:&quot;W&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "power",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.powermeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.powermeter.energy",
+			"name" : "Energy",
+			"parameters" : "{&quot;unit&quot;:&quot;kWh&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "energy",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.powermeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.powermeter.prevenergy",
+			"name" : "Energy previous reading",
+			"parameters" : "{&quot;unit&quot;:&quot;kWh&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "previous reading",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.powermeter",
+			"feature_type" : "actuator",
+			"id" : "ozwave.powermeter.reset",
+			"name" : "Reset",
+			"parameters" : "{&quot;unit&quot;:&quot;kWh&quot;}",
+			"return_confirmation" : "1",
+			"stat_key" : "reset",
+			"value_type" : "binary"
+		}, {
+			"device_type_id" : "ozwave.motion",
+			"feature_type" : "sensor",
+			"id" : "ozwave.motion.general",
+			"name" : "Motion",
+			"parameters" : "{}",
+			"return_confirmation" : "0",
+			"stat_key" : "general",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.motion",
+			"feature_type" : "sensor",
+			"id" : "ozwave.motion.battery",
+			"name" : "Battery",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "battery",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.luminance",
+			"feature_type" : "sensor",
+			"id" : "ozwave.luminance.luminance",
+			"name" : "Luminance",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "luminance",
+			"value_type" : "number"
 		}
 	],
 	"device_types" : [{
@@ -144,19 +170,26 @@
 			"description" : "Sensor, like door sensor",
 			"name" : "ON/OFF Sensor",
 			"id" : "ozwave.sensor"
-		},        {
-            "description": "Thermometer, Everspring ST814,...", 
-            "id": "ozwave.thermometer", 
-            "name": "Temperature"
-        }, 
-        {
-            "description": "Humidity, Everspring ST814,...", 
-            "id": "ozwave.humidity", 
-            "name": "Humidity"
-        },{
-			"description": "Power Meter",
-			"name": "Power",
-			"id": "ozwave.powermeter"
+		}, {
+			"description" : "Thermometer, Everspring ST814,...",
+			"name" : "Temperature",
+			"id" : "ozwave.thermometer"
+		}, {
+			"description" : "Humidity, Everspring ST814,...",
+			"name" : "Humidity",
+			"id" : "ozwave.humidity"
+		}, {
+			"description" : "Power Meter",
+			"name" : "Power",
+			"id" : "ozwave.powermeter"
+		}, {
+			"description" : "Motion detection",
+			"name" : "Motion",
+			"id" : "ozwave.motion"
+		}, {
+			"description" : "Luminance, Ex. with motion sensor",
+			"name" : "Luminance",
+			"id" : "ozwave.luminance"
 		}
 	],
 	"configuration" : [{
@@ -168,7 +201,7 @@
 			"optionnal" : "no",
 			"type" : "boolean",
 			"id" : "0"
-		},{
+		}, {
 			"description" : "Z-wave device",
 			"default" : "/dev/zwave",
 			"options" : [],
@@ -177,7 +210,7 @@
 			"optionnal" : "no",
 			"type" : "string",
 			"id" : "1"
-		},{
+		}, {
 			"description" : "Open zwave log (see file OZW_Log.txt in User path)",
 			"default" : "False",
 			"options" : [],
@@ -186,7 +219,7 @@
 			"optionnal" : "no",
 			"type" : "boolean",
 			"id" : "2"
-		},{
+		}, {
 			"description" : "Openzwave configuration path auto detection, else use configpath.",
 			"default" : "True",
 			"options" : [],
@@ -195,7 +228,7 @@
 			"optionnal" : "no",
 			"type" : "boolean",
 			"id" : "3"
-		},{
+		}, {
 			"description" : "Path for openzwave files configuration (see your openzwave installation).",
 			"default" : "/usr/local/share/python-openzwave/config",
 			"options" : [],
@@ -204,7 +237,7 @@
 			"optionnal" : "yes",
 			"type" : "string",
 			"id" : "4"
-		},{
+		}, {
 			"description" : "Home id name for association with device",
 			"default" : "myHomeId",
 			"options" : [],
@@ -213,7 +246,7 @@
 			"optionnal" : "no",
 			"type" : "string",
 			"id" : "5"
-		},{
+		}, {
 			"description" : "Home id refered to special page",
 			"default" : "Copy HomeId from special page",
 			"options" : [],
@@ -233,16 +266,16 @@
 		"category" : "Z-wave",
 		"documentation" : "http://wiki.domogik.org/tiki-index.php?page=plugin_ozwave",
 		"description" : "Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control",
-		"changelog" : " 0.1b2\n - add neighbors page.\n0.1b4\n - add groups associations\n0.1\n - plugin creation.",
+		"changelog" : " 0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
 		"author_email" : "nico84dev at gmail.com",
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.3.0",
 		"dependencies" : [{
-			"id" : "python-openzwave-lib (>=0.2.4)", 
-            "type": "python"
+				"id" : "python-openzwave-lib (>=0.2.4)",
+				"type" : "python"
 			}
 		],
-		"version" : "0.1b4.dev20121214",
+		"version" : "0.1b5.dev20130103",
 		"type" : "plugin",
 		"id" : "ozwave"
 	},

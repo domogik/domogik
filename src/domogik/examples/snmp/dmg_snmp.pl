@@ -55,7 +55,7 @@ my $event_ip = "127.0.0.1";
 my $event_req_port = "6559";
 my $dmg_manager = "/usr/local/bin/dmg_manager";
 
-my $domogik_oid = ".1.3.6.1.4.1.8072.9999.9999";
+my $domogik_oid = ".1.3.6.1.4.1.41072";
 
 my $sub_oid_application = ".0.1";
 my $sub_oid_core = ".0.2";
@@ -1017,6 +1017,7 @@ sub init_parameters {
     $ttl_conf = $Config->{'ttl.conf'};
     $ttl_zmq = $Config->{'ttl.zmq'};
     $domogik_cfg = $Config->{'domogik.config'};
+    $dmg_manager = $Config->{'domogik.manager'};
     $debug = $Config->{'snmp.debug'};
 
     my $cfg2 = new Config::Simple();

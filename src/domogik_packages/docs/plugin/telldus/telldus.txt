@@ -203,7 +203,7 @@ Shutter
 |                    |                   |                                                                                            |
 |                    |                   | Stop : Stop the shutter move (UP or DOWN)                                                  |
 |                    |                   |                                                                                            |
-|                    |                   | Dim : Open the shutter then close it to the specified level                                |
+|                    |                   | Shut : Open the shutter then close it to the specified level                                |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Reference         |                                                                                            |
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+

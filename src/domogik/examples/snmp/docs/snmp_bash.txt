@@ -7,6 +7,7 @@ Install the bash domogik agent
 ==============================
 
 This bash agent is depracated and will not be developped anymore.
+Please use the perl one instead.
 
 Edit snmpd.conf and add the domogik extension :
 
