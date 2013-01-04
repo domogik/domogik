@@ -185,8 +185,9 @@ function copy_sample_files {
     fi
     if [ ! -f $DMG_ETC/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-        chown $d_user:root $DMG_ETC/domogik.cfg
-        chmod 640 $DMG_ETC/domogik.cfg
+        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+        chown $d_user:root $DMG_ETC/*.cfg
+        chmod 640 $DMG_ETC/*.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
             cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
             chown $d_user:root $DMG_ETC/sources.list
@@ -201,8 +202,9 @@ function copy_sample_files {
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-            chown $d_user:root $DMG_ETC/domogik.cfg
-            chmod 640 $DMG_ETC/domogik.cfg
+            cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+            chown $d_user:root $DMG_ETC/*.cfg
+            chmod 640 $DMG_ETC/*.cfg
             if [ $MAIN_INSTALL = "y" ] ; then
                 cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
                 chown $d_user:root $DMG_ETC/sources.list
@@ -220,7 +222,9 @@ function copy_sample_files {
     fi
     if [ -d "/etc/logrotate.d/" ];then
         cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
+        cp src/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/domogik
+        chmod 644 /etc/logrotate.d/xplhub
     fi
     if [ -d "/etc/init.d/" ];then
         cp src/domogik/examples/init/domogik /etc/init.d/
@@ -446,6 +450,8 @@ function modify_hosts {
 function create_log_dir {
     mkdir -p /var/log/domogik
     chown -R $d_user: /var/log/domogik 
+    mkdir -p /var/log/xplhub
+    chown -R $d_user: /var/log/xplhub 
 }
 
 function install_plugins {

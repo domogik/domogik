@@ -116,6 +116,7 @@ setup(
             dmg_send = domogik.xpl.bin.send:main
             dmg_dump = domogik.xpl.bin.dump_xpl:main
             dmg_version = domogik.xpl.bin.version:main
+            dmg_hub = domogik.xpl.bin.hub:main
             """
         ],
     },

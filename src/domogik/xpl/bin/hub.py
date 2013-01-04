@@ -61,8 +61,7 @@ import ConfigParser
 import traceback
 
 # config file
-CONFIG_FILE = "/etc/xplhub/xplhub.cfg"
-#LOG_FILE = "/var/log/xplhub/xplhub.log"
+CONFIG_FILE = "/etc/domogik/xplhub.cfg"
 
 # client status
 ALIVE = "alive"
@@ -108,8 +107,16 @@ class Hub():
 
         file_clients = "%s/client_list.txt" % config['log_dir_path']
         do_log_bandwidth = config['log_bandwidth']
+        if do_log_bandwidth == "True":
+            do_log_bandwidth = True
+        else:
+            do_log_bandwidth = False
         file_bandwidth = "%s/bandwidth.csv" % config['log_dir_path']
         do_log_invalid_data = config['log_invalid_data']
+        if do_log_invalid_data == "True":
+            do_log_invalid_data = True
+        else:
+            do_log_invalid_data = False
         file_invalid_data = "%s/invalid_data.csv" % config['log_dir_path']
 
         ### Start listening to udp
@@ -654,8 +661,11 @@ class Logger:
         log.err(msg)
 
 
-if __name__ == "__main__":
+def main():
     Hub()
+
+if __name__ == "__main__":
+    main()
 
 
 

@@ -31,8 +31,10 @@
 CUSTOM_PATH=""
 HUB_IFACE="lo"
 LAUNCH_DOMOGIK_XPL_HUB="true"
+DOMOGIK_XPL_HUB="python"
 NAME=dmg_manager
-XPLHUB=xPL_Hub
+C_XPLHUB=xPL_Hub
+PYTHON_XPLHUB=dmg_hub
 DIETIME=2
 STARTTIME=5
 #PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
@@ -60,18 +62,34 @@ function start {
 }
 
 function start_xpl {
-    if [ -z "$(which ${XPLHUB})" ];then
-        echo "ERROR : ${XPLHUB} not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
-        exit 1
-    fi
     echo -n " * Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which ${XPLHUB}) -interface ${HUB_IFACE} >/dev/null "
-    if [ $? -gt 0 ]; then
-        echo " An error occured during Xpl startup."
-        exit 1
+    if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
+        if [ -z "$(which ${C_XPLHUB})" ];then
+            echo "ERROR : ${C_XPLHUB} not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
+            exit 1
+        fi
+        /bin/su - ${DOMOGIK_USER} -c "$(which ${C_XPLHUB}) -interface ${HUB_IFACE} >/dev/null "
+        if [ $? -gt 0 ]; then
+            echo " An error occured during Xpl startup."
+            exit 1
+        fi
+
+    elif [ "${DOMOGIK_XPL_HUB}" == "python" ] ; then
+        if [ -z "$(which ${PYTHON_XPLHUB})" ];then
+            echo "ERROR : ${PYTHON_XPLHUB} not in path, did you had any issue during the installation ?"
+            exit 1
+        fi
+        /bin/su - ${DOMOGIK_USER} -c "nohup $(which ${PYTHON_XPLHUB}) >/dev/null &"
+        if [ $? -gt 0 ]; then
+            echo " An error occured during Xpl startup."
+            exit 1
+        fi
+
     else
-        echo " Done."
+        echo " The choosen xpl hub is not known by Domogik : "${DOMOGIK_XPL_HUB}
+        exit 1
     fi
+    echo " Done."
 }
 
 function start_manager {
@@ -127,13 +145,29 @@ function status_manager {
 }
 
 function status_xpl {
-    set +e
-    RUNNING=$(/usr/bin/pgrep -c ${XPLHUB})
-    set -e
-    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
-        echo " * ${XPLHUB} is running"
+    if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
+        set +e
+        RUNNING=$(/usr/bin/pgrep -c ${C_XPLHUB})
+        set -e
+        if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+            echo " * ${C_XPLHUB} is running"
+        else
+            echo " * ${C_XPLHUB} is not running"
+        fi
+
+    elif [ "${DOMOGIK_XPL_HUB}" == "python" ] ; then
+        set +e
+        RUNNING=$(/usr/bin/pgrep -c ${PYTHON_XPLHUB})
+        set -e
+        if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+            echo " * ${PYTHON_XPLHUB} is running"
+        else
+            echo " * ${PYTHON_XPLHUB} is not running"
+        fi
+
     else
-        echo " * ${XPLHUB} is not running"
+        echo " The choosen xpl hub is not known by Domogik : "${DOMOGIK_XPL_HUB}
+        exit 1
     fi
 }
 
@@ -150,11 +184,24 @@ function stop {
 
 function stop_xpl {
     echo -n " * Stopping XPL..."
-    for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-        sleep ${DIETIME}
-        kill -9 $pid 2>/dev/null 1>&2
-    done
+    if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
+        for pid in `ps ax | grep "${C_XPLHUB}" | grep -v grep | awk '{print $1}'`; do
+            kill -15 $pid 2>/dev/null 1>&2
+            sleep ${DIETIME}
+            kill -9 $pid 2>/dev/null 1>&2
+        done
+
+    elif [ "${DOMOGIK_XPL_HUB}" == "python" ] ; then
+        for pid in `ps ax | grep "${PYTHON_XPLHUB}" | grep -v grep | awk '{print $1}'`; do
+            kill -15 $pid 2>/dev/null 1>&2
+            sleep ${DIETIME}
+            kill -9 $pid 2>/dev/null 1>&2
+        done
+
+    else
+        echo " The choosen xpl hub is not known by Domogik : "${DOMOGIK_XPL_HUB}
+        exit 1
+    fi
     echo " Done."
 }
 

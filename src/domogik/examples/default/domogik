@@ -21,6 +21,13 @@ MANAGER_PARAMS="-d -r -p -E"
 # If so, set this option to 'false'
 LAUNCH_DOMOGIK_XPL_HUB=true
 
+# Two hubs are available in Domogik
+# - the C hub 
+# - the Domogik python hub
+# By default, the Domogik python hub is used. On very slow computers, you may want to use the C hub instead.
+# Possible values are: c, python
+DOMOGIK_XPL_HUB=python
+
 # You can define one or many extra path(s) for Domogik startup scripts.
 # This should only be useful if you use Domogik in developement mode (with setup.py develop)
 # or if you have a custom path install.
