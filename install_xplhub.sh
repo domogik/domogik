@@ -115,6 +115,14 @@ function copy_sample_files {
             chmod 640 $HUB_ETC/xplhub.cfg
         fi
     fi
+    if [ -d "/etc/default/" ];then
+        if [ "$keep" = "n" -o "$keep" = "N" ];then
+            cp src/xplhub/examples/default/xplhub /etc/default/
+        fi
+    else
+        echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
+        exit 6
+    fi
     if [ -d "/etc/logrotate.d/" ];then
         cp src/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/xplhub
@@ -137,6 +145,16 @@ function create_log_dir {
     mkdir -p /var/log/xplhub
     chown -R $d_user: /var/log/xplhub 
 }
+
+
+function update_default_config {
+    if [ ! -f /etc/default/xplhub ];then
+        echo "Can't find /etc/default/xplhub!"
+        exit 8
+    fi
+    [ -f /etc/default/xplhub ] &&  sed -i "s;^XPLHUB_USER.*$;XPLHUB_USER=$d_user;" /etc/default/xplhub
+}
+
 
 #Main part
 echo "This install tool is linked to the new python xPL hub. This hub is not yet the official xPL hub for Domogik. Use it with caution"
