@@ -55,7 +55,7 @@ my $event_ip = "127.0.0.1";
 my $event_req_port = "6559";
 my $dmg_manager = "/usr/local/bin/dmg_manager";
 
-my $domogik_oid = ".1.3.6.1.4.1.8072.9999.9999";
+my $domogik_oid = ".1.3.6.1.4.1.41072";
 
 my $sub_oid_application = ".0.1";
 my $sub_oid_core = ".0.2";
@@ -110,45 +110,50 @@ sub compute_zmq_info {
     return $HoH_zmq;
 }
 
-
 sub compute_rest_info {
     # Compute the rest informations
     # Return a hash
 
     my $HoH_rest = $cache->get("rest_info");
     if ( !defined $HoH_rest ) {
-        $HoH_rest->{ "rest_version" } = "unknown";
-        $HoH_rest->{ "version" } = "unknown";
         DEBUG "dmg_snmp.pl : rest_info NOT IN cache";
         my $trendsurl = sprintf("http://%s:%s",$rest_ip,$rest_port );
         my $json = get( $trendsurl );
+        my $decoded_json;
+        eval {                          # try
 
-        # This next line isn't Perl.  don't know what you're going for.
-        #my $decoded_json = @{decode_json{shares}};
+            # This next line isn't Perl.  don't know what you're going for.
+            #my $decoded_json = @{decode_json{shares}};
 
-        # Decode the entire JSON
-        my $decoded_json = decode_json( $json );
+            # Decode the entire JSON
+            $decoded_json = decode_json( $json );
+            # you'll get this (it'll print out); comment this when done.
+            #print Dumper $decoded_json;
 
-        # you'll get this (it'll print out); comment this when done.
-        #print Dumper $decoded_json;
-
-        #DEBUG sprintf("dmg_snmp.pl : compute_rest_info json = %s", $decoded_json);
-        #DEBUG sprintf("dmg_snmp.pl : compute_rest_info json = %s", $decoded_json->{'rest'});
-        my @arest = $decoded_json->{'rest'};
-        my $restpart;
-        for $restpart ( @arest ) {
-            #DEBUG sprintf("dmg_snmp.pl : compute_rest_info restpart = %s", $restpart);
-            my $role;
-            for $role ( keys @$restpart ) {
-                 #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest = %s", @$restpart[$role]);
-                 if ( defined @$restpart[$role]->{'info'}->{'REST_API_version'} ) {
-                    $HoH_rest->{ "rest_version" } = @$restpart[$role]->{'info'}->{'REST_API_version'};
-                    $HoH_rest->{ "version" } = @$restpart[$role]->{'info'}->{'Domogik_version'};
-                 }
-                 #print "$role=$href->{$role} ";
-                 #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest->{'info'}->{'REST_API_version'} = %s", @$restpart[$role]->{'info'}->{'REST_API_version'});
+            #DEBUG sprintf("dmg_snmp.pl : compute_rest_info json = %s", $decoded_json);
+            #DEBUG sprintf("dmg_snmp.pl : compute_rest_info json = %s", $decoded_json->{'rest'});
+            my @arest = $decoded_json->{'rest'};
+            my $restpart;
+            for $restpart ( @arest ) {
+                #DEBUG sprintf("dmg_snmp.pl : compute_rest_info restpart = %s", $restpart);
+                my $role;
+                for $role ( @$restpart ) {
+                     #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest = %s", @$restpart[$role]);
+                     if ( defined $role->{'info'}->{'REST_API_version'} ) {
+                        $HoH_rest->{ "rest_version" } = $role->{'info'}->{'REST_API_version'};
+                        $HoH_rest->{ "version" } = $role->{'info'}->{'Domogik_version'};
+                     }
+                     #print "$role=$href->{$role} ";
+                     #DEBUG sprintf("dmg_snmp.pl : compute_rest_info arest->{'info'}->{'REST_API_version'} = %s", @$restpart[$role]->{'info'}->{'REST_API_version'});
+                }
             }
-        }
+            1;
+        } or do {                       # catch
+            $HoH_rest->{ "rest_version" } = "unknown";
+            $HoH_rest->{ "version" } = "unknown";
+        };
+               my $decoded_json;
+
         my $delay = sprintf("%ds", $ttl_rest);
         $cache->set('rest_info', $HoH_rest, $delay );
     }
@@ -1012,6 +1017,7 @@ sub init_parameters {
     $ttl_conf = $Config->{'ttl.conf'};
     $ttl_zmq = $Config->{'ttl.zmq'};
     $domogik_cfg = $Config->{'domogik.config'};
+    $dmg_manager = $Config->{'domogik.manager'};
     $debug = $Config->{'snmp.debug'};
 
     my $cfg2 = new Config::Simple();
@@ -1092,3 +1098,4 @@ foreach $core ( sort keys %$CoreOrder ) {
 
 INFO "dmg_snmp.pl started";
 
+1;

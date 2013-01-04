@@ -8,3 +8,4 @@ Table of content
 * :doc:`Perl agent </snmp_perl>`
 * :doc:`Cacti configuration </domogik_cacti>`
 * :doc:`Bash agent </snmp_bash>`
+* :doc:`Developpers notes </developpers>`

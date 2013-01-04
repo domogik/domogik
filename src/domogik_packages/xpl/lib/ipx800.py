@@ -130,7 +130,7 @@ class IPX:
         """ Try to access to IPX board and return error if not possible
         """
         if model not in IPX800_MODELS:
-            error = "Bad ipx800 model : %s" % model
+            error = "Bad ipx800 model : %s. Available list : %s" % (model, IPX800_MODELS)
             print(error)
             self._log.error(error)
             raise IPXException(error)

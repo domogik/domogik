@@ -5,7 +5,6 @@ Perl implementation
 
 Installation
 ============
-
 You must install some Perl modules :
 
 .. code-block:: bash
@@ -13,6 +12,9 @@ You must install some Perl modules :
     sudo apt-get install libchi-perl libnet-snmp-perl libproc-processtable-perl \
     libconfig-simple-perl libsnmp-perl liblog-log4perl-perl \
     liblwp-protocol-https-perl
+
+Note to debian user : some of the previous packages are not included
+in your distribution. Please install them by hand using cpan.
 
 You need to install the libzmq2 manualy
 
@@ -59,85 +61,83 @@ Restart your computer or logoff if needed. Restart the snmp daemon :
 
 And Use it
 ==========
+.. code-block:: bash
+
+    snmpwalk -v 2c -c public 192.168.x.x .1.3.6.1.4.1.41072
 
 .. code-block:: bash
 
-    snmpwalk -v 2c -c public 192.168.x.x .1.3.6.1.4.1.8072.9999.9999
-
-.. code-block:: bash
-
-    iso.3.6.1.4.1.8072.9999.9999.0.1.0 = STRING: "Domogik"
-    iso.3.6.1.4.1.8072.9999.9999.0.1.1 = STRING: "0.3.0" # Domogik version
-    iso.3.6.1.4.1.8072.9999.9999.0.1.2 = STRING: "0.6" # REST version
-    iso.3.6.1.4.1.8072.9999.9999.0.1.10.0 = INTEGER: 8 # Number of plugins (normal and core) installed
-    iso.3.6.1.4.1.8072.9999.9999.0.1.10.1 = INTEGER: 7 # Number of plugins (normal and core) running
-    iso.3.6.1.4.1.8072.9999.9999.0.1.10.10.0 = STRING: "0.97" # Total perccentage of CPU
-    iso.3.6.1.4.1.8072.9999.9999.0.1.10.11.0 = STRING: "4.08" # Total percentage of Memory
-    iso.3.6.1.4.1.8072.9999.9999.0.1.10.11.1 = INTEGER: 86253568 # Total RSS memory
-    iso.3.6.1.4.1.8072.9999.9999.0.1.10.11.2 = INTEGER: 488321024 # Total SIZE memory
-    iso.3.6.1.4.1.8072.9999.9999.0.2.0 = INTEGER: 3 # Number of core plugins installed
-    iso.3.6.1.4.1.8072.9999.9999.0.2.1 = INTEGER: 3 # Number of core plugins running
-    iso.3.6.1.4.1.8072.9999.9999.0.2.10.0 = STRING: "manager" # Manager process
-    iso.3.6.1.4.1.8072.9999.9999.0.2.10.1 = INTEGER: 29512 # PID
-    iso.3.6.1.4.1.8072.9999.9999.0.2.10.10.0 = STRING: "0.05" # PCPU
-    iso.3.6.1.4.1.8072.9999.9999.0.2.10.11.0 = STRING: "0.80" # PMEM
-    iso.3.6.1.4.1.8072.9999.9999.0.2.10.11.1 = INTEGER: 16855040 # RSS
-    iso.3.6.1.4.1.8072.9999.9999.0.2.10.11.2 = INTEGER: 86450176 # SIZE
-    iso.3.6.1.4.1.8072.9999.9999.0.2.11.0 = STRING: "dbmgr"
-    iso.3.6.1.4.1.8072.9999.9999.0.2.11.1 = INTEGER: 29535
-    iso.3.6.1.4.1.8072.9999.9999.0.2.11.10.0 = STRING: "0.05"
-    iso.3.6.1.4.1.8072.9999.9999.0.2.11.11.0 = STRING: "0.64"
-    iso.3.6.1.4.1.8072.9999.9999.0.2.11.11.1 = INTEGER: 13594624
-    iso.3.6.1.4.1.8072.9999.9999.0.2.11.11.2 = INTEGER: 58159104
-    iso.3.6.1.4.1.8072.9999.9999.0.2.12.0 = STRING: "rest"
-    iso.3.6.1.4.1.8072.9999.9999.0.2.12.1 = INTEGER: 29599
-    iso.3.6.1.4.1.8072.9999.9999.0.2.12.10.0 = STRING: "0.61"
-    iso.3.6.1.4.1.8072.9999.9999.0.2.12.11.0 = STRING: "1.21"
-    iso.3.6.1.4.1.8072.9999.9999.0.2.12.11.1 = INTEGER: 25530368
-    iso.3.6.1.4.1.8072.9999.9999.0.2.12.11.2 = INTEGER: 129687552
-    iso.3.6.1.4.1.8072.9999.9999.0.3.0 = INTEGER: 5 # Number of normal plugins installed
-    iso.3.6.1.4.1.8072.9999.9999.0.3.1 = INTEGER: 4 # Number of normal plugins running
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.0.0 = STRING: "bluez" # plugins names
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.0.1 = STRING: "cron"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.0.2 = STRING: "earth"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.0.3 = STRING: "ozwave"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.0.4 = STRING: "scene"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.1.0 = INTEGER: 1 # Plugins running
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.1.1 = INTEGER: 1
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.1.2 = INTEGER: 1
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.1.3 = INTEGER: 0
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.1.4 = INTEGER: 1
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.2.0 = INTEGER: 29795 # PIDs
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.2.1 = INTEGER: 29652
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.2.2 = INTEGER: 29643
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.2.3 = INTEGER: 0
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.2.4 = INTEGER: 29942
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.3.0 = STRING: "0.08" # PCPU
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.3.1 = STRING: "0.08"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.3.2 = STRING: "0.05"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.3.3 = STRING: "0.00"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.3.4 = STRING: "0.05"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.4.0 = STRING: "0.29" # PMEM
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.4.1 = STRING: "0.47"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.4.2 = STRING: "0.34"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.4.3 = STRING: "0.00"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.4.4 = STRING: "0.33"
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.5.0 = INTEGER: 6094848 # RSS
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.5.1 = INTEGER: 9945088
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.5.2 = INTEGER: 7254016
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.5.3 = INTEGER: 0
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.5.4 = INTEGER: 6979584
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.6.0 = INTEGER: 49909760 # Size
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.6.1 = INTEGER: 70230016
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.6.2 = INTEGER: 52011008
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.6.3 = INTEGER: 0
-    iso.3.6.1.4.1.8072.9999.9999.0.3.10.6.4 = INTEGER: 41873408
+    iso.3.6.1.4.1.41072.0.1.0 = STRING: "Domogik"
+    iso.3.6.1.4.1.41072.0.1.1 = STRING: "0.3.0" # Domogik version
+    iso.3.6.1.4.1.41072.0.1.2 = STRING: "0.6" # REST version
+    iso.3.6.1.4.1.41072.0.1.10.0 = INTEGER: 8 # Number of plugins (normal and core) installed
+    iso.3.6.1.4.1.41072.0.1.10.1 = INTEGER: 7 # Number of plugins (normal and core) running
+    iso.3.6.1.4.1.41072.0.1.10.10.0 = STRING: "0.97" # Total perccentage of CPU
+    iso.3.6.1.4.1.41072.0.1.10.11.0 = STRING: "4.08" # Total percentage of Memory
+    iso.3.6.1.4.1.41072.0.1.10.11.1 = INTEGER: 86253568 # Total RSS memory
+    iso.3.6.1.4.1.41072.0.1.10.11.2 = INTEGER: 488321024 # Total SIZE memory
+    iso.3.6.1.4.1.41072.0.2.0 = INTEGER: 3 # Number of core plugins installed
+    iso.3.6.1.4.1.41072.0.2.1 = INTEGER: 3 # Number of core plugins running
+    iso.3.6.1.4.1.41072.0.2.10.0 = STRING: "manager" # Manager process
+    iso.3.6.1.4.1.41072.0.2.10.1 = INTEGER: 29512 # PID
+    iso.3.6.1.4.1.41072.0.2.10.10.0 = STRING: "0.05" # PCPU
+    iso.3.6.1.4.1.41072.0.2.10.11.0 = STRING: "0.80" # PMEM
+    iso.3.6.1.4.1.41072.0.2.10.11.1 = INTEGER: 16855040 # RSS
+    iso.3.6.1.4.1.41072.0.2.10.11.2 = INTEGER: 86450176 # SIZE
+    iso.3.6.1.4.1.41072.0.2.11.0 = STRING: "dbmgr"
+    iso.3.6.1.4.1.41072.0.2.11.1 = INTEGER: 29535
+    iso.3.6.1.4.1.41072.0.2.11.10.0 = STRING: "0.05"
+    iso.3.6.1.4.1.41072.0.2.11.11.0 = STRING: "0.64"
+    iso.3.6.1.4.1.41072.0.2.11.11.1 = INTEGER: 13594624
+    iso.3.6.1.4.1.41072.0.2.11.11.2 = INTEGER: 58159104
+    iso.3.6.1.4.1.41072.0.2.12.0 = STRING: "rest"
+    iso.3.6.1.4.1.41072.0.2.12.1 = INTEGER: 29599
+    iso.3.6.1.4.1.41072.0.2.12.10.0 = STRING: "0.61"
+    iso.3.6.1.4.1.41072.0.2.12.11.0 = STRING: "1.21"
+    iso.3.6.1.4.1.41072.0.2.12.11.1 = INTEGER: 25530368
+    iso.3.6.1.4.1.41072.0.2.12.11.2 = INTEGER: 129687552
+    iso.3.6.1.4.1.41072.0.3.0 = INTEGER: 5 # Number of normal plugins installed
+    iso.3.6.1.4.1.41072.0.3.1 = INTEGER: 4 # Number of normal plugins running
+    iso.3.6.1.4.1.41072.0.3.10.0.0 = STRING: "bluez" # plugins names
+    iso.3.6.1.4.1.41072.0.3.10.0.1 = STRING: "cron"
+    iso.3.6.1.4.1.41072.0.3.10.0.2 = STRING: "earth"
+    iso.3.6.1.4.1.41072.0.3.10.0.3 = STRING: "ozwave"
+    iso.3.6.1.4.1.41072.0.3.10.0.4 = STRING: "scene"
+    iso.3.6.1.4.1.41072.0.3.10.1.0 = INTEGER: 1 # Plugins running
+    iso.3.6.1.4.1.41072.0.3.10.1.1 = INTEGER: 1
+    iso.3.6.1.4.1.41072.0.3.10.1.2 = INTEGER: 1
+    iso.3.6.1.4.1.41072.0.3.10.1.3 = INTEGER: 0
+    iso.3.6.1.4.1.41072.0.3.10.1.4 = INTEGER: 1
+    iso.3.6.1.4.1.41072.0.3.10.2.0 = INTEGER: 29795 # PIDs
+    iso.3.6.1.4.1.41072.0.3.10.2.1 = INTEGER: 29652
+    iso.3.6.1.4.1.41072.0.3.10.2.2 = INTEGER: 29643
+    iso.3.6.1.4.1.41072.0.3.10.2.3 = INTEGER: 0
+    iso.3.6.1.4.1.41072.0.3.10.2.4 = INTEGER: 29942
+    iso.3.6.1.4.1.41072.0.3.10.3.0 = STRING: "0.08" # PCPU
+    iso.3.6.1.4.1.41072.0.3.10.3.1 = STRING: "0.08"
+    iso.3.6.1.4.1.41072.0.3.10.3.2 = STRING: "0.05"
+    iso.3.6.1.4.1.41072.0.3.10.3.3 = STRING: "0.00"
+    iso.3.6.1.4.1.41072.0.3.10.3.4 = STRING: "0.05"
+    iso.3.6.1.4.1.41072.0.3.10.4.0 = STRING: "0.29" # PMEM
+    iso.3.6.1.4.1.41072.0.3.10.4.1 = STRING: "0.47"
+    iso.3.6.1.4.1.41072.0.3.10.4.2 = STRING: "0.34"
+    iso.3.6.1.4.1.41072.0.3.10.4.3 = STRING: "0.00"
+    iso.3.6.1.4.1.41072.0.3.10.4.4 = STRING: "0.33"
+    iso.3.6.1.4.1.41072.0.3.10.5.0 = INTEGER: 6094848 # RSS
+    iso.3.6.1.4.1.41072.0.3.10.5.1 = INTEGER: 9945088
+    iso.3.6.1.4.1.41072.0.3.10.5.2 = INTEGER: 7254016
+    iso.3.6.1.4.1.41072.0.3.10.5.3 = INTEGER: 0
+    iso.3.6.1.4.1.41072.0.3.10.5.4 = INTEGER: 6979584
+    iso.3.6.1.4.1.41072.0.3.10.6.0 = INTEGER: 49909760 # Size
+    iso.3.6.1.4.1.41072.0.3.10.6.1 = INTEGER: 70230016
+    iso.3.6.1.4.1.41072.0.3.10.6.2 = INTEGER: 52011008
+    iso.3.6.1.4.1.41072.0.3.10.6.3 = INTEGER: 0
+    iso.3.6.1.4.1.41072.0.3.10.6.4 = INTEGER: 41873408
 
 The previous OID is a temporary one.
 
 Debug
 =====
-
 Set debug to 1 in snmp.cfg.
 
 Launch the script with no argument to check syntax.
@@ -154,7 +154,10 @@ For test only. You must uncomment code in source to try it.
 
 Install the missing packages :
 
-sudo apt-get install libzeromq-perl libzmq-dev
+.. code-block:: bash
+
+sudo apt-get install libzeromq-perl libzmq-dev libtest-requires-perl \
+ libtest-fatal-perl libtest-tcp-perl
 
 There is no package for libzmq2, so you must use cpan to install it :
 
@@ -163,7 +166,6 @@ There is no package for libzmq2, so you must use cpan to install it :
     sudo cpan i /AnyEvent/
     sudo cpan i /Proc::Guard/
     sudo LANG=C cpan i /libzmq2/
-
 
 Example code :
 

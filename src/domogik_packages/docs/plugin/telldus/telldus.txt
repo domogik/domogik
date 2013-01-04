@@ -7,8 +7,13 @@ Purpose
 The purpose of this plugin is to manage your devices using the Tellstick
 or the Tellstick Duo from Telldus.
 
+.. |telldus_products| image:: telldus_products.png
+    :width: 400px
+
+|telldus_products|
+
 It supports the following technologies : Chacon/DIO, Nexa, Proove, Intertechno,
-HomeEasy, KlikAanKlikUit, Byebye Standby, Rusta ... and many others
+HomeEasy, KlikAanKlikUit, Byebye Standby, Rusta ... and many others.
 
 For a list of supported protocols/models, please see the telldus-core
 documentation `here <http://developer.telldus.se/wiki/TellStick_conf>`_.
@@ -16,21 +21,25 @@ documentation `here <http://developer.telldus.se/wiki/TellStick_conf>`_.
 Known issues
 ============
 
-Don't use special characters when creating devices in telldus center. This will break the helper.
+Don't use special characters when creating devices in telldus center.
+This will break the helper.
 
 Dependencies
 ============
 
-pympler (>=0.2.1)
+* pympler (>=0.2.1)
 
-tailer (>=0.2.1)
+* tailer (>=0.2.1)
 
-To use this plugin, you also need to install tellduscenter on your computer. Look at Telldus `documentation <http://developer.telldus.com/wiki/TellStick_installation_Linux>`_.
+To use this plugin, you also need to install tellduscenter on your computer.
 
 How to plug
 ===========
+Plug your stick in an usb port and install telldus softwares :
+look at Telldus `documentation <http://developer.telldus.com/wiki/TellStick_installation_Linux>`_.
 
-Plug your stick in an usb port and add your devices in tellduscenter.
+You also need to add your devices in telldus center :
+look at Telldus `documentation <http://www.telldus.com/products/guides?section=using_selflearning>`_.
 
 Plugin configuration
 ====================
@@ -103,36 +112,38 @@ TSxx.btn (where xx is the address of the device).
 
 Here is an example :
 
-	TS15.btn
+.. code-block:: none
+
+    TS15.btn
 
 .. code-block:: none
 
-	[Button]
-	device=TS15
-	actions=lighting,shutter1,shutter2
-	[lighting]
-	xpltype=xpl-cmnd
-	xplschema=lighting.basic
-	xplcommand=command
-	xplon=activate
-	xploff=deactivate
-	scene=samtv
-	[shutter1]
-	xpltype=xpl-cmnd
-	xplschema=telldus.basic
-	xplcommand=level
-	xplon=10
-	xploff=100
-	device=TS3
-	command=shut
-	[shutter2]
-	xpltype=xpl-cmnd
-	xplschema=telldus.basic
-	xplcommand=level
-	xplon=10
-	xploff=100
-	device=TS4
-	command=shut
+    [Button]
+    device=TS15
+    actions=lighting,shutter1,shutter2
+    [lighting]
+    xpltype=xpl-cmnd
+    xplschema=lighting.basic
+    xplcommand=command
+    xplon=activate
+    xploff=deactivate
+    scene=samtv
+    [shutter1]
+    xpltype=xpl-cmnd
+    xplschema=telldus.basic
+    xplcommand=level
+    xplon=10
+    xploff=100
+    device=TS3
+    command=shut
+    [shutter2]
+    xpltype=xpl-cmnd
+    xplschema=telldus.basic
+    xplcommand=level
+    xplon=10
+    xploff=100
+    device=TS4
+    command=shut
 
 This example activate the scene samtv and dim the shutters (to 10%)
 when activating. It deactivate the scene and open the shutters when deactivating.
@@ -192,7 +203,7 @@ Shutter
 |                    |                   |                                                                                            |
 |                    |                   | Stop : Stop the shutter move (UP or DOWN)                                                  |
 |                    |                   |                                                                                            |
-|                    |                   | Dim : Open the shutter then close it to the specified level                                |
+|                    |                   | Shut : Open the shutter then close it to the specified level                                |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Reference         |                                                                                            |
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+

@@ -31,18 +31,12 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-import traceback
 from hashlib import md5
 import base64
-from time import time, strftime
+from time import time
 from random import randint
-from domogik.xpl.common.xplmessage import XplMessage
-#import XyneHTTPServer
-#import BaseHTTPServer, select, socket, SocketServer, urlparse
 import BaseHTTPServer
-from domogik.common.database import DbHelper, DbHelperException
-#from domogik_packages.xpl.lib.XyneHTTPServer import BaseHTTPRequestHandler
-import SocketServer, urlparse, socket, select
+import urlparse, socket, select
 
 class ProxyException(Exception):
     """
@@ -104,26 +98,28 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # Create a nonce value
     def create_nonce(self):
         """
+        Create a nonce
         """
         NONCE_MAX = 2 ** (self.NONCE_LENGTH * 4) - 1
         NONCE_FORMAT = '%0' + str(self.NONCE_LENGTH) + 'x'
         return NONCE_FORMAT % randint(0, NONCE_MAX)
 
     # Get the nonce value
-    def get_nonce(self,opaque,nc):
+    def get_nonce(self, opaque, nonc):
         """
+        Return a nonce
         """
         # Purge values that have timed out or exceeded the limit
-        t = time()
-        for k in self.opaques.keys():
-            if t - self.opaques[k]['time'] > self.OPAQUE_TIMEOUT or int(self.opaques[k]['nc'],16) > self.NC_LIMIT:
-                del self.opaques[k]
+        ttt = time()
+        for kkk in self.opaques.keys():
+            if t - self.opaques[kkk]['time'] > self.OPAQUE_TIMEOUT or int(self.opaques[kkk]['nc'],16) > self.NC_LIMIT:
+                del self.opaques[kkk]
         try:
-            if self.opaques[opaque]['nc'] != nc:
+            if self.opaques[opaque]['nc'] != nonc:
                 del self.opaques[opaque]
                 return ''
-            self.opaques[opaque]['nc'] = "%08x" % (int(nc,16) + 1)
-            self.opaques[opaque]['time'] = t
+            self.opaques[opaque]['nc'] = "%08x" % (int(nonc,16) + 1)
+            self.opaques[opaque]['time'] = ttt
             return self.opaques[opaque]['nonce']
         except KeyError:
             return None
@@ -131,6 +127,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # Reject an unauthenticated request.
     def reject_unauthenticated_request(self):
         """
+        Reject unauthenticated.
         """
         if self.server.auth_method == "basic" or \
           (self.server.auth_method == "both" and self.both_current == 1) :
@@ -273,6 +270,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_authenticated_CONNECT(self):
         """
+        Do an authenticated CONNECT.
         """
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
@@ -290,6 +288,7 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_authenticated_GET(self):
         """
+        Do an authenticated GET.
         """
         (scm, netloc, path, params, query, fragment) = urlparse.urlparse(
             self.path, 'http')
@@ -351,12 +350,14 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         """
+        Do a GET.
         """
         if self.authenticate('GET'):
             self.do_authenticated_GET()
 
     def do_HEAD(self):
         """
+        Do a HEAD.
         """
         if self.authenticate('GET'):
             self.do_authenticated_GET()
@@ -369,12 +370,14 @@ class ProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_PUT(self):
         """
+        Do a PUT.
         """
         if self.authenticate('GET'):
             self.do_authenticated_GET()
 
     def do_POST(self):
         """
+        Do a POST.
         """
         if self.authenticate('POST'):
             self.do_authenticated_GET()
