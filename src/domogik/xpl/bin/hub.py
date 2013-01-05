@@ -43,6 +43,7 @@ class MulticastPingPong(DatagramProtocol)
 
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
+from optparse import OptionParser
 
 # TODO :
 # 1. move xplmessage in a new xplhub project.
@@ -50,6 +51,7 @@ from twisted.internet import reactor
 # 3. adapt domogik to use the new lib
 # 4. adapt domogik install to also install the new hub
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
+from domogik.common import daemonize
 
 from datetime import datetime
 from time import time
@@ -59,6 +61,10 @@ from threading import Thread, Event
 from netifaces import interfaces, ifaddresses, AF_INET
 import ConfigParser
 import traceback
+import sys
+
+# version
+VERSION=1.0
 
 # config file
 CONFIG_FILE = "/etc/domogik/xplhub.cfg"
@@ -78,7 +84,27 @@ class Hub():
         """ Init hub
         """
 
-        print("Domogik xPL Hub (python)")
+        ### Options management
+        parser = OptionParser()
+        parser.add_option("-V", 
+                          "--version", 
+                          action="store_true", 
+                          dest="display_version", 
+                          default=False, 
+                          help="Display the xPL hub version.")
+        parser.add_option("-f", 
+                          action="store_true", 
+                          dest="run_in_foreground", 
+                          default=False, 
+                          help="Run the xPL hub in foreground, default to background.")
+        (self.options, self.args) = parser.parse_args()
+        if self.options.display_version:
+            print(VERSION)
+            sys.exit(0)
+        elif not self.options.run_in_foreground:
+            daemonize.createDaemon()
+
+        print("Domogik xPL Hub (python) v%s" % VERSION)
         print("Starting...")
         print("- Reading configuration...")
 
@@ -662,6 +688,8 @@ class Logger:
 
 
 def main():
+    #print("Launching the xPL hub as a daemon...")
+    #daemonize.createDaemon()
     Hub()
 
 if __name__ == "__main__":

@@ -79,7 +79,7 @@ function start_xpl {
             echo "ERROR : ${PYTHON_XPLHUB} not in path, did you had any issue during the installation ?"
             exit 1
         fi
-        /bin/su - ${DOMOGIK_USER} -c "nohup $(which ${PYTHON_XPLHUB}) >/dev/null &"
+        /bin/su - ${DOMOGIK_USER} -c "$(which ${PYTHON_XPLHUB}) >/dev/null"
         if [ $? -gt 0 ]; then
             echo " An error occured during Xpl startup."
             exit 1
