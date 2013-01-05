@@ -282,14 +282,14 @@ class Mscene():
        for device in self.devices:
            print device
            print self.devices[device]['key']
-           print self.devices[device]['adr']
+           print eval(self.devices[device]['filters'])[0]['xpl_stat']
+           
            if self.devices[device]['key'] in message.data:
               print 'find key'
            for i in range(len(eval(self.devices[device]['filters']))):
-              if self.devices[device]['key'] in message.data and eval(self.devices[device]['filters'])[i]['device'] in message.data:
+              if eval(self.devices[device]['filters'])[0]['xpl_stat'] in message.data and eval(self.devices[device]['filters'])[i]['device'] in message.data:
                  if message.data[eval(self.devices[device]['filters'])[i]['device']]==self.devices[device]['adr']:
-                    print ('pourquoi?')
-                    self.devices_stat[device]=message.data[self.devices[device]['key']]
+                    self.devices_stat[device]=message.data[eval(self.devices[device]['filters'])[0]['xpl_stat']]
        self.device_test()
 
     def send_command(self, actions):
@@ -334,6 +334,8 @@ class Mscene():
     def device_test(self):
 ### test devices value and evaluate result
         print('test of device')
+        print("value du message")
+        print 
         for device in self.devices:
            if self.devices[device]['op'] != '':
               if self.devices[device]['op'] == '=':
