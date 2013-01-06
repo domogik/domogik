@@ -37,6 +37,11 @@ import traceback
 import ConfigParser
 import os
 import glob
+from domogik.common.messaging.reqrep.messaging_reqrep import MessagingRep
+from domogik.common.messaging.pubsub.messaging_event_utils import MessagingEventPub
+import json
+from random import choice
+from time import sleep
 
 ERROR_NO = 0
 ERROR_PARAMETER = 1
@@ -65,6 +70,78 @@ EARTHERRORS = { ERROR_NO: 'No error',
                ERROR_STATUS_NOT_EXIST: "Event's status does not exist.",
                ERROR_REST: 'Error with REST. But Event is created.',
                }
+
+class EarthZmq():
+    """
+    Interface to the ZMQ
+    """
+    category = "plugin.earth.admin"
+
+    def __init__(self, earth, stop):
+        """
+        Initialise the ZMQ interface.
+        """
+        self._earth = earth
+        self.stop = stop
+        self._zmq_reply = MessagingRep()
+
+    def get_reply_action(self, reqid):
+        """
+        Retrieve action from the id of request.
+
+        """
+        idxx = reqid.find(self.category)
+        if idxx == -1:
+            return None
+        else :
+            offset = len(self.category)
+            temp = reqid[idxx+offset+1:]
+            idxx = temp.find(".")
+            return temp[:idxx]
+
+    def reply(self):
+        """
+        Wait for ZMQ request and send reply.
+
+        """
+        self._earth.log.debug("EarthZmq.reply : Listen for messages ...")
+        while not self.stop.isSet():
+            self._earth.log.debug("EarthZmq.reply : Waiting for request...")
+            try:
+                j_request = self._zmq_reply.wait_for_request()
+                self._earth.log.debug("EarthZmq.reply : Received request %s" % j_request)
+                request = json.loads(j_request)
+                action = self.get_reply_action(request['id'])
+                repl = dict()
+                print("YYYYYYYYYYYYYYMQ : Incoming request")
+                if action == "check":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request check")
+                    repl["check"] = "ok"
+                elif action == "gateway":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request gateway")
+                    repl = self._earth.gateway()
+                elif action == "memory":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request memory")
+                    repl = self._earth.memory()
+                elif action == "info":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request info")
+                    etype = None
+                    edelay = None
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    repl = self._earth.event_info(etype, edelay)
+                else:
+                    repl["error"] = "action %s not found" % action
+            except :
+                repl["error"] = "exception %s" % traceback.format_exc()
+            finally:
+                self._zmq_reply.send_reply(repl)
+            #print("action %s" % action)
+            #self._earth.log.debug("EarthZmq.reply : request receive %s " % request)
+            #sleep(.5)
+            #self._zmq_reply.send_reply("%s : done!" % request['id'])
 
 class EarthStore():
     """
