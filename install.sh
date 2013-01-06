@@ -37,14 +37,20 @@ function display_usage {
     echo "Usage : "
     echo "  Full installation : ./install.sh"
     echo "  Installation on secondary host : ./install.sh --secondary"
+    echo "  Use the C xPL hub instead of the python one : ./install.sh --hub_c"
     echo "  Help : ./install.sh -h"
     echo "         ./install.sh --help"
 }
 
 MAIN_INSTALL=y
+DOMOGIK_XPL_HUB=python
 while [ "$1" ] ; do 
     arg=$1
     case $arg in
+        --hub_c) 
+            DOMOGIK_XPL_HUB="c"
+            echo "The C version of the xPL hub will be used instead of the python one."
+            ;;
         --secondary) 
             MAIN_INSTALL="n"
             echo "This installation will be done as a secondary host installation : only manager (and plugins) will be launched on this host."
@@ -244,7 +250,7 @@ function update_default_config {
         exit 8
     fi
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
-
+    [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_XPL_HUB.*$;DOMOGIK_XPL_HUB=${DOMOGIK_XPL_HUB};" /etc/default/domogik
 
     if [ "$MODE" = "develop" ];then
         arch_path=$(python install/get_arch.py)
