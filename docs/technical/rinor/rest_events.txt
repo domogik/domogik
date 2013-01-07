@@ -14,11 +14,11 @@ First, you create a new event request for one or more device id. This request wi
 * a ticket id (which you will have to use in following requests)
 * data of event
 
-After this event creation you can make a request for this event as often as you want. On REST side, data are put in queue, so no data will be loose between 2 requests.
+After the event creation you can make a request for the event as often as you want. On REST side, data is put in a queue, so no data will be lost between 2 requests.
 
-When you don't need anymore the request, please free him with the appropriate request.
+When you don't need the reauest anymore, please free it with the appropriate request.
 
-When there is no data in queue, REST will keep connection open until it can give you data or until timeout occurs (cf **q-evt-timeout** configuration key).
+When there is no data in queue, REST will keep connection open until it can give you the data or until timeout occurs (cf **q-evt-timeout** configuration key).
 
 Configuration
 =============
@@ -28,7 +28,7 @@ Configuration
 * q-evt-timeout : timeout for a /event new or get request.
 
 .. note::
-    Each event has his own queue
+    Each event has its own queue
 
 .. warning::
     Don't change these values if you don't know what you are doing.
