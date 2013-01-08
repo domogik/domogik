@@ -14,14 +14,10 @@ Table Of Content
     /enduser/installation/index
     /enduser/installation/external
     /enduser/configuration/index
-    /enduser/configuration/house
     /enduser/configuration/plugins/index
     /enduser/configuration/plugins/install
     /enduser/configuration/plugins/helpers
     /enduser/configuration/devices
-    /enduser/administration/house
-    /enduser/administration/area
-    /enduser/administration/room
     /enduser/administration/device
     /enduser/administration/plugin
     /enduser/administration/account

@@ -186,7 +186,11 @@ class SceneManager(XplPlugin):
              action['type'] = data['action'][action_text]['type']
              action['address'] = data['action'][action_text]['address']
              action['command'] = data['action'][action_text]['command']
-             action['value']= data['action'][action_text]['value']
+             if 'value' in data['action'][action_text]:
+                action['value']= data['action'][action_text]['value']
+             else:
+                print('No value for this command')
+                action['value']=''
              action['techno']= data['action'][action_text]['techno']
              actions[action_text]= action
 
@@ -238,16 +242,20 @@ class SceneManager(XplPlugin):
       files = glob.glob("%s/*/*xml" % filetoopen)
       res = {}
       for _files in files:
+         print(_files)
          if _files[-4:] == ".xml":
             doc = minidom.parse(_files)
             technology = doc.documentElement.attributes.get("technology").value
+#            print(technology)
             schema_types = self.get_schemas_and_types(doc.documentElement)
             if technology not in res:
                res[technology] = {}
             for schema in schema_types:
-               if schema not in res[technology]:
+               #print(schema)
+               if schema==schema:#schema not in res[technology]:
                   res[technology][schema] = {}
                   for xpl_type in schema_types[schema]:
+                #     print(xpl_type)
                      if xpl_type == "xpl-trig" and technology == techno:
                         device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
                         for i in range(len(mapping)):
