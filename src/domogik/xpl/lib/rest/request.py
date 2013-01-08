@@ -163,7 +163,8 @@ class ProcessRequest():
         },
         # /log
         'log': {
-            # TODO
+            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
+            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
         },
         # /package
         'package': {
@@ -186,8 +187,10 @@ class ProcessRequest():
             '^/plugin/config/list/del/(?P<host>[a-z]+)/(?P<id>[a-z]+)/by-key/(?P<key>[a-z0-9]+)$':   '_rest_plugin_config_del',
 	    '^/plugin/config/set/.*$':								 '_rest_plugin_config_set',
         },
-	# /queuecontent
-        # TODO
+        # /queuecontent
+        'queuecontent': {
+            '^/queuecontent/.*$':                                                                    'rest_queuecontent',
+        },
         # /repo
         'repo': {
             '^/repo/put$':                                                                           '_rest_repo_put',
