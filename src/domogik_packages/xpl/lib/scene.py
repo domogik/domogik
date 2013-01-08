@@ -325,7 +325,10 @@ class Mscene():
         if action['command']=='':
            the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, action['techno'], action['address'], action['value'])
         else:
-           the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],actions[action]['value'])
+           if action['value']=='':
+              the_url = 'http://%s/command/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'])
+           else:
+              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],actions[action]['value'])
         req = urllib2.Request(the_url)
         handle = urllib2.urlopen(req)
         resp1 = handle.read()
