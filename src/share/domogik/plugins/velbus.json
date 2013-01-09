@@ -1,4 +1,84 @@
 {
+    "products" : [ 
+       {
+           "name" : "VMB1RY",
+           "id" : "velbus_VMB1RY",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=363066",
+           "type" : "velbus.relay"
+       },
+       {
+           "name" : "VMB4RY",
+           "id" : "velbus_VMB4RY",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=363140",
+           "type" : "velbus.relay"
+       },
+       {
+           "name" : "VMB4RYLD",
+           "id" : "velbus_VMB1RYLD",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=383056",
+           "type" : "velbus.relay"
+       },
+       {
+           "name" : "VMB4RYNO",
+           "id" : "velbus_VMB1RNO",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=383130",
+           "type" : "velbus.relay"
+       },
+       {
+           "name" : "VMB1RY",
+           "id" : "velbus_VMB1RY",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=363066",
+           "type" : "velbus.relay"
+       },
+       {
+           "name" : "VMB1LED",
+           "id" : "velbus_VMB1LED",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=379644",
+           "type" : "velbus.dimmer"
+       },
+       {
+           "name" : "VMB4DC",
+           "id" : "velbus_VMB4DC",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=384234",
+           "type" : "velbus.dimmer"
+       },
+       {
+           "name" : "VMBDME",
+           "id" : "velbus_VMBDME",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=385774",
+           "type" : "velbus.dimmer"
+       },
+       {
+           "name" : "VMBDMI",
+           "id" : "velbus_VMBDMI",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=386050",
+           "type" : "velbus.dimmer"
+       },
+       {
+           "name" : "VMBRGBDC",
+           "id" : "velbus_VMBRGBDC",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=385316",
+           "type" : "velbus.dimmer"
+       },
+       {
+           "name" : "VMB1BL",
+           "id" : "velbus_VMB1BL",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=363200",
+           "type" : "velbus.shutter"
+       },
+       {
+           "name" : "VMB2BL",
+           "id" : "velbus_VMB2BL",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=363226",
+           "type" : "velbus.shutter"
+       },
+       {
+           "name" : "VMB2BLE",
+           "id" : "velbus_VMB2BLE",
+           "doc" : "http://www.velbus.eu/support/downloads/?id=409562",
+           "type" : "velbus.shutter"
+       }
+    ],
     "configuration": [
         {
             "default": "False", 
