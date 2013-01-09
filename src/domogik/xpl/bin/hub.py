@@ -42,26 +42,24 @@ class MulticastPingPong(DatagramProtocol)
 # pip install netifaces
 
 from twisted.internet.protocol import DatagramProtocol
-from twisted.internet import reactor
+#from twisted.internet import reactor
+#from twisted.python import log
 from optparse import OptionParser
 
-# TODO :
-# 1. move xplmessage in a new xplhub project.
-# 2. use the new lib
-# 3. adapt domogik to use the new lib
-# 4. adapt domogik install to also install the new hub
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
 from domogik.common import daemonize
 
 from datetime import datetime
 from time import time
-from twisted.python import log
 from sys import stdout
 from threading import Thread, Event
 from netifaces import interfaces, ifaddresses, AF_INET
 import ConfigParser
 import traceback
 import sys
+#import copy
+#import os
+#import socket
 
 # version
 VERSION=1.0
@@ -75,34 +73,46 @@ DEAD = "dead"
 STOPPED = "stopped"
 
 
+
+
+
+
+
+
+class Logger:
+
+    def __init__(self, log_level):
+        self._log_level = log_level
+
+    def info(self, msg):
+        # log only in 'info' log level
+        if self._log_level == 'info':
+            log.msg(msg)
+
+    def error(self, msg):
+        # log in all log level
+        log.err(msg)
+
+
+
+
+
+
+
+
+
 class Hub():
     """ Main class
         Here we will launch the hub
     """
 
-    def __init__(self):
+
+    def __init__(self, daemon = False):
         """ Init hub
+            @param daemon : True : launch as a daemon
         """
 
-        ### Options management
-        parser = OptionParser()
-        parser.add_option("-V", 
-                          "--version", 
-                          action="store_true", 
-                          dest="display_version", 
-                          default=False, 
-                          help="Display the xPL hub version.")
-        parser.add_option("-f", 
-                          action="store_true", 
-                          dest="run_in_foreground", 
-                          default=False, 
-                          help="Run the xPL hub in foreground, default to background.")
-        (self.options, self.args) = parser.parse_args()
-        if self.options.display_version:
-            print(VERSION)
-            sys.exit(0)
-        elif not self.options.run_in_foreground:
-            daemonize.createDaemon()
+        self.is_daemon = daemon
 
         print("Domogik xPL Hub (python) v%s" % VERSION)
         print("Starting...")
@@ -149,14 +159,18 @@ class Hub():
         # We use listenMultiple=True so that we can run MulticastServer.py and
         # MulticastClient.py on same machine:
         print("- Initiating the multicast UDP client...")
+        self.log.info("Initiating the multicast UDP client...")
+        self.log.info("- creation...")
         self.MPP = MulticastPingPong(log = self.log,
                                      file_clients = file_clients,
                                      do_log_bandwidth = do_log_bandwidth,
                                      file_bandwidth = file_bandwidth,
                                      do_log_invalid_data = do_log_invalid_data,
                                      file_invalid_data = file_invalid_data)
+        self.log.info("- start reactor...")
         reactor.listenMulticast(3865, self.MPP,
                                 listenMultiple=True)
+        self.log.info("- add triggers...")
         reactor.addSystemEventTrigger('during', 'shutdown', self.stop_hub)
         print("xPL hub started!")
 
@@ -168,6 +182,14 @@ class Hub():
         print("Request to stop the xPL hub")
         self.log.info("Request to stop the xPL hub")
         self.MPP.stop_threads()
+
+
+
+
+
+
+
+
 
 
 class MulticastPingPong(DatagramProtocol):
@@ -672,29 +694,64 @@ class MulticastPingPong(DatagramProtocol):
                 self._cb()
                 self._stop.wait(self._time)
 
-class Logger:
 
-    def __init__(self, log_level):
-        self._log_level = log_level
 
-    def info(self, msg):
-        # log only in 'info' log level
-        if self._log_level == 'info':
-            log.msg(msg)
 
-    def error(self, msg):
-        # log in all log level
-        log.err(msg)
+
+
+
+
+if __name__ == "__main__":
+#    main()
+
+    ### Options management
+    parser = OptionParser()
+    parser.add_option("-V", 
+                      "--version", 
+                      action="store_true", 
+                      dest="display_version", 
+                      default=False, 
+                      help="Display the xPL hub version.")
+    parser.add_option("-f", 
+                      action="store_true", 
+                      dest="run_in_foreground", 
+                      default=False, 
+                      help="Run the xPL hub in foreground, default to background.")
+    (options, args) = parser.parse_args()
+    if options.display_version:
+        print(VERSION)
+        sys.exit(0)
+    if not options.run_in_foreground:
+        daemon = True
+        daemonize.createDaemon()
+
+        #from twisted.internet.protocol import DatagramProtocol
+        from twisted.internet import reactor
+        from twisted.python import log
+
+    else:
+        daemon = False
+        #from twisted.internet.protocol import DatagramProtocol
+        from twisted.internet import reactor
+        from twisted.python import log
+
+
+    ### Launch the hub
+    Hub(daemon)
+
+
+
+
+
+
+
+
+
+
 
 
 def main():
-    #print("Launching the xPL hub as a daemon...")
-    #daemonize.createDaemon()
-    Hub()
-
-if __name__ == "__main__":
-    main()
-
+    pass
 
 
 

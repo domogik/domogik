@@ -46,6 +46,7 @@ End User Documentation
  
 Technical Documentation
 =======================
+* :doc:`The xPL hub </xplhub/index>`
 * :doc:`Network ports used by Domogik </technical/network_ports>`
 * :doc:`Actuators </technical/actuator>`
 * :doc:`Sensors </technical/sensor>`
