@@ -2,7 +2,8 @@
 Package json file
 =================
 .. warning ::
-   This docmentation is only valid for json version 2 and up
+   This docmentation is only valid for json version 2 and up.
+   To learn how to upgrade read the json file :doc:`upgrade <json_file_upgrade>` documentation
 
 .. |yes| image:: yes.png
 .. |no|  image:: no.png
