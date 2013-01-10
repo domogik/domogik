@@ -43,7 +43,7 @@ class MulticastPingPong(DatagramProtocol)
 
 from twisted.internet.protocol import DatagramProtocol
 #from twisted.internet import reactor
-#from twisted.python import log
+from twisted.python import log
 from optparse import OptionParser
 
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
@@ -454,7 +454,7 @@ class MulticastPingPong(DatagramProtocol):
         """
         addresses = []
         if xpl.target == "*":
-            msg = "Target=*. Client ids for delivery : "
+            msg = "Target=*. Client ids for delivery : *"
             for client in self._client_list:
                 addresses.append((client['ip'], client['port']))
                 msg += "%s, " % client['id']
@@ -704,6 +704,8 @@ class MulticastPingPong(DatagramProtocol):
 if __name__ == "__main__":
 #    main()
 
+
+#def main():
     ### Options management
     parser = OptionParser()
     parser.add_option("-V", 
@@ -727,13 +729,13 @@ if __name__ == "__main__":
 
         #from twisted.internet.protocol import DatagramProtocol
         from twisted.internet import reactor
-        from twisted.python import log
+        #from twisted.python import log
 
     else:
         daemon = False
         #from twisted.internet.protocol import DatagramProtocol
         from twisted.internet import reactor
-        from twisted.python import log
+        #from twisted.python import log
 
 
     ### Launch the hub
@@ -745,13 +747,15 @@ if __name__ == "__main__":
 
 
 
+#if __name__ == "__main__":
+#    main()
 
 
 
 
 
-def main():
-    pass
+#def main():
+#    pass
 
 
 
