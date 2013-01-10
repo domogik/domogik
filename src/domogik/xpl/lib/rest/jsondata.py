@@ -175,7 +175,7 @@ class JSonHelper():
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple", "NamedTuple")
-        list_type = ("list", "InstrumentedList")
+        list_type = ("list", "InstrumentedList", "pluginProducts")
         dict_type = ("dict")
         # new definitions
         jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")

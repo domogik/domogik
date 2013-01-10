@@ -200,6 +200,7 @@ class ProcessRequest():
         'plugin': {
             '^/plugin/list$':                                                                        '_rest_plugin_list',
             '^/plugin/json/(?P<id>[a-z]+)$':                                                         '_rest_plugin_json',
+            '^/plugin/products/(?P<id>[a-z]+)$':                                                     '_rest_plugin_products',
             '^/plugin/detail/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                      '_rest_plugin_detail',
             '^/plugin/dependency/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                  '_rest_plugin_dependency',
             '^/plugin/udev-rule/(?P<host>[a-z]+)/(?P<id>[a-z]+)$':                                   '_rest_plugin_udev_rule',
@@ -2177,6 +2178,20 @@ class ProcessRequest():
             self.send_http_response_error(999, "Bad operation for /plugin", self.jsonp, self.jsonp_cb)
             return
 
+    def _rest_plugin_products(self, id):
+        self.log.debug("Plugin : ask for plugin products")
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("pluginProducts")
+        try:
+            pjson = PackageJson(id)
+            if 'products' in pjson.json:
+		for p in pjson.json['products']:
+                    json_data.add_data(p)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
 
     def _rest_plugin_json(self, id):
         self.log.debug("Plugin : ask for plugin json")
