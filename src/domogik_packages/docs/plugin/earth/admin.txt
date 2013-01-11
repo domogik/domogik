@@ -2,8 +2,50 @@
 Admin
 =====
 
-Theses pages are dedicated to the developpement of the new communication
-protocol between plugins and UI pages.
+ZMQ schema
+==========
+
+rooting
+-------
+
+(req|rep).plugin.earth.$REP.timestamp.version
+(req|rep).plugin.ping.timestamp.version
+(pub|sub).plugin.earth.$PUB.timestamp.version
+(pub|sub).plugin.enabled.timestamp.version
+
+
+REP
+---
+
+'gateway' : return the gateway (plugin) capabilities
+'memory' : return memory informations (for debug)
+'admin.set' : set a parameter value
+'admin.get' : get a parameter value
+'admin.list' : list all events
+'admin.info' : return info on an event
+'admin.status' : return a status
+'admin.start' : start an evet
+'admin.stop' : stop an event
+'admin.resume' : resume an event
+'admin.halt' : halt an event
+'check' : check that the plugin is running
+'stop' : stop the plugin
+'ping' : ping
+
+PUB
+---
+
+'admin.list' : list of events
+'admin.event' : event
+'admin.status' : status events
+'enabled' : plugin is enabled
+
+Known bugs
+----------
+
+- plugin doesn't stop : need to send a last request to get out of the
+wait_for_request loop
+-
 
 Today/Tomorrow
 ==============
