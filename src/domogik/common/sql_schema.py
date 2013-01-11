@@ -26,21 +26,15 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-- class Area
-- class Room
 - class DeviceUsage
 - class DeviceTechnology
 - class PluginConfig
-- class DeviceType(Base):
+- class DeviceType
 - class Device
 - class DeviceFeature
-- class DeviceFeatureAssociation
 - class DeviceStats
 - class Person
 - class UserAccount
-- class SystemStats(Base):
-- class SystemStatsValue
-- class UIItemConfig
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2012 Domogik project
@@ -475,37 +469,3 @@ class UserAccount(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return UserAccount.__tablename__
-
-
-class UIItemConfig(Base):
-    """UI configuration parameters for items (area, room, device) such as css class name for icons"""
-
-    __tablename__ = '%s_ui_item_config' % _db_prefix
-    name =  Column(Unicode(30), primary_key=True)
-    reference = Column(Unicode(30), primary_key=True)
-    key = Column(Unicode(30), primary_key=True)
-    value = Column(UnicodeText(), nullable=False)
-
-    def __init__(self, name, reference, key, value):
-        """Class constructor
-
-        @param name : item name (ex. area)
-        @param reference : item reference (ex. 2)
-        @param key : key (ex. icon)
-        @param value : associated value (ex. basement)
-
-        """
-        self.name = ucode(name)
-        self.reference = ucode(reference)
-        self.key = ucode(key)
-        self.value = ucode(value)
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<UIItemConfig(name='%s' reference='%s', key='%s', value='%s')>"\
-               % (self.name, self.reference, self.key, self.value)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return UIItemConfig.__tablename__

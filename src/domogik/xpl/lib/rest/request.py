@@ -124,21 +124,6 @@ class ProcessRequest():
             '^/base/feature/list$':			                                         '_rest_base_feature_list',
             '^/base/feature/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_base_feature_list',
             '^/base/feature/list/by-device_id/(?P<device_id>[0-9]+)$':   			 '_rest_base_feature_list',
-            # /base/feature_association
-            '^/base/feature_association/list$':			                                 '_rest_base_feature_association_list',
-            '^/base/feature_association/by-house$':			                         '_rest_base_feature_association_list_by_house',
-            '^/base/feature_association/by-area/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_area',
-            '^/base/feature_association/by-room/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_room',
-            '^/base/feature_association/by-feature/(?P<id>[0-9]+)$':			         '_rest_base_feature_association_list_by_feature',
-            # /base/ui-config
-            '^/base/ui-config/list$':                                                            '_rest_base_ui_item_config_list',
-            '^/base/ui-config/list/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':              '_rest_base_ui_item_config_list',
-            '^/base/ui-config/list/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':  '_rest_base_ui_item_config_list',
-            '^/base/ui-config/list/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_list',
-            '^/base/ui-config/set/.*$':                                                          '_rest_base_ui_item_config_set',
-            '^/base/ui-config/del/by-key/(?P<name>[a-z0-9]+)/(?P<key>[a-z0-9]+)$':               '_rest_base_ui_item_config_del',
-            '^/base/ui-config/del/by-reference/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)$':   '_rest_base_ui_item_config_del',
-            '^/base/ui-config/del/by-element/(?P<name>[a-z0-9]+)/(?P<reference>[a-z0-9]+)/(?P<key>[a-z0-9]+)$': '_rest_base_ui_item_config_del',
         },
         # /command
         'command': {
@@ -170,8 +155,14 @@ class ProcessRequest():
         'package': {
             '^/package/get-mode$':								 '_rest_package_get_mode',
             '^/package/list-repo$':							         '_rest_package_list_repo',
-            '^/package/update-cahce$':								 '_rest_package_update_cache',
-            # TODO
+            '^/package/update-cache$':								 '_rest_package_update_cache',
+            '^/package/available/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)$':		 '_rest_package_available',
+            '^/package/installed/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)$':		 '_rest_package_installed',
+            '^/package/dependency/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)/(?P<id>[^/]+)/(?P<version>[^/]+)$': '_rest_package_dependency',
+            '^/package/install/(?P<host>[a-z]+)/(?P<type>[plugin|external]+)/(?P<id>[^/]+)/(?P<version>[^/]+)$': '_rest_package_install',
+            '^/package/uninstall/(?P<host>[a-z]+)/(?P<type>[plugin|external]+)/(?P<id>[^/]+)$':  '_rest_package_uninstall',
+            '^/package/icon/available/(?P<type>[plugin|external]+)/(?P<id>[^/]+)/(?P<version>[^/]+)$':  '_rest_package_icon_available',
+            '^/package/icon/installed/(?P<type>[plugin|external]+)/(?P<id>[^/]+)$':              '_rest_package_icon_installed',
         },
         # /plugin
         'plugin': {
@@ -196,10 +187,14 @@ class ProcessRequest():
             '^/repo/put$':                                                                           '_rest_repo_put',
             '^/repo/get/(?P<file_name>[a-z0-9]+)$':                                                  '_rest_repo_get',
         },
-        # /scenario
-        # TODO
         # /stats
-        # TODO
+        'stats': {
+            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/all$':				     '_rest_stats_all',
+            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/latest$':				     '_rest_stats_last',
+            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/last/(?P<num>[0-9]+)$':		     '_rest_stats_last',
+            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/from/.*$':     		             '_rest_stats_from',
+            '^/stats/multi/.*$':								     '_rest_stats_multi',
+        },
    }
 
 
@@ -1332,79 +1327,8 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        ### ui_config ################################
-        if self.rest_request[0] == "ui_config":
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_ui_item_config_list()
-                elif len(self.rest_request) >= 3 and len(self.rest_request) <=4:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 5:
-                    if self.rest_request[2] == "by-key":
-                        self._rest_base_ui_item_config_list(name = self.rest_request[3], key = self.rest_request[4])
-                    elif self.rest_request[2] == "by-reference":
-                        self._rest_base_ui_item_config_list(name = self.rest_request[3], reference = self.rest_request[4])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 6:
-                    if self.rest_request[2] == "by-element":
-                        self._rest_base_ui_item_config_list(name = self.rest_request[3], reference = self.rest_request[4], key = self.rest_request[5])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### set
-            elif self.rest_request[1] == "set":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_set()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### delete
-            elif self.rest_request[1] == "del":
-                #offset = 2
-                #if self.set_parameters(offset):
-                #    self._rest_base_ui_item_config_del()
-                #else:
-                #    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-                if len(self.rest_request) !=5 and len(self.rest_request) != 6:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 5:
-                    if self.rest_request[2] == "by-key":
-                        self._rest_base_ui_item_config_del(name = self.rest_request[3], key = self.rest_request[4])
-                    elif self.rest_request[2] == "by-reference":
-                        self._rest_base_ui_item_config_del(name = self.rest_request[3], reference = self.rest_request[4])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 6:
-                    if self.rest_request[2] == "by-element":
-                        self._rest_base_ui_item_config_del(name = self.rest_request[3], reference = self.rest_request[4], key = self.rest_request[5])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
         ### device_usage #############################
-        elif self.rest_request[0] == "device_usage":
+        if self.rest_request[0] == "device_usage":
 
             ### list
             if self.rest_request[1] == "list":
@@ -1674,95 +1598,6 @@ target=*
         else:
             self.send_http_response_error(999, "Bad date format (YYYYMMDD or YYYYMMDD-HHMM required", self.jsonp, self.jsonp_cb)
         return my_date
-
-######
-# /base/ui_config processing
-######
-
-    def _rest_base_ui_item_config_list(self, name = None, reference = None, key = None):
-        """ list ui_item_config
-            @param name : ui item config name
-            @param reference : ui item config reference
-            @param key : ui item config key
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("ui_config")
-        if name == None and reference == None and key == None:
-            for ui_item_config in self._db.list_all_ui_item_config():
-                json_data.add_data(ui_item_config)
-        elif name != None and reference != None:
-            if key == None:
-                # by-reference
-                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_item_name = name, ui_item_reference = reference):
-                    json_data.add_data(ui_item_config)
-            else:
-                # by-key
-                for ui_item_config in self._db.list_ui_item_config_by_key(ui_item_name = name, ui_item_key= key):
-                    json_data.add_data(ui_item_config)
-        elif name != None and key != None and reference != None:
-            # by-element
-            ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, \
-                                                         ui_item_reference = reference, ui_item_key = key)
-            if ui_item_config is not None:
-                json_data.add_data(ui_item_config)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_ui_item_config_set(self):
-        """ set ui_item_config (add if it doesn't exists, update else)
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("ui_config")
-        try:
-            ui_item_config = self._db.set_ui_item_config(self.get_parameters("name"), \
-                                                         self.get_parameters("reference"), \
-                                                         self.get_parameters("key"), \
-                                                         self.get_parameters("value"))
-            json_data.add_data(ui_item_config)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-    #def _rest_base_ui_item_config_del(self):
-    #    """ del ui_item_config
-    #    """
-    #    json_data = JSonHelper("OK")
-    #    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-    #    json_data.set_data_type("ui_config")
-    #    try:
-    #        for ui_item_config in self._db.delete_ui_item_config( \
-    #                           ui_name = self.get_parameters("name"), \
-    #                           ui_reference = self.get_parameters("reference"),\
-    #                           ui_key = self.get_parameters("key")):
-    #            json_data.add_data(ui_item_config)
-    #    except:
-    #        json_data.set_error(code = 999, description = self.get_exception())
-    #    self.send_http_response_ok(json_data.get())
-
-    def _rest_base_ui_item_config_del(self, name = None, reference = None, key = None):
-        """ delete ui_item_config
-            @param name : ui item config name
-            @param reference : ui item config reference
-            @param key : ui item config key
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("ui_config")
-        try:
-            for ui_item_config in self._db.del_ui_item_config(ui_item_name = name,
-                                                             ui_item_reference = reference,
-                                                             ui_item_key = key):
-                json_data.add_data(ui_item_config)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
 
 ######
 # /base/device_usage processing
