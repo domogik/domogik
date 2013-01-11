@@ -110,6 +110,13 @@ class BluezAPI:
                 else:
                     loop = False
             if (self.delay_sensor > 0):
+                if self.timer_stat != None:
+                    try:
+                        self.timer_stat.cancel()
+                    except:
+                        error = "%s" %  \
+                                 (traceback.format_exc())
+                        self.log.error("reload_config : " + error)
                 self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
                 self.timer_stat.start()
         except:

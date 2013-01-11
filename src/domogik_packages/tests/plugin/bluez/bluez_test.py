@@ -148,7 +148,7 @@ class PluginTestCase(unittest.TestCase):
             #print("%s : %s" % (self._result['errorcode'], self._result['error']))
             return False
 
-    def query_many(self, key, testmsg, dictkeys=[], dictkeyvals={}, retry=10):
+    def query_many(self, key, testmsg, dictkeys=[], dictkeyvals={}, retry=20):
         '''
         Send a command and wait for response from the plugin.
 
@@ -168,7 +168,7 @@ class PluginTestCase(unittest.TestCase):
         left = retry
         res = False
         while ((left >= 0) and (res != True)):
-            res = self.query(key, testmsg, dictkeys, dictkeyvals, timeout=45)
+            res = self.query(key, testmsg, dictkeys, dictkeyvals, timeout=60)
             left = left -1
         return res
 
@@ -180,7 +180,7 @@ class PluginTestCase(unittest.TestCase):
         self._result = None
         self.schema = "bluez.basic"
         self.xpltype = "xpl-trig"
-        self.timeout = 10
+        self.time_start = datetime.datetime.now()
 
 #    def tearDown(self):
 #        self.plugin.force_leave()
@@ -262,7 +262,6 @@ class BluezTestCase(PluginTestCase):
         keyvalss = {"device":"myphone", "bluez":"bluez", "type":"ping", "current":"high"}
         print("")
         print("You must now turn ON bluetooth on your phone")
-        print("")
         self.assertTrue(self.query_many("device", message, keys, keyvalss))
 
     def test_550_wait_for_high_stat(self):
@@ -277,6 +276,25 @@ class BluezTestCase(PluginTestCase):
         keys = None
         keyvalss = {"device":"myphone", "bluez":"bluez", "type":"ping", "current":"high"}
         self.assertTrue(self.query_many("device", message, keys, keyvalss))
+        duration = datetime.datetime.now() - self.time_start
+        print("")
+        print("Delay between 2 stats is %s seconds" % duration.seconds)
+
+    def test_570_wait_for_high_stat_delay(self):
+        #time.sleep(30)
+        self.schema = "sensor.basic"
+        self.xpltype = "xpl-stat"
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema(self.schema)
+        message.add_data({"action" :  "status"})
+        message.add_data({"device" :  "bluez"})
+        keys = None
+        keyvalss = {"device":"myphone", "bluez":"bluez", "type":"ping", "current":"high"}
+        self.assertTrue(self.query_many("device", message, keys, keyvalss))
+        duration = datetime.datetime.now() - self.time_start
+        print("")
+        print("Delay between 2 stats is %s seconds" % duration.seconds)
 
     def test_610_wait_for_phone_off(self):
         #time.sleep(30)
@@ -291,7 +309,6 @@ class BluezTestCase(PluginTestCase):
         keyvalss = {"device":"myphone", "bluez":"bluez", "type":"ping", "current":"low"}
         print("")
         print("You must now turn OFF bluetooth on your phone")
-        print("")
         self.assertTrue(self.query_many("device", message, keys, keyvalss))
 
     def test_650_wait_for_low_stat(self):
