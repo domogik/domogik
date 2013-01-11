@@ -18,13 +18,7 @@ At least, a plugin consist of the following files :
 * :doc:`src/domogik_packages/xpl/lib/myplg.py <plugin_library_part>` : the python part that contains all the functions/classes related to the device/service the plugin will handle. This is called the *library* part. 
 * :doc:`src/share/domogik/plugins/myplg.json <json_file>` : a json file which describe the plugin and the features it handles.
 
-Then, a plugin should have at least one file on one of the following folders :
-
-* :doc:`src/share/domogik/stats/ <stats_files>` : in this folder are stored the xml files that describes the way data in xPL messages are inserted in the database.
-* :doc:`src/share/domogik/url2xpl/ <url2xpl_files>` : in this folder are stored the xml files that describes how the rest server will create and send a xPL message when it receives a command from a user interface.
-
 Sometimes a plugin could also need :doc:`some data files <data_files>`.
-
 
 With which part should I begin ?
 ================================
