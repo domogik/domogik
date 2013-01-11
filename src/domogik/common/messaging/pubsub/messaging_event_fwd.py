@@ -64,7 +64,7 @@ def main():
         
         log.debug("Forwarding messages...")
         zmq.device(zmq.FORWARDER, frontend, backend)
-    except Exception, e:
+    except Exception as e:
         log.error(e)
         log.error("Bringing down ZMQ device")
         raise Exception("Error with forwarder device")
