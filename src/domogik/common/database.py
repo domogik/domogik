@@ -55,7 +55,7 @@ from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceStats,
-        DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Person,
+        DeviceTechnology, PluginConfig, DeviceType, Person,
         UserAccount, SENSOR_VALUE_TYPE_LIST
 )
 
@@ -1161,6 +1161,14 @@ class DbHelper():
 ####
 # Device stats
 ####
+    def lis_device_stats_distinct_key(self, ds_device_id):
+        filters = {}
+        filters['device_id'] = ds_device_id
+        return self.__session.query(
+                            DeviceStats
+                        ).filter_by(**filters
+                        ).distinct()
+
     def list_device_stats(self, ds_device_id=None,ds_skey=None,ds_number=None):
         """Return a list of all stats for a device
 
@@ -1891,139 +1899,6 @@ class DbHelper():
             return person
         else:
             self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
-
-###
-# UIItemConfig
-###
-
-    def set_ui_item_config(self, ui_item_name, ui_item_reference, ui_item_key, ui_item_value):
-        """Add / update an UI parameter
-
-        @param ui_item_name : item name
-        @param ui_item_reference : the item reference
-        @param ui_item_key : key we want to add / update
-        @param ui_item_value : key value we want to add / update
-        @return : the updated UIItemConfig item
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.log.debug("ui item : %s %s" % (ui_item_name, ui_item_value))
-        self.__session.expire_all()
-        ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
-        if ui_item_config is None:
-            ui_item_config = UIItemConfig(name=ui_item_name, reference=ui_item_reference, key=ui_item_key,
-                                          value=ui_item_value)
-        else:
-            ui_item_config.value = ucode(ui_item_value)
-        self.__session.add(ui_item_config)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return ui_item_config
-
-    def get_ui_item_config(self, ui_item_name, ui_item_reference, ui_item_key):
-        """Get a UI parameter of an item
-
-        @param ui_item_name : item name
-        @param ui_item_reference : item reference
-        @param ui_item_key : key
-        @return an UIItemConfig object
-
-        """
-        return self.__session.query(
-                        UIItemConfig
-                    ).filter_by(name=ucode(ui_item_name), reference=ucode(ui_item_reference),
-                                key=ucode(ui_item_key)
-                    ).first()
-
-    def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
-        """List all UI parameters of an item
-
-        @param ui_item_name : item name
-        @param ui_item_reference : item reference
-        @return a list of UIItemConfig objects
-
-        """
-        return self.__session.query(
-                        UIItemConfig
-                    ).filter_by(name=ucode(ui_item_name), reference=ucode(ui_item_reference)
-                    ).all()
-
-    def list_ui_item_config_by_key(self, ui_item_name, ui_item_key):
-        """List all UI parameters of an item
-
-        @param ui_item_name : item name
-        @param ui_item_key : item key
-        @return a list of UIItemConfig objects
-
-        """
-        return self.__session.query(
-                        UIItemConfig
-                    ).filter_by(name=ucode(ui_item_name), key=ucode(ui_item_key)
-                    ).all()
-
-    def list_ui_item_config(self, ui_item_name):
-        """List all UI parameters of an item
-
-        @param ui_item_name : item name
-        @return a list of UIItemConfig objects
-
-        """
-        return self.__session.query(
-                        UIItemConfig
-                    ).filter_by(name=ucode(ui_item_name)
-                    ).all()
-
-    def list_all_ui_item_config(self):
-        """List all UI parameters
-
-        @return a list of UIItemConfig objects
-
-        """
-        return self.__session.query(UIItemConfig).all()
-
-    def del_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
-        """Delete a UI parameter of an item
-
-        @param ui_item_name : item name
-        @param ui_item_reference : item reference, optional
-        @param ui_item_key : key of the item, optional
-        @return the deleted UIItemConfig object(s)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        ui_item_config_list = []
-        if ui_item_reference == None and ui_item_key == None:
-            ui_item_config_list = self.__session.query(
-                                            UIItemConfig
-                                        ).filter_by(name=ucode(ui_item_name)
-                                        ).all()
-        elif ui_item_key is None:
-            ui_item_config_list = self.__session.query(
-                                            UIItemConfig
-                                        ).filter_by(name=ucode(ui_item_name),
-                                                    reference=ucode(ui_item_reference)
-                                        ).all()
-        elif ui_item_reference is None:
-            ui_item_config_list = self.__session.query(
-                                            UIItemConfig
-                                        ).filter_by(name=ucode(ui_item_name), key=ucode(ui_item_key)
-                                        ).all()
-        else:
-            ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
-            if ui_item_config is not None:
-                ui_item_config_list.append(ui_item_config)
-
-        for item in ui_item_config_list:
-            self.__session.delete(item)
-        if len(ui_item_config_list) > 0:
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return ui_item_config_list
 
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
         """Raise a DbHelperException and log it

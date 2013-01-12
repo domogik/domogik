@@ -110,6 +110,13 @@ class BluezAPI:
                 else:
                     loop = False
             if (self.delay_sensor > 0):
+                if self.timer_stat != None:
+                    try:
+                        self.timer_stat.cancel()
+                    except:
+                        error = "%s" %  \
+                                 (traceback.format_exc())
+                        self.log.error("reload_config : " + error)
                 self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
                 self.timer_stat.start()
         except:
@@ -125,6 +132,7 @@ class BluezAPI:
         Stop timers and threads.
         """
         self.log.info("stop_all : close all timers and threads.")
+        self._state = "stopped"
         if (self.delay_sensor >0):
             self.timer_stat.cancel()
 
@@ -192,6 +200,7 @@ class BluezAPI:
                 if self.listen_adaptator() == True:
                     self._stop.wait(self._scan_delay)
                 else:
+                    self.log.debug("_listen_adaptator : Can't listen to adaptator")
                     for aaddr in self._targets:
                         self._trig_detect("xpl-trig", aaddr, LOW)
                     self._stop.wait(self._error_delay)

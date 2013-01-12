@@ -43,7 +43,7 @@ Database
 --------
 The database is used in two ways : 
 
-* directly by RINOR (request of room list, devices...)
+* directly by RINOR (request of stats, devices...)
 * when plugins ask for their configuration. The configuration is stored in the database but plugins do not have a direct access to it (this is required for modularity purposes). So the database can provide the configuration to plugins by communicating over the xPL network (in fact RINOR asks the database to retrieve this information).
 
 Plugins

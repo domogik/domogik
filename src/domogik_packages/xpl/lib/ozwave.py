@@ -41,6 +41,7 @@ import libopenzwave
 from libopenzwave import PyManager
 from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
+from ozwctrl import ZWaveController
 from ozwdefs import *
 import time
 from time import sleep
@@ -234,7 +235,7 @@ class OZWavemanager(threading.Thread):
     def cb_openzwave(self,  args):
         """Callback depuis la librairie py-openzwave 
         """
-    # callback ordre : (notificationtype, homeid, nodeid, ValueID, groupidx, event) 
+    # callback ordre : (notificationtype, homeId, nodeId, ValueID, groupidx, event) 
     # notification implémentés
 #         ValueAdded = 0                    / A new node value has been added to OpenZWave's list. These notifications occur after a node has been discovered, and details of its command classes have been received.  Each command class may generate one or more values depending on the complexity of the item being represented.
 #         ValueChanged = 2                  / A node value has been updated from the Z-Wave network and it is different from the previous value.
@@ -316,10 +317,9 @@ class OZWavemanager(threading.Thread):
                 self._handleInitializationComplete(args) # TODO :depuis la rev 585 pas de 'AwakeNodesQueried' ou  'AllNodesQueried' ? on force l'init
         
     def _handleNodeReadyToMsg(self, args):
-        """Les requettes essentielles d'initialisation du node sont complétée il peu recevoir des msg."""
+        """Les requettes essentielles d'initialisation du node sont complétée il peut recevoir des msg."""
         node = self._getNode(self._homeId, args['nodeId'])
         if node :
-         #   node.updateNode()
             self._log.info('Z-Wave Device Node {0} status essential queries ok.'.format(node.id))        
         
 
@@ -336,20 +336,32 @@ class OZWavemanager(threading.Thread):
         """ Renvoi et construit un nouveau node s'il n'existe pas et l'enregistre dans le dict """
         retval = self._getNode(homeId, nodeId)
         if retval is None:
-            retval = ZWaveNode(self,  homeId, nodeId)
-            print ('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
-            self._log.debug('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
-            self._nodes[nodeId] = retval
-            if not self._controller : 
-                print("It's the controler node (affected to it)")
-                self._controller = retval
+            if nodeId != 0 :
+                if nodeId == self._ctrlnodeId :
+                    if not self._controller : 
+                        retval = ZWaveController(self,  homeId, nodeId,  True)
+                        print 'Node %d is affected as primary controller' %(nodeId)
+                        self._log.info("Node %d is affected as primary controller)", nodeId)
+                        self._controller = retval
+                    else :
+                        self._log.info("A primary controller allready existing, node %d id affected as secondary.", nodeId)
+                        retval = ZWaveController(self,  homeId, nodeId,  False)
+                else : 
+                    retval = ZWaveNode(self,  homeId, nodeId)
+                print 'Created new node with homeId 0x%0.8x, nodeId %d' %(homeId, nodeId)
+                self._log.debug('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
+                self._nodes[nodeId] = retval
+            else :
+                self._log.debug("Can't create a Node ID n°0")
+                raise OZwaveManagerException ("Can't create a Node ID n°0")
+                retval = None
         return retval
 
     def _handleNodeChanged(self, args):
-        """Un node est ajouté à changé"""
+        """Un node est ajouté ou a changé"""
         node = self._fetchNode(args['homeId'], args['nodeId'])
         node._lastUpdate = time.time()
-        self._log.info ('Node %d as add (homeId %.8x)' , args['nodeId'],  args['homeId'])
+        self._log.info ('Node %d as add or changed (homeId %.8x)' , args['nodeId'],  args['homeId'])
 
     def _handleValueAdded(self, args):
         """Un valueNode est ajouté au node depuis le réseaux zwave"""
@@ -423,9 +435,9 @@ class OZWavemanager(threading.Thread):
     def _handleInitializationComplete(self, args):
         # La séquence d'initialisation est terminée
         controllercaps = set()
-        if self._manager.isPrimaryController(self._homeId): controllercaps.add('primaryController')
-        if self._manager.isStaticUpdateController(self._homeId): controllercaps.add('staticUpdateController')
-        if self._manager.isBridgeController(self._homeId): controllercaps.add('bridgeController')
+        if self._manager.isPrimaryController(self._homeId): controllercaps.add('Primary Controller')
+        if self._manager.isStaticUpdateController(self._homeId): controllercaps.add('Static Update Controller')
+        if self._manager.isBridgeController(self._homeId): controllercaps.add('Bridge Controller')
         self._controllerCaps = controllercaps
         self._log.info('Controller capabilities are: %s', controllercaps)
         for node in self._nodes.values():  
@@ -450,6 +462,30 @@ class OZWavemanager(threading.Thread):
                 return k
         return None
         
+    def handle_ControllerAction(self,  action, cmd, option):
+        retval = {}
+        retval['error'] = ''
+        retval['cmd'] = cmd
+        retval['action'] = action
+        if action == 'RequestNetworkUpdate' :
+            if cmd == 'Start action' :
+                if self._controller.begin_command_request_network_update() :
+                    retval['cmdstate'] ='running'
+                    retval['userinfo'] ='Waiting during refresh, be patient....'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'not started'
+                    retval['userinfo'] = 'check your controller.'
+            elif cmd == 'Stop action' :
+                self._controller.cancel_command()
+                retval['cmdstate'] ='not running'
+                retval['error'] = ''
+                retval['userinfo'] = 'User have stop refresh.'
+        else :
+            retval['cmdstate'] ='TODO'
+            retval['userinfo'] ='Command will be root soon as possible, be patient....'
+        return retval
+        
     def _getValue(self, valueId):
         """Return l'objet Value correspondant au valueId"""
         retval= None
@@ -458,7 +494,14 @@ class OZWavemanager(threading.Thread):
                 retval = node._values[valueId]
                 break
         return retval
-       
+    
+    def getCountMsgQueue(self):
+        """"Retourne le nombre de message
+        :return: The count of messages in the outgoing send queue.
+        :rtype: int
+        """
+        return self._manager.getSendQueueCount(self.homeId)
+        
     def getNetworkInfo(self):
         """ Retourne les infos principales du réseau zwave (dict) """
         retval={}
@@ -551,7 +594,17 @@ class OZWavemanager(threading.Thread):
         for elem in  libopenzwave.PyValueTypes :
             retval[elem] = elem.doc
         return retval
-           
+        
+    def getListCmdsCtrl(self):
+        """Retourne le liste des commandes possibles du controleur ainsi que la doc associée."""
+        retval={}
+        if self.ready :
+            retval = self._controller.cmdsAvailables()
+            retval['error'] = ""
+            return retval
+        else : return {"error" : "Zwave network not ready, can't find controller"}
+        
+        
     def setUINodeNameLoc(self,  nodeID,  newname, newloc):
         """Change le nom et/ou le localisation du node dans OZW et dans le decive si celui-ci le supporte """
         if self.ready :

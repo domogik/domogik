@@ -109,7 +109,7 @@ class OZwave(XplPlugin):
     def getdict2UIdata(self, UIdata):
         """ retourne un format dict en provenance de l'UI (passage outre le format xPL)"""
 #        retval = UIdata.replace('|', '{').replace('\\', '}')
-        retval = UIdata.replace('&quot;', '"').replace("&ouvr;", '{').replace("&ferm;", '}') ;
+        retval = UIdata.replace('&quot;', '"').replace('&squot;', "'").replace("&ouvr;", '{').replace("&ferm;", '}') ;
         try :
  #           return  eval(retval.replace(';', ','))
             return eval(retval)
@@ -122,10 +122,14 @@ class OZwave(XplPlugin):
   #      return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None', "''")
         print "conversion pour transfertvers UI , " , str(ddict)
         for k in ddict :   # TODO: pour passer les 1452 chars dans RINOR, à supprimer quand MQ OK, 
-            if len(str(ddict[k])) >800 : 
-                ddict[k]=ddict[k][:800]
-                print("value raccourccis : ", k, ddict[k])
-                self.log.debug ("Format data to UI : value to large, cut to 800, key : %s, value : %s" % (str(k), str(ddict[k])))
+            print ('++++',  type(ddict[k]))
+            if isinstance(ddict[k], str) :
+                ddict[k] = ddict[k].replace("'", "&squot;")  # remplace les caractères interdits pour rinor
+                print ('****Replace quote : ',  ddict[k])
+                if len(str(ddict[k])) >800 : 
+                    ddict[k]=ddict[k][:800]
+                    print("value raccourccis : ", k, ddict[k])
+                    self.log.debug ("Format data to UI : value to large, cut to 800, key : %s, value : %s" % (str(k), str(ddict[k])))
         return str(ddict).replace('{', '&ouvr;').replace('}', '&ferm;').replace('"','&quot;').replace("'",'&quot;').replace('False', 'false').replace('True', 'true').replace('None', '""')
         
     def ui_cmd_cb(self, message):
@@ -138,7 +142,14 @@ class OZwave(XplPlugin):
             mess.set_type('xpl-trig') 
             mess.set_schema('ozwave.basic')
             print request
-            if request['request'] == 'GetNetworkID' :
+            if request['request'] == 'ctrlAction' :
+                info = self.getUIdata2dict(self.myzwave.handle_ControllerAction(request['action'], request['cmd'], request['option']))
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'ctrlaction' : request['action'], 
+                                    'data': info})
+                print "Refresh network info"
+            elif request['request'] == 'GetNetworkID' :
                 info = self.getUIdata2dict(self.myzwave.getNetworkInfo())
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
@@ -204,6 +215,22 @@ class OZwave(XplPlugin):
                                     'listetypes' : 'valuestype', 
                                     'data': info})               
                 print mess
+            elif  request['request'] == 'GetListCmdsCtrl':
+                listeCmd = self.myzwave.getListCmdsCtrl()
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'listetypes' : 'cmdsctrl'})
+                i=1
+                for item in listeCmd:
+                    print 'adding : ',  item , ' : ',  listeCmd[item]
+                    if item =='error':
+                        if listeCmd[item] =='' : mess.add_data({'error' :  'no' })
+                        else : mess.add_data({'error' :  listeCmd[item] })
+                    else :
+                        d = {item: listeCmd[item]}
+                        mess.add_data({'item%d'%i : self.getUIdata2dict(d) })
+                        i=i+1
+                print mess
             elif  request['request'] == 'setValue':
                 valId = long(request['valueid']) # Pour javascript type string
                 newvalue = request['newValue']
@@ -211,7 +238,7 @@ class OZwave(XplPlugin):
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'listetypes' : 'valuestype', 
-                                    'data': info})               
+                                    'data': info})
                 print mess
             elif  request['request'] == 'setGroups':
                 info = self.getUIdata2dict(self.myzwave.setMembersGrps(request['node'], request['ngrps']))
@@ -219,7 +246,7 @@ class OZwave(XplPlugin):
                                     'group' :'UI', 
                                     'node' : request['node'], 
                                     'data': info})               
-                print mess                
+                print mess
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 

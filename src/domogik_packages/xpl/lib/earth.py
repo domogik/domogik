@@ -59,7 +59,7 @@ class EarthEvents():
     """
     Encapsulate the EarthEvents.
     """
-    def __init__(self, api):
+    def __init__(self, api, zmq):
         """
         Init the EarthEvents container
 
@@ -68,7 +68,7 @@ class EarthEvents():
         """
         self._api = api
         self.store = EarthStore(self._api.log, self._api.data_files_dir)
-
+        self.zmq = zmq
         self.data = dict()
         self.device_types = dict()
         self.device_status = dict()
@@ -279,6 +279,7 @@ class EarthEvents():
                 return ERROR_STORE
             if retcron != True :
                 return ERROR_SCHEDULER
+            self.zmq.publish_stop(event, delay, self._api.event_info(event, delay))
             return ERROR_NO
         else:
             return ERROR_EVENT_NOT_EXIST
@@ -313,6 +314,9 @@ class EarthEvents():
                     return ERROR_STORE
                 if retcron != True :
                     return ERROR_SCHEDULER
+            self.zmq.publish_halt(event, delay, \
+                self._api.event_info(event, delay), \
+                self._api.event_list())
             return ERROR_NO
         else:
             return ERROR_EVENT_NOT_EXIST
@@ -334,7 +338,7 @@ class EarthEvents():
                 if retcron == "halted" :
                     retcron = self.add_event_to_cron(event, delay)
                 retstore = self.store.on_resume(event, delay)
-                retstart = self.start_event(event, delay)
+                retstart = self.start_event(event, delay, resume=True)
                 if retstore != ERROR_NO :
                     return ERROR_STORE
                 if retcron != True :
@@ -381,7 +385,7 @@ class EarthEvents():
             evt["current"] = "halted"
             return False
 
-    def start_event(self, event, delay):
+    def start_event(self, event, delay, resume=False):
         """
         Start an event.
 
@@ -397,13 +401,13 @@ class EarthEvents():
                 evt['runs'] = 0
             if 'next' not in evt:
                 evt['next'] = "None"
-            if 'delay' not in evt:
-                evt['delay'] = "0"
             if 'runtime' not in evt:
                 evt['runtime'] = 0
             if 'createtime' not in evt:
                 evt['createtime'] = datetime.datetime.today().strftime("%x %X")
             evt['current'] = "started"
+            evt['type'] = event
+            evt['delay'] = delay
             cronret = self.add_event_to_cron(event, delay)
             #print "ret add_event_to_cron : %s" % ret
             if cronret == True:
@@ -414,6 +418,13 @@ class EarthEvents():
             if storeret != ERROR_NO :
                 self.halt_event(event, delay)
                 return ERROR_STORE
+            if resume :
+                self.zmq.publish_resume(event, delay, \
+                    self._api.event_info(event, delay))
+            else :
+                self.zmq.publish_start(event, delay, \
+                    self._api.event_info(event, delay), \
+                    self._api.event_list())
             return ERROR_NO
         else:
             return ERROR_EVENT_NOT_EXIST
@@ -676,14 +687,13 @@ class EarthAPI:
         self._stop = stop
         self._hostname = hostname
         self.cronquery = CronQuery(self.myxpl, self.log)
-        self._zmq_reply = MessagingRep()
+        #self._zmq_reply = MessagingRep()
+        self._zmq_interface = EarthZmq(self, self._stop)
         self._zmq_reply_thread = threading.Thread(None,
-                                    self.reply_zmq,
+                                    self._zmq_interface.reply,
                                    "zmq_reply_earth",
                                    (),
                                    {})
-        self._zmq_reply_thread.start()
-        self._zmq_publish = MessagingEventPub('zmq_publish_earth')
         try:
             self.delay_sensor = int(self.config.query('earth', 'delay-sensor'))
             self.delay_stat = int(self.config.query('earth', 'delay-stat'))
@@ -732,7 +742,7 @@ class EarthAPI:
         self.mycity.pressure = pressure
         try :
             self._events_lock.acquire()
-            self.events = EarthEvents(self)
+            self.events = EarthEvents(self, self._zmq_interface)
             if load_dawndusk:
                 self.events.ext_dawndusk()
             if load_moonphases:
@@ -748,9 +758,21 @@ class EarthAPI:
 #        self.rest_server_ip = conf_rest['rest_server_ip']
 #        self.rest_server_port = conf_rest['rest_server_port']
 #        self.rest = CronRest(self.rest_server_ip,self.rest_server_port,log)
+        self._zmq_reply_thread.start()
+
         if (self.delay_sensor >0):
             self.timer_stat = Timer(self.delay_sensor, self.send_sensors)
             self.timer_stat.start()
+
+    def plugin_enabled(self,status):
+        """
+        Send the status of a plugin
+
+        :returns: the result of operations
+        :rtype: bool
+
+        """
+        self._zmq_interface.publish_plugin_enabled(status)
 
     def get_list_acts(self):
         """
@@ -771,21 +793,6 @@ class EarthAPI:
 
         """
         return ['gateway', 'memory', 'set', 'get', 'list', 'info', 'status']
-
-    def reply_zmq(self):
-        """
-        Wait for ZMQ request and send reply.
-
-        """
-        self.log.debug("reply_zmq : Listen for messages ...")
-        while not self._stop.isSet():
-            print("ZZZZZZZZZZZZZZZZMQ : Waiting for request...")
-            j_request = self._zmq_reply.wait_for_request()
-            print("ZZZZZZZZZZZZZZZZMQ : Received request %s" % j_request)
-            #print("ZZZZZZZZZZZZZZZZMQ : Processing request...")
-            request = json.loads(j_request)
-            sleep(.5)
-            self._zmq_reply.send_reply("%s : done!" % request['id'])
 
     def publish_zmq(self):
         """
@@ -864,7 +871,7 @@ class EarthAPI:
             else :
                 self.log.debug("command_listener : Command '%s' found in message." % command)
             if command == "gateway" :
-                self._send_event_gateway(myxpl)
+                self._send_gateway(myxpl)
             elif command == "memory" :
                 self._send_memory(myxpl)
             elif command == "list" :
@@ -937,6 +944,7 @@ class EarthAPI:
                     if self.events.device_status[status]["callback"](event, message):
                         #The status was updated. We send a message.
                         self._send_event_status(myxpl, status)
+                        self._zmq_interface.publish_status(status, self.event_status(status))
             else:
                 self.log.debug("fire_listener : Can't find event in the event list.")
         finally :
@@ -971,7 +979,7 @@ class EarthAPI:
             if 'type' in message.data:
                 eventtype = message.data['type']
             if eventtype == None :
-                self.log.debug("action_listener : no type found in message." % eventtype)
+                self.log.debug("action_listener : no event type found in message.")
                 return
             delay = "0"
             if 'delay' in message.data:
@@ -1000,7 +1008,7 @@ class EarthAPI:
 
     def _send_event_list(self, myxpl):
         """
-        Send a lists of active events.
+        Send a list of active events.
 
         earth.basic
         {
@@ -1017,29 +1025,91 @@ class EarthAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("earth.basic")
-        count = 0
-        evlist = ""
-        for evt in self.events.get_list_events() :
-            if evlist == "" :
-                evlist = evt
-                count += 1
+        rdict = self.event_list()
+        for key in rdict:
+            if type(rdict[key]) == type(set()):
+                mylist = ""
+                for myval in rdict[key] :
+                    if mylist == "" :
+                        mylist = myval
+                    else :
+                        mylist = mylist + "," + myval
+                    if len(mylist) > 110:
+                        mess.add_data({key : mylist})
+                if len(mylist) > 0:
+                    mess.add_data({key : mylist})
             else :
-                evlist = evlist + "," + evt
-                count += 1
-            if len(evlist) > 110:
-                mess.add_data({"evnt-list" : evlist})
-                evlist = ""
-        if len(evlist) > 0:
-            mess.add_data({"evnt-list" : evlist})
-        #if "evnt-list" not in mess.data:
-        #    mess.add_data({"evnt-list" : ""})
-        mess.add_data({"count" : count})
+                mess.add_data({key : rdict[key]})
         myxpl.send(mess)
         self.log.debug("_send_event_list : Done :)")
 
+    def event_list(self):
+        """
+        Return information on an event in a dict.
+        {
+        "evnt-list=type1": ["delay1,type2:delay2, ...]
+        }
+
+        """
+        self.log.debug("event_list : Start ...")
+        rdict = dict()
+        events = self.events.get_list_events()
+        rdict["evnt-list"] = events
+        rdict["count"] = len(events)
+        self.log.debug("event_list : Done :)")
+        return rdict
+
+    def event_info(self, etype, delay):
+        """
+        Return information on an event in a dict.
+
+        {
+        'type' ; 'dawn|dusk|sunrise|fullmoon|...'
+        'label' ; '<a human readable name>'
+        'delay' ; '+|-XXXXXX'
+        'args' ; 'str'
+        'current' ; 'halted|resumed|stopped|started'
+        'uptime' ; '<number of seconds since created>'
+        'fullruntime' ; '<number of seconds in the "started" state>'
+        'runtime' ; '<number of seconds since the last start>'
+        'runs' ; '<number of fires>'
+        'next' ; '<the date of the next event>'
+        }
+
+        :returns: A dict containing information on an event
+        :rtype: dict()
+
+        """
+        self.log.debug("event_info : Start ...")
+        event = self.events.get_event(etype, delay)
+        rdict = dict()
+        rdict["type"] = etype
+        rdict["delay"] = delay
+        if etype not in self.events.device_types:
+            rdict["errorcode"] = ERROR_TYPE_NOT_EXIST
+            rdict["error"] = EARTHERRORS[ERROR_TYPE_NOT_EXIST]
+        elif event != None:
+            if "args" in event :
+                rdict["args"] = event['args']
+            rdict["current"] = event['current']
+            rdict["uptime"] = self.events.get_up_time(etype, delay)
+            rdict["fullruntime"] = self.events.get_full_run_time(etype, delay)
+            rdict["runtime"] = self.events.get_run_time(etype, delay)
+            rdict["runs"] = event['runs']
+            rdict["next"] =  event['next']
+        else :
+            rdict["current"] = "halted"
+            rdict["uptime"] = 0
+            rdict["fullruntime"] = 0
+            rdict["runtime"] = 0
+            rdict["runs"] = 0
+            rdict["next"] =  "None"
+        self.log.debug("event_info : Done")
+        return rdict
+
     def _send_event_info(self, myxpl, etype, delay):
         """
-        Send information on an event.
+        Send information on an event via xpl.
 
         earth.basic
         {
@@ -1067,30 +1137,24 @@ class EarthAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("earth.basic")
-        mess.add_data({"type" : etype})
-        mess.add_data({"delay" : delay})
-        event = self.events.get_event(etype, delay)
-        if etype not in self.events.device_types:
-            mess.add_data({"errorcode" : ERROR_TYPE_NOT_EXIST})
-            mess.add_data({"error" : EARTHERRORS[ERROR_TYPE_NOT_EXIST]})
-        elif event != None:
-            if "args" in event :
-                mess.add_data({"args" : event['args']})
-            mess.add_data({"current" : event['current']})
-            mess.add_data({"uptime" : self.events.get_up_time(etype, delay)})
-            mess.add_data({"fullruntime" : self.events.get_full_run_time(etype, delay)})
-            mess.add_data({"runtime" : self.events.get_run_time(etype, delay)})
-            mess.add_data({"runs" : event['runs']})
-            mess.add_data({"next" : event['next']})
-        else :
-            mess.add_data({"current" : "halted"})
-            mess.add_data({"uptime" : 0})
-            mess.add_data({"fullruntime" : 0})
-            mess.add_data({"runtime" : 0})
-            mess.add_data({"runs" : 0})
-            mess.add_data({"next" : "None"})
+        rdict = self.event_info(etype, delay)
+        for key in rdict:
+            if type(rdict[key]) == type(set()):
+                mylist = ""
+                for myval in rdict[key] :
+                    if mylist == "" :
+                        mylist = myval
+                    else :
+                        mylist = mylist + "," + myval
+                    if len(mylist) > 110:
+                        mess.add_data({key : mylist})
+                if len(mylist) > 0:
+                    mess.add_data({key : mylist})
+            else :
+                mess.add_data({key : rdict[key]})
         myxpl.send(mess)
         self.log.debug("_send_event_info : Done :)")
+
 
     def _send_event_status(self, myxpl, status):
         """
@@ -1112,14 +1176,44 @@ class EarthAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("earth.basic")
-        mess.add_data({"type" : status})
-        if status in self.events.get_list_status():
-            mess.add_data({"status" :  self.events.device_status[status]["value"]})
-        else :
-            mess.add_data({"errorcode" : ERROR_STATUS_NOT_EXIST})
-            mess.add_data({"error" : EARTHERRORS[ERROR_STATUS_NOT_EXIST]})
+        rdict = self.event_status(status)
+        for key in rdict:
+            if type(rdict[key]) == type(set()):
+                mylist = ""
+                for myval in rdict[key] :
+                    if mylist == "" :
+                        mylist = myval
+                    else :
+                        mylist = mylist + "," + myval
+                    if len(mylist) > 110:
+                        mess.add_data({key : mylist})
+                if len(mylist) > 0:
+                    mess.add_data({key : mylist})
+            else :
+                mess.add_data({key : rdict[key]})
         myxpl.send(mess)
         self.log.debug("_send_event_status : Done.")
+
+    def event_status(self, status):
+        """
+        Return information on an event in a dict.
+
+        {
+        "type" : "daynight"
+        "status" : "day|night"
+        }
+
+        """
+        self.log.debug("event_status : Start ...")
+        rdict = dict()
+        rdict["type"] = status
+        if status in self.events.get_list_status():
+            rdict["status"] = self.events.device_status[status]["value"]
+        else :
+            rdict["errorcode"] =  ERROR_STATUS_NOT_EXIST
+            rdict["error"] = EARTHERRORS[ERROR_STATUS_NOT_EXIST]
+        self.log.debug("event_status : Done.")
+        return rdict
 
     def _send_event_parameter(self, myxpl, param):
         """
@@ -1150,9 +1244,35 @@ class EarthAPI:
         myxpl.send(mess)
         self.log.debug("_send_event_parameter : Done :)")
 
+    def memory(self):
+        """
+        Return  memory information in a dict.
+
+        {
+            'memory' : 120000
+            'events' : n,11000
+            'rest' : n,11000
+            'zmq' : 11000
+        }
+
+        :returns: A dict containing the  memory information
+        :rtype: dict()
+
+        """
+        self.log.debug("memory : Start ...")
+        rdict = dict()
+        rdict["memory"] = "%s kbytes" % (asizeof(self)/1024)
+        rdict["events"] ="%s kbytes(%s)" % (asizeof(self.events.data)/1024, self.events.count_events())
+        rdict["store"] = "%s kbytes" % (asizeof(self.events.store)/1024)
+        rdict["datafiles"] = "%s" % (self.events.store.count_files())
+        rdict["zmq"] = "%s kbytes" % ((asizeof(self._zmq_interface) + \
+            asizeof(self._zmq_reply_thread)))
+        self.log.debug("memory : Done")
+        return rdict
+
     def _send_memory(self, myxpl):
         """
-        Returns memory information
+        Send memory information via xpl
 
         earth.basic
         {
@@ -1169,16 +1289,59 @@ class EarthAPI:
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("earth.basic")
-        mess.add_data({"memory" : "%s kbytes" % (asizeof(self)/1024)})
-        mess.add_data({"events" : "%s kbytes(%s)" % (asizeof(self.events.data)/1024,self.events.count_events())})
-        mess.add_data({"store" : "%s kbytes" % (asizeof(self.events.store)/1024)})
-        mess.add_data({"datafiles" : "%s" % (self.events.store.count_files())})
+        rdict = self.memory()
+        for key in rdict:
+            if type(rdict[key]) == type(set()):
+                mylist = ""
+                for myval in rdict[key] :
+                    if mylist == "" :
+                        mylist = myval
+                    else :
+                        mylist = mylist + "," + myval
+                    if len(mylist) > 110:
+                        mess.add_data({key : mylist})
+                if len(mylist) > 0:
+                    mess.add_data({key : mylist})
+            else :
+                mess.add_data({key : rdict[key]})
         myxpl.send(mess)
         self.log.debug("_send_memory : Done :)")
 
-    def _send_event_gateway(self, myxpl):
+    def gateway(self):
         """
-        Return gateway capabilities.
+        Return gateway capabilities in a dict.
+
+        {
+        'gateway' : "Domogik Earth"
+        'host' : "host.tld"
+        'stat-list' : "dawndusk,daynight"
+        'type-list' : "dawn,dusk"
+        'cmd-list' : "list,info,status,gateway,memory"
+        'act-list' : "start,stop,resume,halt"
+        'param-list' : "latitude,longitude,dawndusk"
+        }
+
+        :returns: A dict containing the gate capabilites
+        :rtype: dict()
+
+        """
+        self.log.debug("gateway : Start ...")
+        rdict = dict()
+        rdict["gateway"] = "Domogik Earth"
+        rdict["host"] = self._hostname
+        rdict["type-list"] = self.events.get_list_types()
+        rdict["stat-list"] = self.events.get_list_status()
+        rdict["cmd-list"] = self.get_list_cmds()
+        rdict["act-list"] = self.get_list_acts()
+        rdict["param-list"] = self.events.get_list_params()
+        rdict["rep-list"] = self._zmq_interface.get_list_replies()
+        rdict["pub-list"] = self._zmq_interface.get_list_pubs()
+        self.log.debug("gateway : Done")
+        return rdict
+
+    def _send_gateway(self, myxpl):
+        """
+        Send gateway capabilities via xpl.
 
         earth.basic
         {
@@ -1189,69 +1352,34 @@ class EarthAPI:
         cmd-list=list,info,status,gateway,memory
         act-list=start,stop,resume,halt
         param-list=latitude,longitude,dawndusk
+        ...
         }
 
         :param myxpl: The XPL sender
         :type myxpl: XPL Manager
 
         """
-        self.log.debug("_send_event_gateway : Start ...")
+        self.log.debug("_send_gateway : Start ...")
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("earth.basic")
-        mess.add_data({"host" : self._hostname})
-        mylist = ""
-        for myval in self.events.get_list_types() :
-            if mylist == "" :
-                mylist = myval
+        rdict = self.gateway()
+        for key in rdict:
+            if type(rdict[key]) == type(set()):
+                mylist = ""
+                for myval in rdict[key] :
+                    if mylist == "" :
+                        mylist = myval
+                    else :
+                        mylist = mylist + "," + myval
+                    if len(mylist) > 110:
+                        mess.add_data({key : mylist})
+                if len(mylist) > 0:
+                    mess.add_data({key : mylist})
             else :
-                mylist = mylist + "," + myval
-            if len(mylist) > 110:
-                mess.add_data({"type-list" : mylist})
-        if len(mylist) > 0:
-            mess.add_data({"type-list" : mylist})
-        mylist = ""
-        for myval in self.events.get_list_status() :
-            if mylist == "" :
-                mylist = myval
-            else :
-                mylist = mylist + "," + myval
-            if len(mylist) > 110:
-                mess.add_data({"stat-list" : mylist})
-        if len(mylist) > 0:
-            mess.add_data({"stat-list" : mylist})
-        mylist = ""
-        for myval in self.get_list_cmds() :
-            if mylist == "" :
-                mylist = myval
-            else :
-                mylist = mylist + "," + myval
-            if len(mylist) > 110:
-                mess.add_data({"cmd-list" : mylist})
-        if len(mylist) > 0:
-            mess.add_data({"cmd-list" : mylist})
-        mylist = ""
-        for myval in self.get_list_acts() :
-            if mylist == "" :
-                mylist = myval
-            else :
-                mylist = mylist + "," + myval
-            if len(mylist) > 110:
-                mess.add_data({"act-list" : mylist})
-        if len(mylist) > 0:
-            mess.add_data({"act-list" : mylist})
-        mylist = ""
-        for myval in self.events.get_list_params() :
-            if mylist == "" :
-                mylist = myval
-            else :
-                mylist = mylist + "," + myval
-            if len(mylist) > 110:
-                mess.add_data({"param-list" : mylist})
-        if len(mylist) > 0:
-            mess.add_data({"param-list" : mylist})
+                mess.add_data({key : rdict[key]})
         myxpl.send(mess)
-        self.log.debug("_send_event_gateway : Done :)")
+        self.log.debug("_send_gateway : Done :)")
 
     def send_sensors(self):
         """
@@ -1291,9 +1419,16 @@ class EarthAPI:
         Stop the timer and the running jobs.
         """
         self.log.info("EventAPI.stop_all : close all jobs.")
-        self.events.close_all()
+        self.plugin_enabled(False)
         if (self.delay_sensor >0):
             self.timer_stat.cancel()
+        self.events.close_all()
+        #sleep(10)
+        #self._zmq_interface.close()
+        #sleep(10)
+        #del(self._zmq_interface)
+        #del(self._zmq_reply_thread)
+        #sleep(10)
 
 class DawnDusk():
     """

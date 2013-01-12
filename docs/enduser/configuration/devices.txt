@@ -21,7 +21,7 @@ In some plugins there are helpers which can display available modules and their 
 Set devices to a place
 ======================
 To set devices to a place, you must be on the visualisation screen. From **Home Screen**, click on **Visualisation** to go to your house's visualisation screen.
-For each area and room, it will be the same process to set devices.
+For each page it will be the same process to set devices.
 
 Go to the edition mode
 ----------------------

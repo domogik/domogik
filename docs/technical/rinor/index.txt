@@ -94,13 +94,13 @@ This forces the response to be a Jsonp response. This is needed for calling REST
 
 Example response without callback: ::
 
-    /base/area/list
-    {"status" : "OK", "code" : 0, "description" : "" "area: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]}
+    /base/device/list
+    {"status" : "OK", "code" : 0, "description" : "" "device: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]}
 
 And the result with callback=foo: ::
 
-    /base/area/list?callback=foo
-    foo ({"status" : "OK", "code" : 0, "description" : "" "area: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]})
+    /base/device/list?callback=foo
+    foo ({"status" : "OK", "code" : 0, "description" : "" "device: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]})
 
 export=csv
 ----------

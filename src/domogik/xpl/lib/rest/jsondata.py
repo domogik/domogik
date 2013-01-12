@@ -112,13 +112,9 @@ class JSonHelper():
                      "plugin_config_param",  \
                      "device_type",  \
                      "device_feature_model",  \
-                     "uiitemconfig",  \
                      "useraccount",  \
                      "sensor_reference_data",  \
                      "person",  \
-                     "system_config",  \
-                     "system_stats",  \
-                     "system_statsvalue", \
                      "id", \
                      "device_id", \
                      "name"]
@@ -151,13 +147,12 @@ class JSonHelper():
             return "#MAX_DEPTH# "
 
         # define data types
-        db_type = ("DeviceFeature", "Area", "Device", "DeviceUsage", \
+        db_type = ("DeviceFeature", "Device", "DeviceUsage", \
                    "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
-                   "DeviceType", "UIItemConfig", "Room", "UserAccount", \
-                   "SensorReferenceData", "Person", \
-                   "SystemStats", "SystemStatsValue", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
+                   "DeviceType", "UserAccount", \
+                   "SensorReferenceData", "Person", 
+                   "DeviceFeatureModel") 
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")

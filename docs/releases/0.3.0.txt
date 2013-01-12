@@ -1,0 +1,13 @@
+=============
+Release 0.3.0
+=============
+
+.. todo::
+    This release is actually in alpha/beta/rc status. This page will be updated soon.
+
+New features 
+============
+
+Ui en core seperation
+*********************
+Domoweb and other UI's don't use RINOR anymore to store there configuration. As a consequence of this the Hous, Area and rooms system is removed and is replaced by a system specifick for each UI.

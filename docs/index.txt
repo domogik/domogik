@@ -24,12 +24,6 @@ End User Documentation
 * **First steps:**
 
   * :doc:`First Use </enduser/configuration/index>` (*)
-  * :doc:`Create and configure your house </enduser/configuration/house>` (*)
-
-    * :doc:`House management </enduser/administration/house>` (*)
-    * :doc:`Areas management </enduser/administration/area>` (*)
-    * :doc:`Rooms management </enduser/administration/room>` (*)
-
   * :doc:`Accounts management </enduser/administration/account>`
 
 * **Packages:**
@@ -57,7 +51,7 @@ Technical Documentation
   :doc:`Overview </technical/rinor/index>` |
   :doc:`Statistics Manager </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
   
-    * :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (area, rooms, devices, events, etc)
+    * :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (devices, events, etc)
     * :doc:`REST /command </technical/rinor/rest_command>`: Send commands to devices
     * :doc:`REST /events </technical/rinor/rest_events>`: Get events
     * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database

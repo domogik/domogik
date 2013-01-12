@@ -56,7 +56,7 @@ MemberGrpStatus = {0: 'unknown',
                              2: 'to confirm', 
                              3: 'to update'}
                              
-Capabilities = ['Routing', 'Listening', 'Beaming', 'Security', 'FLiRS']
+Capabilities = ['Primary Controller', 'Secondary Controller', 'Static Update Controller','Bridge Controller' ,'Routing', 'Listening', 'Beaming', 'Security', 'FLiRS']
 
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
