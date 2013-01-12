@@ -218,6 +218,13 @@ function copy_sample_files {
             fi
         fi
     fi
+    # Add the xplhub.cfg config file in an existing configuration it it does not exists
+    if [ ! -f $DMG_ETC/xplhub.cfg ] ; then
+        echo "No existing xplhub.cfg file : creating it"
+        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+        chown $d_user:root $DMG_ETC/xplhub.cfg
+        chmod 640 $DMG_ETC/xplhub.cfg
+    fi
     if [ -d "/etc/default/" ];then
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp src/domogik/examples/default/domogik /etc/default/
