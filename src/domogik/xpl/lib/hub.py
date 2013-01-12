@@ -130,7 +130,7 @@ class Hub():
                     config[k] = v
 
         except:
-            self.log.error("ERROR : Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
+            print("ERROR : Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
             return
  
         ### Initiate the logger
