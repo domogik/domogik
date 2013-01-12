@@ -54,7 +54,7 @@ class ZWaveNode:
 
     def __init__(self, ozwmanager,  homeId, nodeId):
         '''initialise le node zwave
-        @param manger: pointeur sur l'instance du manager
+        @param manager: pointeur sur l'instance du manager
         @param homeid: ID du réseaux home/controleur
         @param nodeid: ID du node
         '''
@@ -81,8 +81,8 @@ class ZWaveNode:
     id = property(lambda self: self._nodeId)
     name = property(lambda self: self._name)
     location = property(lambda self: self._location)
-    product = property(lambda self: self._product.name if self._product else '')
-    productType = property(lambda self: self._productType.name if self._productType else '')
+    product = property(lambda self: self._getProductName())
+    productType = property(lambda self: self.getProductTypeName())
     lastUpdate = property(lambda self: self._lastUpdate)
     homeId = property(lambda self: self._homeId)
     nodeId = property(lambda self: self._nodeId)
@@ -90,7 +90,7 @@ class ZWaveNode:
     commandClasses = property(lambda self: self._commandClasses)
     neighbors = property(lambda self:self._neighbors)
     values = property(lambda self:self._values)
-    manufacturer = property(lambda self: self._manufacturer.name if self._manufacturer else '')
+    manufacturer = property(lambda self: self.GetManufacturerName ())
     groups = property(lambda self:self._groups)
     isSleeping = property(lambda self: self._isSleeping())
     isLocked = property(lambda self: self._getIsLocked())
@@ -125,7 +125,31 @@ class ZWaveNode:
                 print group
             grps.append(group)
         return grps
-        
+    
+    def _getProductName(self):
+        """Retourne le nom du produit ou son id ou Undefined"""
+        if self._product.name :
+            return self._product.name 
+        elif self._product.id :
+            return ('Product id: ' + self._product.id) 
+        else : return 'Undefined'
+
+    def getProductTypeName(self):
+        """Retourne le nom du type de produit ou son id ou Undefined"""
+        if self._productType.name :
+            return self._productType.name 
+        elif self._productType.id :
+            return ('Product id: ' + self._productType.id) 
+        else : return 'Undefined'
+
+    def GetManufacturerName(self):
+        """Retourne le nom du type de produit ou son id ou Undefined"""
+        if self._manufacturer.name :
+            return self._manufacturer.name 
+        elif self._manufacturer.id :
+            return ('Product id: ' + self._manufacturer.id) 
+        else : return 'Undefined'
+
 # Fonction de renvoie des valeurs des valueNode en fonction des Cmd CLASS zwave
 # C'est ici qu'il faut enrichire la prise en compte des fonctions Zwave
 # COMMAND_CLASS implémentées :
@@ -235,7 +259,7 @@ class ZWaveNode:
     
     def _updateCapabilities(self):
         """Mise à jour des capabilities set du node"""
-  #      Capabilities = ['Routing', 'Listening', 'Beanning', 'Security', 'FLiRS']
+  #      Capabilities = ['Routing', 'Listening', 'Beanning', 'Security', 'FLiRS']  restreintes à un node non controleur
         nodecaps = set()
         if self._manager.isNodeRoutingDevice(self._homeId, self._nodeId): nodecaps.add('Routing')
         if self._manager.isNodeListeningDevice(self._homeId, self._nodeId): nodecaps.add('Listening')
@@ -277,7 +301,7 @@ class ZWaveNode:
             if (time.time() - self.lastUpdate) > 30 :
                 retval = True
             else :  retval = False
-        print '+++++ Is Sleeping ? :', retval, ' ++++'
+        print '+++++ node ', self._nodeId,  ' is Sleeping ? :', retval, ' ++++'
         print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
         return retval        
     
@@ -414,6 +438,7 @@ class ZWaveNode:
         retval["Last update"] = time.ctime(self.lastUpdate)
         retval["Neighbors"] = list(self.neighbors) if  self.neighbors else 'No one'
         retval["Groups"] = self._getGroupsDict()
+        retval["Capabilities"] = list(self._capabilities) if  self._capabilities else 'No one'
         return retval
         
     def getValuesInfos(self):
