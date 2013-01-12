@@ -278,7 +278,7 @@ class BluezTestCase(PluginTestCase):
         self.assertTrue(self.query_many("device", message, keys, keyvalss))
         duration = datetime.datetime.now() - self.time_start
         print("")
-        print("Delay between 2 stats is %s seconds" % duration.seconds)
+        print("Delay before getting message is %s seconds" % duration.seconds)
 
     def test_570_wait_for_high_stat_delay(self):
         #time.sleep(30)
@@ -295,6 +295,7 @@ class BluezTestCase(PluginTestCase):
         duration = datetime.datetime.now() - self.time_start
         print("")
         print("Delay between 2 stats is %s seconds" % duration.seconds)
+        self.assertTrue((duration.seconds>50) and (duration.seconds<70))
 
     def test_610_wait_for_phone_off(self):
         #time.sleep(30)
