@@ -23,24 +23,23 @@ fi
 
 # creating domoweb user if he isn't already there
 if ! getent passwd domogik >/dev/null; then
-    # Adding system user: domoweb.
-    #  --no-create-home
-    adduser \
-      --system \
-      --disabled-password \
-      --group \
-      --home /var/lib/domogik \
-      --gecos "Domogik Server" \
-      --shell /bin/bash \
-      domogik  >/dev/null
-    usermod --append --groups tty,dialout,fax,voice,cdrom,audio,video
-    set +e
-    /bin/cp /etc/skel/* /var/lib/domogik/ >/dev/null 2>&1
-    /bin/cp /etc/skel/.* /var/lib/domogik/ >/dev/null 2>&1
-    echo export PATH=\"/usr/sbin:\$PATH\" >> /var/lib/domogik/.profile
-    echo export PYTHONPATH=\"/var/lib/domogik/\" >> /var/lib/domogik/.profile
-    echo export PYTHONPATH=\"/var/lib/domogik/\" >> /var/lib/domogik/.bashrc
-    set -e
+	# Adding system user: domoweb.
+	#  --no-create-home
+	adduser \
+	  --system \
+	  --disabled-password \
+	  --group \
+	  --home /var/lib/domogik \
+	  --gecos "Domogik Server" \
+	  --shell /bin/bash \
+	  domogik  >/dev/null
+	  set +e
+	  /bin/cp /etc/skel/* /var/lib/domogik/ >/dev/null 2>&1
+	  /bin/cp /etc/skel/.* /var/lib/domogik/ >/dev/null 2>&1
+	  echo export PATH=\"/usr/sbin:\$PATH\" >> /var/lib/domogik/.profile
+	  echo export PYTHONPATH=\"/var/lib/domogik/\" >> /var/lib/domogik/.profile
+	  echo export PYTHONPATH=\"/var/lib/domogik/\" >> /var/lib/domogik/.bashrc
+	  set -e
 fi
 
 set -e

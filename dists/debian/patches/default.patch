@@ -1,19 +1,10 @@
 diff -Nru domogik-0.1.99.orig/src/domogik/examples/default/domogik domogik-0.1.99/src/domogik/examples/default/domogik
---- domogik-0.1.99.orig/src/domogik/examples/default/domogik	2012-05-09 00:32:40.000000000 +0200
-+++ domogik-0.1.99/src/domogik/examples/default/domogik	2012-05-09 00:33:54.000000000 +0200
-@@ -7,7 +7,7 @@
- # -d to start the database manager (launch only on master host)
- # -r to start the rest component (launch only on master host)
- # -E to manage external members (launch only on master host)
--# -p to regulary ping plugins 
-+# -p to regulary ping plugins
- # -t <ping duration> to customize ping duration
- # -w <wait time between 2 ping> to customize ping delay
- # Remember : Your domogik installation must have *one* and *only one*
+--- domogik-0.1.99.orig/src/domogik/examples/default/domogik    2012-05-09 00:32:40.000000000 +0200
++++ domogik-0.1.99/src/domogik/examples/default/domogik 2012-05-09 00:33:54.000000000 +0200
 @@ -21,6 +21,9 @@
  # If so, set this option to 'false'
  LAUNCH_DOMOGIK_XPL_HUB=true
- 
+
 +#Should we start domogik at startup
 +RUN=yes
 +
