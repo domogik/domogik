@@ -111,6 +111,8 @@ class Earth(XplPlugin):
         self.log.debug("__init__ : Enable the heartbeat")
         self.enable_hbeat()
 
+        self._earth.plugin_enabled(True)
+
         self.log.info("Plugin earth correctly started.")
 
     def request_cb(self, message):

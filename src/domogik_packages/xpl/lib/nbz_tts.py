@@ -78,10 +78,10 @@ class NBZNotification:
             statreq = urllib2.Request(staturl)
             try:
                 stathandle = urllib2.urlopen(statreq)
-            except URLError, err:
+            except URLError as err:
                 self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
                 return False
-            except HTTPError, err:
+            except HTTPError as err:
                 self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
                 return False
             else:
@@ -92,10 +92,10 @@ class NBZNotification:
                     wakupreq = urllib2.Request(wakupurl)
                     try:
                         wakuphandle = urllib2.urlopen(wakupreq)
-                    except URLError, err:
+                    except URLError as err:
                         self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
                         return False
-                    except HTTPError, err:
+                    except HTTPError as err:
                         self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
                         return False
                     else:
@@ -106,10 +106,10 @@ class NBZNotification:
                     ttsreq = urllib2.Request(ttsurl)
                     try:
                         ttshandle = urllib2.urlopen(ttsreq)
-                    except URLError, err:
+                    except URLError as err:
                         self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
                         return False
-                    except HTTPError, err:
+                    except HTTPError as err:
                         self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
                         return False
                     else:
@@ -119,10 +119,10 @@ class NBZNotification:
                     sleepreq = urllib2.Request(sleepurl)
                     try:
                         sleephandle = urllib2.urlopen(sleepreq)
-                    except URLError, err:
+                    except URLError as err:
                         self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
                         return False
-                    except HTTPError, err:
+                    except HTTPError as err:
                         self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
                         return False
                     else:
@@ -133,10 +133,10 @@ class NBZNotification:
                     ttsreq = urllib2.Request(ttsurl)
                     try:
                         ttshandle = urllib2.urlopen(ttsreq)
-                    except URLError, err:
+                    except URLError as err:
                         self._log.debug("Can not connect to Wizz.cc\'s server.        \nReason : ", err.reason)
                         return False
-                    except HTTPError, err:
+                    except HTTPError as err:
                         self._log.debug("Wizz.cc\'s server was unable to satify your demand.        \nError code : ",  err.code)
                         return False
                     else:

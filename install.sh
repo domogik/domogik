@@ -37,14 +37,20 @@ function display_usage {
     echo "Usage : "
     echo "  Full installation : ./install.sh"
     echo "  Installation on secondary host : ./install.sh --secondary"
+    echo "  Use the C xPL hub instead of the python one : ./install.sh --hub_c"
     echo "  Help : ./install.sh -h"
     echo "         ./install.sh --help"
 }
 
 MAIN_INSTALL=y
+DOMOGIK_XPL_HUB=python
 while [ "$1" ] ; do 
     arg=$1
     case $arg in
+        --hub_c) 
+            DOMOGIK_XPL_HUB="c"
+            echo "The C version of the xPL hub will be used instead of the python one."
+            ;;
         --secondary) 
             MAIN_INSTALL="n"
             echo "This installation will be done as a secondary host installation : only manager (and plugins) will be launched on this host."
@@ -185,8 +191,9 @@ function copy_sample_files {
     fi
     if [ ! -f $DMG_ETC/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-        chown $d_user:root $DMG_ETC/domogik.cfg
-        chmod 640 $DMG_ETC/domogik.cfg
+        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+        chown $d_user:root $DMG_ETC/*.cfg
+        chmod 640 $DMG_ETC/*.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
             cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
             chown $d_user:root $DMG_ETC/sources.list
@@ -201,14 +208,22 @@ function copy_sample_files {
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-            chown $d_user:root $DMG_ETC/domogik.cfg
-            chmod 640 $DMG_ETC/domogik.cfg
+            cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+            chown $d_user:root $DMG_ETC/*.cfg
+            chmod 640 $DMG_ETC/*.cfg
             if [ $MAIN_INSTALL = "y" ] ; then
                 cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
                 chown $d_user:root $DMG_ETC/sources.list
                 chmod 640 $DMG_ETC/sources.list
             fi
         fi
+    fi
+    # Add the xplhub.cfg config file in an existing configuration it it does not exists
+    if [ ! -f $DMG_ETC/xplhub.cfg ] ; then
+        echo "No existing xplhub.cfg file : creating it"
+        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+        chown $d_user:root $DMG_ETC/xplhub.cfg
+        chmod 640 $DMG_ETC/xplhub.cfg
     fi
     if [ -d "/etc/default/" ];then
         if [ "$keep" = "n" -o "$keep" = "N" ];then
@@ -220,7 +235,9 @@ function copy_sample_files {
     fi
     if [ -d "/etc/logrotate.d/" ];then
         cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
+        cp src/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/domogik
+        chmod 644 /etc/logrotate.d/xplhub
     fi
     if [ -d "/etc/init.d/" ];then
         cp src/domogik/examples/init/domogik /etc/init.d/
@@ -240,7 +257,7 @@ function update_default_config {
         exit 8
     fi
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
-
+    [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_XPL_HUB.*$;DOMOGIK_XPL_HUB=${DOMOGIK_XPL_HUB};" /etc/default/domogik
 
     if [ "$MODE" = "develop" ];then
         arch_path=$(python install/get_arch.py)
@@ -446,6 +463,8 @@ function modify_hosts {
 function create_log_dir {
     mkdir -p /var/log/domogik
     chown -R $d_user: /var/log/domogik 
+    mkdir -p /var/log/xplhub
+    chown -R $d_user: /var/log/xplhub 
 }
 
 function install_plugins {

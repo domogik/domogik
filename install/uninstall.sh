@@ -59,8 +59,10 @@ fi
 # Ask for confirmation
 echo "This script will uninstall completely Domogik :"
 echo "- Domogik core"
+echo "- xPL hub"
 echo "- Configuration"
 echo "- Plugins"
+echo "- Logs"
 echo "- ..."
 echo "Only the database will not be removed"
 echo "Are you sure ? [y/N]"
@@ -87,6 +89,8 @@ RM="rm -Rf "
 
 echo "Delete /etc/logrotate.d/domogik"
 $RM /etc/logrotate.d/domogik
+echo "Delete /etc/logrotate.d/xplhub"
+$RM /etc/logrotate.d/xplhub
 
 echo "Delete /etc/default/domogik"
 $RM /etc/default/domogik
@@ -108,7 +112,12 @@ $RM $CONFIG_FOLDER
 echo "Delete $GLOBAL_CONFIG"
 $RM $GLOBAL_CONFIG
 
-for fic in dmgenplug dmgdisplug dmg_manager dmg_send dmg_pkgmgr dmg_version dmg_dump  
+echo "Delete /var/log/domogik"
+$RM /var/log/domogik
+echo "Delete /var/log/xplhub"
+$RM /var/log/xplhub
+
+for fic in dmgenplug dmgdisplug dmg_manager dmg_send dmg_pkgmgr dmg_version dmg_dump dmg_hub 
   do
     TO_DEL=$(which $fic)
     echo "Delete $TO_DEL"

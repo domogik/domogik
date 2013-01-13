@@ -96,7 +96,9 @@ setup(
                       'pyinotify >= 0.8.9', 
                       'pip >= 1.0', 
                       'Distutils2',
-                      'pyserial >= 2.5'],
+                      'pyserial >= 2.5',
+                      'netifaces>=0.8',
+                      'Twisted>=12.1.0'],
     zip_safe = False,
     license = 'GPL v3',
     # namespace_packages = ['domogik', 'mpris', 'tools'],
@@ -116,6 +118,7 @@ setup(
             dmg_send = domogik.xpl.bin.send:main
             dmg_dump = domogik.xpl.bin.dump_xpl:main
             dmg_version = domogik.xpl.bin.version:main
+            dmg_hub = domogik.xpl.bin.hub:main
             """
         ],
     },

@@ -20,12 +20,12 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 Plugin purpose
 ==============
-XPL Cron server.
+XPL Earth server.
 
 Implements
 ==========
-class CronStore
-class cronTools
+class EarthStore
+class EarthZmq
 
 @author: Sébastien Gallet <sgallet@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
@@ -42,6 +42,8 @@ from domogik.common.messaging.pubsub.messaging_event_utils import MessagingEvent
 import json
 from random import choice
 from time import sleep
+from json import dumps, loads, JSONEncoder, JSONDecoder
+import pickle
 
 ERROR_NO = 0
 ERROR_PARAMETER = 1
@@ -71,11 +73,23 @@ EARTHERRORS = { ERROR_NO: 'No error',
                ERROR_REST: 'Error with REST. But Event is created.',
                }
 
+class PythonObjectEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (list, dict, str, unicode, int, float, bool, type(None))):
+            return JSONEncoder.default(self, obj)
+        return {'_python_object': pickle.dumps(obj)}
+
+def as_python_object(dct):
+    if '_python_object' in dct:
+        return pickle.loads(str(dct['_python_object']))
+    return dct
+
 class EarthZmq():
     """
     Interface to the ZMQ
     """
-    category = "plugin.earth.admin"
+    plugin_name = "earth"
+    category = "plugin.earth"
 
     def __init__(self, earth, stop):
         """
@@ -84,6 +98,22 @@ class EarthZmq():
         self._earth = earth
         self.stop = stop
         self._zmq_reply = MessagingRep()
+        self._zmq_publish = MessagingEventPub('plugin_earth')
+
+    def __del__(self, earth, stop):
+        """
+        Delete zmq objects
+        """
+        del(self._zmq_reply)
+        del(self._zmq_publish)
+
+    def close(self):
+        """
+        Close the mq
+
+        """
+        self._zmq_reply.s_rep.close()
+        self._zmq_publish.s_send.close()
 
     def get_reply_action(self, reqid):
         """
@@ -92,12 +122,148 @@ class EarthZmq():
         """
         idxx = reqid.find(self.category)
         if idxx == -1:
-            return None
+            idxx = reqid.find("plugin.ping")
+            if idxx == -1:
+                return None
+            else:
+                return "ping"
         else :
             offset = len(self.category)
             temp = reqid[idxx+offset+1:]
-            idxx = temp.find(".")
-            return temp[:idxx]
+            path = temp.split(".")
+            res = path[0]
+            if (path[0] == "admin") :
+                res = path[0] + "." + path[1]
+            return res
+
+    def get_list_replies(self):
+        """
+        Retrieve list of replies
+
+        """
+        return ['gateway', 'memory', 'admin.set', 'admin.get', 'admin.list', 'admin.info',
+            'admin.status', 'admin.start', 'admin.stop', 'admin.resume', 'admin.halt',
+            'check', 'ping']
+
+    def get_list_pubs(self):
+        """
+        Retrieve list of pubs
+
+        """
+        return ['admin.list', 'admin.event', 'admin.status', 'enabled']
+
+    def _publish_list(self, action, rdict):
+        """
+        Publish the list using channel list
+
+        """
+        path = "%s.%s" % (self.category, "admin.list")
+        r_content = dict()
+        r_content["action"] = action
+        r_content["data"] = rdict
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_list : send list %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
+
+    def _get_id(self, event, delay):
+        """
+        Return the id to use
+
+        """
+        return "%s.%s" % (event, delay)
+
+    def publish_plugin_enabled(self,status):
+        """
+        Publish that the plugin is enabled
+
+        """
+        r_content = dict()
+        r_content["status"] = status
+        r_content["plugin"] = self.plugin_name
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        path = "%s.%s" % (self.category, "enabled")
+        self._zmq_publish.send_event(path, j_content)
+        path = "%s.%s" % ("plugin", "enabled")
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_plugin_enabled : data %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
+
+    def publish_start(self, event, delay, eventdict, listdict):
+        """
+        An event wav created
+
+        """
+        path = "%s.%s" % (self.category, "admin.event")
+        r_content = dict()
+        r_content["action"] = "added"
+        r_content["id"] = self._get_id(event, delay)
+        r_content["data"] = eventdict
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_start : send list %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
+        self._publish_list("event-added",eventdict)
+
+    def publish_halt(self, event, delay, eventdict, listdict):
+        """
+        An event wav halted
+
+        """
+        path = "%s.%s" % (self.category, "admin.event")
+        r_content = dict()
+        r_content["action"] = "removed"
+        r_content["id"] = self._get_id(event, delay)
+        r_content["data"] = eventdict
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_halt : data %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
+        self._publish_list("event-removed",eventdict)
+
+    def publish_stop(self, event, delay, eventdict):
+        """
+        An event was stopped
+
+        """
+        path = "%s.%s" % (self.category, "admin.event")
+        r_content = dict()
+        r_content["action"] = "stopped"
+        r_content["id"] = self._get_id(event, delay)
+        r_content["data"] = eventdict
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_stop : data %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
+
+    def publish_resume(self, event, delay, eventdict):
+        """
+       An event wav resumed
+
+        """
+        path = "%s.%s" % (self.category, "admin.event")
+        r_content = dict()
+        r_content["action"] = "resumed"
+        r_content["id"] = self._get_id(event, delay)
+        r_content["data"] = eventdict
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_resume : data %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
+
+    def publish_status(self, status, rdict):
+        """
+        A status is updated
+        """
+        path = "%s.%s" % (self.category, "event.status")
+        r_content = dict()
+        r_content["action"] = "status"
+        r_content["id"] = status
+        r_content["data"] = rdict
+        j_content = json.dumps(r_content, cls=PythonObjectEncoder)
+        self._zmq_publish.send_event(path, j_content)
+        self._earth.log.debug("EarthZmq.publish_status : data %s" % j_content)
+        print("Message sent : %s - %s"  % (path, j_content))
 
     def reply(self):
         """
@@ -117,31 +283,135 @@ class EarthZmq():
                 if action == "check":
                     print("ZZZZZZZZZZZZZZZZMQ : Processing request check")
                     repl["check"] = "ok"
+                elif action == "ping":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request ping")
+                    repl["plugin"] = self.plugin_name
                 elif action == "gateway":
                     print("ZZZZZZZZZZZZZZZZMQ : Processing request gateway")
                     repl = self._earth.gateway()
                 elif action == "memory":
                     print("ZZZZZZZZZZZZZZZZMQ : Processing request memory")
                     repl = self._earth.memory()
-                elif action == "info":
-                    print("ZZZZZZZZZZZZZZZZMQ : Processing request info")
+                elif action == "admin.start":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request start")
                     etype = None
-                    edelay = None
+                    edelay = "0"
                     if 'type' in request['content']:
                         etype = request['content']['type']
                     if 'delay' in request['content']:
                         edelay = request['content']['delay']
-                    repl = self._earth.event_info(etype, edelay)
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        data = {}
+                        if "args" in  request['content'] :
+                            data["args"] = request['content']['args']
+                        data["current"] = "started"
+                        self._earth.events.add_event(etype, edelay, data)
+                        repl = self._earth.event_info(etype, edelay)
+                elif action == "admin.stop":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request stop")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        self._earth.events.stop_event(etype, edelay)
+                        repl = self._earth.event_info(etype, edelay)
+                elif action == "admin.resume":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request resume")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        self._earth.events.resume_event(etype, edelay)
+                        repl = self._earth.event_info(etype, edelay)
+                elif action == "admin.halt":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request halt")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        self._earth.events.halt_event(etype, edelay)
+                        repl = self._earth.event_info(etype, edelay)
+                elif action == "admin.info":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request info")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        repl = self._earth.event_info(etype, edelay)
+                elif action == "admin.simulate":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request simulate")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        repl["error"] = "Not implemented"
+                elif action == "admin.set":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request set")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None:
+                        repl["error"] = "no event type found in message."
+                    else :
+                        repl["error"] = "Not implemented"
+                elif action == "admin.get":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request get")
+                    etype = None
+                    edelay = "0"
+                    if 'type' in request['content']:
+                        etype = request['content']['type']
+                    if 'delay' in request['content']:
+                        edelay = request['content']['delay']
+                    if etype == None :
+                        repl["error"] = "no event type found in message."
+                    else :
+                        repl["error"] = "Not implemented"
+                elif action == "admin.status":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request status")
+                    equery = None
+                    if 'query' in request['content']:
+                        equery = request['content']['query']
+                    repl = self._earth.event_status(equery)
+                elif action == "admin.list":
+                    print("ZZZZZZZZZZZZZZZZMQ : Processing request list")
+                    repl = self._earth.event_list()
                 else:
                     repl["error"] = "action %s not found" % action
             except :
                 repl["error"] = "exception %s" % traceback.format_exc()
             finally:
                 self._zmq_reply.send_reply(repl)
-            #print("action %s" % action)
-            #self._earth.log.debug("EarthZmq.reply : request receive %s " % request)
-            #sleep(.5)
-            #self._zmq_reply.send_reply("%s : done!" % request['id'])
+
 
 class EarthStore():
     """

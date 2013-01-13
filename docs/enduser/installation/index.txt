@@ -82,7 +82,11 @@ From **domogik-<release>** folder, run the install: ::
 
     $ sudo ./install.sh
 
-.. note:: During installation, a new user will be created if necessary.
+.. note:: 
+
+    During installation, a new user will be created if necessary.
+    
+    If you want to use the C hub instead of the python hub (the default one), use the **--hub_c** option. See :doc:`here </xplhub/index>` for more informations on the xpl hubs.
 
 You will be asked for the following questions: ::
 

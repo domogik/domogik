@@ -69,6 +69,15 @@
 		}, {
 			"device_type_id" : "ozwave.thermometer",
 			"feature_type" : "sensor",
+			"id" : "ozwave.thermometer.humidity",
+			"name" : "relative humidity",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "humidity",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.thermometer",
+			"feature_type" : "sensor",
 			"id" : "ozwave.thermometer.battery",
 			"name" : "Battery",
 			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",

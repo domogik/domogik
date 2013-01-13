@@ -1,0 +1,72 @@
+================
+xPL hub overview
+================
+
+Domogik is now delivered with 2 xPL hubs:
+
+* the C xPL hub which was used wince the first Domogik release.
+* the new python xPL hub.
+
+As the C hub has an issue on some servers, the python hub is now used as the default one. This new hub is better for analysing the xPL network as it maintains a list of all the xpl clients and some statistics on them (number of valid and invalid messages, last time seen, ...). It also logs all the invalid xpl messages.
+
+F.A.Q
+=====
+
+* Q: I want to use the C hub instead of the python hub. How can I do ?
+* R: On Domogik installation, add the **--hub_c** option to the *./install.sh* command. After the installation, you can switch by editing **/etc/default/domogik** and setting **DOMOGIK_XPL_HUB** to **c** (or **python** for the new hub)
+
+* Q: Where are the hub log files ?
+* R: The C hub has no log files. The python hub log files are in */var/log/xplhub/*. You can also customize the loglevel in the hub config file : **/etc/domogik/xplhub.cfg**.
+
+The python hub
+==============
+
+Configuration file
+******************
+
+The configuration file is **/etc/domogik/xplhub**. All the configuration items are related to the logs. The content of this file is enough to understand how to tune it.
+The default configuration is enough for all end users. Only the developpers may need to increase the logs verbosity.
+
+Log files
+*********
+
+The default folder for the logs is **/var/log/xplhub/**. Several log files are created:
+
+* client_list.txt: ::
+
+    | Client id             | Client source                      | Interval | Last seen                  | Status  | Nb OK  | Nb KO  |
+    |-----------------------+------------------------------------+----------+----------------------------+---------+--------+--------|
+    | 192.168.1.10_43879    | domogik-manager.darkstar           |        5 | 2013-01-06T17:14:55.641510 | alive   |     11 |      0 |
+    | 192.168.1.10_45993    | domogik-dbmgr.darkstar             |        5 | 2013-01-06T17:14:59.044806 | alive   |      9 |      0 |
+    | 192.168.1.10_57712    | domogik-rest.darkstar              |        5 | 2013-01-06T17:14:59.343223 | alive   |      1 |      0 |
+    |-----------------------+------------------------------------+----------+----------------------------+---------+--------+--------|
+
+  This log file contains the list of all the clients that the hub has seen, even if they have been stopped or if they disappear. 
+
+* bandwidth.csv: ::
+
+    192.168.1.10_57712    ;   1357488915.05 ; domogik-rest.darkstar              ; hbeat.app         ; xpl-stat
+    192.168.1.50_54361    ;   1357488915.05 ; domogik-teleinfo.ambre             ; hbeat.app         ; xpl-stat
+    192.168.1.50_54937    ;   1357488915.05 ; domogik-wol_ping.ambre             ; hbeat.app         ; xpl-stat
+    192.168.1.50_56589    ;   1357488915.06 ; domogik-diskfree.ambre             ; hbeat.app         ; xpl-stat
+    192.168.1.50_33303    ;   1357488915.06 ; domogik-rest.ambre                 ; hbeat.app         ; xpl-stat
+    192.168.1.50_58976    ;   1357488915.06 ; domogik-xpl_time.ambre             ; hbeat.app         ; xpl-stat
+    192.168.1.50_47922    ;   1357488915.06 ; domogik-manager.ambre              ; hbeat.app         ; xpl-stat
+    192.168.1.50_49465    ;   1357488915.06 ; domogik-dbmgr.ambre                ; hbeat.app         ; xpl-stat
+    192.168.1.50_58976    ;   1357488927.23 ; domogik-xpl_time.ambre             ; datetime.basic    ; xpl-trig
+    192.168.1.50_47922    ;   1357488927.64 ; domogik-manager.ambre              ; hbeat.request     ; xpl-cmnd
+    192.168.1.50_54937    ;   1357488927.64 ; domogik-wol_ping.ambre             ; hbeat.app         ; xpl-stat
+    192.168.1.50_56589    ;   1357488927.65 ; domogik-diskfree.ambre             ; hbeat.app         ; xpl-stat
+    192.168.1.10_45993    ;   1357488927.65 ; domogik-dbmgr.darkstar             ; hbeat.app         ; xpl-stat
+
+  This log file will track all the xpl messages on the network. The columns are: 
+    
+    * the client id (ip and port used by the xpl client)
+    * the timestamp
+    * the source
+    * the message schema
+    * the message type
+
+* invalid_data.csv: this file contains all the invalid xpl messages =.
+
+* xplhub.log: this is the hub log file.

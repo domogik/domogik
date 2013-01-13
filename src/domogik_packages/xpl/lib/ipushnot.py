@@ -69,10 +69,10 @@ class IPushNotification:
 	    req = urllib2.Request(myurl)
 	    try:
 	    	handle = urllib2.urlopen(req)
-	    except URLError, err:
+	    except URLError as err:
 		self._log.debug("Can not connect to Pushme\'s server.        \nReason : ", err.reason)
 		return False
-	    except HTTPError, err:
+	    except HTTPError as err:
 		self._log.debug("Pushme\'s server was unable to satify your demand.        \nError code : ",  err.code)
 		return False
 	    else:

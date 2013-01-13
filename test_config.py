@@ -127,6 +127,8 @@ def test_config_files():
             hub_iface = value
         elif item.strip() == "LAUNCH_DOMOGIK_XPL_HUB":
             launch_domogik_xpl_hub = value
+        elif item.strip() == "DOMOGIK_XPL_HUB":
+            domogik_xpl_hub = value
         elif item.strip() == "DIETIME":
             pass
         elif item.strip() == "STARTTIME":
