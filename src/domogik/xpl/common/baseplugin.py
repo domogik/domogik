@@ -37,7 +37,10 @@ Implements
 import threading
 from socket import gethostname 
 import sys
+import os
+import pwd
 
+from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
 from optparse import OptionParser
 from domogik.common.daemonize import createDaemon
@@ -54,6 +57,17 @@ class BasePlugin():
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
+
+        # First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
+        # in the file /etc/default/domogik : DOMOGIK_USER
+        Default = DefaultLoader()
+        dmg_user = Default.get("DOMOGIK_USER")
+        logname = pwd.getpwuid(os.getuid())[0]
+        if dmg_user != logname:
+            print("ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : %s" % dmg_user)
+            sys.exit(1)
+
+        # Then, start the plugin...
         self._threads = []
         self._timers = []
         if name is not None:
