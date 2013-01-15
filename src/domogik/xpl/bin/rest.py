@@ -55,6 +55,7 @@ from domogik.xpl.lib.rest.event import DmgEvents
 from domogik.xpl.lib.rest.eventrequest import RequestEvents
 from domogik.xpl.lib.rest.stat import StatsManager
 from domogik.xpl.lib.rest.request import ProcessRequest
+from domogik.xpl.lib.rest.url import urlHandler
 from domogik.common.configloader import Loader
 from domogik.common.packagemanager import PackageManager
 from xml.dom import minidom
@@ -74,6 +75,9 @@ import pyinotify
 import calendar
 import tempfile
 from threading import Semaphore
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
 
 REST_API_VERSION = "0.7"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
@@ -109,7 +113,7 @@ TMP_DIR = tempfile.gettempdir()
 # Repository
 DEFAULT_REPO_DIR = TMP_DIR
 
-
+# start flask urlhandler
 
 ################################################################################
 class EventHandler(pyinotify.ProcessEvent):
@@ -700,8 +704,15 @@ class Rest(XplPlugin):
     def start_http(self):
         """ Start HTTP Server
         """
-        # Start HTTP server
         self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
+        http_server = HTTPServer(WSGIContainer(urlHandler))
+        # for ssl, extra parameter to HTTPServier init
+        #ssl_options={
+             #"certfile": os.path.join(data_dir, "mydomain.crt"),
+             #"keyfile": os.path.join(data_dir, "mydomain.key"),
+        #}) 
+        http_server.listen(8090)
+        IOLoop.instance().start()
 
         if self.use_ssl:
             self.server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
@@ -717,6 +728,8 @@ class Rest(XplPlugin):
     def stop_http(self):
         """ Stop HTTP Server
         """
+        IOLoop.instance().stop()
+        return
         self.server.stop_handling()
 
 
@@ -746,332 +759,6 @@ class Rest(XplPlugin):
         print(my_exception)
         print("=======================")
         return my_exception
-
-
-
-
-################################################################################
-# HTTP
-class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
-    """ Extends HTTPServer to allow send params to the Handler.
-    """
-
-    def __init__(self, server_address, request_handler_class, \
-                 bind_and_activate=True, handler_params = []):
-        HTTPServer.__init__(self, server_address, request_handler_class, \
-                            bind_and_activate)
-        self.address = server_address
-        self.handler_params = handler_params
-        self.stop = False
-
-
-    def serve_forever(self):
-        """ we rewrite this fucntion to make HTTP Server shutable
-        """
-        self.stop = False
-        while not self.stop:
-            self.handle_request()
-
-
-    def stop_handling(self):
-        """ put the stop flag to True in order stopping handling requests
-        """
-        self.stop = True
-        # we do a last request to terminate server
-        print("Make a last request to HTTP server to stop it")
-        resp = urllib.urlopen("http://%s:%s" % (self.address[0], self.address[1]))
-
-
-
-################################################################################
-# HTTPS
-class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
-    """ Extends HTTPServer to allow send params to the Handler.
-    """
-
-    def __init__(self, server_address, request_handler_class, \
-                 bind_and_activate=True, handler_params = []):
-        HTTPServer.__init__(self, server_address, request_handler_class, \
-                            bind_and_activate)
-        self.address = server_address
-        self.handler_params = handler_params
-        self.stop = False
-
-        ### SSL specific
-        ssl_certificate = self.handler_params[0].ssl_certificate
-        #if 1 == 1:
-        try:
-            ctx = SSL.Context(SSL.SSLv23_METHOD)
-            ctx.use_privatekey_file (ssl_certificate)
-            ctx.use_certificate_file(ssl_certificate)
-            self.socket = SSL.Connection(ctx, socket.socket(self.address_family,
-                                                        self.socket_type))
-        except:
-            error = "SSL error : %s. Did you generate certificate ?" % self.handler_params[0].get_exception()
-            print(error)
-            self.handler_params[0].log.error(error)
-            # force exiting
-            self.handler_params[0].force_leave()
-            return
-        self.server_bind()
-        self.server_activate()
-
-
-    def serve_forever(self):
-        """ we rewrite this fucntion to make HTTP Server shutable
-        """
-        self.stop = False
-        while not self.stop:
-            self.handle_request()
-
-
-    def stop_handling(self):
-        """ put the stop flag to True in order stopping handling requests
-        """
-        self.stop = True
-        # we do a last request to terminate server
-        resp = urllib.urlopen("https://%s:%s" % (self.address[0], self.address[1]))
-
-
-
-
-
-
-
-
-################################################################################
-class RestHandler(BaseHTTPRequestHandler):
-    """ Class/object called for each request to HTTP server
-        Here we will process use GET/POST/OPTION HTTP methods 
-        and then create a REST request
-    """
-
-
-######
-# GET/POST/OPTIONS processing
-######
-
-
-    def setup(self):
-        """ Function only for SSL
-        """
-        use_ssl = self.server.handler_params[0].use_ssl
-        if use_ssl == True:
-            self.connection = self.request
-            self.rfile = socket._fileobject(self.request, "rb", self.rbufsize)
-            self.wfile = socket._fileobject(self.request, "wb", self.wbufsize)
-        else:
-            BaseHTTPRequestHandler.setup(self)
-
-
-    def do_GET(self):
-        """ Process GET requests
-            Call directly .do_for_all_methods()
-        """
-        self.do_for_all_methods()
-
-    def do_POST(self):
-        """ Process POST requests
-            Call directly .do_for_all_methods()
-        """
-        # get type to see if we had to make tricky action for TinyWebDb
-        # notice : this code is duplicated from request.py : ProcessRequest
-        if self.path[-1:] == "/":
-            self.path = self.path[0:len(self.path)-1]
-        tab_path = self.path.split("/")
-
-        # Get type of request : /command, /xpl-cmnd, /base, etc
-        if len(tab_path) < 2:
-            rest_type = None
-            # Display an information json if no request done in do_for_all_methods
-            return
-        rest_type = tab_path[1].lower()
-
-        # tricky usage for TinyWebDb in order to use Google appinventor
-        if rest_type == "getvalue":
-            if self.headers.has_key("content-length"):
-                post_length = int(self.headers['content-length'])
-                post_data = self.rfile.read(post_length)
-                post_tab = post_data.split("&")
-                for data in post_tab:
-                    if data[0:3] == "tag":
-                        tag = data[4:]
-                tag = unicode(urllib.unquote(tag), "UTF-8")
-            else:
-                tag = None
-            # replace self.path with tag value
-            self.path = tag
-
-        self.do_for_all_methods()
-
-    def do_PUT(self):
-        """ Process PUT requests
-            Call directly .do_for_all_methods()
-        """
-        self.do_for_all_methods()
-
-    def do_OPTIONS(self):
-        """ Process OPTIONS requests
-            Call directly .do_for_all_methods()
-        """
-        self.do_for_all_methods()
-
-    def do_for_all_methods(self):
-        """ Create an object for each request. This object will process 
-            the REST url
-        """
-        try:
-            request = ProcessRequest(self.server.handler_params, self.path, \
-                                 self.command, \
-                                 self.headers, \
-                                 self.send_response, \
-                                 self.send_header, \
-                                 self.end_headers, \
-                                 self.wfile, \
-                                 self.rfile, \
-                                 self.send_http_response_ok, \
-                                 self.send_http_response_404, \
-                                 self.send_http_response_error, \
-                                 self.send_http_response_text_plain, \
-                                 self.send_http_response_text_html)
-            request.do_for_all_methods()
-        except:
-            self.server.handler_params[0].log.error("%s" % self.server.handler_params[0].get_exception())
-        
-
-
-
-
-######
-# HTTP return
-######
-
-    def send_http_response_ok(self, data = ""):
-        """ Send to browser a HTTP 200 responde
-            200 is the code for "no problem"
-            Send also json data
-            @param data : json data to display
-        """
-        self.server.handler_params[0].log.debug("Send HTTP header for OK")
-        try:
-            self.send_response(200)
-            self.send_header('Content-type',  'application/json')
-            self.send_header('Expires', '-1')
-            self.send_header('Cache-control', 'no-cache')
-            self.send_header('Content-Length', len(data.encode("utf-8")))
-            self.end_headers()
-            if data:
-                # if big data, log only start of data
-                if len(data) > 1000:
-                    self.server.handler_params[0].log.debug("Send HTTP data : %s... [truncated because data too long for logs]" % data[0:1000].encode("utf-8"))
-                # else log all data
-                else:
-                    self.server.handler_params[0].log.debug("Send HTTP data : %s" % data.encode("utf-8"))
-                self.wfile.write(data.encode("utf-8"))
-        except IOError as err: 
-            if err.errno == errno.EPIPE:
-                # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
-                return
-            else:
-                raise err
-
-
-
-    def send_http_response_404(self):
-        """ Send a 404 error
-        """
-        self.server.handler_params[0].log.warning("Send HTTP header for 404")
-        try:
-            self.send_response(404)
-            self.send_header("Content-Type","text/html")
-            self.end_headers()       
-            self.wfile.write("404 - Not found") 
-        except IOError as err:
-            if err.errno == errno.EPIPE:
-                # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
-                return
-            else:
-                raise err
-
-
-    def send_http_response_error(self, err_code, err_msg, jsonp, jsonp_cb):
-        """ Send to browser a HTTP 200 responde
-            200 is the code for "no problem" but we send error status in 
-            json data, so we use 200 code
-            Send also json data
-            @param err_code : error code. 999 : generic error 
-            @param err_msg : error description
-            @param jsonp : True/False. True : use jsonp format
-            @param jsonp_cb : if jsonp is True, name of callback to use 
-                              in jsonp format
-        """
-        self.server.handler_params[0].log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
-        json_data = JSonHelper("ERROR", err_code, err_msg)
-        json_data.set_jsonp(jsonp, jsonp_cb)
-        try:
-            self.send_response(200)
-            self.send_header('Content-type',    'text/html')
-            self.send_header('Expires', '-1')
-            self.send_header('Cache-control', 'no-cache')
-            self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
-            self.end_headers()
-            self.wfile.write(json_data.get())
-        except IOError as err:
-            if err.errno == errno.EPIPE:
-                # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
-                return
-            else:
-                raise err
-
-    def send_http_response_text_plain(self, data = ""):
-        """ Send to browser a HTTP 200 responde
-            200 is the code for "no problem"
-            Send also text plain data
-            @param data : text plain data
-        """
-        self.server.handler_params[0].log.debug("Send HTTP header for OK")
-        try:
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.send_header('Expires', '-1')
-            self.send_header('Cache-control', 'no-cache')
-            self.send_header('Content-Length', len(data.encode("utf-8")))
-            self.end_headers()
-            self.wfile.write(data.encode("utf-8"))
-        except IOError as err: 
-            if err.errno == errno.EPIPE:
-                # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
-                return
-            else:
-                raise err
-
-    def send_http_response_text_html(self, data = ""):
-        """ Send to browser a HTTP 200 responde
-            200 is the code for "no problem"
-            Send also text html data
-            @param data : text html data
-        """
-        self.server.handler_params[0].log.debug("Send HTTP header for OK")
-        try:
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.send_header('Expires', '-1')
-            self.send_header('Cache-control', 'no-cache')
-            self.send_header('Content-Length', len(data.encode("utf-8")))
-            self.end_headers()
-            self.wfile.write(data.encode("utf-8"))
-        except IOError as err: 
-            if err.errno == errno.EPIPE:
-                # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
-                return
-            else:
-                raise err
-
 
 if __name__ == '__main__':
     # Create REST server with default values (overriden by ~/.domogik/domogik.cfg)
