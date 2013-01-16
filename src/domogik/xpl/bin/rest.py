@@ -242,17 +242,6 @@ class Rest(XplPlugin):
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR
 
-            # For temporary ticket : #1591
-            db_cfg = Loader('database')
-            db_config = db_cfg.load()
-            db_conf = dict(db_config[1])
-            self.db_type = db_conf['db_type']
-            self.db_user = db_conf['db_user']
-            self.db_password = db_conf['db_password']
-            self.db_port = db_conf['db_port']
-            self.db_host = db_conf['db_host']
-            self.db_prefix = db_conf['db_prefix']
-
             # Gloal Queues config
             self.log.debug("Get queues configuration")
             self._config = Query(self.myxpl, self.log)
@@ -698,9 +687,6 @@ class Rest(XplPlugin):
         self.sema_installed.release()
         self.log.debug("*** sema released")
     
-
-
-
     def start_http(self):
         """ Start HTTP Server
         """
@@ -713,26 +699,13 @@ class Rest(XplPlugin):
         #}) 
         http_server.listen(8090)
         IOLoop.instance().start()
-
-        if self.use_ssl:
-            self.server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
-                                         handler_params = [self])
-        else:
-            self.server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
-                                         handler_params = [self])
-
-        self.server.serve_forever()
-
-
+	return
 
     def stop_http(self):
         """ Stop HTTP Server
         """
         IOLoop.instance().stop()
         return
-        self.server.stop_handling()
-
-
 
     def start_stats(self):
         """ Start Statistics manager
