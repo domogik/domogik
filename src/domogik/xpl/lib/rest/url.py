@@ -43,4 +43,3 @@ def json_response(action_func):
 
 # import the flask urls
 import domogik.xpl.lib.rest.urls.status
-import domogik.xpl.lib.rest.urls.blah
