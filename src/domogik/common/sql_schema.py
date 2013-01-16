@@ -74,27 +74,33 @@ _config = None
 _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
+from sqlalchemy.ext.declarative import DeclarativeMeta
+import json
+def new_alchemy_encoder():
+    _visited_objs = []
+    class AlchemyEncoder(json.JSONEncoder):
+        def default(self, obj):
+	    if isinstance(obj.__class__, DeclarativeMeta):
+	        # don't re-visit self
+     	        if obj in _visited_objs:
+		    return None
+                _visited_objs.append(obj)
 
-class Serializer(object):
-    __public__ = None
+	        # an SQLAlchemy class
+	        fields = {}
+	        for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and x != 'get_tablename']:
+		    fields[field] = obj.__getattribute__(field)
+	        # a json-encodable dict
+	        return fields
 
-    def get_public(self):
-        "Returns model's PUBLIC data for jsonify"
-        dict = {}
-        for public_key in self.__public__:
-            value = getattr(self, public_key)
-            #if type(value) is datetime:
-            #    value = value.isoformat()
-            if value:
-                dict[public_key] = value
-        return dict
+	    return json.JSONEncoder.default(self, obj)
+    return AlchemyEncoder
 
 # Define objects
-class DeviceUsage(Base, Serializer):
+class DeviceUsage(Base):
     """Usage of a device (temperature, heating, lighting, music...)"""
 
     __tablename__ = '%s_device_usage' % _db_prefix
-    __public__ = ['id', 'name', 'description', 'default_options']
     id = Column(Unicode(80), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
