@@ -75,11 +75,26 @@ _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
 
+class Serializer(object):
+    __public__ = None
+
+    def get_public(self):
+        "Returns model's PUBLIC data for jsonify"
+        dict = {}
+        for public_key in self.__public__:
+            value = getattr(self, public_key)
+            #if type(value) is datetime:
+            #    value = value.isoformat()
+            if value:
+                dict[public_key] = value
+        return dict
+
 # Define objects
-class DeviceUsage(Base):
+class DeviceUsage(Base, Serializer):
     """Usage of a device (temperature, heating, lighting, music...)"""
 
     __tablename__ = '%s_device_usage' % _db_prefix
+    __public__ = ['id', 'name', 'description', 'default_options']
     id = Column(Unicode(80), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
