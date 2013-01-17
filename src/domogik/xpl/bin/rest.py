@@ -49,12 +49,9 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.event import DmgEvents
 from domogik.xpl.lib.rest.eventrequest import RequestEvents
 from domogik.xpl.lib.rest.stat import StatsManager
-from domogik.xpl.lib.rest.request import ProcessRequest
 from domogik.xpl.lib.rest.url import urlHandler
 from domogik.common.configloader import Loader
 from domogik.common.packagemanager import PackageManager
