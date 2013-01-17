@@ -8,6 +8,7 @@ import json
 
 # url handler itself
 urlHandler = Flask(__name__)
+urlHandler.debug = True
 
 # principel
 #principals = Principal(urlHandler)
@@ -45,5 +46,17 @@ def json_response(action_func):
         )
     return create_json_response
 
+# view class registration
+def register_api(view, endpoint, url, pk='id', pk_type='int'):
+    view_func = view.as_view(endpoint)
+    urlHandler.add_url_rule(url, defaults={pk: None},
+                     view_func=view_func, methods=['GET',])
+    urlHandler.add_url_rule(url, view_func=view_func, methods=['POST',])
+    urlHandler.add_url_rule('%s<%s:%s>' % (url, pk_type, pk), view_func=view_func,
+                     methods=['GET', 'PUT', 'DELETE'])
+
+
 # import the flask urls
 import domogik.xpl.lib.rest.urls.status
+from domogik.xpl.lib.rest.urls.device import deviceAPI
+register_api(deviceAPI, 'device_api', '/device/', pk='device_id', pk_type='int')
