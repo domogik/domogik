@@ -17,6 +17,13 @@ def domogik_encoder():
                     fields[field] = obj.__getattribute__(field)
                 # a json-encodable dict
                 return fields
+            elif isinstance(obj, datetime.datetime):
+                return obj.isoformat()
+            elif isinstance(obj, datetime.date):
+                return obj.isoformat()
+            elif isinstance(obj, datetime.timedelta):
+                return (datetime.datetime.min + obj).time().isoformat()
             # add other objects types here
-            return json.JSONEncoder.default(self, obj)
+            else:
+                return json.JSONEncoder.default(self, obj)
     return DomogikEncoder
