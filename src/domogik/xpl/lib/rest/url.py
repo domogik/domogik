@@ -48,6 +48,17 @@ def json_response(action_func):
         )
     return create_json_response
 
+# decorator to handle logging
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print '%r (%r, %r) %2.2f sec' % \
+              (method.__name__, args, kw, te-ts)
+        return result
+    return timed
+
 # view class registration
 def register_api(view, endpoint, url, pk='id', pk_type=None):
     view_func = view.as_view(endpoint)
@@ -62,7 +73,15 @@ def register_api(view, endpoint, url, pk='id', pk_type=None):
 
 # import the flask urls
 import domogik.xpl.lib.rest.urls.status
+
 from domogik.xpl.lib.rest.urls.device import deviceAPI
 register_api(deviceAPI, 'device_api', '/device/', pk='device_id', pk_type='int')
+
 from domogik.xpl.lib.rest.urls.device_usage import deviceUsageAPI
 register_api(deviceUsageAPI, 'device_usage_api', '/device_usage/', pk='usage_id')
+
+from domogik.xpl.lib.rest.urls.device_technology import deviceTechnologyAPI
+register_api(deviceTechnologyAPI, 'device_techno_api', '/device_technology/', pk='techno_id')
+
+from domogik.xpl.lib.rest.urls.device_type import deviceTypeAPI
+register_api(deviceTypeAPI, 'device_type_api', '/device_type/', pk='type_id')

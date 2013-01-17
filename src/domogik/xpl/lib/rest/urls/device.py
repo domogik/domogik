@@ -7,10 +7,10 @@ class deviceAPI(MethodView):
     @json_response
     def get(self, device_id):
         b = dbHelper.db.get_device(device_id)
-        return [b]
+        return b
 
     @db_helper
     @json_response
     def delete(self, device_id):
         b = dbHelper.db.get_device(device_id)
-        return [204, b]
+        return 204, b
