@@ -1,4 +1,5 @@
-etc/domogik
+etc/domogik/domogik.cfg
+etc/domogik/sources.list
 usr/bin/dmg_* /usr/sbin/
 usr/lib
 usr/sbin/dmgdisplug /usr/sbin/
