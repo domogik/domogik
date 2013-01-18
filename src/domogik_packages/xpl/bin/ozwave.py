@@ -115,6 +115,7 @@ class OZwave(XplPlugin):
             return eval(retval)
         except :
             print retval
+            self.log.debug ("Format data to UI : eval in getdict2UIdata error : " +   retval)
             return {'error': 'invalid format'}
             
     def getUIdata2dict(self, ddict):
@@ -122,10 +123,10 @@ class OZwave(XplPlugin):
   #      return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None', "''")
         print "conversion pour transfertvers UI , " , str(ddict)
         for k in ddict :   # TODO: pour passer les 1452 chars dans RINOR, à supprimer quand MQ OK, 
-            print ('++++',  type(ddict[k]))
+  #          print ('++++',  type(ddict[k]))
             if isinstance(ddict[k], str) :
                 ddict[k] = ddict[k].replace("'", "&squot;")  # remplace les caractères interdits pour rinor
-                print ('****Replace quote : ',  ddict[k])
+   #             print ('****Replace quote : ',  ddict[k])
                 if len(str(ddict[k])) >800 : 
                     ddict[k]=ddict[k][:800]
                     print("value raccourccis : ", k, ddict[k])
@@ -134,6 +135,7 @@ class OZwave(XplPlugin):
         
     def ui_cmd_cb(self, message):
         """xpl en provenace de l'UI (config/special)"""
+        response = True
         info = "essais"
         request = self.getdict2UIdata(message.data['value'])
         print("Commande UI")
@@ -141,14 +143,16 @@ class OZwave(XplPlugin):
             mess = XplMessage()
             mess.set_type('xpl-trig') 
             mess.set_schema('ozwave.basic')
-            print request
             if request['request'] == 'ctrlAction' :
-                info = self.getUIdata2dict(self.myzwave.handle_ControllerAction(request['action'], request['cmd'], request['option']))
+                action = dict(request)
+                del action['request']
+                report = self.myzwave.handle_ControllerAction(action)
+                info = self.getUIdata2dict(report)
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'ctrlaction' : request['action'], 
                                     'data': info})
-                print "Refresh network info"
+                if request['cmd'] =='getState' and report['cmdstate'] != 'stop' : response = False
             elif request['request'] == 'GetNetworkID' :
                 info = self.getUIdata2dict(self.myzwave.getNetworkInfo())
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -253,13 +257,21 @@ class OZwave(XplPlugin):
                                     'node' : request['node'], 
                                     'data': "unknown request"})
                 print "commande inconnue"
-            self.myxpl.send(mess)
+            if response : self.myxpl.send(mess)
                                   
                                     
-    def send_xPL(self, write):
-        """ Envoie une commande zwave vers XPL"""
-        # TODO : a implémenter pour les sénarios zwave entre module ?
-        pass
+    def send_xPL(self, header,  msg):
+        """ Envoie une commande ou message zwave vers xPL"""
+        mess = XplMessage()
+        mess.set_type(header['type']) 
+        mess.set_schema(header['schema'])
+        mess.add_data(header['data'])
+   #     for k in msg.keys() : 
+        info = self.getUIdata2dict(msg)
+        print '********************* Dans send_xPL *****************'
+        mess.add_data({'data': info})
+        print mess
+        self.myxpl.send(mess)
         
     def sendxPL_trig(self, msgtrig):
         mess = XplMessage()
@@ -282,10 +294,10 @@ class OZwave(XplPlugin):
                             'level': msgtrig['level']})
                 if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
             elif msgtrig['genre'] == 'sensor' :  # tout sensor
-                if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget portal
+                if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget binary
                     mess.add_data({'device' : msgtrig['addressety'],
                             'type' : msgtrig['type'] ,
-                            'current' : 'low' if msgtrig['value']   else 'high'})
+                            'current' : 'true' if msgtrig['value']   else 'false'})
                 else : mess.add_data({'device' : msgtrig['addressety'],  
                             'type' : msgtrig['type'] ,
                             'current' : msgtrig['value'] })

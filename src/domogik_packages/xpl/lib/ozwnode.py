@@ -63,6 +63,11 @@ class ZWaveNode:
         self._lastUpdate = None
         self._homeId = homeId
         self._nodeId = nodeId
+        self._linked = False
+        self._receiver = False
+        self._ready = False
+        self._named = False
+        self._failed =False
         self._capabilities = set()
         self._commandClasses = set()
         self._neighbors = set()
@@ -74,7 +79,7 @@ class ZWaveNode:
         self._product = None
         self._productType = None
         self._groups = list()
-        self._sleeping = True
+        self._sleeping = False
         
     # On accède aux attributs uniquement depuis les property
     # Chaque attribut est une propriétée qui est automatique à jour au besoin via le réseaux Zwave
@@ -94,6 +99,11 @@ class ZWaveNode:
     groups = property(lambda self:self._groups)
     isSleeping = property(lambda self: self._isSleeping())
     isLocked = property(lambda self: self._getIsLocked())
+    isLinked = property(lambda self: self._linked)
+    isReceiver= property(lambda self: self._receiver)
+    isReady = property(lambda self: self._ready)
+    isNamed = property(lambda self: self._named)
+    isFailed = property(lambda self: self._failed)
     level = property(lambda self: self._getLevel())
     isOn = property(lambda self: self._getIsOn())
     batteryLevel = property(lambda self: self._getBatteryLevel())
@@ -104,6 +114,32 @@ class ZWaveNode:
     security = property(lambda self: self._nodeInfos.security if self._nodeInfos else None)
     version = property(lambda self:  self._nodeInfos.version if self._nodeInfos else None)
 
+    def setLinked(self):
+        """Le node a reçu la notification NodeProtocolInfo , il est relié au controleur."""
+        self_linked = True
+
+    def setReceiver(self):
+        """Le node a reçu la notification EssentialNodeQueriesComplete , il est relié au controleur et peut recevoir des messages basic."""
+        self._receiver = True
+   
+    def setReady(self):
+        """Le node a reçu la notification NodeQueriesComplete, la procédure d'intialisation est complète."""
+        self._ready= True
+        
+    def setNamed(self):
+        """Le node a reçu la notification NodeNaming, le device à été identifié dans la librairie openzwave (config/xml)"."""
+        self._named= True
+        
+    def setSleeping(self, state= False):
+        """Une notification d'état du node à été recue, awake ou sleep."""
+        self._sleeping = state;
+    
+    def markAsDead(self): 
+        """Le node est marqué comme HS."""
+        # TODO: Gerer l'état du Node Dead
+        self._ready = False
+        self._sleeping = True
+        
     def _getIsLocked(self):
         return False
     
@@ -149,7 +185,29 @@ class ZWaveNode:
         elif self._manufacturer.id :
             return ('Product id: ' + self._manufacturer.id) 
         else : return 'Undefined'
-
+        
+    def GetNodeStateNW(self):
+        """Retourne une chaine décrivant l'état d'initialisation du device  
+           Status = {0:'Uninitialized',
+                          1:'Initialized - not known', 
+                          2:'Completed',
+                          3:'In progress - Devices initializing',
+                          4:'In progress - Linked to controller',
+                          5:'In progress - Can receive messages', 
+                          6:'Out of operation'}
+        """      
+        retval =NodeStatusNW[0]
+        if self.isLinked : retval = NodeStatusNW[4]
+        if self.isReceiver : 
+            if self.isLinked : retval = NodeStatusNW[5]
+            else : retval = NodeStatusNW[7]
+        if self.isReady : retval = NodeStatusNW[1]
+        if self.isReady and self.isNamed : retval = NodeStatusNW[2]
+        if self.isFailed : retval = NodeStatusNW[6]
+        print ('node state linked:',  self.isLinked, ' isReceiver:', self.isReceiver, ' isReady:', self.isReady, 'isNamed:', self.isNamed, ' isFailed:', self.isFailed )
+        return retval
+        
+        
 # Fonction de renvoie des valeurs des valueNode en fonction des Cmd CLASS zwave
 # C'est ici qu'il faut enrichire la prise en compte des fonctions Zwave
 # COMMAND_CLASS implémentées :
@@ -295,15 +353,16 @@ class ZWaveNode:
     
     def  _isSleeping(self):
         "Interroge le node pour voir son etat"
-        # TODO: A perfectionner, pour l'instant uniquement basé sur la capacité du node et non son etat réel
-        if 'Listening' in self._capabilities : retval = False
-        else : 
-            if (time.time() - self.lastUpdate) > 30 :
-                retval = True
-            else :  retval = False
+        # TODO: A perfectionner, pour l'instant basé d'après la notification d'openzwave (plus sur la capacité du node et non son etat réel).
+        retval = self._sleeping
+    #     if 'Listening' in self._capabilities : retval = False
+    #    else : 
+    #        if (time.time() - self.lastUpdate) > 30 :
+    #            retval = True
+    #        else :  retval = False
         print '+++++ node ', self._nodeId,  ' is Sleeping ? :', retval, ' ++++'
-        print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
-        return retval        
+        if retval : print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
+        return retval              
     
     def _updateNeighbors(self):
         """Mise à jour de la liste des nodes voisins"""
@@ -439,6 +498,7 @@ class ZWaveNode:
         retval["Neighbors"] = list(self.neighbors) if  self.neighbors else 'No one'
         retval["Groups"] = self._getGroupsDict()
         retval["Capabilities"] = list(self._capabilities) if  self._capabilities else 'No one'
+        retval["InitState"] = self.GetNodeStateNW()
         return retval
         
     def getValuesInfos(self):
@@ -500,7 +560,7 @@ class ZWaveNode:
             retval = ZWaveValueNode(self, valueId)
             self._ozwmanager._log.debug('Created new value node with homeId %0.8x, nodeId %d, valueId %s', self.homeId, self.nodeId, valueId)
             self._values[vid] = retval
-            print ('Created new value node with homeId %0.8x, nodeId %d, valueId %s', self.homeId, self.nodeId, valueId)
+            print ('Created new value node with homeId %0.8x, nodeId %d, valueId %s' %(self.homeId, self.nodeId, valueId))
         return retval 
    
     def getValue(self, valueId):

@@ -92,7 +92,7 @@
 			"parameters" : "{}",
 			"return_confirmation" : "0",
 			"stat_key" : "status",
-			"value_type" : "string"
+			"value_type" : "boolean"
 		}, {
 			"device_type_id" : "ozwave.sensor",
 			"feature_type" : "sensor",

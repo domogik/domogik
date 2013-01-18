@@ -13,7 +13,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="level" />
-      <key name="addressety" value="@address@"/>
+      <key name="device" value="@address@"/>
     </filter>
   </listener>
 </technology>
