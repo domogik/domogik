@@ -25,6 +25,8 @@ override_dh_install:
 	/usr/bin/install -c -p -m 755 debian/dpkg-preconfigure-domogik debian/tmp/usr/sbin/
 	/usr/bin/install -c -p -m 755 debian/dmgdb_dump debian/tmp/usr/sbin/
 	/usr/bin/install -c -p -m 755 debian/dmgdb_restore debian/tmp/usr/sbin/
+	#/usr/bin/install -c -p -m 755 src/domogik/examples/snmp/dmg_snmp.pl debian/tmp/usr/sbin/
+	#/usr/bin/install -c -p -m 640 src/domogik/examples/snmp/snmp.cfg debian/tmp/etc/domogik/
 	dh_install --sourcedir=debian/tmp
 
 override_dh_installinit:
