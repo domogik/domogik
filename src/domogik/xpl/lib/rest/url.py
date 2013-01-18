@@ -74,14 +74,12 @@ def register_api(view, endpoint, url, pk='id', pk_type=None):
 # import the flask urls
 import domogik.xpl.lib.rest.urls.status
 
-from domogik.xpl.lib.rest.urls.device import deviceAPI
-register_api(deviceAPI, 'device_api', '/device/', pk='device_id', pk_type='int')
+# more complex URLS
+from domogik.xpl.lib.rest.urls.device import *
 
+# Pure REST API
 from domogik.xpl.lib.rest.urls.device_usage import deviceUsageAPI
-register_api(deviceUsageAPI, 'device_usage_api', '/device_usage/', pk='usage_id')
-
 from domogik.xpl.lib.rest.urls.device_technology import deviceTechnologyAPI
-register_api(deviceTechnologyAPI, 'device_techno_api', '/device_technology/', pk='techno_id')
-
 from domogik.xpl.lib.rest.urls.device_type import deviceTypeAPI
-register_api(deviceTypeAPI, 'device_type_api', '/device_type/', pk='type_id')
+from domogik.xpl.lib.rest.urls.person import personAPI
+from domogik.xpl.lib.rest.urls.account import accountAPI

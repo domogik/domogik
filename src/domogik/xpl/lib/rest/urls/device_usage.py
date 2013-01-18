@@ -1,7 +1,6 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper
+from domogik.xpl.lib.rest.url import *
 from flask import g as dbHelper, request
 from flask.views import MethodView
-
 
 class deviceUsageAPI(MethodView):
     decorators = [db_helper, json_response]
@@ -44,3 +43,4 @@ class deviceUsageAPI(MethodView):
         return 200, b
 
 
+register_api(deviceUsageAPI, 'device_usage_api', '/device_usage/', pk='usage_id')

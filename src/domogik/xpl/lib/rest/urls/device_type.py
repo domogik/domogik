@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper
+from domogik.xpl.lib.rest.url import *
 from flask import g as dbHelper, request
 from flask.views import MethodView
 
@@ -34,4 +34,4 @@ class deviceTypeAPI(MethodView):
         )
         return 200, b
 
-
+register_api(deviceTypeAPI, 'device_type_api', '/device_type/', pk='type_id')

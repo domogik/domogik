@@ -1,5 +1,6 @@
 from sqlalchemy.ext.declarative import DeclarativeMeta
 import json
+import datetime
 
 def domogik_encoder():
     _visited_objs = []
@@ -13,7 +14,7 @@ def domogik_encoder():
 
                 # an SQLAlchemy class
                 fields = {}
-                for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and x != 'get_tablename']:
+                for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and x != 'get_tablename' and x != 'set_password']:
                     fields[field] = obj.__getattribute__(field)
                 # a json-encodable dict
                 return fields
