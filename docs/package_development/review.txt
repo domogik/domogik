@@ -1,0 +1,31 @@
+===================
+Review of a package
+===================
+
+Overview
+========
+
+Reviewing a package is an action done by a Domogik core team member each time a package is sent on the developpers mailling list as a candidate to a repository.
+As there are a lot of points to check, a tool has been developped to help!
+
+The tool : review.py
+====================
+
+This tool is located only in Domogik sources (you will not find it in an official delivery). He is located in this folder : *src/tools/packages/review/*.
+
+You just need to launch it with one parameter : the path to a package. Example: ::
+
+    $ ./review.py /tmp/plugin-ozwave-0.1b5.dev20130103.tgz
+
+The tool will do 2 sorts of actions:
+
+* some automated tests and depending on the result, it will allow or not the package to be candidate for a repository.
+* ask the user to make some manual checks and to answer a question. Depending on the answer, it will allow or not the package to be candidate for a repository.
+
+At the end, the tool will give you the best repository candidate for the package!
+
+Best practice
+=============
+
+Before submitting a package, the package developper should launch the review tool. It will help him to find some issues in the package.
+
