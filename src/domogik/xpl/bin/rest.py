@@ -688,13 +688,14 @@ class Rest(XplPlugin):
         """ Start HTTP Server
         """
         self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
+        urlHandler.rest = self
         http_server = HTTPServer(WSGIContainer(urlHandler))
         # for ssl, extra parameter to HTTPServier init
         #ssl_options={
              #"certfile": os.path.join(data_dir, "mydomain.crt"),
              #"keyfile": os.path.join(data_dir, "mydomain.key"),
         #}) 
-        http_server.listen(8090)
+        http_server.listen(int(self.server_port), address=self.server_ip)
         IOLoop.instance().start()
 	return
 
