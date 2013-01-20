@@ -62,6 +62,10 @@ Example for the plugin cidmodem: ::
     - info.xml
     OK
 
+Review your package
+===================
+It is not mandatory (but recommended) that you launch the :doc:`review tool <review>` on your generated package. This may help you to find issue and to have an idea on which repository will be allowed for your package.
+
 How to put the package archive on a repository
 ==============================================
 You just need to write an email to *domogik-developers <domogik-developers@lists.labs.libre-entreprise.org>*

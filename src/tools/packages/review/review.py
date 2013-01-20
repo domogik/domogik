@@ -93,14 +93,18 @@ class PkgReview:
         self._extract()
 
         ### Check all other points
+        # files between sources and the package 
+        # check if all in included
+        self._included_files()
+
         # doc
         self.title("Documentation review")
         self._compile_doc()
         self._review_doc()
 
         # icon
-        #self.title("Icon review")
-        #self._review_icon()
+        self.title("Icon review")
+        self._review_icon()
 
         # json
         # - version
@@ -109,20 +113,16 @@ class PkgReview:
         # - domogik min version
 
         # python
-        # - file names
-        # - pylint
-        #self.title("Python code : quality analysis")
-        #self._pylint()
+        self.title("Python code : quality analysis")
+        self._pylint()
 
         # web pages ?
-        #self.title("Domoweb related pages")
-        #self._domoweb()
+        self.title("Domoweb related pages")
+        self._domoweb()
 
         # tests 
-        #self.title("Tests review")
-        #self._review_test()
-
-
+        self.title("Tests review")
+        self._review_test()
 
         ### The end
         self.title("Review finished!")
@@ -328,6 +328,19 @@ class PkgReview:
 
 
 
+    def _included_files(self):
+        """ Ask the user to check if all the files are included in the package
+        """
+        files_checklist = "All the files below are the only ones needed by the package (please compare to the sources) :"
+        for r,d,f in os.walk(REVIEW_DIR):
+            for files in f:
+                if files not in ['_theme', '_build']:
+                    if "_theme" not in r.split("/") and \
+                       "_build" not in r.split("/"):
+                        files_checklist += "\n%s- %s" % (LINE_BLANK, os.path.join(r,files))
+        self.ask(files_checklist, REPO_TESTING)
+        
+
 
 
     def _pylint(self):
@@ -378,7 +391,7 @@ class PkgReview:
             # but if this is not the case, we ask the user to read the output (pylint may give some bad score for
             # some bad reasons)
             if the_score >= 8:
-                self.ok("- The code quality is good for this file")
+                self.ok("- The code quality is good for this file : more than 8/10")
             else:
                 self.ask("Please look at pylint output to choose the best candidate repository for this file")
 
