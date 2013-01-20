@@ -58,4 +58,5 @@ Table Of Content
     /package_development/plugin_library_part
     /package_development/data_files
     /package_development/icon
+    /package_development/review
 

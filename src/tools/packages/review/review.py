@@ -93,6 +93,10 @@ class PkgReview:
         self._extract()
 
         ### Check all other points
+        # files between sources and the package 
+        # check if all in included
+        self._included_files()
+
         # doc
         self.title("Documentation review")
         self._compile_doc()
@@ -109,8 +113,6 @@ class PkgReview:
         # - domogik min version
 
         # python
-        # - file names
-        # - pylint
         self.title("Python code : quality analysis")
         self._pylint()
 
@@ -118,9 +120,9 @@ class PkgReview:
         self.title("Domoweb related pages")
         self._domoweb()
 
-        # tests ?
-
-
+        # tests 
+        self.title("Tests review")
+        self._review_test()
 
         ### The end
         self.title("Review finished!")
@@ -213,6 +215,7 @@ class PkgReview:
                 rep = raw_input("%sFor which repo is this valid ? %s > " % (LINE_BLANK, REPO_LIST[0:REPO_NB]))
             # we remove the next repo in the list (the one better than the choosen one)
             self._no_more(REPO_LIST[1+REPO_LIST.index(rep)])
+        return rep
     
 
     def _no_more(self, repo):
@@ -325,6 +328,19 @@ class PkgReview:
 
 
 
+    def _included_files(self):
+        """ Ask the user to check if all the files are included in the package
+        """
+        files_checklist = "All the files below are the only ones needed by the package (please compare to the sources) :"
+        for r,d,f in os.walk(REVIEW_DIR):
+            for files in f:
+                if files not in ['_theme', '_build']:
+                    if "_theme" not in r.split("/") and \
+                       "_build" not in r.split("/"):
+                        files_checklist += "\n%s- %s" % (LINE_BLANK, os.path.join(r,files))
+        self.ask(files_checklist, REPO_TESTING)
+        
+
 
 
     def _pylint(self):
@@ -375,7 +391,7 @@ class PkgReview:
             # but if this is not the case, we ask the user to read the output (pylint may give some bad score for
             # some bad reasons)
             if the_score >= 8:
-                self.ok("- The code quality is good for this file")
+                self.ok("- The code quality is good for this file : more than 8/10")
             else:
                 self.ask("Please look at pylint output to choose the best candidate repository for this file")
 
@@ -394,8 +410,23 @@ class PkgReview:
         domoweb_checklist = "Please check the special pages on the actual domoweb stable release"
         domoweb_checklist += "\n%s- The current Domoweb stable release contains all the needed pages for this package release" % LINE_BLANK
         domoweb_checklist += "\n%s- This package version will work perfectly with the Domoweb special pages" % LINE_BLANK
-        rep = self.ask(domoweb_checklist, REPO_STABLE)
+        self.ask(domoweb_checklist, REPO_STABLE)
 
+    def _review_test(self):
+        """ Ask the user some questions about the tests
+        """
+        msg = "Test cases and test campaign are managed on http://test.domogik.org/"
+        msg += "\n%sIf you don't have any account, juste send an email to the developpers mailing list"
+        self.info(msg)
+        rep = self.ask("Some test cases are defined for this package release.", REPO_TESTING)
+        if rep == "n":
+            return
+        rep = self.ask("A test campaign has been defined and the more important features has been tested.", REPO_TESTING)
+        if rep == "n":
+            return
+        rep = self.ask("A test campaign has been defined and all the tests are OK.", REPO_STABLE)
+        if rep == "n":
+            return
 
 
 
