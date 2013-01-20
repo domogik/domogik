@@ -3,12 +3,12 @@ import sys
 import os
 import domogik
 from subprocess import Popen, PIPE
+from flask import Response
 
 @urlHandler.route('/')
 @json_response
 def api_root():
     # domogik global version
-    __import__("domogik")
     global_version = sys.modules["domogik"].__version__
     # domogik src version
     domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
@@ -161,4 +161,4 @@ def api_root():
            "event" : events,
            "configuration" : conf,
            "tmp_db_info" : "tmp_db_info"}
-    return data
+    return 200, data

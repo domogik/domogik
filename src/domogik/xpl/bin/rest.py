@@ -687,6 +687,7 @@ class Rest(XplPlugin):
     def start_http(self):
         """ Start HTTP Server
         """
+        print("Start Http")
         self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
         urlHandler.rest = self
         http_server = HTTPServer(WSGIContainer(urlHandler))

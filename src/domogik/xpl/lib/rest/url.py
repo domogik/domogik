@@ -4,6 +4,7 @@ from flask.ext.login import LoginManager, login_user, logout_user, \
      login_required, current_user
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.lib.rest.jsondata import domogik_encoder
+from functools import wraps
 import json
 
 # url handler itself
@@ -19,6 +20,7 @@ urlHandler.debug = True
 
 # DB handler decorator
 def db_helper(action_func):
+    @wraps(action_func)
     def create_db_helper(*args, **kwargs):
         g.db = DbHelper()
         return action_func(*args, **kwargs)
@@ -29,6 +31,7 @@ def db_helper(action_func):
 # json reponse handler decorator
 # the url handlers funictions can return
 def json_response(action_func):
+    @wraps(action_func)
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
         if type(ret) is list or type(ret) is tuple:
@@ -50,6 +53,7 @@ def json_response(action_func):
 
 # decorator to handle logging
 def timeit(method):
+    @wraps(method)
     def timed(*args, **kw):
         ts = time.time()
         result = method(*args, **kw)
