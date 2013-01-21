@@ -101,6 +101,7 @@ class PkgReview:
         self.title("Documentation review")
         self._compile_doc()
         self._review_doc()
+        self._review_wiki_doc()
 
         # icon
         self.title("Icon review")
@@ -303,6 +304,16 @@ class PkgReview:
         doc_build_checklist += "\n%s- There is (if needed) a helper page" % LINE_BLANK
         doc_build_checklist += "\n%s- There is (if needed) a page for domoweb special pages" % LINE_BLANK
         self.ask(doc_build_checklist, REPO_TESTING)
+
+    def _review_wiki_doc(self):
+        """ Check the wiki doc
+        """
+        wiki_check_list = "Please check the doc on the wiki : http://wiki.domogik.org/plugin_XXXX"
+        wiki_check_list += "\n%s- There is no more 'user doc' in the wiki, just dev notes or specs" % LINE_BLANK
+        wiki_check_list += "\n%s- There is a link on the wiki to this package doc (nightly release)" % LINE_BLANK
+        wiki_check_list += "\n%s- There is no more link to the wiki page on http://wiki.domogik.org/Plugins_in_Domogik" % LINE_BLANK
+        wiki_check_list += "\n%s- This plugin json key for doc is linked to the wiki page and not the package doc" % LINE_BLANK
+        self.ask(wiki_check_list, REPO_TESTING)
 
     def _review_icon(self):
         """ Check the icon
