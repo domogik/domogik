@@ -34,13 +34,9 @@ def json_response(action_func):
     @wraps(action_func)
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
-        if type(ret) is list or type(ret) is tuple:
-            if len(ret) == 2:
-                code = ret[0]
-                resp = ret[1]
-            else:
-                code = 200
-                resp = ret[1]
+        if (type(ret) is list or type(ret) is tuple) and len(ret) == 2:
+            code = ret[0]
+            resp = ret[1]
         else:
             code = 204
             resp = None
@@ -52,11 +48,11 @@ def json_response(action_func):
     return create_json_response
 
 # decorator to handle logging
-def timeit(method):
-    @wraps(method)
+def timeit(action_func):
+    @wraps(action_func)
     def timed(*args, **kw):
         ts = time.time()
-        result = method(*args, **kw)
+        result = action_func(*args, **kw)
         te = time.time()
         print '%r (%r, %r) %2.2f sec' % \
               (method.__name__, args, kw, te-ts)
