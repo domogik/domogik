@@ -58,5 +58,6 @@ Download :download:`SVG source file <packages_lifecycle.svg>`.
 #. Write some :doc:`test cases <test_cases>` for the package. 
 #. :doc:`Test your package <test_the_package>`.
 #. :doc:`Generate the package <generate_the_package>` and send a request to upload it on a repository. 
+#. :doc:`The package will be reviewed <review>` by a Domogik core team member.
 
 

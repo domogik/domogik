@@ -11,7 +11,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="command" value="on" />
-      <key name="addressety" value="@address@"/>
+      <key name="device" value="@address@"/>
     </filter>
   </listener>
 </technology>

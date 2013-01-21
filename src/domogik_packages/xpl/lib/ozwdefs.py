@@ -47,16 +47,26 @@ OZWPLuginVers = "0.1b5"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
-NodeInfo = namedtuple('NodeInfo', ['generic','basic','specific','security','version'])
-GroupInfo = namedtuple('GroupInfo', ['index','label','maxAssociations','members'])
+NodeInfo = namedtuple('NodeInfo', ['generic', 'basic', 'specific', 'security', 'version'])
+GroupInfo = namedtuple('GroupInfo', ['index', 'label', 'maxAssociations', 'members'])
 
 # Status des membres d'un group d'association pour gestion des mises à jour des nodes sleeping
 MemberGrpStatus = {0: 'unknown',
                              1: 'confirmed', 
                              2: 'to confirm', 
                              3: 'to update'}
-                             
-Capabilities = ['Primary Controller', 'Secondary Controller', 'Static Update Controller','Bridge Controller' ,'Routing', 'Listening', 'Beaming', 'Security', 'FLiRS']
+# Status des nodes dans le reseau zwave                             
+NodeStatusNW = {0:'Uninitialized',
+                          1:'Initialized - not known', 
+                          2:'Completed',
+                          3:'In progress - Devices initializing',
+                          4:'In progress - Linked to controller',
+                          5:'In progress - Can receive messages', 
+                          6:'Out of operation', 
+                          7:'In progress - Can receive messages (Not linked)'}
+                            
+Capabilities = ['Primary Controller', 'Secondary Controller', 'Static Update Controller', 'Bridge Controller' ,
+                    'Routing', 'Listening', 'Beaming', 'Security', 'FLiRS']
 
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
@@ -138,8 +148,6 @@ SpecificDeviceType = { 0x00:{0x00:'SPECIFIC_TYPE_NOT_USED'},
                                          0x01:'SPECIFIC_TYPE_ENERGY_PRODUCTION'},
                                 0xff: {0x00:'SPECIFIC_TYPE_NOT_USED'}                             # TYPE_NON_INTEROPERABLE
                                 }
-
-
 
 class OZwaveException(Exception):
     """"Zwave generic exception class.

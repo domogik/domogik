@@ -40,6 +40,7 @@ import libopenzwave
 from libopenzwave import PyManager
 from ozwnode import ZWaveNode
 from ozwdefs import *
+import time 
 from time import sleep
 
 class OZwaveCtrlException(OZwaveException):
@@ -92,17 +93,17 @@ class ZWaveController(ZWaveNode):
         - Driver::ControllerState_Failed - will be sent if the command fails for any reason.
 
     '''
-    SIGNAL_CTRL_NORMAL = 'Normal'
-    SIGNAL_CTRL_STARTING = 'Starting'
-    SIGNAL_CTRL_CANCEL = 'Cancel'
-    SIGNAL_CTRL_ERROR = 'Error'
-    SIGNAL_CTRL_WAITING = 'Waiting'
-    SIGNAL_CTRL_SLEEPING = 'Sleeping'
-    SIGNAL_CTRL_INPROGRESS = 'InProgress'
-    SIGNAL_CTRL_COMPLETED = 'Completed'
-    SIGNAL_CTRL_FAILED = 'Failed'
-    SIGNAL_CTRL_NODEOK = 'NodeOK'
-    SIGNAL_CTRL_NODEFAILED = 'NodeFailed'
+    SIGNAL_CTRL_NORMAL = 'Normal'                   # No command in progress.  
+    SIGNAL_CTRL_STARTING = 'Starting'             # The command is starting.  
+    SIGNAL_CTRL_CANCEL = 'Cancel'                   # The command was cancelled.
+    SIGNAL_CTRL_ERROR = 'Error'                       # Command invocation had error(s) and was aborted 
+    SIGNAL_CTRL_WAITING = 'Waiting'                # Controller is waiting for a user action.  
+    SIGNAL_CTRL_SLEEPING = 'Sleeping'              # Controller command is on a sleep queue wait for device.  
+    SIGNAL_CTRL_INPROGRESS = 'InProgress'       # The controller is communicating with the other device to carry out the command.  
+    SIGNAL_CTRL_COMPLETED = 'Completed'         # The command has completed successfully.  
+    SIGNAL_CTRL_FAILED = 'Failed'                     # The command has failed.  
+    SIGNAL_CTRL_NODEOK = 'NodeOK'                   # Used only with ControllerCommand_HasNodeFailed to indicate that the controller thinks the node is OK.  
+    SIGNAL_CTRL_NODEFAILED = 'NodeFailed'       # Used only with ControllerCommand_HasNodeFailed to indicate that the controller thinks the node has failed.
 
     SIGNAL_CONTROLLER = 'Message'
 
@@ -145,7 +146,9 @@ class ZWaveController(ZWaveNode):
             nodeId = 1
         ZWaveNode.__init__(self, ozwmanager,  homeId, nodeId)
         self._isPrimaryCtrl = isPrimaryCtrl
-        
+        print 'creation du ctrl'
+        self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_NORMAL, 'error_msg' : 'None.', 'message': 'No command in progress.', 'error': 0}
+        print "fait"
     # On accède aux attributs uniquement depuis les property
     isPrimaryCtrl = property(lambda self: self._isPrimaryCtrl)
 
@@ -158,6 +161,11 @@ class ZWaveController(ZWaveNode):
         else : typeCtrl = "a secondary"
         return 'homeId: [{0}]  nodeId: [{1}] product: {2}  name: {3} is it {4} controller'.format(self._homeId, self._nodeId, self._product, self._name, typeCtrl)
 
+    def getLastState(self):
+        """Retourne le dernier etat connus du controlleur et issue du callback des message action"""
+        return self._lastCtrlState
+        
+    
     def stats(self):
         """
         Retrieve statistics from driver.
@@ -204,6 +212,74 @@ class ZWaveController(ZWaveNode):
         self._capabilities = nodecaps
         self._ozwmanager._log.debug('Node [%d] capabilities are: %s', self._nodeId, self._capabilities)
         
+    def handle_Action(self,  action):
+        """Gestion des action du controlleur et des messages de retour"""    
+        retval = action
+        retval['error'] = ''
+        if action['cmd'] == 'Stop action' :
+            if self.cancel_command() :
+                retval['cmdstate'] ='not running'
+                retval['error'] = ''
+                retval['message'] = 'User have stop command.'
+            else :
+                retval['cmdstate'] ='not running'
+                retval['error'] = 'Fail to stop controller commande'
+                if self._lastCtrlState['state'] == self.SIGNAL_CTRL_NORMAL : 
+                    retval['message'] = 'User have try stop command. But no action processing.'
+                else : retval['message'] = 'User have try stop command. ' + self._lastCtrlState['message'] 
+        elif action['cmd'] == 'Start action' :
+            if action['action'] == 'RequestNetworkUpdate' :
+                if self.begin_command_request_network_update() :
+                    retval['cmdstate'] ='running'
+                    retval['message'] ='Waiting during refresh, be patient....'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'not started'
+                    retval['message'] = 'check your controller.'
+            if action['action'] =='RequestNodeNeighborUpdate':
+                if action['nodeid'] == 0 :
+                    self._log.error('No action.nodeid for controleur command, quit')
+                    print ('ERROR : No action.nodeid for controleur command, quit')
+                    node = None
+                else :
+                    node = self._ozwmanager._getNode(self.homeId, action['nodeid'])
+                if node :
+                    if self.begin_command_request_node_neigbhor_update(action['nodeid']) :
+                        retval['cmdstate'] ='running'
+                        retval['message'] ='Waiting during refresh, be patient....'
+                    else :
+                        retval['cmdstate'] ='not running'
+                        retval['error'] = 'not started'
+                        retval['message'] = 'check your controller.'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'Unknown node : ' + action['nodeid']
+                    retval['message'] = 'check input options.'
+            else :
+                retval['cmdstate'] ='TODO'
+                retval['message'] ='Command will be root soon as possible, be patient....'
+        elif action['cmd'] =='getState':
+            print '***********'
+            print self.checkActionCtrl() 
+            if self.checkActionCtrl() :
+                retval['cmdstate']  = 'stop'
+                retval.update(self.checkActionCtrl())
+            else : retval['cmdstate']  = 'waiting'
+        else :
+            retval['error'] = 'Unknown cmd : ' + action['cmd']
+            retval['cmdstate'] ='Unknown'
+            retval['message'] ='Command error'
+        return retval
+        
+    def _getValue(self, valueId):
+        """Return l'objet Value correspondant au valueId"""
+        retval= None
+        for node in self._nodes.values():
+            if node._values.has_key(valueId):
+                retval = node._values[valueId]
+                break
+        return retval
+        
     def hard_reset(self):
         """
         Hard Reset a PC Z-Wave Controller.
@@ -231,7 +307,7 @@ class ZWaveController(ZWaveNode):
     
     def cmdsAvailables(self):
         """
-        Return all availables crontroller commands wtieh associate documentations
+        Return all availables crontroller commands with associate documentations
          :return: list of commands
          :rtype: dict
         """
@@ -472,6 +548,14 @@ class ZWaveController(ZWaveNode):
 
         """
         self._manager.cancelControllerCommand(self.homeId)
+        
+    def checkActionCtrl(self):
+        
+        if self._lastCtrlState['state'] in [self.SIGNAL_CTRL_NORMAL,  self.SIGNAL_CTRL_CANCEL,  self.SIGNAL_CTRL_ERROR,
+                                                      self.SIGNAL_CTRL_COMPLETED, self.SIGNAL_CTRL_FAILED] :
+            return self._lastCtrlState
+        else : return None
+
 
     def zwcallback(self, args):
         """
@@ -484,9 +568,13 @@ class ZWaveController(ZWaveNode):
 
         """
         self._ozwmanager._log.debug('Controller state change : %s' % (args))
+        self._lastCtrlState = args
+        self._lastCtrlState["update"]= time.time()
         state = args['state']
         message = args['message']
         if state == self.SIGNAL_CTRL_WAITING:
-            print('state :', state, ' -- message :', message, ' -- controller', self)
+            print 'state :', state, ' -- message :', message, ' -- controller', self
         else :
-            print('state :', state, ' -- message :', message, ' -- controller', self)
+            print 'state :', state, ' -- message :', message, ' -- controller', self
+        self._ozwmanager.reportCtrlMsg(self._lastCtrlState)
+

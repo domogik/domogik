@@ -27,7 +27,7 @@ List of the available board models:
 
 .. code-block:: none
 
-    $ ipx800 status ipx800v1 192.168.0.102 admin pass
+    $ ipx800 status 192.168.0.102 ipx800v1 admin pass
     List of relay :
     - led0 : 0
     - led1 : 0

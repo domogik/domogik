@@ -43,9 +43,9 @@ from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
 from ozwctrl import ZWaveController
 from ozwdefs import *
-import time
-from time import sleep
-import os.path
+# import time
+# from time import sleep
+# import os.path
 
 
 class OZwaveManagerException(OZwaveException):
@@ -74,14 +74,14 @@ class OZWavemanager(threading.Thread):
             @ param msgEndCb (désactivée pour l'instant) Envoi d'une notification quand la transaction est complete (defaut = "--NotifyTransactions  false")
         """
         self._device = None
-        self._configPlug=config
+        self._configPlug = config
         self._log = log
-        self._cb_send_xPL= cb_send_xPL
-        self._cb_sendxPL_trig= cb_sendxPL_trig
+        self._cb_send_xPL = cb_send_xPL
+        self._cb_sendxPL_trig = cb_sendxPL_trig
         self._stop = stop
         self._homeId = 0
-        self._activeNodeId= None # node actif courant, pour utilisation dans les fonctions du manager
-        self._ctrlnodeId = 0
+        self._activeNodeId = None # node actif courant, pour utilisation dans les fonctions du manager
+        self._ctrlnodeId = -1
         self._controller = None
         self._nodes = dict()
         self._libraryTypeName = 'Unknown'
@@ -90,8 +90,10 @@ class OZWavemanager(threading.Thread):
         self._configPath = configPath
         self._userPath = userPath
         self._ready = False
+        self._initFully = False
+        self._ctrlActProgress= None   
         # récupération des association nom de réseaux et homeID
-        self._nameAssoc ={}
+        self._nameAssoc = {}
         if self._configPlug != None :
             num = 1
             loop = True
@@ -120,8 +122,8 @@ class OZWavemanager(threading.Thread):
             
         # Séquence d'initialisation d'openzwave
         # Spécification du chemain d'accès à la lib open-zwave
-        opt=""
-        if ozwlog=="True" : opts = "--logging true"
+        opt = ""
+        if ozwlog == "True" : opts = "--logging true"
         else : opts = "--logging false"
         # if msgEndCb : opts = opts + "--NotifyTransactions true" # false par defaut  --- desactivé, comportement bizard
         self._log.info("Try to run openzwave manager")
@@ -165,7 +167,7 @@ class OZWavemanager(threading.Thread):
         
     def stop(self):
         """ Stop class OZWManager."""
-        print("Stopping plugin, Remove driver from openzwave : %s",  self._device)
+        print("Stopping plugin, Remove driver from openzwave : %s" %self._device)
         self._log.info("Stopping plugin, Remove driver from openzwave : %s",  self._device)
         sleep(1)
         self._manager.removeDriver(self.device)
@@ -242,19 +244,20 @@ class OZWavemanager(threading.Thread):
 #         Group = 4                         / The associations for the node have changed. The application should rebuild any group information it holds about the node.
 #         NodeNew = 5                       / A new node has been found (not already stored in zwcfg*.xml file)
 #         NodeAdded = 6                     / A new node has been added to OpenZWave's list.  This may be due to a device being added to the Z-Wave network, or because the application is initializing itself.
+#         NodeProtocolInfo = 8              / Basic node information has been receievd, such as whether the node is a listening device, a routing device and its baud rate and basic, generic and specific types. It is after this notification that you can call Manager::GetNodeType to obtain a label containing the device description.
+#         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
 #         NodeEvent = 10                    / A node has triggered an event.  This is commonly caused when a node sends a Basic_Set command to the controller.  The event value is stored in the notification.
 #         DriverReady = 18                  / A driver for a PC Z-Wave controller has been added and is ready to use.  The notification will contain the controller's Home ID, which is needed to call most of the Manager methods.
 #         EssentialNodeQueriesComplete = 22 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
 #         NodeQueriesComplete = 23          / All the initialisation queries on a node have been completed.
 #         AwakeNodesQueried = 24            / All awake nodes have been queried, so client application can expected complete data for these nodes.
 #         AllNodesQueried = 25              / All nodes have been queried, so client application can expected complete data.
+#         Notification = 26                        / An error has occured that we need to report.
 
 #TODO: notification à implémenter
 #         ValueRemoved = 1                  / A node value has been removed from OpenZWave's list.  This only occurs when a node is removed.
 #         ValueRefreshed = 3                / A node value has been updated from the Z-Wave network.
 #         NodeRemoved = 7                   / A node has been removed from OpenZWave's list.  This may be due to a device being removed from the Z-Wave network, or because the application is closing.
-#         NodeProtocolInfo = 8              / Basic node information has been receievd, such as whether the node is a listening device, a routing device and its baud rate and basic, generic and specific types. It is after this notification that you can call Manager::GetNodeType to obtain a label containing the device description.
-#         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
 #         PollingDisabled = 11              / Polling of a node has been successfully turned off by a call to Manager::DisablePoll
 #         PollingEnabled = 12               / Polling of a node has been successfully turned on by a call to Manager::EnablePoll
 #         SceneEvent = 13                 / Scene Activation Set received
@@ -265,7 +268,6 @@ class OZWavemanager(threading.Thread):
 #         DriverFailed = 19                 / Driver failed to load
 #         DriverReset = 20                  / All nodes and values for this driver have been removed.  This is sent instead of potentially hundreds of individual node and value notifications.
 #         MsgComplete = 21                  / The last message that was sent is now complete.
-#         Error = 26                        / An error has occured that we need to report.
 
         print('\n%s\n[%s]:' % ('-'*20, args['notificationType']))
         print args
@@ -282,13 +284,18 @@ class OZWavemanager(threading.Thread):
             self._handleNodeEvent(args)
         elif notifyType == 'Group':
             self._handleGroupChanged(args)
-        elif notifyType == 'NodeQueriesComplete':
-            self._handleNodeQueryComplete(args)
         elif notifyType in ('AwakeNodesQueried', 'AllNodesQueried'):
             self._handleInitializationComplete(args)
+        elif notifyType == 'NodeProtocolInfo':
+            self._handleNodeLinked(args)
         elif notifyType == 'EssentialNodeQueriesComplete':
             self._handleNodeReadyToMsg(args)
-
+        elif notifyType == 'NodeNaming':
+            self._handleNodeNaming(args)
+        elif notifyType == 'NodeQueriesComplete':
+            self._handleNodeQueryComplete(args)
+        elif notifyType == 'Notification':
+            self._handleNotification(args)
         else : 
             self._log.info("zwave callback : %s is not handled yet",  notifyType)
             self._log.info(args)
@@ -305,24 +312,83 @@ class OZWavemanager(threading.Thread):
         self._log.info('OpenZWave Initialization Begins.')
         self._log.info('The initialization process could take several minutes.  Please be patient.')
         print ('controleur prêt' )
+
+    def _handleNodeLinked(self, args):
+        """Le node est relier au controleur."""
+        node = self._getNode(self._homeId, args['nodeId'])
+        if node :
+            node.setLinked()
+            self._log.info('Z-Wave Device Node {0} is linked to controller.'.format(node.id))        
+        else :
+            self._log.debug('Error notification : ', args)
+
+    def _handleNodeReadyToMsg(self, args):
+        """Les requettes essentielles d'initialisation du node sont complétée il peut recevoir des msg."""
+        node = self._getNode(self._homeId, args['nodeId'])
+        if node :
+            node.setReceiver()
+            self._log.info('Z-Wave Device Node {0} status essential queries ok.'.format(node.id))        
+        else :
+            self._log.debug('Error notification : ', args)
+       
+    def _handleNodeNaming(self, args):
+        """Le node à été identifié dans la lib openzwave. Son fabriquant et type sont connus"""
+        node = self._getNode(self._homeId, args['nodeId'])
+        if node :
+            node.setNamed()
+            self._log.info('Z-Wave Device Node {0} type is known in openzwave library.'.format(node.id))
+            print ('Z-Wave Device Node {0} type is known in openzwave library.'.format(node.id))
+        else :
+            self._log.debug('Error notification : ', args)
         
     def _handleNodeQueryComplete(self, args):
         """Les requettes d'initialisation du node sont complété."""
         node = self._getNode(self._homeId, args['nodeId'])
         if node :
+            node.setReady()
             node.updateNode()
-            self._log.info('Z-Wave Device Node {0} is ready.'.format(node.id))
+            self._log.info('Z-Wave Device Node {0} is ready, full initialized.'.format(node.id))
+            if node.id == self._ctrlnodeId and not self._ready :
+                self._ready = True
+                print ('controleur node ready pour autorisation dialogue UI')
+                self._log.info('Z-Wave Controller Node {0} is ready, UI dialogue autorised.'.format(node.id))
         else :
             if args['nodeId']== 255 and not self._ready :
                 self._handleInitializationComplete(args) # TODO :depuis la rev 585 pas de 'AwakeNodesQueried' ou  'AllNodesQueried' ? on force l'init
-        
-    def _handleNodeReadyToMsg(self, args):
-        """Les requettes essentielles d'initialisation du node sont complétée il peut recevoir des msg."""
+            
+    def _handleNotification(self,  args):
+        """Une erreur ou notification particulière est arrivée"""
+        # TODO: Supprimer code nimérique que les notificationCodes seront pris en charge par python-openzwave
         node = self._getNode(self._homeId, args['nodeId'])
-        if node :
-            self._log.info('Z-Wave Device Node {0} status essential queries ok.'.format(node.id))        
-        
-
+        nCode = args['notificationCode']
+        if nCode in (0 , 'MsgComplete'):     #      Code_MsgComplete = 0,                                   /**< Completed messages */
+            print ('MsgComplete notification code :', args)
+            self._log.info('MsgComplete notification code : {0}'.format(args))
+        elif nCode in (1 , 'Timeout'):         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
+            print ('Timeout notification code :', args)
+            self._log.info('Timeout notification code : {0}'.format(args))
+        elif nCode in (2 , 'NoOperation'):  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
+            print ('NoOperation notification code :', args)
+            self._log.info('NoOperation notification code : {0}'.format(args))
+        elif nCode in (3 , 'Awake'):            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
+            if node : 
+                node.setSleeping(False)
+                print ('Z-Wave sleeping device Node {0} wakes up.'.format(node.id))
+                self._log.info('Z-Wave sleeping device Node {0} wakes up.'.format(node.id))
+        elif nCode in (4 , 'Sleep'):            #      Code_Sleep,                                                /**< Report when a node goes to sleep */
+            if node : 
+                node.setSleeping(True)
+                print ('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
+                self._log.info('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
+        elif nCode in (0 , 'Dead'):             #       Code_Dead                                               /**< Report when a node is presumed dead */
+            if node : 
+                node.setSleeping(True)
+                print ('Z-Wave Device Node {0} marked as dead.'.format(node.id))
+                self._log.info('Z-Wave Device Node {0} marked as dead.'.format(node.id))
+        else :
+            self._log.debug('Error notification code unknown : ', args)
+            
+            
     def _getNode(self, homeId, nodeId):
         """ Renvoi l'objet node correspondant"""
         if self._nodes.has_key(nodeId) :
@@ -331,7 +397,7 @@ class OZWavemanager(threading.Thread):
             print "Z-Wave Device Node {0} isn't register to manager.".format(nodeId)
             self._log.debug("Z-Wave Device Node {0} isn't register to manager.".format(nodeId))        
             return None
-        
+            
     def _fetchNode(self, homeId, nodeId):
         """ Renvoi et construit un nouveau node s'il n'existe pas et l'enregistre dans le dict """
         retval = self._getNode(homeId, nodeId)
@@ -427,10 +493,10 @@ class OZWavemanager(threading.Thread):
             print "-- Value :"
             print value
         if args2 :
-                print "Event transmit à ValueChanged :"
-                print args2
-                self._handleValueChanged(args2)
-                print"********** Node event handle fin du traitement ******"        
+            print "Event transmit à ValueChanged :"
+            print args2
+            self._handleValueChanged(args2)
+            print"********** Node event handle fin du traitement ******"        
                 
     def _handleInitializationComplete(self, args):
         # La séquence d'initialisation est terminée
@@ -444,6 +510,7 @@ class OZWavemanager(threading.Thread):
             node.updateNode() # Pourrait être utile si un node s'est réveillé pendant l'init
             node._updateConfig()
         self._ready = True
+        self._initFully = True
         print ("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         self._log.info("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         #self._manager.writeConfig(self._homeId)
@@ -462,37 +529,11 @@ class OZWavemanager(threading.Thread):
                 return k
         return None
         
-    def handle_ControllerAction(self,  action, cmd, option):
-        retval = {}
-        retval['error'] = ''
-        retval['cmd'] = cmd
-        retval['action'] = action
-        if action == 'RequestNetworkUpdate' :
-            if cmd == 'Start action' :
-                if self._controller.begin_command_request_network_update() :
-                    retval['cmdstate'] ='running'
-                    retval['userinfo'] ='Waiting during refresh, be patient....'
-                else :
-                    retval['cmdstate'] ='not running'
-                    retval['error'] = 'not started'
-                    retval['userinfo'] = 'check your controller.'
-            elif cmd == 'Stop action' :
-                self._controller.cancel_command()
-                retval['cmdstate'] ='not running'
-                retval['error'] = ''
-                retval['userinfo'] = 'User have stop refresh.'
-        else :
-            retval['cmdstate'] ='TODO'
-            retval['userinfo'] ='Command will be root soon as possible, be patient....'
-        return retval
-        
-    def _getValue(self, valueId):
-        """Return l'objet Value correspondant au valueId"""
-        retval= None
-        for node in self._nodes.values():
-            if node._values.has_key(valueId):
-                retval = node._values[valueId]
-                break
+    def handle_ControllerAction(self,  action):
+        print ('********************** handle_ControllerAction ***********')
+        print('Action : ',  action)
+        self._ctrlActProgress = action   
+        retval = self._controller.handle_Action(action)
         return retval
     
     def getCountMsgQueue(self):
@@ -519,6 +560,10 @@ class OZWavemanager(threading.Thread):
             retval["Version"] = self._libraryVersion
             retval["Node count"] = self.nodeCount
             retval["Node sleeping"] = self.sleepingNodeCount
+            if self._initFully :
+                retval["Init state"] = NodeStatusNW[2] #Completed
+            else :
+                retval["Init state"] = NodeStatusNW[3] #In progress - Devices initializing
             retval["error"] =""
             ln = []
             for n in self.nodes : ln.append(n)
@@ -527,6 +572,7 @@ class OZWavemanager(threading.Thread):
             return retval
         else : 
             retval["error"] = "Zwave network not ready, be patient..."
+            retval["Init state"] = NodeStatusNW[0] #Uninitialized
             return retval
         
     def saveNetworkConfig(self):
@@ -585,12 +631,12 @@ class OZWavemanager(threading.Thread):
                 retval = value.getInfos()
                 retval['error'] = ""
                 return retval
-            else : return {"error" : "Unknown value %d" %valId}
-        else : return {"error" : "Zwave network not ready, can't find value %d" %valId}
+            else : return {"error" : "Unknown value %d" % valId}
+        else : return {"error" : "Zwave network not ready, can't find value %d" % valId}
         
     def getValueTypes(self):
         """Retourne la liste des type de value possible et la doc"""
-        retval ={}
+        retval = {}
         for elem in  libopenzwave.PyValueTypes :
             retval[elem] = elem.doc
         return retval
@@ -634,7 +680,7 @@ class OZWavemanager(threading.Thread):
         retval={}
         if self.ready :
             node = self._getNode(self.homeId,  nodeID)
-            grp =node.setMembersGrps(newGroups);
+            grp =node.setMembersGrps(newGroups)
             if grp :
                 retval['groups'] = grp
                 retval['error'] = ""
@@ -643,3 +689,47 @@ class OZWavemanager(threading.Thread):
             return 
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeID}
                 
+    def reportCtrlMsg(self, ctrlmsg):
+        """Un message de changement d'état a été recu, il est reporté au besoin sur le hub xPL pour l'UI
+            SIGNAL_CTRL_NORMAL = 'Normal'                   # No command in progress.  
+            SIGNAL_CTRL_STARTING = 'Starting'             # The command is starting.  
+            SIGNAL_CTRL_CANCEL = 'Cancel'                   # The command was cancelled.
+            SIGNAL_CTRL_ERROR = 'Error'                       # Command invocation had error(s) and was aborted 
+            SIGNAL_CTRL_WAITING = 'Waiting'                # Controller is waiting for a user action.  
+            SIGNAL_CTRL_SLEEPING = 'Sleeping'              # Controller command is on a sleep queue wait for device.  
+            SIGNAL_CTRL_INPROGRESS = 'InProgress'       # The controller is communicating with the other device to carry out the command.  
+            SIGNAL_CTRL_COMPLETED = 'Completed'         # The command has completed successfully.  
+            SIGNAL_CTRL_FAILED = 'Failed'                     # The command has failed.  
+            SIGNAL_CTRL_NODEOK = 'NodeOK'                   # Used only with ControllerCommand_HasNodeFailed to indicate that the controller thinks the node is OK.  
+            SIGNAL_CTRL_NODEFAILED = 'NodeFailed'       # Used only with ControllerCommand_HasNodeFailed to indicate that the controller thinks the node has failed.
+        """
+
+        report  ={}
+        if self._ctrlActProgress :
+            report = self._ctrlActProgress
+        else :            
+            report['action'] = 'undefine'
+            report['id'] = 0
+            report['cmd'] = 'undefine'
+            report['cptmsg'] = 0
+            report['cmdSource'] = 'undefine'
+            report['arg'] ={}
+        report['state'] = ctrlmsg['state'] 
+        report['error'] = ctrlmsg['error']
+        report['message'] = ctrlmsg['message']
+        if ctrlmsg['error_msg'] != 'None.' : report['err_msg'] = ctrlmsg['error_msg']  
+        else : report['err_msg'] = 'no'
+        report['update'] = ctrlmsg['update']
+
+        if ctrlmsg['state'] in [self._controller.SIGNAL_CTRL_NORMAL,  self._controller.SIGNAL_CTRL_CANCEL,
+                                        self._controller.SIGNAL_CTRL_ERROR,  self._controller.SIGNAL_CTRL_COMPLETED,  
+                                        self._controller.SIGNAL_CTRL_FAILED] :
+            report['cmdstate'] = 'stop'                                            
+            self._ctrlActProgress= None   
+        else :
+            report['cmdstate'] = 'waiting'           
+        header={}   
+        header['type'] = 'xpl-trig'
+        header['schema'] = 'ozwave.basic'
+        header['data'] = {'command' : 'Refresh-ack', 'group' :'UI'}
+        self._cb_send_xPL(header, report)
