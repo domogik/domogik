@@ -11,7 +11,6 @@ def domogik_encoder():
                 if obj in _visited_objs:
                     return None
                 _visited_objs.append(obj)
-
                 # an SQLAlchemy class
                 fields = {}
                 for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and x != 'get_tablename' and x != 'set_password']:

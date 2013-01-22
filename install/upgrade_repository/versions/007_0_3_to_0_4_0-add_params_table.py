@@ -1,6 +1,6 @@
 from sqlalchemy import *
 from migrate import *
-from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, DeviceFeatureModel, Device, Command, CommandParam, Sensor, SensorHistory
+from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, Device, Command, CommandParam, Sensor, SensorHistory
 from domogik.common import database_utils
 
 def upgrade(migrate_engine):
@@ -37,12 +37,12 @@ def upgrade(migrate_engine):
         dev= Table(Device.__tablename__, meta, autoload=True)
         dev.c.address.alter(nullable=True)
     # delete feature and featureModels
-    if database_utils.table_exists(migrate_engine, DeviceFeatureModel.__tablename__):
-        table = DeviceFeatureModel.__table__
-        table.drop(bind=migrate_engine)
-    if database_utils.table_exists(migrate_engine, DeviceFeature.__tablename__):
-        table = DeviceFeature.__table__
-        table.drop(bind=migrate_engine)
+    if database_utils.table_exists(migrate_engine, "core_device_feature_association"):
+        migrate_engine.execute("DROP table core_device_feature_association")
+    if database_utils.table_exists(migrate_engine, "core_device_feature"):
+        migrate_engine.execute("DROP table core_device_feature")
+    if database_utils.table_exists(migrate_engine, "core_device_feature_model"):
+        migrate_engine.execute("DROP table core_device_feature_model")
 
 def downgrade(migrate_engine):
     # bind the engine
