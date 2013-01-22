@@ -70,3 +70,7 @@ def column_exists(db_engine, table_name, column_name):
             column_found = True
             break
     return column_found
+
+def table_exists(db_engine, table_name):
+    insp = reflection.Inspector.from_engine(db_engine)
+    return table_name in insp.get_table_names()
