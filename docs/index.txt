@@ -11,7 +11,7 @@ Overview
 End User Documentation
 ======================
 
-* :doc:`Release 0.2.0 </releases/0.2.0>`
+* :doc:`Release 0.4.0 </releases/0.4.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**
 
@@ -42,9 +42,9 @@ Technical Documentation
 =======================
 * :doc:`The xPL hub </xplhub/index>`
 * :doc:`Network ports used by Domogik </technical/network_ports>`
-* :doc:`Actuators </technical/actuator>`
+* :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
-* :doc:`Device types, features and usages  </technical/device_feature_usage>`
+* :doc:`Device types and usages  </technical/device_feature_usage>`
 * **Database:**
   :doc:`Model </technical/database>`
 * **RINOR:**

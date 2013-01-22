@@ -74,3 +74,4 @@ def column_exists(db_engine, table_name, column_name):
 def table_exists(db_engine, table_name):
     insp = reflection.Inspector.from_engine(db_engine)
     return table_name in insp.get_table_names()
+
