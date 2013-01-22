@@ -24,7 +24,6 @@ Implements
 @organization: Domogik
 """
 from sqlalchemy import MetaData, Table
-from domogik.common.sql_schema import DeviceUsage
 from domogik.common import database_utils
 
 def upgrade(migrate_engine):
