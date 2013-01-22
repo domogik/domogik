@@ -240,10 +240,12 @@ class OZWavemanager(threading.Thread):
     # callback ordre : (notificationtype, homeId, nodeId, ValueID, groupidx, event) 
     # notification implémentés
 #         ValueAdded = 0                    / A new node value has been added to OpenZWave's list. These notifications occur after a node has been discovered, and details of its command classes have been received.  Each command class may generate one or more values depending on the complexity of the item being represented.
+#         ValueRemoved = 1                  / A node value has been removed from OpenZWave's list.  This only occurs when a node is removed.
 #         ValueChanged = 2                  / A node value has been updated from the Z-Wave network and it is different from the previous value.
 #         Group = 4                         / The associations for the node have changed. The application should rebuild any group information it holds about the node.
 #         NodeNew = 5                       / A new node has been found (not already stored in zwcfg*.xml file)
 #         NodeAdded = 6                     / A new node has been added to OpenZWave's list.  This may be due to a device being added to the Z-Wave network, or because the application is initializing itself.
+#         NodeRemoved = 7                   / A node has been removed from OpenZWave's list.  This may be due to a device being removed from the Z-Wave network, or because the application is closing.
 #         NodeProtocolInfo = 8              / Basic node information has been receievd, such as whether the node is a listening device, a routing device and its baud rate and basic, generic and specific types. It is after this notification that you can call Manager::GetNodeType to obtain a label containing the device description.
 #         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
 #         NodeEvent = 10                    / A node has triggered an event.  This is commonly caused when a node sends a Basic_Set command to the controller.  The event value is stored in the notification.
@@ -255,9 +257,7 @@ class OZWavemanager(threading.Thread):
 #         Notification = 26                        / An error has occured that we need to report.
 
 #TODO: notification à implémenter
-#         ValueRemoved = 1                  / A node value has been removed from OpenZWave's list.  This only occurs when a node is removed.
 #         ValueRefreshed = 3                / A node value has been updated from the Z-Wave network.
-#         NodeRemoved = 7                   / A node has been removed from OpenZWave's list.  This may be due to a device being removed from the Z-Wave network, or because the application is closing.
 #         PollingDisabled = 11              / Polling of a node has been successfully turned off by a call to Manager::DisablePoll
 #         PollingEnabled = 12               / Polling of a node has been successfully turned on by a call to Manager::EnablePoll
 #         SceneEvent = 13                 / Scene Activation Set received
@@ -276,8 +276,12 @@ class OZWavemanager(threading.Thread):
             self._handleDriverReady(args)          
         elif notifyType in ('NodeAdded', 'NodeNew'):
             self._handleNodeChanged(args)
+        elif notifyType == 'NodeRemoved':
+            self._handleNodeRemoved(args)
         elif notifyType == 'ValueAdded':
             self._handleValueAdded(args)
+        elif notifyType == 'ValueRemoved':
+            self._handleValueRemoved(args)
         elif notifyType == 'ValueChanged':
             self._handleValueChanged(args)
         elif notifyType == 'NodeEvent':
@@ -429,6 +433,16 @@ class OZWavemanager(threading.Thread):
         node._lastUpdate = time.time()
         self._log.info ('Node %d as add or changed (homeId %.8x)' , args['nodeId'],  args['homeId'])
 
+    def _handleNodeRemoved(self, args):
+        """Un node est ajouté ou a changé"""
+        node = self._getNode(args['homeId'], args['nodeId'])
+        if node :
+            self._nodes.pop(node.id)
+            self._log.info ('Node %d is removed (homeId %.8x)' , args['nodeId'],  args['homeId'])
+        else :
+            self._log.debug ("Node %d unknown, isn't removed (homeId %.8x)" , args['nodeId'],  args['homeId'])
+
+
     def _handleValueAdded(self, args):
         """Un valueNode est ajouté au node depuis le réseaux zwave"""
         homeId = args['homeId']
@@ -437,6 +451,15 @@ class OZWavemanager(threading.Thread):
         node = self._fetchNode(homeId, activeNodeId)
         node._lastUpdate = time.time()
         node.createValue(valueId)
+       
+    def _handleValueRemoved(self, args):
+        """Un valueNode est retiré au node depuis le réseaux zwave"""
+        homeId = args['homeId']
+        activeNodeId= args['nodeId']
+        valueId = args['valueId']
+        node = self._fetchNode(homeId, activeNodeId)
+        node._lastUpdate = time.time()
+        node.removeValue(valueId)
        
     def _handleValueChanged(self, args):
         """"Un valuenode à changé sur le réseaux zwave"""
@@ -720,10 +743,15 @@ class OZWavemanager(threading.Thread):
         if ctrlmsg['error_msg'] != 'None.' : report['err_msg'] = ctrlmsg['error_msg']  
         else : report['err_msg'] = 'no'
         report['update'] = ctrlmsg['update']
-
+        if ctrlmsg['state'] == self._controller.SIGNAL_CTRL_FAILED :
+            node = self._getNode(self._homeId, ctrlmsg['nodeid']) 
+            if node : node.markAsFailed();
+        if ctrlmsg['state'] == self._controller.SIGNAL_CTRL_NODEOK :
+            node = self._getNode(self._homeId, ctrlmsg['nodeid']) 
+            if node : node.markAsOK()
         if ctrlmsg['state'] in [self._controller.SIGNAL_CTRL_NORMAL,  self._controller.SIGNAL_CTRL_CANCEL,
                                         self._controller.SIGNAL_CTRL_ERROR,  self._controller.SIGNAL_CTRL_COMPLETED,  
-                                        self._controller.SIGNAL_CTRL_FAILED] :
+                                        self._controller.SIGNAL_CTRL_FAILED, self._controller.SIGNAL_CTRL_NODEOK] :
             report['cmdstate'] = 'stop'                                            
             self._ctrlActProgress= None   
         else :

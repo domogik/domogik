@@ -216,6 +216,8 @@ class ZWaveController(ZWaveNode):
         """Gestion des action du controlleur et des messages de retour"""    
         retval = action
         retval['error'] = ''
+        if action['highpower'] =='True' : highpower = True
+        else : highpower = False
         if action['cmd'] == 'Stop action' :
             if self.cancel_command() :
                 retval['cmdstate'] ='not running'
@@ -228,14 +230,35 @@ class ZWaveController(ZWaveNode):
                     retval['message'] = 'User have try stop command. But no action processing.'
                 else : retval['message'] = 'User have try stop command. ' + self._lastCtrlState['message'] 
         elif action['cmd'] == 'Start action' :
-            if action['action'] == 'RequestNetworkUpdate' :
-                if self.begin_command_request_network_update() :
+            retval['cmdstate'] ='TODO'
+            retval['message'] ='Command will be root soon as possible, be patient....'
+            if action['action'] == 'AddDevice' :
+                if self.begin_command_add_device(highpower) :
                     retval['cmdstate'] ='running'
-                    retval['message'] ='Waiting during refresh, be patient....'
+                    retval['message'] ='It is up to you to perform the action on the local device(s) to add. Usually a switch to actuate 2 or 3 times.'
                 else :
                     retval['cmdstate'] ='not running'
                     retval['error'] = 'not started'
                     retval['message'] = 'check your controller.'
+                    
+            if action['action'] == 'RemoveDevice' :
+                if self.begin_command_add_device(highpower) :
+                    retval['cmdstate'] ='running'
+                    retval['message'] ='It is up to you to perform the action on the local device(s) to renove. Usually a switch to actuate 2 or 3 times.'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'not started'
+                    retval['message'] = 'check your controller.'
+                    
+            if action['action'] == 'RequestNetworkUpdate' :
+                if self.begin_command_request_network_update() :
+                    retval['cmdstate'] ='running'
+                    retval['message'] ='Wait for refresh, be patient....'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'not started'
+                    retval['message'] = 'check your controller.'
+                    
             if action['action'] =='RequestNodeNeighborUpdate':
                 if action['nodeid'] == 0 :
                     self._log.error('No action.nodeid for controleur command, quit')
@@ -246,7 +269,7 @@ class ZWaveController(ZWaveNode):
                 if node :
                     if self.begin_command_request_node_neigbhor_update(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='Waiting during refresh, be patient....'
+                        retval['message'] ='Wait for refresh, be patient....'
                     else :
                         retval['cmdstate'] ='not running'
                         retval['error'] = 'not started'
@@ -255,9 +278,47 @@ class ZWaveController(ZWaveNode):
                     retval['cmdstate'] ='not running'
                     retval['error'] = 'Unknown node : ' + action['nodeid']
                     retval['message'] = 'check input options.'
-            else :
-                retval['cmdstate'] ='TODO'
-                retval['message'] ='Command will be root soon as possible, be patient....'
+                    
+            if action['action'] =='HasNodeFailed':
+                if action['nodeid'] == 0 :
+                    self._log.error('No action.nodeid for controleur command, quit')
+                    print ('ERROR : No action.nodeid for controleur command, quit')
+                    node = None
+                else :
+                    node = self._ozwmanager._getNode(self.homeId, action['nodeid'])
+                if node :
+                    if self.begin_command_has_node_failed(action['nodeid']) :
+                        retval['cmdstate'] ='running'
+                        retval['message'] ='wait for research , be patient....'
+                    else :
+                        retval['cmdstate'] ='not running'
+                        retval['error'] = 'not started'
+                        retval['message'] = 'check your controller.'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'Unknown node : ' + action['nodeid']
+                    retval['message'] = 'check input options.'
+                    
+            if action['action'] =='RemoveFailedNode':
+                if action['nodeid'] == 0 :
+                    self._log.error('No action.nodeid for controleur command, quit')
+                    print ('ERROR : No action.nodeid for controleur command, quit')
+                    node = None
+                else :
+                    node = self._ozwmanager._getNode(self.homeId, action['nodeid'])
+                if node :
+                    if self.begin_command_remove_failed_node(action['nodeid']) :
+                        retval['cmdstate'] ='running'
+                        retval['message'] ='wait for removing node , be patient....'
+                    else :
+                        retval['cmdstate'] ='not running'
+                        retval['error'] = 'not started'
+                        retval['message'] = 'check your controller.'
+                else :
+                    retval['cmdstate'] ='not running'
+                    retval['error'] = 'Unknown node : ' + action['nodeid']
+                    retval['message'] = 'check input options.'                    
+                    
         elif action['cmd'] =='getState':
             print '***********'
             print self.checkActionCtrl() 
@@ -550,9 +611,12 @@ class ZWaveController(ZWaveNode):
         self._manager.cancelControllerCommand(self.homeId)
         
     def checkActionCtrl(self):
-        
+        """
+        Check if controller action is in state finished return None is not finish or all state if finished
+        """
         if self._lastCtrlState['state'] in [self.SIGNAL_CTRL_NORMAL,  self.SIGNAL_CTRL_CANCEL,  self.SIGNAL_CTRL_ERROR,
-                                                      self.SIGNAL_CTRL_COMPLETED, self.SIGNAL_CTRL_FAILED] :
+                                                      self.SIGNAL_CTRL_COMPLETED, self.SIGNAL_CTRL_FAILED, 
+                                                      self.SIGNAL_CTRL_NODEOK,  self.SIGNAL_CTRL_NODEFAILED] :
             return self._lastCtrlState
         else : return None
 
@@ -574,7 +638,7 @@ class ZWaveController(ZWaveNode):
         message = args['message']
         if state == self.SIGNAL_CTRL_WAITING:
             print 'state :', state, ' -- message :', message, ' -- controller', self
-        else :
-            print 'state :', state, ' -- message :', message, ' -- controller', self
+        
+        print 'state :', state, ' -- message :', message, ' -- controller', self
         self._ozwmanager.reportCtrlMsg(self._lastCtrlState)
 

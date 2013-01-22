@@ -134,11 +134,15 @@ class ZWaveNode:
         """Une notification d'état du node à été recue, awake ou sleep."""
         self._sleeping = state;
     
-    def markAsDead(self): 
+    def markAsFailed(self): 
         """Le node est marqué comme HS."""
-        # TODO: Gerer l'état du Node Dead
         self._ready = False
         self._sleeping = True
+        self._failed = True
+    
+    def markAsOK(self): 
+        """Le node est marqué comme Bon réinit nécéssaire ."""
+        self._failed = False
         
     def _getIsLocked(self):
         return False
@@ -562,6 +566,21 @@ class ZWaveNode:
             self._values[vid] = retval
             print ('Created new value node with homeId %0.8x, nodeId %d, valueId %s' %(self.homeId, self.nodeId, valueId))
         return retval 
+   
+    def removeValue(self,  valueId):
+        """Detruit la valueNode valueId du node si besoin et renvoie true ou  false."""
+        vid = valueId['id']
+        if self._values.has_key(vid):
+            self._values.pop(vid)
+            retval = True
+            self._ozwmanager._log.debug('Removed value node with homeId %0.8x, nodeId %d, valueId %s', self.homeId, self.nodeId, valueId)
+            print ('Removed value node with homeId %0.8x, nodeId %d, valueId %s' %(self.homeId, self.nodeId, valueId))
+        else:
+            retval = False
+            self._ozwmanager._log.debug('Not remove value unknown node with homeId %0.8x, nodeId %d, valueId %s', self.homeId, self.nodeId, valueId)
+            print ('Not remove value unkn node with homeId %0.8x, nodeId %d, valueId %s' %(self.homeId, self.nodeId, valueId))
+        return retval 
+   
    
     def getValue(self, valueId):
         """Renvoi la valueNode valueId du node."""
