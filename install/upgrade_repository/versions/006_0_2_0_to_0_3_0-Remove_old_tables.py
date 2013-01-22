@@ -24,21 +24,14 @@ Implements
 @organization: Domogik
 """
 from sqlalchemy import MetaData, Table
-from domogik.common import database_utils
-
+from domogik.common.sql_schema import DeviceUsage
 def upgrade(migrate_engine):
     # core_device_config
-    if database_utils.table_exists(migrate_engine, "core_device_config"):
-        migrate_engine.execute("DROP table core_device_config")
+    migrate_engine.execute("DROP table core_device_config")
     # core_system_info
-    if database_utils.table_exists(migrate_engine, "core_system_info"):
-        migrate_engine.execute("DROP table core_system_info")
+    migrate_engine.execute("DROP table core_system_info")
     # core_system_config
-    if database_utils.table_exists(migrate_engine, "core_system_config"):
-        migrate_engine.execute("DROP table core_system_config")
+    migrate_engine.execute("DROP table core_system_config")
     # core_trigger
-    if database_utils.table_exists(migrate_engine, "core_trigger"):
-        migrate_engine.execute("DROP table core_trigger") 
+    migrate_engine.execute("DROP table core_trigger") 
     # core_ui_item_config
-    if database_utils.table_exists(migrate_engine, "core_ui_item_config"):
-        migrate_engine.execute("DROP table core_ui_item_config") 
