@@ -698,7 +698,15 @@ class Rest(XplPlugin):
         """
         print("Start Http")
         self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
+        # Temp fix, once MQ is used, queues are removed, so we basically only need the API version
         urlHandler.rest = self
+        # needed for status
+        urlHandler.apiversion = self._rest_api_version
+        urlHandler.use_ssl = self.use_ssl
+        urlHandler.hostname = self.get_sanitized_hostname()
+        # xpl handler
+        urlHandler.xpl = self.myxpl 
+        
         http_server = HTTPServer(WSGIContainer(urlHandler))
         # for ssl, extra parameter to HTTPServier init
         #ssl_options={

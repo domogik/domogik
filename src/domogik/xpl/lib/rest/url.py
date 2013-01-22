@@ -1,7 +1,4 @@
 from flask import Flask, g, Response, request
-from flask_principal import Principal, Permission, RoleNeed
-from flask.ext.login import LoginManager, login_user, logout_user, \
-     login_required, current_user
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.lib.rest.jsondata import domogik_encoder
 from functools import wraps
@@ -10,13 +7,6 @@ import json
 # url handler itself
 urlHandler = Flask(__name__)
 urlHandler.debug = True
-
-# principel
-#principals = Principal(urlHandler)
-
-# login manager
-#login_manager = LoginManager()
-#login_manager.setup_app(urlHandler)
 
 # DB handler decorator
 def db_helper(action_func):
@@ -71,6 +61,7 @@ def register_api(view, endpoint, url, pk='id', pk_type=None):
         urlHandler.add_url_rule('%s<%s>' % (url, pk), view_func=view_func,
                      methods=['GET', 'PUT', 'DELETE'])
 
+
 # import the flask urls
 import domogik.xpl.lib.rest.urls.status
 
@@ -83,4 +74,4 @@ from domogik.xpl.lib.rest.urls.device_usage import deviceUsageAPI
 from domogik.xpl.lib.rest.urls.device_technology import deviceTechnologyAPI
 from domogik.xpl.lib.rest.urls.device_type import deviceTypeAPI
 from domogik.xpl.lib.rest.urls.person import personAPI
-from domogik.xpl.lib.rest.urls.account import accountAPI
+from domogik.xpl.lib.rest.urls.account import AccountAPI

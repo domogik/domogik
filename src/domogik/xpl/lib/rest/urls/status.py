@@ -22,14 +22,14 @@ def api_root():
         src_version = global_version
 
     info = {}
-    info["REST_API_version"] = urlHandler.rest._rest_api_version
-    info["SSL"] = urlHandler.rest.use_ssl
+    info["REST_API_version"] = urlHandler.apiversion
+    info["SSL"] = urlHandler.use_ssl
     info["Domogik_version"] = global_version
     info["Sources_version"] = src_version
-    info["Host"] = urlHandler.rest.get_sanitized_hostname()
+    info["Host"] = urlHandler.hostname
 
     # for compatibility with Rest API < 0.6
-    info["REST_API_release"] = urlHandler.rest._rest_api_version
+    info["REST_API_release"] = urlHandler.apiversion
     info["Domogik_release"] = global_version
     info["Sources_release"] = src_version
 
