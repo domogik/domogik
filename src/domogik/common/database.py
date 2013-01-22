@@ -54,7 +54,7 @@ from domogik.common import logger
 from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
+        ACTUATOR_VALUE_TYPE_LIST, Device,
         DeviceUsage, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, Person,
         UserAccount, SENSOR_VALUE_TYPE_LIST,

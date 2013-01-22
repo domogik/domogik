@@ -221,7 +221,6 @@ class Device(Base):
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=True)
     device_type = relation(DeviceType)
-    """device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")"""
     commands = relationship("Command", backref=__tablename__, cascade="all, delete")
     sensors = relationship("Sensor", backref=__tablename__, cascade="all, delete")
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")
@@ -255,103 +254,6 @@ class Device(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return Device.__tablename__
-
-
-class DeviceFeatureModel(Base):
-    """Device features that can be associated to a device (type) : switch, dimmer, temperature..."""
-
-    __tablename__ = '%s_device_feature_model' % _db_prefix
-    id = Column(Unicode(80), primary_key=True)
-    name = Column(Unicode(30), nullable=False)
-    feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
-    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType)
-    #parameters = Column(UnicodeText())
-    value_type = Column(Unicode(30), nullable=False)
-    stat_key = Column(Unicode(30))
-    #return_confirmation = Column(Boolean, nullable=False)
-    xpl_command = Column(Unicode(255), nullable=True)
-    value_field = Column(Unicode(32), nullable=True)
-    values = Column(Unicode(255), nullable=True)
-    unit = Column(Unicode(32), nullable=True)
-    device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
-
-    def __init__(self, id, name, feature_type, device_type_id, value_type, stat_key=None, \
-                xpl_command=None, value_field=None, values=None, unit=None):
-        """Class constructor
-
-        @param id : device feature id
-        @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
-        @param feature_type : device feature type (actuator / sensor)
-        @param device_type_id : device type id
-        @param value_type : value type the actuator can accept / the sensor can return
-        @param stat_key : key reference in the core_device_stats table, optional
-        Parameters only for actuators
-            @xpl_command
-            @value_field
-            @values
-        """
-        self.id = ucode(id)
-        self.name = ucode(name)
-        if feature_type not in ('actuator', 'sensor'):
-            raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
-        self.feature_type = feature_type
-        if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s"
-                            % (value_type, ACTUATOR_VALUE_TYPE_LIST))
-        elif self.feature_type == 'sensor' and value_type not in SENSOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s"
-                            % (value_type, SENSOR_VALUE_TYPE_LIST))
-        self.device_type_id = device_type_id
-        self.value_type = ucode(value_type)
-        self.stat_key = ucode(stat_key)
-        self.xpl_command = ucode(xpl_command)
-        self.value_field = ucode(value_field)
-        self.values = ucode(values)
-        self.unit = ucode(unit)
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceFeatureModel(%s, %s, device_type=%s, value_type=%s, stat_key=%s, xpl_command=%s, value_field=%s, values=%s)>"\
-               % (self.id, self.feature_type, self.device_type, self.value_type,\
-                  self.stat_key, self.xpl_command, self.value_field, self.values)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceFeatureModel.__tablename__
-
-
-class DeviceFeature(Base):
-    """Association between Device and DeviceFeatureModel entities"""
-
-    __tablename__ = '%s_device_feature' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
-    device = relation(Device, backref=backref(__tablename__))
-    device_feature_model_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
-    device_feature_model = relation(DeviceFeatureModel)
-
-    UniqueConstraint(device_id, device_feature_model_id)
-
-    def __init__(self, device_id, device_feature_model_id):
-        """Class constructor
-
-        @param device_id : device id
-        @param device_feature_model_id : device feature model id
-
-        """
-        self.device_id = device_id
-        self.device_feature_model_id = device_feature_model_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceFeature(%s, %s, %s)>" % (self.id, self.device, self.device_feature_model)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceFeature.__tablename__
 
 class DeviceStats(Base):
     """Device stats (values that were associated to the device)"""
