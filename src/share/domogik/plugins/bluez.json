@@ -146,7 +146,8 @@
         "src/share/domogik/url2xpl/bluez/stop.xml",
         "src/domogik_packages/xpl/bin/bluez.py",
         "src/domogik_packages/xpl/helpers/bluez.py",
-        "src/domogik_packages/xpl/lib/bluez.py"
+        "src/domogik_packages/xpl/lib/bluez.py",
+        "src/domogik_packages/tests/plugin/bluez/"
     ],
     "identity": {
         "author": "Sebastien GALLET",
