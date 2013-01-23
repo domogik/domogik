@@ -524,11 +524,14 @@ class PackageManager():
             if package_part == PKG_PART_XPL:
                 if pkg_type == "plugin":
                     copytree("%s/src/domogik_packages/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
+                    copytree("%s/src/domogik_packages/tests" % pkg_dir, "%s/tests" % plg_path, self.log)
                     self._create_init_py("%s/" % plg_path)
                     self._create_init_py("%s/xpl/" % plg_path)
                     self._create_init_py("%s/xpl/bin/" % plg_path)
                     self._create_init_py("%s/xpl/lib/" % plg_path)
                     self._create_init_py("%s/xpl/helpers/" % plg_path)
+                    self._create_init_py("%s/tests/" % plg_path)
+                    self._create_init_py("%s/tests/plugin/" % plg_path)
                     type_path = "plugins"
                 if pkg_type == "external":
                     type_path = "externals"
