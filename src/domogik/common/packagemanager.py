@@ -287,8 +287,11 @@ class PackageManager():
                 self.log("- %s" % path)
                 if os.path.isfile(SRC_PATH + path):
                     tar.add(SRC_PATH + path, arcname = path)
+                elif os.path.isdir(SRC_PATH + path):
+                    self.log("  (directory)")
+                    tar.add(SRC_PATH + path, arcname = path)
                 else:
-                    self.log("  WARNING : file doesn't exists")
+                    self.log("  WARNING : file doesn't exists : %s" % SRC_PATH + path)
             if info_file != None:
                 self.log("- info.json")
                 tar.add(info_file, arcname="info.json")
