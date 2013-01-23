@@ -7,7 +7,7 @@
 		"src/share/domogik/url2xpl/ozwave/on.xml",
 		"src/share/domogik/url2xpl/ozwave/off.xml",
 		"src/share/domogik/url2xpl/ozwave/Refresh.xml",
-		"src/share/domogik/data/ozwave/ozwconfig/*.*",
+		"src/share/domogik/data/ozwave/ozwconfig/",
 		"src/domogik_packages/xpl/bin/ozwave.py",
 		"src/domogik_packages/xpl/lib/ozwave.py",
 		"src/domogik_packages/xpl/lib/ozwdefs.py",
