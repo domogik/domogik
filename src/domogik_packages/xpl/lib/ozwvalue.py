@@ -230,33 +230,33 @@ class ZWaveValueNode:
                 msgtrig ['type'] = 'status'
                 msgtrig ['value'] = self.valueData['value']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
-                sendxPL = True
-            #    msgtrig['typexpl'] ='xpl-stat'
-                msgtrig['schema'] ='sensor.basic'
-                msgtrig ['genre'] = 'sensor'
-                if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
-                    msgtrig['value'] = round(self.valueData['value'],2)
-                else:
-                    msgtrig ['value'] = self.valueData['value']
-                msgtrig ['type'] = self.valueData['label'].lower()
-                msgtrig ['units']= self.valueData['units']
-        elif self.valueData['commandClass'] == 'COMMAND_CLASS_BATTERY' :
-                sendxPL = True
-                msgtrig['schema'] ='sensor.basic'
-                msgtrig ['genre'] = 'sensor'
+            sendxPL = True
+        #    msgtrig['typexpl'] ='xpl-stat'
+            msgtrig['schema'] ='sensor.basic'
+            msgtrig ['genre'] = 'sensor'
+            if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
+                msgtrig['value'] = round(self.valueData['value'],2)
+            else:
                 msgtrig ['value'] = self.valueData['value']
-                msgtrig ['units']= self.valueData['units']
+            msgtrig ['type'] = self.valueData['label'].lower()
+            msgtrig ['units']= self.valueData['units']
+        elif self.valueData['commandClass'] == 'COMMAND_CLASS_BATTERY' :
+            sendxPL = True
+            msgtrig['schema'] ='sensor.basic'
+            msgtrig ['genre'] = 'sensor'
+            msgtrig ['value'] = self.valueData['value']
+            msgtrig ['units']= self.valueData['units']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_METER' :
-                sendxPL = True
-                msgtrig['schema'] ='sensor.basic'
-                msgtrig ['genre'] = 'sensor'
-                msgtrig ['type'] = self.valueData['label'].lower()
-                if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
-                    msgtrig['value'] = round(self.valueData['value'],2)
-                else:
-                    msgtrig ['value'] = self.valueData['value']
-                msgtrig ['units']= self.valueData['units']
-                
+            sendxPL = True
+            msgtrig['schema'] ='sensor.basic'
+            msgtrig ['genre'] = 'sensor'
+            msgtrig ['type'] = self.valueData['label'].lower()
+            if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
+                msgtrig['value'] = round(self.valueData['value'],2)
+            else:
+                msgtrig ['value'] = self.valueData['value']
+            msgtrig ['units']= self.valueData['units']
+    
         if sendxPL :
             return msgtrig
         else : return None

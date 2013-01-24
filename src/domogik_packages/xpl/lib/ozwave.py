@@ -559,6 +559,18 @@ class OZWavemanager(threading.Thread):
         retval = self._controller.handle_Action(action)
         return retval
     
+    def  handle_ControllerSoftReset(self):
+        retval = {'error': ''}
+        if not self._controller.soft_reset() :
+            retval['error'] = 'No reset for secondary controller'
+        return retval
+        
+    def  handle_ControllerHardReset(self):
+        retval = {'error': ''}
+        if not self._controller.hard_reset() :
+            retval['error'] = 'No reset for secondary controller'
+        return retval
+    
     def getCountMsgQueue(self):
         """"Retourne le nombre de message
         :return: The count of messages in the outgoing send queue.

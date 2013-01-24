@@ -153,6 +153,16 @@ class OZwave(XplPlugin):
                                     'ctrlaction' : request['action'], 
                                     'data': info})
                 if request['cmd'] =='getState' and report['cmdstate'] != 'stop' : response = False
+            elif request['request'] == 'ctrlSoftReset' :
+                info = self.getUIdata2dict(self.myzwave.handle_ControllerSoftReset())
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'data': info})
+            elif request['request'] == 'ctrlHardReset' :
+                info = self.getUIdata2dict(self.myzwave.handle_ControllerHardReset())
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'data': info})   
             elif request['request'] == 'GetNetworkID' :
                 info = self.getUIdata2dict(self.myzwave.getNetworkInfo())
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -255,7 +265,8 @@ class OZwave(XplPlugin):
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : request['node'], 
-                                    'data': "unknown request"})
+                                    'data': "unknown request", 
+                                    'error': "unknown request"})
                 print "commande inconnue"
             if response : self.myxpl.send(mess)
                                   
