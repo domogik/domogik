@@ -216,7 +216,7 @@ class OZwave(XplPlugin):
                 print mess
             elif  request['request'] == 'GetValueInfos':
                 valId = long(request['valueid']) # Pour javascript type string
-                info =self.getUIdata2dict(self.myzwave.getValueInfos(valId))
+                info =self.getUIdata2dict(self.myzwave.getValueInfos(request['node'], valId))
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'valueid' : request['valueid'], 
@@ -248,7 +248,7 @@ class OZwave(XplPlugin):
             elif  request['request'] == 'setValue':
                 valId = long(request['valueid']) # Pour javascript type string
                 newvalue = request['newValue']
-                info = self.getUIdata2dict(self.myzwave.setValue(valId, newvalue))
+                info = self.getUIdata2dict(self.myzwave.setValue(request['node'], valId, newvalue))
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'listetypes' : 'valuestype', 

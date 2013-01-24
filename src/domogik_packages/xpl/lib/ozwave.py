@@ -657,17 +657,18 @@ class OZWavemanager(threading.Thread):
             return node.getValuesInfos()
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
         
-    def getValueInfos(self,  valId):
+    def getValueInfos(self,  nodeId,  valueId):
         """ Retourne les informations d'une value d'un device, format dict{} """
         retval={}
         if self.ready :
-            value = self._getValue(valId)
+            node = self._getNode(self.homeId,  nodeId)
+            value = node.getValue(valueId)
             if value :
                 retval = value.getInfos()
                 retval['error'] = ""
                 return retval
-            else : return {"error" : "Unknown value %d" % valId}
-        else : return {"error" : "Zwave network not ready, can't find value %d" % valId}
+            else : return {"error" : "Unknown value %d" % valueId}
+        else : return {"error" : "Zwave network not ready, can't find value %d" % valueId}
         
     def getValueTypes(self):
         """Retourne la liste des type de value possible et la doc"""
@@ -686,22 +687,23 @@ class OZWavemanager(threading.Thread):
         else : return {"error" : "Zwave network not ready, can't find controller"}
         
         
-    def setUINodeNameLoc(self,  nodeID,  newname, newloc):
+    def setUINodeNameLoc(self,  nodeId,  newname, newloc):
         """Change le nom et/ou le localisation du node dans OZW et dans le decive si celui-ci le supporte """
         if self.ready :
-            node = self._getNode(self.homeId,  nodeID)
+            node = self._getNode(self.homeId,  nodeId)
             if node.name != newname :
                 node.setName(newname)
             if node.location != newloc :
                 node.setLocation(newloc)
             return node.getInfos()                                
-        else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
+        else : return {"error" : "Zwave network not ready, can't find node %d" %nodeId}
         
-    def setValue(self,  valueId,  newValue):
+    def setValue(self,  nodeId,  valueId,  newValue):
         """Envoie la valeur a l'objet value"""
         retval={}
         if self.ready :
-            value = self._getValue(valueId)
+            node = self._getNode(self.homeId,  nodeId)
+            value = node.getValue(valueId)
             if value :
                 retval['value'] = value.setValue(newValue)
           #      print ('SetValue, relecture de la valeur : ',  value.getOZWValue())

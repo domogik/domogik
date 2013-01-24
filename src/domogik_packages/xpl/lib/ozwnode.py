@@ -584,12 +584,11 @@ class ZWaveNode:
    
     def getValue(self, valueId):
         """Renvoi la valueNode valueId du node."""
-        vid = valueId['id']
         retval= None
-        if self._values.has_key(vid):
-            retval = self._values[vid]
+        if self._values.has_key(valueId):
+            retval = self._values[valueId]
         else:
-            raise OZwaveNodeException('Value get received before creation (homeId %.8x, nodeId %d, valueid %s)' % (self.homeId, self.nodeId,  valueId))
+            raise OZwaveNodeException('Value get received before creation (homeId %.8x, nodeId %d, valueid %d)' % (self.homeId, self.nodeId,  valueId))
         return retval
         
     def setMembersGrps(self,  newGroups):
