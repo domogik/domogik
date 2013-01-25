@@ -236,7 +236,6 @@ class OZwave(XplPlugin):
                                     'listetypes' : 'cmdsctrl'})
                 i=1
                 for item in listeCmd:
-                    print 'adding : ',  item , ' : ',  listeCmd[item]
                     if item =='error':
                         if listeCmd[item] =='' : mess.add_data({'error' :  'no' })
                         else : mess.add_data({'error' :  listeCmd[item] })
@@ -261,10 +260,19 @@ class OZwave(XplPlugin):
                                     'node' : request['node'], 
                                     'data': info})               
                 print mess
+            elif  request['request'] == 'GetGeneralStats':
+                info = self.myzwave.getGeneralStatistics()
+                err = info['error']
+                del info['error']
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'error': err if err != '' else "no", 
+                                    'data': self.getUIdata2dict(info)})               
+                print mess                
+                
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
-                                    'node' : request['node'], 
                                     'data': "unknown request", 
                                     'error': "unknown request"})
                 print "commande inconnue"
