@@ -153,6 +153,16 @@ class OZwave(XplPlugin):
                                     'ctrlaction' : request['action'], 
                                     'data': info})
                 if request['cmd'] =='getState' and report['cmdstate'] != 'stop' : response = False
+            elif request['request'] == 'ctrlSoftReset' :
+                info = self.getUIdata2dict(self.myzwave.handle_ControllerSoftReset())
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'data': info})
+            elif request['request'] == 'ctrlHardReset' :
+                info = self.getUIdata2dict(self.myzwave.handle_ControllerHardReset())
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'data': info})   
             elif request['request'] == 'GetNetworkID' :
                 info = self.getUIdata2dict(self.myzwave.getNetworkInfo())
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -206,7 +216,7 @@ class OZwave(XplPlugin):
                 print mess
             elif  request['request'] == 'GetValueInfos':
                 valId = long(request['valueid']) # Pour javascript type string
-                info =self.getUIdata2dict(self.myzwave.getValueInfos(valId))
+                info =self.getUIdata2dict(self.myzwave.getValueInfos(request['node'], valId))
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'valueid' : request['valueid'], 
@@ -226,7 +236,6 @@ class OZwave(XplPlugin):
                                     'listetypes' : 'cmdsctrl'})
                 i=1
                 for item in listeCmd:
-                    print 'adding : ',  item , ' : ',  listeCmd[item]
                     if item =='error':
                         if listeCmd[item] =='' : mess.add_data({'error' :  'no' })
                         else : mess.add_data({'error' :  listeCmd[item] })
@@ -238,7 +247,7 @@ class OZwave(XplPlugin):
             elif  request['request'] == 'setValue':
                 valId = long(request['valueid']) # Pour javascript type string
                 newvalue = request['newValue']
-                info = self.getUIdata2dict(self.myzwave.setValue(valId, newvalue))
+                info = self.getUIdata2dict(self.myzwave.setValue(request['node'], valId, newvalue))
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'listetypes' : 'valuestype', 
@@ -251,11 +260,21 @@ class OZwave(XplPlugin):
                                     'node' : request['node'], 
                                     'data': info})               
                 print mess
+            elif  request['request'] == 'GetGeneralStats':
+                info = self.myzwave.getGeneralStatistics()
+                err = info['error']
+                del info['error']
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'error': err if err != '' else "no", 
+                                    'data': self.getUIdata2dict(info)})               
+                print mess                
+                
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
-                                    'node' : request['node'], 
-                                    'data': "unknown request"})
+                                    'data': "unknown request", 
+                                    'error': "unknown request"})
                 print "commande inconnue"
             if response : self.myxpl.send(mess)
                                   

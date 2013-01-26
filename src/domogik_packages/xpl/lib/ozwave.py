@@ -43,6 +43,7 @@ from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
 from ozwctrl import ZWaveController
 from ozwdefs import *
+from datetime import timedelta
 # import time
 # from time import sleep
 # import os.path
@@ -83,6 +84,7 @@ class OZWavemanager(threading.Thread):
         self._activeNodeId = None # node actif courant, pour utilisation dans les fonctions du manager
         self._ctrlnodeId = -1
         self._controller = None
+        self._timeStarted = 0
         self._nodes = dict()
         self._libraryTypeName = 'Unknown'
         self._libraryVersion = 'Unknown'
@@ -312,6 +314,7 @@ class OZWavemanager(threading.Thread):
         self._libraryVersion = self._manager.getLibraryVersion(self._homeId)
         self._libraryTypeName = self._manager.getLibraryTypeName(self._homeId)
         self._ctrlnodeId =  self._activeNodeId
+        self._timeStarted = time.time()
         self._log.info("Device %s ready. homeId is 0x%0.8x, controller node id is %d, using %s library version %s", self._device,  self._homeId, self._activeNodeId, self._libraryTypeName, self._libraryVersion)
         self._log.info('OpenZWave Initialization Begins.')
         self._log.info('The initialization process could take several minutes.  Please be patient.')
@@ -469,7 +472,7 @@ class OZWavemanager(threading.Thread):
         valueId = args['valueId']
         node = self._fetchNode(homeId, activeNodeId)
         node._lastUpdate = time.time()
-        valueNode = node.getValue(valueId)
+        valueNode = node.getValue(valueId['id'])
         valueNode.updateData(valueId) 
 #        print node.commandClasses 
         # formattage infos générales
@@ -559,6 +562,18 @@ class OZWavemanager(threading.Thread):
         retval = self._controller.handle_Action(action)
         return retval
     
+    def  handle_ControllerSoftReset(self):
+        retval = {'error': ''}
+        if not self._controller.soft_reset() :
+            retval['error'] = 'No reset for secondary controller'
+        return retval
+        
+    def  handle_ControllerHardReset(self):
+        retval = {'error': ''}
+        if not self._controller.hard_reset() :
+            retval['error'] = 'No reset for secondary controller'
+        return retval
+    
     def getCountMsgQueue(self):
         """"Retourne le nombre de message
         :return: The count of messages in the outgoing send queue.
@@ -645,17 +660,18 @@ class OZWavemanager(threading.Thread):
             return node.getValuesInfos()
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
         
-    def getValueInfos(self,  valId):
+    def getValueInfos(self,  nodeId,  valueId):
         """ Retourne les informations d'une value d'un device, format dict{} """
         retval={}
         if self.ready :
-            value = self._getValue(valId)
+            node = self._getNode(self.homeId,  nodeId)
+            value = node.getValue(valueId)
             if value :
                 retval = value.getInfos()
                 retval['error'] = ""
                 return retval
-            else : return {"error" : "Unknown value %d" % valId}
-        else : return {"error" : "Zwave network not ready, can't find value %d" % valId}
+            else : return {"error" : "Unknown value %d" % valueId}
+        else : return {"error" : "Zwave network not ready, can't find value %d" % valueId}
         
     def getValueTypes(self):
         """Retourne la liste des type de value possible et la doc"""
@@ -673,23 +689,38 @@ class OZWavemanager(threading.Thread):
             return retval
         else : return {"error" : "Zwave network not ready, can't find controller"}
         
+    def getGeneralStatistics(self):
+        """Retourne les statistic générales du réseaux"""
+        retval={}
+        if self.ready :
+            retval = self._controller.stats()
+            if retval : 
+                for  item in retval : retval[item] = str (retval[item]) # Pour etre compatible avec javascript
+                retval['error'] = ""
+            else : retval['error'] = "Zwave controller not response"
+            retval['msqueue'] = str(self.getCountMsgQueue())
+            retval['elapsedtime'] = str(timedelta(0,time.time()-self._timeStarted))
+            return retval
+        else : return {"error" : "Zwave network not ready, can't find controller"}        
         
-    def setUINodeNameLoc(self,  nodeID,  newname, newloc):
+        
+    def setUINodeNameLoc(self,  nodeId,  newname, newloc):
         """Change le nom et/ou le localisation du node dans OZW et dans le decive si celui-ci le supporte """
         if self.ready :
-            node = self._getNode(self.homeId,  nodeID)
+            node = self._getNode(self.homeId,  nodeId)
             if node.name != newname :
                 node.setName(newname)
             if node.location != newloc :
                 node.setLocation(newloc)
             return node.getInfos()                                
-        else : return {"error" : "Zwave network not ready, can't find node %d" %nodeID}
+        else : return {"error" : "Zwave network not ready, can't find node %d" %nodeId}
         
-    def setValue(self,  valueId,  newValue):
+    def setValue(self,  nodeId,  valueId,  newValue):
         """Envoie la valeur a l'objet value"""
         retval={}
         if self.ready :
-            value = self._getValue(valueId)
+            node = self._getNode(self.homeId,  nodeId)
+            value = node.getValue(valueId)
             if value :
                 retval['value'] = value.setValue(newValue)
           #      print ('SetValue, relecture de la valeur : ',  value.getOZWValue())
