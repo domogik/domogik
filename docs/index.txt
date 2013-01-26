@@ -73,3 +73,4 @@ Technical Documentation
 Developers Documentation
 ========================
 * :doc:`Developing a package </package_development/index>`
+* :doc:`Tools </tools/index>`

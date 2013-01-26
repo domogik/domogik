@@ -1,0 +1,39 @@
+=====
+Tools
+=====
+
+pylint-check.sh
+===============
+
+This is a script which check all *.py* files from a directory to get a note about their quality. 
+
+Example (we assert $DOMOGIK_HOME is the root of your Domogik repository): ::
+
+    $ cd $DOMOGIK_HOME/domogik/src/domogik/xpl/bin # for example
+    $ $DOMOGIK_HOME/domogik/src/tools/pylint-check.sh
+    [...]
+    Good files :                                                                    
+    ./cidmodem.py;9,49;OK                                                           
+    ./datetimemgr.py;8,71;OK                                                        
+    ./gagenda.py;9,80;OK                                                            
+    ./__init__.py;10,00;OK                                                          
+    ./ipx800.py;9,38;OK                                                             
+    ./manager.py;8,03;OK                                                            
+    ./mirror.py;9,17;OK                                                             
+    ./onewire.py;8,31;OK                                                            
+    ./plcbus.py;8,33;OK                                                             
+    ./send.py;9,57;OK                                                               
+    ./teleinfo.py;9,74;OK                                                           
+    ./wol_ping.py;9,32;OK                                                           
+    ./x10_heyu.py;8,18;OK                                                           
+    ./xbmc_not.py;9,51;OK                                                           
+    Bad files :                                                                     
+    ./dawndusk.py;3,17;KO                                                           
+    ./dbmgr.py;7,67;KO                                                              
+    ./dump_xpl.py;7,50;KO                                                           
+    ./module_sample.py;7,14;KO                                                      
+    ./rest.py;7,18;KO                                                               
+    ./test.py;-10,00;KO                                                            
+    ./test_send.py;7,83;KO         
+
+By default, a good file has a note greater or equals to 8,00/10. You can change this value in the script.
