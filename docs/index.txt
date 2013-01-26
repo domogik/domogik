@@ -37,6 +37,10 @@ End User Documentation
 
   * :doc:`Devices management </enduser/administration/device>` (*)
   * :doc:`Set up your devices </enduser/configuration/devices>` (*)
+
+* **Uninstallation:**
+
+  * :doc:`How to uninstall Domogik </enduser/installation/uninstall>` 
  
 Technical Documentation
 =======================

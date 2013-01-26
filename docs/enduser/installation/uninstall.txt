@@ -1,0 +1,18 @@
+=====================
+Uninstall Domogik
+=====================
+
+Overview
+========
+
+The uninstall tool will delete all the Domogik related files on your filesystem (even the configuration files) unless the development files if you are using Domogik sources. The database won't be deleted.
+
+Uninstall
+=========
+
+From the root of Domogik sources or the Domogik package, just do: ::
+
+    ./install/uninstall.sh
+
+ 
+
