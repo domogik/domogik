@@ -65,6 +65,7 @@ Technical Documentation
     * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
     * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
     * :doc:`REST /package </technical/rinor/rest_package>`: Packages
+    * :doc:`REST /host </technical/rinor/rest_host>`: Hosts informations
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
 

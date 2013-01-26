@@ -1,0 +1,50 @@
+==========
+REST /host
+==========
+
+Purpose
+=======
+
+The following commands are used to get informations about the hosts of the Domogik installation
+
+/host/
+======
+
+List all the hosts (aka managers) seen on xPL: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "host": [
+            {
+                "id": "darkstar",
+                "primary": "True"
+            },
+            {
+                "id": "ambre",
+                "primary": "False"
+            }
+        ]
+    }
+
+/host/<host>
+============
+
+Give details about an host: ::
+
+    {
+        "status": "OK",
+        "code": 0,
+        "description": "None",
+        "host": [
+            {
+                "status": "on",
+                "ip": "192.168.1.10",
+                "interval": 300,
+                "primary": "True",
+                "id": "darkstar",
+                "last_seen": 1325251443.82
+            }
+        ]
+    }
