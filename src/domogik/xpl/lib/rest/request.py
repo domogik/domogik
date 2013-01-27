@@ -82,34 +82,34 @@ class ProcessRequest():
     """
 
     urls = {
-	# /account
-        'account': {
-            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
+#	# /account
+#        'account': {
+#            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
 #            '^/account/user/list$':						                 '_rest_account_user_list',
 #            '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		         '_rest_account_user_list',
 #            '^/account/user/add/.*$':						                 '_rest_account_user_add',
 #            '^/account/user/update/.*$':				                         '_rest_account_user_update',
-            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
+#            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
 #            '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
 #            '^/account/person/list$':						                 '_rest_account_person_list',
 #            '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
 #            '^/account/person/add/.*$':					                         '_rest_account_person_add',
 #            '^/account/person/update/.*$':					                 '_rest_account_person_update',
-            '^/account/person/password/.*$':				                         '_rest_account_person_password',
+#            '^/account/person/password/.*$':				                         '_rest_account_person_password',
 #            '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
-        },
+#        },
         # /base
         'base': {
             # /base/device
 #            '^/base/device/list$':			                                         '_rest_base_device_list',
 #            '^/base/device/list-old$':			                                         '_rest_base_device_list_old',
-            '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
+#            '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
 #            '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
-            '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
-#            '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
+#            '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
+#            '^/base/device/update/.*$':		                                         '_rest_base_device_update',
 #            '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
-            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                  '_rest_base_device_addxplcmdparams',
-            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplstatparams',
+#            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplcmdparams',
+#            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                '_rest_base_device_addxplstatparams',
             # /base/device_technology
 #            '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
 #            '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
@@ -159,19 +159,19 @@ class ProcessRequest():
             '^/events/request/get/(?P<ticket_id>[0-9]+)$':				         '_rest_events_request_get',
             '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                 '_rest_events_request_free',
         },
-        # /helper
-        'helper': {
-            '^/helper/.*$':			                                                 'rest_helper',
-        },
-        # /host
-        'host': {
-            '^/host/.*$':			                                                 'rest_host',
-        },
-        # /log
-        'log': {
-            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
-            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
-        },
+#        # /helper
+#        'helper': {
+#            '^/helper/.*$':			                                                 'rest_helper',
+#        },
+#        # /host
+#        'host': {
+#            '^/host/.*$':			                                                 'rest_host',
+#        },
+#        # /log
+#        'log': {
+#            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
+#            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
+#        },
         # /package
         'package': {
 #            '^/package/get-mode$':								 '_rest_package_get_mode',

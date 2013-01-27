@@ -68,6 +68,7 @@ import domogik.xpl.lib.rest.urls.status
 # more complex URLS
 from domogik.xpl.lib.rest.urls.device import *
 from domogik.xpl.lib.rest.urls.package import *
+from domogik.xpl.lib.rest.urls.helper import *
 
 # Pure REST API
 from domogik.xpl.lib.rest.urls.device_usage import deviceUsageAPI
@@ -75,3 +76,4 @@ from domogik.xpl.lib.rest.urls.device_technology import deviceTechnologyAPI
 from domogik.xpl.lib.rest.urls.device_type import deviceTypeAPI
 from domogik.xpl.lib.rest.urls.person import personAPI
 from domogik.xpl.lib.rest.urls.account import AccountAPI
+from domogik.xpl.lib.rest.urls.host import hostAPI

@@ -704,6 +704,7 @@ class Rest(XplPlugin):
         urlHandler.apiversion = self._rest_api_version
         urlHandler.use_ssl = self.use_ssl
         urlHandler.hostname = self.get_sanitized_hostname()
+        urlHandler.hosts_list = self._hosts_list
         # xpl handler
         urlHandler.xpl = self.myxpl 
         

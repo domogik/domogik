@@ -28,9 +28,33 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.lib.rest.url import db_helper, json_response, register_api
+from domogik.xpl.lib.rest.url import db_helper, json_response, register_api, urlHandler
 from flask import g as dbHelper, request
 from flask.views import MethodView
+
+@urlHandler.route('/account/user/password/', methods=['GET'])
+@db_helper
+@json_response
+def user_password():
+    change_ok = dbHelper.db.change_password(request.args.get("id"), \
+                                          request.args.get("old"), \
+                                          request.args.get("new"))
+    if change_ok == True:
+        account = self._db.get_user_account(request.args.get("id"))
+        return 200, account
+    else:
+        return 204, ""
+
+@urlHandler.route('/account/auth/<login>/<password>/', methods=['GET'])
+@db_helper
+@json_response
+def account_auth(login, password):
+        login_ok = dbHelper.db.authenticate(login, password)
+        if login_ok == True:
+            account = dbHelper.db.get_user_account_by_login(login)
+            return 200, account
+        else:
+            return 204, ""
 
 class AccountAPI(MethodView):
     """ class to handle all /account urls """
@@ -38,7 +62,7 @@ class AccountAPI(MethodView):
 
     def get(self, aid):
         """ GET /account/<aid> """
-        if id != None:
+        if aid != None:
             dbr = dbHelper.db.get_user_account(aid)
         else:
             dbr = dbHelper.db.list_user_accounts()
