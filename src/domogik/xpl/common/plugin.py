@@ -278,8 +278,11 @@ class XplPlugin(BasePlugin):
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("domogik.system")
-        mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-            "host": self.get_sanitized_hostname()})
+        #mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
+        #    "host": self.get_sanitized_hostname()})
+        mess.add_data({"command":"stop", 
+                       "host": self.get_sanitized_hostname(),
+                       "plugin": self.get_plugin_name()})
         self.myxpl.send(mess)
 
     def _send_hbeat_end(self):
