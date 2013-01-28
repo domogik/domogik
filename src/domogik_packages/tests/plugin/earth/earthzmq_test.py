@@ -128,19 +128,19 @@ class PluginTestCase(unittest.TestCase):
                     raise RuntimeError("No answer received for key %s, check your cron xpl setup" % (key))
             except KeyError:
                 pass
+        res = True
         if 'error' not in self._result:
             if dictkeys != None:
-                res = True
                 for mykey in dictkeys :
                     if mykey not in self._result :
                         res = False
+            if dictkeyvals != None:
                 for mykey in dictkeyvals :
                     if mykey not in self._result :
                         res = False
                     elif self._result[mykey] != dictkeyvals[mykey]:
                         res = False
-                return res
-            return False
+            return res
         else:
             print("Error %s when communicating key %s" % (self._result['errorcode'], key))
             print("%s : %s" % (self._result['errorcode'], self._result['error']))
@@ -156,8 +156,6 @@ class PluginTestCase(unittest.TestCase):
         self.xpltype = "xpl-trig"
         #global messagingreq
         #self.messaging_req = messagingreq
-        #global sendrequest
-        #self.__sendrequest = sendrequest
         self.messaging_req = MessagingReq()
         self.category = "plugin.earth"
         #self.category_filters = ["admin.list","admin.event","admin.status","enabled"]
@@ -422,6 +420,22 @@ class DawnDuskTestCase(PluginTestCase):
         keyvalss = None
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
+    def test_840_stop_dawn(self):
+        action = "admin.stop"
+        request = {}
+        request["type"] =  "dawn"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"dawn", 'current' : 'stopped','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
+    def test_841_resume_dawn(self):
+        action = "admin.resume"
+        request = {}
+        request["type"] =  "dawn"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"dawn", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
     def test_850_halt_dawn(self):
         action = "admin.halt"
         request = {}
@@ -500,6 +514,22 @@ class MoonPhasesTestCase(PluginTestCase):
         keyvalss = {"type":"fullmoon", 'current' : 'started','delay' : '0'}
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
+    def test_120_stop_fullmoon(self):
+        action = "admin.stop"
+        request = {}
+        request["type"] =  "fullmoon"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"fullmoon", 'current' : 'stopped','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
+    def test_121_resume_fullmoon(self):
+        action = "admin.resume"
+        request = {}
+        request["type"] =  "fullmoon"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"fullmoon", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
     def test_130_info(self):
         action = "admin.info"
         request = {}
@@ -510,6 +540,22 @@ class MoonPhasesTestCase(PluginTestCase):
 
     def test_150_add_new_moon(self):
         action = "admin.start"
+        request = {}
+        request["type"] =  "newmoon"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"newmoon", 'current' : 'started','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
+    def test_157_stop_newmoon(self):
+        action = "admin.stop"
+        request = {}
+        request["type"] =  "newmoon"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"newmoon", 'current' : 'stopped','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
+    def test_158_resume_newmoon(self):
+        action = "admin.resume"
         request = {}
         request["type"] =  "newmoon"
         keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
@@ -626,14 +672,14 @@ class MoonPhasesTestCase(PluginTestCase):
         keyvalss = {"type":"lastquarter", 'current' : 'started','delay' : delay}
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
-    def test_300_list(self):
+    def test_300_memory(self):
         action = "memory"
         request = {}
         keys = ['memory', 'events', 'store', 'datafiles', 'zmq']
         keyvalss = None
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
-    def test_310_memory(self):
+    def test_310_list(self):
         action = "admin.list"
         request = {}
         keys = ['count']
@@ -708,6 +754,13 @@ class MoonPhasesTestCase(PluginTestCase):
         keyvalss = {'type' : 'moonphase', 'status' : 'lastquarter'}
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
+    def test_500_list(self):
+        action = "admin.list"
+        request = {}
+        keys = ['count']
+        keyvalss = None
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
     def test_600_simulate_firstquarter_moins(self):
         message = XplMessage()
         message.set_type("xpl-trig")
@@ -774,6 +827,13 @@ class MoonPhasesTestCase(PluginTestCase):
         keyvalss = {"type":"fullmoon", 'current' : 'halted','delay' : '0'}
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
+    def test_901_list(self):
+        action = "admin.list"
+        request = {}
+        keys = ['count']
+        keyvalss = None
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
     def test_903_halt_full_moon_delay_plus(self):
         action = "admin.halt"
         request = {}
@@ -792,6 +852,22 @@ class MoonPhasesTestCase(PluginTestCase):
         request["delay"] =  delay
         keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
         keyvalss = {"type":"fullmoon", 'current' : 'halted','delay' : delay}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
+    def test_907_stop_newmoon(self):
+        action = "admin.stop"
+        request = {}
+        request["type"] =  "newmoon"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"newmoon", 'current' : 'stopped','delay' : '0'}
+        self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
+
+    def test_908_resume_newmoon(self):
+        action = "admin.resume"
+        request = {}
+        request["type"] =  "newmoon"
+        keys = ['uptime', 'fullruntime', 'runtime', 'runs', 'next']
+        keyvalss = {"type":"newmoon", 'current' : 'started','delay' : '0'}
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
     def test_910_halt_newmoon(self):
@@ -898,6 +974,7 @@ class MoonPhasesTestCase(PluginTestCase):
         keyvalss = None
         self.assertTrue(self.send_request(self.category, action, request, keys, keyvalss))
 
+
 if __name__ == '__main__':
 
     #messagingreq = MessagingReq()
@@ -905,11 +982,14 @@ if __name__ == '__main__':
     sendplugin = XplPlugin(name = 'eartht', daemonize = False, \
             parser = None, nohub = True)
 
+
     #unittest.main()
     suite = unittest.TestLoader().loadTestsFromTestCase(GeneralTestCase)
     suite.addTests(unittest.TestLoader().loadTestsFromTestCase(DawnDuskTestCase))
     suite.addTests(unittest.TestLoader().loadTestsFromTestCase(MoonPhasesTestCase))
+
     unittest.TextTestRunner(verbosity=3).run(suite)
+
 
     sendplugin.force_leave()
     #messagingreq.s_req.close()
