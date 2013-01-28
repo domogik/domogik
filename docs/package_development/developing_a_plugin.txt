@@ -53,12 +53,32 @@ Physical devices and interfaces
 
 * A plugin don't have to be launched as root : if necessary, the plugin documentation must explain how to access the plugin device without needing to be root : this should be done  by providing a sample udev rule in the :doc:`json file <json_file>`.
 
-Web services or web features 
+    Web services or web features 
 ----------------------------
 * A plugin that needs a web service should not keep a connexion (user session) always open : being connected 24H/24 to a webservice is not a good idea in terms of bandwidtch, security, ... So, the plugin should connect to the web service only when it needs it. 
 
 Python code
 ===========
+
+Coding conventions
+------------------
+
+See `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`_
+
+Specific rules we follow when coding
+************************************
+
+*Private* instance variables that cannot be accessed except from inside an object don’t exist in Python. Although there are recommended conventions they still remain more or less evasive. So we decided to adopt our own conventions following as close as possible the PEP8 ones.
+
+Classes:
+
+* Private attributes / methods are systematically prefixed by a double underscore : __foo
+* If we consider that the attribute / method can be accessed by derivated objects then we prefix them by a simple underscore : _foo 
+
+Modules (no class)
+
+* Use a simple underscore for variables / functions that shouldn't be directly accessible. So they won't be usable when the module will be imported. 
+
 
 Configuration management
 ------------------------
