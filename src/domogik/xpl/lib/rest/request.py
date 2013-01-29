@@ -106,10 +106,13 @@ class ProcessRequest():
             '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
+            '^/base/device/updateglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_updateglobal',
             '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
             '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
             '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                  '_rest_base_device_addxplcmdparams',
             '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplstatparams',
+            '^/base/device/updatexplcmdparams/id/(?P<id>[0-9]+)/.*$':                            '_rest_base_device_updatexplcmdparams',
+            '^/base/device/udpatexplstatparams/id/(?P<id>[0-9]+)/.*$':                           '_rest_base_device_updatexplstatparams',
             # /base/device_technology
             '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
             '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
@@ -1745,7 +1748,22 @@ class ProcessRequest():
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
         self.send_http_response_ok(json_data.get())
-    
+
+    def _rest_base_device_updateglobal(self, id):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        dev = self._db.get_device(id)
+        js = self._rest_base_deviceparams(dev.device_type_id, json=False)
+        for x in self._db.get_xpl_command_by_device_id(id):
+             for p in x.params:
+                 if self.get_parameters(p.key) is not None:
+                     self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key)))
+        for x in self._db.get_xpl_stat_by_device_id(id):
+             for p in x.params:
+                 if self.get_parameters(p.key) is not None:
+                     self._db.update_xpl_stat_param(statid=x.id, key=p.key, value=self.get_parameters(p.key), static=True)
+        self.send_http_response_ok(json_data.get())
+   
     def _rest_base_device_addxplcmdparams(self, id):
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1787,6 +1805,25 @@ class ProcessRequest():
             # go and add the param
             self._db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
         self.send_http_response_ok(json_data.get())
+
+    def _rest_base_device_updatexplcmdparams(self, id):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        for x in self._db.get_xpl_command(id):
+             for p in x.params:
+                 if self.get_parameters(p.key) is not None:
+                     self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key)))
+        self.send_http_response_ok(json_data.get())
+ 
+    def _rest_base_device_updatexplstatparams(self, id):
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        for x in self._db.get_xpl_stat(id):
+             for p in x.params:
+                 if self.get_parameters(p.key) is not None:
+                     self._db.update_xpl_stat_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key)))
+        self.send_http_response_ok(json_data.get())
+ 
  
     def _rest_base_device_addxplstatparams(self, id):
         json_data = JSonHelper("OK")
