@@ -1757,7 +1757,7 @@ class ProcessRequest():
         for x in self._db.get_xpl_command_by_device_id(id):
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
-                     self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key)))
+                     self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
         for x in self._db.get_xpl_stat_by_device_id(id):
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
@@ -1812,7 +1812,7 @@ class ProcessRequest():
         for x in self._db.get_xpl_command(id):
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
-                     self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key)))
+                     self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
         self.send_http_response_ok(json_data.get())
  
     def _rest_base_device_updatexplstatparams(self, id):
@@ -1821,7 +1821,7 @@ class ProcessRequest():
         for x in self._db.get_xpl_stat(id):
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
-                     self._db.update_xpl_stat_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key)))
+                     self._db.update_xpl_stat_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
         self.send_http_response_ok(json_data.get())
  
  
