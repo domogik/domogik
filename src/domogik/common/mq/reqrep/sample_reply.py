@@ -4,12 +4,12 @@
 # Sample Reply
 
 import json
-from messaging_reqrep import MessagingRep
+from mq_reqrep_utils import MqRep
 from time import sleep
 
 print("Reply sample")
 
-msg_rep = MessagingRep()
+msg_rep = MqRep()
 
 while True:
     print("Waiting for request...")
