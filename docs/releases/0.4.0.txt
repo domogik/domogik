@@ -1,0 +1,14 @@
+=============
+Release 0.4.0
+=============
+
+.. todo::
+    This release is actually in alpha/beta/rc status. This page will be updated soon.
+
+New features 
+============
+
+New DB schema
+*************
+A new DB schema has been implemented, with this new schema we removed the features but add support for multiple adress fields (like address and channel). We also added support for devices that use a different address for receiving commands and for sending there statusses. With this implementation we increased the plugin json_version to 2, meaning that the old plugins will not work in this release.
+

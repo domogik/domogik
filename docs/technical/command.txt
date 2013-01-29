@@ -1,0 +1,15 @@
+========
+Commands
+========
+
+.. warning ::
+
+    All the actuators are not listed in this page. This page purpose is to give some examples.
+
+A command is an action that can be done on a device, like switching it on or off, setting the dimmer value, ...
+The opposit of a command is a :doc:`Sensor </technical/sensor>`.
+Note that some devices can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
+
+A command is defined in the the plugin :doc:`json file </package_development/json_file>`, on device creation the commands devined in the plugin json file and linked to the to create device type will be inserted in the DB. A command can be executed by calling a rest url :doc:`/cmd </technical/rinor/rest_command.txt>`.
+
+A command can have parameters that are required to successfully execute the command, typically the result of a widget.
