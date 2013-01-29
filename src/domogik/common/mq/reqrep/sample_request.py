@@ -3,7 +3,7 @@
 
 # Sample Request
 
-from messaging_reqrep import MessagingReq
+from mq_reqrep_utils import MqReq
 from random import choice
 
 print("Requester sample")
@@ -13,7 +13,7 @@ categories = {
     'plugin' : ['list', 'enable', 'disable'],
 }
 
-msg_req = MessagingReq()
+msg_req = MqReq()
 i=0
 while True:
     category = choice(categories.keys())
