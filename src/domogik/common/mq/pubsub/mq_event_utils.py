@@ -42,21 +42,21 @@ from domogik.common.configloader import Loader
 
 MSG_VERSION = "0_1"
 
-class MessagingEvent:
+class MqEvent:
     def __init__(self, caller_id):
         if caller_id is None:
             raise Exception("Caller id can't be empty!")
         self.caller_id = caller_id
         self.context = zmq.Context()
-        cfg = Loader('messaging').load()
-        self.cfg_messaging = dict(cfg[1])
+        cfg = Loader('mq').load()
+        self.cfg_mq = dict(cfg[1])
 
-class MessagingEventPub(MessagingEvent):
+class MqEventPub(MqEvent):
     def __init__(self, caller_id):
-        MessagingEvent.__init__(self, caller_id)
-        self.log = logger.Logger('messaging_event_pub').get_logger()
+        MqEvent.__init__(self, caller_id)
+        self.log = logger.Logger('mq_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
-        pub_addr = "tcp://localhost:%s" % self.cfg_messaging['event_pub_port']
+        pub_addr = "tcp://localhost:%s" % self.cfg_mq['event_pub_port']
         self.log.debug("Publishing on address : %s" % pub_addr)
         self.s_send.connect(pub_addr)
         # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
@@ -79,12 +79,12 @@ class MessagingEventPub(MessagingEvent):
         self.s_send.send(content)
         self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
 
-class MessagingEventSub(MessagingEvent):
+class MqEventSub(MqEvent):
     def __init__(self, caller_id, *category_filters):
-        MessagingEvent.__init__(self, caller_id)
-        self.log = logger.Logger('messaging_event_sub').get_logger()
+        MqEvent.__init__(self, caller_id)
+        self.log = logger.Logger('mq_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
-        sub_addr = "tcp://localhost:%s" % self.cfg_messaging['event_sub_port']
+        sub_addr = "tcp://localhost:%s" % self.cfg_mq['event_sub_port']
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
 

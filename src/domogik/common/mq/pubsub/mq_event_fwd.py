@@ -39,9 +39,9 @@ from domogik.common.configloader import Loader
 from domogik.common import logger
 
 def main():
-    cfg = Loader('messaging').load()
+    cfg = Loader('mq').load()
     cfg_messaging = dict(cfg[1])
-    log = logger.Logger('messaging_event_fwd').get_logger()
+    log = logger.Logger('mq_event_fwd').get_logger()
     
     try:
         context = zmq.Context(1)

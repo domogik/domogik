@@ -1,9 +1,9 @@
 - Make sure to add in /etc/domogik.cfg :
-[messaging]
+[mq]
 event_pub_port = 40410
 event_sub_port = 40411
 
-- Run ./messaging_event_fwd.py
+- Run ./mq_event_fwd.py
 
 - Run ./sample_receiver.py [filter1] [filter2] ... [filterN]
 You can ran as many instances as you want.

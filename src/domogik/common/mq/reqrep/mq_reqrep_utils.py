@@ -27,13 +27,13 @@ def as_python_object(dct):
         return pickle.loads(str(dct['_python_object']))
     return dct
 
-class MessagingReqRep:
+class MqReqRep:
     def __init__(self):
         self.context = zmq.Context()
 
-class MessagingReq(MessagingReqRep):
+class MqReq(MqReqRep):
     def __init__(self):
-        MessagingReqRep.__init__(self)
+        MqReqRep.__init__(self)
         self.s_req = self.context.socket(zmq.REQ)
         self.s_req.connect(PORT_REQ)
 
@@ -47,9 +47,9 @@ class MessagingReq(MessagingReqRep):
 
         return reply
 
-class MessagingRep(MessagingReqRep):
+class MqRep(MqReqRep):
     def __init__(self):
-        MessagingReqRep.__init__(self)
+        MqReqRep.__init__(self)
         self.s_rep = self.context.socket(zmq.REP)
         self.s_rep.connect(PORT_REP)
 
