@@ -465,7 +465,8 @@ class Sensor(Base):
 
 class SensorHistory(Base):
     __tablename__ = '%s_sensor_history' % _db_prefix
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk')
+    id = Column(Integer, primary_key=True) 
+    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename()), nullable=False)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float, nullable=False)
     value_str = Column(Unicode(32), nullable=False)

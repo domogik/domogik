@@ -217,6 +217,7 @@ class ProcessRequest():
         },
         # /stats
         'stats': {
+            '^/stats/(?P<device_id>[0-9]+)/keys$':						     '_rest_stats_keys',
             '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/all$':				     '_rest_stats_all',
             '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/latest$':				     '_rest_stats_last',
             '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/last/(?P<num>[0-9]+)$':		     '_rest_stats_last',
@@ -899,7 +900,14 @@ class ProcessRequest():
                                         "exists" : False})
             idx += 2
         self.send_http_response_ok(json_data.get())
-
+  
+    def _rest_stats_keys(self, device_id):
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("stats")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        for b in self._db.lis_device_stats_distinct_key(device_id):
+            json_data.add_data(b.skey)
+        self.send_http_response_ok(json_data.get())
 
     def _rest_stats_all(self, device_id, key):
         """ Get all values for device/key in database

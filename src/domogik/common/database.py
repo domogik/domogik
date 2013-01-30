@@ -891,7 +891,7 @@ class DbHelper():
         filters = {}
         filters['device_id'] = ds_device_id
         return self.__session.query(
-                            DeviceStats
+                            DeviceStats.skey
                         ).filter_by(**filters
                         ).distinct()
 
