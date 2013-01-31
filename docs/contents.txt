@@ -28,6 +28,7 @@ Table Of Content
     /technical/sensor
     /technical/device_feature_usage
     /technical/database
+    /technical/manager/index
     /technical/network_ports
     /technical/rinor/index
     /technical/rinor/statmgr

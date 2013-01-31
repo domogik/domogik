@@ -11,7 +11,7 @@ For configuration, REST works directly with databse.
 
 xPL Schema 
 ==========
-The :doc:`domogik.system </technical/xpl_domogik_system>` xPL schema is used to manage plugins by sending commands and gettings informations from the :doc:`manager </technical/manager>`. 
+The :doc:`domogik.system </technical/xpl_domogik_system>` xPL schema is used to manage plugins by sending commands and gettings informations from the :doc:`manager </technical/manager/index>`. 
 
 List plugins
 ============

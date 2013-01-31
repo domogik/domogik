@@ -49,6 +49,8 @@ Technical Documentation
 * :doc:`Actuators </technical/actuator>`
 * :doc:`Sensors </technical/sensor>`
 * :doc:`Device types, features and usages  </technical/device_feature_usage>`
+* **Manager:**
+  :doc:`Overview </technical/manager/index>`
 * **Database:**
   :doc:`Model </technical/database>`
 * **RINOR:**
@@ -68,6 +70,18 @@ Technical Documentation
     * :doc:`REST /host </technical/rinor/rest_host>`: Hosts informations
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
+* **xPL messages:**
+
+  * All the official xPL messages can be found `on the xPL project website <http://xplproject.org.uk/wiki/index.php?title=XPL_Message_Schema>`_.
+  * :doc:`domogik.system (Domogik internal communication) </technical/xpl/internal>`
+  * :doc:`domogik.package (Domogik internal communication) </technical/xpl/internal>`
+  * Teleinfo
+
+    * :doc:`teleinfo.basic </technical/xpl/teleinfo>`
+    * :doc:`teleinfo.short </technical/xpl/teleinfo>`
+
+  * :doc:`plcbus.basic </technical/xpl/plcbus.basic>`
+  * :doc:`weather.basic </technical/xpl/weather.basic>`
 
 
 Developers Documentation
