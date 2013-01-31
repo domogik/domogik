@@ -321,7 +321,7 @@ class IPX:
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_LOW:
             current = "low"
         else:
-            current = data['value']
+            current = float(data['value'])
 
         # translate type
         if data['elt'] == "led":
@@ -336,7 +336,7 @@ class IPX:
                 # TODO : type to change in f(anselect)
                 sel = self.ipx_anselect[data['num']]
                 if sel == '0':
-                    elt_type = None
+                    elt_type = 'generic'
                 elif sel == '1':
                     elt_type = 'voltage'
                     current = current * 0.00323

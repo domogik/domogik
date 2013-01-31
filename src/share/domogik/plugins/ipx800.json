@@ -118,6 +118,66 @@
             "value_type": "number"
         }, 
         {
+            "device_type_id": "relayboard.analog_input_anselect0", 
+            "feature_type": "sensor", 
+            "id": "relayboard.analog_input_anselect0.analog_input", 
+            "name": "Analog input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "generic", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "relayboard.analog_input_anselect1", 
+            "feature_type": "sensor", 
+            "id": "relayboard.analog_input_anselect1.analog_input", 
+            "name": "Analog input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "voltage", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "relayboard.analog_input_anselect2", 
+            "feature_type": "sensor", 
+            "id": "relayboard.analog_input_anselect2.analog_input", 
+            "name": "Analog input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "temp", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "relayboard.analog_input_anselect3", 
+            "feature_type": "sensor", 
+            "id": "relayboard.analog_input_anselect3.analog_input", 
+            "name": "Analog input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "percent", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "relayboard.analog_input_anselect4", 
+            "feature_type": "sensor", 
+            "id": "relayboard.analog_input_anselect4.analog_input", 
+            "name": "Analog input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "temp", 
+            "value_type": "number"
+        }, 
+        {
+            "device_type_id": "relayboard.analog_input_anselect5", 
+            "feature_type": "sensor", 
+            "id": "relayboard.analog_input_anselect5.analog_input", 
+            "name": "Analog input", 
+            "parameters": "{}", 
+            "return_confirmation": "0", 
+            "stat_key": "percent", 
+            "value_type": "number"
+        }, 
+        {
             "device_type_id": "relayboard.counter", 
             "feature_type": "sensor", 
             "id": "relayboard.counter.counter", 
@@ -140,9 +200,39 @@
             "name": "Digital input"
         }, 
         {
-            "description": "Analog input", 
+            "description": "Analog input (ipx800 v1, pro, v2)", 
             "id": "relayboard.analog_input", 
-            "name": "Analog input"
+            "name": "Analog input (ipx800 v1, pro, v2)"
+        }, 
+        {
+            "description": "Analog input (ipx800 v3) : Analog", 
+            "id": "relayboard.analog_input_anselect0", 
+            "name": "Analog input (ipx800 v3) : Analog"
+        }, 
+        {
+            "description": "Analog input (ipx800 v3) : Volt", 
+            "id": "relayboard.analog_input_anselect1", 
+            "name": "Analog input (ipx800 v3) : Volt"
+        }, 
+        {
+            "description": "Analog input (ipx800 v3) : Temperature (TC4012 Sensor)", 
+            "id": "relayboard.analog_input_anselect2", 
+            "name": "Analog input (ipx800 v3) : Temperature (TC4012 Sensor)"
+        }, 
+        {
+            "description": "Analog input (ipx800 v3) : Percent (SHT-X3:Light-LS100)", 
+            "id": "relayboard.analog_input_anselect3", 
+            "name": "Analog input (ipx800 v3) : Percent (SHT-X3:Light-LS100)"
+        }, 
+        {
+            "description": "Analog input (ipx800 v3) : Temperature (SHT-X3:Temp-TC5050)",
+            "id": "relayboard.analog_input_anselect4", 
+            "name": "Analog input (ipx800 v3) : Temperature (SHT-X3:Temp-TC5050)"
+        }, 
+        {
+            "description": "Analog input (ipx800 v3) : Percent (SHT-X3:RH-SH100)", 
+            "id": "relayboard.analog_input_anselect5", 
+            "name": "Analog input (ipx800 v3) : Percent (SHT-X3:RH-SH100)"
         }, 
         {
             "description": "Counter", 
