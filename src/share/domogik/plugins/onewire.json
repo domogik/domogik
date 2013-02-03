@@ -234,7 +234,7 @@
 	"temperature": {
 		"name": "temperature",
                 "unit": "C",
-                "value_type": "number",
+                "value_type": "number"
 	},
 	"serial": {
 		"name": "serial",
