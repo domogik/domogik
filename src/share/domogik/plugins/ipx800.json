@@ -159,7 +159,7 @@
         "voltage": {
                 "name": "voltage",
                 "unit": "V",
-                "value_type": "range",
+                "value_type": "number",
                 "values": [0, 100]
         },
         "count": {
