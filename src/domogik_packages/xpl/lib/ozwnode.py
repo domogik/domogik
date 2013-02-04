@@ -636,6 +636,7 @@ class ZWaveNode:
         
     def sendCmdBasic(self, instance,  command,  opt):
         """Envoie une commande au node"""
+        retval = {'error' : ''}
         if (opt != "") and (opt != 'None'):
             opt = int(opt)
         else : opt = 0
@@ -648,6 +649,7 @@ class ZWaveNode:
                 self.setOff()
             else : 
                 self._ozwmanager._log.info("xPL to ozwave unknown command : %s , nodeId : %d",  command,  self.nodeId)
+                retval['error'] = ("xPL to ozwave unknown command : %s , nodeId : %d",  command,  self.nodeId)
         else : # instance secondaire, utilisation de set value
             print ("instance secondaire")
             cmdsClass= ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY','COMMAND_CLASS_SWITCH_MULTILEVEL']
@@ -657,9 +659,14 @@ class ZWaveNode:
                 if (val['commandClass'] in cmdsClass)  and val['instance'] == instance :                 
                     if command=='on' : opt = 255
                     elif command=='off' : opt = 0
-                    self.values[value].setValue(opt)
+                    retval = self.values[value].setValue(opt)
                     break
-        print ("commande transmise")
+        if retval['error'] == '' :
+            self._ozwmanager._log.debug("xPL to ozwave sended command : %s , nodeId : %d",  command,  self.nodeId)
+            print ("commande transmise")
+        else :
+            self._ozwmanager._log.debug("xPL to ozwave not sended command : %s , nodeId : %d, error : %s",  command,  self.nodeId,  retval['error'])
+            print("commande non transmise, erreur : %s" %retval['error'])
         
     def __str__(self):
         return 'homeId: [{0}]  nodeId: [{1}] product: {2}  name: {3}'.format(self._homeId, self._nodeId, self._product, self._name)

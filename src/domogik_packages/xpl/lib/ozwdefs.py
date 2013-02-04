@@ -43,7 +43,7 @@ import os.path
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.1b6"
+OZWPLuginVers = "0.1b7"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
@@ -70,7 +70,19 @@ Capabilities = ['Primary Controller', 'Secondary Controller', 'Static Update Con
 
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
-                               'COMMAND_CLASS_SENSOR_MULTILEVEL', 'COMMAND_CLASS_BATTERY',  'COMMAND_CLASS_METER']
+                               'COMMAND_CLASS_SENSOR_MULTILEVEL', 'COMMAND_CLASS_BATTERY',  'COMMAND_CLASS_METER', 
+                               'COMMAND_CLASS_SWITCH_MULTILEVEL', ]
+                               
+# Listes des types reconnues comme device domogik (label openzwave)
+# TODO: CONSTANTE à remplacer après passage au MQ
+DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery-level', 'sensor', 'status', # sensor
+                                  'power', 'energy', 'previous-reading', 'luminance',  'general', 'motion',
+                                  'alarm-type', 'alarm-level', 'count', 'instant-energy-production', 'total-energy-production',
+                                  'energy-production-today', 'total-production-time', 'indicator', 'locked', 'level',
+                                  'operating-state', 
+                                  'basic', 'switch', 'step-size', 'inc', 'dec', 'bright', 'dim',  'toggle-switch',  # Actuaror
+                                  'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint']
+
                                
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
