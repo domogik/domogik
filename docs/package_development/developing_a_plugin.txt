@@ -4,7 +4,7 @@ Developing a plugin
 
 Plugin name
 ===========
-The plugin name must have a maxium size of 8 characters. This restriction is linked to xPL.
+The plugin name must have a maxium size of 8 characters and must be lower case. This restriction is linked to xPL.
 
 Version number
 ==============
