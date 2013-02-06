@@ -63,6 +63,7 @@ class DemoData():
     # humidity
     # pressure
     def weather_data(self):
+        self.log.debug("Get weather data")
         try:
             data = urlopen('http://openweathermap.org/data/2.1/find/name?q=paris&lang=fr')
             cities = load(data)
@@ -84,6 +85,7 @@ class DemoData():
             self.log.error("Error while getting weather data")
 
     def teleinfo_data(self):
+        self.log.debug("Simulate teleinfo data")
         try:
             # Demo trame :
             #adco=030928084432
@@ -211,6 +213,7 @@ class DemoData():
     # tank
     # level and distance 
     def tank_data(self):
+        self.log.debug("Simulate tank data")
         try:
             now = datetime.datetime.now()
             minute = (now - now.replace(hour=0,minute=0,second=0)).seconds / 60
