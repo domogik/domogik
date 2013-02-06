@@ -1,0 +1,153 @@
+==========================
+Controller & devices tools
+==========================
+
+.. |menu2| image:: ozwave_menu-ctrldev.png
+    :width: 500px
+
+|menu2|
+
+Get Zwave controller informations
+=================================
+
+.. |check-ctrl1| image:: ozwave_check-ctrl1.png
+    :width: 600px
+
+.. |bt-refresh-ctrl| image:: ozwave_btrefresh-ctrl.png
+    :width: 60px
+
+- you can check to verify the information on zwave network state and controller in the first part of the page.
+
+|check-ctrl1|
+
+The status information can be refreshed using button. |bt-refresh-ctrl|
+
+Get Zwave devices (Nodes) informations
+======================================
+
+On a zwave system, devices are called **Nodes**.
+
+- **Devices initialisation** field give state of global initialize process.
+
+The process can take a long time (up to 5 min). Be patient.....
+All nodes discovered and / or stored are scanned one by one to be initialized.
+
+.. |check-dev1| image:: ozwave_check-dev1.png
+    :width: 600px
+
+|check-dev1|
+
+The status information can be refreshed using button. |bt-refresh-ctrl|
+
+.. |progess-state1| image:: ozwave_progess-state1.png
+    :width: 150px
+
+.. |progess-state2| image:: ozwave_progess-state2.png
+
+.. |awake1| image:: ozwave_awake1.png
+
+.. |awake2| image:: ozwave_awake2.png
+
+.. |det-type| image:: ozwave_detail-type.png
+    :width: 150px
+
+.. |cmd_node| image:: ozwave_cmd_node.png
+
++------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+| Representation   | Message                            | Description                                                                                        |
++==================+====================================+====================================================================================================+
+|                  | **Pointing the mouse over icon column "NodeId" give status of initializing.**                                                           |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+| |progess-state1| | Uninitialized                      | No starting init operation.                                                                        |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Initialized - not known            | Node has completed init, but openzwave don't know is model (shows xml openzwave files).            |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Completed                          | Node has full completed init.                                                                      |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | In progress - Can receive messages | Node can now receive messages, but his initialization not finish.                                  |
+|                  | (Not linked)                       | Probably node sleeping. Controller have finish init, when node awake it state should be Completed. |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+| |progess-state2| | In progress - Linked to controller | Node is recognize by controller, initialization is in progress.                                    |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | In progress - Can receive messages | Node can now receive messages, but initialization not finish.                                      |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Out of operation                   | Node is mark as failed, controller don't find him.                                                 |
++------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | **Pointing the mouse over icon column "Awake" give status of listening mode.**                                                          |
+| |awake1|         +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | active                             | Node is awake, message can send immediately.                                                       |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+| |awake2|         | Unknown                            | Node probably sleeping, message are put on send queue.                                             |
++------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | **Pointing the mouse over icon column "Type" give capacities of node.**                                                                 |
+| |det-type|       +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  |                                    | Node is primary controller, is the main device used to configure and control a Z-Wave network.     |
+|                  | Primary Controller                 |                                                                                                    |
+|                  |                                    | The only difference between a primary and secondary controller is that the primary is the only one |
+|                  |                                    | that can be used to add or remove other devices.                                                   |
+|                  |                                    |                                                                                                    |  
+|                  |                                    | For this reason, it is usually better for the primary controller to be portable, since most        |
+|                  |                                    | devices must be added when installed in their final location.                                      |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Secondary Controller               | There can only be one primary controller - all other controllers are secondary controllers.        |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Static Update Controller           | A Static Update Controller (SUC) is a controller that must never be moved in normal operation      |
+|                  |                                    | and which can be used by other nodes to receive information about network changes.                 |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Bridge Controller                  | A bridge controller is able to create virtual nodes that can be associated with other controllers  |
+|                  |                                    | to enable events to be passed on.                                                                  |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Routing                            | Node is a routing device that passes messages to other nodes.                                      |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Listening                          | Node is a setening device that does not go to sleep.                                               |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Beaming                            | Node is a beam capable device..                                                                    |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Security                           | Node supports security features.                                                                   |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | FLiRS                              | Node is a frequent setening device that goes to sleep but can be woken up by a beam.               |
+|                  |                                    | Useful to determine node and controller consistency..                                              |
++------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | **Buttons on column "Action" get access of others commands on nodes.**                                                                  |
+| |cmd_node|       +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Detail Node                        | Show/hide command class capacities table.                                                          |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Update Node                        | Send to node **name** and **location** field to update it.                                         |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Edit association                   | Manage groups association.                                                                         |
++------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+
+Manage devices Commands Class
+=============================
+
+- All command class are listed in a table.
+
+.. |tab-cmdclass1| image:: ozwave_tab-cmdclass1.png
+    :width: 600px
+
+|tab-cmdclass1|
+
+- you can edit the values that are in writing, if the value is changed one "Edit" button appears, you must click it to send change at device
+
+.. |tab-cmdclass2| image:: ozwave_tab-cmdclass2.png
+    :width: 600px
+
+|tab-cmdclass2|
+
+
+.. todo:: 
+    Screen shoot and explanations of other functions......
+
+Controller commands and actions
+===============================
+
+.. todo:: 
+    Screen shoot and explanations ......
+
+Reset controller
+================
+
+.. todo:: 
+    Screen shoot and explanations ......
+ 
+
