@@ -234,17 +234,20 @@
 	"temperature": {
 		"name": "temperature",
                 "unit": "C",
-                "value_type": "number"
+                "value_type": "number",
+                "values": ""
 	},
 	"serial": {
 		"name": "serial",
                 "unit": "",
-                "value_type": "string"
+                "value_type": "string",
+                "values": ""
 	},
        	"gpio": {
                 "name": "gpio",
                 "unit": "",
-                "value_type": "string"
+                "value_type": "string",
+                "values": ""
         },
 	"humidity": {
 		"name": "humidity",

@@ -103,7 +103,7 @@ class ProcessRequest():
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
             '^/base/device/list-old$':			                                         '_rest_base_device_list_old',
-            '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
+            '^/base/device/params/(?P<dev_type_id>[-_\.a-zA-Z0-9]+)$':                           '_rest_base_deviceparams',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
             '^/base/device/updateglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_updateglobal',
