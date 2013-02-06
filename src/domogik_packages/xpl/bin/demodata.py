@@ -68,6 +68,9 @@ class DemoDataManager(XplPlugin):
             port = DEFAULT_PORT 
         else:
             port = int(port)
+        self.log.info("Listen port is %s" % port)
+
+        self.log.info("Start creating the listeners")
 
         ### Create listeners for the fake actuator devices
         # RGB controller
@@ -83,8 +86,10 @@ class DemoDataManager(XplPlugin):
             'xpltype': 'xpl-cmnd',
         })
 
+        self.log.info("All listeners are created")
 
         ### Call the data creators
+        self.log.info("Start all the data creator threads")
         demo = DemoData(self.log, self.send_sensor_basic, \
                                   self.send_teleinfo_basic)
 
@@ -106,7 +111,7 @@ class DemoDataManager(XplPlugin):
                                   self.myxpl)
         self._tank_thr.start()
 
-
+        self.log.info("All the data creator threads created")
 
         self.enable_hbeat()
 
@@ -139,7 +144,9 @@ class DemoDataManager(XplPlugin):
             @param type : type
             @param current : current
         """
-        print("sensor.basic { device=%s, type=%s, current=%s}" % (device, type, current))
+        mess = "sensor.basic { device=%s, type=%s, current=%s}" % (device, type, current)
+        print(mess)
+        self.log.debug(msg)
         if current == "":
             return
         msg = XplMessage()
@@ -156,7 +163,9 @@ class DemoDataManager(XplPlugin):
         ''' Send a frame from teleinfo device to xpl
         @param frame : a dictionnary mapping teleinfo informations
         '''
-        print("teleinfo.basic : %s" % frame)
+        mess = "teleinfo.basic : %s" % frame
+        print(mess)
+        self.log.debug(mess)
         msg = XplMessage()
         msg.set_type("xpl-stat")
         msg.set_schema("teleinfo.basic")
@@ -173,7 +182,9 @@ class DemoDataManager(XplPlugin):
         self.send_arduino_rgb(device, command, color)
 
     def send_arduino_rgb(self, device, command, color):
-        print("arduino.rgb : device=%s, command=%s, color=%s" % (device, command, color))
+        mess = "arduino.rgb : device=%s, command=%s, color=%s" % (device, command, color)
+        print(mess)
+        self.log.debug(mess)
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema("arduino.rgb")
@@ -199,7 +210,9 @@ class DemoDataManager(XplPlugin):
         self.send_lighting_device(device, command, level, fade_rate)
 
     def send_lighting_device(self, device, command, level = None, fade_rate = None):
-        print("lighting.device : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate))
+        mess = "lighting.device : device=%s, command=%s, level=%s, fade_rate=%s" % (device, command, level, fade_rate)
+        print(mess)
+        self.log.debug(mess)
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema("lighting.device")
@@ -213,7 +226,9 @@ class DemoDataManager(XplPlugin):
     # Caller id
     def send_cid_basic(self, device, calltype, phone_number):
         # Notice that device is not used in this xpl schema
-        print("cid.basic : calltype=%s, phone=%s" % (calltype, phone_number))
+        mess = "cid.basic : calltype=%s, phone=%s" % (calltype, phone_number)
+        print(mess)
+        self.log.debug(mess)
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema("cid.basic")
