@@ -20,6 +20,14 @@ Viewing and setting Zwave devices is accessed via a special plugin page from the
 Actualy only supported by domogik develop branch default.
 Development is in progress, features will get gradually
 
+Detailed architecture
+---------------------
+
+.. |principe-schema.png| image:: ozwave_principe-schema.png
+    :width: 700px
+
+|principe-schema.png| 
+
 Dependencies
 ============
 
@@ -61,7 +69,7 @@ Gather information about your device controller (USB)
 
 - Example using Aeon Stick2 on USB port. For ohter model it's should different.
 
-Use "lsusb" command for listing of USB devices, check before and after plug your USB controller.
+* Use "lsusb" command for listing of USB devices, check before and after plug your USB controller.
 
 .. code-block:: bash
 
@@ -80,7 +88,7 @@ Use "lsusb" command for listing of USB devices, check before and after plug your
     Bus 004 Device 006: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC
     Bus 007 Device 002: ID 0b05:179c ASUSTek Computer, Inc.
 
-Use "ls /dev/ttyUSB*" to check your num USB, check before and after plug your USB controller.
+* Use "ls /dev/ttyUSB*" to check your num USB, check before and after plug your USB controller.
 
 * Before
 
@@ -96,7 +104,7 @@ Use "ls /dev/ttyUSB*" to check your num USB, check before and after plug your US
     $ ls /dev/ttyUSB*
     /dev/ttyUSB0  /dev/ttyUSB2
 
-Use "udevadm" command to gather information about your device :
+* Use "udevadm" command to gather information about your device :
 
 .. code-block:: bash
 
@@ -270,8 +278,11 @@ In Domogik administration, go to the ozwave configuration page.
 |                |               |                                                                                      |
 |                |               | When activate all openzwave C++ lib events are logged in OZW_Log.txt.                |
 |                |               | You cant read it in user path "share/domogik/data/ozwave/OZW_Log.txt"                |
+|                |               |                                                                                      |
 |                |               | .. warning ::                                                                        |
-|                |               | There is no log rotate, so file will increased enormously.                           |
+|                |               |                                                                                      |
+|                |               |     There is no log rotate, so file will increased enormously.                       |
+|                |               |                                                                                      |
 +----------------+---------------+--------------------------------------------------------------------------------------+
 | autoconfpath   | true          | Openzwave configuration path auto detection, else use configpath parameter.          |
 +----------------+---------------+--------------------------------------------------------------------------------------+
@@ -320,8 +331,8 @@ Feature example
 |                    | Address           | The device address : 'homename-1'.NodeId.instance                                          |
 |                    |                   | Example : ZWHome.5.1                                                                       |
 |                    |                   |                                                                                            |
-|                    |                   | You can find the reference in the table of command_class of device (node),                 |
-|                    |                   | pointing the mouse over the star.                                                          |
+|                    |                   | You can find the reference in the `table <ctldevtools.html>`_ of command_class             |
+|                    |                   | of device (node) by pointing the mouse over the star.                                      |
 |                    |                   | |example_device2|                                                                          |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Feature           | Example : Z-wave.Switch                                                                    |
