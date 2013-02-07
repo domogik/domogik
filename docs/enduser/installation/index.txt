@@ -210,7 +210,7 @@ It will start :
 Next step : domoweb, the web user interface
 -------------------------------------------
 
-You can now install Domoweb, the web user interface.
+You can now `install Domoweb <http://docs.domogik.org/domoweb/0.3/>`_, the web user interface.
 
 It doesn't work?
 ----------------
