@@ -270,7 +270,27 @@ Schematic processing
 Reset controller
 ================
 
-.. todo:: 
-    Screen shoot and explanations ......
- 
+.. |ctrl-reset-bt| image:: ozwave_ctrl-reset-bt.png
+
+- Two mode possible with acces by buttons : |ctrl-reset-bt|
+
+Soft reset
+----------
+
+.. |ctrl-reset-dialog1| image:: ozwave_ctrl-reset-dialog1.png
+
+- Soft Reset a PC Z-Wave Controller who resets a controller without erasing its network configuration settings
+
+|ctrl-reset-dialog1|
+
+
+Hard reset
+----------
+
+.. |ctrl-reset-dialog2| image:: ozwave_ctrl-reset-dialog2.png
+
+.. warning ::
+   Be careful this action is irreverssible
+
+|ctrl-reset-dialog2|
 

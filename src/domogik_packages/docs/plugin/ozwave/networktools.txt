@@ -22,7 +22,7 @@ Graphic neighborhood network
 
 |neighboors1|
 
-- You can move nodes and adjence it for better link view, but not save position for momment.
+- You can move nodes and arrange it for better links view, but not function to save position for the moment.
 
 |neighboors2|
 
