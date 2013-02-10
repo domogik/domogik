@@ -33,6 +33,7 @@ ProcessRequest object
 @license: GPL(v3)
 @organization: Domogik
 """
+from domogik.common.utils import ucode
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper, DbHelperException
@@ -102,7 +103,8 @@ class ProcessRequest():
         'base': {
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
-            '^/base/device/list-old$':			                                         '_rest_base_device_list_old',
+            '^/base/device/list-upgrade$':		                                         '_rest_base_device_list_upgrade',
+            '^/base/device/upgrade/(?P<oid>[0-9]+)/key/(?P<nid>[0-9]+)/(?P<sid>[0-9]+)$':	 '_rest_base_device_upgrade',
             '^/base/device/params/(?P<dev_type_id>[-_\.a-zA-Z0-9]+)$':                           '_rest_base_deviceparams',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
@@ -1734,14 +1736,55 @@ class ProcessRequest():
             json_data.add_data(device, exclude=['device_stats'])
         self.send_http_response_ok(json_data.get())
 
-    def _rest_base_device_list_old(self):
-        """ list devices
+    def _rets_base_device_upgrade(self, oid, okey, nid, sid):
+        """ do device uprgade
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device")
-        for device in self._db.list_old_devices():
-            json_data.add_data(device, exclude=['device_stats'])
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_device_list_upgrade(self):
+        """ upgrade devices
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("upgrade")
+        ret = {}
+        ret['new'] = []
+        ret['old'] = []
+        oid = ''
+        current = {}
+        # old devices
+        for dev in self._db.upgrade_list_old():
+            if oid != dev[0]:
+                if current != {}:
+                    ret['old'].append( current )
+                    current = {}
+                current["id"] = ucode(dev[0])
+                current["name"] = ucode(dev[1])
+                current["keys"] = []
+            current["keys"].append( ucode(dev[2]) )
+            oid = dev[0]
+        if current != {}:
+            ret['old'].append( current )
+            current = {}
+        # new devices
+        oid = ''
+        for device in self._db.upgrade_list_new():
+            if oid != dev[0]:
+                if current != {}:
+                    ret['new'].append( current )
+                    current = {}
+                current["id"] = ucode(dev[0])
+                current["name"] = ucode(dev[1])
+                current["keys"] = []
+            current["keys"].append( ucode(dev[2]) )
+            oid = dev[0]
+        if current != {}:
+            ret['new'].append( current )
+            current = {}
+        # return
+        json_data.add_data(ret)
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_addglobal(self, id):

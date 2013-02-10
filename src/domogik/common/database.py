@@ -885,13 +885,31 @@ class DbHelper():
         return device
 
 ####
+# stats upgrade
+####
+    def upgrade_list_old(self):
+        return self.__session.query(Device.id,Device.name,DeviceStats.skey).\
+                    filter(Device.id==DeviceStats.device_id).\
+                    filter(Device.address!=None).\
+                    order_by(Device.id).\
+                    distinct()
+
+    def upgrade_list_new(self):
+        return self.__session.query(Device.id,Device.name,Sensor.name).\
+                    filter(Device.id==Sensor.device_id).\
+                    filter(Device.address==None).\
+                    order_by(Device.id).\
+                    distinct()
+
+####
 # Device stats
 ####
     def lis_device_stats_distinct_key(self, ds_device_id):
         filters = {}
-        filters['device_id'] = ds_device_id
+        filters['DeviceStats.device_id'] = ds_device_id
         return self.__session.query(
-                            DeviceStats.skey
+                            DeviceStats.skey,
+                            Device.name
                         ).filter_by(**filters
                         ).distinct()
 
