@@ -1770,7 +1770,7 @@ class ProcessRequest():
             current = {}
         # new devices
         oid = ''
-        for device in self._db.upgrade_list_new():
+        for dev in self._db.upgrade_list_new():
             if oid != dev[0]:
                 if current != {}:
                     ret['new'].append( current )
