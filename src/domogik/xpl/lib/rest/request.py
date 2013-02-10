@@ -1748,7 +1748,7 @@ class ProcessRequest():
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("upgrade")
+        json_data.set_data_type("device")
         ret = {}
         ret['new'] = []
         ret['old'] = []
