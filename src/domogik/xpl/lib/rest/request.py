@@ -1752,37 +1752,28 @@ class ProcessRequest():
         ret = {}
         ret['new'] = []
         ret['old'] = []
-        oid = ''
-        current = {}
-        # old devices
         for dev in self._db.upgrade_list_old():
-            if oid != dev[0]:
-                if current != {}:
-                    ret['old'].append( current )
-                    current = {}
-                current["id"] = ucode(dev[0])
-                current["name"] = ucode(dev[1])
-                current["keys"] = []
-            current["keys"].append( ucode(dev[2]) )
-            oid = dev[0]
-        if current != {}:
-            ret['old'].append( current )
-            current = {}
-        # new devices
-        oid = ''
+            key = []
+            key.append( ucode(dev[0]) )
+            key.append( '-' )
+            key.append( ucode(dev[2]) )
+            val = []
+            val.append( 'Device: ' )
+            val.append( ucode(dev[1]) )
+            val.append( ', Stat key: ' )
+            val.append( ucode(dev[2]) )
+            ret['old'].append( (''.join(key), ''.join(val)) )
         for dev in self._db.upgrade_list_new():
-            if oid != dev[0]:
-                if current != {}:
-                    ret['new'].append( current )
-                    current = {}
-                current["id"] = ucode(dev[0])
-                current["name"] = ucode(dev[1])
-                current["keys"] = []
-            current["keys"].append( ucode(dev[2]) )
-            oid = dev[0]
-        if current != {}:
-            ret['new'].append( current )
-            current = {}
+            key = []
+            key.append( ucode(dev[0]) )
+            key.append( '-' )
+            key.append( ucode(dev[2]) )
+            val = []
+            val.append( 'Device: ' )
+            val.append( ucode(dev[1]) )
+            val.append( ', Sensor: ' )
+            val.append( ucode(dev[2]) )
+            ret['new'].append( (''.join(key), ''.join(val)) )
         # return
         json_data.add_data(ret)
         self.send_http_response_ok(json_data.get())
