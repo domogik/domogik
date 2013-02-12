@@ -56,7 +56,7 @@ from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Device,
         DeviceUsage, DeviceStats,
-        DeviceTechnology, PluginConfig, DeviceType, Person,
+        Plugin, PluginConfig, DeviceType, Person,
         UserAccount, SENSOR_VALUE_TYPE_LIST,
         Command, CommandParam,
         Sensor,
@@ -306,7 +306,7 @@ class DbHelper():
 
         """
         if plugin is not None:
-            return self.__session.query(DeviceType).filter_by(device_technology_id=ucode(plugin)).all()
+            return self.__session.query(DeviceType).filter_by(plugin_id=ucode(plugin)).all()
         else:
             return self.__session.query(DeviceType).all()
 
@@ -346,10 +346,10 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
+        if not self.__session.query(Plugin).filter_by(id=dt_id).first():
             self.__raise_dbhelper_exception("Couldn't add device type with technology id %s. It does not exist" % dt_id)
         dty = DeviceType(id=ucode(dty_id), name=ucode(dty_name), description=ucode(dty_description),
-                         device_technology_id=dt_id)
+                         plugin_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -377,9 +377,9 @@ class DbHelper():
         if dty_name is not None:
             device_type.name = ucode(dty_name)
         if dt_id is not None:
-            if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
+            if not self.__session.query(Plugin).filter_by(id=dt_id).first():
                 self.__raise_dbhelper_exception("Couldn't find technology id %s. It does not exist" % dt_id)
-            device_type.device_technology_id = dt_id
+            device_type.plugin_id = dt_id
         self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
@@ -421,37 +421,28 @@ class DbHelper():
 ####
 # Device technology
 ####
-    def list_device_technologies(self):
+    def get_plugin(self, id=None):
         """Return a list of device technologies
 
         @return a list of DeviceTechnology objects
 
         """
-        return self.__session.query(DeviceTechnology).all()
+        if id == None:
+            return self.__session.query(Plugin).all()
+        else:
+            return self.__session.query(Plugin).filter_by(id=ucode(id)).first()
 
-    def get_device_technology_by_id(self, dt_id):
-        """Return information about a device technology
+    def add_plugin(self, name, description=None, version=None):
+        """Add a plugin
 
-        @param dt_id : the device technology id
-        @return a DeviceTechnology object
-
-        """
-        return self.__session.query(
-                        DeviceTechnology
-                    ).filter_by(id=ucode(dt_id)
-                    ).first()
-
-    def add_device_technology(self, dt_id, dt_name, dt_description=None):
-        """Add a device_technology
-
-        @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
-        @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
-        @param dt_description : extended description of the technology
+        @param name : plugin name
+        @param description : extended description of the plugin
+        @param version : version of the plugin
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = DeviceTechnology(id=dt_id, name=dt_name, description=dt_description)
+        dt = Plugin(id=name, description=description, version=version)
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -459,58 +450,59 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dt
 
-    def update_device_technology(self, dt_id, dt_name=None, dt_description=None):
-        """Update a device technology
+    def update_plugin(self, id, description=None, version=None):
+        """Update a plugin
 
-        @param dt_id : device technology id to be updated
-        @param dt_name : device technology name (optional)
-        @param dt_description : device technology detailed description (optional)
-        @return a DeviceTechnology object
+        @param name : plugin name
+        @param description : extended description of the plugin
+        @param version : version of the plugin
+        @return a plugin object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_tech = self.__session.query(
-                                DeviceTechnology
-                            ).filter_by(id=ucode(dt_id)
+        plugin = self.__session.query(
+                                Plugin
+                            ).filter_by(id=ucode(id)
                             ).first()
-        if device_tech is None:
-            self.__raise_dbhelper_exception("DeviceTechnology with id %s couldn't be found" % dt_id)
-        if dt_name is not None:
-            device_tech.name = ucode(dt_name)
-        if dt_description is not None:
-            if dt_description == '': dt_description = None
-            device_tech.description = ucode(dt_description)
-        self.__session.add(device_tech)
+        if plugin is None:
+            self.__raise_dbhelper_exception("Plugin with id %s couldn't be found" % id)
+        if description is not None:
+            if description == '': description = None
+            plugin.description = ucode(description)
+        if version is not None:
+            if version == '': version = None
+            plugin.version = ucode(version)
+        self.__session.add(plugin)
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_tech
+        return plugin
 
-    def del_device_technology(self, dt_id, cascade_delete=False):
-        """Delete a device technology record
+    def del_plugin(self, pid, cascade_delete=False):
+        """Delete a plugin
 
-        @param dt_id : id of the device technology to delete
+        @param id : id of the plugin to delete
         @param cascade_delete : True if related objects should be deleted, optional default set to False
-        @return the deleted DeviceTechnology object
+        @return the deleted plugin  object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
+        dt = self.__session.query(Plugin).filter_by(id=ucode(pid)).first()
         if dt:
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all():
+                for device_type in self.__session.query(DeviceType).filter_by(plugin_id=ucode(dt.id)).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
                     self.__session.commit()
             else:
                 device_type_list = self.__session.query(
                                             DeviceType
-                                        ).filter_by(device_technology_id=ucode(dt.id)
+                                        ).filter_by(plugin_id=ucode(dt.id)
                                         ).all()
                 if len(device_type_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete device technology %s : there are associated device types"
+                    self.__raise_dbhelper_exception("Couldn't delete plugin %s : there are associated device types"
                                                % dt_id)
 
             self.__session.delete(dt)
@@ -520,7 +512,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return dt
         else:
-            self.__raise_dbhelper_exception("Couldn't delete device technology with id %s : it doesn't exist" % dt_id)
+            self.__raise_dbhelper_exception("Couldn't delete plugin with id %s : it doesn't exist" % dt_id)
 
 ####
 # Plugin config
@@ -688,8 +680,8 @@ class DbHelper():
                                 ).filter_by(id=device.device_type_id
                                 ).first()
             device_tech = self.__session.query(
-                                    DeviceTechnology
-                                ).filter_by(id=device_type.device_technology_id
+                                    Plugin
+                                ).filter_by(id=device_type.plugin_id
                                 ).first()
             if device_tech.id.lower() == ucode(techno_id.lower()):
                 return device
@@ -717,7 +709,7 @@ class DbHelper():
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
-        pjson = PackageJson(dt.device_technology_id).json
+        pjson = PackageJson(dt.plugin_id).json
         if pjson['json_version'] < 2:
             self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
             return None

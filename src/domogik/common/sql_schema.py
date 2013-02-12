@@ -27,7 +27,7 @@ Implements
 ==========
 
 - class DeviceUsage
-- class DeviceTechnology
+- class Plugin
 - class PluginConfig
 - class DeviceType
 - class Device
@@ -110,34 +110,34 @@ class DeviceUsage(Base):
         return DeviceUsage.__tablename__
 
 
-class DeviceTechnology(Base):
-    """Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)"""
+class Plugin(Base):
+    """Plugins"""
 
-    __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(Unicode(30), primary_key=True)
-    name = Column(Unicode(30), nullable=False)
+    __tablename__ = '%s_plugin' % _db_prefix
+    id = Column(Unicode(30), primary_key=True, nullable=False)
     description = Column(UnicodeText())
+    version = Column(Unicode(30))
 
-    def __init__(self, id, name, description=None):
+    def __init__(self, id, description=None, version=None):
         """Class constructor
 
         @param id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
-        @param name : short name of the technology
         @param description : extended description, optional
+        @param version : version number, optional
 
         """
         self.id = ucode(id)
-        self.name = ucode(name)
         self.description = ucode(description)
+        self.version = ucode(version)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceTechnology(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<Plugin(id='%s', desc='%s', version='%s')>" % (self.id, self.description, self.version)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return DeviceTechnology.__tablename__
+        return Plugin.__tablename__
 
 
 class PluginConfig(Base):
@@ -178,12 +178,12 @@ class DeviceType(Base):
 
     __tablename__ = '%s_device_type' % _db_prefix
     id = Column(Unicode(80), primary_key=True)
-    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
-    device_technology = relation(DeviceTechnology)
+    plugin_id = Column(Unicode(30), ForeignKey('%s.id' % Plugin.get_tablename()), nullable=False)
+    plugin = relation(Plugin)
     name = Column(Unicode(80), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, id, name, device_technology_id, description=None):
+    def __init__(self, id, name, plugin_id, description=None):
         """Class constructor
 
         @paral id : device type id
@@ -195,12 +195,12 @@ class DeviceType(Base):
         self.id = ucode(id)
         self.name = ucode(name)
         self.description = ucode(description)
-        self.device_technology_id = ucode(device_technology_id)
+        self.plugin_id = ucode(plugin_id)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceType(id='%s', name='%s', desc='%s', device techno='%s')>"\
-               % (self.id, self.name, self.description, self.device_technology)
+        return "<DeviceType(id='%s', name='%s', desc='%s', plugin='%s')>"\
+               % (self.id, self.name, self.description, self.plugin)
 
     @staticmethod
     def get_tablename():
