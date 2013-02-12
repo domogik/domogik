@@ -238,7 +238,10 @@ class Mscene():
           req = urllib2.Request(the_url)
           handle = urllib2.urlopen(req)
           resp = handle.read()
-          self.devices_stat[device]= ast.literal_eval(resp)['stats'][0]['value']
+          if len(ast.literal_eval(resp)['stats'])>0:
+              self.devices_stat[device]= ast.literal_eval(resp)['stats'][0]['value']
+          else:
+              self.devices_stat[device] =""
 
     def start_listerner(self):
        self.listener = {}
@@ -299,15 +302,19 @@ class Mscene():
           for action in actions:
              if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
                 subp = subprocess.Popen(actions[action]['value'], shell=True)
-             if actions[action]['techno'] == 'send-xpl':
+             elif actions[action]['techno'] == 'send-xpl':
                 self.send_action_xpl(actions[action])
-             if actions[action]['techno'] != 'command' and actions[action]['techno'] != 'send-xpl':
+             elif actions[action]['techno'] == 'Wait':
+                self.wait_action(action['value'])
+             else:
                 self.rinor_command(actions[action])
        else:
           print ('1 test pour rien')
           self.initstat = 0
 
-          
+    def wait_action(self, time):
+        time.sleep(time)
+      
     def send_action_xpl(self, action):
 ### Send an xpl message define in scene action
      ### action['type_message'] =xpl-type
@@ -317,18 +324,29 @@ class Mscene():
        msg.set_source(self.senderscene)
        msg.set_schema(action['schema'])
        msg.set_type(action['type_message'])
+#       if "Eval" in action['value'] or "eval" in action['value']:
+#          msg.add_data(eval(action['value'].replace('Eval','')))
+#       else:
+#          msg.add_data(action['value'])
        msg.add_data(action['value'])
        self.myxpl.send(msg)
 
     def rinor_command(self,action):
 ### send rinot action
-        if action['command']=='':
-           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, action['techno'], action['address'], action['value'])
+
+        if "Eval" in action['value'] or "eval" in action['value']:
+           command_value = eval(action['value'].replace('Eval',''))
         else:
+           command_value = action['value']
+
+        if action['command']=='':
+           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, action['techno'], action['address'], command_value)
+        else:
+
            if action['value']=='':
               the_url = 'http://%s/command/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'])
            else:
-              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],actions[action]['value'])
+              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],command_value)
         req = urllib2.Request(the_url)
         handle = urllib2.urlopen(req)
         resp1 = handle.read()
@@ -367,22 +385,22 @@ class Mscene():
 
         if last_value != new_value:
            if new_value == True:
-              ### TODO send command and xpl-trig
+              ### send command and xpl-trig
               self.send_msg_scene('xpl-trig', 'OK','True')
               print("xpl-trig and gaction:%s" %self.gaction_true)
               self.send_command(self.gaction_true)
            if new_value == False:
-              ### TODO send command and xpl-trig
+              ### send command and xpl-trig
               self.send_msg_scene('xpl-trig', 'OK','False')
               print("xpl-trig and gaction:%s" %self.gaction_false)
               self.send_command(self.gaction_false)
         else:
            if new_value == True:
-              ### TODO send xpl-stat
+              ### send xpl-stat
               self.send_msg_scene('xpl-stat', 'OK','True')
               print("xpl-stat")
            if new_value == False:
-              ### TODO send xpl-stat
+              ### send xpl-stat
               print("xpl-stat")
               self.send_msg_scene('xpl-stat', 'OK','False')
 
