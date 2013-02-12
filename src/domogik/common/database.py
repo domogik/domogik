@@ -895,11 +895,15 @@ class DbHelper():
                     distinct()
 
     def upgrade_list_new(self):
-        return self.__session.query(Device.id,Device.name,Sensor.name).\
+        return self.__session.query(Device.id,Device.name,Sensor.id,Sensor.name).\
                     filter(Device.id==Sensor.device_id).\
                     filter(Device.address==None).\
                     order_by(Device.id).\
                     distinct()
+
+    def upgrade_do(self, oldid, oldkey, newid, sensorid):
+        # do the upgrade
+        return
 
 ####
 # Device stats
