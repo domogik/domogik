@@ -55,7 +55,7 @@ Technical Documentation
   :doc:`Overview </technical/rinor/index>` |
   :doc:`Statistics Manager </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
     * :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (devices, events, etc)
-    * :doc:`REST /cmnd </technical/rinor/rest_command>`: Send commands to devices
+    * :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
     * :doc:`REST /events </technical/rinor/rest_events>`: Get events
     * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
     * :doc:`REST /account </technical/rinor/rest_account>`: List accounts, login, etc
