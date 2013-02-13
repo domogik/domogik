@@ -121,7 +121,7 @@ class Plugin(Base):
     def __init__(self, id, description=None, version=None):
         """Class constructor
 
-        @param id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
+        @param id : plugin id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param description : extended description, optional
         @param version : version number, optional
 
@@ -189,7 +189,7 @@ class DeviceType(Base):
         @paral id : device type id
         @param name : short name of the type
         @param description : extended description, optional
-        @param device_technology_id : technology id
+        @param plugin_id : plugin id
 
         """
         self.id = ucode(id)

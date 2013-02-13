@@ -339,7 +339,7 @@ class DbHelper():
 
         @param dty_id : device type id
         @param dty_name : device type name
-        @param dt_id : technology id (x10, plcbus,...)
+        @param dt_id : plugin id (x10, plcbus,...)
         @param dty_description : device type description (optional)
         @return a DeviceType (the newly created one)
 
@@ -347,7 +347,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         if not self.__session.query(Plugin).filter_by(id=dt_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device type with technology id %s. It does not exist" % dt_id)
+            self.__raise_dbhelper_exception("Couldn't add device type with plugin id %s. It does not exist" % dt_id)
         dty = DeviceType(id=ucode(dty_id), name=ucode(dty_name), description=ucode(dty_description),
                          plugin_id=dt_id)
         self.__session.add(dty)
@@ -362,7 +362,7 @@ class DbHelper():
 
         @param dty_id : device type id to be updated
         @param dty_name : device type name (optional)
-        @param dt_id : id of the associated technology (optional)
+        @param dt_id : id of the associated plugin (optional)
         @param dty_description : device type detailed description (optional)
         @return a DeviceType object
 
@@ -378,7 +378,7 @@ class DbHelper():
             device_type.name = ucode(dty_name)
         if dt_id is not None:
             if not self.__session.query(Plugin).filter_by(id=dt_id).first():
-                self.__raise_dbhelper_exception("Couldn't find technology id %s. It does not exist" % dt_id)
+                self.__raise_dbhelper_exception("Couldn't find plugin id %s. It does not exist" % dt_id)
             device_type.plugin_id = dt_id
         self.__session.add(device_type)
         if dty_description is not None:
@@ -419,7 +419,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
 
 ####
-# Device technology
+# Plugin
 ####
     def get_plugin(self, id=None):
         """Return a list of device technologies
@@ -659,33 +659,33 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def get_device_by_technology_and_address(self, techno_id, device_address):
-        """Return a device by its technology and address
-
-        @param techno_id : technology id
-        @param device address : device address
-        @return a device object
-
-        """
-        device_list = self.__session.query(
-                                Device
-                            ).filter_by(address=ucode(device_address)
-                            ).all()
-        if len(device_list) == 0:
-            return None
-        device = []
-        for device in device_list:
-            device_type = self.__session.query(
-                                    DeviceType
-                                ).filter_by(id=device.device_type_id
-                                ).first()
-            device_tech = self.__session.query(
-                                    Plugin
-                                ).filter_by(id=device_type.plugin_id
-                                ).first()
-            if device_tech.id.lower() == ucode(techno_id.lower()):
-                return device
-        return None
+    #def get_device_by_technology_and_address(self, techno_id, device_address):
+    #    """Return a device by its technology and address
+    #
+    #    @param techno_id : technology id
+    #    @param device address : device address
+    #    @return a device object
+    #
+    #    """
+    #    device_list = self.__session.query(
+    #                            Device
+    #                        ).filter_by(address=ucode(device_address)
+    #                        ).all()
+    #    if len(device_list) == 0:
+    #        return None
+    #    device = []
+    #    for device in device_list:
+    #        device_type = self.__session.query(
+    #                                DeviceType
+    #                            ).filter_by(id=device.device_type_id
+    #                            ).first()
+    #        device_tech = self.__session.query(
+    #                                Plugin
+    #                            ).filter_by(id=device_type.plugin_id
+    #                            ).first()
+    #        if device_tech.id.lower() == ucode(techno_id.lower()):
+    #            return device
+    #    return None
 
     def get_all_devices_of_usage(self, du_id):
         """Return all the devices of a usage
