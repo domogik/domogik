@@ -296,11 +296,6 @@
         "version": "0.5.0"
     }, 
     "json_version": 2, 
-    "technology": {
-        "description": "Velbus http://www.velbus.eu", 
-        "id": "velbus", 
-        "name": "Velbus"
-    }, 
     "udev-rules": [
         {
             "description": "Velbus USB interface", 

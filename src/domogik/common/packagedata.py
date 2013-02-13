@@ -68,20 +68,20 @@ class PackageData():
     def insert(self):
         """ Insert data for plugin
         """
-        ### Technology
-        print("Technology %s" % self.pkg["technology"]["id"])
-        if self._db.get_device_technology_by_id(self.pkg["technology"]["id"]) == None:
+        ### Plugin
+        print("plugin %s" % self.pkg["identity"]["id"])
+        if self._db.get_plugin(self.pkg["identity"]["id"]) == None:
             # add if not exists
             print("add...")
-            self._db.add_device_technology(self.pkg["technology"]["id"],
-                                           self.pkg["technology"]["name"],
-                                           self.pkg["technology"]["description"])
+            self._db.add_plugin(self.pkg["identity"]["id"],
+                                  self.pkg["identity"]["description"],
+                                  self.pkg["identity"]["version"])
         else:
             # update if exists
             print("update...")
-            self._db.update_device_technology(self.pkg["technology"]["id"],
-                                           self.pkg["technology"]["name"],
-                                           self.pkg["technology"]["description"])
+            self._db.update_plugin(self.pkg["identity"]["id"],
+                                  self.pkg["identity"]["description"],
+                                  self.pkg["identity"]["version"])
  
         ### Device types
         for device_type in self.pkg["device_types"].keys():
@@ -92,12 +92,12 @@ class PackageData():
                 print("add...")
                 self._db.add_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg["technology"]["id"],
+                                         self.pkg["identity"]["id"],
                                          device_type["description"])
             else:
                 # update if exists
                 print("update...")
                 self._db.update_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg["technology"]["id"],
+                                         self.pkg["identity"]["id"],
                                          device_type["description"])
