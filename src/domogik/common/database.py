@@ -39,25 +39,22 @@ Implements
 """
 
 import datetime, hashlib, time
-from types import DictType
 
 import json
 import sqlalchemy
 from sqlalchemy import Table, MetaData
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker,scoped_session
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-from sqlalchemy.pool import QueuePool
+from sqlalchemy.orm import sessionmaker
 
 from domogik.common.utils import ucode
 from domogik.common import logger
 from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        ACTUATOR_VALUE_TYPE_LIST, Device,
+        Device,
         DeviceUsage, DeviceStats,
         Plugin, PluginConfig, DeviceType, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST,
+        UserAccount,
         Command, CommandParam,
         Sensor,
         XplCommand, XplStat, XplStatParam, XplCommandParam
@@ -659,34 +656,6 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    #def get_device_by_technology_and_address(self, techno_id, device_address):
-    #    """Return a device by its technology and address
-    #
-    #    @param techno_id : technology id
-    #    @param device address : device address
-    #    @return a device object
-    #
-    #    """
-    #    device_list = self.__session.query(
-    #                            Device
-    #                        ).filter_by(address=ucode(device_address)
-    #                        ).all()
-    #    if len(device_list) == 0:
-    #        return None
-    #    device = []
-    #    for device in device_list:
-    #        device_type = self.__session.query(
-    #                                DeviceType
-    #                            ).filter_by(id=device.device_type_id
-    #                            ).first()
-    #        device_tech = self.__session.query(
-    #                                Plugin
-    #                            ).filter_by(id=device_type.plugin_id
-    #                            ).first()
-    #        if device_tech.id.lower() == ucode(techno_id.lower()):
-    #            return device
-    #    return None
-
     def get_all_devices_of_usage(self, du_id):
         """Return all the devices of a usage
 
@@ -773,7 +742,7 @@ class DbHelper():
                 self.__session.add(xplcommand)
                 self.__session.flush()
                 # add static params
-	        for p in xpl_command['parameters']['static']:
+                for p in xpl_command['parameters']['static']:
                     par = XplCommandParam(cmd_id=xplcommand.id, \
                                          key=p['key'], value=p['value'])           
                     self.__session.add(par)
@@ -865,7 +834,7 @@ class DbHelper():
         # Use this method rather than cascade deletion (much faster)
         meta = MetaData(bind=DbHelper.__engine)
         t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-        result = self.__session.execute(
+        self.__session.execute(
             t_stats.delete().where(t_stats.c.device_id == d_id)
         )
         
@@ -880,14 +849,14 @@ class DbHelper():
 # stats upgrade
 ####
     def upgrade_list_old(self):
-        return self.__session.query(Device.id,Device.name,DeviceStats.skey).\
+        return self.__session.query(Device.id, Device.name, DeviceStats.skey).\
                     filter(Device.id==DeviceStats.device_id).\
                     filter(Device.address!=None).\
                     order_by(Device.id).\
                     distinct()
 
     def upgrade_list_new(self):
-        return self.__session.query(Device.id,Device.name,Sensor.name).\
+        return self.__session.query(Device.id, Device.name, Sensor.name).\
                     filter(Device.id==Sensor.device_id).\
                     filter(Device.address==None).\
                     order_by(Device.id).\
@@ -905,7 +874,7 @@ class DbHelper():
                         ).filter_by(**filters
                         ).distinct()
 
-    def list_device_stats(self, ds_device_id=None,ds_skey=None,ds_number=None):
+    def list_device_stats(self, ds_device_id=None, ds_skey=None, ds_number=None):
         """Return a list of all stats for a device
 
         @param ds_device_id : the device id
@@ -933,7 +902,7 @@ class DbHelper():
                         ).all()
 
 
-    def list_last_n_stats_of_device(self, ds_device_id=None,ds_skey=None,ds_number=None):
+    def list_last_n_stats_of_device(self, ds_device_id=None, ds_skey=None, ds_number=None):
         """Get the N latest statistics of a device for a given key
 
         @param ds_device_id : the device id
@@ -985,7 +954,7 @@ class DbHelper():
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
-    def get_last_stat_of_device(self, ds_device_id=None,ds_skey=None):
+    def get_last_stat_of_device(self, ds_device_id=None, ds_skey=None):
         """Get the latest statistic of a device for a given key
 
         @param ds_device_id : the device id
@@ -1177,7 +1146,7 @@ class DbHelper():
                 }
             }
 
-    def device_has_stats(self, ds_device_id=None,ds_skey=None):
+    def device_has_stats(self, ds_device_id=None, ds_skey=None):
         """Check if the device has stats that were recorded
 
         @param ds_device_id : the device id
@@ -1185,7 +1154,7 @@ class DbHelper():
         @return True or False
 
         """
-        return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
+        return len(self.list_device_stats(ds_device_id, ds_skey, 1)) > 0
 
     def _get_duplicated_devicestats_id(self, device_id, key, value):
         """Check if the data is duplicated with older values
@@ -1207,23 +1176,21 @@ class DbHelper():
         self.log.debug("after read")
         last_values = my_db.list_last_n_stats_of_device(device_id, key, ds_number=2)
         if last_values and len(last_values)>=2:
-            # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
-            # Ex: db_round_filter = {"12" : { "total_space" : 1048576, "free_space" : 1048576, "percent_used" : 0.5, "used_space": 1048576 },"13" : { "hchp" : 500, "hchc" : 500, "papp" : 200 }}
-            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value, last_values[0].value, last_values[1].value,id))
+            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key, value, last_values[0].value, last_values[1].value, id))
             if db_round_filter and str(last_values[1].device.id) in db_round_filter and key in db_round_filter[str(last_values[1].device.id)]:
-                    round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
-                    rvalue = int(float(value) / round_value) * round_value
-                    val0 = int(float(last_values[0].value) / round_value) * round_value
-                    val1 = int(float(last_values[1].value) / round_value) * round_value
-                    self.log.debug("rvalue=%s" % rvalue)
-                    self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue, value, val0, val1))
+                round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
+                rvalue = int(float(value) / round_value) * round_value
+                val0 = int(float(last_values[0].value) / round_value) * round_value
+                val1 = int(float(last_values[1].value) / round_value) * round_value
+                self.log.debug("rvalue=%s" % rvalue)
+                self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue, value, val0, val1))
             else:
                 rvalue = value
                 val0 = last_values[0].value
                 val1 = last_values[1].value
             
             if val0 == val1 and val0 == rvalue:
-                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id, last_values[1].device.id,key))
+                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id, last_values[1].device.id, key))
                 return last_values[1].id
         
         return None
@@ -1245,7 +1212,7 @@ class DbHelper():
         self.__session.expire_all()
 
         # Remove intermediate data
-        duplicated_id = self._get_duplicated_devicestats_id(ds_device_id,ds_key,ds_value)
+        duplicated_id = self._get_duplicated_devicestats_id(ds_device_id, ds_key, ds_value)
         if duplicated_id:
             old_stat = self.__session.query(DeviceStats).filter_by(id=duplicated_id).first()
             if old_stat:

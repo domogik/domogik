@@ -115,12 +115,6 @@ class ProcessRequest():
             '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplstatparams',
             '^/base/device/updatexplcmdparams/id/(?P<id>[0-9]+)/.*$':                            '_rest_base_device_updatexplcmdparams',
             '^/base/device/udpatexplstatparams/id/(?P<id>[0-9]+)/.*$':                           '_rest_base_device_updatexplstatparams',
-            # /base/device_technology
-            '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
-            '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
-            '^/base/device_technology/add/.*$':		 	                                 '_rest_base_device_technology_add',
-            '^/base/device_technology/update/.*$':		                                 '_rest_base_device_technology_update',
-            '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
             # /base/device_type
             '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
             '^/base/device_type/list/by-plugin/(?P<name>[a-z0-9]+)$':			         '_rest_base_device_type_list_by_plugin',
@@ -1316,57 +1310,6 @@ class ProcessRequest():
                                                   self.jsonp, self.jsonp_cb)
                 return
 
-        ### device technology ##########################
-        elif self.rest_request[0] == "device_technology":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_device_technology_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_device_technology_list(id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_technology_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_technology_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_device_technology_del(dt_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
-
-
-
 
         ### device #####################################
         elif self.rest_request[0] == "device":
@@ -1608,7 +1551,7 @@ class ProcessRequest():
         try:
             device_type = self._db.add_device_type(self.get_parameters("id"), \
                                                    self.get_parameters("name"), \
-                                                   self.get_parameters("technology_id"), \
+                                                   self.get_parameters("plugin_id"), \
                                                    self.get_parameters("description"))
             json_data.add_data(device_type)
         except:
@@ -1626,7 +1569,7 @@ class ProcessRequest():
         try:
             b = self._db.update_device_type(self.get_parameters("id"), \
                                                self.get_parameters("name"), \
-                                               self.get_parameters("technology_id"), \
+                                               self.get_parameters("plugin_id"), \
                                                self.get_parameters("description"))
             json_data.add_data(b)
         except:
@@ -1649,78 +1592,6 @@ class ProcessRequest():
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
-
-######
-# /base/device_technology processing
-######
-
-    def _rest_base_device_technology_list(self, id = None):
-        """ list device technologies
-            @param name : device technology name
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology")
-        if id == None:
-            for device_technology in self._db.list_device_technologies():
-                json_data.add_data(device_technology)
-        else:
-            device_technology = self._db.get_device_technology_by_id(id)
-            if device_technology is not None:
-                json_data.add_data(device_technology)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_technology_add(self):
-        """ add device technology
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology")
-        try:
-            device_technology = self._db.add_device_technology(self.get_parameters("name"), \
-                                                                  self.get_parameters("description"))
-            json_data.add_data(device_technology)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_device_technology_update(self):
-        """ update device technology
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology")
-        try:
-            device_technology = self._db.update_device_technology(self.get_parameters("id"), \
-                                                                  self.get_parameters("name"), \
-                                                                  self.get_parameters("description"))
-            json_data.add_data(device_technology)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_device_technology_del(self, dt_id=None):
-        """ delete device technology
-            @param dt_id : device tehcnology id
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology")
-        try:
-            device_technology = self._db.del_device_technology(dt_id)
-            json_data.add_data(device_technology)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-
 
 ######
 # /base/device processing
@@ -1828,7 +1699,7 @@ class ProcessRequest():
             self.send_http_response_ok(json_data.get())
             return
         # get the json
-        pjson = PackageJson(dt.device_technology_id).json
+        pjson = PackageJson(dt.plugin_id).json
         if pjson['json_version'] < 2:
 	    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
 	    self.send_http_response_ok(json_data.get())
@@ -1889,7 +1760,7 @@ class ProcessRequest():
             self.send_http_response_ok(json_data.get())
             return
         # get the json
-        pjson = PackageJson(dt.device_technology_id).json
+        pjson = PackageJson(dt.plugin_id).json
         if pjson['json_version'] < 2:
 	    json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
 	    self.send_http_response_ok(json_data.get())
@@ -2185,13 +2056,9 @@ class ProcessRequest():
                 try:
                     plg_name = message.data["plugin"+str(idx)+"-name"]
                     plg_type = message.data["plugin"+str(idx)+"-type"]
-                    #plg_description = message.data["plugin"+str(idx)+"-desc"]
-                    plg_technology = message.data["plugin"+str(idx)+"-techno"]
                     plg_status = message.data["plugin"+str(idx)+"-status"]
                     plg_host = message.data["plugin"+str(idx)+"-host"]
                     plugin_data = ({"id" : plg_name, 
-                                    "technology" : plg_technology, 
-                                    #"description" : plg_description, 
                                     "status" : plg_status, 
                                     "type" : plg_type, 
                                     "host" : plg_host})
@@ -2270,7 +2137,6 @@ class ProcessRequest():
             except KeyError:
                 do_loop = False
             idx += 1
-        technology = message.data["technology"]
         status = message.data["status"]
         version = message.data["version"]
         documentation = message.data["documentation"]
@@ -2355,7 +2221,7 @@ class ProcessRequest():
                 except:
                     loop_again = False
 
-        json_data.add_data({"id" : id, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : version, "documentation" : documentation, "configuration" : config_data})
+        json_data.add_data({"id" : id, "description" : description, "status" : status, "host" : host, "version" : version, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 
@@ -2585,7 +2451,7 @@ class ProcessRequest():
 ######
 
     def _rest_plugin_config_list(self, id = None, hostname = None, key = None):
-        """ list device technology config
+        """ list device plugin config
             @param id : name of module
             @param key : key of config
         """
@@ -2607,7 +2473,7 @@ class ProcessRequest():
 
 
     def _rest_plugin_config_set(self):
-        """ set device technology config
+        """ set device plugin config
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2624,7 +2490,7 @@ class ProcessRequest():
 
 
     def _rest_plugin_config_del(self, id, hostname):
-        """ delete device technology config
+        """ delete device plugin config
             @param id : module name
             @param hostname : host
         """
@@ -2640,7 +2506,7 @@ class ProcessRequest():
 
 
     def _rest_plugin_config_del_key(self, id, hostname, key):
-        """ delete device technology config
+        """ delete device plugin config
             @param id : module name
             @param hostname : host
             @param key : key to delete
@@ -4528,7 +4394,6 @@ class ProcessRequest():
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("deviceparams")
         try:
-            # select device_technology_id FROM core_device_type WHERE id=dev_type_id
             dt = self._db.get_device_type_by_id(dev_type_id)
             if dt == None:
                 if json:
@@ -4538,7 +4403,7 @@ class ProcessRequest():
                 else:
                     return None
             # get the json
-            pjson = PackageJson(dt.device_technology_id).json
+            pjson = PackageJson(dt.plugin_id).json
             if pjson['json_version'] < 2:
                 if json:
                     json_data.set_error(code = 999, description = "This plugin does not support this command, json_version should at least be 2")
