@@ -116,7 +116,7 @@ class JSonHelper():
                      "device_config",  \
                      "device_stats",  \
                      "device_stats_value",  \
-                     "device_technology",  \
+                     "plugin",  \
                      "plugin_config",  \
                      "plugin_config_param",  \
                      "device_type",  \
