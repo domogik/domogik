@@ -2,89 +2,340 @@
 Plugin documentation
 ====================
 
+.. |icon| image:: icon.png
+    :width: 48px
+
+|icon|
+
 Purpose
 =======
-.. todo:: 
-    Quick description of the package usage : features, ...
-    Put a photography or picture of the materials
+Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control. This plugin allows to control zwave devices.
 
-Known issues
-============
+It uses open source `library openZwave c++ project <http://code.google.com/p/open-zwave/>`_ and python-openzwave as interfacing cython,
+The Zwave network manager is directly integrated into the plugin
 
-.. todo:: 
-    Eventually if there are some issues with the package, list them. If not, delete this chapter.
+Simple action/sensor of devices have access via domogik devices (widgets).
+Viewing and setting Zwave devices is accessed via a special plugin page from the admin panel.
+
+Actualy only supported by domogik develop branch default.
+Development is in progress, features will get gradually
+
+Detailed architecture
+---------------------
+
+.. |principe-schema.png| image:: ozwave_principe-schema.png
+    :width: 700px
+
+|principe-schema.png| 
 
 Dependencies
 ============
 
-.. todo::
-    If the package has some dependencies, list them here. Else, delete this chapter.
+- `Python-openzwave <http://wiki.domogik.org/plugin_pyozw>`_ (>=0.2.5) 
 
-    * For Domogik dependencies (a plugin which depends on another plugin), just mention their name.
-    * For Python dependencies, just mention their name : the command line to install them will be indicated to the user when he will try to install the package.
-    * For other dependencies (like heyu, owfs, ...), explain how to install them.
+Controller/devices Compatibility List
+=====================================
 
-How to plug
-===========
+Following interfaces are supported and verify with domogik:
 
-.. todo:: 
-    Explain how to plug the material. If there is nothing to plug, delete this chapter or replace it with the appropriate one (account creation for a web service, ...)
+- Aeon Labs Z-Stick Series 2  
 
-Create the udev rule
---------------------
+Others controllers are supported by openzwave, `you can check here <http://code.google.com/p/open-zwave/wiki/Controller_Compatibility_List>`_
 
-.. todo::
-    If needed, tell the user to create an udev rule. Else, delete this chapter.
+Following devices are supported :
+
+- Everspring - ST814
+
+- Everspring (C.T.) - HSM02
+
+- Fibaro FGS211 - Switch 3KW
+
+- Fibaro FGS221 - Double Relay Switch 2x1,5kW
+
+- Aeon Labs - Home Energy Metter
+
+- Express Controls - EZMotion
+
+Create the udev rule for controller
+===================================
 
 You may create a udev rule for this device. The rule and filename are given in the **Requirements** tab of the plugin configuration page.
 
+Currently, your PC controller is known as "/dev/ttyUSBx" (by default). This is not very convenient nor meaningful.
+We will then create a new udev rule that will create a link called "/dev/zwave" that will point to "/dev/ttyUSBx".
+
+Gather information about your device controller (USB)
+-----------------------------------------------------
+
+- Example using Aeon Stick2 on USB port. For ohter model it's should different.
+
+* Use "lsusb" command for listing of USB devices, check before and after plug your USB controller.
+
+.. code-block:: bash
+
+    $ lsusb
+    Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+    Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+    Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+    Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+    Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+    Bus 006 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+    Bus 007 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+    Bus 008 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+    Bus 009 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+    Bus 005 Device 002: ID 0040:073d
+    Bus 004 Device 002: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x Composite Device
+    Bus 004 Device 006: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC
+    Bus 007 Device 002: ID 0b05:179c ASUSTek Computer, Inc.
+
+* Use "ls /dev/ttyUSB*" to check your num USB, check before and after plug your USB controller.
+
+* Before
+
+.. code-block:: bash
+
+    $ ls /dev/ttyUSB*
+    /dev/ttyUSB2
+
+* After USB plug
+
+.. code-block:: bash
+
+    $ ls /dev/ttyUSB*
+    /dev/ttyUSB0  /dev/ttyUSB2
+
+* Use "udevadm" command to gather information about your device :
+
+.. code-block:: bash
+
+    $ udevadm info  -a -n /dev/ttyUSB0
+
+    Udevadm info starts with the device specified by the devpath and then
+    walks up the chain of parent devices. It prints for every device
+    found, all possible attributes in the udev rules key format.
+    A rule to match, can be composed by the attributes of the device
+    and the attributes from one single parent device.
+
+      looking at device '/devices/pci0000:00/0000:00:12.0/usb4/4-3/4-3:1.0/ttyUSB0/tty/ttyUSB0':
+        KERNEL=="ttyUSB0"
+        SUBSYSTEM=="tty"
+        DRIVER==""
+
+      looking at parent device '/devices/pci0000:00/0000:00:12.0/usb4/4-3/4-3:1.0/ttyUSB0':
+        KERNELS=="ttyUSB0"
+        SUBSYSTEMS=="usb-serial"
+        DRIVERS=="cp210x"
+        ATTRS{port_number}=="0"
+
+      looking at parent device '/devices/pci0000:00/0000:00:12.0/usb4/4-3/4-3:1.0':
+        KERNELS=="4-3:1.0"
+        SUBSYSTEMS=="usb"
+        DRIVERS=="cp210x"
+        ATTRS{bInterfaceNumber}=="00"
+        ATTRS{bAlternateSetting}==" 0"
+        ATTRS{bNumEndpoints}=="02"
+        ATTRS{bInterfaceClass}=="ff"
+        ATTRS{bInterfaceSubClass}=="00"
+        ATTRS{bInterfaceProtocol}=="00"
+        ATTRS{supports_autosuspend}=="1"
+        ATTRS{interface}=="CP2102 USB to UART Bridge Controller"
+
+      looking at parent device '/devices/pci0000:00/0000:00:12.0/usb4/4-3':
+        KERNELS=="4-3"
+        SUBSYSTEMS=="usb"
+        DRIVERS=="usb"
+        ATTRS{configuration}==""
+        ATTRS{bNumInterfaces}==" 1"
+        ATTRS{bConfigurationValue}=="1"
+        ATTRS{bmAttributes}=="80"
+        ATTRS{bMaxPower}=="100mA"
+        ATTRS{urbnum}=="10835"
+        ATTRS{idVendor}=="10c4"
+        ATTRS{idProduct}=="ea60"
+        ATTRS{bcdDevice}=="0100"
+        ATTRS{bDeviceClass}=="00"
+        ATTRS{bDeviceSubClass}=="00"
+        ATTRS{bDeviceProtocol}=="00"
+        ATTRS{bNumConfigurations}=="1"
+        ATTRS{bMaxPacketSize0}=="64"
+        ATTRS{speed}=="12"
+        ATTRS{busnum}=="4"
+        ATTRS{devnum}=="2"
+        ATTRS{devpath}=="3"
+        ATTRS{version}==" 1.10"
+        ATTRS{maxchild}=="0"
+        ATTRS{quirks}=="0x0"
+        ATTRS{avoid_reset_quirk}=="0"
+        ATTRS{authorized}=="1"
+        ATTRS{manufacturer}=="Silicon Labs"
+        ATTRS{product}=="CP2102 USB to UART Bridge Controller"
+        ATTRS{serial}=="0001"
+
+      looking at parent device '/devices/pci0000:00/0000:00:12.0/usb4':
+        KERNELS=="usb4"
+        SUBSYSTEMS=="usb"
+        DRIVERS=="usb"
+        ATTRS{configuration}==""
+        ATTRS{bNumInterfaces}==" 1"
+        ATTRS{bConfigurationValue}=="1"
+        ATTRS{bmAttributes}=="e0"
+        ATTRS{bMaxPower}=="  0mA"
+        ATTRS{urbnum}=="134"
+        ATTRS{idVendor}=="1d6b"
+        ATTRS{idProduct}=="0001"
+        ATTRS{bcdDevice}=="0300"
+        ATTRS{bDeviceClass}=="09"
+        ATTRS{bDeviceSubClass}=="00"
+        ATTRS{bDeviceProtocol}=="00"
+        ATTRS{bNumConfigurations}=="1"
+        ATTRS{bMaxPacketSize0}=="64"
+        ATTRS{speed}=="12"
+        ATTRS{busnum}=="4"
+        ATTRS{devnum}=="1"
+        ATTRS{devpath}=="0"
+        ATTRS{version}==" 1.10"
+        ATTRS{maxchild}=="5"
+        ATTRS{quirks}=="0x0"
+        ATTRS{avoid_reset_quirk}=="0"
+        ATTRS{authorized}=="1"
+        ATTRS{manufacturer}=="Linux 3.0.0-24-generic ohci_hcd"
+        ATTRS{product}=="OHCI Host Controller"
+        ATTRS{serial}=="0000:00:12.0"
+        ATTRS{authorized_default}=="1"
+
+      looking at parent device '/devices/pci0000:00/0000:00:12.0':
+        KERNELS=="0000:00:12.0"
+        SUBSYSTEMS=="pci"
+        DRIVERS=="ohci_hcd"
+        ATTRS{vendor}=="0x1002"
+        ATTRS{device}=="0x4397"
+        ATTRS{subsystem_vendor}=="0x1043"
+        ATTRS{subsystem_device}=="0x8496"
+        ATTRS{class}=="0x0c0310"
+        ATTRS{irq}=="18"
+        ATTRS{local_cpus}=="00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000003"
+        ATTRS{local_cpulist}=="0-1"
+        ATTRS{numa_node}=="-1"
+        ATTRS{dma_mask_bits}=="32"
+        ATTRS{consistent_dma_mask_bits}=="32"
+        ATTRS{broken_parity_status}=="0"
+        ATTRS{msi_bus}==""
+
+      looking at parent device '/devices/pci0000:00':
+        KERNELS=="pci0000:00"
+        SUBSYSTEMS==""
+        DRIVERS==""
+
+Those information will be useful to determinate for sure that this device is your Zwave controller. We will use several information, flagged above as "DRIVERS", "ATTRS{manufacturer}" and "ATTRS{product}". With that, we will be sure that we'll be talking to our controller. You can chose others attributs.
+
+Create rule.
+------------
+
+* Create a new file, in folder "/etc/udev/rules.d". Let's call it "98-usbcp210x.rules".
+
+* Enter those information in the file : 
+
+.. code-block:: bash
+
+    # for z-Stick serie 2 to domogik /dev/zwave
+    DRIVERS=="usb", ATTRS{manufacturer}=="Silicon Labs", ATTRS{product}=="CP2102 USB to UART Bridge Controller", SYMLINK+="zwave", MODE="0666"
+
+The "DRIVERS", "ATTRS{manufacturer}", "ATTRS{product}" values must be coherent with what you have found above.
+* Ask udev to rediscover your device :
+
+.. code-block:: bash
+
+    # udevadm test $(udevadm info --query path --name ttyUSB0)
+
+* Your device should now be re-discovered, let's confirm it :
+
+.. code-block:: bash
+
+    $ ls -l /dev/zwave
+    lrwxrwxrwx 1 root root 7 2012-08-27 00:46 /dev/zwave -> ttyUSB0
+
+
 Plugin configuration
 ====================
-
-.. todo:: 
-    If the packahe is not a plugin, delete this chapter
 
 Configuration
 -------------
 In Domogik administration, go to the ozwave configuration page.
 
-+---------------+---------------+-----------------------------------------------------------------------------------------------------+
-|Key            | Default value | Description                                                                                         |
-+===============+===============+=====================================================================================================+
-| .. todo::     |               | .. todo::                                                                                           |
-|     key 1     |               |     Description of the first configuration key                                                      |
-+---------------+---------------+-----------------------------------------------------------------------------------------------------+
-| .. todo::     |               | .. todo::                                                                                           |
-|     key 2     |               |     Description of the second configuration key                                                     |
-+---------------+---------------+-----------------------------------------------------------------------------------------------------+
+.. |menuconf| image:: ozwave_menu-config.png
+    :width: 500px
+
+|menuconf|
+
++----------------+---------------+--------------------------------------------------------------------------------------+
+|Key             | Default value | Description                                                                          |
++================+===============+======================================================================================+
+| startup-plugin | false         | Automatically start plugin at Domogik startup                                        |
++----------------+---------------+--------------------------------------------------------------------------------------+
+| device         | /dev/zwave    | Z-wave device that you have define in UDEV rule                                      |
++----------------+---------------+--------------------------------------------------------------------------------------+
+| ozwlog         | false         | Activate openzwave log. Only for debuging action.                                    |
+|                |               |                                                                                      |
+|                |               | When activate all openzwave C++ lib events are logged in OZW_Log.txt.                |
+|                |               | You cant read it in user path "share/domogik/data/ozwave/OZW_Log.txt"                |
+|                |               |                                                                                      |
+|                |               | .. warning ::                                                                        |
+|                |               |                                                                                      |
+|                |               |     There is no log rotate, so file will increased enormously.                       |
+|                |               |                                                                                      |
++----------------+---------------+--------------------------------------------------------------------------------------+
+| autoconfpath   | true          | Openzwave configuration path auto detection, else use configpath parameter.          |
++----------------+---------------+--------------------------------------------------------------------------------------+
+| configpath     | Show default  | Path for openzwave files configuration (see your openzwave installation).            |
+|                | path          |                                                                                      |
+|                |               | This is the path that openzwave xml files are located, it can be shared with others  |
+|                |               | using openzwave C++ library                                                          |
++----------------+---------------+--------------------------------------------------------------------------------------+
+
+* Now you need to configure zwave network link to domogik.
+
+You can create more than one association, but only first is avaiblable.
+This parameter allows you to make the names of devices domogik partially independent of zwave network.
+
++----------------+---------------+--------------------------------------------------------------------------------------+
+|Key             | Default value | Description                                                                          |
++================+===============+======================================================================================+
+| homename-1     | ZWHome        | Home ID name for association with domogik device.                                    |
+|                |               |                                                                                      |
+|                |               | Give name you want without space and "."                                             |
++----------------+---------------+--------------------------------------------------------------------------------------+
+| homeidass-1    |               | Home ID refered to ID home key.                                                      |
+|                |               |                                                                                      |
+|                |               | Report Home ID information show in "Controller and devices" page.                    |
+|                |               | Example : 0x018d0f23                                                                 |
++----------------+---------------+--------------------------------------------------------------------------------------+
 
 Creating devices for ozwave
 -----------------------------
 In administration, go to Organization > Devices page to create your devices.
 
-Feature 1
-*********
+Feature example
+***************
 
-.. todo:: 
-    Update the screenshot
-    Describe the data to set in each field of the device creation box
-
-.. |example_feature1| image:: example_feature1.png
+.. |example_device1| image:: ozwave_create_device1.png
     :width: 200px
+
+.. |example_device2| image:: ozwave_create_device2.png
+    :width: 350px
 
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
 | Example            | Key               | Description                                                                                |
 +====================+===================+============================================================================================+
-| |example_feature1| | Name              | The name you want to give to the device : ...                                              |
+| |example_device1|  | Name              | The name you want to give to the device : ...                                              |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Address           | The device address : ...                                                                   |
-|                    |                   | Example for ... : ...                                                                      |
+|                    | Address           | The device address : 'homename-1'.NodeId.instance                                          |
+|                    |                   | Example : ZWHome.5.1                                                                       |
 |                    |                   |                                                                                            |
-|                    |                   | .. todo::                                                                                  |
-|                    |                   |     For some packages, you need to use a helper command to get the devices addresses.      |
-|                    |                   |     If this is the case, mention it here.                                                  |
+|                    |                   | You can find the reference in the `table <ctldevtools.html>`_ of command_class             |
+|                    |                   | of device (node) by pointing the mouse over the star.                                      |
+|                    |                   | |example_device2|                                                                          |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Feature           | xxx.yyy                                                                                    |
+|                    | Feature           | Example : Z-wave.Switch                                                                    |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Usage             | An appropriate usage (...)                                                                 |
 |                    +-------------------+--------------------------------------------------------------------------------------------+

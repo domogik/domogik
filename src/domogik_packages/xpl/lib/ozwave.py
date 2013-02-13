@@ -252,10 +252,11 @@ class OZWavemanager(threading.Thread):
 #         NodeNaming = 9                    / One of the node names has changed (name, manufacturer, product).
 #         NodeEvent = 10                    / A node has triggered an event.  This is commonly caused when a node sends a Basic_Set command to the controller.  The event value is stored in the notification.
 #         DriverReady = 18                  / A driver for a PC Z-Wave controller has been added and is ready to use.  The notification will contain the controller's Home ID, which is needed to call most of the Manager methods.
-#         EssentialNodeQueriesComplete = 22 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
-#         NodeQueriesComplete = 23          / All the initialisation queries on a node have been completed.
-#         AwakeNodesQueried = 24            / All awake nodes have been queried, so client application can expected complete data for these nodes.
-#         AllNodesQueried = 25              / All nodes have been queried, so client application can expected complete data.
+#         EssentialNodeQueriesComplete = 21 / The queries on a node that are essential to its operation have been completed. The node can now handle incoming messages.
+#         NodeQueriesComplete = 22          / All the initialisation queries on a node have been completed.
+#         AwakeNodesQueried = 23            / All awake nodes have been queried, so client application can expected complete data for these nodes.
+#         AllNodesQueried = 24              / All nodes have been queried, so client application can expected complete data.
+#         AllNodesQueriedSomeDead = 25      / All nodes have been queried but some dead nodes found.
 #         Notification = 26                        / An error has occured that we need to report.
 
 #TODO: notification à implémenter
@@ -269,7 +270,6 @@ class OZWavemanager(threading.Thread):
 #         ButtonOff = 17                    / Handheld controller button off pressed event 
 #         DriverFailed = 19                 / Driver failed to load
 #         DriverReset = 20                  / All nodes and values for this driver have been removed.  This is sent instead of potentially hundreds of individual node and value notifications.
-#         MsgComplete = 21                  / The last message that was sent is now complete.
 
         print('\n%s\n[%s]:' % ('-'*20, args['notificationType']))
         print args
@@ -292,6 +292,8 @@ class OZWavemanager(threading.Thread):
             self._handleGroupChanged(args)
         elif notifyType in ('AwakeNodesQueried', 'AllNodesQueried'):
             self._handleInitializationComplete(args)
+        elif notifyType in ('AllNodesQueriedSomeDead'):
+            self._handleMarkSomeNodesDead(args)
         elif notifyType == 'NodeProtocolInfo':
             self._handleNodeLinked(args)
         elif notifyType == 'EssentialNodeQueriesComplete':
@@ -362,6 +364,13 @@ class OZWavemanager(threading.Thread):
         else :
             if args['nodeId']== 255 and not self._ready :
                 self._handleInitializationComplete(args) # TODO :depuis la rev 585 pas de 'AwakeNodesQueried' ou  'AllNodesQueried' ? on force l'init
+    
+    def _handleMarkSomeNodesDead(self,  args):
+        """Un ou plusieurs node(s) ont été identifié comme mort"""
+        self._log.info("Some nodes ares dead : " , args)
+        print "**************************************"
+        print ("Some nodes ares dead : " , args)
+        # TODO: nouvelle notification à identifier et gérer le fonctionnement
             
     def _handleNotification(self,  args):
         """Une erreur ou notification particulière est arrivée"""
@@ -394,7 +403,6 @@ class OZWavemanager(threading.Thread):
                 self._log.info('Z-Wave Device Node {0} marked as dead.'.format(node.id))
         else :
             self._log.debug('Error notification code unknown : ', args)
-            
             
     def _getNode(self, homeId, nodeId):
         """ Renvoi l'objet node correspondant"""
@@ -722,12 +730,11 @@ class OZWavemanager(threading.Thread):
             node = self._getNode(self.homeId,  nodeId)
             value = node.getValue(valueId)
             if value :
-                retval['value'] = value.setValue(newValue)
+                retval = value.setValue(newValue)
           #      print ('SetValue, relecture de la valeur : ',  value.getOZWValue())
-                retval['error'] = ""
                 return retval
-            else : return {"error" : "Unknown value %d" %valId}
-        else : return {"error" : "Zwave network not ready, can't find value %d" %valId}     
+            else : return {"value": newValue, "error" : "Unknown value %d" %valId}
+        else : return {"value": newValue, "error" : "Zwave network not ready, can't find value %d" %valId}     
 
     def setMembersGrps(self,  nodeID,  newGroups):
         """Envoie les changement des associations de nodes dans les groups d'association."""

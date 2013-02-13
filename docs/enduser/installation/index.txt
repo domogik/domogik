@@ -196,30 +196,21 @@ Start domogik
 .. code-block:: bash
 
     $ sudo /etc/init.d/domogik start
-    * Starting XPL... Done.
-    * Starting Manager (with -d -r -p)...
-     [INFO] Check if dbmgr is running.
-     [INFO] Check if rest is running.
-     [INFO] Start dbmgr on ambre
-     [OK] Component dbmgr started with pid 18351
-     [INFO] Check non-system plugins to start at manager startup.
-     [INFO] Start rest on ambre
-     [OK] Component rest started with pid 18366
-     [OK] System manager initialized.
-     * Starting Django... Done.
+    * Starting xPL (python version)... Done.
+    * Starting Manager (with -d -r -p -E)... Done.
+    * Updating packages cache... Done
+
 
 It will start : 
 
 * The xpl hub
 * The Domogik manager on this host
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
-* The web interface
 
-Now, you can access the UI using this url : http://127.0.0.1:40404/domogik (adapt to your ip/port defined during the installation).
+Next step : domoweb, the web user interface
+-------------------------------------------
 
-To access to the administration panel :
-* login : admin
-* password : 123
+You can now `install Domoweb <http://docs.domogik.org/domoweb/0.3/>`_, the web user interface.
 
 It doesn't work?
 ----------------

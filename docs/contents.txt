@@ -28,6 +28,7 @@ Table Of Content
     /technical/sensor
     /technical/device_feature_usage
     /technical/database
+    /technical/manager/index
     /technical/network_ports
     /technical/rinor/index
     /technical/rinor/statmgr
@@ -39,6 +40,7 @@ Table Of Content
     /technical/rinor/rest_plugin
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
+    /technical/rinor/rest_host
     /package_development/index
     /package_development/howto
     /package_development/packages_lifecycle
@@ -59,4 +61,6 @@ Table Of Content
     /package_development/data_files
     /package_development/icon
     /package_development/review
+    /tools/index
+    /tools/others
 

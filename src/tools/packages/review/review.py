@@ -46,6 +46,7 @@ import tarfile
 import subprocess
 import time
 from PIL import Image
+import re
 
 ALL_REPO = "@@ALL@@"   # string to identify a better repo than stable (used for self._no_more)
 REPO_STABLE = "stable"    
@@ -116,6 +117,7 @@ class PkgReview:
         # python
         self.title("Python code : quality analysis")
         self._pylint()
+        self._python_bad_usages()
 
         # web pages ?
         self.title("Domoweb related pages")
@@ -406,6 +408,36 @@ class PkgReview:
             else:
                 self.ask("Please look at pylint output to choose the best candidate repository for this file")
 
+    def _python_bad_usages(self):
+        """ Check in the python code for some bad usages
+        """
+        the_files = []
+        self.debug("List the python files to analysis...")
+        for r,d,f in os.walk(SRC_DIR):
+            for files in f:
+                if files.endswith(".py"):
+                     self.debug("- %s" %  os.path.join(r,files))
+                     the_files += [os.path.join(r,files)]
+
+        # Do the "while True" check for each file
+        # while *True must not be used as this is blocking for stopping the plugin properly
+        self._python_find_bad_usages("while *True", the_files)
+        
+
+    def _python_find_bad_usages(self, pattern, file_list):
+        """ Look for a bad pattern in a list of files
+        """
+        for the_file in file_list:
+            found_bad_usage, bad_usages =  self._grep(the_file, pattern)
+            if found_bad_usage:
+                result = "\n"
+                for line in bad_usages:
+                    result += "%s%s" % (LINE_BLANK, line)
+                self.warning("There may be something bad in : %s%s" % (the_file, result))
+                self.ask("Check in the file if this is OK")
+
+
+
 
 
 
@@ -496,6 +528,18 @@ class PkgReview:
         tar.extractall(path = extract_path)
         tar.close()
 
+    def _grep(self, filename, pattern):
+        """ search for the pattern in the file
+        """
+        lines_found = []
+        found = False
+        line_num = 0
+        for line in open(filename):
+            line_num += 1
+            if re.search(pattern, line):
+                found = True 
+                lines_found.append("%4d:%s" % (line_num, line))
+        return found, lines_found
 
 if __name__ == "__main__":
     review = PkgReview(sys.argv[1])

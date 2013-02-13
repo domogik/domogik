@@ -62,7 +62,8 @@ In Domogik administration, go to the ipx800 configuration page.
 |               |               |                                                                                                     |
 |               |               | * relay 0 (0..7) : "ipx-led0"                                                                       |
 |               |               | * digital input 2 (0..3) : "ipx-btn2"                                                               |
-|               |               | * analog input 1 (1..2) : "ipx-an1"                                                                 |
+|               |               | * analog input 1 (1..2) : "ipx-an1"  (for models : ipx800, ipx800 pro, ipx800 v2)                   |
+|               |               | * analog input 1 (0..3) : "ipx-analog0"  (for models : ipx800 v3)                                   |
 |               |               | * counter 3 (0..3) : "ipx-count3"                                                                   |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 | ip            |               | Ip address of the relay board. You can use the **ipx800 find** helper to discover it                |
@@ -138,10 +139,28 @@ Analog input
 +====================+===================+============================================================================================+
 | |example_anain|    | Name              | The name you want to give to the device : *Temperature, voltage, ...*                      |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Address           | The device address : <ipx800 name>-an<1..2>. The number is the analog input number.        |
+|                    | Address           | Ipx800, ipx800 pro, ipx800 v2 :                                                            |
+|                    |                   |                                                                                            |
+|                    |                   | The device address : <ipx800 name>-an<1..2>. The number is the analog input number.        |
 |                    |                   | Example for a relay board name *ipx* : ipx-an2                                             |
+|                    |                   |                                                                                            |
+|                    |                   | Ipx800 v3 :                                                                                |
+|                    |                   |                                                                                            |
+|                    |                   | The device address : <ipx800 name>-analog<0..3>. The number is the analog input number.    |
+|                    |                   | Example for a relay board name *ipx* : ipx-analog2                                         |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Feature           | RelayBoard.Analog_Input                                                                    |
+|                    | Feature           | Ipx800, ipx800 pro, ipx800 v2 :                                                            |
+|                    |                   |                                                                                            |
+|                    |                   | * Analog input (ipx800 v1, pro, v2)                                                        |
+|                    |                   |                                                                                            |
+|                    |                   | Ipx800 v3 :                                                                                |
+|                    |                   |                                                                                            |
+|                    |                   | * Analog input (ipx800 v3) : Analog                                                        |
+|                    |                   | * Analog input (ipx800 v3) : Volt                                                          |
+|                    |                   | * Analog input (ipx800 v3) : Temperature (TC4012 Sensor)                                   |
+|                    |                   | * Analog input (ipx800 v3) : Percent (SHT-X3:Light-LS100)                                  |
+|                    |                   | * Analog input (ipx800 v3) : Temperature (SHT-X3:Temp-TC5050)                              |
+|                    |                   | * Analog input (ipx800 v3) : Percent (SHT-X3:RH-SH100)                                     |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Usage             | An appropriate usage (*Temperature, ...*)                                                  |
 |                    +-------------------+--------------------------------------------------------------------------------------------+

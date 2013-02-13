@@ -6,8 +6,13 @@
                 <filter>
                     <key name="type" value="output"/>
                     <key name="type" value="input"/>
-                    <key name="type" value="voltage"/>
                     <key name="type" value="count"/>
+                    <!-- all ipx analog -->
+                    <key name="type" value="voltage"/>
+                    <!-- ipx3 analog -->
+                    <key name="type" value="generic"/>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="percent"/>
                 </filter>
             </listener>
             <mapping>
@@ -16,10 +21,18 @@
                        filter_key="type" filter_value="output" />
                 <value field="current" new_name="input"
                        filter_key="type" filter_value="input" />
-                <value field="current" new_name="voltage"
-                       filter_key="type" filter_value="voltage" />
                 <value field="current" new_name="count"
                        filter_key="type" filter_value="count" />
+                <!-- all ipx analog -->
+                <value field="current" new_name="voltage"
+                       filter_key="type" filter_value="voltage" />
+                <!-- ipx3 analog -->
+                <value field="current" new_name="generic"
+                       filter_key="type" filter_value="generic" />
+                <value field="current" new_name="temp"
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="percent"
+                       filter_key="type" filter_value="percent" />
             </mapping>
         </xpltype>
     </schema>

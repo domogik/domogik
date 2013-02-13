@@ -1,18 +1,20 @@
-=======
-Manager
-=======
-
-.. todo ::
-    http://wiki.domogik.org/xPL_plugin_manager&highlight=xpl%20plugin%20manager
+================
+Manager Overview
+================
 
 Purpose
 =======
-The manager is used to automatically start core components and eventually plugins at its startup. Then he will check the plugins status and wait for a command.
 
-You can call it with *dmg_manager*.
+The manager is the one which will start, stop and monitor all the others components (dbmgr, rest, plugins, ...). It will also manage the packages (installation, ...).
+
+You can have several managers on a multihost installation.
+
+You can call it with the **dmg_manager** command.
+
 
 Design
 ======
+
 The plugins manager is a xPL plugin (heritates of *domogik.xpl.common.plugin.XplPlugin*).
 When it starts, it connects to the xPL network and wait for messages.
 
@@ -35,10 +37,31 @@ It will then wait and listen for *domogik.system* and *domogik.package* xPL comm
 
 Auto-refresh the enabled plugins list
 =====================================
+
 When the Domogik configuration file is updated, the manager reloads it (so there is no need to restart the manager after enabling a plugin).
 
 xPL commands
 ============
-See :doc:`the dedicated page </technical/xpl_domogik_system>`.
 
-    
+See :doc:`the dedicated page </technical/xpl/internal>`.
+
+Multi host
+==========
+
+On a multi host system, there are 2 sorts of managers : 
+
+* the master which is only on the main host. 
+* the secondaries which are on all the others hosts. 
+
+Master manager
+--------------
+
+On startup this manager will start **dbmgr**, **rest** and the plugins. It will also look for external members.
+
+
+
+Secondaries managers
+--------------------
+
+These managers only handle the plugins on the host (start, stop, monitor, installation).
+You must not add these options to a secondary manager : -d, -r or -H !!
