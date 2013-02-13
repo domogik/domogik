@@ -96,6 +96,7 @@ class Scene:
             config.read(file)
             scene={}
             scene_numb= "scene_" + config.get('Scene','name')
+            self.log.info("Open file %s" %scene_numb)
             for section in config.sections():
                data={}
                for option in config.options(section):
@@ -156,11 +157,13 @@ class Mscene():
 ### Action_true is a list with all action in dictionnary form, dictionnary key is address,techno, command and value
 ### Action_false is same as Action_true but for else case
 
-    def __init__(self,scene,xplmanager,devices,Actions,rinor,host):
+    def __init__(self,scene,xplmanager,devices,Actions,rinor,host,logfile):
        #initialise les variables global
+       self.log = logfile
+       self.log.info('initialisation d une scene')
        print('initialisation d une scene')
        self.number= "scene_%s" %scene['name']
-       print("scene name= %s" %self.number)
+       self.log.info("scene name= %s" %self.number)
        self.file = scene['file']
        self.gcondition=self.condition_formulate(scene['condition'])
        self.myxpl=xplmanager
@@ -168,10 +171,12 @@ class Mscene():
        self.senderplug = "domogik-scene.%s" %host
        self.gaction_true = {}
        self.gaction_false ={}
-       print 'initilisation des actions: %s' %Actions
+       self.log.info("scene %s: Initialisation des actions" %self.number)
        for action in Actions:
-          print 'initilisation de l actions: %s' %Actions[action]
-          print 'actiontype = %s' %Actions[action]["type"]
+          self.log.info("scene %s: Initialisation de l'action %s" %(self.number,Actions[action]))
+###          print 'initilisation de l actions: %s' %Actions[action]
+          self.log.info("scene %s: ActionType = %s" %(self.number,Actions[action]["type"]))
+###          print 'actiontype = %s' %Actions[action]["type"]
           if Actions[action]["type"] == 'Action True':
              print 'Gaction_true'
              self.gaction_true[action]=Actions[action]
@@ -356,7 +361,7 @@ class Mscene():
 ### test devices value and evaluate result
         print('test of device')
         print("value du message")
-        print 
+
         for device in self.devices:
            if self.devices[device]['op'] != '':
               if self.devices[device]['op'] == '=':
@@ -381,7 +386,11 @@ class Mscene():
         print 'conditon: %s' %self.gcondition
         print 'self.devices_test: %s' %self.devices_test
         print 'self.devices_stat: %s' %self.devices_stat
-        new_value = eval(self.gcondition)
+
+        try:
+           new_value = eval(self.gcondition)
+        except:
+           self.log.error("scene %s: incorrect Condition = %s" %(self.number, self.gcondition))
 
         if last_value != new_value:
            if new_value == True:
@@ -406,6 +415,7 @@ class Mscene():
 
     def condition_formulate(self,condition):
 ### correction of condition test to do a correct test
+       self.log.info("scene %s: Condition = %s" %(self.number,condition))
        condition = condition.lower()
        condition = condition.replace('(', ' ( ')
        condition = condition.replace(')', ' ) ')
@@ -426,5 +436,6 @@ class Mscene():
           condition = condition.replace(device_av, device_ap)
 
        condition = " ".join(condition.split())
-       print 'nouvelle condition : %s' %condition
+       self.log.info("scene %s: Nouvelle condition = %s" %(self.number,condition))
+###       print 'nouvelle condition : %s' %condition
        return condition
