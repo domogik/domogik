@@ -42,7 +42,7 @@ from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.xpl.lib.rest.tail import Tail
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, ICON_CACHE_DIR 
-from domogik.common.packagexml import PackageException
+from domogik.common.packagejson import PackageException
 from domogik.common.packagejson import PackageJson
 import time
 import urllib
