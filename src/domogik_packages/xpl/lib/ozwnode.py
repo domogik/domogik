@@ -513,6 +513,38 @@ class ZWaveNode:
         for value in self.values.keys():
             retval['Values'].append(self.values[value].getInfos())
         return retval
+
+    def getStatistics(self):
+        """
+        Retrieve statistics from node.
+
+        Statistics:
+
+         sentCnt                             # Number of messages sent from this node.
+         sentFailed                          # Number of sent messages failed
+         retries                               # Number of message retries
+         receivedCnt                       # Number of messages received from this node.
+         receivedDups                      # Number of duplicated messages received;
+         receivedUnsolicited              # Number of messages received unsolicited
+         sentTS                                 # Last message sent time
+         receivedTS                            # Last message received time
+         lastRequestRTT                  # Last message request RTT
+         averageRequestRTT             # Average Request Round Trip Time (ms).
+         lastResponseRTT                 # Last message response RTT
+         averageResponseRTT           #Average Reponse round trip time.
+         quality                                # Node quality measure
+         lastReceivedMessage[254]      # Place to hold last received message
+         ccData                               # List of statistic on each command_class
+            commandClassId   # Num type of CommandClass id.
+            sentCnt             # Number of messages sent from this CommandClass.
+            receivedCnt        # Number of messages received from this CommandClass.
+
+        :return: Statistics of the node
+        :rtype: dict()
+
+        """
+       
+        return self._manager.getNodeStatistics(self.homeId,  self.nodeId)
         
     def setName(self, name):
         """Change le nom du node"""

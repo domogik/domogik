@@ -269,7 +269,26 @@ class OZwave(XplPlugin):
                                     'error': err if err != '' else "no", 
                                     'data': self.getUIdata2dict(info)})               
                 print mess                
-                
+            elif  request['request'] == 'GetNodeStats':
+                info = self.myzwave.getNodeStatistics(request['node'])
+                err = info['error']
+                ccData = info['ccData']
+                del info['error']
+                del info['ccData']
+                del info['lastReceivedMessage']  # TODO: key supprimée, gerer le message zwave en hex.
+                for  item in info : info[item] = str (info[item]) # Pour etre compatible avec javascript
+                mess.add_data({'command' : 'Refresh-ack', 
+                                    'group' :'UI', 
+                                    'node' : request['node'],
+                                    'error': err if err != '' else "no", 
+                                    'data': self.getUIdata2dict(info)})
+                i = 1
+                for item in ccData :
+                    item['commandClassId'] = self.myzwave.getCommandClassName(item['commandClassId'] ) + ' (' + hex(item['commandClassId'] ) +')'
+                    for  cclass in item: item[cclass] = str (item[cclass])  # Pour etre compatible avec javascript
+                    mess.add_data({'item%d' %i  : self.getUIdata2dict(item)})
+                    i=i+1
+                print mess                             
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 

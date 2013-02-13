@@ -710,7 +710,18 @@ class OZWavemanager(threading.Thread):
             retval['elapsedtime'] = str(timedelta(0,time.time()-self._timeStarted))
             return retval
         else : return {"error" : "Zwave network not ready, can't find controller"}        
-        
+    
+    def getNodeStatistics(self, nodeId):
+        """Retourne les statistic d'un node"""
+        if self.ready :
+            node = self._getNode(self.homeId,  nodeId)
+            retval = node.getStatistics()
+            if retval : 
+                # for  item in retval : retval[item] = str (retval[item]) # Pour etre compatible avec javascript
+                retval['error'] = ""
+            else : retval['error'] = "Zwave node %d not response" %nodeId
+            return retval
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
         
     def setUINodeNameLoc(self,  nodeId,  newname, newloc):
         """Change le nom et/ou le localisation du node dans OZW et dans le decive si celui-ci le supporte """
