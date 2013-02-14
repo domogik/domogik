@@ -713,13 +713,15 @@ class OZWavemanager(threading.Thread):
     
     def getNodeStatistics(self, nodeId):
         """Retourne les statistic d'un node"""
+        retval={}
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
-            retval = node.getStatistics()
-            if retval : 
-                # for  item in retval : retval[item] = str (retval[item]) # Pour etre compatible avec javascript
-                retval['error'] = ""
-            else : retval['error'] = "Zwave node %d not response" %nodeId
+            if node :
+                retval = node.getStatistics()
+                if retval : 
+                    retval['error'] = ""
+                else : retval['error'] = "Zwave node %d not response" %nodeId
+            else : retval['error'] = "Zwave node %d unknown" %nodeId
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
         
