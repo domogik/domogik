@@ -96,7 +96,7 @@ class Scene:
             config.read(file)
             scene={}
             scene_numb= "scene_" + config.get('Scene','name')
-            self.log.info("Open file %s" %scene_numb)
+            self._log.info("Open for read file %s" %scene_numb)
             for section in config.sections():
                data={}
                for option in config.options(section):
@@ -106,12 +106,16 @@ class Scene:
         return all_scene
         
     def delete_scene(self,file):
-        """ Add ligne to scene file
+        """ Delete a scene file
         """
-        os.remove(file)
+        self._log.info("Remove file: %s" %file)
+        try:
+           os.remove(file)
+        except:
+           self._log.error("Impossible to remove %s" %file)
         
     def add_scene(self,data):
-        """ Add a ligne to scene fle
+        """ Add a scene file
         """
         file=ConfigParser.ConfigParser()
         scene_file = data['Scene']['file']
@@ -133,17 +137,12 @@ class Scene:
         file.add_section('Other')
         for value in data['Other']:
            file.set('Other',str(value), str(data['Other'][value]))
-        
-#        new_file.add_section('Action_True')
-#        new_file.set('Action_True','address',action_true_adr)
-
 
         with open(scene_file, 'w') as fich:
            file.write(fich)
         fich.close
         
-        
-        print("add new scene")
+        self._log.info("Add new scene %s Sucessfully" %data['Scene'][value])
 
 
 class Mscene():
