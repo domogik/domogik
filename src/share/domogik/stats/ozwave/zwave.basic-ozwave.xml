@@ -6,7 +6,7 @@
                 <filter/>
             </listener>
             <mapping>
-                <device field="addressety"/>
+                <device field="device"/>
                 <value field="command"/>
                 <value field="level"/>
             </mapping>

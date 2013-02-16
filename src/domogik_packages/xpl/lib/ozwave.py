@@ -485,7 +485,7 @@ class OZWavemanager(threading.Thread):
 #        print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
-                          'addressety' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
+                          'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
                      #     'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
                           'valuetype':  valueId['type'], 
                           'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
@@ -629,10 +629,10 @@ class OZWavemanager(threading.Thread):
         retval["File"] ="confirmed"
         return retval
 
-    def getZWRefFromxPL(self, addresseTy):
+    def getZWRefFromxPL(self, device):
         """ Retourne  les références Zwave envoyées depuis le xPL domogik 
-        @ param : addresseTy format : nomReseaux.NodeID.Instance """
-        ids = addresseTy.split('.')
+        @ param : device format : nomReseaux.NodeID.Instance """
+        ids = device.split('.')
         retval ={}
         retval['homeId'] = self._nameAssoc[ids[0]] if self._nameAssoc[ids[0]]  else self.homeId
         if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO: gérer un message pour l'utilisateur pour erreur de config.
@@ -641,12 +641,12 @@ class OZWavemanager(threading.Thread):
         print "getZWRefFromxPL : ", retval
         return retval
         
-    def sendNetworkZW(self, command,  addresseTy, opt =""):
+    def sendNetworkZW(self, command,  device, opt =""):
         """ En provenance du réseaux xPL
               Envoie la commande sur le réseaux zwave  """ 
         print ("envoi zwave command %s" % command)
-        if addresseTy != None :
-            addrZW = self.getZWRefFromxPL(addresseTy)
+        if device != None :
+            addrZW = self.getZWRefFromxPL(device)
             nodeID = int(addrZW['nodeId'])
             homeId = addrZW['homeId'] # self.homeId
             instance = addrZW['instance']
