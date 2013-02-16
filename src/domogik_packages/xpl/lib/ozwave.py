@@ -705,7 +705,7 @@ class OZWavemanager(threading.Thread):
             if retval : 
                 for  item in retval : retval[item] = str (retval[item]) # Pour etre compatible avec javascript
                 retval['error'] = ""
-            else : retval['error'] = "Zwave controller not response"
+            else : retval = {'error' : "Zwave controller not response"}
             retval['msqueue'] = str(self.getCountMsgQueue())
             retval['elapsedtime'] = str(timedelta(0,time.time()-self._timeStarted))
             return retval
@@ -720,7 +720,7 @@ class OZWavemanager(threading.Thread):
                 retval = node.getStatistics()
                 if retval : 
                     retval['error'] = ""
-                else : retval['error'] = "Zwave node %d not response" %nodeId
+                else : retval = {'error' : "Zwave node %d not response" %nodeId}
             else : retval['error'] = "Zwave node %d unknown" %nodeId
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
