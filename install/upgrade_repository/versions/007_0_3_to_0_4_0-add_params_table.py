@@ -43,6 +43,15 @@ def upgrade(migrate_engine):
         migrate_engine.execute("DROP table core_device_feature")
     if database_utils.table_exists(migrate_engine, "core_device_feature_model"):
         migrate_engine.execute("DROP table core_device_feature_model")
+    # technology removal
+    # 0- delete foreign key between device and device_type
+    # 1- set device_type to null
+    # 2- empty device_type
+    # 3- empty technology
+    # 4- rename table
+    # 5- rename field in device_type
+    # 6- re-add the foreign key
+
 
 def downgrade(migrate_engine):
     # bind the engine

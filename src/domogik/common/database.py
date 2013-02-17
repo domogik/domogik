@@ -39,25 +39,22 @@ Implements
 """
 
 import datetime, hashlib, time
-from types import DictType
 
 import json
 import sqlalchemy
 from sqlalchemy import Table, MetaData
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker,scoped_session
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-from sqlalchemy.pool import QueuePool
+from sqlalchemy.orm import sessionmaker
 
 from domogik.common.utils import ucode
 from domogik.common import logger
 from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        ACTUATOR_VALUE_TYPE_LIST, Device,
+        Device,
         DeviceUsage, DeviceStats,
-        DeviceTechnology, PluginConfig, DeviceType, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST,
+        Plugin, PluginConfig, DeviceType, Person,
+        UserAccount,
         Command, CommandParam,
         Sensor,
         XplCommand, XplStat, XplStatParam, XplCommandParam
@@ -306,7 +303,7 @@ class DbHelper():
 
         """
         if plugin is not None:
-            return self.__session.query(DeviceType).filter_by(device_technology_id=ucode(plugin)).all()
+            return self.__session.query(DeviceType).filter_by(plugin_id=ucode(plugin)).all()
         else:
             return self.__session.query(DeviceType).all()
 
@@ -339,17 +336,17 @@ class DbHelper():
 
         @param dty_id : device type id
         @param dty_name : device type name
-        @param dt_id : technology id (x10, plcbus,...)
+        @param dt_id : plugin id (x10, plcbus,...)
         @param dty_description : device type description (optional)
         @return a DeviceType (the newly created one)
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device type with technology id %s. It does not exist" % dt_id)
+        if not self.__session.query(Plugin).filter_by(id=dt_id).first():
+            self.__raise_dbhelper_exception("Couldn't add device type with plugin id %s. It does not exist" % dt_id)
         dty = DeviceType(id=ucode(dty_id), name=ucode(dty_name), description=ucode(dty_description),
-                         device_technology_id=dt_id)
+                         plugin_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -362,7 +359,7 @@ class DbHelper():
 
         @param dty_id : device type id to be updated
         @param dty_name : device type name (optional)
-        @param dt_id : id of the associated technology (optional)
+        @param dt_id : id of the associated plugin (optional)
         @param dty_description : device type detailed description (optional)
         @return a DeviceType object
 
@@ -377,9 +374,9 @@ class DbHelper():
         if dty_name is not None:
             device_type.name = ucode(dty_name)
         if dt_id is not None:
-            if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
-                self.__raise_dbhelper_exception("Couldn't find technology id %s. It does not exist" % dt_id)
-            device_type.device_technology_id = dt_id
+            if not self.__session.query(Plugin).filter_by(id=dt_id).first():
+                self.__raise_dbhelper_exception("Couldn't find plugin id %s. It does not exist" % dt_id)
+            device_type.plugin_id = dt_id
         self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
@@ -419,39 +416,30 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
 
 ####
-# Device technology
+# Plugin
 ####
-    def list_device_technologies(self):
+    def get_plugin(self, id=None):
         """Return a list of device technologies
 
         @return a list of DeviceTechnology objects
 
         """
-        return self.__session.query(DeviceTechnology).all()
+        if id == None:
+            return self.__session.query(Plugin).all()
+        else:
+            return self.__session.query(Plugin).filter_by(id=ucode(id)).first()
 
-    def get_device_technology_by_id(self, dt_id):
-        """Return information about a device technology
+    def add_plugin(self, name, description=None, version=None):
+        """Add a plugin
 
-        @param dt_id : the device technology id
-        @return a DeviceTechnology object
-
-        """
-        return self.__session.query(
-                        DeviceTechnology
-                    ).filter_by(id=ucode(dt_id)
-                    ).first()
-
-    def add_device_technology(self, dt_id, dt_name, dt_description=None):
-        """Add a device_technology
-
-        @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
-        @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
-        @param dt_description : extended description of the technology
+        @param name : plugin name
+        @param description : extended description of the plugin
+        @param version : version of the plugin
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = DeviceTechnology(id=dt_id, name=dt_name, description=dt_description)
+        dt = Plugin(id=name, description=description, version=version)
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -459,58 +447,59 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dt
 
-    def update_device_technology(self, dt_id, dt_name=None, dt_description=None):
-        """Update a device technology
+    def update_plugin(self, id, description=None, version=None):
+        """Update a plugin
 
-        @param dt_id : device technology id to be updated
-        @param dt_name : device technology name (optional)
-        @param dt_description : device technology detailed description (optional)
-        @return a DeviceTechnology object
+        @param name : plugin name
+        @param description : extended description of the plugin
+        @param version : version of the plugin
+        @return a plugin object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_tech = self.__session.query(
-                                DeviceTechnology
-                            ).filter_by(id=ucode(dt_id)
+        plugin = self.__session.query(
+                                Plugin
+                            ).filter_by(id=ucode(id)
                             ).first()
-        if device_tech is None:
-            self.__raise_dbhelper_exception("DeviceTechnology with id %s couldn't be found" % dt_id)
-        if dt_name is not None:
-            device_tech.name = ucode(dt_name)
-        if dt_description is not None:
-            if dt_description == '': dt_description = None
-            device_tech.description = ucode(dt_description)
-        self.__session.add(device_tech)
+        if plugin is None:
+            self.__raise_dbhelper_exception("Plugin with id %s couldn't be found" % id)
+        if description is not None:
+            if description == '': description = None
+            plugin.description = ucode(description)
+        if version is not None:
+            if version == '': version = None
+            plugin.version = ucode(version)
+        self.__session.add(plugin)
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_tech
+        return plugin
 
-    def del_device_technology(self, dt_id, cascade_delete=False):
-        """Delete a device technology record
+    def del_plugin(self, pid, cascade_delete=False):
+        """Delete a plugin
 
-        @param dt_id : id of the device technology to delete
+        @param id : id of the plugin to delete
         @param cascade_delete : True if related objects should be deleted, optional default set to False
-        @return the deleted DeviceTechnology object
+        @return the deleted plugin  object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
+        dt = self.__session.query(Plugin).filter_by(id=ucode(pid)).first()
         if dt:
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all():
+                for device_type in self.__session.query(DeviceType).filter_by(plugin_id=ucode(dt.id)).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
                     self.__session.commit()
             else:
                 device_type_list = self.__session.query(
                                             DeviceType
-                                        ).filter_by(device_technology_id=ucode(dt.id)
+                                        ).filter_by(plugin_id=ucode(dt.id)
                                         ).all()
                 if len(device_type_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete device technology %s : there are associated device types"
+                    self.__raise_dbhelper_exception("Couldn't delete plugin %s : there are associated device types"
                                                % dt_id)
 
             self.__session.delete(dt)
@@ -520,7 +509,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return dt
         else:
-            self.__raise_dbhelper_exception("Couldn't delete device technology with id %s : it doesn't exist" % dt_id)
+            self.__raise_dbhelper_exception("Couldn't delete plugin with id %s : it doesn't exist" % dt_id)
 
 ####
 # Plugin config
@@ -667,34 +656,6 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def get_device_by_technology_and_address(self, techno_id, device_address):
-        """Return a device by its technology and address
-
-        @param techno_id : technology id
-        @param device address : device address
-        @return a device object
-
-        """
-        device_list = self.__session.query(
-                                Device
-                            ).filter_by(address=ucode(device_address)
-                            ).all()
-        if len(device_list) == 0:
-            return None
-        device = []
-        for device in device_list:
-            device_type = self.__session.query(
-                                    DeviceType
-                                ).filter_by(id=device.device_type_id
-                                ).first()
-            device_tech = self.__session.query(
-                                    DeviceTechnology
-                                ).filter_by(id=device_type.device_technology_id
-                                ).first()
-            if device_tech.id.lower() == ucode(techno_id.lower()):
-                return device
-        return None
-
     def get_all_devices_of_usage(self, du_id):
         """Return all the devices of a usage
 
@@ -717,7 +678,7 @@ class DbHelper():
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
-        pjson = PackageJson(dt.device_technology_id).json
+        pjson = PackageJson(dt.plugin_id).json
         if pjson['json_version'] < 2:
             self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
             return None
@@ -781,7 +742,7 @@ class DbHelper():
                 self.__session.add(xplcommand)
                 self.__session.flush()
                 # add static params
-	        for p in xpl_command['parameters']['static']:
+                for p in xpl_command['parameters']['static']:
                     par = XplCommandParam(cmd_id=xplcommand.id, \
                                          key=p['key'], value=p['value'])           
                     self.__session.add(par)
@@ -873,7 +834,7 @@ class DbHelper():
         # Use this method rather than cascade deletion (much faster)
         meta = MetaData(bind=DbHelper.__engine)
         t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-        result = self.__session.execute(
+        self.__session.execute(
             t_stats.delete().where(t_stats.c.device_id == d_id)
         )
         
@@ -888,22 +849,18 @@ class DbHelper():
 # stats upgrade
 ####
     def upgrade_list_old(self):
-        return self.__session.query(Device.id,Device.name,DeviceStats.skey).\
+        return self.__session.query(Device.id, Device.name, DeviceStats.skey).\
                     filter(Device.id==DeviceStats.device_id).\
                     filter(Device.address!=None).\
                     order_by(Device.id).\
                     distinct()
 
     def upgrade_list_new(self):
-        return self.__session.query(Device.id,Device.name,Sensor.id,Sensor.name).\
+        return self.__session.query(Device.id, Device.name, Sensor.name).\
                     filter(Device.id==Sensor.device_id).\
                     filter(Device.address==None).\
                     order_by(Device.id).\
                     distinct()
-
-    def upgrade_do(self, oldid, oldkey, newid, sensorid):
-        # do the upgrade
-        return
 
 ####
 # Device stats
@@ -917,7 +874,7 @@ class DbHelper():
                         ).filter_by(**filters
                         ).distinct()
 
-    def list_device_stats(self, ds_device_id=None,ds_skey=None,ds_number=None):
+    def list_device_stats(self, ds_device_id=None, ds_skey=None, ds_number=None):
         """Return a list of all stats for a device
 
         @param ds_device_id : the device id
@@ -945,7 +902,7 @@ class DbHelper():
                         ).all()
 
 
-    def list_last_n_stats_of_device(self, ds_device_id=None,ds_skey=None,ds_number=None):
+    def list_last_n_stats_of_device(self, ds_device_id=None, ds_skey=None, ds_number=None):
         """Get the N latest statistics of a device for a given key
 
         @param ds_device_id : the device id
@@ -997,7 +954,7 @@ class DbHelper():
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
-    def get_last_stat_of_device(self, ds_device_id=None,ds_skey=None):
+    def get_last_stat_of_device(self, ds_device_id=None, ds_skey=None):
         """Get the latest statistic of a device for a given key
 
         @param ds_device_id : the device id
@@ -1189,7 +1146,7 @@ class DbHelper():
                 }
             }
 
-    def device_has_stats(self, ds_device_id=None,ds_skey=None):
+    def device_has_stats(self, ds_device_id=None, ds_skey=None):
         """Check if the device has stats that were recorded
 
         @param ds_device_id : the device id
@@ -1197,7 +1154,7 @@ class DbHelper():
         @return True or False
 
         """
-        return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
+        return len(self.list_device_stats(ds_device_id, ds_skey, 1)) > 0
 
     def _get_duplicated_devicestats_id(self, device_id, key, value):
         """Check if the data is duplicated with older values
@@ -1219,23 +1176,21 @@ class DbHelper():
         self.log.debug("after read")
         last_values = my_db.list_last_n_stats_of_device(device_id, key, ds_number=2)
         if last_values and len(last_values)>=2:
-            # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
-            # Ex: db_round_filter = {"12" : { "total_space" : 1048576, "free_space" : 1048576, "percent_used" : 0.5, "used_space": 1048576 },"13" : { "hchp" : 500, "hchc" : 500, "papp" : 200 }}
-            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value, last_values[0].value, last_values[1].value,id))
+            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key, value, last_values[0].value, last_values[1].value, id))
             if db_round_filter and str(last_values[1].device.id) in db_round_filter and key in db_round_filter[str(last_values[1].device.id)]:
-                    round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
-                    rvalue = int(float(value) / round_value) * round_value
-                    val0 = int(float(last_values[0].value) / round_value) * round_value
-                    val1 = int(float(last_values[1].value) / round_value) * round_value
-                    self.log.debug("rvalue=%s" % rvalue)
-                    self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue, value, val0, val1))
+                round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
+                rvalue = int(float(value) / round_value) * round_value
+                val0 = int(float(last_values[0].value) / round_value) * round_value
+                val1 = int(float(last_values[1].value) / round_value) * round_value
+                self.log.debug("rvalue=%s" % rvalue)
+                self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue, value, val0, val1))
             else:
                 rvalue = value
                 val0 = last_values[0].value
                 val1 = last_values[1].value
             
             if val0 == val1 and val0 == rvalue:
-                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id, last_values[1].device.id,key))
+                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id, last_values[1].device.id, key))
                 return last_values[1].id
         
         return None
@@ -1257,7 +1212,7 @@ class DbHelper():
         self.__session.expire_all()
 
         # Remove intermediate data
-        duplicated_id = self._get_duplicated_devicestats_id(ds_device_id,ds_key,ds_value)
+        duplicated_id = self._get_duplicated_devicestats_id(ds_device_id, ds_key, ds_value)
         if duplicated_id:
             old_stat = self.__session.query(DeviceStats).filter_by(id=duplicated_id).first()
             if old_stat:
