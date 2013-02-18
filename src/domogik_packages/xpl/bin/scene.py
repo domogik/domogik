@@ -111,8 +111,8 @@ class SceneManager(XplPlugin):
                
       Mini_scene = Mscene(scene['Scene'],self.manager,devices,actions,scene['Rinor']['addressport'],self.get_sanitized_hostname(),self.log)
 
-      if 'start_run' in scene:
-         option_start=scene['start_run']
+      if 'run' in scene:
+         option_start=scene['run']
       else:
          option_start=True
 
