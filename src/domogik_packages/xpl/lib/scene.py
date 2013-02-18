@@ -206,10 +206,13 @@ class Mscene():
        print ('command for %s' %self.number)
        if message.type == "xpl-cmnd" and 'command' in message.data:
           if message.data['command']=='start':
+             self.log.info("%s: start command")
              self.scene_start()
           elif message.data['command']=='stop':
+             self.log.info("%s: stop command")
              self.scene_stop()
           elif message.data['command']=='delete':
+             self.log.info("%s: delete command")
              self.scene_delete()
 
     def send_msg_plugin(self, run, stats):
@@ -263,7 +266,7 @@ class Mscene():
        self.initstat='1'
        self.get_stat()
        self.start_listerner()
-       #self.send_msg_plugin('start', 'None')
+       self.send_msg_plugin('start', 'None')
        self.device_test()
        
     def scene_delete(self):

@@ -99,10 +99,13 @@ class SceneManager(XplPlugin):
       
    def mem_scene(self, scene):
 ### init scene one by one
-      print(scene)
+      print('init mem_scene: %s' %scene)
       devices={}
       actions={}
       for section in scene:
+
+         if 'run' in scene[section]:
+            option_start= scene[section]['run']
          if 'type' in scene[section]:
             if scene[section]['type']=='devices':
                devices[section]=scene[section]
@@ -111,13 +114,10 @@ class SceneManager(XplPlugin):
                
       Mini_scene = Mscene(scene['Scene'],self.manager,devices,actions,scene['Rinor']['addressport'],self.get_sanitized_hostname(),self.log)
 
-      if 'run' in scene:
-         option_start=scene['run']
-      else:
-         option_start=True
-
-      if option_start==True:
+      if option_start=="true":
          Mini_scene.scene_start()
+      else:
+         print("pas de lancement")
 
    def scene_cmd(self, message):
 ### function call when plugin receive a message
