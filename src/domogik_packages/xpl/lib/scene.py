@@ -394,23 +394,23 @@ class Mscene():
         if last_value != new_value:
            if new_value == True:
               ### send command and xpl-trig
-              self.send_msg_scene('xpl-trig', 'OK','True')
+              self.send_msg_scene('xpl-trig', 'start','True')
               print("xpl-trig and gaction:%s" %self.gaction_true)
               self.send_command(self.gaction_true)
            if new_value == False:
               ### send command and xpl-trig
-              self.send_msg_scene('xpl-trig', 'OK','False')
+              self.send_msg_scene('xpl-trig', 'start','False')
               print("xpl-trig and gaction:%s" %self.gaction_false)
               self.send_command(self.gaction_false)
         else:
            if new_value == True:
               ### send xpl-stat
-              self.send_msg_scene('xpl-stat', 'OK','True')
+              self.send_msg_scene('xpl-stat', 'start','True')
               print("xpl-stat")
            if new_value == False:
               ### send xpl-stat
               print("xpl-stat")
-              self.send_msg_scene('xpl-stat', 'OK','False')
+              self.send_msg_scene('xpl-stat', 'start','False')
 
     def condition_formulate(self,condition):
 ### correction of condition test to do a correct test

@@ -111,8 +111,8 @@ class SceneManager(XplPlugin):
                
       Mini_scene = Mscene(scene['Scene'],self.manager,devices,actions,scene['Rinor']['addressport'],self.get_sanitized_hostname(),self.log)
 
-      if 'option_start' in scene:
-         option_start=scene['option_start']
+      if 'start_run' in scene:
+         option_start=scene['start_run']
       else:
          option_start=True
 
@@ -128,7 +128,7 @@ class SceneManager(XplPlugin):
       if 'command' in message.data:
          print('command receive')
          if 'fake' in message.data['command']:
-            print 'fake command'
+            self.log.info("Fake Command")
             self.cmd_fake(message)
 
    def cmd_fake(self, message):
