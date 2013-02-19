@@ -159,10 +159,8 @@ class Mscene():
     def __init__(self,scene,xplmanager,devices,Actions,rinor,host,logfile):
        #initialise les variables global
        self.log = logfile
-       self.log.info('initialisation d une scene')
-       print('initialisation d une scene')
        self.number= "scene_%s" %scene['name']
-       self.log.info("scene name= %s" %self.number)
+       self.log_scene('info',"initialisation")
        self.file = scene['file']
        self.gcondition=self.condition_formulate(scene['condition'])
        self.myxpl=xplmanager
@@ -170,12 +168,9 @@ class Mscene():
        self.senderplug = "domogik-scene.%s" %host
        self.gaction_true = {}
        self.gaction_false ={}
-       self.log.info("scene %s: Initialisation des actions" %self.number)
+       self.log_scene('info',"Initialisation of actions")
        for action in Actions:
-          self.log.info("scene %s: Initialisation de l'action %s" %(self.number,Actions[action]))
-###          print 'initilisation de l actions: %s' %Actions[action]
-          self.log.info("scene %s: ActionType = %s" %(self.number,Actions[action]["type"]))
-###          print 'actiontype = %s' %Actions[action]["type"]
+          self.log_scene('info',("scene %s: Initialisation de l'action %s" %(self.number,Actions[action])))
           if Actions[action]["type"] == 'Action True':
              print 'Gaction_true'
              self.gaction_true[action]=Actions[action]
@@ -206,14 +201,22 @@ class Mscene():
        print ('command for %s' %self.number)
        if message.type == "xpl-cmnd" and 'command' in message.data:
           if message.data['command']=='start':
-             self.log.info("%s: start command")
+             self.log_scene('info', "start command receive")
              self.scene_start()
           elif message.data['command']=='stop':
-             self.log.info("%s: stop command")
+             self.log_scene('info', "start stop receive")
              self.scene_stop()
           elif message.data['command']=='delete':
-             self.log.info("%s: delete command")
+             self.log_scene('info', "delete command receive")
              self.scene_delete()
+
+    def log_scene(self, type, datalog):
+        if type == "error":
+           self.log.error("%s : %s" %(self.number,datalog))
+           print("Error %s : %s" %(self.number,datalog))
+        else:
+           self.log.info("%s : %s" %(self.number,datalog))
+           print("INFO %s : %s" %(self.number,datalog))
 
     def send_msg_plugin(self, run, stats):
 ### send a message with the plugin name as source
@@ -236,6 +239,7 @@ class Mscene():
        msg.add_data({'run':run})
        msg.add_data({'stats':stats})
        self.myxpl.send(msg)
+       self.log_scene('info', "Send and xpl message: %s" %msg)
 
     def get_stat(self):
 ### get last stat for a device, argument need is a device_id and the device_keystat
@@ -259,10 +263,10 @@ class Mscene():
           for i in range(len(eval(self.devices[device]['filters']))):
              self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
              liste= liste+1
+       self.log_scene("info","All listener start")
 
     def scene_start(self):
 ###initialise all device_stat et les listerners
-       print('start scene')
        self.initstat='1'
        self.get_stat()
        self.start_listerner()
@@ -271,14 +275,12 @@ class Mscene():
        
     def scene_delete(self):
 ### stop device listerner and del scene listerner
-        print('delete scene')
         self.scene_stop()
         #self.myxpl.del_listener(self.glistener)
         os.remove(self.file)
            
     def scene_stop(self):
 ### del all devices listerner
-       print('stop scene')
        for element in self.listener:
           print self.listener[element]
           self.myxpl.del_listener(self.listener[element])
@@ -286,9 +288,8 @@ class Mscene():
        self.send_msg_plugin('stop','None')
 
     def cmd_device(self, message):
-       print message.data
-       print message
 ### get the stat of message and place it in devices_stat
+       self.log_scene('info', "Intercept an xpl-trig message: %s" %message)
        for device in self.devices:
            print device
            print self.devices[device]['key']
@@ -417,7 +418,7 @@ class Mscene():
 
     def condition_formulate(self,condition):
 ### correction of condition test to do a correct test
-       self.log.info("scene %s: Condition = %s" %(self.number,condition))
+       self.log_scene('info',"Condition = %s" %condition)
        condition = condition.lower()
        condition = condition.replace('(', ' ( ')
        condition = condition.replace(')', ' ) ')
@@ -438,6 +439,6 @@ class Mscene():
           condition = condition.replace(device_av, device_ap)
 
        condition = " ".join(condition.split())
-       self.log.info("scene %s: Nouvelle condition = %s" %(self.number,condition))
-###       print 'nouvelle condition : %s' %condition
+       self.log_scene('info',"new condition is = %s" %condition)
+
        return condition
