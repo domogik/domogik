@@ -24,8 +24,9 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 
 Get Zwave devices (Nodes) informations
 ======================================
+.. note ::
 
-On a zwave system, devices are called **Nodes**.
+   On a zwave system, devices are called **Nodes**.
 
 - **Devices initialisation** field give state of global initialize process.
 
@@ -56,7 +57,7 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 | Representation   | Message                            | Description                                                                                        |
 +==================+====================================+====================================================================================================+
-|                  | **Pointing the mouse over icon column "NodeId" give status of initializing.**                                                           |
+|                  | **Pointing the mouse over icon in column "NodeId" give status of initializing.**                                                        |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
 | |progess-state1| | Uninitialized                      | No starting init operation.                                                                        |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
@@ -73,13 +74,13 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | Out of operation                   | Node is mark as failed, controller don't find him.                                                 |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
-|                  | **Pointing the mouse over icon column "Awake" give status of listening mode.**                                                          |
+|                  | **Pointing the mouse over icon in column "Awake" give status of listening mode.**                                                       |
 | |awake1|         +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | active                             | Node is awake, message can send immediately.                                                       |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
 | |awake2|         | Unknown                            | Node probably sleeping, message are put on send queue.                                             |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
-|                  | **Pointing the mouse over icon column "Type" give capacities of node.**                                                                 |
+|                  | **Pointing the mouse over icon in column "Type" give capacities of node.**                                                              |
 | |det-type|       +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  |                                    | Node is primary controller, is the main device used to configure and control a Z-Wave network.     |
 |                  | Primary Controller                 |                                                                                                    |
@@ -112,10 +113,70 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 | |cmd_node|       +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | Detail Node                        | Show/hide command class capacities table.                                                          |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
-|                  | Update Node                        | Send to node **name** and **location** field to update it.                                         |
+|                  | Update Node                        | Send to node **Name** and **Location** field to update it.                                         |
+|                  |                                    |                                                                                                    |
+|                  |                                    | Saving modification in config file with "Save config" button                                       |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | Edit association                   | Manage groups association.                                                                         |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+
+Manage association devices (groups)
+===================================
+
+.. |grp-dialog-bt| image:: ozwave_grp-dialog-bt.png
+
+- Some devices have the ability to be combined with other devices and can send their information.
+- These associations are using groups, access to the dialog management groups is done with the button |grp-dialog-bt|
+
+.. |grp-dialog| image:: ozwave_grp-dialog.png
+    :width: 500px
+
+|grp-dialog|
+
+how to use management associations
+----------------------------------
+
+.. note ::
+
+      - Due to the possibility of sleeping devices, the system considers the command to have been transmitted.
+      - In the case of a device sleeping command will be transmitted when the device wakes up.
+      - So the association will be effective as this momment there.
+
+      .. warning ::
+
+          Careful if the plugin is stopped between  time command is lost.
+
+- An icon indicates the status of the device in the group, it may be : 
+
+     - unknown
+     - confirmed
+     - to confirm
+     - to update
+
+- The operations are performed by simply drag and drop.
+- After making the changes click on **OK** to send at the device.
+- To quit dialog box click **Cancel**.
+- Actually button **Reset** is not handled.
+
+.. |grp-dialog1| image:: ozwave_grp-dialog1.png
+
+.. |grp-dialog2| image:: ozwave_grp-dialog2.png
+
+.. |grp-dialog3| image:: ozwave_grp-dialog3.png
+
+.. |grp-dialog4| image:: ozwave_grp-dialog4.png
+
++---------------+---------------------------------------------------------------------------------+
+| Example       | Description                                                                     |
++===============+=================================================================================+
+| |grp-dialog1| | If you drop at bad placement a icon forbidden is show.                          |
++---------------+---------------------------------------------------------------------------------+
+| |grp-dialog2| | When you drop in a group who device ins'it to add it, a icon plus is show.      |
++---------------+---------------------------------------------------------------------------------+
+| |grp-dialog3| | After adding device in group, a icon to update is show.                         |
++---------------+---------------------------------------------------------------------------------+
+| |grp-dialog4| | If you drop at bad placement a icon forbidden is show.                          |
++---------------+---------------------------------------------------------------------------------+
 
 Manage devices Commands Class
 =============================
@@ -123,14 +184,15 @@ Manage devices Commands Class
 - All command class are listed in a table.
 
 .. |tab-cmdclass1| image:: ozwave_tab-cmdclass1.png
-    :width: 600px
+    :width: 750px
 
 |tab-cmdclass1|
 
-- you can edit the values that are in writing, if the value is changed one "Edit" button appears, you must click it to send change at device
+- You can edit the values that are in writing, if the value is changed one "Edit" button appears, you must click it to send change at device
+- If exist, pointing the mouse over icon "i" give information about command-class.
 
 .. |tab-cmdclass2| image:: ozwave_tab-cmdclass2.png
-    :width: 600px
+    :width: 650px
 
 |tab-cmdclass2|
 
@@ -141,13 +203,94 @@ Manage devices Commands Class
 Controller commands and actions
 ===============================
 
-.. todo:: 
-    Screen shoot and explanations ......
+.. |ctrl-action-bt| image:: ozwave_ctrl-action-bt.png
+
+.. |ctrl-action-dialog| image:: ozwave_ctrl-action-dialog.png
+    :width: 250px
+
+- You access to dialog box by button |ctrl-action-bt| 
+
+|ctrl-action-dialog|
+
+Actions process
+---------------
+
+- This modal dialog contains informations to guide the user.
+- All actions are not implemented yet and processing is in beta testing.
+
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| Action / command          | Description                                                                                                |
++===========================+============================================================================================================+
+| AddDevice                 | Add a new device (but not a controller) to the Z-Wave network.                                             |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| CreateNewPrimary          | Add a new controller to the Z-Wave network.  The new controller will be the primary, and the current       |
+|                           | primary will become a secondary controller.                                                                |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| ReceiveConfiguration      | Receive Z-Wave network configuration information from another controller.                                  |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| RemoveDevice              | Remove a new device (but not a controller) from the Z-Wave network.                                        |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| RemoveFailedNode          | Move a node to the controller's failed nodes list. This command will only work if the node cannot respond. |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| HasNodeFailed             | Check whether a node is in the controller's failed nodes list.                                             |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| ReplaceFailedNode         | Replace a non-responding node with another. The node must be in the controller's list of failed nodes for  |
+|                           | this command to succeed.                                                                                   |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| TransferPrimaryRole       | Make a different controller the primary.                                                                   |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| RequestNetworkUpdate      | Request network information from the SUC/SIS.                                                              |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| RequestNodeNeighborUpdate | Get a node to rebuild its neighbour list.  This method also does ControllerCommand_RequestNodeNeighbors.   |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| AssignReturnRoute         | Assign a network return routes to a device.                                                                |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| DeleteAllReturnRoutes     | Delete all return routes from a device.                                                                    |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| SendNodeInformation       | Send a node information frame.                                                                             |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| ReplicationSend           | Send information from primary to secondary.                                                                |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| CreateButton              | Create an id that tracks handheld button presses.                                                          |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+| DeleteButton              | Delete id that tracks handheld button presses.                                                             |
++---------------------------+------------------------------------------------------------------------------------------------------------+
+
+Schematic processing
+--------------------
+
+- Each action have differents step, some will attempt user action on device, some will take a long time, some must be stop manually.
+- You can stop action, but stop result have some time a fail report.
+
+.. |ctrl-action-process| image:: ozwave_ctrl-action-process.png
+    :width: 650px
+
+|ctrl-action-process|
 
 Reset controller
 ================
 
-.. todo:: 
-    Screen shoot and explanations ......
- 
+.. |ctrl-reset-bt| image:: ozwave_ctrl-reset-bt.png
+
+- Two mode possible with acces by buttons : |ctrl-reset-bt|
+
+Soft reset
+----------
+
+.. |ctrl-reset-dialog1| image:: ozwave_ctrl-reset-dialog1.png
+
+- Soft Reset a PC Z-Wave Controller who resets a controller without erasing its network configuration settings
+
+|ctrl-reset-dialog1|
+
+
+Hard reset
+----------
+
+.. |ctrl-reset-dialog2| image:: ozwave_ctrl-reset-dialog2.png
+
+.. warning ::
+   Be careful this action is irreverssible
+
+|ctrl-reset-dialog2|
 

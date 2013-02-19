@@ -96,6 +96,7 @@ class Scene:
             config.read(file)
             scene={}
             scene_numb= "scene_" + config.get('Scene','name')
+            self._log.info("Open for read file %s" %scene_numb)
             for section in config.sections():
                data={}
                for option in config.options(section):
@@ -105,12 +106,16 @@ class Scene:
         return all_scene
         
     def delete_scene(self,file):
-        """ Add ligne to scene file
+        """ Delete a scene file
         """
-        os.remove(file)
+        self._log.info("Remove file: %s" %file)
+        try:
+           os.remove(file)
+        except:
+           self._log.error("Impossible to remove %s" %file)
         
     def add_scene(self,data):
-        """ Add a ligne to scene fle
+        """ Add a scene file
         """
         file=ConfigParser.ConfigParser()
         scene_file = data['Scene']['file']
@@ -132,17 +137,12 @@ class Scene:
         file.add_section('Other')
         for value in data['Other']:
            file.set('Other',str(value), str(data['Other'][value]))
-        
-#        new_file.add_section('Action_True')
-#        new_file.set('Action_True','address',action_true_adr)
-
 
         with open(scene_file, 'w') as fich:
            file.write(fich)
         fich.close
         
-        
-        print("add new scene")
+        self._log.info("Add new scene %s Sucessfully" %data['Scene'][value])
 
 
 class Mscene():
@@ -156,11 +156,11 @@ class Mscene():
 ### Action_true is a list with all action in dictionnary form, dictionnary key is address,techno, command and value
 ### Action_false is same as Action_true but for else case
 
-    def __init__(self,scene,xplmanager,devices,Actions,rinor,host):
+    def __init__(self,scene,xplmanager,devices,Actions,rinor,host,logfile):
        #initialise les variables global
-       print('initialisation d une scene')
+       self.log = logfile
        self.number= "scene_%s" %scene['name']
-       print("scene name= %s" %self.number)
+       self.log_scene('info',"initialisation")
        self.file = scene['file']
        self.gcondition=self.condition_formulate(scene['condition'])
        self.myxpl=xplmanager
@@ -168,10 +168,9 @@ class Mscene():
        self.senderplug = "domogik-scene.%s" %host
        self.gaction_true = {}
        self.gaction_false ={}
-       print 'initilisation des actions: %s' %Actions
+       self.log_scene('info',"Initialisation of actions")
        for action in Actions:
-          print 'initilisation de l actions: %s' %Actions[action]
-          print 'actiontype = %s' %Actions[action]["type"]
+          self.log_scene('info',("scene %s: Initialisation de l'action %s" %(self.number,Actions[action])))
           if Actions[action]["type"] == 'Action True':
              print 'Gaction_true'
              self.gaction_true[action]=Actions[action]
@@ -202,11 +201,22 @@ class Mscene():
        print ('command for %s' %self.number)
        if message.type == "xpl-cmnd" and 'command' in message.data:
           if message.data['command']=='start':
+             self.log_scene('info', "Start command receive")
              self.scene_start()
           elif message.data['command']=='stop':
+             self.log_scene('info', "Stop command receive")
              self.scene_stop()
           elif message.data['command']=='delete':
+             self.log_scene('info', "Delete command receive")
              self.scene_delete()
+
+    def log_scene(self, type, datalog):
+        if type == "error":
+           self.log.error("%s : %s" %(self.number,datalog))
+           print("Error %s : %s" %(self.number,datalog))
+        else:
+           self.log.info("%s : %s" %(self.number,datalog))
+           print("INFO %s : %s" %(self.number,datalog))
 
     def send_msg_plugin(self, run, stats):
 ### send a message with the plugin name as source
@@ -229,6 +239,7 @@ class Mscene():
        msg.add_data({'run':run})
        msg.add_data({'stats':stats})
        self.myxpl.send(msg)
+       self.log_scene('info', "Send and xpl message: %s" %msg)
 
     def get_stat(self):
 ### get last stat for a device, argument need is a device_id and the device_keystat
@@ -238,7 +249,10 @@ class Mscene():
           req = urllib2.Request(the_url)
           handle = urllib2.urlopen(req)
           resp = handle.read()
-          self.devices_stat[device]= ast.literal_eval(resp)['stats'][0]['value']
+          if len(ast.literal_eval(resp)['stats'])>0:
+              self.devices_stat[device]= ast.literal_eval(resp)['stats'][0]['value']
+          else:
+              self.devices_stat[device] =""
 
     def start_listerner(self):
        self.listener = {}
@@ -249,36 +263,35 @@ class Mscene():
           for i in range(len(eval(self.devices[device]['filters']))):
              self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
              liste= liste+1
+       self.log_scene("info","All listener start")
 
     def scene_start(self):
 ###initialise all device_stat et les listerners
-       print('start scene')
        self.initstat='1'
        self.get_stat()
        self.start_listerner()
-       #self.send_msg_plugin('start', 'None')
+       self.send_msg_plugin('start', 'None')
        self.device_test()
-       
+       self.log_scene('info','Start done')
+ 
     def scene_delete(self):
 ### stop device listerner and del scene listerner
-        print('delete scene')
         self.scene_stop()
         #self.myxpl.del_listener(self.glistener)
         os.remove(self.file)
            
     def scene_stop(self):
 ### del all devices listerner
-       print('stop scene')
        for element in self.listener:
           print self.listener[element]
           self.myxpl.del_listener(self.listener[element])
        self.listener = {}
        self.send_msg_plugin('stop','None')
+       self.log_scene('info','Stop done')
 
     def cmd_device(self, message):
-       print message.data
-       print message
 ### get the stat of message and place it in devices_stat
+       self.log_scene('info', "Intercept an xpl-trig message: %s" %message)
        for device in self.devices:
            print device
            print self.devices[device]['key']
@@ -299,15 +312,19 @@ class Mscene():
           for action in actions:
              if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
                 subp = subprocess.Popen(actions[action]['value'], shell=True)
-             if actions[action]['techno'] == 'send-xpl':
+             elif actions[action]['techno'] == 'send-xpl':
                 self.send_action_xpl(actions[action])
-             if actions[action]['techno'] != 'command' and actions[action]['techno'] != 'send-xpl':
+             elif actions[action]['techno'] == 'Wait':
+                self.wait_action(action['value'])
+             else:
                 self.rinor_command(actions[action])
        else:
           print ('1 test pour rien')
           self.initstat = 0
 
-          
+    def wait_action(self, time):
+        time.sleep(time)
+      
     def send_action_xpl(self, action):
 ### Send an xpl message define in scene action
      ### action['type_message'] =xpl-type
@@ -317,18 +334,29 @@ class Mscene():
        msg.set_source(self.senderscene)
        msg.set_schema(action['schema'])
        msg.set_type(action['type_message'])
+#       if "Eval" in action['value'] or "eval" in action['value']:
+#          msg.add_data(eval(action['value'].replace('Eval','')))
+#       else:
+#          msg.add_data(action['value'])
        msg.add_data(action['value'])
        self.myxpl.send(msg)
 
     def rinor_command(self,action):
 ### send rinot action
-        if action['command']=='':
-           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, action['techno'], action['address'], action['value'])
+
+        if "Eval" in action['value'] or "eval" in action['value']:
+           command_value = eval(action['value'].replace('Eval',''))
         else:
+           command_value = action['value']
+
+        if action['command']=='':
+           the_url = 'http://%s/command/%s/%s/%s' %(self.grinor, action['techno'], action['address'], command_value)
+        else:
+
            if action['value']=='':
               the_url = 'http://%s/command/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'])
            else:
-              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],actions[action]['value'])
+              the_url = 'http://%s/command/%s/%s/%s/%s' %(self.grinor,action['techno'], action['address'], action['command'],command_value)
         req = urllib2.Request(the_url)
         handle = urllib2.urlopen(req)
         resp1 = handle.read()
@@ -338,7 +366,7 @@ class Mscene():
 ### test devices value and evaluate result
         print('test of device')
         print("value du message")
-        print 
+
         for device in self.devices:
            if self.devices[device]['op'] != '':
               if self.devices[device]['op'] == '=':
@@ -363,31 +391,36 @@ class Mscene():
         print 'conditon: %s' %self.gcondition
         print 'self.devices_test: %s' %self.devices_test
         print 'self.devices_stat: %s' %self.devices_stat
-        new_value = eval(self.gcondition)
+
+        try:
+           new_value = eval(self.gcondition)
+        except:
+           self.log.error("scene %s: incorrect Condition = %s" %(self.number, self.gcondition))
 
         if last_value != new_value:
            if new_value == True:
-              ### TODO send command and xpl-trig
-              self.send_msg_scene('xpl-trig', 'OK','True')
+              ### send command and xpl-trig
+              self.send_msg_scene('xpl-trig', 'start','True')
               print("xpl-trig and gaction:%s" %self.gaction_true)
               self.send_command(self.gaction_true)
            if new_value == False:
-              ### TODO send command and xpl-trig
-              self.send_msg_scene('xpl-trig', 'OK','False')
+              ### send command and xpl-trig
+              self.send_msg_scene('xpl-trig', 'start','False')
               print("xpl-trig and gaction:%s" %self.gaction_false)
               self.send_command(self.gaction_false)
         else:
            if new_value == True:
-              ### TODO send xpl-stat
-              self.send_msg_scene('xpl-stat', 'OK','True')
+              ### send xpl-stat
+              self.send_msg_scene('xpl-stat', 'start','True')
               print("xpl-stat")
            if new_value == False:
-              ### TODO send xpl-stat
+              ### send xpl-stat
               print("xpl-stat")
-              self.send_msg_scene('xpl-stat', 'OK','False')
+              self.send_msg_scene('xpl-stat', 'start','False')
 
     def condition_formulate(self,condition):
 ### correction of condition test to do a correct test
+       self.log_scene('info',"Condition = %s" %condition)
        condition = condition.lower()
        condition = condition.replace('(', ' ( ')
        condition = condition.replace(')', ' ) ')
@@ -408,5 +441,6 @@ class Mscene():
           condition = condition.replace(device_av, device_ap)
 
        condition = " ".join(condition.split())
-       print 'nouvelle condition : %s' %condition
+       self.log_scene('info',"new condition is = %s" %condition)
+
        return condition

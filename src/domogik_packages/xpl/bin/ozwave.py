@@ -94,17 +94,16 @@ class OZwave(XplPlugin):
                 self.ui_cmd_cb(message)
             else :
                 cmd = message.data['command']
-                # addresseTy = int(message.data['node'])
-                addresseTy = message.data['addressety']
+                device = message.data['device']
                 if cmd == 'level' :
                     print ("appel envoi zwave command %s" %cmd)
                     lvl = message.data['level']
-                    self.myzwave.sendNetworkZW(cmd, addresseTy, lvl)
+                    self.myzwave.sendNetworkZW(cmd, device, lvl)
                 elif cmd == "on"  or cmd == "off" :
                     print ("appel envoi zwave command %s" %cmd)
-                    self.myzwave.sendNetworkZW(cmd, addresseTy)
+                    self.myzwave.sendNetworkZW(cmd, device)
                 else:
-                    self.myzwave.sendNetworkZW(cmd, addresseTy)
+                    self.myzwave.sendNetworkZW(cmd, device)
                     
     def getdict2UIdata(self, UIdata):
         """ retourne un format dict en provenance de l'UI (passage outre le format xPL)"""
@@ -269,7 +268,27 @@ class OZwave(XplPlugin):
                                     'error': err if err != '' else "no", 
                                     'data': self.getUIdata2dict(info)})               
                 print mess                
-                
+            elif  request['request'] == 'GetNodeStats':
+                info = self.myzwave.getNodeStatistics(request['node'])
+                err = info['error']
+                mess.add_data({'command' : 'Refresh-ack', 
+                    'group' :'UI', 
+                    'node' : request['node'],
+                    'error': err if err != '' else "no"})
+                if err =='' :
+                    ccData = info['ccData']
+                    del info['error']
+                    del info['ccData']
+                    del info['lastReceivedMessage']  # TODO: key supprimée, gerer le message zwave en hex.
+                    for  item in info : info[item] = str (info[item]) # Pour etre compatible avec javascript
+                    mess.add_data({'data': self.getUIdata2dict(info)})
+                    i = 1
+                    for item in ccData :
+                        item['commandClassId'] = self.myzwave.getCommandClassName(item['commandClassId'] ) + ' (' + hex(item['commandClassId'] ) +')'
+                        for  cclass in item: item[cclass] = str (item[cclass])  # Pour etre compatible avec javascript
+                        mess.add_data({'item%d' %i  : self.getUIdata2dict(item)})
+                        i=i+1
+                print mess                             
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
@@ -308,16 +327,16 @@ class OZwave(XplPlugin):
                 if msgtrig['level'] in [0, 'False', False] : cmd ="off"
                 elif msgtrig['level'] in [255, 'True',  True]: cmd ="on"
                 else: cmd ='level'
-                mess.add_data({'device' : msgtrig['addressety'],
+                mess.add_data({'device' : msgtrig['device'],
                             'command' : cmd,
                             'level': msgtrig['level']})
                 if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
             elif msgtrig['genre'] == 'sensor' :  # tout sensor
                 if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget binary
-                    mess.add_data({'device' : msgtrig['addressety'],
+                    mess.add_data({'device' : msgtrig['device'],
                             'type' : msgtrig['type'] ,
                             'current' : 'true' if msgtrig['value']   else 'false'})
-                else : mess.add_data({'device' : msgtrig['addressety'],  
+                else : mess.add_data({'device' : msgtrig['device'],  
                             'type' : msgtrig['type'] ,
                             'current' : msgtrig['value'] })
             if msgtrig.has_key('units') and msgtrig['units'] !='' : mess.add_data({'units' : msgtrig['units'] })

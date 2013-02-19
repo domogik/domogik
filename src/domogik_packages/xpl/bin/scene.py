@@ -25,16 +25,17 @@ class SceneManager(XplPlugin):
       XplPlugin.__init__(self, name = 'scene')
       print ("manager= %s" %self.myxpl)
       self.manager= self.myxpl
-      print (self.manager)
+      print ("manager=%s" %self.manager)
       
       try:
           self.scene = Scene(self.log, self.send_xpl)
-          self.log.info("Start Scene")
+          self.log.info("Start Scene plugin")
+          print("Start Scene plugin")
           self.scene.open()
 
       except SceneException as err:
           self.log.error(err.value)
-          print(err.value)
+          print("error value: %s" %err.value)
           self.force_leave()
           return
 
@@ -55,7 +56,7 @@ class SceneManager(XplPlugin):
 
       self.fake_stat = {}
       ### Create listeners for commands
-      self.log.info("Creating listener for KNX")
+      self.log.info("Creating listener for scene commands")
       Listener(self.scene_cmd, self.myxpl,{'schema':'scene.basic'})
       self.enable_hbeat()
       
@@ -67,59 +68,77 @@ class SceneManager(XplPlugin):
          self.mem_scene(all_scene[scene])
 
       self.log.info("Plugin ready :)")
+      print ("Plugin ready :)")
 
    def init_file(self):
 ### init the file system
        self.path = self.get_data_files_directory()
        initfile = self.path+'/init_scene.ini'      
        if os.path.exists(self.path) == False:
-          os.mkdir(path, 0770)
+          try:
+             os.mkdir(path, 0770)
+          except:
+             self.log.error("can't create folder")
+             print("Error: can't create folder")
+
        print os.path.isfile(initfile)
+
        if os.path.isfile(initfile) == False:
-          file=ConfigParser.ConfigParser()
-          file.add_section('Init')
-          file.set('Init','number','0')
-          number = 1
-          with open(initfile, 'w') as fich:
-             file.write(fich)
-          fich.close
+          try:
+             file=ConfigParser.ConfigParser()
+             file.add_section('Init')
+             file.set('Init','number','0')
+             number = 1
+             with open(initfile, 'w') as fich:
+                file.write(fich)
+             fich.close
+          except:
+             self.log.error("can't create init files")
+             print("can't create init files")
        else:
           file=ConfigParser.ConfigParser()
           file.read(initfile)
           number = file.get('Init','number')
+          self.log.info("Read config init scene number: %s" %number)
        return number
       
    def mem_scene(self, scene):
 ### init scene one by one
-      print(scene)
+      self.log.info('init mem_scene: %s' %scene)
+      print('init mem_scene: %s' %scene)
       devices={}
       actions={}
       for section in scene:
+         if 'run' in scene[section]:
+            option_start= scene[section]['run']
          if 'type' in scene[section]:
             if scene[section]['type']=='devices':
                devices[section]=scene[section]
             if scene[section]['type']=='Action True' or scene[section]['type']=='Action False':
                actions[section]=scene[section]
                
-      Mini_scene = Mscene(scene['Scene'],self.manager,devices,actions,scene['Rinor']['addressport'],self.get_sanitized_hostname())
+      Mini_scene = Mscene(scene['Scene'],self.manager,devices,actions,scene['Rinor']['addressport'],self.get_sanitized_hostname(),self.log)
 
-      if 'option_start' in scene:
-         option_start=scene['option_start']
-      else:
-         option_start=True
-
-      if option_start==True:
+      if option_start=="true":
          Mini_scene.scene_start()
+         self.log.info("%s Auto start" %scene['Scene'])
+         print("%s Auto start" %scene['Scene'])
+      else:
+         self.log.info("%s Not auto start" %scene['Scene'])
+         print("%s Not auto start" %scene['Scene'])
 
    def scene_cmd(self, message):
 ### function call when plugin receive a message
       if 'command' in message.data and 'data' in message.data:
          if message.data['command'] == 'Create':
+            self.log.info("Add new scene")
+            print("Add new scene")
             self.Create_scene_msg(message.data)
       if 'command' in message.data:
          print('command receive')
          if 'fake' in message.data['command']:
-            print 'fake command'
+            self.log.info("Fake Command for %s" %message.data['number'])
+            print("Fake Command for %s" %message.data['number'])
             self.cmd_fake(message)
 
    def cmd_fake(self, message):
@@ -197,21 +216,15 @@ class SceneManager(XplPlugin):
        Rinor = {'addressport':data['rinor']}
        Other = {'run':data['start_run'], 'init_test':''}
 
-       New_Scene = Mscene(Scene_section,self.manager,devices,actions,data['rinor'],self.get_sanitized_hostname())
+       New_Scene = Mscene(Scene_section,self.manager,devices,actions,data['rinor'],self.get_sanitized_hostname(),self.log)
        Scene_write={'Scene':Scene_section,'devices':devices,'actions':actions,'Rinor':Rinor,'Other':Other }
        self.scene.add_scene(Scene_write)
        self.send_xpl('scene_%s' %self.SceneCount)
        self.increase_scene()
        
-       
-      # print ('start_run:%s' %data['start_run'])
-      # if data['start_run']=='true':
-      #    New_Scene.scene_start()
-
    def increase_scene(self):
 ### Add 1 to the init file count scene
        self.SceneCount=int(self.SceneCount)+1
-       print("add to init file")
        initfile = self.path+'/init_scene.ini'      
        file=ConfigParser.ConfigParser()
        file.add_section('Init')
@@ -219,7 +232,8 @@ class SceneManager(XplPlugin):
        with open(initfile, 'w') as fich:
           file.write(fich)
        fich.close
-       print("that do")
+       self.log.info("increase SceneCount to: %s" %self.SceneCount)
+       print("increase SceneCount to: %s" %self.SceneCount)
        
    def send_xpl(self,data):
       print("send xpl...")
@@ -232,6 +246,7 @@ class SceneManager(XplPlugin):
       msg.add_data({'scene': '0'})
       msg.add_data({'data':data})
       self.myxpl.send(msg)
+      self.log.info("scene sucessfully create")
       
 ### all function below this comment was copy to rest.py and adapte
    def search_filter(self, techno, key_stat):
@@ -240,6 +255,7 @@ class SceneManager(XplPlugin):
       filetoopen= self.get_stats_files_directory()
       filetoopen= filetoopen[:filetoopen.find('stats')+6]
       files = glob.glob("%s/*/*xml" % filetoopen)
+      self.log.info("read all xml to find value")
       res = {}
       for _files in files:
          print(_files)

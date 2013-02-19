@@ -2,7 +2,7 @@
   <command name="off">
     <schema>ozwave.basic</schema>
     <command-key>command</command-key>
-    <address-key>addressety</address-key>
+    <address-key>device</address-key>
     <command-xpl-value>off</command-xpl-value>
     <parameters/>
   </command>

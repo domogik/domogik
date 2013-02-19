@@ -2,7 +2,7 @@
   <command name="preset_dim">
     <schema>ozwave.basic</schema>
     <command-key>command</command-key>	
-    <address-key>addressety</address-key>	
+    <address-key>device</address-key>	
     <command-xpl-value>level</command-xpl-value>  
     <parameters>                                                                                            
       <parameter key="level" location="1"/>                                                           
