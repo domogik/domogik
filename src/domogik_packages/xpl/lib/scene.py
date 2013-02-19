@@ -201,13 +201,13 @@ class Mscene():
        print ('command for %s' %self.number)
        if message.type == "xpl-cmnd" and 'command' in message.data:
           if message.data['command']=='start':
-             self.log_scene('info', "start command receive")
+             self.log_scene('info', "Start command receive")
              self.scene_start()
           elif message.data['command']=='stop':
-             self.log_scene('info', "start stop receive")
+             self.log_scene('info', "Stop command receive")
              self.scene_stop()
           elif message.data['command']=='delete':
-             self.log_scene('info', "delete command receive")
+             self.log_scene('info', "Delete command receive")
              self.scene_delete()
 
     def log_scene(self, type, datalog):
@@ -272,7 +272,8 @@ class Mscene():
        self.start_listerner()
        self.send_msg_plugin('start', 'None')
        self.device_test()
-       
+       self.log_scene('info','Start done')
+ 
     def scene_delete(self):
 ### stop device listerner and del scene listerner
         self.scene_stop()
@@ -286,6 +287,7 @@ class Mscene():
           self.myxpl.del_listener(self.listener[element])
        self.listener = {}
        self.send_msg_plugin('stop','None')
+       self.log_scene('info','Stop done')
 
     def cmd_device(self, message):
 ### get the stat of message and place it in devices_stat
