@@ -142,7 +142,7 @@ class Scene:
            file.write(fich)
         fich.close
         
-        self._log.info("Add new scene %s Sucessfully" %data['Scene'][value])
+        self._log.info("Add new scene %s Sucessfully")
 
 
 class Mscene():
@@ -277,8 +277,10 @@ class Mscene():
     def scene_delete(self):
 ### stop device listerner and del scene listerner
         self.scene_stop()
-        #self.myxpl.del_listener(self.glistener)
-        os.remove(self.file)
+        try:
+           os.remove(self.file)
+        except:
+           self.log_scene('error',"Can't remove file: %s" %self.file)
            
     def scene_stop(self):
 ### del all devices listerner
@@ -394,8 +396,9 @@ class Mscene():
 
         try:
            new_value = eval(self.gcondition)
+           self.log_scene('info',"new value: %s" %new_value)
         except:
-           self.log.error("scene %s: incorrect Condition = %s" %(self.number, self.gcondition))
+           self.log_scene("error","incorrect Condition = %s" %self.gcondition)
 
         if last_value != new_value:
            if new_value == True:
