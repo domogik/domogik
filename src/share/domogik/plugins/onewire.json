@@ -1,4 +1,18 @@
 {
+	"products" : [
+	   {
+	       "name" : "DS18B20",
+	       "id" : "ONWIRE_DS18B20",
+	       "doc" : "http://www.maximintegrated.com/datasheet/index.mvp/id/2812",
+	       "type" : "onewire.thermometer"
+	   },
+	   {
+	       "name" : "DS18S20",
+	       "id" : "ONWIRE_DS18S20",
+	       "doc" : "http://www.maximintegrated.com/datasheet/index.mvp/id/2815",
+	       "type" : "onewire.thermometer"
+	   },
+	],
     "configuration": [
         {
             "default": "False", 
@@ -266,10 +280,8 @@
             "xpl_params": [
                 {
                     "key": "address",
-                    "description": "The decimal address",
-                    "type": "integer",
-                    "max_value": 255,
-                    "min_value": 0
+                    "description": "The hexadecimal address",
+                    "type": "string",
                 }
             ]
         }, 
@@ -282,10 +294,8 @@
             "xpl_params": [
                 {
                     "key": "address",
-                    "description": "The decimal address",
-                    "type": "integer",
-                    "max_value": 255,
-                    "min_value": 0
+                    "description": "The hexadecimal address",
+                    "type": "string",
                 }
             ]
         }, 
@@ -298,10 +308,8 @@
             "xpl_params": [
                 {
                     "key": "address",
-                    "description": "The decimal address",
-                    "type": "integer",
-                    "max_value": 255,
-                    "min_value": 0
+                    "description": "The hexadecimal address",
+                    "type": "string",
                 }
             ]
         }, 
@@ -314,10 +322,8 @@
             "xpl_params": [
                 {
                     "key": "address",
-                    "description": "The decimal address",
-                    "type": "integer",
-                    "max_value": 255,
-                    "min_value": 0
+                    "description": "The hexadecimal address",
+                    "type": "string",
                 },
                 {
                     "key": "switch",
