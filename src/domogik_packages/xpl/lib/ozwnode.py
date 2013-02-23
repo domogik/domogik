@@ -503,6 +503,7 @@ class ZWaveNode:
         retval["Groups"] = self._getGroupsDict()
         retval["Capabilities"] = list(self._capabilities) if  self._capabilities else 'No one'
         retval["InitState"] = self.GetNodeStateNW()
+        retval["ComQuality"] = self.getComQuality()
         return retval
         
     def getValuesInfos(self):
@@ -545,6 +546,24 @@ class ZWaveNode:
         """
        
         return self._manager.getNodeStatistics(self.homeId,  self.nodeId)
+        
+    def getComQuality(self):
+        """
+        Calculate quality indice communication from node.
+        It's use node statistics for evaluate node activity and transmission.
+        0 -> bad
+        100 -> best
+        """
+        quality = 0.0
+        maxRTT = 10000.0
+        S = self.getStatistics()
+        Q1 = float(float(S['sentCnt'] - S['sentFailed'] ) / S['sentCnt'])  if S['sentCnt'] != 0 else 0.0
+        Q2 = float(((maxRTT /2) - S['averageRequestRTT']) / (maxRTT / 2))
+        Q3 = float((maxRTT - S['averageResponseRTT']) / maxRTT)
+        Q4 = float(1 - (float(S['receivedCnt']  - S['receivedUnsolicited']) / S['receivedCnt'])) if S['receivedCnt'] != 0 else 0.0
+        quality = ((Q1 + Q2 + Q3 + Q4) / 4.0) * 100.0
+        print 'Quality com : ',  quality,  Q1,  Q2,  Q3,  Q4
+        return int(quality)
         
     def setName(self, name):
         """Change le nom du node"""
@@ -672,7 +691,7 @@ class ZWaveNode:
         if (opt != "") and (opt != 'None'):
             opt = int(opt)
         else : opt = 0
-        if instance == 1 :
+        if instance == 1 and self.getValuesForCommandClass('COMMAND_CLASS_BASIC'):
             if command == 'level':
                 self.setLevel(opt)
             elif command == 'on':
@@ -682,8 +701,8 @@ class ZWaveNode:
             else : 
                 self._ozwmanager._log.info("xPL to ozwave unknown command : %s , nodeId : %d",  command,  self.nodeId)
                 retval['error'] = ("xPL to ozwave unknown command : %s , nodeId : %d",  command,  self.nodeId)
-        else : # instance secondaire, utilisation de set value
-            print ("instance secondaire")
+        else : # instance secondaire, ou command class non basic utilisation de set value
+            print ("instance secondaire ou pas de COMMAND_CLASS_BASIC")
             cmdsClass= ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY','COMMAND_CLASS_SWITCH_MULTILEVEL']
             for value in self.values.keys() :
                 val = self.values[value].valueData
