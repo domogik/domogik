@@ -42,7 +42,8 @@ Mysql server
 ------------
 
 .. note::
-    If you have already a Mysql server installed, you will only have to create the Domogik database.
+    * If you have already a Mysql server installed, you will only have to create the Domogik database.
+    * It is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
 Install packages for mysql server: ::
 
