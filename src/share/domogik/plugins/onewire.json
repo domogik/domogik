@@ -11,7 +11,7 @@
 	       "id" : "ONWIRE_DS18S20",
 	       "doc" : "http://www.maximintegrated.com/datasheet/index.mvp/id/2815",
 	       "type" : "onewire.thermometer"
-	   },
+	   }
 	],
     "configuration": [
         {
@@ -281,7 +281,7 @@
                 {
                     "key": "address",
                     "description": "The hexadecimal address",
-                    "type": "string",
+                    "type": "string"
                 }
             ]
         }, 
@@ -295,7 +295,7 @@
                 {
                     "key": "address",
                     "description": "The hexadecimal address",
-                    "type": "string",
+                    "type": "string"
                 }
             ]
         }, 
@@ -309,7 +309,7 @@
                 {
                     "key": "address",
                     "description": "The hexadecimal address",
-                    "type": "string",
+                    "type": "string"
                 }
             ]
         }, 
@@ -323,7 +323,7 @@
                 {
                     "key": "address",
                     "description": "The hexadecimal address",
-                    "type": "string",
+                    "type": "string"
                 },
                 {
                     "key": "switch",
