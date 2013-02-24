@@ -4,7 +4,7 @@ Device types, features and usages
 
 .. warning ::
 
-    All the device types, features and usages are not listed in this page. This page purpose is to give some examples.
+    All the device types, features and usages are not listed in this page. The purpose of this page is to give some examples.
 
 Device types 
 ============
