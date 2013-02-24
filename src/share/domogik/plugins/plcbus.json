@@ -180,7 +180,7 @@
             "description": "ON/OFF Binary Switch", 
             "name": "Switch",
             "commands": ["set_binary"],
-            "sensors": ["get_binary"],
+            "sensors": ["binary_state"],
             "xpl_params": [
                 {
                     "key": "device",
