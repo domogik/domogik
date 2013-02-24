@@ -237,7 +237,7 @@
         "type": "plugin", 
         "version": "0.2a0"
     }, 
-    "json_version": 1, 
+    "json_version": 2, 
     "technology": {
         "description": "PLCBus", 
         "id": "plcbus", 
