@@ -5,7 +5,7 @@ Packages installation
 Main and secondary hosts
 ========================
 
-Domogik can be installed on multiple hosts. There are 2 type of Domogik installations :
+Domogik can be installed on multiple hosts. There are two types of Domogik installations :
 
 * the Domogik main host
 * the Domogik secondary hosts
@@ -31,7 +31,7 @@ Updating the package cache is important. This is done on each Domogik startup an
 
 .. image:: admin_update_cache.png
 
-Just click on the **Update cache** button to update the cache for the listed :doc:`repositories <repositories>`.
+Just click **Update cache** to update the cache for the listed :doc:`repositories <repositories>`.
 
 Before searching or installing a new package, do a cache update in order to see and get the latest package releases.
 
@@ -46,14 +46,14 @@ You can search for a plugin and install it from the *Plugins* tab of a host. Thi
 The list of the installed plugins
 *********************************
 
-The list of the installed plugins shows all installed plugins on the host:
+The list of the installed plugins shows all installed plugins on the host :
 
 .. image:: admin_plugin_installed.png
 
 The list of the available plugins
 *********************************
 
-The list of the available plugins shows all available plugins:
+The list of the available plugins shows all available plugins :
 
 .. image:: admin_plugin_available.png
 
@@ -64,13 +64,13 @@ Some plugins can be available in several versions (one version by repository):
 Install a plugin
 ****************
 
-Search for the plugin in the available plugins list. And click on the **install** button.
+Search for the plugin in the available plugins list and click **install**.
 
 The plugin will be downloaded from the repository and installed on the host. It will now be in the installed plugins list:
 
 .. image:: admin_plugin_install_01.png
 
-The plugin is disabled and you need to enable it to see it in the *Plugins* menu and configure it. Just click on the **Enable button** to enable it.
+The plugin is disabled and you need to enable it to see it in the *Plugins* menu and configure it. Just click **Enable** to enable it.
 
 .. image:: admin_plugin_install_02.png
 
@@ -81,7 +81,7 @@ Now you can see the plugin in the *Plugins* menu and configure it:
 Update a plugin
 ***************
 
-When an update is available for a plugin, there is a new button for the plugin in the installed plugins list.Just click on it to update the plugin.
+When an update is available for a plugin, there is a new button for the plugin in the installed plugins list. Just click on it to update the plugin.
 
 .. image:: admin_plugin_install_03.png
 

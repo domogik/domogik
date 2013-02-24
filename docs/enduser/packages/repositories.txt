@@ -10,7 +10,7 @@ Official repositories
 =====================
 The officiel repositories are managed by the Domogik team. There are 4 repositories :
 
-* **stable** : this repositories hosts all stable and functionnal packages. This is the only repository activated after an installation.
+* **stable** : this repository hosts all stable and functionnal packages. This is the only repository activated after an installation.
 * **testing** : this repository hosts the packages that are candidates to the *stable* repository*. They are fully functionnal but they have not been totally tested.
 * **experimental** : this repository hosts non complete packages for testing or demo only.
 * **nightly builds** : this repository is refreshed every night with packages automatically created from the sources.

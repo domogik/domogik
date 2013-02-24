@@ -2,25 +2,25 @@
 Plugin configuration and startup
 ================================
 
-The plugin configuration page can be accessed by:
+The plugin configuration page can be accessed by :
 
 * the **Configure** button in the installed plugins list.
 * the plugin entry in the **Plugins** menu.
 
 There are several tabs:
 
-* *Informations*
+* *Information*
 * *Requirements*
 * *Configuration*
-* Optionnal *special* tabs depending on the plugins.
+* Optional *special* tabs depending on the plugins.
 
 .. warning ::
-    Domogik 0.2 and Domoweb 0.2 don't handle *special pages* packages currently. So, these special pages are still included in Domoweb packages. If you use some plugins with special pages, be caution to use the latest Domoweb release compatible with Domogik 0.2!
+    Domogik 0.2 and Domoweb 0.2 don't currently handle *special pages* packages. So, these special pages are still included in Domoweb packages. If you use some plugins with special pages, be caution to use the latest Domoweb release compatible with Domogik 0.2!
 
-The informations tab
-====================
+The information tab
+===================
 
-This tab give some informations about the plugin:
+This tab give some information about the plugin :
 
 * technology
 * release
@@ -34,16 +34,16 @@ It also indicates if the plugin is *on* or *off* and allows to *start* or *stop*
 The requirements tab
 ====================
 
-This tab must be read before trying to start the plugin!!!
+You must read this tab content before trying to start the plugin!!!
 
-It list the plugin dependencies (if there are some) and give some recommended *udev rules* (if needed). You will find more informations about udev rules on :doc:`this page </various/udev_rule>`.
+It lists the plugin dependencies (if there are some) and give some recommended *udev rules* (if needed). You will find more information about *udev rules* on :doc:`this page </various/udev_rule>`.
 
 .. image :: admin_plugin_requirements.png
 
 The configuration tab
 =====================
 
-This tab allow to configure the plugin. Each plugin has a **startup-plugin** parameter. If you set it, the plugin will start on Domogik startup. The other parameters are related to the plugin. You should read the plugin documentation.
+This tab allows to configure the plugin. Each plugin has a **startup-plugin** parameter. If you set it, the plugin will start on Domogik startup. The other parameters are related to the plugin. You should read the plugin documentation.
 
 .. image :: admin_plugin_configuration.png
 

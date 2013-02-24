@@ -5,15 +5,15 @@ Plugin helpers
 Purpose
 =======
 In Domogik a helper is a little tool linked to a plugin that helps users to get information about hardware linked to a plugin.
-For example helpers can help you to find your ''IPX800 relayboard'' on the network, display its status (which relay is on, etc), list all 1wire components...
+For example helpers can help you to find your *IPX800 relayboard* on the network, display its status (which relay is on, etc.), list all *1wire*components...
 But helpers are right now restricted : you can't use at the same time a plugin and its helper. 
 Keep in mind that actual helpers format will totally change in following releases.
 
 Using helpers
 =============
-Helpers page is a command line tool which is used from web UI. So right now all helpers are a command with optional parameters.
+Helpers page is a command line tool which is used from the web UI. So right now all helpers are a command with optional parameters.
 
-To access this command line tool, go to **Administration > Tools > Helpers**. You should see the command line interface: 
+To access this command line tool, go to **Administration > Tools > Helpers**. You should see the command line interface : 
 
 .. image:: plugin_helper.png
 
@@ -22,7 +22,7 @@ Screen description
 
 On the top, there is the **command line entry**. On the right of this entry, you will find 2 buttons : 
 
-* **Send** which will send the helper command (you can also directly hit **enter**).
+* **Send** which will send the helper a command (you can also directly hit **enter**).
 * **Clear** which will clean the output zone.
 
 On the bottom, there is the **output zone** in which will display the output of the helper.
@@ -66,7 +66,7 @@ Example:
 * helper : ipx800
 * command : find
 
-First, shut down the associated plugin : **Administration > Plugins > ipx800**. Click on **Stop plugin** button. Wait for plugin shutdown.
+First, shut down the associated plugin : **Administration > Plugins > ipx800**. Click **Stop plugin**. Wait for plugin shutdown.
 
 Next, launch the helper: ::
 
@@ -74,7 +74,7 @@ Next, launch the helper: ::
     List of all IPX800 boards found :
     192.168.0.150 : IPX800
 
-Then, restart the associated plugin : **Administration > Plugins > ipx800**. Click on **Start plugin** button.
+Then, restart the associated plugin : **Administration > Plugins > ipx800**. Click **Start plugin**.
 
 Helpers errors 
 --------------
@@ -96,8 +96,8 @@ Missing parameter(s)
     Missing parameters.
     Usage : all <adaptator device>
 
-Helpers in future
-=================
+Helpers in the future
+=====================
 Following things should change in next releases :
 
 * Helpers will really be included in plugins (no need anymore to shut down the plugin in order to use associated helper).
