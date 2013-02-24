@@ -4,10 +4,10 @@ Actuators
 
 .. warning ::
 
-    All the actuators are not listed in this page. This page purpose is to give some examples.
+    All the actuators are not listed in this page. The purpose of this page is to give some examples.
 
-An actuator is an item to which a command can be sent (this is the opposite of a :doc:`Sensors </technical/sensor>`).
-Note that some items can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
+An actuator is an item to which a command can be sent (this is the opposite of a :doc:`sensor </technical/sensor>`).
+Note that some items can be both. Acutator examples : a module to switch on/off the lights, a thermostat which can be controled and can send back a value (the temperature).
 
 Command values 
 ==============
@@ -19,7 +19,7 @@ Command values
 * range
 
     * parameters : ``{command, valueMin, valueMax}`` (ex. ``{"command": "dim", "valueMin":0, "valueMax":100}``)
-    * value : value between valueMin and valueMax
+    * value : value between *valueMin* and *valueMax*
 
 * list
 
@@ -43,7 +43,7 @@ Command values
 
     * value : json structure
 
-Exemple Features
+Feature examples
 ================
 
 x10.Switch 

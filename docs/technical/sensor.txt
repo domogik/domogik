@@ -4,7 +4,7 @@ Sensors
 
 .. warning ::
 
-    All the features are not listed in this page. This page purpose is to give some examples.
+    All the features are not listed in this page. This purpose of this page is to give some examples.
 
 
 Type of returned values
