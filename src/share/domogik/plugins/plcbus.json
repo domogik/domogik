@@ -82,8 +82,10 @@
             "xplstat_name": "get_preset_dim",
             "parameters": {
                     "static": [
+		    	{
 			    "key": "command",
 			    "value": "PRESET_DIM"
+		    	}
                     ],
                     "device": []
                 }
@@ -94,8 +96,10 @@
             "xplstat_name": "get_bright",
             "parameters": {
                     "static": [
+		    	{
 			    "key": "command",
 			    "value": "BRIGHT"
+		    	}
                     ],
                     "device": []
                 }
@@ -114,7 +118,8 @@
                              "sensor": "binary_state"
                         }
                     ]
-                },
+                }
+	},
         "get_preset_dim": {
              "name": "get_preset_dim",
 	     "schema": "plcbus.basic",
@@ -128,7 +133,7 @@
 	                 }
 	             ]
 	        }
-       }
+       	}
     },
     "commands": {
        "set_binary": {
@@ -183,7 +188,7 @@
                     "type": "string"
 	        }
             ]
-        }
+        },
         "plcbus.dimmer": {
             "id": "plcbus.dimmer",
             "description": "Level Dimmer", 
