@@ -97,7 +97,7 @@ During the installation, some python librairies could be downloaded. If you use 
 
 System user that will launch Domogik. You should keep the default choice.
 
-If the choosen user doesn't exists, you will have to answser following questions: ::
+If the choosen user doesn't exist, you will have to answser following questions: ::
 
     Enter new UNIX password: 
     ...
@@ -126,8 +126,7 @@ To use Domogik only on a local computer, choose **lo**. To access it from anothe
     If you need to access Domogik from outside, you can specify an IP now :
 
 Used to access to Domogik over the internet.
-You can set your public IP here (depending on your configuration, you could need to create a port redirection on your router.
-..warning:: Domogik is not yet secure, use this with caution!
+You can set your public IP here (depending on your configuration, you could need to create a port redirection on your router. **Warning** : Domogik is not yet secure, use this with caution!
 
 .. code-block:: bash
 
@@ -139,7 +138,7 @@ You can set your public IP here (depending on your configuration, you could need
 
 If you have installed Mysql server and create the Domogik database, just press Enter.
 
-Set connection informations for the database: ::
+Set connection information for the database: ::
 
     Please set your mysql parameters.                                               
     Username : domogik                                                              
