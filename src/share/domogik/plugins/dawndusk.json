@@ -102,7 +102,7 @@
         },
         {
             "default": "on",
-            "description": "Value of command when a dawn event occurs",
+            "description": "Value of command when dawn event",
             "id": "10",
             "interface": "yes",
             "key": "dawn",
@@ -112,31 +112,11 @@
         },
         {
             "default": "off",
-            "description": "Value of command when a dusk event occurs",
+            "description": "Value of command when dusk event",
             "id": "11",
             "interface": "yes",
             "key": "dusk",
             "optionnal": "no",
-            "options": [],
-            "type": "string"
-        },
-        {
-            "default": "0",
-            "description": "Value in +/- seconds after/before dawn event",
-            "id": "12",
-            "interface": "yes",
-            "key": "dawnseconds",
-            "optionnal": "yes",
-            "options": [],
-            "type": "string"
-        },
-        {
-            "default": "0",
-            "description": "Value in +/- seconds after/before dusk event",
-            "id": "13",
-            "interface": "yes",
-            "key": "duskseconds",
-            "optionnal": "yes",
             "options": [],
             "type": "string"
         }
@@ -171,7 +151,7 @@
         "author": "Sebastien GALLET, Maxence Dunnewind",
         "author_email": "sgallet at gmail dot com",
         "category": "dawndusk",
-        "changelog": "0.2\n- Update the plugin to domogik 0.2.0\n0.1\n- plugin creation",
+        "changelog": "0.2.0\n- Package release\n0.2\n- Update the plugin to domogik 0.2.0\n0.1\n- plugin creation",
         "dependencies": [
             {
                 "id": "apscheduler (>=2.0.2)",
@@ -180,10 +160,6 @@
             {
                 "id": "pyephem (>=3.7.5)",
                 "type": "python"
-            },
-            {
-                "id": "xpl_time",
-                "type": "plugin"
             }
         ],
         "description": "Get the dawn and dusk events using the geocoordinates.\n  Can also send commands to devices using this event.",
@@ -191,7 +167,7 @@
         "domogik_min_version": "0.2.0",
         "id": "dawndusk",
         "type": "plugin",
-        "version": "0.2a1"
+        "version": "0.2.0"
     },
     "json_version": 1,
     "technology": {

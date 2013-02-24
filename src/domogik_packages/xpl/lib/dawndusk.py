@@ -20,328 +20,215 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 Plugin purpose
 ==============
-Dawndusk and other planet's events.
+
+Send events at dawn/dusk
 
 Implements
 ==========
-class DawnDuskAPI
+Class dawnduskAPI
+- dawndusk:.__init__(self)
+- dawndusk:.get_dawn_dusk(self, long, lat, fh)
+
+Class dawnduskScheduler
+
+Class dawnduskException
 
 @author: Sébastien Gallet <sgallet@gmail.com>
+@author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
-import traceback
+import ephem
+import datetime
+from apscheduler.scheduler import Scheduler
 from domogik.xpl.common.xplmessage import XplMessage
-import bluetooth
-import threading
-#import logging
-#logging.basicConfig()
+try:
+    from domogik_packages.xpl.lib.cron_query import CronQuery
+except ImportError:
+    pass
 
-STATES = ["started", "stopped", "unknown"]
-HIGH = "high"
-LOW = "low"
-
-class DawnDuskAPI:
+class DawnduskException(Exception):
     """
-    dawndusk API.
-    Encapsulate the access to the bluetooth equipment
+    dawndusk exception
     """
 
-    def __init__(self, log, config, myxpl, stop):
+    def __init__(self, value):
         """
-        Constructor
-        @param log : the logger to use
-        @param config : the config to use
-        @param myxpl : the xpl sender to use
-        @param stop : the stop method of the plugin thread
+        dawndusk exception
+        """
+        Exception.__init__(self)
+        self.value = value
 
+    def __str__(self):
         """
+        dawndusk exception
+        """
+        return repr(self.value)
+
+class DawnduskAPI:
+    """
+    dawndusk API
+    """
+
+    def __init__(self, lgt, lat, use_cron, myxpl, log):
+        """
+        Init the dawndusk API
+        @param lgt : longitude of the observer
+        @param lat : latitude of the observer
+        """
+        self.use_cron = use_cron
         self.log = log
         self.myxpl = myxpl
-        self._config = config
-        self._stop = stop
-        self._scan_delay = 3
-        self._error_delay = 20
-        self.listen_adaptator = self._listen_adaptator_lookup
-        self._hysteresis = 3
-        self._state = "stopped"
-        self._device_name = "dawndusk"
-        self._thread = None
-        self._targets = dict()
-
-    def reload_config(self):
-        """
-        Reload config of the plugin.
-        """
-        self.log.debug("reload_config : Try to get configuration from XPL")
-        num = 1
-        try:
-            self._scan_delay = int(self._config.query('dawndusk', 'scan-delay'))
-            self._error_delay = int(self._config.query('dawndusk', 'error-delay'))
-            self._device_name = str(self._config.query('dawndusk', 'device-name'))
-            listen = str(self._config.query('dawndusk', 'listen-method'))
-            methods = {
-            'lookup': lambda : self._listen_adaptator_lookup(),
-            'discovery': lambda : self._listen_adaptator_discovery(),
-            }
-            self.listen_adaptator = methods[listen]
-            loop = True
-            self._targets = dict()
-            while loop == True:
-                addr = self._config.query('dawndusk', \
-                    'bt-addr-%s' % str(num))
-                name = self._config.query('dawndusk', \
-                    'bt-name-%s' % str(num))
-                if addr != None:
-                    self._targets[addr] = {"name":name, "count":0, "status":LOW}
-                    self._trig_detect("xpl-trig", addr, LOW)
-                    num += 1
-                else:
-                    loop = False
-        except:
-            error = "Can't get configuration from XPL : %s" %  \
-                     (traceback.format_exc())
-            self.log.error("reload_config : " + error)
-        #self.log.debug("reload_config : _target=%s" % self._targets)
-        self.log.info("Found %s bluetooth devices in configuration." % (num-1))
-        self.log.debug("reload_config : Done")
-
-    def start_adaptator(self):
-        """
-        Start the thread listening to the bluetooth adaptator.
-        """
-        self.log.debug("start_adaptator : Start ...")
-        if self._state != "started":
-            self.reload_config()
-            self._thread = threading.Thread(None,
-                                            self._listen_adaptator,
-                                            "listen_adaptator",
-                                            (),
-                                            {})
-            self._thread.start()
-            self._state = "started"
-        self.log.info("Bluetooth detector activated.")
-        self.log.debug("start_adaptator : Done :)")
-
-    def stop_adaptator(self):
-        """
-        Stop the thread listening to the bluetooth adaptator.
-        """
-        self.log.debug("stop_adaptator : Start ...")
-        if self._state != "stopped":
-            self.log.info("Bluetooth detector deactivated.")
-            self._state = "stopped"
-            self._thread = None
-            for aaddr in self._targets:
-                self._trig_detect("xpl-trig", aaddr, LOW)
-        self.log.debug("stop_adaptator : Done :)")
-
-    def _listen_adaptator(self):
-        """
-        Encapsulate the call to the callback function.
-        Catch exception and test thread stop.
-        """
-        self.log.debug("_listen_adaptator : Start ...")
-        while not self._stop.isSet() and self._state == "started":
-            try:
-                if self.listen_adaptator() == True:
-                    self._stop.wait(self._scan_delay)
-                else:
-                    for aaddr in self._targets:
-                        self._trig_detect("xpl-trig", aaddr, LOW)
-                    self._stop.wait(self._error_delay)
-            except:
-                self.log.error("_listen_adaptator : Error when calling \
-listen_method")
-                error = "traceback : %s" %  \
-                     (traceback.format_exc())
-                self.log.error("listen_adaptator : " + error)
-                self._stop.wait(self._error_delay)
-        self.log.debug("_listen_adaptator : Done :)")
-
-    def _listen_adaptator_discovery(self):
-        """
-        Listen to bluetooth adaptator. This method use the
-        bluetooth.discover_devices(). It takes approcimatively 10 seconds
-        to proceed. Phones must be "visible" in bluetooth.
-        """
-        try:
-    #        self.log.debug("_listen_adaptator_discovery : Start \
-    #bluetooth.discover_devices at %s" % datetime.datetime.today())
-            nearby_devices = bluetooth.discover_devices()
-    #        self.log.debug("_listen_adaptator_discovery : Stop \
-    #bluetooth.discover_devices at %s" % datetime.datetime.today())
-            for aaddr in self._targets:
-                if self._targets[aaddr]["status"] == HIGH :
-                    if aaddr not in nearby_devices:
-                        self._targets[aaddr]["count"] = \
-                            self._targets[aaddr]["count"] +1
-                        if self._targets[aaddr]["count"] >= \
-                            self._hysteresis:
-                            self._trig_detect("xpl-trig", aaddr, LOW)
-            for bdaddr in nearby_devices:
-                target_name = bluetooth.lookup_name( bdaddr )
-                if bdaddr in self._targets:
-                    self._targets[bdaddr]["count"] = 0
-                    if self._targets[bdaddr]["status"] == LOW:
-                        self._trig_detect("xpl-trig", bdaddr, HIGH)
-                        self.log.info("Match bluetooth device %s with \
-    address %s" % (target_name, bdaddr))
-            return True
-        except:
-            self.log.error("_listen_adaptator : Error with bluetooth \
-adaptator")
-            error = "traceback : %s" %  \
-                 (traceback.format_exc())
-            self.log.error("listen_adaptator : " + error)
-            return False
-
-    def _listen_adaptator_lookup(self):
-        """
-        Listen to bluetooth adaptator. This method use the
-        bluetooth.lookup_name(). It takes approcimatively 3 seconds
-        to proceed.
-        """
-        try:
-            for aaddr in self._targets:
-    #            self.log.debug("_listen_adaptator_lookup : Start \
-    #bluetooth.lookup_name at %s" % datetime.datetime.today())
-                target_name = bluetooth.lookup_name( aaddr )
-    #            self.log.debug("_listen_adaptator_lookup : Stop \
-    #bluetooth.lookup_name at %s" % datetime.datetime.today())
-                if target_name == None:
-                    if self._targets[aaddr]["status"] == HIGH :
-                        self._targets[aaddr]["count"] = \
-                            self._targets[aaddr]["count"] +1
-                        if self._targets[aaddr]["count"] >= \
-                            self._hysteresis:
-                            self._trig_detect("xpl-trig", aaddr, LOW)
-                            self.log.info("bluetooth device %s with \
-    address %s is gone" % (target_name, aaddr))
-                else:
-                    self._targets[aaddr]["count"] = 0
-                    if self._targets[aaddr]["status"] == LOW:
-                        self._trig_detect("xpl-trig", aaddr, HIGH)
-                        self.log.info("Match bluetooth device %s with \
-    address %s" % (target_name, aaddr))
-            return True
-        except:
-            self.log.error("_listen_adaptator : Error with bluetooth \
-adaptator")
-            error = "traceback : %s" %  \
-                 (traceback.format_exc())
-            self.log.error("listen_adaptator : " + error)
-            return False
-
-    def basic_listener(self, message):
-        """
-        Listen to dawndusk.basic messages.
-        @param message : The XPL message received.
-
-        dawndusk.basic
-           {
-            action=start|stop|status
-            device=<name of the dawndusk plugin "instance">
-            ...
-           }
-        """
-        self.log.debug("basic_listener : Start ...")
-        actions = {
-            'stop': lambda x, d, m: self._action_stop(x, d),
-            'start': lambda x, d, m: self._action_start(x, d),
-            'status': lambda x, d, m: self._action_status(x, d),
-        }
-        device = None
-        if 'device' in message.data:
-            device = message.data['device']
-        if device != None and device == self._device_name:
-            try:
-                action = None
-                if 'action' in message.data:
-                    action = message.data['action']
-                self.log.debug("basic_listener : action %s received \
-for device %s" % (action, device))
-                actions[action](self.myxpl, device, message)
-            except:
-                self.log.error("action _ %s _ unknown." % (action))
-                error = "Exception : %s" %  \
-                         (traceback.format_exc())
-                self.log.debug("basic_listener : "+error)
+        if self.use_cron == False:
+            self._scheduler = Scheduler()
+            self._scheduler.start()
         else:
-            self.log.warning("basic_listener : action %s received \
-for unknown device %s" % (action, device))
+            self._cronquery = CronQuery(self.myxpl, self.log)
+        self.mycity = ephem.Observer()
+        self.mycity.lat, self.mycity.lon = lat, lgt
+        self.mycity.horizon = '-6'
+        self.job = None
+        self.job_test_dawn = None
+        self.job_test_dusk = None
 
-    def _action_status(self, myxpl, device):
+    def __del__(self):
         """
-        Status of the dawndusk plugin.
-        @param myxpl : The xpl sender to use.
-        @param device : The "plugin" device.
+        Kill the dawndusk API
+        @param lgt : longitude of the observer
+        @param lat : latitude of the observer
+        """
+        if self.use_cron == True:
+            self._cronquery.halt_job("dawndusk")
+            self._cronquery.halt_job("dawn-test")
+            self._cronquery.halt_job("dusk-test")
+        else :
+            self._scheduler.shutdown()
 
-        timer.basic
-           {
-            action=status
-            ...
-           }
+    def sched_add(self, sdate, cb_function, label):
         """
-        self.log.debug("action_status : Start ...")
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("dawndusk.basic")
-        mess.add_data({"device" : device})
-        mess.add_data({"status" : self._state})
-        myxpl.send(mess)
-        self.log.debug("action_status : Done :)")
+        Add an event in the schedulered tasks
+        @param sdate : the date of the event
+        @param cb_function : the callback function to call
+        @param : the label of the event
+        """
+        self.log.debug("dawndusk.schedAdd : Start ... %s" % label)
+        if self.use_cron == False:
+            if label == "dawn" or label == "dusk":
+                self.job = self._scheduler.add_date_job(cb_function, \
+                    sdate, args = [label])
+                self.log.debug("dawndusk.schedAdd : Use internal cron \
+                    for %s" % label)
+            elif label == "dawn-test":
+                self.job_test_dawn = self._scheduler.add_date_job\
+                    (cb_function, sdate, args = ["dawn"])
+                self.log.debug("dawndusk.schedAdd : Use internal cron \
+                    for %s" % "dawn")
+            elif label == "dusk-test":
+                self.job_test_dusk = self._scheduler.add_date_job\
+                    (cb_function, sdate, args = ["dusk"])
+                self.log.debug("dawndusk.schedAdd : Use internal cron \
+                    for %s" % "dusk")
+            for i in self._scheduler.get_jobs():
+                self.log.debug("APScheduler : %-10s | %8s" % \
+                    (str(i.trigger), i.runs))
+        else :
+            self.log.debug("dawndusk.schedAdd : Use external cron ...")
+            if label == "dawn" or label == "dusk":
+                device = "dawndusk"
+            elif label == "dawn-test":
+                device = "dawn-test"
+            elif label == "dusk-test":
+                device = "dusk-test"
+            if self._cronquery.status_job(device, extkey = "current") \
+                != "halted":
+                self._cronquery.halt_job(device)
+                self.log.debug("dawndusk.schedAdd : Halt old device")
+            nstmess = XplMessage()
+            nstmess.set_type("xpl-trig")
+            nstmess.set_schema("dawndusk.basic")
+            nstmess.add_data({"type" : "dawndusk"})
+            if label == "dawn":
+                nstmess.add_data({"status" :  "dawn"})
+            elif label == "dusk":
+                nstmess.add_data({"status" :  "dusk"})
+            elif label == "dawn-test":
+                nstmess.add_data({"status" :  "dawn"})
+            elif label == "dusk-test":
+                nstmess.add_data({"status" :  "dusk"})
+            if self._cronquery.start_date_job(device, nstmess, sdate):
+                self.log.debug("dawndusk.schedAdd : External cron activated")
+                self.log.debug("dawndusk.schedAdd : Done :)")
+            else:
+                self.log.error("dawndusk.schedAdd : Can't activate \
+                    external cron")
+                self.log.debug("dawndusk.schedAdd : Done :(")
+                return False
+        self.log.info("Add a new event of type %s at %s" % (label, sdate))
+        return True
 
-    def _action_stop(self, myxpl, device):
+    def get_next_dawn(self):
         """
-        Stop the bluetooth detection
-        @param myxpl : The xpl sender to use.
-        @param device : The "plugin" device.
+        Return the date and time of the next dawn
+        @return : the next dawn daytime
         """
-        self.log.debug("_action_stop : Start ...")
-        self.stop_adaptator()
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("dawndusk.basic")
-        mess.add_data({"device" : device})
-        mess.add_data({"status" : self._state})
-        myxpl.send(mess)
-        self.log.debug("_action_stop : Done :)")
+        self.mycity.date = datetime.datetime.today()
+        dawn = ephem.localtime(self.mycity.next_rising(ephem.Sun(), \
+            use_center = True))
+        return dawn
 
-    def _action_start(self, myxpl, device):
+    def get_next_dusk(self):
         """
-        Start the bluetooth detection
-        @param myxpl : The xpl sender to use.
-        @param device : The "plugin" device.
+        Return the date and time of the dusk
+        @return : the next dusk daytime
         """
-        self.log.debug("_action_start : Start ...")
-        self.start_adaptator()
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("dawndusk.basic")
-        mess.add_data({"device" : device})
-        mess.add_data({"status" : self._state})
-        myxpl.send(mess)
-        self.log.debug("_action_start : Done :)")
+        self.mycity.date = datetime.datetime.today()
+        dusk = ephem.localtime(self.mycity.next_setting(ephem.Sun(), \
+            use_center = True))
+        return dusk
 
-    def _trig_detect(self, xpltype, addr, status):
+    def get_next_fullmoon_dawn(self):
         """
-        Send a message with the status of the "phone" device.
-        @param xpltype : The xpltype of the message to send.
-        @param addr : the mac address of the bluetooth device.
-        @param status : the status of the bluetooth device.
+        Return the date and time of the next dawn and dusk of the next fullmoon
+        @return : the next dawn daytime
         """
-        self.log.debug("_trig_detect : Start ...")
-        self._targets[addr]["status"] = status
-        mess = XplMessage()
-        mess.set_type(xpltype)
-        mess.set_schema("sensor.basic")
-        mess.add_data({"dawndusk" : self._device_name})
-        mess.add_data({"device" : self._targets[addr]["name"]})
-        mess.add_data({"type" :  "ping"})
-        mess.add_data({"current" : status})
-        self.myxpl.send(mess)
-        self.log.debug("_trig_detect : Done :)")
+        self.mycity.date = self._get_next_fullmoon()
+        dawn = ephem.localtime(self.mycity.next_rising(ephem.Moon(), \
+            use_center = True))
+        dusk = ephem.localtime(self.mycity.next_setting(ephem.Moon(), \
+            use_center = True))
+        if dawn > dusk:
+            dawn = ephem.localtime(self.mycity.previous_rising(ephem.Moon(), \
+            use_center = True))
+        return dawn
 
+    def get_next_fullmoon_dusk(self):
+        """
+        Return the date and time of the dusk of the next fullmoon
+        @return : the next dusk daytime
+        """
+        self.mycity.date = self._get_next_fullmoon()
+        dusk = ephem.localtime(self.mycity.next_setting(ephem.Moon(), \
+            use_center = True))
+        return dusk
+
+    def get_next_fullmoon(self):
+        """
+        Return the date and time of the next fullmoon
+        @return : the next full moon daytime
+        """
+        dusk = ephem.localtime(self._get_next_fullmoon())
+        return dusk
+
+    def _get_next_fullmoon(self):
+        """
+        Return the date and time of the next full moon
+        @return : the next full moon daytime
+        """
+        now = datetime.datetime.today()
+        nextfullmoon = ephem.next_full_moon(now)
+        return nextfullmoon
+
+if __name__ == "__main__":
+    D = DawnduskAPI()
