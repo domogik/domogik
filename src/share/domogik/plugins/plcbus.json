@@ -164,6 +164,7 @@
     "sensors": {
 	"binary_state": {
 		"name": "Binary State",
+                "unit": "",
                 "value_type": "string",
                 "values": ["ON", "OFF"]
 	},
