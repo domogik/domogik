@@ -5,7 +5,7 @@ Repositories configuration
 Purpose
 =======
 
-Since the release 0.2.0 of Domogik, plugins are not delivered with Domogik. They are available on online repositories as packages. These packages can be installed from the administration in Domoweb (the web user interface). Several repositories can be activated depending of your needs.
+Since Domogik 0.2.0 plugins are not delivered by default with Domogik. They are available on online repositories as packages. These packages can be installed from the administration in Domoweb (the web user interface). Several repositories can be activated depending of your needs.
 
 
 Configuration
@@ -22,8 +22,8 @@ Edit the file **/etc/domogik/sources.list**. Here is the sample file installed b
 
 Only the *stable* repository is activated by default. We recommend you to use only this repository.
 
-For a complete description of each repositories, you can read :doc:`the appropriate page </enduser/packages/repositories>`.
+For a complete description of each repository, you can read :doc:`the appropriate page </enduser/packages/repositories>`.
 
-If you update this file, you will need to retsart Domogik: ::
+If you update this file, you will need to restart Domogik: ::
 
     $ sudo /etc/init.d/domogik restart
