@@ -32,8 +32,8 @@ Then check your */usr/lib/apache2/modules* directory and make sure the file *mod
 
 Create your wsgi file
 ---------------------
-At the top of the django directory (ie where *settings.py* lives) create a subdirectory named *apache*.
-Create in this directory a file named *django.wsgi* with this content (eventually adapt the python path to your needs):
+At the top of the django directory (i.e. where *settings.py* lives), create a subdirectory named *apache*.
+Create in this directory a file named *django.wsgi* with this content (eventually adapt the python path to your needs) :
 
 .. code-block:: python
 
@@ -49,11 +49,11 @@ Create in this directory a file named *django.wsgi* with this content (eventuall
 Add an entry to your Apache configuration file
 ----------------------------------------------
 
-First enable the rewrite module: ::
+First enable the rewrite module : ::
 
     a2enmod rewrite
     
-Add for example a virtual host like this: ::
+Add for example a virtual host like this : ::
 
     <VirtualHost *:80>
         ServerName domogik.myserver.org
@@ -92,7 +92,7 @@ Before doing this, don't forget that django is not made to be directly accessibl
 
 * bind Django port on your box.
 * bind REST port on your box.
-* configure /etc/domogik/domogik.cfg file to use your public internet IP.
+* configure */etc/domogik/domogik.cfg* file to use your public internet IP.
 
 Notice that doing this will make all your local Domogik use go through the internet.
 
