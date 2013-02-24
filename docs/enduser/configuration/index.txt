@@ -4,7 +4,7 @@ First use of Domogik
 
 Purpose
 =======
-In this page we will present you the different screens and sections of Domogik. If you already use Domogik you can directly go to ((Create_and_configure_your_house|the next page)).
+In this page we will present you the different screens and sections of Domogik. If you already use Domogik you can directly go to :doc:`the next page </enduser/configuration/house>`.
 
 Accessing to the Domogik web UI
 ===============================
@@ -14,7 +14,7 @@ At the end of the installation the installer script should have displayed this i
 * Administrator password
 * Domogik web UI url
 
-So you should be now able to access to the Domogik web UI :)
+So you should now be able to access the Domogik web UI :)
 
 Screens description
 ===================
