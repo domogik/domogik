@@ -10,7 +10,7 @@ New features
 
 Domoweb goes out of Domogik
 ***************************
-Domoweb, the web user interface is no more included in Domogik. It is now a separate project. This will allow to release new Domoweb releases without needing to deliver new Domogik releases.
+Domoweb, the web user interface is no more included in Domogik. It is now a separate project. This will allow to release new Domoweb versions without needing to deliver new Domogik releases.
 
 Packages management (plugins)
 *****************************
@@ -24,17 +24,17 @@ A dedicated software has been developped to manage our repositories. It is avail
 New user documentation
 **********************
 In the previous release, all the user documentation was on the wiki. This was not very easy to manage (especially to manage different versions of the documentation).
-Now, the user documentation is in the `ReST <http://en.wikipedia.org/wiki/ReStructuredText>`_ format and is hosted in Domogik sources. The html build is generated and published regulary on `http://docs.domogik.org/domogik <http://docs.domogik.org/domogik>`_.
+Now the user documentation is in `ReST <http://en.wikipedia.org/wiki/ReStructuredText>`_ format and is hosted in Domogik sources. The html build is generated and published regulary on `http://docs.domogik.org/domogik <http://docs.domogik.org/domogik>`_.
 
 Packaging improvment
 ********************
-In order to allow the creation of distribution packages, a hard work has been made on the FHS. The configuration files are now in the */etc/domogik/* folder and during the installation the files are now placed in the appropriate places.
+In order to allow the creation of distribution packages, a hard work has been made on the FHS. The configuration files are now in the */etc/domogik/* folder and during the installation the files are now copied to the appropriate places.
 
 Some Ubuntu and Fedora packages will be available for Domogik releases.
 
 Multiple hosts
 **************
-The installer is now able to install Domogik on a secondary host. You will be able to install packages on these secondary hosts directly from Domoweb in the same way as on the main host.
+The installer is now able to install Domogik on a secondary host. You will be able to install packages on this secondary host directly from Domoweb in the same way as on the main host.
 
 
 
