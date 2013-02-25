@@ -143,7 +143,7 @@
                {
                    "key": "command",
                    "value_type": "binary",
-                   "values": ["ON", "OFF"]
+                   "values": ["OFF", "ON"]
                }
            ],
            "xpl_command": "set_binary"
@@ -166,7 +166,7 @@
 		"name": "binary_state",
                 "unit": "",
                 "value_type": "string",
-                "values": ["ON", "OFF"]
+                "values": ["OFF", "ON"]
 	},
 	"dim_level": {
 		"name": "dim_level",
