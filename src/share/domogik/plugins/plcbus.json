@@ -163,13 +163,13 @@
     },
     "sensors": {
 	"binary_state": {
-		"name": "Binary State",
+		"name": "binary_state",
                 "unit": "",
                 "value_type": "string",
                 "values": ["ON", "OFF"]
 	},
 	"dim_level": {
-		"name": "Dim Level",
+		"name": "dim_level",
                 "unit": "%",
                 "value_type": "number",
                 "values": [0, 100]
@@ -238,12 +238,7 @@
         "type": "plugin", 
         "version": "0.2a0"
     }, 
-    "json_version": 2, 
-    "technology": {
-        "description": "PLCBus", 
-        "id": "plcbus", 
-        "name": "PLCBus"
-    }, 
+    "json_version": 2,
     "udev-rules": [
         {
             "description": "Plcbus 1141U Usb adaptator", 
