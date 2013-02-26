@@ -123,20 +123,20 @@ class VelbusManager(XplPlugin):
     def process_lighting_basic(self, message):
         """ Process xpl chema lightning.basic
         """
+        print message
         #self.send_xpl("lighting.device", message.data)
-        add = message.data['device'].split('-')
-        chan = int(add[1])
-        address = add[0]
+        address = message.data['address']
+        chan = message.data['channel']
         if message.data["level"] == 'None':
             message.data["level"] = 0
         if message.data["level"] == str(255):
             self.log.debug("set relay on / dim to max")
             self.manager.send_relayon( address, chan )
-            self.manager.send_setdimmervalue( address, chan, 255 )
+            #self.manager.send_setdimmervalue( address, chan, 255 )
         elif message.data["level"] == str(0):
             self.log.debug("set relay off / dim to min")
             self.manager.send_relayoff( address, chan )
-            self.manager.send_setdimmervalue( address, chan, 0 )
+            #self.manager.send_setdimmervalue( address, chan, 0 )
         else:
             self.log.debug("set dimmer value")
             self.manager.send_setdimmervalue( address, chan, message.data["level"] )

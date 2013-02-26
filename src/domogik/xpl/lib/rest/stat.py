@@ -167,11 +167,12 @@ class StatsManager:
                 for p in self._stat.params:
                     if p.sensor_id is not None:
                         if p.key in message.data:
-                            key = None
-                            value = None
+                            self._log_stats.debug("Key found %s." \
+                                % (p.key))
+                            value = message.data[p.key]
                             # store it
-                            device_data.append({"key" : key, "value" : value})
-                            #my_db.add_device_stat(current_date, key, value, self._dev.id, hist_size=0)
+                            device_data.append({"key" : p.key, "value" : value})
+                            my_db.add_sensor_history(p.sensor_id, value, current_date)
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
                 print("==== Error in Stats ====")
