@@ -420,7 +420,7 @@ class CommandParam(Base):
         self.cmd_id = cmd_id
         self.key = ucode(key)
         self.value_type = ucode(value_type)
-        self.values = ucode(values)
+        self.values = str(values)
    
     def __repr__(self):
         """Return an internal representation of the class"""
