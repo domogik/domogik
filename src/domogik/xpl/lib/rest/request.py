@@ -213,12 +213,10 @@ class ProcessRequest():
         },
         # /stats
         'stats': {
-            '^/stats/(?P<device_id>[0-9]+)/keys$':						     '_rest_stats_keys',
-            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/all$':				     '_rest_stats_all',
-            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/latest$':				     '_rest_stats_last',
-            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/last/(?P<num>[0-9]+)$':		     '_rest_stats_last',
-            '^/stats/(?P<device_id>[0-9]+)/(?P<key>[^/]+)/from/.*$':     		             '_rest_stats_from',
-            '^/stats/multi/.*$':								     '_rest_stats_multi',
+            '^/stats/(?P<sensor_id>[0-9]+)/all$':				     '_rest_stats_all',
+            '^/stats/(?P<sensor_id>[0-9]+)/latest$':				     '_rest_stats_last',
+            '^/stats/(?P<sensor_id>[0-9]+)/last/(?P<num>[0-9]+)$':		     '_rest_stats_last',
+            '^/stats/(?P<sensor_id>[0-9]+)/from/.*$':     		             '_rest_stats_from',
         },
    }
 
@@ -872,67 +870,28 @@ class ProcessRequest():
             self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
             return
 
-
-    def _rest_stats_multi(self):
-        """ Get the last values for all couples device/key in database
-        """
-
-        json_data = JSonHelper("OK")
-        json_data.set_data_type("stats")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        idx = 1
-        while idx < len(self.rest_request):
-            data = None
-            for data in self._db.list_last_n_stats_of_device(self.rest_request[idx], self.rest_request[idx+1],  1):
-                setattr(data, "exists", "True")
-                json_data.add_data(data)
-            if data == None:
-                # first, check if the device exists
-                if self._db.get_device(self.rest_request[idx]):
-                    json_data.add_data({"device_id" : self.rest_request[idx], \
-                                        "exists" : True})
-                else:
-                    json_data.add_data({"device_id" : self.rest_request[idx], \
-                                        "exists" : False})
-            idx += 2
-        self.send_http_response_ok(json_data.get())
-  
-    def _rest_stats_keys(self, device_id):
-        json_data = JSonHelper("OK")
-        json_data.set_data_type("stats")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for b in self._db.lis_device_stats_distinct_key(device_id):
-            json_data.add_data(b.skey)
-        self.send_http_response_ok(json_data.get())
-
-    def _rest_stats_all(self, device_id, key):
+    def _rest_stats_all(self, sensor_id):
         """ Get all values for device/key in database
              @param device_id : device id
-             @param key : key for device
         """
-        # TODO
-
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_device_stats(device_id,key):
-            # TODO : filter by key
+        for data in self._db.list_sensor_history(sensor_id):
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
 
 
-    def _rest_stats_last(self, device_id, key, num = 1):
+    def _rest_stats_last(self, sensor_id, num = 1):
         """ Get the last values for device/key in database
              @param device_id : device id
-             @param key : key for device
              @param num : number of data to return
         """
-
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_last_n_stats_of_device(device_id, key,  num):
+        for data in self._db.list_sensor_history(sensor_id, num):
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 

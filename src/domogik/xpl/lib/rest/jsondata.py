@@ -163,7 +163,7 @@ class JSonHelper():
                    "SensorReferenceData", "Person", \
                    "Command", "CommandParam", \
                    "XplCommandParam", "XplStatParam", "XplCommand", "XplStat", \
-                   "Sensor")
+                   "Sensor", "SensorHistory")
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")

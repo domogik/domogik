@@ -882,6 +882,13 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
 
+    def list_sensor_history(self, sid, num=None):
+        if num is None:
+            return self.__session.query(SensorHistory).filter_by(sensor_id=sid).all()
+        else:
+            return self.__session.query(SensorHistory).filter_by(sensor_id=sid).limit(num)
+            
+
 ####
 # User accounts
 ####
