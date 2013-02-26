@@ -180,6 +180,6 @@ class StatsManager:
                 print("========================")
                 self._log_stats.error(error)
             # put data in the event queue
-            self._event_requests.add_in_queues(d_id, 
+            self._event_requests.add_in_queues(self._dev.id, 
                     {"timestamp" : current_date, "device_id" : self._dev.id, "data" : device_data})
             del(my_db)
