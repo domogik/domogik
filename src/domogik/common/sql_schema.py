@@ -471,11 +471,14 @@ class SensorHistory(Base):
     value_num = Column(Float, nullable=False)
     value_str = Column(Unicode(32), nullable=False)
 
-    def __init__(self, sensor_id, date, value_num, value_str):
+    def __init__(self, sensor_id, date, value):
         self.sensor_id = sensor_id
         self.date = date
-        self.value_num = value_num
-        self.value_str = ucode(value_str)
+        try:
+            self.value_num = float(value)
+        except ValueError:
+            pass
+        self.value_str = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""

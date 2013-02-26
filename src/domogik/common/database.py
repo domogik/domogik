@@ -870,7 +870,7 @@ class DbHelper():
 	sensor = self.__session.query(Sensor).filter_by(id=sid).first()
 	if sensor is not None:
             # insert new recored in core_sensor_history
-            h = SensorHistory(sensor.id, date, int(value), str(value))
+            h = SensorHistory(sensor.id, date, value)
             self.__session.add(h)
 	    sensor.last_received = date
             sensor.last_value = str(value)
@@ -888,6 +888,38 @@ class DbHelper():
         else:
             return self.__session.query(SensorHistory).filter_by(sensor_id=sid).limit(num)
             
+    def list_sensor_history_between(self, sid, frm, to=None):
+        if to:
+            if to < frm:
+                self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
+        else:
+            to = int(time.time())
+        return self.__session.query(SensorHistory
+                  ).filter_by(sensor_id=sid
+                  ).filter("date >= "+str(frm)
+                  ).filter("date <= "+str(to)
+                  ).order_by(sqlalchemy.asc(SensorHistory.date)
+                  ).all()
+       
+    def list_sensor_history_filter(self, sid, frm, to, step, function_used):
+        if not frm:
+            self.__raise_dbhelper_exception("You have to provide a start date")
+        if to:
+            if to > frm:
+                self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
+        else:
+            to = int(time.time())
+        if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
+            self.__raise_dbhelper_exception("'function_used' parameter should be one of : min, max, avg")
+        if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
+            self.__raise_dbhelper_exception("'period' parameter should be one of : minute, hour, day, week, month, year")
+        function = {
+            'min': func.min(SensorHistory._SensorHistory_value_num),
+            'max': func.max(SensorHistory._SensorHistory__value_num),
+            'avg': func.avg(SensorHistory._SensorHistory__value_num),
+        }
+
+
 
 ####
 # User accounts
