@@ -171,7 +171,7 @@ class StatsManager:
                                 % (p.key))
                             value = message.data[p.key]
                             # store it
-                            device_data.append({"key" : p.key, "value" : value})
+                            device_data.append({"value" : value, "sensor": p.sensor_id})
                             my_db.add_sensor_history(p.sensor_id, value, current_date)
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
