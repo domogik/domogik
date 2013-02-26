@@ -98,10 +98,19 @@ class StatsManager:
             # key1, key2 = device_type_id, schema
             self.stats = []
             for sen in self._db.get_all_sensor():
-                self._log_stats.error(sen)
+                self._log_stats.debug(sen)
                 statparam = self._db.get_xpl_stat_param_by_sensor(sen.id)
-                stat = self._db.get_xpl_stat(statparam.xplstat_id) 
+                if statparam is None:
+                    self._log_stats.error('Corresponding xpl-stat param can not be found for sensor %s' % (sen))
+                    continue
+                stat = self._db.get_xpl_stat(statparam.xplstat_id)
+                if stat is None:
+                    self._log_stats.error('Corresponding xpl-stat can not be found for xplstatparam %s' % (statparam))
+                    continue
                 dev = self._db.get_device(stat.device_id)
+                if dev is None:
+                    self._log_stats.error('Corresponding device can not be found for xpl-stat %s' % (stat))
+                    continue
                 # xpl-trig
                 self.stats.append(self._Stat(self.myxpl, dev, stat, "xpl-trig", self._log_stats, self._log_stats_unknown, self._db, self._event_requests))
                 # xpl-stat
