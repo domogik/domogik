@@ -24,9 +24,11 @@ __email__ = 'gst-py@a-nugget.de'
 
 import zmq
 from zmq.eventloop.zmqstream import ZMQStream
-from zmq.eventloop.ioloop import PeriodicCallback
+from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
 
 from domogik.common.mq.common import split_address
+from domogik.common.configloader import Loader
+from domogik.common.daemonize import createDaemon
 
 ###
 
@@ -69,7 +71,7 @@ class MDPBroker(object):
     WORKER_PROTO = b'MDPW01'  #: Worker protocol identifier
 
 
-    def __init__(self, context, main_ep, opt_ep=None, worker_q=None):
+    def __init__(self, context, main_ep, opt_ep=None):
         """Init MDPBroker instance.
         """
         socket = context.socket(zmq.ROUTER)
@@ -107,11 +109,10 @@ class MDPBroker(object):
 
         :rtype: None
         """
-	print "register_worker"
-	print service
         if wid in self._workers:
             return
-        self._workers[wid] = WorkerRep(self.WORKER_PROTO, wid, service, self.main_stream)
+        self._workers[wid] = WorkerRep(
+                self.WORKER_PROTO, wid, service, self.main_stream)
         if service in self._services:
             wq, wr = self._services[service]
             wq.put(wid)
@@ -133,7 +134,6 @@ class MDPBroker(object):
 
         :rtype: None
         """
-	print "unregister_worker"
         try:
             wrep = self._workers[wid]
         except KeyError:
@@ -157,7 +157,6 @@ class MDPBroker(object):
 
         :rtype: None
         """
-	print "disconnect"
         try:
             wrep = self._workers[wid]
         except KeyError:
@@ -180,7 +179,6 @@ class MDPBroker(object):
 
         :rtype: None
         """
-	print "client_response"
         to_send = rp[:]
         to_send.extend([b'', self.CLIENT_PROTO, service])
         to_send.extend(msg)
@@ -552,6 +550,19 @@ class ServiceQueue(object):
         return self.q.pop(0)
 #
 ###
+def main():
+    cfg = Loader('mq')
+    my_conf = cfg.load()
+    config = dict(my_conf[1])
+
+    createDaemon()
+    context = zmq.Context()
+    broker = MDPBroker(context, config['broker_uri'])
+    IOLoop.instance().start()
+    broker.shutdown()
+
+if __name__ == '__main__':
+    main()
 
 ### Local Variables:
 ### buffer-file-coding-system: utf-8

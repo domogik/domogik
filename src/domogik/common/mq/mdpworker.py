@@ -52,14 +52,17 @@ class MDPWorker(object):
     HB_INTERVAL = 1000  # in milliseconds
     HB_LIVENESS = 3    # HBs to miss before connection counts as dead
 
-    def __init__(self, context, endpoint, service):
+    def __init__(self, context, service):
         """Initialize the MDPWorker.
 
         context is the zmq context to create the socket from.
         service is a byte-string with the service name.
         """
+        cfg = Loader('mq')
+        my_conf = cfg.load()
+        config = dict(my_conf[1])
         self.context = context
-        self.endpoint = endpoint
+        self.endpoint = config['broker_uri']
         self.service = service
         self.stream = None
         self._tmo = None
