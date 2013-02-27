@@ -897,13 +897,12 @@ class ProcessRequest():
 
 
 
-    def _rest_stats_from(self, device_id, key):
+    def _rest_stats_from(self, sensor_id):
         """ Get the values for device/key in database for an start time to ...
              @param device_id : device id
-             @param key : key for device
              @param others params : will be get with get_parameters (dynamic params)
         """
-
+        self.set_parameters(1)
         st_from = float(self.get_parameters("from"))
         st_to = self.get_parameters("to")
         if st_to != None:
@@ -923,16 +922,15 @@ class ProcessRequest():
             csv_data = CsvHelper()
         values = []
         if st_interval != None and st_selector != None:
-            data = self._db.filter_stats_of_device_by_key(device_id,
-                                                               key,
-                                                               st_from,
-                                                               st_to,
-                                                               st_interval,
-                                                               st_selector)
+            data = self._db.list_sensor_history_filter(sensor_id,
+                                                         st_from,
+                                                         st_to,
+                                                         st_interval,
+                                                         st_selector)
             if self.csv_export == False:
                 json_data.add_data({"values" : data["values"],
                                     "global_values" : data["global_values"],
-                                    "key" : key, "device_id" : device_id})
+                                    "sensor_id" : sensor_id})
             else:
                 for my_tuple in data["values"]:
                     if st_interval == "year":
@@ -965,10 +963,10 @@ class ProcessRequest():
                                                                  my_tuple[5],
                                                                  my_tuple[6]))
         else:
-            for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
+            for data in self._db.list_sensor_history_between(sensor_id, st_from, st_to):         
                 values.append(data) 
             if self.csv_export == False:
-                json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
+                json_data.add_data({"values" : values, "sensor_id" : sensor_id})
             else:
                 for my_value in values:
                     csv_data.add_data("%s;%s" % (my_value.date,
