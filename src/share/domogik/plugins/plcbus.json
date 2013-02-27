@@ -1,4 +1,18 @@
 {
+	"products" : [
+	   {
+	       "name" : "Module prise (PLCBUS-2027)",
+	       "id" : "PLCBUS_2027",
+	       "doc" : "http://www.plcbus.com.cn/Html/news/1435.html",
+	       "type" : "plcbus.switch"
+	   },
+	   {
+	       "name" : "Micro Module variateur (PLCBUS-2263)",
+	       "id" : "PLCBUS_2263",
+	       "doc" : "http://www.plcbus.com.cn/Html/news/1434.html",
+	       "type" : "plcbus.dimmer"
+	   }
+	],
     "configuration": [
         {
             "default": "False", 
@@ -50,51 +64,147 @@
             "options": [], 
             "type": "string"
         }
-    ], 
-    "device_feature_models": [
-        {
-            "device_type_id": "plcbus.switch", 
-            "feature_type": "actuator", 
-            "id": "plcbus.switch.switch", 
-            "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "command", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "plcbus.dimmer", 
-            "feature_type": "actuator", 
-            "id": "plcbus.dimmer.switch", 
-            "name": "Dimmer", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "command", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "plcbus.dimmer", 
-            "feature_type": "actuator", 
-            "id": "plcbus.dimmer.change", 
-            "name": "Change", 
-            "parameters": "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
-            "return_confirmation": "1", 
-            "stat_key": "level", 
-            "value_type": "range"
+    ],
+    
+    "xpl_commands": {
+         "set_binary": {
+            "name": "set_binary",
+            "schema": "plcbus.basic",
+            "xplstat_name": "get_binary",
+            "parameters": {
+                    "static": [],
+                    "device": []
+                }
+         },
+         "set_preset_dim": {
+            "name": "set_preset_dim",
+            "schema": "plcbus.basic",
+            "xplstat_name": "get_preset_dim",
+            "parameters": {
+                    "static": [
+		    	{
+			    "key": "command",
+			    "value": "PRESET_DIM"
+		    	}
+                    ],
+                    "device": []
+                }
+         },
+         "set_bright": {
+            "name": "set_bright",
+            "schema": "plcbus.basic",
+            "xplstat_name": "get_bright",
+            "parameters": {
+                    "static": [
+		    	{
+			    "key": "command",
+			    "value": "BRIGHT"
+		    	}
+                    ],
+                    "device": []
+                }
+         }
+    },
+    "xpl_stats": {
+       "get_binary": {
+            "name": "get_binary",
+            "schema": "plcbus.basic",
+            "parameters": {
+                    "static": [],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "command",
+                             "sensor": "binary_state"
+                        }
+                    ]
+                }
+	},
+        "get_preset_dim": {
+             "name": "get_preset_dim",
+	     "schema": "plcbus.basic",
+	     "parameters": {
+	             "static": [],
+	             "device": [],
+	             "dynamic": [
+	                 {
+	                      "key": "data1",
+	                      "sensor": "dim_level"
+	                 }
+	             ]
+	        }
+       	}
+    },
+    "commands": {
+       "set_binary": {
+           "name": "Switch On or Off",
+           "return_confirmation": true,
+           "params": [
+               {
+                   "key": "command",
+                   "value_type": "binary",
+                   "values": ["OFF", "ON"]
+               }
+           ],
+           "xpl_command": "set_binary"
+        },
+        "set_preset_dim": {
+            "name": "Set Level with Absolute value",
+            "return_confirmation": true,
+            "params": [
+                {
+                    "key": "data1",
+                    "value_type": "range",
+                    "values": [0, 100]
+                }
+            ],
+            "xpl_command": "set_preset_dim"
+         }
+    },
+    "sensors": {
+	"binary_state": {
+		"name": "binary_state",
+                "unit": "",
+                "value_type": "string",
+                "values": ["OFF", "ON"]
+	},
+	"dim_level": {
+		"name": "dim_level",
+                "unit": "%",
+                "value_type": "number",
+                "values": [0, 100]
+	}
+    },
+    "device_types": {
+        "plcbus.switch": {
+            "id": "plcbus.switch",
+            "description": "ON/OFF Binary Switch", 
+            "name": "Switch",
+            "commands": ["set_binary"],
+            "sensors": ["binary_state"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
+        },
+        "plcbus.dimmer": {
+            "id": "plcbus.dimmer",
+            "description": "Level Dimmer", 
+            "name": "Dimmer",
+            "commands": ["set_binary", "set_preset_dim"],
+            "sensors": ["binary_state", "dim_level"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }
-    ], 
-    "device_types": [
-        {
-            "description": "Switch", 
-            "id": "plcbus.switch", 
-            "name": "Switch"
-        }, 
-        {
-            "description": "Dimmer", 
-            "id": "plcbus.dimmer", 
-            "name": "Dimmer"
-        }
-    ], 
+    },
     "files": [
         "src/share/domogik/design/plugin/plcbus/icon.png", 
         "src/share/domogik/plugins/plcbus.json", 
@@ -128,12 +238,7 @@
         "type": "plugin", 
         "version": "0.2a0"
     }, 
-    "json_version": 1, 
-    "technology": {
-        "description": "PLCBus", 
-        "id": "plcbus", 
-        "name": "PLCBus"
-    }, 
+    "json_version": 2,
     "udev-rules": [
         {
             "description": "Plcbus 1141U Usb adaptator", 

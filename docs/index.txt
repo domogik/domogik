@@ -11,7 +11,7 @@ Overview
 End User Documentation
 ======================
 
-* :doc:`Release 0.2.0 </releases/0.2.0>`
+* :doc:`Release 0.4.0 </releases/0.4.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**
 
@@ -46,19 +46,16 @@ Technical Documentation
 =======================
 * :doc:`The xPL hub </xplhub/index>`
 * :doc:`Network ports used by Domogik </technical/network_ports>`
-* :doc:`Actuators </technical/actuator>`
+* :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
-* :doc:`Device types, features and usages  </technical/device_feature_usage>`
-* **Manager:**
-  :doc:`Overview </technical/manager/index>`
+* :doc:`Device types and usages  </technical/device_feature_usage>`
 * **Database:**
   :doc:`Model </technical/database>`
 * **RINOR:**
   :doc:`Overview </technical/rinor/index>` |
   :doc:`Statistics Manager </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
-  
     * :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (devices, events, etc)
-    * :doc:`REST /command </technical/rinor/rest_command>`: Send commands to devices
+    * :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
     * :doc:`REST /events </technical/rinor/rest_events>`: Get events
     * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
     * :doc:`REST /account </technical/rinor/rest_account>`: List accounts, login, etc
@@ -70,18 +67,6 @@ Technical Documentation
     * :doc:`REST /host </technical/rinor/rest_host>`: Hosts informations
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
-* **xPL messages:**
-
-  * All the official xPL messages can be found `on the xPL project website <http://xplproject.org.uk/wiki/index.php?title=XPL_Message_Schema>`_.
-  * :doc:`domogik.system (Domogik internal communication) </technical/xpl/internal>`
-  * :doc:`domogik.package (Domogik internal communication) </technical/xpl/internal>`
-  * Teleinfo
-
-    * :doc:`teleinfo.basic </technical/xpl/teleinfo>`
-    * :doc:`teleinfo.short </technical/xpl/teleinfo>`
-
-  * :doc:`plcbus.basic </technical/xpl/plcbus.basic>`
-  * :doc:`weather.basic </technical/xpl/weather.basic>`
 
 
 Developers Documentation
