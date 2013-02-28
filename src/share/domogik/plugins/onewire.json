@@ -282,7 +282,7 @@
             "sensors": ["temperature"],
             "xpl_params": [
                 {
-                    "key": "address",
+                    "key": "device",
                     "description": "The hexadecimal address",
                     "type": "string"
                 }
@@ -296,7 +296,7 @@
             "sensors": ["temperature", "humidity"],
             "xpl_params": [
                 {
-                    "key": "address",
+                    "key": "device",
                     "description": "The hexadecimal address",
                     "type": "string"
                 }
@@ -310,7 +310,7 @@
             "sensors": ["serial"],
             "xpl_params": [
                 {
-                    "key": "address",
+                    "key": "device",
                     "description": "The hexadecimal address",
                     "type": "string"
                 }
@@ -324,7 +324,7 @@
             "sensors": ["gpio"],
             "xpl_params": [
                 {
-                    "key": "address",
+                    "key": "device",
                     "description": "The hexadecimal address",
                     "type": "string"
                 },
