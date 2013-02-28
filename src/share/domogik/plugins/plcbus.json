@@ -124,7 +124,12 @@
              "name": "get_preset_dim",
 	     "schema": "plcbus.basic",
 	     "parameters": {
-	             "static": [],
+	             "static": [
+		     	{
+    			    "key": "command",
+    		    	    "value": "PRESET_DIM"	
+		     	}	             	
+	             ],
 	             "device": [],
 	             "dynamic": [
 	                 {
