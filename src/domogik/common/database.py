@@ -684,22 +684,23 @@ class DbHelper():
             return None
         sensors = {}
         addedxplstats = {}
-        for sensor_name in pjson['device_types'][dt.id]['sensors']:
+        for sensor_id in pjson['device_types'][dt.id]['sensors']:
             # add the command
-            sensor = pjson['sensors'][sensor_name]
+            sensor = pjson['sensors'][sensor_id]
             sen = Sensor(name=sensor['name'], \
-                    device_id=dev.id, reference=sensor_name, \
+                    device_id=dev.id, reference=sensor_id, \
                     value_type=sensor['value_type'], values=sensor['values'], \
                     unit=sensor['unit'])
             self.__session.add(sen)
             self.__session.flush()
-            sensors[sensor['name']] = sen.id
+            sensors[sensor_id] = sen.id
             if 'xpl_stat' in sensor:
-                xpl_stat = pjson['xpl_stats'][sensor['xpl_stat']]
+                xpl_stat_id = sensor['xpl_stat']
+                xpl_stat = pjson['xpl_stats'][xpl_stat_id]
                 xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id)
                 self.__session.add(xplstat)
                 self.__session.flush()
-                addedxplstats[xpl_stat['name']] = xplstat.id
+                addedxplstats[xpl_stat_id] = xplstat.id
                 # add static params
                 for p in xpl_stat['parameters']['static']:
                     par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
@@ -717,15 +718,15 @@ class DbHelper():
                     par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
                                     key=p['key'], value=None, static=False)           
                     self.__session.add(par)
-        for command_name in pjson['device_types'][dt.id]['commands']:
+        for command_id in pjson['device_types'][dt.id]['commands']:
             # add the command
-            command = pjson['commands'][command_name]
+            command = pjson['commands'][command_id]
             cmd = Command(name=command['name'], \
-                    device_id=dev.id, reference=command_name, return_confirmation=command['return_confirmation'])
+                    device_id=dev.id, reference=command_id, return_confirmation=command['return_confirmation'])
             self.__session.add(cmd)
             self.__session.flush()
             # add the command params
-            for p in pjson['commands'][command_name]['params']:
+            for p in pjson['commands'][command_id]['params']:
                 pa = CommandParam(cmd.id, p['key'], p['value_type'], p['values'])
                 self.__session.add(pa)
                 self.__session.flush()
@@ -734,8 +735,9 @@ class DbHelper():
                 xpl_command = pjson['xpl_commands'][command['xpl_command']]
                 # add the xpl_stat
                 if 'xplstat_name' in xpl_command:
-                    if xpl_stat['name'] not in addedxplstats:
-                        xpl_stat = pjson['xpl_stats'][xpl_command['xplstat_name']]
+		    xpl_stat_id = xpl_command['xplstat_name']
+                    if xpl_stat_id not in addedxplstats:
+                        xpl_stat = pjson['xpl_stats'][xpl_stat_id]
                         xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id)
                         self.__session.add(xplstat)
                         self.__session.flush()
@@ -758,7 +760,7 @@ class DbHelper():
                                          key=p['key'], value=None, static=False)           
                             self.__session.add(par)
                     else:
-                        xplstatid = addedxplstats[xpl_stat['name']]
+                        xplstatid = addedxplstats[xpl_stat_id]
                 else:
                     xplstatid = None
                 # add the xpl command
