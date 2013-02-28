@@ -945,7 +945,127 @@ class DbHelper():
             'max': func.max(SensorHistory._SensorHistory__value_num),
             'avg': func.avg(SensorHistory._SensorHistory__value_num),
         }
-
+        sql_query = {
+            'minute' : {
+                # Query for mysql
+                # func.week(SensorHistory.date, 3) is equivalent to python's isocalendar()[2] method
+                'mysql': self.__session.query(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.week(SensorHistory.date, 3), func.day(SensorHistory.date),
+                            func.hour(SensorHistory.date), func.minute(SensorHistory.date),
+                            function[function_used]
+                        ).group_by(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.day(SensorHistory.date), func.hour(SensorHistory.date),
+                            func.minute(SensorHistory.date)
+                        ),
+                 'postgresql': self.__session.query(
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date), extract('minute', SensorHistory.date),
+                            function[function_used]
+                        ).group_by(
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date), extract('minute', SensorHistory.date)
+                        ).order_by(
+                            sqlalchemy.asc('year_c')
+                        )
+            },
+            'hour' : {
+                'mysql': self.__session.query(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.week(SensorHistory.date, 3), func.day(SensorHistory.date),
+                            func.hour(SensorHistory.date), function[function_used]
+                        ).group_by(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.day(SensorHistory.date), func.hour(SensorHistory.date)
+                        ),
+                'postgresql': self.__session.query(
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date),
+                            function[function_used]
+                        ).group_by(
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date)
+                        ).order_by(
+                            sqlalchemy.asc('year_c')
+                        )
+            },
+            'day' : {
+                'mysql': self.__session.query(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.week(SensorHistory.date, 3), func.day(SensorHistory.date),
+                                      function[function_used]
+                        ).group_by(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.day(SensorHistory.date)
+                        ),
+                'postgresql': self.__session.query(
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            function[function_used]
+                        ).group_by(
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date)
+                        ).order_by(
+                            sqlalchemy.asc('year_c')
+                        )
+            },
+            'week' : {
+                'mysql': self.__session.query(
+                            func.year(SensorHistory.date), func.week(SensorHistory.date, 1), function[function_used]
+                        ).group_by(
+                            func.year(SensorHistory.date), func.week(SensorHistory.date, 1)
+                        ),
+                'postgresql': self.__session.query(
+                            extract('year', SensorHistory.date).label('year_c'), extract('week', SensorHistory.date),
+                            function[function_used]
+                        ).group_by(
+                            extract('year', SensorHistory.date).label('year_c'), extract('week', SensorHistory.date)
+                        ).order_by(
+                            sqlalchemy.asc('year_c')
+                        )
+            },
+            'year' : {
+                'mysql': self.__session.query(
+                            func.year(SensorHistory.date), function[function_used]
+                        ).group_by(
+                            func.year(SensorHistory.date)
+                        ),
+                'postgresql': self.__session.query(
+                            extract('year', SensorHistory.date).label('year_c'), function[function_used]
+                        ).group_by(
+                            extract('year', SensorHistory.date)
+                        ).order_by(
+                            sqlalchemy.asc('year_c')
+                        )
+            },
+            'global' : self.__session.query(
+                            function['min'], function['max'], function['avg']
+                        )
+        }
+        if self.get_db_type() in ('mysql', 'postgresql'):
+            cond_min = "date >= '" + frm + "'"
+            cond_max = "date < '" + to + "'"
+            query = sql_query[step_used][self.get_db_type()]
+            query = query.filter_by(sensor_id=sid
+                        ).filter(cond_min
+                        ).filter(cond_max)
+            results_global = sql_query['global'].filter_by(sensor_id=sid
+                                               ).filter(cond_min
+                                               ).filter(cond_max
+                                               ).first()
+            return {
+                'values': query.all(),
+                'global_values': {
+                    'min': results_global[0],
+                    'max': results_global[1],
+                    'avg': results_global[2]
+                }
+            }
 
 
 ####
