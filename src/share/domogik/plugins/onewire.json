@@ -246,14 +246,14 @@
     },
     "sensors": {
 	"temperature": {
-		"name": "temperature",
+		"name": "Temperature",
                 "unit": "C",
                 "value_type": "number",
                 "values": "",
                 "xpl_stat": "get_temp"
 	},
 	"serial": {
-		"name": "serial",
+		"name": "Serial",
                 "unit": "",
                 "value_type": "string",
                 "values": "",
@@ -266,7 +266,7 @@
                 "values": ""
         },
 	"humidity": {
-		"name": "humidity",
+		"name": "Humidity",
                 "unit": "%",
                 "value_type": "number",
                 "values": [0, 100],
@@ -365,11 +365,6 @@
         "version": "0.3b1"
     }, 
     "json_version": 2, 
-    "technology": {
-        "description": "1-wire", 
-        "id": "onewire", 
-        "name": "1-wire"
-    }, 
     "udev-rules": [
         {
             "description": "Usb DS9490R adaptator", 

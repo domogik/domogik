@@ -163,16 +163,18 @@
     },
     "sensors": {
 	"binary_state": {
-		"name": "binary_state",
+		"name": "Binary State",
                 "unit": "",
                 "value_type": "string",
-                "values": ["OFF", "ON"]
+                "values": ["OFF", "ON"],
+                "xpl_stat": "get_binary"
 	},
 	"dim_level": {
-		"name": "dim_level",
+		"name": "Dim Level",
                 "unit": "%",
                 "value_type": "number",
-                "values": [0, 100]
+                "values": [0, 100],
+                "xpl_stat": "get_preset_dim"
 	}
     },
     "device_types": {
