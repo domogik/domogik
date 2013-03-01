@@ -704,10 +704,12 @@ class DbHelper():
                 # add static params
                 for p in xpl_stat['parameters']['static']:
                     par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
-                                   key=p['key'], value=p['value'], static=True)           
+                                   key=p['key'], value=p['value'], static=True, ignore_values=None)           
                     self.__session.add(par)
                 # add dynamic params
                 for p in xpl_stat['parameters']['dynamic']:
+                    if 'ignore_values' not in p:
+                        p['ignore_values'] = None
                     sensorid = None
                     if p['sensor'] is not None: 
                         if p['sensor'] in sensors:
@@ -716,7 +718,7 @@ class DbHelper():
                             self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
                             return None
                     par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
-                                    key=p['key'], value=None, static=False)           
+                                    key=p['key'], value=None, static=False, ignore_values=p['ignore_values'])           
                     self.__session.add(par)
         for command_id in pjson['device_types'][dt.id]['commands']:
             # add the command
@@ -749,6 +751,8 @@ class DbHelper():
                             self.__session.add(par)
                         # add dynamic params
                         for p in xpl_stat['parameters']['dynamic']:
+                            if 'ignore_values' not in p:
+                                p['ignore_values'] = None
                             sensorid = None
                             if p['sensor'] is not None: 
                                 if p['sensor'] in sensors:
@@ -757,7 +761,7 @@ class DbHelper():
                                     self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
                                     return None
                             par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
-                                         key=p['key'], value=None, static=False)           
+                                         key=p['key'], value=None, static=False, ignore_values=p['ignore_values'])           
                             self.__session.add(par)
                     else:
                         xplstatid = addedxplstats[xpl_stat_id]
@@ -1401,6 +1405,7 @@ class DbHelper():
 # sensor
 ###################
     def get_all_sensor(self):
+        self.__session.expire_all()
         return self.__session.query(Sensor).all()
 
     def get_sensor_by_device_id(self, did):
@@ -1601,9 +1606,9 @@ class DbHelper():
     def get_xpl_stat_param_by_sensor(self, sensor_id):
         return self.__session.query(XplStatParam).filter_by(sensor_id=sensor_id).first()
 
-    def add_xpl_stat_param(self, statid, key, value, static):
+    def add_xpl_stat_param(self, statid, key, value, static, ignore_values=None):
         self.__session.expire_all()
-        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None)
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None, ignore_values=ignore_values)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -1611,7 +1616,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_stat_param(self, stat_id, key, value=None, static=None):
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, ignore_values=None):
         self.__session.expire_all()
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is None:
@@ -1620,6 +1625,8 @@ class DbHelper():
             param.value = ucode(value)
         if static is not None:
             param.static = static
+        if ignore_values is not None:
+            param.ignore_values = ignore_values
         self.__session.add(param)
         try:
             self.__session.commit()

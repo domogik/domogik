@@ -1618,6 +1618,7 @@ class ProcessRequest():
         for x in self._db.get_xpl_stat_by_device_id(id):
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
+        self.stat_mgr.load()
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_updateglobal(self, id):
@@ -1751,7 +1752,6 @@ class ProcessRequest():
                                          reference=self.get_parameters("reference"))
             json_data.set_data_type("device")
             json_data.add_data(device)
-            self.stat_mgr.load()
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
         except:

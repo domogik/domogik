@@ -88,6 +88,7 @@ class StatsManager:
     def load(self):
         """ (re)load all xml files to (re)create _Stats objects
         """
+        self._log_stats.info("Rest Stat Manager loading.... ")
         try:
             # not the first load : clean
             if self.stats != None:
@@ -170,9 +171,15 @@ class StatsManager:
                             self._log_stats.debug("Key found %s." \
                                 % (p.key))
                             value = message.data[p.key]
-                            # store it
-                            device_data.append({"value" : value, "sensor": p.sensor_id})
-                            my_db.add_sensor_history(p.sensor_id, value, current_date)
+                            if value not in eval(p.ignore_values):
+                                self._log_stats.debug("Value %s is not in ignore list %s." \
+                                    % (value, p.ignore_values))
+                                # store it
+                                device_data.append({"value" : value, "sensor": p.sensor_id})
+                                my_db.add_sensor_history(p.sensor_id, value, current_date)
+                            else:
+                                self._log_stats.debug("Value %s is in ignore list %s." \
+                                    % (value, p.ignore_values))
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
                 print("==== Error in Stats ====")
