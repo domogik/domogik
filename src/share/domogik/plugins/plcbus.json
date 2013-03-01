@@ -115,7 +115,8 @@
                     "dynamic": [
                         {
                              "key": "command",
-                             "sensor": "binary_state"
+                             "sensor": "binary_state",
+			     "ignore_value": ["PRESET_DIM", "DIM", "BRIGHT"]
                         }
                     ]
                 }
