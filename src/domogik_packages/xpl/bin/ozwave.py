@@ -73,7 +73,7 @@ class OZwave(XplPlugin):
             self.log.error(e.value)
             print e.value
             self.force_leave()
-            return    
+            return
         self.add_stop_cb(self.myzwave.stop)
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
@@ -168,7 +168,6 @@ class OZwave(XplPlugin):
                                     'group' :'UI', 
                                     'node' : 0, 
                                     'data': info})
-                print "Refresh network info"
             elif request['request'] == 'GetNodeInfo' :
                 info = self.myzwave.getNodeInfos(request['node'])
                 gprs = info['Groups']
@@ -227,7 +226,6 @@ class OZwave(XplPlugin):
                                     'group' :'UI', 
                                     'listetypes' : 'valuestype', 
                                     'data': info})               
-                print mess
             elif  request['request'] == 'GetListCmdsCtrl':
                 listeCmd = self.myzwave.getListCmdsCtrl()
                 mess.add_data({'command' : 'Refresh-ack', 
@@ -242,7 +240,6 @@ class OZwave(XplPlugin):
                         d = {item: listeCmd[item]}
                         mess.add_data({'item%d'%i : self.getUIdata2dict(d) })
                         i=i+1
-                print mess
             elif  request['request'] == 'setValue':
                 valId = long(request['valueid']) # Pour javascript type string
                 newvalue = request['newValue']
@@ -298,18 +295,18 @@ class OZwave(XplPlugin):
             if response : self.myxpl.send(mess)
                                   
                                     
-    def send_xPL(self, header,  msg):
+    def send_xPL(self, xPLmsg,  args = {}):
         """ Envoie une commande ou message zwave vers xPL"""
         mess = XplMessage()
-        mess.set_type(header['type']) 
-        mess.set_schema(header['schema'])
-        mess.add_data(header['data'])
-   #     for k in msg.keys() : 
-        info = self.getUIdata2dict(msg)
+        mess.set_type(xPLmsg['type']) 
+        mess.set_schema(xPLmsg['schema'])
+        if xPLmsg.has_key('data') : mess.add_data(xPLmsg['data'])
         print '********************* Dans send_xPL *****************'
-        mess.add_data({'data': info})
+        if args :
+            mess.add_data({'data': self.getUIdata2dict(args)})
         print mess
         self.myxpl.send(mess)
+       # self.get_stop().wait(0.7)  # TODO: A supprimer au passage MQ, l'envois à une cadence trops soutenue fait perdre des messages
         
     def sendxPL_trig(self, msgtrig):
         mess = XplMessage()

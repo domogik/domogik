@@ -145,10 +145,9 @@ controller to learn new data.
             nodeId = 1
         ZWaveNode.__init__(self, ozwmanager,  homeId, nodeId)
         self._isPrimaryCtrl = isPrimaryCtrl
-        print 'creation du ctrl'
         self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_NORMAL, 'error_msg' : 'None.', 'message': 'No command in progress.', 'error': 0}
-        print "fait"
-    # On accède aux attributs uniquement depuis les property
+
+# On accède aux attributs uniquement depuis les property
     isPrimaryCtrl = property(lambda self: self._isPrimaryCtrl)
 
     def __str__(self):
@@ -161,10 +160,30 @@ controller to learn new data.
         return 'homeId: [{0}]  nodeId: [{1}] product: {2}  name: {3} is it {4} controller'.format(self._homeId, self._nodeId, self._product, self._name, typeCtrl)
 
     def getLastState(self):
-        """Retourne le dernier etat connus du controlleur et issue du callback des message action"""
+        """Retourne le dernier etat connus du cozwctrl.pyontrolleur et issue du callback des message action"""
         return self._lastCtrlState
         
-    
+    def reportChangeToUI(self, report):
+        """Envois un report de changement/notification du réseau zwave en générant un evénement
+            à destination de l'UI.
+            Pour l'instant utilise le reseaux xPL, doit basculer vers MQ.
+        """
+        #TODO: reportChangeToUI utilise le hub xPL, a basculer sur MQ
+        vBasic = self._getValuesForCommandClass(0x20)   # COMMAND_CLASS_BASIC
+        if vBasic :
+             report['device'] = vBasic[0].getDomogikDevice()
+        else  :
+            nameAssoc = self._ozwmanager._nameAssoc
+            report['device']  = "%s.%d.1" %(nameAssoc.keys()[nameAssoc.values().index(self.homeId)] , self.nodeId) 
+        xPLmsg={}   
+        xPLmsg['type'] = 'xpl-trig'
+        xPLmsg['schema'] = 'ozwctrl.basic'
+        xPLmsg['data'] =  report
+        print 'Send report to xPL hub for UI : '
+        print xPLmsg
+        self._ozwmanager.msgToUI.append({'header': xPLmsg,  'report': {}})
+        # self._ozwmanager._cb_send_xPL(xPLmsg)
+        
     def stats(self):
         """
         Retrieve statistics from driver.
