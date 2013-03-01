@@ -1751,6 +1751,7 @@ class ProcessRequest():
                                          reference=self.get_parameters("reference"))
             json_data.set_data_type("device")
             json_data.add_data(device)
+            self.stat_mgr.load()
         except DbHelperException as e:
             json_data.set_error(code = 999, description = e.value)
         except:
