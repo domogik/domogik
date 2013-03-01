@@ -171,15 +171,16 @@ class StatsManager:
                             self._log_stats.debug("Key found %s." \
                                 % (p.key))
                             value = message.data[p.key]
-                            if value not in eval(p.ignore_values):
-                                self._log_stats.debug("Value %s is not in ignore list %s." \
-                                    % (value, p.ignore_values))
+                            store = True
+                            if p.ignore_values:
+                                if value in eval(p.ignore_values):
+                                    self._log_stats.debug("Value %s is in the ignore list %s, so not storing." \
+                                         % (value, p.ignore_values))
+                                    store = False
+                            if store:
                                 # store it
                                 device_data.append({"value" : value, "sensor": p.sensor_id})
                                 my_db.add_sensor_history(p.sensor_id, value, current_date)
-                            else:
-                                self._log_stats.debug("Value %s is in ignore list %s." \
-                                    % (value, p.ignore_values))
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
                 print("==== Error in Stats ====")
