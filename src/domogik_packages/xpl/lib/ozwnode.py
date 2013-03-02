@@ -580,12 +580,17 @@ class ZWaveNode:
         quality = 0.0
         maxRTT = 10000.0
         S = self.getStatistics()
-        Q1 = float(float(S['sentCnt'] - S['sentFailed'] ) / S['sentCnt'])  if S['sentCnt'] != 0 else 0.0
-        Q2 = float(((maxRTT /2) - S['averageRequestRTT']) / (maxRTT / 2))
-        Q3 = float((maxRTT - S['averageResponseRTT']) / maxRTT)
-        Q4 = float(1 - (float(S['receivedCnt']  - S['receivedUnsolicited']) / S['receivedCnt'])) if S['receivedCnt'] != 0 else 0.0
-        quality = ((Q1 + (Q2*2) + (Q3*3) + Q4) / 7.0) * 100.0
-        print 'Quality com : ',  quality,  Q1,  Q2,  Q3,  Q4
+        if S and S !={} :
+            Q1 = float(float(S['sentCnt'] - S['sentFailed'] ) / S['sentCnt'])  if S['sentCnt'] != 0 else 0.0
+            Q2 = float(((maxRTT /2) - S['averageRequestRTT']) / (maxRTT / 2))
+            Q3 = float((maxRTT - S['averageResponseRTT']) / maxRTT)
+            Q4 = float(1 - (float(S['receivedCnt']  - S['receivedUnsolicited']) / S['receivedCnt'])) if S['receivedCnt'] != 0 else 0.0
+            quality = ((Q1 + (Q2*2) + (Q3*3) + Q4) / 7.0) * 100.0
+            print 'Quality com : ',  quality,  Q1,  Q2,  Q3,  Q4
+        else :
+            self._ozwmanager._log.debug('GetNodeStatistic return empty for node {0} '.format(self.id,))
+            print ('GetNodeStatistic return empty for node {0} '.format(self.id,))
+            quality = 50; 
         return int(quality)
         
     def setName(self, name):
