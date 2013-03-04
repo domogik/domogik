@@ -238,17 +238,6 @@ class Rest(XplPlugin):
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR
 
-            # For temporary ticket : #1591
-            db_cfg = Loader('database')
-            db_config = db_cfg.load()
-            db_conf = dict(db_config[1])
-            self.db_type = db_conf['db_type']
-            self.db_user = db_conf['db_user']
-            self.db_password = db_conf['db_password']
-            self.db_port = db_conf['db_port']
-            self.db_host = db_conf['db_host']
-            self.db_prefix = db_conf['db_prefix']
-
             # Gloal Queues config
             self.log.debug("Get queues configuration")
             self._config = Query(self.myxpl, self.log)

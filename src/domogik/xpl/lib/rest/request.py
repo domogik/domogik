@@ -656,22 +656,10 @@ class ProcessRequest():
                 }
             ] 
 
-        # temporary for ticket #1591
-        tmp_db_info = {
-                          "db_type" : self.handler_params[0].db_type,
-                          "db_user" : self.handler_params[0].db_user,
-                          "db_password" : self.handler_params[0].db_password,
-                          "db_port" : self.handler_params[0].db_port,
-                          "db_host" : self.handler_params[0].db_host,
-                          "db_prefix" : self.handler_params[0].db_prefix,
-                          "warning" : "these data are temporary and only for dev purpose. They will soon disappear"
-                      }
-
         data = {"info" : info, 
                 "queue" : queues, 
                 "event" : events,
-                "configuration" : conf,
-                "tmp_db_info" : tmp_db_info}
+                "configuration" : conf}
         json_data.add_data(data)
 
         self.send_http_response_ok(json_data.get())
