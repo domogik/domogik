@@ -121,29 +121,45 @@ class ZWaveNode:
     def setReceiver(self):
         """Le node a reçu la notification EssentialNodeQueriesComplete , il est relié au controleur et peut recevoir des messages basic."""
         self._receiver = True
-   
+        self.reportToUI({'type': 'init-process', 'usermsg' : 'Waiting for node initializing ', 'data': NodeStatusNW[5]})
+        
     def setReady(self):
         """Le node a reçu la notification NodeQueriesComplete, la procédure d'intialisation est complète."""
         self._ready= True
+        self.reportToUI({'type': 'init-process', 'usermsg' : 'Node is now ready', 'data': NodeStatusNW[2]})
         
     def setNamed(self):
         """Le node a reçu la notification NodeNaming, le device à été identifié dans la librairie openzwave (config/xml)"."""
+        self._updateInfos
         self._named= True
+        self.reportToUI({'type': 'node-state-changed', 'usermsg' : 'Node recognized', 'data': {'typestate': 'model', 'model': self.manufacturer + " -- " + self.product}})
         
     def setSleeping(self, state= False):
         """Une notification d'état du node à été recue, awake ou sleep."""
         self._sleeping = state;
-    
+        m = 'Device goes to sleep.' if state else 'Sleeping device wakes up.'
+        self.reportToUI({'type': 'node-state-changed', 'usermsg' : m,  'data': {'typestate': 'sleep', 'state sleeping': state}})
+        
     def markAsFailed(self): 
         """Le node est marqué comme HS."""
         self._ready = False
         self._sleeping = True
         self._failed = True
+        self.reportToUI({'type': 'init-process', 'usermsg' : 'Node marked as fail ', 'data': NodeStatusNW[6]})
     
     def markAsOK(self): 
-        """Le node est marqué comme Bon réinit nécéssaire ."""
+        """Le node est marqué comme Bon, réinit nécéssaire ."""
         self._failed = False
+        self.reportToUI({'type': 'init-process', 'usermsg' : 'Node marked good, should be reinit ', 'data': NodeStatusNW[0]})
         
+    def reportToUI(self,  msg):    
+        """ transfert à l'objet controlleur  le message à remonter à l'UI"""
+        if msg :
+            msg['node'] = self.nodeId
+            print '&&&&&&&&&&&&&&&&&&&&&&& Report vers UI : '
+            self._ozwmanager.controllerNode.reportChangeToUI(msg)
+        
+    
     def _getIsLocked(self):
         return False
     
@@ -168,26 +184,32 @@ class ZWaveNode:
     
     def _getProductName(self):
         """Retourne le nom du produit ou son id ou Undefined"""
-        if self._product.name :
-            return self._product.name 
-        elif self._product.id :
-            return ('Product id: ' + self._product.id) 
+        if self._product :
+            if self._product.name :
+                return self._product.name 
+            elif self._product.id :
+                return ('Product id: ' + self._product.id) 
+            else : return 'Undefined'
         else : return 'Undefined'
 
     def getProductTypeName(self):
         """Retourne le nom du type de produit ou son id ou Undefined"""
-        if self._productType.name :
-            return self._productType.name 
-        elif self._productType.id :
-            return ('Product id: ' + self._productType.id) 
+        if self._productType :
+            if self._productType.name :
+                return self._productType.name 
+            elif self._productType.id :
+                return ('Product id: ' + self._productType.id) 
+            else : return 'Undefined'
         else : return 'Undefined'
 
     def GetManufacturerName(self):
         """Retourne le nom du type de produit ou son id ou Undefined"""
-        if self._manufacturer.name :
-            return self._manufacturer.name 
-        elif self._manufacturer.id :
-            return ('Product id: ' + self._manufacturer.id) 
+        if self._manufacturer :
+            if self._manufacturer.name :
+                return self._manufacturer.name 
+            elif self._manufacturer.id :
+                return ('Product id: ' + self._manufacturer.id) 
+            else : return 'Undefined'
         else : return 'Undefined'
         
     def GetNodeStateNW(self):
@@ -198,7 +220,8 @@ class ZWaveNode:
                           3:'In progress - Devices initializing',
                           4:'In progress - Linked to controller',
                           5:'In progress - Can receive messages', 
-                          6:'Out of operation'}
+                          6:'Out of operation',
+                          7:'In progress - Can receive messages (Not linked)'}
         """      
         retval =NodeStatusNW[0]
         if self.isLinked : retval = NodeStatusNW[4]
@@ -364,8 +387,8 @@ class ZWaveNode:
     #        if (time.time() - self.lastUpdate) > 30 :
     #            retval = True
     #        else :  retval = False
-        print '+++++ node ', self._nodeId,  ' is Sleeping ? :', retval, ' ++++'
-        if retval : print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
+    #    print '+++++ node ', self._nodeId,  ' is Sleeping ? :', retval, ' ++++'
+    #   if retval : print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
         return retval              
     
     def _updateNeighbors(self):
@@ -501,7 +524,7 @@ class ZWaveNode:
         retval["Last update"] = time.ctime(self.lastUpdate)
         retval["Neighbors"] = list(self.neighbors) if  self.neighbors else 'No one'
         retval["Groups"] = self._getGroupsDict()
-        retval["Capabilities"] = list(self._capabilities) if  self._capabilities else 'No one'
+        retval["Capabilities"] = list(self._capabilities) if  self._capabilities else list(['No one'])
         retval["InitState"] = self.GetNodeStateNW()
         retval["ComQuality"] = self.getComQuality()
         return retval
@@ -557,12 +580,17 @@ class ZWaveNode:
         quality = 0.0
         maxRTT = 10000.0
         S = self.getStatistics()
-        Q1 = float(float(S['sentCnt'] - S['sentFailed'] ) / S['sentCnt'])  if S['sentCnt'] != 0 else 0.0
-        Q2 = float(((maxRTT /2) - S['averageRequestRTT']) / (maxRTT / 2))
-        Q3 = float((maxRTT - S['averageResponseRTT']) / maxRTT)
-        Q4 = float(1 - (float(S['receivedCnt']  - S['receivedUnsolicited']) / S['receivedCnt'])) if S['receivedCnt'] != 0 else 0.0
-        quality = ((Q1 + Q2 + Q3 + Q4) / 4.0) * 100.0
-        print 'Quality com : ',  quality,  Q1,  Q2,  Q3,  Q4
+        if S and S !={} :
+            Q1 = float(float(S['sentCnt'] - S['sentFailed'] ) / S['sentCnt'])  if S['sentCnt'] != 0 else 0.0
+            Q2 = float(((maxRTT /2) - S['averageRequestRTT']) / (maxRTT / 2))
+            Q3 = float((maxRTT - S['averageResponseRTT']) / maxRTT)
+            Q4 = float(1 - (float(S['receivedCnt']  - S['receivedUnsolicited']) / S['receivedCnt'])) if S['receivedCnt'] != 0 else 0.0
+            quality = ((Q1 + (Q2*2) + (Q3*3) + Q4) / 7.0) * 100.0
+            print 'Quality com : ',  quality,  Q1,  Q2,  Q3,  Q4
+        else :
+            self._ozwmanager._log.debug('GetNodeStatistic return empty for node {0} '.format(self.id,))
+            print ('GetNodeStatistic return empty for node {0} '.format(self.id,))
+            quality = 50; 
         return int(quality)
         
     def setName(self, name):

@@ -43,7 +43,7 @@ import os.path
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.1b7"
+OZWPLuginVers = "0.1b8"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
@@ -74,7 +74,6 @@ CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COM
                                'COMMAND_CLASS_SWITCH_MULTILEVEL', ]
                                
 # Listes des types reconnues comme device domogik (label openzwave)
-# TODO: CONSTANTE à remplacer après passage au MQ
 DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery-level', 'sensor', 'status', # sensor
                                   'power', 'energy', 'previous-reading', 'luminance',  'general', 'motion',
                                   'alarm-type', 'alarm-level', 'count', 'instant-energy-production', 'total-energy-production',
@@ -83,6 +82,8 @@ DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery
                                   'basic', 'switch', 'step-size', 'inc', 'dec', 'bright', 'dim',  'toggle-switch',  # Actuaror
                                   'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint']
 
+# Notifications reportés sur le hub xPL pour l'UI
+UICtrlReportType = ['driver-ready',  'init-process', 'ctrl-error', 'ctrl-action',  'node-state-changed', 'value-changed']
                                
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
