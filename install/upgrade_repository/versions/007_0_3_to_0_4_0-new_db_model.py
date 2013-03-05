@@ -34,9 +34,14 @@ def upgrade(migrate_engine):
         table.create(bind=migrate_engine)
     # device address make nullable
     if database_utils.column_exists(migrate_engine, Device.__tablename__, 'address'):
-        dev= Table(Device.__tablename__, meta, autoload=True)
+        dev = Table(Device.__tablename__, meta, autoload=True)
         dev.c.address.alter(nullable=True)
+    # device device_type_id make nullable
+    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'ad'):
+        dev = Table(Device.__tablename__, meta, autoload=True)
         dev.c.device_type_id.alter(nullable=True)
+        # set deviceType to Null for existing devices
+        dev.update().execute(device_type_id=None);
     # delete feature and featureModels
     if database_utils.table_exists(migrate_engine, "core_device_feature_association"):
         migrate_engine.execute("DROP table core_device_feature_association")
