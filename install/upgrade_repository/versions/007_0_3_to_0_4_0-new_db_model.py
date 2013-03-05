@@ -1,4 +1,5 @@
 from sqlalchemy import *
+from sqlalchemy.orm import sessionmaker
 from migrate import *
 from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, Device, Command, CommandParam, Sensor, SensorHistory, DeviceType, Plugin
 from domogik.common import database_utils
@@ -7,7 +8,7 @@ def upgrade(migrate_engine):
     # bind the engine
     meta = MetaData(bind=migrate_engine)
 
-    # create the new table
+    #reate the new table
     if not database_utils.table_exists(migrate_engine, Command.__tablename__):
         table = Command.__table__
         table.create(bind=migrate_engine)
@@ -37,11 +38,16 @@ def upgrade(migrate_engine):
         dev = Table(Device.__tablename__, meta, autoload=True)
         dev.c.address.alter(nullable=True)
     # device device_type_id make nullable
-    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'ad'):
+    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'device_type_id'):
         dev = Table(Device.__tablename__, meta, autoload=True)
         dev.c.device_type_id.alter(nullable=True)
         # set deviceType to Null for existing devices
-        dev.update().execute(device_type_id=None);
+        Session = sessionmaker(bind=migrate_engine)
+        session = Session()
+        session.query(Device).update({'device_type_id': None}) 
+        session.commit()
+        session = None
+        Session = None
     # delete feature and featureModels
     if database_utils.table_exists(migrate_engine, "core_device_feature_association"):
         migrate_engine.execute("DROP table core_device_feature_association")
