@@ -4386,7 +4386,7 @@ class ProcessRequest():
                         return None
                 # find the xpl commands that are neede for this feature
                 cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
-                cmd['name'] = c
+                cmd['id'] = c
                 # finc the xpl_stat message
                 if not 'xplstat_name' in cmd:
                     break
@@ -4398,7 +4398,7 @@ class ProcessRequest():
                     else:
                         return None
                 stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
-                stat['name'] = cmd['xplstat_name']
+                stat['id'] = cmd['xplstat_name']
                 if json:
                     # remove all parameters
                     cmd['params'] = cmd['parameters']['device']
