@@ -370,8 +370,55 @@ Description
 Xpl_commands
 ------------
 
-TODO
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|    |yes|
+========================================== ======= =========
 
+Example
++++++++
+::
+    "xpl_commands": {
+         "set_level_bin": {
+            "name": "blah",
+            "schema": "lighting.basic",
+            "xplstat_name": "get_level",
+            "parameters": {
+                    "static": [
+                        {  
+                            "key": "stat",
+                            "value": "stat"
+                        }
+                    ],
+                    "device": [
+                        {  
+                            "key": "dummy",
+                            "description": "a dummy param",
+                            "type": "string"
+                        }
+                    ]
+                }
+         },
+         ...
+    },
+
+Description
+***********
+
+* xpl_command : this section describes the xpl_command to sent when a command is triggered
+   * name : the name of the command
+   * schema : the xpl schema to use
+   * xplstat_name : the xplstat that will be expected as a confirmation
+   * parameters : the key/value pairs for the xpl message
+      * static : values that are static, these key/value pairs are always there and not changeable
+         * key : xpl key
+         * value : xpl value
+      * device : parameter that can be changed on a per device basis, will be displayed in the create device interface
+         * key : xpl key
+         * description : the description that will be displayed
+         * type : the value type
+         
 Xpl_stats
 ---------
 
