@@ -189,9 +189,9 @@ class OZWavemanager(threading.Thread):
                     msg = self.msgToUI.pop(0)
                     print 'Handle Process msg to UI send to UI',  msg
                     self._cb_send_xPL(msg['header'], msg['report'])                    
-                    self._stop.wait(1) # ne pas saturer le hub xPL
+                    self._stop.wait(0.5) # ne pas saturer le hub xPL
                 else :
-                    self._stop.wait(0.1) # ne pas saturer le proc
+                    self._stop.wait(0.3) # ne pas saturer le proc
         except OZwaveManagerException :
             self._log.error("Error listener Msg To UI is stopped")
             print ("Error listener Msg To UI is stopped")
@@ -414,12 +414,12 @@ class OZWavemanager(threading.Thread):
                 node.setSleeping(True)
                 print ('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
-        elif nCode in (4 , 'Dead'):             #       Code_Dead                                               /**< Report when a node is presumed dead */
+        elif nCode in (5, 'Dead'):             #       Code_Dead                                               /**< Report when a node is presumed dead */
             if node : 
                 node.markAsFailed()
                 print ('Z-Wave Device Node {0} marked as dead.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} marked as dead.'.format(node.id))
-        elif nCode in (5 , 'Alive'):             #       Code_Alive						/**< Report when a node is revived */
+        elif nCode in (6 , 'Alive'):             #       Code_Alive						/**< Report when a node is revived */
             if node : 
                 node.markAsOK()
                 print ('Z-Wave Device Node {0} marked as alive.'.format(node.id))
@@ -512,8 +512,7 @@ class OZWavemanager(threading.Thread):
 #        print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
-                          'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
-                     #     'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
+                          'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,                          
                           'valuetype':  valueId['type'], 
                           'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
                                                                             # les labels sont listés dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
