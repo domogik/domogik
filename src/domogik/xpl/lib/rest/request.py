@@ -1606,8 +1606,8 @@ class ProcessRequest():
         for x in self._db.get_xpl_stat_by_device_id(id):
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
-        self.stat_mgr.load()
         self.send_http_response_ok(json_data.get())
+        self.stat_mgr.load()
 
     def _rest_base_device_updateglobal(self, id):
         json_data = JSonHelper("OK")
@@ -1623,6 +1623,7 @@ class ProcessRequest():
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_stat_param(statid=x.id, key=p.key, value=self.get_parameters(p.key), static=True)
         self.send_http_response_ok(json_data.get())
+        self.stat_mgr.load()
    
     def _rest_base_device_addxplcmdparams(self, id):
         json_data = JSonHelper("OK")
@@ -1665,6 +1666,7 @@ class ProcessRequest():
             # go and add the param
             self._db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
         self.send_http_response_ok(json_data.get())
+        self.stat_mgr.load()
 
     def _rest_base_device_updatexplcmdparams(self, id):
         json_data = JSonHelper("OK")
@@ -1674,6 +1676,7 @@ class ProcessRequest():
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
         self.send_http_response_ok(json_data.get())
+        self.stat_mgr.load()
  
     def _rest_base_device_updatexplstatparams(self, id):
         json_data = JSonHelper("OK")
@@ -1683,7 +1686,7 @@ class ProcessRequest():
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_stat_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
         self.send_http_response_ok(json_data.get())
- 
+        self.stat_mgr.load()
  
     def _rest_base_device_addxplstatparams(self, id):
         json_data = JSonHelper("OK")
@@ -1725,6 +1728,7 @@ class ProcessRequest():
             # go and add the param
             self._db.add_xpl_stat_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
         self.send_http_response_ok(json_data.get())
+        self.stat_mgr.load()
 
     def _rest_base_device_add(self):
         """ add devices
@@ -1780,6 +1784,7 @@ class ProcessRequest():
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
+        self.stat_mgr.load()
 
 ######
 # /plugin processing

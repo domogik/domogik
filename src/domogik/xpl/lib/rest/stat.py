@@ -65,10 +65,6 @@ class StatsManager:
             self._log_stats = log.get_logger('rest-stat')
             self._log_stats.info("Rest Stat Manager initialisation...")
     
-            # logging initialization for unkwnon devices
-            log_unknown = logger.Logger('rest-stat-unknown-devices')
-            self._log_stats_unknown = log_unknown.get_logger('rest-stat-unknown-devices')
-            
             # create the dbHelper 
             self._db = DbHelper()
 

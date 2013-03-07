@@ -784,7 +784,6 @@ class DbHelper():
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
         d = self.get_device(dev.id)
-        print d
         return d
 
     def add_device(self, d_name, d_type_id, d_usage_id, d_description=None, d_reference=None):
@@ -1409,15 +1408,18 @@ class DbHelper():
         return self.__session.query(Sensor).all()
 
     def get_sensor_by_device_id(self, did):
+        self.__session.expire_all()
         return self.__session.query(Sensor).filter_by(device_id=did).all()
 
 ###################
 # command
 ###################
     def get_all_command(self):
+        self.__session.expire_all()
         return self.__session.query(Command).all()
     
     def get_command(self, id):
+        self.__session.expire_all()
         return self.__session.query(Command).filter_by(id=id).first()
     
     def add_command(self, device_id, name, reference, return_confirmation):
@@ -1447,12 +1449,15 @@ class DbHelper():
 # xplcommand
 ###################
     def get_all_xpl_command(self):
+        self.__session.expire_all()
         return self.__session.query(XplCommand).all()
     
     def get_xpl_command(self, p_id):
+        self.__session.expire_all()
         return self.__session.query(XplCommand).filter_by(id=p_id).first()
 
     def get_xpl_command_by_device_id(self, d_id):
+        self.__session.expire_all()
         return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
 
     def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id):
@@ -1508,12 +1513,15 @@ class DbHelper():
 # xplstat
 ###################
     def get_all_xpl_stat(self):
+        self.__session.expire_all()
         return self.__session.query(XplStat).all()
 
     def get_xpl_stat(self, p_id):
+        self.__session.expire_all()
         return self.__session.query(XplStat).filter_by(id=p_id).first()
     
     def get_xpl_stat_by_device_id(self, d_id):
+        self.__session.expire_all()
         return self.__session.query(XplStat).filter_by(device_id=d_id).all()
 
     def add_xpl_stat(self, name, schema, device_id):
