@@ -82,9 +82,11 @@ def backup_existing_database(confirm=True):
             return
     answer = raw_input("Backup file? [%s] " % DB_BACKUP_FILE)
     if answer != '':
-        backup_directory = answer
-    print("Backing up your database to %s" % DB_BACKUP_FILE)
-    with open(DB_BACKUP_FILE, 'w') as f:
+        bfile = answer
+    else:
+        bfile = DB_BACKUP_FILE
+    print("Backing up your database to %s" % bfile)
+    with open(bfile, 'w') as f:
         mysqldump_cmd = ['mysqldump', '-u', _db.get_db_user()]
         if _db.get_db_password():
             mysqldump_cmd.extend(('-p%s' %_db.get_db_password(), _db.get_db_name()))
