@@ -182,9 +182,9 @@ Result: ::
         ]
     }
 
-* /base/device/list-old
+* /base/device/list-upgrade
 
-Return: same as /list but only the devices that have an address configured
+Return: will return the datatstructure needed for device upgrade
 
 * /base/device/params/<device_type_id>
 
@@ -274,8 +274,8 @@ Writing operations
 Return: like /list but with only the item added
 
 * /base/device/addglobal/id/<device_id>
-* /base/device/xplcmdparams/id/<device_id>/<param 1>/<value 1>/.../<param N>/<value N>
-* /base/device/xplstatparams/id/<device_id>/<param 1>/<value 1>/.../<param N>/<value N>
+* /base/device/xplcmdparams/id/<xplcommand id>/<param 1>/<value 1>/.../<param N>/<value N>
+* /base/device/xplstatparams/id/<xplparam id>/<param 1>/<value 1>/.../<param N>/<value N>
 
 * /base/device/update/id/<id>/name/<name>/usage_id/<usage_id>/description/<description>/reference/<reference>
 
