@@ -24,8 +24,6 @@ A typical house example with basement, groundfloor and one floor :
 
 .. image:: dmg-house-organisation-01.png
 
-.. todo:: review this picture with final icons
-
 Example of a house with no area
 -------------------------------
 If you live in a small flat or if you don't want to separate your house in several areas, you could obtain this architecture :

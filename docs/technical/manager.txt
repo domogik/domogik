@@ -2,9 +2,6 @@
 Manager
 =======
 
-.. todo ::
-    http://wiki.domogik.org/xPL_plugin_manager&highlight=xpl%20plugin%20manager
-
 Purpose
 =======
 The manager is used to automatically start core components and eventually plugins at its startup. Then he will check the plugins status and wait for a command.

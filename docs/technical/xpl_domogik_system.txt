@@ -2,5 +2,4 @@
 domogik.system xPL schema
 =========================
 
-.. todo ::
-    http://wiki.domogik.org/xPL_Domogik_system_schema
+See http://wiki.domogik.org/xPL_Domogik_system_schema

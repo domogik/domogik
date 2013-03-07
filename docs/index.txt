@@ -2,12 +2,6 @@
 Domogik
 =======
 
-.. todo::
-   This documentation is not yet finished. Missing :
-
-   * release 0.2.0 page to finish
-
-
 Overview
 ========
 
