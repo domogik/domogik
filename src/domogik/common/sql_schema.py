@@ -225,7 +225,6 @@ class Device(Base):
     sensors = relationship("Sensor", backref=__tablename__, cascade="all, delete")
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all, delete")
-    
 
     def __init__(self, name, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
@@ -389,7 +388,7 @@ class Command(Base):
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean)
-    xpl_command = relation("XplCommand", backref=__tablename__, cascade="all, delete")
+    xpl_command = relation("XplCommand", backref=__tablename__, cascade="all, delete", uselist=False)
     params = relationship("CommandParam", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, device_id, name, reference, return_confirmation):
@@ -493,7 +492,7 @@ class SensorHistory(Base):
 class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
     params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete")
