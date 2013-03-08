@@ -548,23 +548,25 @@ class XplCommand(Base):
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()))
+    json_id = Column(Unicode(64))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
     stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), nullable=True)
     stat = relation("XplStat", backref=__tablename__, cascade="all, delete")
     params = relationship("XplCommandParam", backref=__tablename__, cascade="all, delete")
 
-    def __init__(self, name, device_id, cmd_id, schema, stat_id):
+    def __init__(self, name, device_id, cmd_id, json_id, schema, stat_id):
         self.name = ucode(name)
         self.device_id = device_id
         self.cmd_id = cmd_id
         self.schema = ucode(schema)
         self.stat_id = stat_id
+        self.json_id = json_id
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' schema='%s' stat_id=%s params=%s)>"\
-               % (self.id, self.device_id, self.cmd_id, self.name, self.schema, self.stat_id, self.params)
+        return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat_id=%s params=%s)>"\
+               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat_id, self.params)
 
     @staticmethod
     def get_tablename():

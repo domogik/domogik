@@ -734,6 +734,7 @@ class DbHelper():
                 self.__session.flush()
             # if needed add the xpl* stuff
             if 'xpl_command' in command:
+                xpl_command_id = command['xpl_command']
                 xpl_command = pjson['xpl_commands'][command['xpl_command']]
                 # add the xpl_stat
                 if 'xplstat_name' in xpl_command:
@@ -771,7 +772,8 @@ class DbHelper():
                 xplcommand = XplCommand(cmd_id=cmd.id, \
                                         name=xpl_command['name'], \
                                         schema=xpl_command['schema'], \
-                                        device_id=dev.id, stat_id=xplstatid) 
+                                        device_id=dev.id, stat_id=xplstatid, \
+                                        json_id=xpl_command_id) 
                 self.__session.add(xplcommand)
                 self.__session.flush()
                 # add static params
@@ -1460,9 +1462,9 @@ class DbHelper():
         self.__session.expire_all()
         return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
 
-    def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id):
+    def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id, json_id):
         self.__session.expire_all()
-        cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id)
+        cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id, json_id=json_id)
         self.__session.add(cmd)
         try:
             self.__session.commit()
