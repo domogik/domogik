@@ -245,9 +245,10 @@ class Device(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s, commands=%s, sensors=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s, commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type, self.device_usage, self.commands, self.sensors)
+                  self.device_type, self.device_usage, self.commands, \
+                  self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod
     def get_tablename():
@@ -491,7 +492,7 @@ class SensorHistory(Base):
 
 class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
@@ -533,7 +534,7 @@ class XplStatParam(Base):
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s sensor_id=%s ignore)>"\
+        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s sensor_id=%s ignore=%s)>"\
                % (self.xplstat_id, self.key, self.value, self.static, self.sensor_id, self.ignore_values)
 
     @staticmethod
