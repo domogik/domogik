@@ -27,7 +27,8 @@
         "src/share/domogik/design/plugin/demodata/icon.png", 
         "src/share/domogik/plugins/demodata.json", 
         "src/domogik_packages/xpl/bin/demodata.py", 
-        "src/domogik_packages/xpl/lib/demodata.py"
+        "src/domogik_packages/xpl/lib/demodata.py",
+        "src/share/domogik/data/demodata/"
     ], 
     "identity": {
         "author": "Fritz", 
