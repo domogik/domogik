@@ -1,4 +1,12 @@
 {
+	"products" : [
+	   {
+	       "name" : "Switch",
+	       "id" : "knx_switch",
+	       "doc" : "Y en a pas regarde DTC",
+	       "type" : "knx.switch"
+	   }
+	],
     "configuration": [
         {
             "default": "False", 
@@ -9,236 +17,115 @@
             "optionnal": "no", 
             "options": [], 
             "type": "boolean"
-        }, 
-        {
-            "default": null, 
-            "description": "Path of KNX configuration file", 
-            "id": "2", 
-            "interface": "no", 
-            "key": "file", 
-            "optionnal": "no", 
-            "options": [], 
-            "type": "string"
         }
-    ], 
-    "device_feature_models": [
-        {
-            "device_type_id": "knx.windspeed", 
-            "feature_type": "sensor", 
-            "id": "knx.windspeed.speed", 
-            "name": "Speed", 
-            "parameters": "{&quot;unit&quot;:&quot;ms&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "data", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "knx.pressure", 
-            "feature_type": "sensor", 
-            "id": "knx.pressure.pressure", 
-            "name": "Pressure", 
-            "parameters": "{&quot;unit&quot;:&quot;Pa&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "data", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "knx.humidity", 
-            "feature_type": "sensor", 
-            "id": "knx.humidity.humidity", 
-            "name": "Humidity", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "data", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "knx.thermometer", 
-            "feature_type": "sensor", 
-            "id": "knx.thermometer.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "data", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "knx.lux", 
-            "feature_type": "sensor", 
-            "id": "knx.lux.lux", 
-            "name": "Luxmeter", 
-            "parameters": "{&quot;unit&quot;:&quot;lux&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "data", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "knx.HVACMode", 
-            "feature_type": "actuator", 
-            "id": "knx.HVACMode", 
-            "name": "HVACMode", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;commandValues&quot;:[&quot;HVACstop&quot;,&quot;HVACnofreeze&quot;,&quot;HVACeco&quot;,&quot;HVACnormal&quot;]}", 
-            "return_confirmation": "1", 
-            "stat_key": "data", 
-            "value_type": "list"
-        }, 
-        {
-            "device_type_id": "knx.switch", 
-            "feature_type": "actuator", 
-            "id": "knx.switch", 
-            "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "knx.dimmer", 
-            "feature_type": "actuator", 
-            "id": "knx.eib1.dimmer", 
-            "name": "Dimmer", 
-            "parameters": "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}", 
-            "return_confirmation": "1", 
-            "stat_key": "data", 
-            "value_type": "range"
-        }, 
-        {
-            "device_type_id": "knx.shutter", 
-            "feature_type": "actuator", 
-            "id": "knx.shutter.switch", 
-            "name": "Shutter", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;down&quot;, &quot;value1&quot;:&quot;up&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "knx.raw", 
-            "feature_type": "sensor", 
-            "id": "knx.raw.read", 
-            "name": "Read", 
-            "parameters": "{}", 
-            "return_confirmation": "1", 
-            "stat_key": "data", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "knx.thermostat", 
-            "feature_type": "actuator", 
-            "id": "knx.thermostat.number", 
-            "name": "thermostat", 
-            "parameters": "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:7, &quot;valueMax&quot;:30}", 
-            "return_confirmation": "1", 
-            "stat_key": "data", 
-            "value_type": "range"
+    ],
+    
+    "xpl_commands": {
+         "set_binary": {
+            "name": "set_binary",
+            "schema": "knx.basic",
+            "xplstat_name": "get_binary",
+            "parameters": {
+                    "static": [],
+                    "device": [
+                {
+                    "key": "device",
+                    "description": "groups address",
+                    "type": "string"
+	        }
+			],
+			"dynamic": []
+                }
+         }
+    },
+
+    "xpl_stats": {
+       "get_binary": {
+            "name": "get_binary",
+            "schema": "knx.basic",
+            "parameters": {
+                    "static": [],
+                    "device": [
+                {
+                    "key": "device",
+                    "description": "groups address",
+                    "type": "string"
+	        }
+                    ],
+                    "dynamic": [
+                        {
+                             "key": "data",
+                             "sensor": "binary_state",
+			     "ignore_value": ""
+                        }
+                    ]
+                }
+	}
+    },
+
+    "commands": {
+       "set_binary": {
+           "name": "Switch On or Off",
+           "return_confirmation": true,
+           "params": [
+               {
+                   "key": "data",
+                   "value_type": "binary",
+                   "values": ["off", "on"]
+               }
+           ],
+           "xpl_command": "set_binary"
         }
-    ], 
-    "device_types": [
-        {
-            "description": "knx Creator", 
-            "id": "knx.knx", 
-            "name": "KNX_Creator"
-        }, 
-        {
-            "description": "Raw value", 
-            "id": "knx.raw", 
-            "name": "Raw"
-        }, 
-        {
-            "description": "switch", 
-            "id": "knx.switch", 
-            "name": "Switch"
-        }, 
-        {
-            "description": "Eib1", 
-            "id": "knx.dimmer", 
-            "name": "Dimmer"
-        }, 
-        {
-            "description": "Shutter", 
-            "id": "knx.shutter", 
-            "name": "Shutter"
-        }, 
-        {
-            "description": "HVACMode", 
-            "id": "knx.HVACMode", 
-            "name": "HVACMode"
-        }, 
-        {
-            "description": "Temperature", 
-            "id": "knx.thermometer", 
-            "name": "Temperature"
-        }, 
-        {
-            "description": "Lux", 
-            "id": "knx.lux", 
-            "name": "Lux"
-        }, 
-        {
-            "description": "Humidity", 
-            "id": "knx.humidity", 
-            "name": "Humidity"
-        }, 
-        {
-            "description": "Pressure", 
-            "id": "knx.pressure", 
-            "name": "Pressure"
-        }, 
-        {
-            "description": "Wind Speed", 
-            "id": "knx.windspeed", 
-            "name": "WindSpeed"
-        }, 
-        {
-            "description": "send Value for Thermostat", 
-            "id": "knx.thermostat", 
-            "name": "Thermostat"
+    },
+
+    "sensors": {
+	"binary_state": {
+		"name": "Binary State",
+                "unit": "",
+                "value_type": "string",
+                "values": ["off", "on"],
+                "xpl_stat": "get_binary"
+	}
+    },
+
+    "device_types": {
+        "knx.switch": {
+            "id": "knx.switch",
+            "description": "ON/OFF Binary Switch", 
+            "name": "Switch",
+            "commands": ["set_binary"],
+            "sensors": ["binary_state"],
+            "xpl_params": []
         }
-    ], 
+    },
+
     "files": [
         "src/share/domogik/design/plugin/knx/icon.png", 
         "src/share/domogik/plugins/knx.json", 
-        "src/share/domogik/stats/knx/knx.basic.xml", 
         "src/domogik_packages/xpl/bin/knx.py", 
-        "src/domogik_packages/xpl/lib/knx.py", 
-        "src/share/domogik/url2xpl/knx/write.xml", 
-        "src/share/domogik/url2xpl/knx/read.xml", 
-        "src/share/domogik/url2xpl/knx/response.xml", 
-        "src/share/domogik/url2xpl/knx/on.xml", 
-        "src/share/domogik/url2xpl/knx/off.xml", 
-        "src/share/domogik/url2xpl/knx/up.xml", 
-        "src/share/domogik/url2xpl/knx/down.xml", 
-        "src/share/domogik/url2xpl/knx/preset_dim.xml", 
-        "src/share/domogik/url2xpl/knx/HVACnofreeze.xml", 
-        "src/share/domogik/url2xpl/knx/HVACeco.xml", 
-        "src/share/domogik/url2xpl/knx/HVACstop.xml", 
-        "src/share/domogik/url2xpl/knx/HVACnormal.xml", 
-        "src/share/domogik/url2xpl/knx/Add.xml",
-        "src/share/domogik/data/knx/knx.txt"
+        "src/domogik_packages/xpl/lib/knx.py" 
     ], 
+
     "identity": {
         "author": "Basilic", 
-        "author_email": "basilic3@hotmail.com", 
+        "author_email": "basilic3 at hotmail.com", 
         "category": "knx", 
-        "changelog": "0.1-plugin creation", 
-        "dependencies": [
-            {
-                "id": "EIBD bcusdk", 
-                "type": "other"
-            }
-        ], 
-        "description": "KNX management with Eibd", 
-        "documentation": "http://wiki.domogik.org/plugin_knx", 
+        "changelog": "0.2 adapt plugin for release 0.2.0 plugin creation", 
+        "dependencies": "", 
+        "description": "KNX support for domogik", 
+        "documentation": "http://wiki.domogik.org/", 
         "domogik_min_version": "0.2.0", 
         "id": "knx", 
         "type": "plugin", 
-        "version": "0.1b1"
+        "version": "0.1"
     }, 
-    "json_version": 1, 
-    "technology": {
-        "description": "KNX with Eibd", 
-        "id": "knx", 
-        "name": "KNX"
-    }, 
-    "udev-rules": []
+    "json_version": 2,
+    "udev-rules": [
+           {
+            "description": "None", 
+            "filename": "None", 
+            "model": "None", 
+            "rule": "None"
+        }
+    ]
 }

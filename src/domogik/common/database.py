@@ -39,24 +39,25 @@ Implements
 """
 
 import datetime, hashlib, time
-from types import DictType
 
 import json
 import sqlalchemy
 from sqlalchemy import Table, MetaData
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker,scoped_session
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-from sqlalchemy.pool import QueuePool
+from sqlalchemy.orm import sessionmaker
 
 from domogik.common.utils import ucode
 from domogik.common import logger
+from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        ACTUATOR_VALUE_TYPE_LIST, Device, DeviceFeature, DeviceFeatureModel,
+        Device,
         DeviceUsage, DeviceStats,
-        DeviceTechnology, PluginConfig, DeviceType, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST
+        Plugin, PluginConfig, DeviceType, Person,
+        UserAccount,
+        Command, CommandParam,
+        Sensor, SensorHistory,
+        XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
 
@@ -295,13 +296,16 @@ class DbHelper():
 ####
 # Device type
 ####
-    def list_device_types(self):
+    def list_device_types(self, plugin=None):
         """Return a list of device types
 
         @return a list of DeviceType objects
 
         """
-        return self.__session.query(DeviceType).all()
+        if plugin is not None:
+            return self.__session.query(DeviceType).filter_by(plugin_id=ucode(plugin)).all()
+        else:
+            return self.__session.query(DeviceType).all()
 
     def get_device_type_by_name(self, dty_name):
         """Return information about a device type
@@ -332,17 +336,17 @@ class DbHelper():
 
         @param dty_id : device type id
         @param dty_name : device type name
-        @param dt_id : technology id (x10, plcbus,...)
+        @param dt_id : plugin id (x10, plcbus,...)
         @param dty_description : device type description (optional)
         @return a DeviceType (the newly created one)
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device type with technology id %s. It does not exist" % dt_id)
+        if not self.__session.query(Plugin).filter_by(id=dt_id).first():
+            self.__raise_dbhelper_exception("Couldn't add device type with plugin id %s. It does not exist" % dt_id)
         dty = DeviceType(id=ucode(dty_id), name=ucode(dty_name), description=ucode(dty_description),
-                         device_technology_id=dt_id)
+                         plugin_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -355,7 +359,7 @@ class DbHelper():
 
         @param dty_id : device type id to be updated
         @param dty_name : device type name (optional)
-        @param dt_id : id of the associated technology (optional)
+        @param dt_id : id of the associated plugin (optional)
         @param dty_description : device type detailed description (optional)
         @return a DeviceType object
 
@@ -370,9 +374,9 @@ class DbHelper():
         if dty_name is not None:
             device_type.name = ucode(dty_name)
         if dt_id is not None:
-            if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
-                self.__raise_dbhelper_exception("Couldn't find technology id %s. It does not exist" % dt_id)
-            device_type.device_technology_id = dt_id
+            if not self.__session.query(Plugin).filter_by(id=dt_id).first():
+                self.__raise_dbhelper_exception("Couldn't find plugin id %s. It does not exist" % dt_id)
+            device_type.plugin_id = dt_id
         self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
@@ -398,19 +402,10 @@ class DbHelper():
             if cascade_delete:
                 for device in self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all():
                     self.del_device(device.id)
-                for df in self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dty.id)).all():
-                    if df.feature_type == 'actuator':
-                        self.del_actuator_feature_model(df.id)
-                    elif df.feature_type == 'sensor':
-                        self.del_sensor_feature_model(df.id)
             else:
                 device_list = self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all()
                 if len(device_list) > 0:
                     self.__raise_dbhelper_exception("Couldn't delete device type %s : there are associated device(s)" % dty_id)
-                df_list = self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dty.id)).all()
-                if len(df_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete device type %s : there are associated device type "
-                                               + "feature(s)" % dty_id)
             self.__session.delete(dty)
             try:
                 self.__session.commit()
@@ -421,387 +416,30 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
 
 ####
-# Device features
+# Plugin
 ####
-    def get_device_feature(self, df_device_id, df_device_feature_model_id):
-        """Return a device feature
-
-        @param df_device_id : device id
-        @param df_device_feature_model_id : id of the device feature model
-        @return a DeviceFeature object
-
-        """
-        return self.__session.query(
-                        DeviceFeature
-                    ).filter_by(device_id=df_device_id, device_feature_model_id=df_device_feature_model_id
-                    ).first()
-
-    def get_device_feature_by_id(self, df_id):
-        """Return a device feature
-
-        @param df_id : device feature id
-        @return a DeviceFeature object
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(id=df_id).first()
-
-    def list_device_features(self):
-        """List device features
-
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).all()
-
-    def list_device_features_by_device_id(self, df_device_id):
-        """List device features for a device
-
-        @param df_device_id : device id
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id).all()
-
-    def list_device_feature_by_device_id(self, df_device_id):
-        """List device features for a given device id
-
-        @param df_device_id : device id
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id).all()
-
-    def list_device_feature_by_device_feature_model_id(self, df_device_feature_model_id):
-        """List device features for a given device id
-
-        @param df_device_feature_model_id : device feature model id
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(
-                        DeviceFeature
-                    ).filter_by(device_feature_model_id=df_device_feature_model_id
-                    ).all()        
-
-####
-# Device feature models
-####
-    def list_device_feature_models(self):
-        """Return a list of models for device type feature
-
-        @return a list of DeviceFeatureModel objects
-
-        """
-        return self.__session.query(DeviceFeatureModel).all()
-
-    def list_device_feature_models_by_device_type_id(self, dtf_device_type_id):
-        """Return a list of models for device type features (actuator, sensor) knowing the device type id
-
-        @param dtf_device_type_id : device type id
-        @return a list of DeviceFeatureModel objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(device_type_id=dtf_device_type_id
-                    ).all()
-
-    def get_device_feature_model_by_id(self, dtf_id):
-        """Return information about a model for a device type feature
-
-        @param dtf_id : model id
-        @return a DeviceFeatureModel object
-
-        """
-        return self.__session.query(DeviceFeatureModel).filter_by(id=dtf_id).first()
-
-####
-# Actuator feature model
-####
-    def list_actuator_feature_models(self):
-        """Return a list of models for actuator features
-
-        @return a list of DeviceFeatureModel objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(feature_type=u'actuator'
-                    ).all()
-
-    def get_actuator_feature_model_by_id(self, af_id):
-        """Return information about a model for an actuator feature
-
-        @param af_id : actuator feature model id
-        @return an DeviceFeatureModel object
-
-        """
-        return self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(id=ucode(af_id)
-                    ).filter_by(feature_type=u'actuator'
-                    ).first()
-
-    def add_actuator_feature_model(self, af_id, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
-                                   af_parameters=None, af_stat_key=None):
-        """Add a model for an actuator feature
-
-        @param af_id : actuator id
-        @param af_name : actuator name
-        @param af_device_type_id : device type id
-        @param af_value_type : value type the actuator can accept
-        @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command, optional (default False)
-        @param af_parameters : parameters about the command or the returned data associated to the device, optional
-        @param af_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeatureModel object (the newly created one)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
-                                       % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
-        if self.__session.query(DeviceType).filter_by(id=af_device_type_id).first() is None:
-            self.__raise_dbhelper_exception("Can't add actuator feature : device type id '%s' doesn't exist"
-                                       % af_device_type_id)
-        device_feature_m = DeviceFeatureModel(id=ucode(af_id), name=ucode(af_name), feature_type=u'actuator',
-                                              device_type_id=af_device_type_id, value_type=af_value_type,
-                                              return_confirmation=af_return_confirmation,
-                                              parameters=af_parameters, stat_key=af_stat_key)
-        self.__session.add(device_feature_m)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_feature_m
-
-    def update_actuator_feature_model(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
-                                      af_return_confirmation=None, af_stat_key=None):
-        """Update a model for an actuator feature
-
-        @param af_id : actuator feature model id
-        @param af_name : actuator feature name (Switch, Dimmer, ...), optional
-        @param af_parameters : parameters about the command or the returned data associated to the device, optional
-        @param af_value_type : value type the actuator can accept, optional
-        @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command, optional
-        @param af_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeatureModel object (the newly updated one)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        device_feature_m = self.__session.query(
-                                    DeviceFeatureModel
-                                ).filter_by(id=ucode(af_id)
-                                ).filter_by(feature_type=u'actuator'
-                                ).first()
-        if device_feature_m is None:
-            self.__raise_dbhelper_exception("DeviceFeatureModel with id %s (actuator) couldn't be found - can't update it"
-                                       % af_id)
-        if af_id is not None:
-            device_feature_m.id = ucode(af_id)
-        if af_name is not None:
-            device_feature_m.name = ucode(af_name)
-        if af_parameters is not None:
-            if af_parameters == '':
-                af_parameters = None
-            device_feature_m.parameters = ucode(af_parameters)
-        if af_value_type is not None:
-            if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
-                self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
-                                           % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
-            device_feature_m.value_type = ucode(af_value_type)
-        if af_return_confirmation is not None:
-            device_feature_m.return_confirmation = af_return_confirmation
-        if af_stat_key is not None:
-            device_feature_m.stat_key = ucode(af_stat_key)
-        self.__session.add(device_feature_m)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_feature_m
-
-    def del_actuator_feature_model(self, afm_id):
-        """Delete a model for an actuator feature
-
-        @param afm_id : actuator feature model id
-        @return : the deleted object (DeviceFeatureModel)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dfm = self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(id=ucode(afm_id)
-                    ).filter_by(feature_type=u'actuator'
-                    ).first()
-        if not dfm:
-            self.__raise_dbhelper_exception("Can't delete device feature model %s (actuator) : it doesn't exist" % afm_id)
-        self.__session.delete(dfm)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dfm
-
-####
-# Sensor feature model
-####
-    def list_sensor_feature_models(self):
-        """Return a list of models for sensor features
-
-        @return a list of DeviceFeatureModel objects
-
-        """
-        return self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(feature_type=u'sensor'
-                    ).all()
-
-    def get_sensor_feature_model_by_id(self, sf_id):
-        """Return information about a model for a sensor feature
-
-        @param sf_id : sensor feature model id
-        @return a DeviceFeatureModel object
-
-        """
-        return self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(id=ucode(sf_id)
-                    ).filter_by(feature_type=u'sensor'
-                    ).first()
-
-    def add_sensor_feature_model(self, sf_id, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None,
-                                 sf_stat_key=None):
-        """Add a model for sensor feature
-
-        @param sf_id : sensor feature id
-        @param sf_name : sensor feature name (Thermometer, Voltmeter...)
-        @param sf_device_type_id : device type id
-        @param sf_value_type : value type the sensor can return
-        @param sf_parameters : parameters about the command or the returned data associated to the device, optional
-        @param sf_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeatureModel object (the newly created one)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
-            self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
-                                       % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
-        if self.__session.query(DeviceType).filter_by(id=ucode(sf_device_type_id)).first() is None:
-            self.__raise_dbhelper_exception("Can't add sensor : device type id '%s' doesn't exist" % sf_device_type_id)
-        device_feature_m = DeviceFeatureModel(id=ucode(sf_id), name=ucode(sf_name), feature_type=u'sensor',
-                                              device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
-                                              parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
-        self.__session.add(device_feature_m)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_feature_m
-
-    def update_sensor_feature_model(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None,
-                                    sf_stat_key=None):
-        """Update a model for a sensor feature
-
-        @param sf_id : sensor feature model id
-        @param sf_name : sensor feature name (Thermometer, Voltmeter...), optional
-        @param sf_parameters : parameters about the command or the returned data associated to the device, optional
-        @param sf_value_type : value type the sensor can return, optional
-        @param sf_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeatureModel object (the newly updated one)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        device_feature_m = self.__session.query(
-                                    DeviceFeatureModel
-                                ).filter_by(id=ucode(sf_id)
-                                ).filter_by(feature_type=u'sensor'
-                                ).first()
-        if device_feature_m is None:
-            self.__raise_dbhelper_exception("DeviceFeatureModel with id %s couldn't be found - can't update it" % sf_id)
-        if sf_id is not None:
-            device_feature_m.id = ucode(sf_id)
-        if sf_name is not None:
-            device_feature_m.name = ucode(sf_name)
-        if sf_parameters is not None:
-            if sf_parameters == '':
-                sf_parameters = None
-            device_feature_m.parameters = ucode(sf_parameters)
-        if sf_value_type is not None:
-            if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
-                self.__raise_dbhelper_exception("Value type (%s) is not in the allowed item list : %s"
-                                           % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
-            device_feature_m.value_type = ucode(sf_value_type)
-        if sf_stat_key is not None:
-            device_feature_m.stat_key = ucode(sf_stat_key)
-        self.__session.add(device_feature_m)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_feature_m
-
-    def del_sensor_feature_model(self, sfm_id):
-        """Delete a model for a sensor feature
-
-        @param sfm_id : sensor feature model id
-        @return : the deleted object (DeviceFeatureModel)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dfm = self.__session.query(
-                        DeviceFeatureModel
-                    ).filter_by(id=ucode(sfm_id)
-                    ).filter_by(feature_type=u'sensor'
-                    ).first()
-        if not dfm:
-            self.__raise_dbhelper_exception("Can't delete device feature model %s (actuator) : it doesn't exist" % sfm_id)
-        self.__session.delete(dfm)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dfm
-
-####
-# Device technology
-####
-    def list_device_technologies(self):
+    def get_plugin(self, id=None):
         """Return a list of device technologies
 
         @return a list of DeviceTechnology objects
 
         """
-        return self.__session.query(DeviceTechnology).all()
+        if id == None:
+            return self.__session.query(Plugin).all()
+        else:
+            return self.__session.query(Plugin).filter_by(id=ucode(id)).first()
 
-    def get_device_technology_by_id(self, dt_id):
-        """Return information about a device technology
+    def add_plugin(self, name, description=None, version=None):
+        """Add a plugin
 
-        @param dt_id : the device technology id
-        @return a DeviceTechnology object
-
-        """
-        return self.__session.query(
-                        DeviceTechnology
-                    ).filter_by(id=ucode(dt_id)
-                    ).first()
-
-    def add_device_technology(self, dt_id, dt_name, dt_description=None):
-        """Add a device_technology
-
-        @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
-        @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
-        @param dt_description : extended description of the technology
+        @param name : plugin name
+        @param description : extended description of the plugin
+        @param version : version of the plugin
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = DeviceTechnology(id=dt_id, name=dt_name, description=dt_description)
+        dt = Plugin(id=name, description=description, version=version)
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -809,58 +447,59 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return dt
 
-    def update_device_technology(self, dt_id, dt_name=None, dt_description=None):
-        """Update a device technology
+    def update_plugin(self, id, description=None, version=None):
+        """Update a plugin
 
-        @param dt_id : device technology id to be updated
-        @param dt_name : device technology name (optional)
-        @param dt_description : device technology detailed description (optional)
-        @return a DeviceTechnology object
+        @param name : plugin name
+        @param description : extended description of the plugin
+        @param version : version of the plugin
+        @return a plugin object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_tech = self.__session.query(
-                                DeviceTechnology
-                            ).filter_by(id=ucode(dt_id)
+        plugin = self.__session.query(
+                                Plugin
+                            ).filter_by(id=ucode(id)
                             ).first()
-        if device_tech is None:
-            self.__raise_dbhelper_exception("DeviceTechnology with id %s couldn't be found" % dt_id)
-        if dt_name is not None:
-            device_tech.name = ucode(dt_name)
-        if dt_description is not None:
-            if dt_description == '': dt_description = None
-            device_tech.description = ucode(dt_description)
-        self.__session.add(device_tech)
+        if plugin is None:
+            self.__raise_dbhelper_exception("Plugin with id %s couldn't be found" % id)
+        if description is not None:
+            if description == '': description = None
+            plugin.description = ucode(description)
+        if version is not None:
+            if version == '': version = None
+            plugin.version = ucode(version)
+        self.__session.add(plugin)
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_tech
+        return plugin
 
-    def del_device_technology(self, dt_id, cascade_delete=False):
-        """Delete a device technology record
+    def del_plugin(self, pid, cascade_delete=False):
+        """Delete a plugin
 
-        @param dt_id : id of the device technology to delete
+        @param id : id of the plugin to delete
         @param cascade_delete : True if related objects should be deleted, optional default set to False
-        @return the deleted DeviceTechnology object
+        @return the deleted plugin  object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
+        dt = self.__session.query(Plugin).filter_by(id=ucode(pid)).first()
         if dt:
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all():
+                for device_type in self.__session.query(DeviceType).filter_by(plugin_id=ucode(dt.id)).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
                     self.__session.commit()
             else:
                 device_type_list = self.__session.query(
                                             DeviceType
-                                        ).filter_by(device_technology_id=ucode(dt.id)
+                                        ).filter_by(plugin_id=ucode(dt.id)
                                         ).all()
                 if len(device_type_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete device technology %s : there are associated device types"
+                    self.__raise_dbhelper_exception("Couldn't delete plugin %s : there are associated device types"
                                                % dt_id)
 
             self.__session.delete(dt)
@@ -870,7 +509,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return dt
         else:
-            self.__raise_dbhelper_exception("Couldn't delete device technology with id %s : it doesn't exist" % dt_id)
+            self.__raise_dbhelper_exception("Couldn't delete plugin with id %s : it doesn't exist" % dt_id)
 
 ####
 # Plugin config
@@ -998,11 +637,15 @@ class DbHelper():
 ###
     def list_devices(self):
         """Return a list of devices
-
-        @return a list of Device objects
-
+        @return a list of Device objects (only the devices that are known by this realease)
         """
-        return self.__session.query(Device).all()
+        return self.__session.query(Device).filter(Device.address==None).all()
+
+    def list_old_devices(self):
+        """Return a list of devices
+        @return a list of Device objects (only the devices that are inot known by this realease)
+        """
+        return self.__session.query(Device).filter(Device.address!=None).all()
 
     def get_device(self, d_id):
         """Return a device by its id
@@ -1013,34 +656,6 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def get_device_by_technology_and_address(self, techno_id, device_address):
-        """Return a device by its technology and address
-
-        @param techno_id : technology id
-        @param device address : device address
-        @return a device object
-
-        """
-        device_list = self.__session.query(
-                                Device
-                            ).filter_by(address=ucode(device_address)
-                            ).all()
-        if len(device_list) == 0:
-            return None
-        device = []
-        for device in device_list:
-            device_type = self.__session.query(
-                                    DeviceType
-                                ).filter_by(id=device.device_type_id
-                                ).first()
-            device_tech = self.__session.query(
-                                    DeviceTechnology
-                                ).filter_by(id=device_type.device_technology_id
-                                ).first()
-            if device_tech.id.lower() == ucode(techno_id.lower()):
-                return device
-        return None
-
     def get_all_devices_of_usage(self, du_id):
         """Return all the devices of a usage
 
@@ -1050,11 +665,133 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(usage_id=du_id).all()
 
-    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_description=None, d_reference=None):
+    def add_device_and_commands(self, name, type_id, usage_id, description, reference):
+        # first add the device itself
+        if not self.__session.query(DeviceType).filter_by(id=type_id).first():
+            self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % type_id)
+        if not self.__session.query(DeviceUsage).filter_by(id=usage_id).first():
+            self.__raise_dbhelper_exception("Couldn't add device with device usage id %s It does not exist" % usage_id)
+        dt = self.get_device_type_by_id(type_id)
+        self.__session.expire_all()
+        dev = Device(name=name, description=description, reference=reference, \
+                        device_type_id=type_id, device_usage_id=usage_id)
+        self.__session.add(dev)
+        self.__session.flush()
+        # hanle all the commands for this device_type
+        pjson = PackageJson(dt.plugin_id).json
+        if pjson['json_version'] < 2:
+            self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
+            return None
+        sensors = {}
+        addedxplstats = {}
+        for sensor_id in pjson['device_types'][dt.id]['sensors']:
+            # add the command
+            sensor = pjson['sensors'][sensor_id]
+            sen = Sensor(name=sensor['name'], \
+                    device_id=dev.id, reference=sensor_id, \
+                    value_type=sensor['value_type'], values=sensor['values'], \
+                    unit=sensor['unit'])
+            self.__session.add(sen)
+            self.__session.flush()
+            sensors[sensor_id] = sen.id
+            if 'xpl_stat' in sensor:
+                xpl_stat_id = sensor['xpl_stat']
+                xpl_stat = pjson['xpl_stats'][xpl_stat_id]
+                xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
+                self.__session.add(xplstat)
+                self.__session.flush()
+                addedxplstats[xpl_stat_id] = xplstat.id
+                # add static params
+                for p in xpl_stat['parameters']['static']:
+                    par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
+                                   key=p['key'], value=p['value'], static=True, ignore_values=None)           
+                    self.__session.add(par)
+                # add dynamic params
+                for p in xpl_stat['parameters']['dynamic']:
+                    if 'ignore_values' not in p:
+                        p['ignore_values'] = None
+                    sensorid = None
+                    if p['sensor'] is not None: 
+                        if p['sensor'] in sensors:
+                            sensorid = sensors[p['sensor']]
+                        else:
+                            self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
+                            return None
+                    par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
+                                    key=p['key'], value=None, static=False, ignore_values=p['ignore_values'])           
+                    self.__session.add(par)
+        for command_id in pjson['device_types'][dt.id]['commands']:
+            # add the command
+            command = pjson['commands'][command_id]
+            cmd = Command(name=command['name'], \
+                    device_id=dev.id, reference=command_id, return_confirmation=command['return_confirmation'])
+            self.__session.add(cmd)
+            self.__session.flush()
+            # add the command params
+            for p in pjson['commands'][command_id]['params']:
+                pa = CommandParam(cmd.id, p['key'], p['value_type'], p['values'])
+                self.__session.add(pa)
+                self.__session.flush()
+            # if needed add the xpl* stuff
+            if 'xpl_command' in command:
+                xpl_command_id = command['xpl_command']
+                xpl_command = pjson['xpl_commands'][command['xpl_command']]
+                # add the xpl_stat
+                if 'xplstat_name' in xpl_command:
+		    xpl_stat_id = xpl_command['xplstat_name']
+                    if xpl_stat_id not in addedxplstats:
+                        xpl_stat = pjson['xpl_stats'][xpl_stat_id]
+                        xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
+                        self.__session.add(xplstat)
+                        self.__session.flush()
+                        xplstatid = xplstat.id
+                        # add static params
+                        for p in xpl_stat['parameters']['static']:
+                            par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
+                                         key=p['key'], value=p['value'], static=True)           
+                            self.__session.add(par)
+                        # add dynamic params
+                        for p in xpl_stat['parameters']['dynamic']:
+                            if 'ignore_values' not in p:
+                                p['ignore_values'] = None
+                            sensorid = None
+                            if p['sensor'] is not None: 
+                                if p['sensor'] in sensors:
+                                    sensorid = sensors[p['sensor']]
+                                else:
+                                    self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
+                                    return None
+                            par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
+                                         key=p['key'], value=None, static=False, ignore_values=p['ignore_values'])           
+                            self.__session.add(par)
+                    else:
+                        xplstatid = addedxplstats[xpl_stat_id]
+                else:
+                    xplstatid = None
+                # add the xpl command
+                xplcommand = XplCommand(cmd_id=cmd.id, \
+                                        name=xpl_command['name'], \
+                                        schema=xpl_command['schema'], \
+                                        device_id=dev.id, stat_id=xplstatid, \
+                                        json_id=xpl_command_id) 
+                self.__session.add(xplcommand)
+                self.__session.flush()
+                # add static params
+                for p in xpl_command['parameters']['static']:
+                    par = XplCommandParam(cmd_id=xplcommand.id, \
+                                         key=p['key'], value=p['value'])           
+                    self.__session.add(par)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
+        d = self.get_device(dev.id)
+        return d
+
+    def add_device(self, d_name, d_type_id, d_usage_id, d_description=None, d_reference=None):
         """Add a device item
 
         @param d_name : name of the device
-        @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage_id : usage id (ex. temperature)
         @param d_description : extended device description, optional
@@ -1068,35 +805,22 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % d_type_id)
         if not self.__session.query(DeviceUsage).filter_by(id=d_usage_id).first():
             self.__raise_dbhelper_exception("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
-        if self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==d_type_id).count() != 0:
-            self.__raise_dbhelper_exception("Couldn't add device, same device with adress %s and type %s already exists" % (d_address,d_type_id))
-        device = Device(name=d_name, address=d_address, description=d_description, reference=d_reference,
+        device = Device(name=d_name, description=d_description, reference=d_reference, \
                         device_type_id=d_type_id, device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
-            self.__session.commit()
-            # Look up for device feature models according to the device type and create corresponding association
-            # between the device and the device feature model
-            dfm_list = self.__session.query(
-                                DeviceFeatureModel
-                            ).filter_by(device_type_id=device.device_type_id
-                            ).all()
-            for dfm in dfm_list:
-                df = DeviceFeature(device_id=device.id, device_feature_model_id=dfm.id)
-                self.__session.add(df)
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None, d_usage_id=None, d_description=None, d_reference=None):
+    def update_device(self, d_id, d_name=None, d_usage_id=None, d_description=None, d_reference=None, d_address=None):
         """Update a device item
 
         If a param is None, then the old value will be kept
 
         @param d_id : Device id
         @param d_name : device name (optional)
-        @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
         @param d_description : Extended item description (optional)
         @param d_usage : Item usage id (optional)
         @return the updated Device object
@@ -1110,9 +834,6 @@ class DbHelper():
         if d_name is not None:
             device.name = ucode(d_name)
         if d_address is not None:
-            # only do the check if we update the device address
-            if device.address != ucode(d_address) and self.__session.query(Device).filter(Device.address==d_address).filter(Device.device_type_id==device.device_type_id).count() != 0:
-                self.__raise_dbhelper_exception("Couldn't update device, same device with adress %s and type %s already exists" % (d_address,device.device_type_id))
             device.address = ucode(d_address)
         if d_description is not None:
             if d_description == '': d_description = None
@@ -1147,7 +868,7 @@ class DbHelper():
         # Use this method rather than cascade deletion (much faster)
         meta = MetaData(bind=DbHelper.__engine)
         t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-        result = self.__session.execute(
+        self.__session.execute(
             t_stats.delete().where(t_stats.c.device_id == d_id)
         )
         
@@ -1159,257 +880,172 @@ class DbHelper():
         return device
 
 ####
-# Device stats
+# stats upgrade
 ####
-    def lis_device_stats_distinct_key(self, ds_device_id):
-        filters = {}
-        filters['device_id'] = ds_device_id
-        return self.__session.query(
-                            DeviceStats
-                        ).filter_by(**filters
-                        ).distinct()
+    def upgrade_list_old(self):
+        return self.__session.query(Device.id, Device.name, DeviceStats.skey).\
+                    filter(Device.id==DeviceStats.device_id).\
+                    filter(Device.address!=None).\
+                    order_by(Device.id).\
+                    distinct()
 
-    def list_device_stats(self, ds_device_id=None,ds_skey=None,ds_number=None):
-        """Return a list of all stats for a device
+    def upgrade_list_new(self):
+        return self.__session.query(Device.id, Device.name, Sensor.name).\
+                    filter(Device.id==Sensor.device_id).\
+                    filter(Device.address==None).\
+                    order_by(Device.id).\
+                    distinct()
 
-        @param ds_device_id : the device id
-        @param ds_key : statistic key
-        @return a list of DeviceStats objects
-
-        """
-        
-        filters = {}
-        if ds_device_id:
-            filters['device_id'] = ds_device_id
-        if ds_skey:
-            filters['skey'] = ucode(ds_skey)
-        
-        if ds_number:
-            return self.__session.query(
-                            DeviceStats
-                        ).filter_by(**filters
-                        ).limit(ds_number
-                        ).all()
+####
+# Sensor history
+####
+    def add_sensor_history(self, sid, value, date):
+	self.__session.expire_all()
+	sensor = self.__session.query(Sensor).filter_by(id=sid).first()
+	if sensor is not None:
+            # insert new recored in core_sensor_history
+            h = SensorHistory(sensor.id, date, value)
+            self.__session.add(h)
+	    sensor.last_received = date
+            sensor.last_value = str(value)
+            self.__session.add(sensor)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         else:
-            return self.__session.query(
-                            DeviceStats
-                        ).filter_by(**filters
-                        ).all()
+            self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
 
-
-    def list_last_n_stats_of_device(self, ds_device_id=None,ds_skey=None,ds_number=None):
-        """Get the N latest statistics of a device for a given key
-
-        @param ds_device_id : the device id
-        @param ds_key : statistic key
-        @param ds_number : the number of statistics we want to retreive
-        @return a list of DeviceStats objects (older records first)
-
-        """
-        filters = {}
-        if ds_device_id:
-            filters['device_id'] = ds_device_id
-        if ds_skey:
-            filters['skey'] = ucode(ds_skey)
-
-        list_s = self.__session.query(
-                            DeviceStats
-                        ).filter_by(**filters
-                        ).order_by(sqlalchemy.desc(DeviceStats.date)
-                        ).limit(ds_number
-                        ).all()
-        list_s.reverse()
-        return list_s
-    
-    def list_stats_of_device_between_by_key(self, ds_device_id=None, ds_skey=None, start_date_ts=None, end_date_ts=None):
-        """Get statistics of a device between two dates for a given key
-
-        @param ds_device_id : the device id
-        @param ds_key : statistic key
-        @param start_date_ts : datetime start, optional (timestamp)
-        @param end_date_ts : datetime end, optional (timestamp)
-        @return a list of DeviceStats objects (older records first)
-
-        """
-        if start_date_ts and end_date_ts:
-            if end_date_ts < start_date_ts:
-                self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
-        
-        query = self.__session.query(DeviceStats)
-        if ds_device_id:
-            query = query.filter_by(device_id=ds_device_id)
-        if ds_skey:
-            query = query.filter_by(skey= ucode(ds_skey))
-        
-        if start_date_ts:
-            query = query.filter("date >= '" + _datetime_string_from_tstamp(start_date_ts)+"'")
-        if end_date_ts:
-            query = query.filter("date <= '" + _datetime_string_from_tstamp(end_date_ts) + "'")
+    def list_sensor_history(self, sid, num=None):
+        if num is None:
+            return self.__session.query(SensorHistory).filter_by(sensor_id=sid).all()
+        else:
+            return self.__session.query(SensorHistory).filter_by(sensor_id=sid).limit(num)
             
-        list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
-        return list_s
-
-    def get_last_stat_of_device(self, ds_device_id=None,ds_skey=None):
-        """Get the latest statistic of a device for a given key
-
-        @param ds_device_id : the device id
-        @param ds_skey : statistic key
-        @return a DeviceStats object
-
-        """
-        filters = {}
-        if ds_device_id:
-            filters['device_id'] = ds_device_id
-        if ds_skey:
-            filters['skey'] = ucode(ds_skey)
-
-        return self.__session.query(
-                        DeviceStats
-                    ).filter_by(**filters
-                    ).order_by(sqlalchemy.desc(DeviceStats.date)
-                    ).first()
-
-    def filter_stats_of_device_by_key(self, ds_device_id, ds_key,  start_date_ts, end_date_ts, step_used, function_used):
-        """Filter statistic values within a period for a given step (minute, hour, day, week, month, year). It then
-        applies a function (min, max, avg) for the values within the step.
-
-        @param ds_key : statistic key
-        @param ds_device_id : device_id
-        @param start_date_ts : date representing the begin of the period (timestamp)
-        @param end_date_ts : date reprensenting the end of the period (timestamp)
-        @param step_used : minute, hour, day, week, month, year
-        @param function_used : min, max, avg
-        @return a list of tuples (date, computed value)
-
-        """
-        if not start_date_ts:
-            self.__raise_dbhelper_exception("You have to provide a start date")
-        if end_date_ts:
-            if start_date_ts > end_date_ts:
+    def list_sensor_history_between(self, sid, frm, to=None):
+        if to:
+            if to < frm:
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
         else:
-            end_date_ts = time.mktime(datetime.datetime.now().timetuple())
-
+            to = int(time.time())
+        return self.__session.query(SensorHistory
+                  ).filter_by(sensor_id=sid
+                  ).filter("date >= "+str(frm)
+                  ).filter("date <= "+str(to)
+                  ).order_by(sqlalchemy.asc(SensorHistory.date)
+                  ).all()
+       
+    def list_sensor_history_filter(self, sid, frm, to, step, function_used):
+        if not frm:
+            self.__raise_dbhelper_exception("You have to provide a start date")
+        if to:
+            if to > frm:
+                self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
+        else:
+            to = int(time.time())
         if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
             self.__raise_dbhelper_exception("'function_used' parameter should be one of : min, max, avg")
         if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
             self.__raise_dbhelper_exception("'period' parameter should be one of : minute, hour, day, week, month, year")
         function = {
-            'min': func.min(DeviceStats._DeviceStats__value_num),
-            'max': func.max(DeviceStats._DeviceStats__value_num),
-            'avg': func.avg(DeviceStats._DeviceStats__value_num),
+            'min': func.min(SensorHistory._SensorHistory_value_num),
+            'max': func.max(SensorHistory._SensorHistory__value_num),
+            'avg': func.avg(SensorHistory._SensorHistory__value_num),
         }
         sql_query = {
             'minute' : {
                 # Query for mysql
-                # func.week(DeviceStats.date, 3) is equivalent to python's isocalendar()[2] method
+                # func.week(SensorHistory.date, 3) is equivalent to python's isocalendar()[2] method
                 'mysql': self.__session.query(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.week(DeviceStats.date, 3), func.day(DeviceStats.date),
-                            func.hour(DeviceStats.date), func.minute(DeviceStats.date),
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.week(SensorHistory.date, 3), func.day(SensorHistory.date),
+                            func.hour(SensorHistory.date), func.minute(SensorHistory.date),
                             function[function_used]
                         ).group_by(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.day(DeviceStats.date), func.hour(DeviceStats.date),
-                            func.minute(DeviceStats.date)
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.day(SensorHistory.date), func.hour(SensorHistory.date),
+                            func.minute(SensorHistory.date)
                         ),
                  'postgresql': self.__session.query(
-                            extract('year', DeviceStats.date).label('year_c'), extract('month', DeviceStats.date),
-                            extract('week', DeviceStats.date), extract('day', DeviceStats.date),
-                            extract('hour', DeviceStats.date), extract('minute', DeviceStats.date),
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date), extract('minute', SensorHistory.date),
                             function[function_used]
                         ).group_by(
-                            extract('year', DeviceStats.date), extract('month', DeviceStats.date),
-                            extract('week', DeviceStats.date), extract('day', DeviceStats.date),
-                            extract('hour', DeviceStats.date), extract('minute', DeviceStats.date)
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date), extract('minute', SensorHistory.date)
                         ).order_by(
                             sqlalchemy.asc('year_c')
                         )
             },
             'hour' : {
                 'mysql': self.__session.query(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.week(DeviceStats.date, 3), func.day(DeviceStats.date),
-                            func.hour(DeviceStats.date), function[function_used]
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.week(SensorHistory.date, 3), func.day(SensorHistory.date),
+                            func.hour(SensorHistory.date), function[function_used]
                         ).group_by(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.day(DeviceStats.date), func.hour(DeviceStats.date)
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.day(SensorHistory.date), func.hour(SensorHistory.date)
                         ),
                 'postgresql': self.__session.query(
-                            extract('year', DeviceStats.date).label('year_c'), extract('month', DeviceStats.date),
-                            extract('week', DeviceStats.date), extract('day', DeviceStats.date),
-                            extract('hour', DeviceStats.date),
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date),
                             function[function_used]
                         ).group_by(
-                            extract('year', DeviceStats.date), extract('month', DeviceStats.date),
-                            extract('week', DeviceStats.date), extract('day', DeviceStats.date),
-                            extract('hour', DeviceStats.date)
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
+                            extract('hour', SensorHistory.date)
                         ).order_by(
                             sqlalchemy.asc('year_c')
                         )
             },
             'day' : {
                 'mysql': self.__session.query(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.week(DeviceStats.date, 3), func.day(DeviceStats.date),
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.week(SensorHistory.date, 3), func.day(SensorHistory.date),
                                       function[function_used]
                         ).group_by(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.day(DeviceStats.date)
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),
+                            func.day(SensorHistory.date)
                         ),
                 'postgresql': self.__session.query(
-                            extract('year', DeviceStats.date).label('year_c'), extract('month', DeviceStats.date),
-                            extract('week', DeviceStats.date), extract('day', DeviceStats.date),
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date),
                             function[function_used]
                         ).group_by(
-                            extract('year', DeviceStats.date), extract('month', DeviceStats.date),
-                            extract('week', DeviceStats.date), extract('day', DeviceStats.date)
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date),
+                            extract('week', SensorHistory.date), extract('day', SensorHistory.date)
                         ).order_by(
                             sqlalchemy.asc('year_c')
                         )
             },
             'week' : {
                 'mysql': self.__session.query(
-                            func.year(DeviceStats.date), func.week(DeviceStats.date, 1), function[function_used]
+                            func.year(SensorHistory.date), func.week(SensorHistory.date, 1), function[function_used]
                         ).group_by(
-                            func.year(DeviceStats.date), func.week(DeviceStats.date, 1)
+                            func.year(SensorHistory.date), func.week(SensorHistory.date, 1)
                         ),
                 'postgresql': self.__session.query(
-                            extract('year', DeviceStats.date).label('year_c'), extract('week', DeviceStats.date),
+                            extract('year', SensorHistory.date).label('year_c'), extract('week', SensorHistory.date),
                             function[function_used]
                         ).group_by(
-                            extract('year', DeviceStats.date).label('year_c'), extract('week', DeviceStats.date)
-                        ).order_by(
-                            sqlalchemy.asc('year_c')
-                        )
-            },
-            'month' : {
-                'mysql': self.__session.query(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            function[function_used]
-                        ).group_by(
-                            func.year(DeviceStats.date),
-                            func.month(DeviceStats.date)
-                        ),
-                'postgresql': self.__session.query(
-                            extract('year', DeviceStats.date).label('year_c'), extract('month', DeviceStats.date),
-                            function[function_used]
-                        ).group_by(
-                            extract('year', DeviceStats.date), extract('month', DeviceStats.date)
+                            extract('year', SensorHistory.date).label('year_c'), extract('week', SensorHistory.date)
                         ).order_by(
                             sqlalchemy.asc('year_c')
                         )
             },
             'year' : {
                 'mysql': self.__session.query(
-                            func.year(DeviceStats.date), function[function_used]
+                            func.year(SensorHistory.date), function[function_used]
                         ).group_by(
-                            func.year(DeviceStats.date)
+                            func.year(SensorHistory.date)
                         ),
                 'postgresql': self.__session.query(
-                            extract('year', DeviceStats.date).label('year_c'), function[function_used]
+                            extract('year', SensorHistory.date).label('year_c'), function[function_used]
                         ).group_by(
-                            extract('year', DeviceStats.date)
+                            extract('year', SensorHistory.date)
                         ).order_by(
                             sqlalchemy.asc('year_c')
                         )
@@ -1418,17 +1054,14 @@ class DbHelper():
                             function['min'], function['max'], function['avg']
                         )
         }
-
         if self.get_db_type() in ('mysql', 'postgresql'):
-            cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts) + "'"
-            cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts) + "'"
+            cond_min = "date >= '" + frm + "'"
+            cond_max = "date < '" + to + "'"
             query = sql_query[step_used][self.get_db_type()]
-            query = query.filter_by(skey=ucode(ds_key)
-                        ).filter_by(device_id=ds_device_id
+            query = query.filter_by(sensor_id=sid
                         ).filter(cond_min
                         ).filter(cond_max)
-            results_global = sql_query['global'].filter_by(skey=ucode(ds_key)
-                                               ).filter_by(device_id=ds_device_id
+            results_global = sql_query['global'].filter_by(sensor_id=sid
                                                ).filter(cond_min
                                                ).filter(cond_max
                                                ).first()
@@ -1440,137 +1073,6 @@ class DbHelper():
                     'avg': results_global[2]
                 }
             }
-
-    def device_has_stats(self, ds_device_id=None,ds_skey=None):
-        """Check if the device has stats that were recorded
-
-        @param ds_device_id : the device id
-        @param ds_key : statistic key
-        @return True or False
-
-        """
-        return len(self.list_device_stats(ds_device_id,ds_skey,1)) > 0
-
-    def _get_duplicated_devicestats_id(self, device_id, key, value):
-        """Check if the data is duplicated with older values
-        
-        @param device_id : device id
-        @param key : stat key
-        @value : stat value
-        
-        """
-        my_db = DbHelper()
-        
-        db_round_filter = None
-        self.log.debug("before read config")
-
-        if self.__db_config.has_key('db_round_filter'):
-            db_round = self.__db_config['db_round_filter']
-            db_round_filter = json.loads(db_round)
-        
-        self.log.debug("after read")
-        last_values = my_db.list_last_n_stats_of_device(device_id, key, ds_number=2)
-        if last_values and len(last_values)>=2:
-            # TODO, remove this, just for testing in developpement (actually in domogik.cfg)
-            # Ex: db_round_filter = {"12" : { "total_space" : 1048576, "free_space" : 1048576, "percent_used" : 0.5, "used_space": 1048576 },"13" : { "hchp" : 500, "hchc" : 500, "papp" : 200 }}
-            self.log.debug("key=%s : value=%s / val0=%s / val1=%s (%s)" % (key,value, last_values[0].value, last_values[1].value,id))
-            if db_round_filter and str(last_values[1].device.id) in db_round_filter and key in db_round_filter[str(last_values[1].device.id)]:
-                    round_value = db_round_filter[str(last_values[1].device.id)][last_values[1].skey]
-                    rvalue = int(float(value) / round_value) * round_value
-                    val0 = int(float(last_values[0].value) / round_value) * round_value
-                    val1 = int(float(last_values[1].value) / round_value) * round_value
-                    self.log.debug("rvalue=%s" % rvalue)
-                    self.log.debug("value=%s(%s) / val0=%s / val1=%s" % (rvalue, value, val0, val1))
-            else:
-                rvalue = value
-                val0 = last_values[0].value
-                val1 = last_values[1].value
-            
-            if val0 == val1 and val0 == rvalue:
-                self.log.debug("REMOVE %s for %s(%s)" % (last_values[1].id, last_values[1].device.id,key))
-                return last_values[1].id
-        
-        return None
-
-
-    def add_device_stat(self, ds_timestamp, ds_key, ds_value, ds_device_id, hist_size=0):
-        """Add a device stat record
-
-        @param ds_key : key for the stat
-        @param ds_timestamp : when the stat was gathered
-        @param ds_value : stat value
-        @param ds_device_id : device id
-        @param hist_size : keep only the last hist_size records after having inserted the item (default is 0 which
-        means to keep all values)
-        @return the new DeviceStats object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-
-        # Remove intermediate data
-        duplicated_id = self._get_duplicated_devicestats_id(ds_device_id,ds_key,ds_value)
-        if duplicated_id:
-            old_stat = self.__session.query(DeviceStats).filter_by(id=duplicated_id).first()
-            if old_stat:
-                self.__session.delete(old_stat)
-            else:
-                # FIXME : shouldn't occur (just for debug purposes related to bug #1503)
-                self.log.error("Can't delete stats for device id '%s' : it doesn't exist" % duplicated_id) 
-
-        if not self.__session.query(Device).filter_by(id=ds_device_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
-        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_timestamp), timestamp=ds_timestamp,
-                                  skey=ds_key, value=ds_value, device_id=ds_device_id)
-        self.__session.add(device_stat)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        # Eventually remove old stats
-        if hist_size > 0:
-            stats_list = self.__session.query(
-                                    DeviceStats
-                                ).filter_by(device_id=ds_device_id
-                                ).filter_by(skey=ucode(ds_key)
-                                ).order_by(sqlalchemy.desc(DeviceStats.date))[:hist_size]
-            last_date_to_keep = stats_list[len(stats_list)-1].date
-            stats_list = self.__session.query(
-                                    DeviceStats
-                                ).filter_by(device_id=ds_device_id
-                                ).filter_by(skey=ucode(ds_key)
-                                ).filter("date < '" + str(last_date_to_keep) + "'"
-                                ).all()
-            for stat in stats_list:
-                self.__session.delete(stat)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-
-        return device_stat
-
-    def del_device_stats(self, ds_device_id, ds_key=None):
-        """Delete a stat record for a given key and device
-
-        @param ds_device_id : device id
-        @param ds_key : stat key, optional
-        @return list of deleted DeviceStat objects
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        query = self.__session.query(DeviceStats).filter_by(device_id=ds_device_id)
-        if ds_key:
-            query = query.filter_by(skey=ucode(ds_key))
-        device_stats_l = query.all()
-        for ds in device_stats_l:
-            self.__session.delete(ds)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device_stats_l
 
 
 ####
@@ -1900,6 +1402,264 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete person with id %s : it doesn't exist" % p_id)
 
+###################
+# sensor
+###################
+    def get_all_sensor(self):
+        self.__session.expire_all()
+        return self.__session.query(Sensor).all()
+
+    def get_sensor_by_device_id(self, did):
+        self.__session.expire_all()
+        return self.__session.query(Sensor).filter_by(device_id=did).all()
+
+###################
+# command
+###################
+    def get_all_command(self):
+        self.__session.expire_all()
+        return self.__session.query(Command).all()
+    
+    def get_command(self, id):
+        self.__session.expire_all()
+        return self.__session.query(Command).filter_by(id=id).first()
+    
+    def add_command(self, device_id, name, reference, return_confirmation):
+        self.__session.expire_all()
+        cmd = Command(name=name, device_id=device_id, reference=reference, return_confirmation=return_confirmation)
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+###################
+# commandParam
+###################
+    def add_commandparam(self, cmd_id, key, value_type, values): 
+        self.__session.expire_all()
+        p = CommandParam(cmd_id=cmd_id, key=key, value_type=value_type, values=values)
+        self.__session.add(p)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return p
+
+###################
+# xplcommand
+###################
+    def get_all_xpl_command(self):
+        self.__session.expire_all()
+        return self.__session.query(XplCommand).all()
+    
+    def get_xpl_command(self, p_id):
+        self.__session.expire_all()
+        return self.__session.query(XplCommand).filter_by(id=p_id).first()
+
+    def get_xpl_command_by_device_id(self, d_id):
+        self.__session.expire_all()
+        return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
+
+    def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id, json_id):
+        self.__session.expire_all()
+        cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id, json_id=json_id)
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+    def del_xpl_command(self, id):
+        self.__session.expire_all()
+        cmd = self.__session.query(XplCommand).filter_by(id=id).first()
+        if cmd is not None:
+            self.__session.delete(cmd)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return cmd
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-command with id %s : it doesn't exist" % id)
+
+    def update_xpl_command(self, id, cmd_id=None, name=None, schema=None, device_id=None, stat_id=None):
+        """Update a xpl_stat
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        cmd = self.__session.query(XplCommand).filter_by(id=id).first()
+        if cmd is None:
+            self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % id)
+        if cmd_id is not None:
+            cmd.cmd_id = cmd_id
+        if schema is not None:
+            cmd.schema = ucode(schema)
+        if device_id is not None:
+            cmd.device_id = device_id
+        if stat_id is not None:
+            cmd.stat_id = stat_id
+        if name is not None:
+            cmd.name = name
+        self.__session.add(cmd)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return cmd
+
+
+###################
+# xplstat
+###################
+    def get_all_xpl_stat(self):
+        self.__session.expire_all()
+        return self.__session.query(XplStat).all()
+
+    def get_xpl_stat(self, p_id):
+        self.__session.expire_all()
+        return self.__session.query(XplStat).filter_by(id=p_id).first()
+    
+    def get_xpl_stat_by_device_id(self, d_id):
+        self.__session.expire_all()
+        return self.__session.query(XplStat).filter_by(device_id=d_id).all()
+
+    def add_xpl_stat(self, name, schema, device_id, json_id):
+        self.__session.expire_all()
+        stat = XplStat(name=name, schema=schema, device_id=device_id, json_id=json_id)
+        self.__session.add(stat)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return stat
+
+    def del_xpl_stat(self, id):
+        self.__session.expire_all()
+        stat = self.__session.query(XplStat).filter_by(id=id).first()
+        if stat is not None:
+            self.__session.delete(stat)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return stat
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
+    
+    def update_xpl_stat(self, id, name=None, schema=None, device_id=None):
+        """Update a xpl_stat
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        stat = self.__session.query(XplStat).filter_by(id=id).first()
+        if stat is None:
+            self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % id)
+        if schema is not None:
+            stat.schema = ucode(schema)
+        if device_id is not None:
+            stat.device_id = device_id
+        if name is not None:
+            stat.name = name
+        self.__session.add(stat)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return stat
+
+###################
+# XplCommandParam
+###################
+    def add_xpl_command_param(self, cmd_id, key, value):
+        self.__session.expire_all()
+        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def update_xpl_command_param(self, cmd_id, key, value=None):
+        self.__session.expire_all()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=cmd_id).filter_by(key=key).first()
+        if param is None:
+            self.__raise_dbhelper_exception("XplCommandParam with id %s and key %s couldn't be found" % (cmd_id, key))
+        if value is not None:
+            param.value = ucode(value)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def del_xpl_command_param(self, id, key):
+        self.__session.expire_all()
+        param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).filter_by(key=key).first()
+        if param is not None:
+            self.__session.delete(param)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return param
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-command-param with id %s : it doesn't exist" % id)
+
+###################
+# XplStatParam
+###################
+    def get_xpl_stat_param_by_sensor(self, sensor_id):
+        return self.__session.query(XplStatParam).filter_by(sensor_id=sensor_id).first()
+
+    def add_xpl_stat_param(self, statid, key, value, static, ignore_values=None):
+        self.__session.expire_all()
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None, ignore_values=ignore_values)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, ignore_values=None):
+        self.__session.expire_all()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
+        if param is None:
+            self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % id)
+        if value is not None:
+            param.value = ucode(value)
+        if static is not None:
+            param.static = static
+        if ignore_values is not None:
+            param.ignore_values = ignore_values
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
+    def del_xpl_stat_param(self, stat_id, key):
+        self.__session.expire_all()
+        param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
+        if param is not None:
+            self.__session.delete(param)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return param
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id %s : it doesn't exist" % id)
+         
+###################
+# helper functions
+###################
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
         """Raise a DbHelperException and log it
 

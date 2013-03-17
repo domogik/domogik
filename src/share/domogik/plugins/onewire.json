@@ -1,4 +1,18 @@
 {
+	"products" : [
+	   {
+	       "name" : "DS18B20",
+	       "id" : "ONWIRE_DS18B20",
+	       "doc" : "http://www.maximintegrated.com/datasheet/index.mvp/id/2812",
+	       "type" : "onewire.thermometer"
+	   },
+	   {
+	       "name" : "DS18S20",
+	       "id" : "ONWIRE_DS18S20",
+	       "doc" : "http://www.maximintegrated.com/datasheet/index.mvp/id/2815",
+	       "type" : "onewire.thermometer"
+	   }
+	],
     "configuration": [
         {
             "default": "False", 
@@ -141,164 +155,193 @@
             "type": "number"
         }
     ], 
-    "device_feature_models": [
-        {
-            "device_type_id": "onewire.thermometer", 
-            "feature_type": "sensor", 
-            "id": "onewire.thermometer.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "onewire.temperature_and_humidity", 
-            "feature_type": "sensor", 
-            "id": "onewire.temperature_and_humidity.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "onewire.temperature_and_humidity", 
-            "feature_type": "sensor", 
-            "id": "onewire.temperature_and_humidity.humidity", 
-            "name": "Humidity", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "humidity", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "onewire.serial_number", 
-            "feature_type": "sensor", 
-            "id": "onewire.serial_number.connected", 
-            "name": "Connected", 
-            "parameters": "{&quot;value0&quot;:&quot;low&quot;,&quot;value1&quot;:&quot;high&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "present", 
-            "value_type": "boolean"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "sensor", 
-            "id": "onewire.gpio.status", 
-            "name": "Status", 
-            "parameters": "{&quot;value0&quot;:&quot;0&quot;,&quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "data", 
-            "value_type": "boolean"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io0", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch0&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data0", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io1", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch1&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data1", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io2", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch2&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data2", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io3", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch3&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data3", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io4", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch4&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data4", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io5", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch5&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data5", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io6", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch6&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data6", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "onewire.gpio", 
-            "feature_type": "actuator", 
-            "id": "onewire.gpio.io7", 
-            "name": "Status", 
-            "parameters": "{&quot;command&quot;:&quot;switch7&quot;,&quot;value0&quot;:&quot;0&quot;, &quot;value1&quot;:&quot;1&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "data7", 
-            "value_type": "binary"
+    "xpl_commands": {
+        "switch": {
+            "name": "Switch on or off",
+            "schema": "sensor.basic",
+            "xplstat_name": "get_gpio",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "command",
+                            "value": "switch"
+                        }
+                    ],
+                    "device": []
+                }
+         }
+    },
+    "xpl_stats": {
+       "get_temp": {
+            "name": "get_temp",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "type",
+                            "value": "temp"
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "sensor": "temperature"
+                        }
+                    ]
+                }
+       },
+       "get_humidity": {
+            "name": "get_humidity",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "type",
+                            "value": "humidity"
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "sensor": "humidity"
+                        }
+                    ]
+                }
+       },
+       "get_serial": {
+            "name": "get_serial",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "type",
+                            "value": "input"
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "sensor": "serial"
+                        }
+                    ]
+                }
+       }
+    },
+    "commands": {
+        "switch": {
+           "name": "Switch On or Off",
+           "return_confirmation": true,
+           "params": [
+               {
+                   "key": "data",
+                   "value_type": "binary",
+                   "values": [0, 1]
+               }
+           ],
+           "xpl_command": "switch"
         }
-    ], 
-    "device_types": [
-        {
+    },
+    "sensors": {
+	"temperature": {
+		"name": "Temperature",
+                "unit": "C",
+                "value_type": "number",
+                "values": "",
+                "xpl_stat": "get_temp"
+	},
+	"serial": {
+		"name": "Serial",
+                "unit": "",
+                "value_type": "string",
+                "values": "",
+                "xpl_stat": "get_serial"
+	},
+       	"gpio": {
+                "name": "gpio",
+                "unit": "",
+                "value_type": "string",
+                "values": ""
+        },
+	"humidity": {
+		"name": "Humidity",
+                "unit": "%",
+                "value_type": "number",
+                "values": [0, 100],
+                "xpl_stat": "get_humidity"
+	}
+    },
+    "device_types": {
+        "onewire.thermometer": {
             "description": "Thermometer", 
             "id": "onewire.thermometer", 
-            "name": "Thermometer"
+            "name": "Thermometer",
+            "commands": [],
+            "sensors": ["temperature"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+                }
+            ]
         }, 
-        {
+        "onewire.temperature_and_humidity": {
             "description": "Temperature and Humidity", 
             "id": "onewire.temperature_and_humidity", 
-            "name": "Temperature and Humidity"
+            "name": "Temperature and Humidity",
+            "commands": [],
+            "sensors": ["temperature", "humidity"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+                }
+            ]
         }, 
-        {
+        "onewire.serial_number": {
             "description": "Serial number", 
             "id": "onewire.serial_number", 
-            "name": "Serial number"
+            "name": "Serial number",
+            "commands": [],
+            "sensors": ["serial"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+                }
+            ]
         }, 
-        {
+        "onewire.gpio": {
             "description": "Onewire GPIO Chipset", 
             "id": "onewire.gpio", 
-            "name": "General purpose IO"
+            "name": "General purpose IO",
+            "commands": ["switch"],
+            "sensors": ["gpio"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+                },
+                {
+                    "key": "switch",
+                    "description": "The switch number",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                } 
+            ]
+ 
         }
-    ], 
+    }, 
     "files": [
         "src/share/domogik/design/plugin/onewire/icon.png", 
         "src/share/domogik/plugins/onewire.json", 
-        "src/share/domogik/stats/1wire/sensor.basic-onewire.xml", 
         "src/domogik_packages/xpl/bin/onewire.py", 
         "src/domogik_packages/xpl/lib/onewire.py",
         "src/domogik_packages/xpl/helpers/onewire.py"
@@ -321,12 +364,7 @@
         "type": "plugin", 
         "version": "0.3b1"
     }, 
-    "json_version": 1, 
-    "technology": {
-        "description": "1-wire", 
-        "id": "onewire", 
-        "name": "1-wire"
-    }, 
+    "json_version": 2, 
     "udev-rules": [
         {
             "description": "Usb DS9490R adaptator", 

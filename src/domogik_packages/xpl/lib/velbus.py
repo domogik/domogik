@@ -366,7 +366,8 @@ class VelbusDev:
            Switch status => send out when a relay is switched
         """
         for channel in self._byte_to_channels(data[5]):
-            device = str(ord(data[2])) + "-" + str(channel)
+            address = str(ord(data[2]))
+            channel = str(channel)
             level = -1
             if (ord(data[7]) & 0x03) == 0:
                 level = 0
@@ -374,7 +375,8 @@ class VelbusDev:
                 level = 100
             if level != -1:
                 self._callback("lighting.device",
-                    {"device" : device,
+                    {"address" : str(ord(data[2])),
+                    "channel" : str(channel),
                     "level" : level})
 
     def _process_238(self, data):
@@ -482,7 +484,7 @@ class VelbusDev:
            Convert a channel to a byte
            only works for one channel at a time
         """
-        return chr( (1 << (chan -1)) )
+        return chr( (1 << (int(chan) -1)) )
 
     def _byte_to_channels(self, byte):
         """

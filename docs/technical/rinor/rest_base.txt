@@ -93,52 +93,6 @@ Return: like /list but with only the item updated
 
 Return: like /list but with only the item deleted
 
-Feature
--------
-
-Reading operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/feature/list/by-id/<id>
-
-Return: ::
-
-    {
-        "status": "OK",
-        "code": 0,
-        "description": "None",
-        "feature": [
-            {
-                "device_feature_model_id": "plcbus.dimmer.switch",
-                "device": {
-                    "description": "",
-                    "reference": "2263D",
-                    "device_usage_id": "light",
-                    "address": "A2",
-                    "device_type_id": "plcbus.dimmer",
-                    "id": 1,
-                    "name": "Lampe"
-                },
-                "device_id": 1,
-                "id": 1,
-                "device_feature_model": {
-                    "return_confirmation": "True",
-                    "feature_type": "actuator",
-                    "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
-                    "stat_key": "command",
-                    "value_type": "binary",
-                    "device_type_id": "plcbus.dimmer",
-                    "id": "plcbus.dimmer.switch",
-                    "name": "Dimmer"
-                }
-            }
-        ]
-    }
-
-* /base/feature/list/by-device_id/<id>
-
-Return: like /list but with the item filtered
-
 Device technology
 -----------------
 
@@ -194,6 +148,8 @@ Reading operations
 
 * /base/device/list
 
+Will only return devices where the address field is NULL
+
 Result: ::
 
     {
@@ -226,14 +182,102 @@ Result: ::
         ]
     }
 
+* /base/device/list-upgrade
+
+Return: will return the datatstructure needed for device upgrade
+
+* /base/device/params/<device_type_id>
+
+Return: The parameters needed for adding a new device, will return the needed global parameters and the command/stat specifick parameters
+
+Result: ::
+
+    {
+       "status": "OK",
+       "code": 0,
+       "description": "None",
+       "deviceparams":
+       [
+           {
+               "xpl_stat":
+               [
+                   {
+                       "params":
+                       [
+                       ],
+                       "name": "get_level",
+                       "schema": "lighting.device"
+                   },
+                   {
+                       "params":
+                       [
+                       ],
+                       "name": "get_level",
+                       "schema": "lighting.device"
+                   }
+               ],
+               "xpl_cmd":
+               [
+                   {
+                       "params":
+                       [
+                           {
+                               "type": "string",
+                               "description": "a dummy param",
+                               "key": "dummy"
+                           }
+                       ],
+                       "xplstat_name": "get_level",
+                       "name": "set_level_bin",
+                       "schema": "lighting.basic"
+                   },
+                   {
+                       "params":
+                       [
+                           {
+                               "type": "string",
+                               "description": "a dummy param",
+                               "key": "dummy"
+                           }
+                       ],
+                       "xplstat_name": "get_level",
+                       "name": "set_level_bin",
+                       "schema": "lighting.basic"
+                   }
+               ],
+               "global":
+               [
+                   {
+                       "max_value": 4,
+                       "min_value": 1,
+                       "type": "integer",
+                       "description": "The channel number",
+                       "key": "channel"
+                   },
+                   {
+                       "max_value": 255,
+                       "min_value": 0,
+                       "type": "integer",
+                       "description": "The decimal address",
+                       "key": "address"
+                   }
+               ]
+           }
+       ]
+    }
+
 Writing operations
 ^^^^^^^^^^^^^^^^^^
 
-* /base/device/add/name/<name>/address/<address>/type_id/<type_id>/usage_id/<usage_id>/description/<description>/reference/<reference>
+* /base/device/add/name/<name>/type_id/<type_id>/usage_id/<usage_id>/description/<description>/reference/<reference>
 
 Return: like /list but with only the item added
 
-* /base/device/update/id/<id>/name/<name>/address/<address>/usage_id/<usage_id>/description/<description>/reference/<reference>
+* /base/device/addglobal/id/<device_id>
+* /base/device/xplcmdparams/id/<xplcommand id>/<param 1>/<value 1>/.../<param N>/<value N>
+* /base/device/xplstatparams/id/<xplparam id>/<param 1>/<value 1>/.../<param N>/<value N>
+
+* /base/device/update/id/<id>/name/<name>/usage_id/<usage_id>/description/<description>/reference/<reference>
 
 Return: like /list but with only the item updated
 

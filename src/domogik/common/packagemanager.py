@@ -89,6 +89,8 @@ EXTERNAL_JSON_PATH = "%s/domogik_packages/externals" % INSTALL_PATH
 # type of part for a plugin
 PKG_PART_XPL = "xpl"
 PKG_PART_RINOR = "rinor"
+# plugin json version should at least be ...
+MIN_JSON_VERSION = 2
 
 class PackageManager():
     """ Tool to create packages
@@ -430,6 +432,14 @@ class PackageManager():
             self.log(msg)
             raise PackageException(msg)
 
+        # check the json_version file
+        self.log("Required json version = %s" % MIN_JSON_VERSION )
+        self.log("Package json version = %s" % pkg_json["json_version"])
+        if pkg_json["json_version"] < MIN_JSON_VERSION : 
+            msg = "This package has json_version set to %s, but Domogik needs at least %s" % (pkg_json["json_version"], MIN_JSON_VERSION )
+            self.log(msg)
+            raise PackageException(msg)
+
         # create install directory
         self._create_folder(INSTALL_PATH)
 
@@ -545,8 +555,8 @@ class PackageManager():
             # exernal/* are installed on rinor host
             if package_part == PKG_PART_RINOR:
                 copytree("%s/src/share/domogik/design/" % pkg_dir, "%s/design/" % plg_path, self.log)
-                copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
-                copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
+                #copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
+                #copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
                 copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
         except:
             msg = "Error while copying %s files : %s" % (pkg_type, traceback.format_exc())
