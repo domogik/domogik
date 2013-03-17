@@ -494,19 +494,21 @@ class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    json_id = Column(Unicode(64))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
     params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete")
     
-    def __init__(self, device_id, name, schema):
+    def __init__(self, device_id, name, schema, json_id):
         self.device_id = device_id
         self.name = ucode(name)
         self.schema = ucode(schema)
+        self.json_id = ucode(json_id)
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStat(id=%s device_id=%s name='%s' schema='%s' params=%s)>"\
-               % (self.id, self.device_id, self.name, self.schema, self.params)
+        return "<XplStat(id=%s device_id=%s name='%s' schema='%s' params=%s json_id=%s)>"\
+               % (self.id, self.device_id, self.name, self.schema, self.params, self.json_id)
 
     @staticmethod
     def get_tablename():

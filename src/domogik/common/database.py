@@ -697,7 +697,7 @@ class DbHelper():
             if 'xpl_stat' in sensor:
                 xpl_stat_id = sensor['xpl_stat']
                 xpl_stat = pjson['xpl_stats'][xpl_stat_id]
-                xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id)
+                xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
                 self.__session.add(xplstat)
                 self.__session.flush()
                 addedxplstats[xpl_stat_id] = xplstat.id
@@ -741,7 +741,7 @@ class DbHelper():
 		    xpl_stat_id = xpl_command['xplstat_name']
                     if xpl_stat_id not in addedxplstats:
                         xpl_stat = pjson['xpl_stats'][xpl_stat_id]
-                        xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id)
+                        xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
                         self.__session.add(xplstat)
                         self.__session.flush()
                         xplstatid = xplstat.id
@@ -1526,9 +1526,9 @@ class DbHelper():
         self.__session.expire_all()
         return self.__session.query(XplStat).filter_by(device_id=d_id).all()
 
-    def add_xpl_stat(self, name, schema, device_id):
+    def add_xpl_stat(self, name, schema, device_id, json_id):
         self.__session.expire_all()
-        stat = XplStat(name=name, schema=schema, device_id=device_id)
+        stat = XplStat(name=name, schema=schema, device_id=device_id, json_id=json_id)
         self.__session.add(stat)
         try:
             self.__session.commit()
