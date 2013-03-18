@@ -181,8 +181,11 @@ class ZWaveValueNode:
             
     def updateData(self, valueData):
         """Mise à jour de valueData depuis les arguments du callback """
-        self._valueData = valueData
+        self._valueData = dict(valueData)
         self._lastUpdate = time.time()
+        valueData['homeId'] = int(valueData['homeId']) # Pour etre compatible avec javascript
+        valueData['id'] = str(valueData['id']) # Pour etre compatible avec javascript
+        self._node.reportToUI({'type': 'value-changed', 'usermsg' :'value has changed', 'data': valueData})
 
     def _getLabelDomogik(self):
         """ retourne le label OZW formaté pour les listener domogik, en lowcase et espaces remplacés pas '-',
@@ -191,7 +194,6 @@ class ZWaveValueNode:
         
     def getDomogikDevice(self):
         """Determine si la value peut être un device domogik et retourne le format du nom de device"""
-        print "&&&&&&&&&&&&&   Label domogik :",  self.labelDomogik
         if (self.valueData['commandClass'] in  CmdsClassAvailable) and (self.labelDomogik in  DomogikTypeAvailable) :
             nameAssoc = self._node._ozwmanager._nameAssoc
             retval = "%s.%d.%d" %(nameAssoc.keys()[nameAssoc.values().index(self.valueData['homeId'])] , self._node.nodeId, self.valueData['instance'])        

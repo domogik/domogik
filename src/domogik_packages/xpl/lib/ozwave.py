@@ -94,6 +94,7 @@ class OZWavemanager(threading.Thread):
         self._ready = False
         self._initFully = False
         self._ctrlActProgress= None   
+        self.msgToUI=[];
         # récupération des association nom de réseaux et homeID
         self._nameAssoc = {}
         if self._configPlug != None :
@@ -113,7 +114,6 @@ class OZWavemanager(threading.Thread):
                     loop = False
                 num += 1                
         print self._nameAssoc
-        threading.Thread.__init__(self, target=self.run)
         autoPath = self._configPlug.query('ozwave', 'autoconfpath')
         print 'autopath : ' , autoPath
         if autoPath and libopenzwave.configPath() :
@@ -127,19 +127,19 @@ class OZWavemanager(threading.Thread):
         opt = ""
         if ozwlog == "True" : opts = "--logging true"
         else : opts = "--logging false"
-        # if msgEndCb : opts = opts + "--NotifyTransactions true" # false par defaut  --- desactivé, comportement bizard
         self._log.info("Try to run openzwave manager")
         self.options = libopenzwave.PyOptions()
         self.options.create(self._configPath, self._userPath,  opts) 
-     #   self.options.addOptionBool("NotifyTransactions", 'true')
         self.options.lock() # nécessaire pour bloquer les options et autoriser le PyManager à démarrer
         self._manager = libopenzwave.PyManager()
         self._manager.create()
         self._manager.addWatcher(self.cb_openzwave) # ajout d'un callback pour les notifications en provenance d'OZW.
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
-        # self.manager.addDriver(self._device)  # ajout d'un driver dans le manager, fait par self.openDevice() dans class OZwave(XplPlugin):
         print ('user config :',  self._userPath,  " Logging openzwave : ",  opts)
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
+        thXplUI = threading.Thread(None, self.ctrlMsgToUI, "send_ctrl_msg_to_ui", (), {} )
+        thXplUI.start()
+        
         
      # On accède aux attributs uniquement depuis les property
     device = property(lambda self: self._device)
@@ -174,20 +174,29 @@ class OZWavemanager(threading.Thread):
         sleep(1)
         self._manager.removeDriver(self.device)
         self._ready = False
+        self._controller.reportChangeToUI({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Plugin stopped and driver removed.', 'data': False})
 
-    def run(self, stop):
+    def ctrlMsgToUI(self):
         """ Maintient la class OZWManager pour le fonctionnement du plugin.
-        @param stop : an Event to wait for stop request."""
+        """
         # tant que le plugins est en cours mais pas lancer pour l'instant, vraiment util ?
-        self._log.info("Start plugin listenner")
-        print ("Start plugin listenner")
+        self._log.info("Start plugin listenner Msg To UI")
+        print ("Start plugin listenner Msg To UI")
         try:
-            while not stop.isSet():
-                sleep (1)  # utile pour libérer le temps processeur ?
+            while not self._stop.isSet():
+          #      print ('Handle Process msg to UI')
+                if len(self.msgToUI) != 0 :
+                    msg = self.msgToUI.pop(0)
+                    print 'Handle Process msg to UI send to UI',  msg
+                    self._cb_send_xPL(msg['header'], msg['report'])                    
+                    self._stop.wait(0.5) # ne pas saturer le hub xPL
+                else :
+                    self._stop.wait(0.3) # ne pas saturer le proc
         except OZwaveManagerException :
-            self._log.error("Error listener run")
+            self._log.error("Error listener Msg To UI is stopped")
+            print ("Error listener Msg To UI is stopped")
             return
-        print ("Stop plugin listener")
+        print ("Stop plugin listener Msg To UI")
             
     def _getPyOZWLibVersion(self):
         """Renvoi les versions des librairies py-openzwave ainsi que la version d'openzwave."""
@@ -373,8 +382,17 @@ class OZWavemanager(threading.Thread):
         # TODO: nouvelle notification à identifier et gérer le fonctionnement
             
     def _handleNotification(self,  args):
-        """Une erreur ou notification particulière est arrivée"""
-        # TODO: Supprimer code nimérique que les notificationCodes seront pris en charge par python-openzwave
+        """Une erreur ou notification particulière est arrivée
+        NotificationCode
+			Code_MsgComplete = 0,					/**< Completed messages */
+			Code_Timeout,						/**< Messages that timeout will send a Notification with this code. */
+			Code_NoOperation,					/**< Report on NoOperation message sent completion  */
+			Code_Awake,						/**< Report when a sleeping node wakes up */
+			Code_Sleep,						/**< Report when a node goes to sleep */
+			Code_Dead,						/**< Report when a node is presumed dead */
+			Code_Alive						/**< Report when a node is revived */
+        """
+        # TODO: Supprimer code numérique que les notificationCodes seront pris en charge par python-openzwave
         node = self._getNode(self._homeId, args['nodeId'])
         nCode = args['notificationCode']
         if nCode in (0 , 'MsgComplete'):     #      Code_MsgComplete = 0,                                   /**< Completed messages */
@@ -396,11 +414,17 @@ class OZWavemanager(threading.Thread):
                 node.setSleeping(True)
                 print ('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
-        elif nCode in (0 , 'Dead'):             #       Code_Dead                                               /**< Report when a node is presumed dead */
+        elif nCode in (5, 'Dead'):             #       Code_Dead                                               /**< Report when a node is presumed dead */
             if node : 
-                node.setSleeping(True)
+                node.markAsFailed()
                 print ('Z-Wave Device Node {0} marked as dead.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} marked as dead.'.format(node.id))
+        elif nCode in (6 , 'Alive'):             #       Code_Alive						/**< Report when a node is revived */
+            if node : 
+                node.markAsOK()
+                print ('Z-Wave Device Node {0} marked as alive.'.format(node.id))
+                self._log.info('Z-Wave Device Node {0} marked as alive.'.format(node.id))
+       
         else :
             self._log.debug('Error notification code unknown : ', args)
             
@@ -424,6 +448,9 @@ class OZWavemanager(threading.Thread):
                         print 'Node %d is affected as primary controller' %(nodeId)
                         self._log.info("Node %d is affected as primary controller)", nodeId)
                         self._controller = retval
+                        self._controller.reportChangeToUI({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Driver is ready.', 'data': True})
+                        self._controller.reportChangeToUI({'node': 'controller', 'type': 'init-process', 'usermsg' : 'Zwave network initialization process could take several minutes. ' +
+                                                    ' Please be patient...', 'data': NodeStatusNW[3]})
                     else :
                         self._log.info("A primary controller allready existing, node %d id affected as secondary.", nodeId)
                         retval = ZWaveController(self,  homeId, nodeId,  False)
@@ -485,8 +512,7 @@ class OZWavemanager(threading.Thread):
 #        print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
-                          'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
-                     #     'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,               
+                          'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,                          
                           'valuetype':  valueId['type'], 
                           'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
                                                                             # les labels sont listés dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
@@ -545,6 +571,7 @@ class OZWavemanager(threading.Thread):
             node._updateConfig()
         self._ready = True
         self._initFully = True
+        self._controller.reportChangeToUI({'node': 'controller', 'type': 'init-process', 'usermsg' : 'Zwave network Initialized.', 'data': NodeStatusNW[2]})
         print ("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         self._log.info("OpenZWave initialization is complete.  Found {0} Z-Wave Device Nodes ({1} sleeping)".format(self.nodeCount, self.sleepingNodeCount))
         #self._manager.writeConfig(self._homeId)
@@ -811,4 +838,5 @@ class OZWavemanager(threading.Thread):
         header['type'] = 'xpl-trig'
         header['schema'] = 'ozwave.basic'
         header['data'] = {'command' : 'Refresh-ack', 'group' :'UI'}
-        self._cb_send_xPL(header, report)
+        self.msgToUI.append({'header': header,  'report': report})
+        # self._cb_send_xPL(header, report)
