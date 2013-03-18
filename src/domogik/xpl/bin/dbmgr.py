@@ -46,7 +46,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
-from domogik.common.mq.reqrep.worker import MDPWorker
+from domogik.mq.reqrep.worker import MDPWorker
 from zmq.eventloop.ioloop import IOLoop
 import time
 import zmq

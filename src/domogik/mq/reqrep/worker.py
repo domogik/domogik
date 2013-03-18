@@ -34,8 +34,8 @@ import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback, PeriodicCallback
 
-from domogik.common.mq.common import split_address
-from domogik.common.mq.message import MQMessage
+from domogik.mq.common import split_address
+from domogik.mq.message import MQMessage
 from domogik.common.configloader import Loader
 
 class MDPWorker(object):

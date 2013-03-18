@@ -26,7 +26,7 @@ import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
 
-from domogik.common.mq.common import split_address
+from domogik.mq.common import split_address
 from domogik.common.configloader import Loader
 from domogik.common.daemonize import createDaemon
 

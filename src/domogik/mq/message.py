@@ -5,6 +5,8 @@
    this wrapper is written to easely extend the message type later on,
 """
 
+import json
+
 class MQMessage():
     """MQMessage
        => part 0 = action (config.get, config,set, config.result)
@@ -60,7 +62,7 @@ class MQMessage():
             input a message list and decompile
         """
         self._action = stack.pop(0)
-        self._data = stack 
+        self._data = stack
 
     def __repr__(self):
         """Return an internal representation of the class"""
