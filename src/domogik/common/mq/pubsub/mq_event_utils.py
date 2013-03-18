@@ -56,7 +56,7 @@ class MqEventPub(MqEvent):
         MqEvent.__init__(self, caller_id)
         self.log = logger.Logger('mq_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
-        pub_addr = "tcp://localhost:%s" % self.cfg_mq['event_pub_port']
+        pub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_pub_port'])
         self.log.debug("Publishing on address : %s" % pub_addr)
         self.s_send.connect(pub_addr)
         # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
@@ -84,7 +84,7 @@ class MqEventSub(MqEvent):
         MqEvent.__init__(self, caller_id)
         self.log = logger.Logger('mq_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
-        sub_addr = "tcp://localhost:%s" % self.cfg_mq['event_sub_port']
+        aub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
 
