@@ -29,6 +29,7 @@ from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
 from domogik.mq.common import split_address
 from domogik.common.configloader import Loader
 from domogik.common.daemonize import createDaemon
+from domogik.common import logger
 
 ###
 
@@ -74,6 +75,9 @@ class MDPBroker(object):
     def __init__(self, context, main_ep, opt_ep=None):
         """Init MDPBroker instance.
         """
+        l = logger.Logger('mq_broker')
+        self.log = l.get_logger()
+
         socket = context.socket(zmq.ROUTER)
         socket.bind(main_ep)
         self.main_stream = ZMQStream(socket)
@@ -110,6 +114,7 @@ class MDPBroker(object):
         :rtype: None
         """
         if wid in self._workers:
+            self.log.info("Worker %s already registered" % service)
             return
         self._workers[wid] = WorkerRep(
                 self.WORKER_PROTO, wid, service, self.main_stream)
@@ -120,6 +125,7 @@ class MDPBroker(object):
             q = ServiceQueue()
             q.put(wid)
             self._services[service] = (q, [])
+        self.log.info("Register worker %s" % service)
         return
 
     def unregister_worker(self, wid):
@@ -145,6 +151,7 @@ class MDPBroker(object):
             wq, wr = self._services[service]
             wq.remove(wid)
         del self._workers[wid]
+        self.log.info("Unregister worker %s" % service)
         return
 
     def disconnect(self, wid):
