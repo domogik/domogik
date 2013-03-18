@@ -43,7 +43,7 @@ def main():
     createDaemon()
     cfg = Loader('mq').load()
     config = dict(cfg[1])
-    log = logger.Logger('mq_event_fwd').get_logger()
+    log = logger.Logger('mq_forwarder').get_logger()
     
     try:
         context = zmq.Context(1)
