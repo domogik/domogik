@@ -557,7 +557,7 @@ def main():
 
     createDaemon()
     context = zmq.Context()
-    broker = MDPBroker(context, config['broker_uri'])
+    broker = MDPBroker(context, "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port']))
     IOLoop.instance().start()
     broker.shutdown()
 

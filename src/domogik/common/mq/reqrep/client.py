@@ -28,10 +28,82 @@ __email__ = 'gst-py@a-nugget.de'
 import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback
+from zmq import select
+from domogik.common.configloader import Loader
 
 ###
 
-PROTO_VERSION = b'MDPC01'
+class MDPSyncClient(object):
+
+    """Class for the MDP client side.
+
+    Thin asynchronous encapsulation of a zmq.REQ socket.
+    Provides a :func:`request` method with optional timeout.
+
+    Objects of this class are ment to be integrated into the
+    asynchronous IOLoop of pyzmq.
+
+    :param context:  the ZeroMQ context to create the socket in.
+    :type context:   zmq.Context
+    :param endpoint: the enpoint to connect to.
+    :type endpoint:  str
+    :param service:  the service the client should use
+    :type service:   str
+    """
+
+    _proto_version = b'MDPC01'
+
+    def __init__(self, context):
+        """Initialize the MDPClient.
+        """
+        cfg = Loader('mq')
+        my_conf = cfg.load()
+        config = dict(my_conf[1])
+        endpoint = "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port'])
+        self.socket = context.socket(zmq.REQ)
+        self.socket.connect(endpoint)         
+        return
+
+    def shutdown(self):
+        """Method to deactivate the client connection completely.
+
+        Will delete the stream and the underlying socket.
+
+        .. warning:: The instance MUST not be used after :func:`shutdown` has been called.
+
+        :rtype: None
+        """
+        if not self.socket:
+            return
+        self.socket.setsockopt(zmq.LINGER, 0)
+        self.socket.close()
+        self.socket = None
+        return
+
+    def request(self, service, msg, timeout=None):
+        """Send the given message.
+
+        :param msg:     message parts to send.
+        :type msg:      list of str
+        :param timeout: time to wait in milliseconds.
+        :type timeout:  int
+        
+        :rtype : message parts
+        """
+
+        if not timeout or timeout < 0.0:
+            timeout = None
+        if type(msg) in (bytes, unicode):
+            msg = [msg]
+        to_send = [self._proto_version, service]
+        to_send.extend(msg)
+        self.socket.send_multipart(to_send)
+        ret = None
+        rlist, _, _ = select([self.socket], [], [], timeout)
+        if rlist and rlist[0] == self.socket:
+            ret = self.socket.recv_multipart()
+            ret.pop(0) # remove service from reply
+        return ret
 
 ###
 
@@ -68,20 +140,23 @@ class MDPAsyncClient(object):
 
     _proto_version = b'MDPC01'
 
-    def __init__(self, context, endpoint, service):
+    def __init__(self, context, service):
         """Initialize the MDPClient.
         """
+        cfg = Loader('mq')
+        my_conf = cfg.load()
+        config = dict(my_conf[1])
         socket = context.socket(zmq.REQ)
         ioloop = IOLoop.instance()
         self.service = service
-        self.endpoint = endpoint
+        self.endpoint = "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port'])
         self.stream = ZMQStream(socket, ioloop)
         self.stream.on_recv(self._on_message)
         self.can_send = True
         self._proto_prefix = [ PROTO_VERSION, service]
         self._tmo = None
         self.timed_out = False
-        socket.connect(endpoint)
+        socket.connect(self.endpoint)
         return
 
     def shutdown(self):

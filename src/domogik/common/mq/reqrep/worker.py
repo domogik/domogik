@@ -35,7 +35,7 @@ from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback, PeriodicCallback
 
 from domogik.common.mq.common import split_address
-from domogik.common.mq.mdpmessage import MDPReqRep 
+from domogik.common.mq.message import MQMessage
 from domogik.common.configloader import Loader
 
 class MDPWorker(object):
@@ -64,7 +64,7 @@ class MDPWorker(object):
         my_conf = cfg.load()
         config = dict(my_conf[1])
         self.context = context
-        self.endpoint = config['broker_uri']
+        self.endpoint = "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port'])
         self.service = service
         self.stream = None
         self._tmo = None
@@ -178,7 +178,7 @@ class MDPWorker(object):
             envelope.append(b'')
             envelope = [ b'', self._proto_version, b'\x03'] + envelope # REPLY
             self.envelope = envelope
-            mes = MDPReqRep()
+            mes = MQMessage()
             mes.set(msg)
             self.on_mdp_request(mes)
         else:

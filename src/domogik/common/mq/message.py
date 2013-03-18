@@ -1,12 +1,12 @@
-"""MDPReqRep
+"""MQMessage
    
    handler class to handle a reqrep message
 
    this wrapper is written to easely extend the message type later on,
 """
 
-class MDPReqRep():
-    """MDPReqRep
+class MQMessage():
+    """MQMessage
        => part 0 = action (config.get, config,set, config.result)
        => part 1 = data
     """
@@ -64,5 +64,5 @@ class MDPReqRep():
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<MDPReqRep(action=%s, data='%s')>" % (self._action, self._data)
+        return "<MQMessage(action=%s, data='%s')>" % (self._action, self._data)
 
