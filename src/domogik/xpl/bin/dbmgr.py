@@ -46,12 +46,15 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
+from domogik.common.mq.mdpworker import MDPWorker
+from zmq.eventloop.ioloop import IOLoop
 import time
+import zmq
 
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
 
-class DBConnector(XplPlugin):
+class DBConnector(XplPlugin, MDPWorker):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object along with the StatsManager to access to the database on the core side
@@ -62,6 +65,7 @@ class DBConnector(XplPlugin):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
+        MDPWorker.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug("Init database_manager instance")
 
         # Check for database connexion
@@ -101,6 +105,15 @@ class DBConnector(XplPlugin):
 
         Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
+        IOLoop.instance().start() 
+
+    def on_mdp_request(self, msg):
+        if msg._action == "config.get":
+            print "action == config,get"
+        elif msg._action == "config.set":
+            print "action == config,set"
+        print(msg._data)
+        self.reply(msg.get())
 
     def _request_config_cb(self, message):
         '''

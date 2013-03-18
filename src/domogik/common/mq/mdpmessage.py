@@ -61,3 +61,8 @@ class MDPReqRep():
         """
         self._action = stack.pop(0)
         self._data = stack 
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<MDPReqRep(action=%s, data='%s')>" % (self._action, self._data)
+

@@ -34,7 +34,9 @@ import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback, PeriodicCallback
 
-from util import split_address
+from domogik.common.mq.common import split_address
+from domogik.common.mq.mdpmessage import MDPReqRep 
+from domogik.common.configloader import Loader
 
 class MDPWorker(object):
 
@@ -176,14 +178,16 @@ class MDPWorker(object):
             envelope.append(b'')
             envelope = [ b'', self._proto_version, b'\x03'] + envelope # REPLY
             self.envelope = envelope
-            self.on_request(msg)
+            mes = MDPReqRep()
+            mes.set(msg)
+            self.on_mdp_request(mes)
         else:
             # invalid message
             # ignored
             pass
         return
 
-    def on_request(self, msg):
+    def on_mdp_request(self, msg):
         """Public method called when a request arrived.
 
         Must be overloaded!
