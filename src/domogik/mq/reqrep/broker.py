@@ -99,6 +99,7 @@ class MDPBroker(object):
                               }
         self.hb_check_timer = PeriodicCallback(self.on_timer, HB_INTERVAL)
         self.hb_check_timer.start()
+        self.log.info("MDP broker started")
         return
 
     def register_worker(self, wid, service):
@@ -394,7 +395,9 @@ class MDPBroker(object):
         except KeyError:
             # unknwon service
             # ignore request
-            print 'broker has no service "%s"' % service
+            msg = "broker has no service {0}".format(service)
+            print msg
+            self.log.warning(msg)
         return
 
     def on_worker(self, proto, rp, msg):
@@ -438,6 +441,7 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.debug("Message received: {0}".format(msg))
         rp, msg = split_address(msg)
         # dispatch on first frame after path
         t = msg.pop(0)
