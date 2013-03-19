@@ -30,6 +30,7 @@ from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from zmq import select
 from domogik.common.configloader import Loader
+from domogik.mq.message import MQMessage
 
 ###
 
@@ -99,11 +100,15 @@ class MDPSyncClient(object):
         to_send.extend(msg)
         self.socket.send_multipart(to_send)
         ret = None
+        msg = None
         rlist, _, _ = select([self.socket], [], [], timeout)
         if rlist and rlist[0] == self.socket:
             ret = self.socket.recv_multipart()
             ret.pop(0) # remove service from reply
-        return ret
+            ret.pop(0)
+            msg = MQMessage()
+            msg.set(ret)
+        return msg
 
 ###
 

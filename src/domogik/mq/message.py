@@ -13,7 +13,7 @@ class MQMessage():
        => part 1 = data
     """
     _action = None
-    _data = []
+    _data = {}
 
     def __init__(self, action=None, data=None):
         """ __init__
@@ -30,11 +30,11 @@ class MQMessage():
         """
         self._action = action
 
-    def adddata(self, data):
+    def adddata(self, key, value):
         """ addData
             append a data element to the stack
         """
-        self._data.append(data)
+        self._data[key] = value
 
     def getaction(self):
         """ getAction
@@ -54,15 +54,17 @@ class MQMessage():
         """
         stack = []
         stack.append( self._action )
-        stack = stack + self._data
+        stack.append( json.dumps(self._data) )
         return stack
 
     def set(self, stack):
         """ set
             input a message list and decompile
         """
+        print stack
         self._action = stack.pop(0)
-        self._data = stack
+        print stack
+        self._data = json.loads(stack.pop(0))
 
     def __repr__(self):
         """Return an internal representation of the class"""
