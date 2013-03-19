@@ -47,6 +47,7 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 from domogik.mq.reqrep.worker import MDPWorker
+from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 import time
 import zmq
@@ -109,11 +110,32 @@ class DBConnector(XplPlugin, MDPWorker):
 
     def on_mdp_request(self, msg):
         if msg._action == "config.get":
-            print "action == config,get"
+            plugin = msg._data['plugin']
+            hostname = msg._data['hostname']
+            key = msg._data['key']
+            if 'element' in msg._data.keys():
+                element = msg._data['element']
+            else:
+                element = None
+            if element:
+                self._mdp_reply(plugin, hostname, key, self._fetch_elmt_config(plugin, element, key), element)
+            elif not key:
+                print 'TODO'
+            else:
+                self._mdp_reply(plugin, hostname, key, self._fetch_techno_config(plugin, hostname, key))
         elif msg._action == "config.set":
-            print "action == config,set"
-        msg._data['value'] = 'socket'
-        print msg._data
+            print 'TODO'
+
+    def _mdp_reply(self, plugin, hostname, key, value, element=None):
+        msg = MQMessage()
+        msg.setaction( 'config.result' )
+        msg.adddata('plugin', plugin)
+        msg.adddata('hostname', hostname)
+        msg.adddata('key', key)
+        msg.adddata('value', value)
+        if element:
+            msg.adddata('element', element)
+        print msg.get()
         self.reply(msg.get())
 
     def _request_config_cb(self, message):

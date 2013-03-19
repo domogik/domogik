@@ -42,6 +42,8 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_sanitized_hostname 
+
 import zmq
 from domogik.mq.message import MQMessage
 from domogik.mq.reqrep.client import MDPSyncClient 
@@ -95,7 +97,6 @@ class QueryMQ():
         '''
         msg = MQMessage()
         msg._action = 'config.set'
-        msg_
         self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
 
     def query(self, plugin, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
@@ -112,7 +113,7 @@ class QueryMQ():
         '''
         msg = MQMessage()
         msg._action = 'config.get'
-        msg._data = {'plugin': plugin, 'key': key, 'element': element}
+        msg._data = {'plugin': plugin, 'key': key, 'element': element, 'hostname': get_sanitized_hostname()}
         ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
         if ret is None:
             return None
