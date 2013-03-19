@@ -482,7 +482,7 @@ class VelbusDev:
            Convert a channel to a byte
            only works for one channel at a time
         """
-        return chr( (1 << (chan -1)) )
+        return chr( (1 << (int(chan) -1)) )
 
     def _byte_to_channels(self, byte):
         """
