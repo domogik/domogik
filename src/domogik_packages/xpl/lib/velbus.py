@@ -325,7 +325,7 @@ class VelbusDev:
         assert len(data) > 0
         assert len(data) >= 6
         assert ord(data[0]) == 0x0f
-        self._log.debug("starting parser")
+        self._log.debug("starting parser: %s" % data.encode('hex'))
         if len(data) > 14:
             self._log.warning("Velbus message: maximum %s bytes, this one is %s",
                 str(14, str(len(data))))
