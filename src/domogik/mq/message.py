@@ -61,9 +61,7 @@ class MQMessage():
         """ set
             input a message list and decompile
         """
-        print stack
         self._action = stack.pop(0)
-        print stack
         self._data = json.loads(stack.pop(0))
 
     def __repr__(self):

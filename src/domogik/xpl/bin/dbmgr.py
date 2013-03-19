@@ -112,7 +112,8 @@ class DBConnector(XplPlugin, MDPWorker):
             print "action == config,get"
         elif msg._action == "config.set":
             print "action == config,set"
-        print(msg._data)
+        msg._data['value'] = 'socket'
+        print msg._data
         self.reply(msg.get())
 
     def _request_config_cb(self, message):

@@ -33,6 +33,13 @@ Implements
 @organization: Domogik
 """
 
+from socket import gethostname
+
+def get_sanitized_hostname():
+    """ Get the sanitized hostname of the host 
+    This will lower it and keep only the part before the first dot
+    """
+    return gethostname().lower().split('.')[0].replace('-','')[0:16]
 
 def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
