@@ -237,9 +237,6 @@ class VelbusDev:
         except KeyError:
             self._log.error("Request to set a level on a device, but the subtype is not known. mtype {0}".format(mtype))
             return
-        print "boe"
-        print ltype
-        print level
         if ltype == "DIMMER":
             """ Send dimemr value
             - speed = 1 second
