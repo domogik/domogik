@@ -1,5 +1,5 @@
 <technology id="rfxcom">
-  <command name="lighting2_ac_preset">
+  <command name="lighting2_ac_preset_dim">
     <schema>ac.basic</schema>
     <command-key>command</command-key>
     <address-key>address</address-key>

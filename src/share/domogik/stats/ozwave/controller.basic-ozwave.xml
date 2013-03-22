@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="ozwave">
+    <schema name="ozwctrl.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="type"/>
+				<value field="node"/>
+				<value field="usermsg"/>
+				<value field="data"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

@@ -719,7 +719,7 @@
         "src/share/domogik/url2xpl/rfxcom/lighting1_x10_on.xml",
         "src/share/domogik/url2xpl/rfxcom/lighting2_ac_off.xml",
         "src/share/domogik/url2xpl/rfxcom/lighting2_ac_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_ac_preset.xml",
+        "src/share/domogik/url2xpl/rfxcom/lighting2_ac_preset_dim.xml",
         "src/share/domogik/url2xpl/rfxcom/lighting2_homeeasy_eu_off.xml",
         "src/share/domogik/url2xpl/rfxcom/lighting2_homeeasy_eu_on.xml",
         "src/share/domogik/url2xpl/rfxcom/lighting2_homeeasy_eu_preset.xml",
