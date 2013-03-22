@@ -130,7 +130,7 @@ class VelbusManager(XplPlugin):
         address = add[0]
         if message.data["level"] == 'None':
             message.data["level"] = 0
-        self.manager.send_setlevel( address, chan, message.data["level"])
+        self.manager.send_level( address, chan, message.data["level"])
 
     def process_shutter_basic(self, message):
         """ Process xpl chema shutter.basic

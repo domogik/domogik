@@ -223,19 +223,23 @@ class VelbusDev:
 
     def send_level(self, address, channel, level):
         """ Set the level for a device
-            if realy => level can only be 0 or 100
+            if relay => level can only be 0 or 100
             if dimmer => level can be anything from 0 to 100
         """
-        try:
+        address = int(address)
+        if address in self._nodes.keys():
             mtype = self._nodes[address] 
-        except KeyError:
-            self.log.error("Request to set a level on a device, but the device is not known. address {0}".format(address))
+        else:
+            self._log.error("Request to set a level on a device, but the device is not known. address {0}".format(address))
             return
         try:
-            ltype = MODULE_TYPES[mtype][subtype]
+            ltype = MODULE_TYPES[mtype]["subtype"]
         except KeyError:
-            self.log.error("Request to set a level on a device, but the subtype is not known. mtype {0}".format(mtype))
+            self._log.error("Request to set a level on a device, but the subtype is not known. mtype {0}".format(mtype))
             return
+        print "boe"
+        print ltype
+        print level
         if ltype == "DIMMER":
             """ Send dimemr value
             - speed = 1 second
@@ -243,18 +247,18 @@ class VelbusDev:
             level = (255 / 100) * level
             data = chr(0x07) + self._channels_to_byte(channel) + chr(int(level)) + chr(0x00) + chr(0x01)
             self.write_packet(address, data)
-        elif level == 100:
+        elif int(level) == 100 and ltype == "RELAY":
             """ Send relay on message
             """
             data = chr(0x02) + self._channels_to_byte(channel)
             self.write_packet(address, data)
-        elif level == 0:          
+        elif int(level) == 0 and ltype == "RELAY":          
             """ Send relay off message
             """
             data = chr(0x01) + self._channels_to_byte(channel)
             self.write_packet(address, data)
         else:
-            self.log.error("This methode should only be called for dimmers or relays and with level 0 tot 100")
+            self._log.error("This methode should only be called for dimmers or relays and with level 0 tot 100")
         return 
         
     def send_moduletyperequest(self, address):
