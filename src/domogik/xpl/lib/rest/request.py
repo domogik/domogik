@@ -1726,7 +1726,7 @@ class ProcessRequest():
     	        self.send_http_response_ok(json_data.get())
 	        return
             # go and add the param
-            self._db.add_xpl_stat_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
+            self._db.add_xpl_stat_param(statid=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
         self.send_http_response_ok(json_data.get())
         self.stat_mgr.load()
 
