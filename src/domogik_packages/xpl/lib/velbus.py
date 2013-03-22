@@ -10,40 +10,40 @@ import threading
 from Queue import Queue
 
 MODULE_TYPES = {
-  1 : "VMB8PB",
-  2 : "VMB1RY",
-  3 : "VMB1BL",
-  5 : "VMB6IN",
-  7 : "VMB1DM",
-  8 : "VMB4RY",
-  9 : "VMB2BL",
- 10 : "VMB8IR",
- 11 : "VMB4PD",
- 12 : "VMB1TS",
- 13 : "VMB1TH",
- 14 : "VMB1TC",
- 15 : "VMB1LED",
- 16 : "VMB4RYLD",
- 17 : "VMB4RYNO",
- 18 : "VMB4DC",
- 19 : "VMBMPD",
- 20 : "VMBDME",
- 21 : "VMBDMI",
- 22 : "VMB8PBU",
- 23 : "VMB6PBN",
- 24 : "VMB2PBN",
- 25 : "VMB6PBB",
- 26 : "VMB4RF",
- 27 : "VMB1RYNO",
- 28 : "VMB1BLE",
- 29 : "VMB2BLE",
- 30 : "VMBGP1",
- 31 : "VMBGP2",
- 32 : "VMBGP4",
- 33 : "VMBGP0"
+  1 : {"id": "VMB8PB", "subtype": "INPUT"},
+  2 : {"id": "VMB1RY", "subtype": "RELAY", "channels": 1},
+  3 : {"id": "VMB1BL", "subtype": "BLIND", "channels": 1},
+  5 : {"id": "VMB6IN", "subtype": "INPUT"},
+  7 : {"id": "VMB1DM", "subtype": "DIMMER", "channels": 1},
+  8 : {"id": "VMB4RY", "subtype": "RELAY", "channels": 4},
+  9 : {"id": "VMB2BL", "subtype": "BLIND", "channels": 2},
+ 10 : {"id": "VMB8IR", "subtype": "INPUT"},
+ 11 : {"id": "VMB4PD", "subtype": "INPUT"},
+ 12 : {"id": "VMB1TS", "subtype": "TEMP"},
+ 13 : {"id": "VMB1TH", "subtype": "UNKNOWN"},
+ 14 : {"id": "VMB1TC", "subtype": "TEMP"},
+ 15 : {"id": "VMB1LED", "subtype": "DIMMER", "channels": 1},
+ 16 : {"id": "VMB4RYLD", "subtype": "RELAY", "channels": 4},
+ 17 : {"id": "VMB4RYNO", "subtype": "RELAY", "channels": 4},
+ 18 : {"id": "VMB4DC", "subtype": "DIMMER", "channels": 4},
+ 19 : {"id": "VMBMPD", "subtype": "UNKNOWN"},
+ 20 : {"id": "VMBDME", "subtype": "DIMMER", "channels": 1},
+ 21 : {"id": "VMBDMI", "subtype": "DIMMER", "channels": 1},
+ 22 : {"id": "VMB8PBU", "subtype": "INPUT"},
+ 23 : {"id": "VMB6PBN", "subtype": "INPUT"},
+ 24 : {"id": "VMB2PBN", "subtype": "INPUT"},
+ 25 : {"id": "VMB6PBB", "subtype": "INPUT"},
+ 26 : {"id": "VMB4RF", "subtype": "INPUT"},
+ 27 : {"id": "VMB1RYNO", "subtype": "RELAY", "channels": 1},
+ 28 : {"id": "VMB1BLE", "subtype": "UNKNOWN"},
+ 29 : {"id": "VMB2BLE", "subtype": "UNKNOWN"},
+ 30 : {"id": "VMBGP1", "subtype": "INPUT"},
+ 31 : {"id": "VMBGP2", "subtype": "INPUT"},
+ 32 : {"id": "VMBGP4", "subtype": "INPUT"},
+ 33 : {"id": "VMBGP0", "subtype": "INPUT"},
 }
 
-COMMAND_TYPES = {
+MSG_TYPES = {
   0 : "switch status",
   1 : "switch relay off",
   2 : "switch relay on",
@@ -161,6 +161,7 @@ class VelbusDev:
         self._stop = stop
         self._dev = None
         self._devtype = 'serial'
+        self._nodes = {}
 
         # Queue for writing packets to Rfxcom
         self.write_rfx = Queue()
@@ -201,7 +202,13 @@ class VelbusDev:
         except:
             error = "Error while closing device"
             raise VelbusException(error)
-        
+       
+    def scan(self):
+        self._log.info("Starting the bus scan")
+        for add in range(0,255):
+            self.send_moduletyperequest(add)
+        self._log.info("Bus scan finished")
+ 
     def send_shutterup(self, address, channel):
         """ Send shutter up message
         """
@@ -213,38 +220,54 @@ class VelbusDev:
         """
         data = chr(0x06) + self._blinchannel_to_byte(channel) + chr(0x00) + chr(0x00) + chr(0x00)
         self.write_packet(address, data)
-    
-    def send_relayon(self, address, channel):
-        """ Send relay on message
-        """
-        data = chr(0x02) + self._channels_to_byte(channel)
-        self.write_packet(address, data)
-    
-    def send_relayoff(self, address, channel):
-        """ Send relay off message
-        """
-        data = chr(0x01) + self._channels_to_byte(channel)
-        self.write_packet(address, data)
 
-    def send_setdimmervalue(self, address, channel, level):
-        """ Send dimemr value
+    def send_level(self, address, channel, level):
+        """ Set the level for a device
+            if realy => level can only be 0 or 100
+            if dimmer => level can be anything from 0 to 100
+        """
+        try:
+            mtype = self._nodes[address] 
+        except KeyError:
+            self.log.error("Request to set a level on a device, but the device is not known. address {0}".format(address))
+            return
+        try:
+            ltype = MODULE_TYPES[mtype][subtype]
+        except KeyError:
+            self.log.error("Request to set a level on a device, but the subtype is not known. mtype {0}".format(mtype))
+            return
+        if ltype == "DIMMER":
+            """ Send dimemr value
             - speed = 1 second
-        """
-        level = (255 / 100) * level
-        data = chr(0x07) + self._channels_to_byte(channel) + chr(int(level)) + chr(0x00) + chr(0x01)
-        self.write_packet(address, data)
-
+            """
+            level = (255 / 100) * level
+            data = chr(0x07) + self._channels_to_byte(channel) + chr(int(level)) + chr(0x00) + chr(0x01)
+            self.write_packet(address, data)
+        elif level == 100:
+            """ Send relay on message
+            """
+            data = chr(0x02) + self._channels_to_byte(channel)
+            self.write_packet(address, data)
+        elif level == 0:          
+            """ Send relay off message
+            """
+            data = chr(0x01) + self._channels_to_byte(channel)
+            self.write_packet(address, data)
+        else:
+            self.log.error("This methode should only be called for dimmers or relays and with level 0 tot 100")
+        return 
+        
     def send_moduletyperequest(self, address):
         """ Request module type
         """
-        self.write_packet(address, chr(0x40))
+        self.write_packet(address, None)
 
     def write_packet(self, address, data):
         """ put a packet in the write queu
         """
         self._log.info("write packet")
         self.write_rfx.put_nowait( {"address": address,
-					"data": data}) 
+				"data": data}) 
 
     def write_daemon(self):
         """ handle the queu
@@ -252,27 +275,33 @@ class VelbusDev:
         self._log.info("write deamon")
         while not self._stop.isSet():
             res = self.write_rfx.get(block = True)
-            self._log.info("START SENDING PACKET TO %s" % hex(int(res["address"])))
-	    # start
+            self._log.debug("start sending packet to {0}".format(hex(int(res["address"]))))
+	    # start (8bit)
             packet = chr(0x0F)
-            # priority
-            packet += chr(0xF8)
-            # address
+            # priority (8bit, F8=high, FB=low)
+            if res["data"] == None:
+                packet += chr(0xFB)
+            else:
+                packet += chr(0xF8)
+            # address (8bit)
             packet += chr(int(res["address"]))
-            # rtr + datasize
-            packet += chr(len(res["data"]))
-            # data
-            packet += res["data"]
-            # checksum
+            if res["data"] == None:
+                # module type request
+                packet += chr(0x40)
+            else:
+                packet += chr(len(res["data"]))
+                # data
+                packet += res["data"]
+            # checksum (8bit)
             packet += self._checksum(packet)
-            # end byte
+            # end byte (8bit)
             packet += chr(0x04)
             self._log.debug( packet.encode('hex') )
 	    # send
             if self._devtype == 'socket':
-                self._log.debug( self._dev.send( packet ) )
+                self._dev.send( packet )
             else:
-                self._log.debug( self._dev.write( packet ) )
+                self._dev.write( packet )
             # sleep for 60ms
             self._stop.wait(0.06)
  
@@ -343,16 +372,37 @@ class VelbusDev:
         if not self._checksum(data[:-2]) == data[-2]:
             self._log.warning("Packet has no valid checksum")
             return
-        if data_size >= 1:
-            if ord(data[4]) in COMMAND_TYPES:
-                self._log.debug("Received message with type: '%s' address: %s" % (COMMAND_TYPES[ord(data[4])], ord(data[2])) )
+        if data_size > 0:
+            if ord(data[4]) in MSG_TYPES:
+                # lookup the module type
                 try:
-                    methodcall = getattr(self, "_process_" + str(ord(data[4])))
-                    methodcall( data )
-                except AttributeError:
-                    self._log.debug("Messagetype unimplemented")		
+                    if ord(data[2]) in self._nodes.keys():
+                        mtype = self._nodes[ord(data[2])]
+                    else:
+                        mtype = None
+                except KeyError:
+                    mtype = None
+                if mtype:
+                    self._log.debug("Received message with type: '%s' address: %s module: %s(%s)" % (MSG_TYPES[ord(data[4])], ord(data[2]), MODULE_TYPES[mtype]['id'], mtype) )
+                else:
+                    self._log.debug("Received message with type: '%s' address: %s module: UNKNOWN" % (MSG_TYPES[ord(data[4])], ord(data[2])) )
+                # first try the module specifick parser
+                parsed = False
+                if mtype:
+                    try:
+                        methodcall = getattr(self, "_process_{0}_{1}".format(ord(data[4]), mtype))
+                        methodcall( data )
+                        parsed = True
+                    except AttributeError:
+                        self._log.debug("Messagetype module specifick parser not implemented")	
+                if not parsed:
+                    try:
+                        methodcall = getattr(self, "_process_{0}".format(ord(data[4])))
+                        methodcall( data )
+                    except AttributeError:
+                        self._log.debug("Messagetype unimplemented {0}".format(ord(data[4])))
             else:
-                self._log.warning("Received message with unknown type %s" % ord(data[4]))
+                self._log.warning("Received message with unknown type {0}".format(ord(data[4])))
         else:
             if (ord(data[3]) & 0x40 == 0x40):
                 self._log.debug("Received module type request")			
@@ -360,6 +410,19 @@ class VelbusDev:
                 self._log.warning("zero sized message received without rtr set")
 
 # procee the velbus received messages
+# format will beL
+#   _process_<messageId> => general parser for this messagetype
+#   _process_<messageId>_<moduleType> => parser specifickly for this module type
+    def _process_255(self, data):
+        """
+           Process a 255 Message
+           Node type => send out as answer on a module_type_request
+        """
+        naddress = ord(data[2])
+        ntype = ord(data[5])
+        self._log.info("Found node with address {0} and module_type {1}".format(str(naddress), MODULE_TYPES[ntype]['id']))
+        self._nodes[naddress] = ntype
+
     def _process_251(self, data):
         """
            Process a 251 Message

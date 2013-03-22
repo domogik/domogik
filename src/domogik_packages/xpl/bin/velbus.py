@@ -92,6 +92,7 @@ class VelbusManager(XplPlugin):
             self.log.error(ex.value)
             self.force_leave()
             return
+        self.manager.scan()
             
         # Start reading RFXCOM
         listenthread = threading.Thread(None,
@@ -129,18 +130,7 @@ class VelbusManager(XplPlugin):
         address = add[0]
         if message.data["level"] == 'None':
             message.data["level"] = 0
-        if message.data["level"] == str(255):
-            self.log.debug("set relay on / dim to max")
-            self.manager.send_relayon( address, chan )
-            self.manager.send_setdimmervalue( address, chan, 255 )
-        elif message.data["level"] == str(0):
-            self.log.debug("set relay off / dim to min")
-            self.manager.send_relayoff( address, chan )
-            self.manager.send_setdimmervalue( address, chan, 0 )
-        else:
-            self.log.debug("set dimmer value")
-            self.manager.send_setdimmervalue( address, chan, message.data["level"] )
-
+        self.manager.send_setlevel( address, chan, message.data["level"])
 
     def process_shutter_basic(self, message):
         """ Process xpl chema shutter.basic
