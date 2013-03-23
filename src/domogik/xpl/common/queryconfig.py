@@ -46,7 +46,7 @@ from domogik.common.utils import get_sanitized_hostname
 
 import zmq
 from domogik.mq.message import MQMessage
-from domogik.mq.reqrep.client import MDPSyncClient 
+from domogik.mq.reqrep.client import MQSyncReq
 
 QUERY_CONFIG_NUM_TRY = 20
 QUERY_CONFIG_WAIT = 5
@@ -85,7 +85,7 @@ class QueryMQ():
         '''
         self.log = log
         self.log.debug("Init config query(mq) instance")
-        self.cli = MDPSyncClient(zmq.Context())
+        self.cli = MQSyncReq(zmq.Context())
 
     def set(self, plugin, key, value):
         '''

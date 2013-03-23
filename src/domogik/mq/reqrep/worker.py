@@ -38,7 +38,7 @@ from domogik.mq.common import split_address
 from domogik.mq.message import MQMessage
 from domogik.common.configloader import Loader
 
-class MDPWorker(object):
+class MQRep(object):
 
     """Class for the MDP worker side.
 

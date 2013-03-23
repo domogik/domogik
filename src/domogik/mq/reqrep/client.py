@@ -34,7 +34,7 @@ from domogik.mq.message import MQMessage
 
 ###
 
-class MDPSyncClient(object):
+class MQSyncReq(object):
 
     """Class for the MDP client side.
 
@@ -125,7 +125,7 @@ class RequestTimeout(UserWarning):
 #
 ###
 
-class MDPAsyncClient(object):
+class MqAsyncReq(object):
 
     """Class for the MDP client side.
 

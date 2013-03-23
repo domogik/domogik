@@ -5,20 +5,21 @@
 
 import json
 import sys
-from mq_event_utils import MqEventSub
+from mq_event_utils import MqAsyncSub
+from zmq.eventloop.ioloop import IOLoop
 
-def main(*category_filters):
+def main():
     print("PUB-SUB receiver")
-    sub_event = MqEventSub('sample_receiver', *category_filters)
+    category_filters = []
+    category_filters.append( "device" )
+    category_filters.append( "package" )
+    sub_event = MqAsyncSub('sample_receiver', category_filters)
+    IOLoop.instance().start()
 
-    while True:
-        msg = sub_event.wait_for_event()
-        print(msg)
+def _plugin(self, msg):
+    print "plugin"
+    print msg
 
 if __name__ == "__main__":
-    category_filters = []
-    if len(sys.argv) > 1:
-        # args are filters
-        category_filters = sys.argv[1:]
-    main(*category_filters)
+    main()
 

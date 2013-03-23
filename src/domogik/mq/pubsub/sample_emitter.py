@@ -4,7 +4,7 @@
 # PUB-SUB emitter
 
 import json
-from mq_event_utils import MqEventPub
+from mq_event_utils import MqPub
 from random import choice
 from time import sleep
 
@@ -46,7 +46,7 @@ categories = {
 
 content = ["Domogik is really cool", "I like Domoweb", "Domogik is magic"]
 
-pub_event = MqEventPub('sample_emitter')
+pub_event = MqPub('sample_emitter')
 
 while True:
     category1 = choice(categories.keys()) 

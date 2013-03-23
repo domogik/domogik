@@ -46,7 +46,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
-from domogik.mq.reqrep.worker import MDPWorker
+from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 import time
@@ -55,7 +55,7 @@ import zmq
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
 
-class DBConnector(XplPlugin, MDPWorker):
+class DBConnector(XplPlugin, MQRep):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object along with the StatsManager to access to the database on the core side
@@ -66,7 +66,7 @@ class DBConnector(XplPlugin, MDPWorker):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
-        MDPWorker.__init__(self, zmq.Context(), 'dbmgr')
+        MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug("Init database_manager instance")
 
         # Check for database connexion
