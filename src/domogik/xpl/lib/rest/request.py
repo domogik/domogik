@@ -83,68 +83,70 @@ class ProcessRequest():
     """
 
     urls = {
-	# /account
-        'account': {
-            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
-            '^/account/user/list$':						                 '_rest_account_user_list',
-            '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		         '_rest_account_user_list',
-            '^/account/user/add/.*$':						                 '_rest_account_user_add',
-            '^/account/user/update/.*$':				                         '_rest_account_user_update',
-            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
-            '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
-            '^/account/person/list$':						                 '_rest_account_person_list',
-            '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
-            '^/account/person/add/.*$':					                         '_rest_account_person_add',
-            '^/account/person/update/.*$':					                 '_rest_account_person_update',
-            '^/account/person/password/.*$':				                         '_rest_account_person_password',
-            '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
-        },
+#	# /account
+#        'account': {
+#            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
+#            '^/account/user/list$':						                 '_rest_account_user_list',
+#            '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		         '_rest_account_user_list',
+#            '^/account/user/add/.*$':						                 '_rest_account_user_add',
+#            '^/account/user/update/.*$':				                         '_rest_account_user_update',
+#            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
+#            '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
+#            '^/account/person/list$':						                 '_rest_account_person_list',
+#            '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
+#            '^/account/person/add/.*$':					                         '_rest_account_person_add',
+#            '^/account/person/update/.*$':					                 '_rest_account_person_update',
+#            '^/account/person/password/.*$':				                         '_rest_account_person_password',
+#            '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
+#        },
         # /base
         'base': {
             # /base/device
-            '^/base/device/list$':			                                         '_rest_base_device_list',
-            '^/base/device/list-upgrade$':		                                         '_rest_base_device_list_upgrade',
-            '^/base/device/upgrade/oldid/(?P<oid>[0-9]+)/oldskey/(?P<okey>[a-zA-Z0-9]+)/newdid/(?P<nid>[0-9]+)/newsensorid/(?P<sid>[0-9]+)$':	 '_rest_base_device_upgrade',
-            '^/base/device/params/(?P<dev_type_id>[-_\.a-zA-Z0-9]+)$':                           '_rest_base_deviceparams',
-            '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
-            '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
-            '^/base/device/updateglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_updateglobal',
-            '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
-            '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
-            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                  '_rest_base_device_addxplcmdparams',
-            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplstatparams',
-            '^/base/device/updatexplcmdparams/id/(?P<id>[0-9]+)/.*$':                            '_rest_base_device_updatexplcmdparams',
-            '^/base/device/udpatexplstatparams/id/(?P<id>[0-9]+)/.*$':                           '_rest_base_device_updatexplstatparams',
+#            '^/base/device/list$':			                                         '_rest_base_device_list',
+#            '^/base/device/list-old$':			                                         '_rest_base_device_list_old',
+#            '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
+#            '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
+#            '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
+#            '^/base/device/update/.*$':		                                         '_rest_base_device_update',
+#            '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
+#            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplcmdparams',
+#            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                '_rest_base_device_addxplstatparams',
+            # /base/device_technology
+#            '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
+#            '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
+#            '^/base/device_technology/add/.*$':		 	                                 '_rest_base_device_technology_add',
+#            '^/base/device_technology/update/.*$':		                                 '_rest_base_device_technology_update',
+#            '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
             # /base/device_type
-            '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
-            '^/base/device_type/list/by-plugin/(?P<name>[a-z0-9]+)$':			         '_rest_base_device_type_list_by_plugin',
-            '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
-            '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
-            '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
+#            '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
+#            '^/base/device_type/list/by-plugin/(?P<name>[a-z0-9]+)$':			         '_rest_base_device_type_list_by_plugin',
+#            '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
+#            '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
+#            '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
             # /base/device_usage
-            '^/base/device_usage/list$':			                                 '_rest_base_device_usage_list',
-            '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
-            '^/base/device_usage/add/.*$':		 	                                 '_rest_base_device_usage_add',
-            '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
-            '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
+#            '^/base/device_usage/list$':			                                 '_rest_base_device_usage_list',
+#            '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
+#            '^/base/device_usage/add/.*$':		 	                                 '_rest_base_device_usage_add',
+#            '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
+#            '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
             # xpl-command
-            '^/base/xpl-command/list$':                                                          '_rest_base_xplcommand_list',
-            '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
-            '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
-            '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
+#            '^/base/xpl-command/list$':                                                          '_rest_base_xplcommand_list',
+#            '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
+#            '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
+#            '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
             # xpl-command-params
-            '^/base/xpl-command-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_xplcommandparam_del',
-            '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
-            '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
+#            '^/base/xpl-command-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_xplcommandparam_del',
+#            '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
+#            '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
             # xpl-stat
-            '^/base/xpl-stat/list$':                                                             '_rest_base_xplstat_list',
-            '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
-            '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
-            '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
+#            '^/base/xpl-stat/list$':                                                             '_rest_base_xplstat_list',
+#            '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
+#            '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
+#            '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
             # xpl-stat-params
-            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
-            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
-            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
+#            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
+#            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
+#            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
         },
         'cmd': {
             '^/cmd/.*$':                         		                                 'rest_ncommand',
@@ -158,26 +160,26 @@ class ProcessRequest():
             '^/events/request/get/(?P<ticket_id>[0-9]+)$':				         '_rest_events_request_get',
             '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                 '_rest_events_request_free',
         },
-        # /helper
-        'helper': {
-            '^/helper/.*$':			                                                 'rest_helper',
-        },
-        # /host
-        'host': {
-            '^/host/.*$':			                                                 'rest_host',
-        },
-        # /log
-        'log': {
-            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
-            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
-        },
+#        # /helper
+#        'helper': {
+#            '^/helper/.*$':			                                                 'rest_helper',
+#        },
+#        # /host
+#        'host': {
+#            '^/host/.*$':			                                                 'rest_host',
+#        },
+#        # /log
+#        'log': {
+#            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
+#            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
+#        },
         # /package
         'package': {
-            '^/package/get-mode$':								 '_rest_package_get_mode',
-            '^/package/list-repo$':							         '_rest_package_list_repo',
+#            '^/package/get-mode$':								 '_rest_package_get_mode',
+#            '^/package/list-repo$':							         '_rest_package_list_repo',
             '^/package/install_from_path/(?P<host>[a-z]+)$':    				 '_rest_package_install_from_path',
             '^/package/download/(?P<type>[a-z]+)/(?P<id>[a-z]+)/(?P<version>[a-z0-9\.]+)$':	 '_rest_package_download',
-            '^/package/update-cache$':								 '_rest_package_update_cache',
+#            '^/package/update-cache$':								 '_rest_package_update_cache',
             '^/package/available/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)$':		 '_rest_package_available',
             '^/package/installed/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)$':		 '_rest_package_installed',
             '^/package/dependency/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)/(?P<id>[^/]+)/(?P<version>[^/]+)$': '_rest_package_dependency',
