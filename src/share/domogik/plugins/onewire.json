@@ -159,7 +159,7 @@
         "switch": {
             "name": "Switch on or off",
             "schema": "sensor.basic",
-            "xplstat_name": "get_gpio",
+            "xplstat_name": "get_temp",
             "parameters": {
                     "static": [
                         {
@@ -249,15 +249,13 @@
 		"name": "Temperature",
                 "unit": "C",
                 "value_type": "number",
-                "values": "",
-                "xpl_stat": "get_temp"
+                "values": ""
 	},
 	"serial": {
 		"name": "Serial",
                 "unit": "",
                 "value_type": "string",
-                "values": "",
-                "xpl_stat": "get_serial"
+                "values": ""
 	},
        	"gpio": {
                 "name": "gpio",
@@ -269,8 +267,7 @@
 		"name": "Humidity",
                 "unit": "%",
                 "value_type": "number",
-                "values": [0, 100],
-                "xpl_stat": "get_humidity"
+                "values": [0, 100]
 	}
     },
     "device_types": {

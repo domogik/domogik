@@ -187,8 +187,7 @@
 		"name": "level sensor",
                 "unit": "%",
                 "value_type": "number",
-                "values": [0, 100],
-                "xpl_stat": "get_level"
+                "values": [0, 100]
 	}
     },
     "device_types": {
@@ -243,17 +242,25 @@
             "id": "velbus.shutter",
             "description": "Shutter control (up, down)", 
             "name": "Shutter",
-            "xpl_commands": ["set_blind"]
+            "commands": [],
+            "sensors": [],
+            "xpl_params": []
         },
         "velbus.temp": {
             "id": "velbus.temp",
             "description": "Temperature Sensor", 
-            "name": "Temperature"
+            "name": "Temperature",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": []
         },
         "velbus.input": {
             "id": "velbus.input",
             "description": "Input contact", 
-            "name": "Input"
+            "name": "Input",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": []
         }
     }, 
     "files": [
