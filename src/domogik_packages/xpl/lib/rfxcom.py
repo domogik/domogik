@@ -700,6 +700,8 @@ class RfxcomUsb:
         """
         COMMAND = {"off"    : "00",
                    "on"     : "01",
+                   "lighting2_ac_off"     : "00",  # dirty fix to handle domogik 0.2 / 0.3
+                   "lighting2_ac_on"     : "01",   # dirty fix to handle domogik 0.2 / 0.3
                    "preset" : "02",
                    "group_off"    : "03",
                    "group_on"     : "04",
@@ -770,6 +772,12 @@ class RfxcomUsb:
                        {"address" : address, 
                         "unit" : unit_code,
                         "command" : AC_CMND[cmnd]})
+            # dirty fix to handle domogik 0.2 / 0.3
+            if AC_CMND[cmnd] in  ("on", "off"):
+                self._callback("ac.basic",
+                           {"address" : address, 
+                            "unit" : unit_code,
+                            "command" : "lighting2_ac_" + AC_CMND[cmnd]})
 
         # no battery : only a filler
         #self._callback("sensor.basic",
