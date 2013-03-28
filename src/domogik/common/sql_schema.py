@@ -412,20 +412,20 @@ class CommandParam(Base):
     __tablename__ = '%s_command_param' % _db_prefix
     cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
-    value_type = Column(Unicode(32), nullable=False)
-    values = Column(Unicode(32), nullable=False)
+    data_type = Column(Unicode(32), nullable=False)
+    conversion = Column(Unicode(255), nullable=True)
     UniqueConstraint('cmd_id', 'key', name='uix_1')
 
-    def __init__(self, cmd_id, key, value_type, values):
+    def __init__(self, cmd_id, key, data_type, conversion):
         self.cmd_id = cmd_id
         self.key = ucode(key)
-        self.value_type = ucode(value_type)
-        self.values = str(values)
+        self.data_type = ucode(data_type)
+        self.conversion = ucode(conversion)
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<CommandParam(cmd_id=%s key='%s' value_type'%s' values='%s')>"\
-               % (self.cmd_id, self.key, self.value_type, self.values)
+        return "<CommandParam(cmd_id=%s key='%s' data_type='%s' conversion='%s')>"\
+               % (self.cmd_id, self.key, self.data_type, self.conversion)
 
     @staticmethod
     def get_tablename():
@@ -438,25 +438,23 @@ class Sensor(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), index=True)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
-    value_type = Column(Unicode(32), nullable=False)
-    values = Column(Unicode(32), nullable=False)
-    unit = Column(Unicode(32), nullable=True)
+    data_type = Column(Unicode(32), nullable=False)
+    conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
     params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete") 
 
-    def __init__(self, device_id, name, reference, value_type, values, unit):
+    def __init__(self, device_id, name, reference, data_type, conversion):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
-        self.value_type = ucode(value_type)
-        self.values = ucode(values)
-        self.unit = ucode(unit)
+        self.data_type = ucode(data_type)
+        self.conversion = ucode(conversion)
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' value_type='%s' values='%s' unit='%s')>"\
-               % (self.id, self.device_id, self.reference, self.name, self.value_type, self.values, self.unit)
+        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' data_type='%s' conversion='%s')>"\
+               % (self.id, self.device_id, self.reference, self.name, self.data_type, self.conversion)
 
     @staticmethod
     def get_tablename():

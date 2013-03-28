@@ -37,6 +37,7 @@ StatsManager object
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
+from domogik.common.utils import call_package_conversion
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
 from xml.dom import minidom
@@ -109,9 +110,15 @@ class StatsManager:
                     self._log_stats.error('Corresponding device can not be found for xpl-stat %s' % (stat))
                     continue
                 # xpl-trig
-                self.stats.append(self._Stat(self.myxpl, dev, stat, "xpl-trig", self._log_stats, self._log_stats_unknown, self._db, self._event_requests))
+                self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
+                                  "xpl-trig", self._log_stats, \
+                                  self._log_stats_unknown, self._db, \
+                                  self._event_requests))
                 # xpl-stat
-                self.stats.append(self._Stat(self.myxpl, dev, stat, "xpl-stat", self._log_stats, self._log_stats_unknown, self._db, self._event_requests))
+                self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
+                                  "xpl-stat", self._log_stats, \
+                                  self._log_stats_unknown, self._db, \
+                                  self._event_requests))
         except:
             self._log_stats.error("%s" % traceback.format_exc())
   
@@ -120,11 +127,12 @@ class StatsManager:
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, dev, stat, xpl_type, log_stats, log_stats_unknown, db, event_requests):
+        def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, log_stats_unknown, db, event_requests):
             """ Initialize a stat instance 
             @param xpl : A xpl manager instance
             @param dev : A Device reference
             @param stat : A XplStat reference
+            @param sensor: A Sensor reference
             @param xpl-type: what xpl-type to listen for
             """
             ### Rest data
@@ -134,6 +142,7 @@ class StatsManager:
             self._log_stats_unknown = log_stats_unknown
             self._dev = dev
             self._stat = stat
+            self._sen = sensor
             
             ### build the filter
             params = {'schema': stat.schema, 'xpltype': xpl_type}
@@ -174,7 +183,12 @@ class StatsManager:
                                          % (value, p.ignore_values))
                                     store = False
                             if store:
-                                # store it
+                                # check if we need a conversion
+                                if self._sen.conversion is not None and sel._sen.conversion == '':
+                                    value = call_package_conversion(\
+                                                self._log, self._dev.device_type.plugin_id, \
+                                                sel._sen.conversion, value)
+                                # do the store
                                 device_data.append({"value" : value, "sensor": p.sensor_id})
                                 my_db.add_sensor_history(p.sensor_id, value, current_date)
             except:

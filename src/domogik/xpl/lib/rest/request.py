@@ -33,7 +33,7 @@ ProcessRequest object
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.common.utils import ucode
+from domogik.common.utils import ucode, call_package_conversion
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper, DbHelperException
@@ -145,6 +145,8 @@ class ProcessRequest():
             '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
             '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
             '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
+            # return the datatype json
+            '^/base/datatype$':                                                                  '_rest_base_datatype',
         },
         'cmd': {
             '^/cmd/.*$':                         		                                 'rest_ncommand',
@@ -709,7 +711,7 @@ class ProcessRequest():
         # get the command
         cmd = self._db.get_command(self.get_parameters('id'))
         if cmd == None:
-            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd.id)
+            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
@@ -719,7 +721,7 @@ class ProcessRequest():
             self.send_http_response_ok(json_data.get())
             return
         # get the xpl* stuff from db
-        xplcmd = cmd.xpl_command[0]
+        xplcmd = cmd.xpl_command
         if xplcmd == None:
             json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -731,6 +733,8 @@ class ProcessRequest():
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
+        # get the device from the db
+        dev = self._db.get_device(int(cmd.device_id))
         # cmd will have all needed info now
         msg = XplMessage()
         msg.set_type("xpl-cmnd")
@@ -739,11 +743,16 @@ class ProcessRequest():
         for p in xplcmd.params:
             msg.add_data({p.key : p.value})
         # dynamic params
-        print cmd
         for p in cmd.params:
-            print p
             if self.get_parameters(p.key):
-                msg.add_data({p.key : self.get_parameters(p.key)})
+                value = self.get_parameters(p.key)
+                # chieck if we need a conversion
+                if p.conversion is not None and p.conversion == '':
+                    value = call_package_conversion(\
+                                self.log, dev.device_type.plugin_id, \
+                                p.conversion, value)
+                # pluginName.conversion.<proc name>
+                msg.add_data({p.key : value})
             else:
 	        json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device command msg is not provided in the url" % p.key)
 		json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -751,7 +760,6 @@ class ProcessRequest():
 		return
         # send out the msg
         self.myxpl.send(msg)   
-        print msg
         ### Wait for answer
         stat_msg = None
         if xplstat != None:
@@ -1175,6 +1183,23 @@ class ProcessRequest():
 ######
 # /base processing
 ######
+
+    def _rest_base_datatype(self):
+        """ return the datatypes json file
+            /src/domogik/common/datatypes.json
+        """
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+
+        json_file = '{0}/domogik/common/datatypes.json'.format()
+        self.json = json.load(open(self.json_file))
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("datatypes")
+        json_data.add_data(self.json)
+        self.send_http_response_ok(json_data.get())
 
     def rest_base(self):
         """ Get data in database

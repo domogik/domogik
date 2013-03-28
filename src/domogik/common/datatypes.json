@@ -1,0 +1,452 @@
+{
+    "DT_Trigger": {
+        "labels": {
+            "1": "Triggered"
+        },
+        "childs": []
+    },
+    "DT_Bool": {
+        "labels": {
+            "0": "False",
+            "1": "True"
+        },
+        "childs": [
+            "DT_Switch",
+            "DT_Enable",
+            "DT_Binary",
+            "DT_Step",
+            "DT_UpDown",
+            "DT_OpenClose",
+            "DT_Start",
+            "DT_State"
+        ]
+    },
+    "DT_Switch": {
+        "labels": {
+            "0": "Off",
+            "1": "On"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_Enable": {
+        "labels": {
+            "0": "Disable",
+            "1": "Enable"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_Binary": {
+        "labels": {
+            "0": "Low",
+            "1": "High"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_Step": {
+        "labels": {
+            "0": "Decrease",
+            "1": "Increase"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_UpDown": {
+        "labels": {
+            "0": "Up",
+            "1": "Down"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_OpenClose": {
+        "labels": {
+            "0": "Open",
+            "1": "Close"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_Start": {
+        "labels": {
+            "0": "Stop",
+            "1": "Start"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_State": {
+        "labels": {
+            "0": "Inactive",
+            "1": "Active"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_Number": {
+        "min": null,
+        "max": null,
+        "unit": null,
+        "childs": [
+            "DT_Scaling",
+            "DT_Angle",
+            "DT_Brightness",
+            "DT_Temp",
+            "DT_TempK",
+            "DT_TempF",
+            "DT_Pression",
+            "DT_Humidity",
+            "DT_AirQuality",
+            "DT_Volt",
+            "DT_mVolt",
+            "DT_kVolt",
+            "DT_Current",
+            "DT_mCurrent",
+            "DT_kCurrent",
+            "DT_Power",
+            "DT_mPower",
+            "DT_kPower",
+            "DT_ActiveEnergy",
+            "DT_kActiveEnergy",
+            "DT_ApparantEnergy",
+            "DT_Speed",
+            "DT_kmhSpeed",
+            "DT_Year",
+            "DT_Month",
+            "DT_Day",
+            "DT_Hour",
+            "DT_minute",
+            "DT_Second",
+            "DT_mSecond",
+            "DT_Timestamp"
+        ]
+    },
+    "DT_Scaling": {
+        "min": 0,
+        "max": 100,
+        "unit": "%",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Angle": {
+        "min": 0,
+        "max": 360,
+        "unit": "°",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Brightness": {
+        "min": null,
+        "max": null,
+        "unit": "lux",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Temp": {
+        "min": null,
+        "max": null,
+        "unit": "°C",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_TempK": {
+        "min": null,
+        "max": null,
+        "unit": "K",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_TempF": {
+        "min": null,
+        "max": null,
+        "unit": "°F",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Pression": {
+        "min": null,
+        "max": null,
+        "unit": "Pa",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Humidity": {
+        "min": null,
+        "max": null,
+        "unit": "%",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_AirQuality": {
+        "min": null,
+        "max": null,
+        "unit": "ppm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Volt": {
+        "min": null,
+        "max": null,
+        "unit": "V",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mVolt": {
+        "min": null,
+        "max": null,
+        "unit": "mV",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kVolt": {
+        "min": null,
+        "max": null,
+        "unit": "kV",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Current": {
+        "min": null,
+        "max": null,
+        "unit": "A",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mCurrent": {
+        "min": null,
+        "max": null,
+        "unit": "mA",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kCurrent": {
+        "min": null,
+        "max": null,
+        "unit": "kA",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Power": {
+        "min": null,
+        "max": null,
+        "unit": "W",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mPower": {
+        "min": null,
+        "max": null,
+        "unit": "mW",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kPower": {
+        "min": null,
+        "max": null,
+        "unit": "kW",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_ActiveEnergy": {
+        "min": null,
+        "max": null,
+        "unit": "Wh",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mActiveEnergy": {
+        "min": null,
+        "max": null,
+        "unit": "mWh",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kActiveEnergy": {
+        "min": null,
+        "max": null,
+        "unit": "kWh",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_ApparantEnergy": {
+        "min": null,
+        "max": null,
+        "unit": "VAh",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Speed": {
+        "min": null,
+        "max": null,
+        "unit": "m/s",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kmhSpeed": {
+        "min": null,
+        "max": null,
+        "unit": "km/h",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Year": {
+        "min": null,
+        "max": null,
+        "unit": "Year",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Month": {
+        "min": 1,
+        "max": 12,
+        "unit": "Month",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Day": {
+        "min": 1,
+        "max": 31,
+        "unit": "Day",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Hour": {
+        "min": 0,
+        "max": 23,
+        "unit": "h",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Minute": {
+        "min": 0,
+        "max": 59,
+        "unit": "min",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Second": {
+        "min": 0,
+        "max": 59,
+        "unit": "s",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mSecond": {
+        "min": 0,
+        "max": 999,
+        "unit": "ms",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Timestamp": {
+        "min": null,
+        "max": null,
+        "unit": null,
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Char": {
+        "childs": []
+    },
+    "DT_String": {
+        "maxLengh": null,
+        "format": null,
+        "childs": [
+            "DT_Phone",
+            "DT_Hexa",
+            "DT_ColorRGBHexa"
+        ]
+    },
+    "DT_Phone": {
+        "maxLengh": null,
+        "format": "+00000000000",
+        "parent": "DT_String",
+        "childs": []
+    },
+    "DT_Hexa": {
+        "maxLengh": null,
+        "format": null,
+        "parent": "DT_String",
+        "childs": [
+            "DT_ColorRGBHexa"
+        ]
+    },
+    "DT_ColorRGBHexa": {
+        "maxLengh": 6,
+        "format": "RRGGBB",
+        "parent": "DT_Hexa",
+        "childs": []
+    },
+    "DT_DayOfWeek": {
+        "values": {
+            "0": "no day",
+            "1": "Monday",
+            "2": "Tuesday",
+            "3": "Wednesday",
+            "4": "Thursday",
+            "5": "Friday",
+            "6": "Saturday",
+            "7": "Sunday"
+        },
+        "childs": []
+    },
+    "DT_HVACMode": {
+        "values": {
+            "0": "Auto",
+            "1": "Comfort",
+            "2": "Standby",
+            "3": "Economy",
+            "4": "Building Protection"
+        },
+        "childs": []
+    },
+    "DT_ColorCII": {
+        "values": {
+            "W": "White",
+            "O": "Orange",
+            "R": "Red",
+            "Y": "Yellow",
+            "B": "Blue",
+            "G": "Green",
+            "Bk": "Black",
+            "Br": "Brown"
+        },
+        "childs": []
+    },
+    "DT_DateTime": {
+        "format": "YYYY-MM-DDThh:mm:ss.s",
+        "childs": [
+            "DT_Date",
+            "DT_Time"
+        ]
+    },
+    "DT_Date": {
+        "format": "YYYY-MM-DD",
+        "parent": "DT_DateTime",
+        "childs": []
+    },
+    "DT_Time": {
+        "format": "hh:mm:ss.s",
+        "parent": "DT_DateTime",
+        "childs": []
+    },
+    "DT_List": {
+        "format": null,
+        "childs": [
+            "DT_ColorRGB",
+            "DT_ColorCMYK"
+        ]
+    },
+    "DT_ColorRGB": {
+        "format": "(R 0-255),(G 0-255),(B 0-255)",
+        "parent": "DT_List",
+        "childs": []
+    },
+    "DT_ColorCMYK": {
+        "format": "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)",
+        "parent": "DT_List",
+        "childs": []
+    }
+}

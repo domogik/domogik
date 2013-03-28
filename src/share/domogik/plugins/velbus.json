@@ -163,8 +163,8 @@
            "params": [
                {
                    "key": "level",
-                   "value_type": "binary",
-                   "values": [0, 255]
+                   "data_type": "DT_Switch",
+                   "conversion": "from_DT_Switch_to_level"
                }
            ],
            "xpl_command": "set_level_bin"
@@ -175,8 +175,8 @@
            "params": [
                {
                    "key": "level",
-                   "value_type": "range",
-                   "values": [0, 255]
+                   "data_type": "DT_Switch",
+                   "conversion": ""
                }
            ],
            "xpl_command": "set_level_bin"
@@ -185,9 +185,8 @@
     "sensors": {
 	"level": {
 		"name": "level sensor",
-                "unit": "%",
-                "value_type": "number",
-                "values": [0, 100]
+                "data_type": "DT_Scaling",
+                "conversion": ""
 	}
     },
     "device_types": {
@@ -268,6 +267,7 @@
         "src/share/domogik/design/plugin/velbus/icon.png", 
         "src/domogik_packages/xpl/bin/velbus.py", 
         "src/domogik_packages/xpl/lib/velbus.py", 
+        "src/domogik_packages/conversions/velbus.py", 
         "src/domogik_packages/xpl/helper/velbus.py"
     ], 
     "identity": {

@@ -689,8 +689,7 @@ class DbHelper():
             sensor = pjson['sensors'][sensor_id]
             sen = Sensor(name=sensor['name'], \
                     device_id=dev.id, reference=sensor_id, \
-                    value_type=sensor['value_type'], values=sensor['values'], \
-                    unit=sensor['unit'])
+                    data_type=sensor['data_type'], conversion=sensor['conversion'])
             self.__session.add(sen)
             self.__session.flush()
             sensors[sensor_id] = sen.id
@@ -729,7 +728,7 @@ class DbHelper():
             self.__session.flush()
             # add the command params
             for p in pjson['commands'][command_id]['params']:
-                pa = CommandParam(cmd.id, p['key'], p['value_type'], p['values'])
+                pa = CommandParam(cmd.id, p['key'], p['data_type'], p['conversion'])
                 self.__session.add(pa)
                 self.__session.flush()
             # if needed add the xpl* stuff
@@ -1437,9 +1436,9 @@ class DbHelper():
 ###################
 # commandParam
 ###################
-    def add_commandparam(self, cmd_id, key, value_type, values): 
+    def add_commandparam(self, cmd_id, key, dtype, conversion): 
         self.__session.expire_all()
-        p = CommandParam(cmd_id=cmd_id, key=key, value_type=value_type, values=values)
+        p = CommandParam(cmd_id=cmd_id, key=key, data_type=dtype, conversion=conversion)
         self.__session.add(p)
         try:
             self.__session.commit()

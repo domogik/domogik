@@ -202,7 +202,7 @@ class PackageJson():
                 expected = ['name', 'return_confirmation', 'params', 'xpl_command']
                 self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
                 # validate the params
-                expected = ['key', 'values', 'value_type']
+                expected = ['key', 'data_type', 'conversion']
                 for par in cmd['params']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
@@ -211,7 +211,7 @@ class PackageJson():
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'unit', 'value_type', 'values']
+                expected = ['name', 'data_type', 'conversion']
                 self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
             #validate the xpl command
             for xcmdid in self.json["xpl_commands"]:
