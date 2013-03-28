@@ -7,6 +7,31 @@ Install python-openzwave, the official way
 
 - `Python-openzwave <http://wiki.domogik.org/plugin_pyozw>`_ (>=0.2.5) 
 
-
 .. todo:: 
     Screen shoot and explanations.......
+
+Install WebSocket library for Python
+====================================
+- `WebSocket library for Python (ws4py). 0.3.0-beta <https://github.com/Lawouach/WebSocket-for-Python>`_
+
+.. warning ::     
+
+	Probably install with  "pip install ws4py" or "easy_install ws4py" install the ws4py 0.2.4 , this version **don't work** !
+
+Normal install
+--------------
+
+get source code
+
+.. code-block:: bash
+
+	$ git clone git@github.com:Lawouach/WebSocket-for-Python.git
+
+Installing the ws4py package is performed as usual:
+
+.. code-block:: bash
+
+	$ python setup.py install
+
+
+

@@ -185,7 +185,7 @@ class ZWaveValueNode:
         self._lastUpdate = time.time()
         valueData['homeId'] = int(valueData['homeId']) # Pour etre compatible avec javascript
         valueData['id'] = str(valueData['id']) # Pour etre compatible avec javascript
-        self._node.reportToUI({'type': 'value-changed', 'usermsg' :'value has changed', 'data': valueData})
+        self._node.reportToUI({'notifytype': 'value-changed', 'usermsg' :'value has changed', 'data': valueData})
 
     def _getLabelDomogik(self):
         """ retourne le label OZW formaté pour les listener domogik, en lowcase et espaces remplacés pas '-',

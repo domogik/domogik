@@ -43,7 +43,7 @@ import os.path
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.1b8"
+OZWPLuginVers = "0.2b1"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
@@ -83,7 +83,7 @@ DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery
                                   'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint']
 
 # Notifications reportés sur le hub xPL pour l'UI
-UICtrlReportType = ['driver-ready',  'init-process', 'ctrl-error', 'ctrl-action',  'node-state-changed', 'value-changed']
+UICtrlReportType = ['plugin-state','driver-ready',  'init-process', 'ctrl-error', 'ctrl-action',  'node-state-changed', 'value-changed']
                                
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 

@@ -42,6 +42,7 @@ from libopenzwave import PyManager
 from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
 from ozwctrl import ZWaveController
+from ozwuiserver import BroadcastServer 
 from ozwdefs import *
 from datetime import timedelta
 # import time
@@ -62,7 +63,7 @@ class OZWavemanager(threading.Thread):
     ZWave class manager
     """
 
-    def __init__(self, config,  cb_send_xPL, cb_sendxPL_trig, stop , log,  configPath, userPath,  ozwlog = False, msgEndCb =  False):
+    def __init__(self, config,  cb_send_xPL, cb_sendxPL_trig, stop , log,  configPath, userPath,  ozwlog = False):
         """ Ouverture du manager py-openzwave
             @ param config : configuration du plugin pour accès aux valeurs paramètrées"
             @ param cb_send_xpl : callback pour envoi msg xpl
@@ -72,7 +73,6 @@ class OZWavemanager(threading.Thread):
             @ param configPath : chemin d'accès au répertoire de configuration pour la librairie openszwave (déf = "./../plugins/configPath/")
             @ param userPath : chemin d'accès au répertoire de sauvegarde de la config openzwave et du log."
             @ param ozwlog (optionnel) : Activation du log d'openzawe, fichier OZW_Log.txt dans le répertoire user (déf = "--logging false")
-            @ param msgEndCb (désactivée pour l'instant) Envoi d'une notification quand la transaction est complete (defaut = "--NotifyTransactions  false")
         """
         self._device = None
         self._configPlug = config
@@ -93,8 +93,9 @@ class OZWavemanager(threading.Thread):
         self._userPath = userPath
         self._ready = False
         self._initFully = False
-        self._ctrlActProgress= None   
-        self.msgToUI=[];
+        self._ctrlActProgress= None
+        self._wsPort = 5570
+        self._wsPort = self._configPlug.query('ozwave', 'wsportserver')
         # récupération des association nom de réseaux et homeID
         self._nameAssoc = {}
         if self._configPlug != None :
@@ -137,9 +138,16 @@ class OZWavemanager(threading.Thread):
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
         print ('user config :',  self._userPath,  " Logging openzwave : ",  opts)
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
-        thXplUI = threading.Thread(None, self.ctrlMsgToUI, "send_ctrl_msg_to_ui", (), {} )
-        thXplUI.start()
-        
+   #     thWSUI = threading.Thread(None, self.runServerUI, "serv_ctrl_msg_to_ui", (), {} )
+   #     thWSUI.start()
+   #     from ozwuiserver import BroadcastServer 
+        self.serverUI =  BroadcastServer(5570,  self.cb_ServerWS,  self._log)
+        self._cb_send_xPL({'type':'xpl-trig', 'schema':'ozwctrl.basic',
+                                    'data': {'device': self._getCtrlDeviceName(),  
+                                            'type':'plugin-state', 
+                                            'node': 'controller',
+                                            'usermsg': 'Plugin is in intialization process, be patient...',
+                                            'data': {'state':'wsserver_started', 'wsport': self._wsPort}}})
         
      # On accède aux attributs uniquement depuis les property
     device = property(lambda self: self._device)
@@ -175,29 +183,30 @@ class OZWavemanager(threading.Thread):
         self._manager.removeDriver(self.device)
         self._ready = False
         self._controller.reportChangeToUI({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Plugin stopped and driver removed.', 'data': False})
-
-    def ctrlMsgToUI(self):
-        """ Maintient la class OZWManager pour le fonctionnement du plugin.
-        """
-        # tant que le plugins est en cours mais pas lancer pour l'instant, vraiment util ?
-        self._log.info("Start plugin listenner Msg To UI")
-        print ("Start plugin listenner Msg To UI")
+        self.serverUI.close()
+        
+    def runServerUI(self):
+        from ozwuiserver import BroadcastServer
         try:
+            self.serverUI =  BroadcastServer(5570,  self._log);
             while not self._stop.isSet():
-          #      print ('Handle Process msg to UI')
-                if len(self.msgToUI) != 0 :
-                    msg = self.msgToUI.pop(0)
-                    print 'Handle Process msg to UI send to UI',  msg
-                    self._cb_send_xPL(msg['header'], msg['report'])                    
-                    self._stop.wait(0.5) # ne pas saturer le hub xPL
-                else :
-                    self._stop.wait(0.3) # ne pas saturer le proc
+                print 'Handle Process msg to UI send to UI'
+                time.sleep(1)  # ne pas saturer le proc
         except OZwaveManagerException :
-            self._log.error("Error listener Msg To UI is stopped")
-            print ("Error listener Msg To UI is stopped")
+            self._log.error("Error server Msg To UI is stopped")
+            print ("Error server Msg To UI is stopped")
             return
-        print ("Stop plugin listener Msg To UI")
-            
+        print ("Stop plugin server Msg To UI")
+    
+    def GetPluginInfo(self):
+        retval={"hostport": self._wsPort,  "ctrlready": self._ready}
+        if self._initFully :
+            retval["Init state"] = NodeStatusNW[2] # Completed
+        else :
+            retval["Init state"] = NodeStatusNW[3] # In progress - Devices initializing
+        retval["error"] =""
+        return retval
+        
     def _getPyOZWLibVersion(self):
         """Renvoi les versions des librairies py-openzwave ainsi que la version d'openzwave."""
         try :
@@ -244,6 +253,16 @@ class OZWavemanager(threading.Thread):
             if node and node._product:
                 return node._product.name
         return 'Unknown Controller'
+        
+    def _getCtrlDeviceName(self):
+        if self._controller :
+            return self._controller.ctrlDeviceName
+        else : # TODO: Pour retour du ctrlname, si ctrl pas initialisé hypothèse qu'il en 1.1, voir si possible a récupérer de domogik....
+            n = str(self._nameAssoc.keys() [0])
+            if n : 
+                return "%s.1.1" %(n)
+            else :
+                return None
 
     def cb_openzwave(self,  args):
         """Callback depuis la librairie py-openzwave 
@@ -396,13 +415,13 @@ class OZWavemanager(threading.Thread):
         node = self._getNode(self._homeId, args['nodeId'])
         nCode = args['notificationCode']
         if nCode in (0 , 'MsgComplete'):     #      Code_MsgComplete = 0,                                   /**< Completed messages */
-            print ('MsgComplete notification code :', args)
+            print 'MsgComplete notification code :', args
             self._log.info('MsgComplete notification code : {0}'.format(args))
         elif nCode in (1 , 'Timeout'):         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
-            print ('Timeout notification code :', args)
+            print 'Timeout notification on node :',  args['nodeId']
             self._log.info('Timeout notification code : {0}'.format(args))
         elif nCode in (2 , 'NoOperation'):  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
-            print ('NoOperation notification code :', args)
+            print 'NoOperation notification code :', args
             self._log.info('NoOperation notification code : {0}'.format(args))
         elif nCode in (3 , 'Awake'):            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
             if node : 
@@ -592,7 +611,7 @@ class OZWavemanager(threading.Thread):
         
     def handle_ControllerAction(self,  action):
         print ('********************** handle_ControllerAction ***********')
-        print('Action : ',  action)
+        print 'Action : ',  action
         self._ctrlActProgress = action   
         retval = self._controller.handle_Action(action)
         return retval
@@ -747,6 +766,8 @@ class OZWavemanager(threading.Thread):
                 retval = node.getStatistics()
                 if retval : 
                     retval['error'] = ""
+                    for item in retval['ccData'] :
+                        item['commandClassId']  = self.getCommandClassName(item['commandClassId'] ) + ' (' + hex(item['commandClassId'] ) +')'
                 else : retval = {'error' : "Zwave node %d not response" %nodeId}
             else : retval['error'] = "Zwave node %d unknown" %nodeId
             return retval
@@ -757,9 +778,17 @@ class OZWavemanager(threading.Thread):
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
             if node.name != newname :
-                node.setName(newname)
+                try :
+                    node.setName(newname)
+                except OZwaveManagerException as e:
+                    self._log.error('node.setName() :' + e.value)
+                    return {"error" : "Node %d, can't update name, error : %s" %(nodeId, e.value) }
             if node.location != newloc :
-                node.setLocation(newloc)
+                try :
+                    node.setLocation(newloc)
+                except OZwaveManagerException as e:
+                    self._log.error('node.setLocation() :' + e.value)
+                    return {"error" : "Node %d, can't update location, error : %s" %(nodeId, e.value) }
             return node.getInfos()                                
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeId}
         
@@ -789,6 +818,76 @@ class OZWavemanager(threading.Thread):
             else : return {"error" : "Manager not send association changement on node %d." %nodeID}
             return 
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeID}
+        
+    def cb_ServerWS(self, message):
+        """Callback en provenance de l'UI via server Websocket (resquest avec ou sans ack)"""
+        blockAck = False
+        report = {'error':  'message not handle'}
+        ackMsg = {}
+        print("WS - Requete UI")
+        if message['header']['type'] in ('req', 'req-ack'):
+            if message['request'] == 'ctrlAction' :
+                report = self.handle_ControllerAction(message['action'])
+                if message['action']['cmd'] =='getState' and report['cmdstate'] != 'stop' : blockAck = True
+            elif message['request'] == 'ctrlSoftReset' :
+                report = self.handle_ControllerSoftReset()
+            elif message['request'] == 'ctrlHardReset' :
+                report = self.handle_ControllerHardReset()
+            elif message['request'] == 'GetNetworkID' :
+                report = self.getNetworkInfo()
+            elif message['request'] == 'GetNodeInfo' :
+                report = self.getNodeInfos(message['node'])
+                ackMsg['node'] = message['node']
+                print "Refresh node :", report
+            elif message['request'] == 'SaveConfig':
+                report = self.saveNetworkConfig()
+            elif message['request'] == 'SetNodeNameLoc':
+                report = self.setUINodeNameLoc(message['node'], message['newname'],  message['newloc'])
+                ackMsg['node'] = message['node']
+            elif message['request'] == 'GetNodeValuesInfo':
+                report =self.getNodeValuesInfos(message['node'])
+                ackMsg['node'] = message['node']
+      #          print 'Refresh all Values infos : ', report
+            elif message['request'] == 'GetValueInfos':
+                valId = long(message['valueid']) # Pour javascript type string
+                report =self.getValueInfos(message['node'], valId)
+                ackMsg['node'] = message['node']
+                ackMsg['valueid'] = message['valueid']
+                print 'Refresh one Value infos : ', report
+            elif message['request'] == 'GetValueTypes':
+                report = sGetListCmdsCtrlelf.getValueTypes()  
+            elif message['request'] == 'GetListCmdsCtrl':
+                report = self.getListCmdsCtrl()
+            elif message['request'] == 'setValue':
+                valId = long(message['valueid']) # Pour javascript type string
+                report = self.setValue(message['node'], valId, message['newValue'])
+                ackMsg['node'] = message['node']
+                ackMsg['valueid'] = message['valueid']
+                print 'Set command_class Value : ',  report
+            elif message['request'] == 'setGroups':
+                report = self.setMembersGrps(message['node'], message['ngrps'])
+                ackMsg['node'] = message['node']         
+                print 'Set Groups association : ',  report
+            elif message['request'] == 'GetGeneralStats':
+                report = self.getGeneralStatistics()
+                print 'Refresh generale stats : ',  report                
+            elif message['request'] == 'GetNodeStats':
+                report = self.getNodeStatistics(message['node'])
+                ackMsg['node'] = message['node']
+                print 'Refresh node stats : ',  report                                
+            else :
+                report['error'] ='unknown request'
+                print "commande inconnue"
+        if message['header']['type'] == 'req-ack' and not blockAck :
+            ackMsg['header'] = {'type': 'ack',  'idws' : message['header']['idws'], 'ip' : message['header']['ip'] , 'timestamp' : long(time.time()*100)}
+            ackMsg['request'] = message['request']
+            if 'error' in report :
+                ackMsg['error'] = report['error']
+            else :
+                ackMsg['error'] =''
+            ackMsg['data'] = report
+            self.serverUI.sendAck(ackMsg)
+
                 
     def reportCtrlMsg(self, ctrlmsg):
         """Un message de changement d'état a été recu, il est reporté au besoin sur le hub xPL pour l'UI
@@ -833,10 +932,7 @@ class OZWavemanager(threading.Thread):
             report['cmdstate'] = 'stop'                                            
             self._ctrlActProgress= None   
         else :
-            report['cmdstate'] = 'waiting'           
-        header={}   
-        header['type'] = 'xpl-trig'
-        header['schema'] = 'ozwave.basic'
-        header['data'] = {'command' : 'Refresh-ack', 'group' :'UI'}
-        self.msgToUI.append({'header': header,  'report': report})
-        # self._cb_send_xPL(header, report)
+            report['cmdstate'] = 'waiting'
+        msg = {'notifytype': 'ctrlstate'}
+        msg['data'] = report
+        self.serverUI.broadcastMessage(msg)
