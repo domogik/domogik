@@ -45,6 +45,7 @@ from ozwctrl import ZWaveController
 from ozwuiserver import BroadcastServer 
 from ozwdefs import *
 from datetime import timedelta
+import pwd
 # import time
 # from time import sleep
 # import os.path
@@ -94,9 +95,8 @@ class OZWavemanager(threading.Thread):
         self._ready = False
         self._initFully = False
         self._ctrlActProgress= None
-        self._wsPort = 5570
-        self._wsPort = self._configPlug.query('ozwave', 'wsportserver')
-        # récupération des association nom de réseaux et homeID
+        self._wsPort = int(self._configPlug.query('ozwave', 'wsportserver'))
+        # récupération des associations nom de réseaux et homeID
         self._nameAssoc = {}
         if self._configPlug != None :
             num = 1
@@ -116,13 +116,28 @@ class OZWavemanager(threading.Thread):
                 num += 1                
         print self._nameAssoc
         autoPath = self._configPlug.query('ozwave', 'autoconfpath')
-        print 'autopath : ' , autoPath
+        user = pwd.getpwuid(os.getuid())[0]
         if autoPath and libopenzwave.configPath() :
             self._configPath = libopenzwave.configPath()
         if not os.path.exists(self._configPath) : 
-            self._log.debug("Directory openzwave config not exist : %s" , self._configPath)
+            self._log.error("Directory openzwave config not exist : %s" , self._configPath)
             raise OZwaveManagerException ("Directory openzwave config not exist : %s"  % self._configPath)
-            
+        elif not os.access(self._configPath,  os.R_OK) :
+            self._log.error("User %s haven't write access on openzwave directory : %s"  %(user,  self._configPath))
+            raise OZwaveManagerException ("User %s haven't write access on openzwave directory : %s"  %(user,  self._configPath))
+        print "User : %s, openzwave path : %s"  %(user,  self._configPath)
+        if not os.path.exists(self._userPath) : 
+            self._log.info("Directory openzwave user not exist, trying create : %s" , self._configPath)
+            try : 
+                os.mkdir(self._userPath)
+                print ("User openzwave directory created : %s"  %self._userPath)
+            except OZwaveManagerException as e:
+                self._log.error(e.value)
+                print e.value
+            raise OZwaveManagerException ("Directory openzwave config not exist : %s"  % self._configPath)
+        if not os.access(self._userPath,  os.W_OK) :
+            self._log.error("User %s haven't write access on user openzwave directory : %s"  %(user,  self._configPath))
+            raise OZwaveManagerException ("User %s haven't write access on user openzwave directory : %s"  %(user,  self._configPath))
         # Séquence d'initialisation d'openzwave
         # Spécification du chemain d'accès à la lib open-zwave
         opt = ""
@@ -136,12 +151,12 @@ class OZWavemanager(threading.Thread):
         self._manager.create()
         self._manager.addWatcher(self.cb_openzwave) # ajout d'un callback pour les notifications en provenance d'OZW.
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
-        print ('user config :',  self._userPath,  " Logging openzwave : ",  opts)
+        print 'user config :',  self._userPath,  " Logging openzwave : ",  opts
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
    #     thWSUI = threading.Thread(None, self.runServerUI, "serv_ctrl_msg_to_ui", (), {} )
    #     thWSUI.start()
    #     from ozwuiserver import BroadcastServer 
-        self.serverUI =  BroadcastServer(5570,  self.cb_ServerWS,  self._log)
+        self.serverUI =  BroadcastServer(self._wsPort,  self.cb_ServerWS,  self._log)
         self._cb_send_xPL({'type':'xpl-trig', 'schema':'ozwctrl.basic',
                                     'data': {'device': self._getCtrlDeviceName(),  
                                             'type':'plugin-state', 
