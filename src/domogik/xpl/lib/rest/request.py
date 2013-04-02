@@ -1653,12 +1653,11 @@ class ProcessRequest():
 	    self.send_http_response_ok(json_data.get())
 	    return
         # get the json device params for this command
-        if pjson['xpl_commands'][cmd.name] is None:
+        if cmd.json_id not in pjson['xpl_commands']:
 	    json_data.set_error(code = 999, description = "This command is not ni the plugin json file")
 	    self.send_http_response_ok(json_data.get())
 	    return
-        for p in pjson['xpl_commands'][cmd.name]['parameters']['device']:
-            print p
+        for p in pjson['xpl_commands'][cmd.json_id]['parameters']['device']:
             if self.get_parameters(p['key']) is None:
 	        json_data.set_error(code = 999, description = "The param (%s) is not in the url" % (p['key']))
     	        self.send_http_response_ok(json_data.get())
