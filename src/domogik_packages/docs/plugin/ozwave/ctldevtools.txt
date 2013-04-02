@@ -47,7 +47,8 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 
 .. |awake1| image:: ozwave_awake1.png
 
-.. |awake2| image:: ozwave_awake2.png
+.. |awake2| image:: ozwave_update-sleep.png
+    :width: 150px
 
 .. |det-type| image:: ozwave_detail-type.png
     :width: 150px
@@ -76,9 +77,9 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | **Pointing the mouse over icon in column "Awake" give status of listening mode.**                                                       |
 | |awake1|         +------------------------------------+----------------------------------------------------------------------------------------------------+
-|                  | active                             | Node is awake, message can send immediately.                                                       |
+|                  | Awake                              | Node is awake, message can send immediately.                                                       |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
-| |awake2|         | Unknown                            | Node probably sleeping, message are put on send queue.                                             |
+| |awake2|         | Sleeping                           | Node probably sleeping, message are put on send queue.                                             |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | **Pointing the mouse over icon in column "Type" give capacities of node.**                                                              |
 | |det-type|       +------------------------------------+----------------------------------------------------------------------------------------------------+
@@ -196,6 +197,12 @@ Manage devices Commands Class
 
 |tab-cmdclass2|
 
+- When a value of command class is updated, she his tagged during 5 secondes. Pointing the mouse over value give date of update.
+
+.. |update-cmdclass| image:: ozwave_update-cmdclass.png
+    :width: 750px
+
+|update-cmdclass|
 
 .. todo:: 
     Screen shoot and explanations of other functions......

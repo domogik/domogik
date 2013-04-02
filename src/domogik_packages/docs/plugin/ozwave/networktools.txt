@@ -26,8 +26,49 @@ Graphic neighborhood network
 
 |neighboors2|
 
-.. todo:: 
-    Finish Screen shoot and explanations.......
+	
+.. |1-Node-W| image:: 1-Node-W.png
+.. |1-Node-S| image:: 1-Node-S.png
+.. |2-Node-W| image:: 2-Node-W.png
+.. |2-Node-S| image:: 2-Node-S.png
+.. |3-Node-W| image:: 3-Node-W.png
+.. |3-Node-S| image:: 3-Node-S.png
+.. |4-Node-W| image:: 4-Node-W.png
+.. |4-Node-S| image:: 4-Node-S.png
+.. |5-Node-W| image:: 5-Node-W.png
+.. |5-Node-S| image:: 5-Node-S.png
+.. |6-Node-W| image:: 6-Node-W.png
+.. |6-Node-S| image:: 6-Node-S.png
+.. |7-Node-W| image:: 7-Node-W.png
+.. |7-Node-S| image:: 7-Node-S.png
+.. |8-Node-W| image:: 8-Node-W.png
+.. |8-Node-S| image:: 8-Node-S.png
+
+Representation of the node according to the initialisation state.
+-----------------------------------------------------------------
+
++------------+----------------------------------------------------------+---------------+
+| Node awake |    Init state                                            | node sleeping |
++============+==========================================================+===============+
+| |1-Node-W| | Uninitialized                                            | |1-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+| |2-Node-W| | Initialized - not known                                  | |2-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+| |3-Node-W| | In progress - Devices initializing                       | |3-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+| |4-Node-W| | In progress - Linked to controller                       | |4-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+| |5-Node-W| | In progress - Can receive messages                       | |5-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+| |6-Node-W| | In progress - Can receive messages (Not linked)          | |6-Node-S|    |
+|            | Means that node probably sleeping during init            |               |
+|            | process, at his wake-up initialization will be completed.|               |
++------------+----------------------------------------------------------+---------------+
++ |7-Node-W| | Completed                                                | |7-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+| |8-Node-W| | Out of operation  (failed)                               | |8-Node-S|    |
++------------+----------------------------------------------------------+---------------+
+
 
 Network statistic
 =================
@@ -37,3 +78,12 @@ Network statistic
 
 |netw-stats|
 
+Node statistic
+=================
+
+Enter node number and click button refresh.
+
+.. |node-stats| image:: ozwave_node-stats.png
+    :width: 750px
+
+|node-stats|

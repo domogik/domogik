@@ -149,7 +149,17 @@ controller to learn new data.
 
 # On accède aux attributs uniquement depuis les property
     isPrimaryCtrl = property(lambda self: self._isPrimaryCtrl)
-
+    ctrlDeviceName = property(lambda self: self._getCtrlDeviceName())
+                              
+    def _getCtrlDeviceName(self):
+        vBasic = self._getValuesForCommandClass(0x20)   # COMMAND_CLASS_BASIC
+        if vBasic :
+            name = vBasic[0].getDomogikDevice()
+        else  :
+            nameAssoc = self._ozwmanager._nameAssoc
+            name = "%s.%d.1" %(nameAssoc.keys()[nameAssoc.values().index(self.homeId)] , self.nodeId)
+        return name
+        
     def __str__(self):
         """
         The string representation of the node.
@@ -160,7 +170,7 @@ controller to learn new data.
         return 'homeId: [{0}]  nodeId: [{1}] product: {2}  name: {3} is it {4} controller'.format(self._homeId, self._nodeId, self._product, self._name, typeCtrl)
 
     def getLastState(self):
-        """Retourne le dernier etat connus du cozwctrl.pyontrolleur et issue du callback des message action"""
+        """Retourne le dernier etat connus du zwctrl controlleur et issue du callback des messages action"""
         return self._lastCtrlState
         
     def reportChangeToUI(self, report):
@@ -169,20 +179,12 @@ controller to learn new data.
             Pour l'instant utilise le reseaux xPL, doit basculer vers MQ.
         """
         #TODO: reportChangeToUI utilise le hub xPL, a basculer sur MQ
-        vBasic = self._getValuesForCommandClass(0x20)   # COMMAND_CLASS_BASIC
-        if vBasic :
-             report['device'] = vBasic[0].getDomogikDevice()
-        else  :
-            nameAssoc = self._ozwmanager._nameAssoc
-            report['device']  = "%s.%d.1" %(nameAssoc.keys()[nameAssoc.values().index(self.homeId)] , self.nodeId) 
-        xPLmsg={}   
-        xPLmsg['type'] = 'xpl-trig'
-        xPLmsg['schema'] = 'ozwctrl.basic'
-        xPLmsg['data'] =  report
-        print 'Send report to xPL hub for UI : '
-        print xPLmsg
-        self._ozwmanager.msgToUI.append({'header': xPLmsg,  'report': {}})
-        # self._ozwmanager._cb_send_xPL(xPLmsg)
+        msg = report
+        msg['ctrldevice'] = self.ctrlDeviceName
+        print 'Send report to WebSockect server for UI : '
+   #     print msg
+        self._ozwmanager.serverUI.broadcastMessage(msg)
+        print '**************************************'
         
     def stats(self):
         """
@@ -231,7 +233,7 @@ controller to learn new data.
         self._ozwmanager._log.debug('Node [%d] capabilities are: %s', self._nodeId, self._capabilities)
         
     def handle_Action(self,  action):
-        """Gestion des action du controlleur et des messages de retour"""    
+        """Gestion des actions du controlleur et des messages de retour"""    
         retval = action
         retval['error'] = ''
         errorCom = {'cmdstate': 'not running' , 'error': 'not started', 'message': 'check your controller.'}
@@ -257,6 +259,8 @@ controller to learn new data.
                 if self.begin_command_add_device(highpower) :
                     retval['cmdstate'] ='running'
                     retval['message'] ='It is up to you to perform the action on the local device(s) to add. Usually a switch to actuate 2 or 3 times.'
+                    self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.', 'message': 'The command is starting.', 'error': 0}
+
                 else : retval.update(errorCom)
                 
             elif action['action'] == 'CreateNewPrimary' :
@@ -400,11 +404,15 @@ controller to learn new data.
                     retval['cmdstate'] ='running'
                     retval['message'] ='Wait for sending information from primary to secondary.'
                 else : retval.update(errorCom)
-                
+            if retval['error'] == '' :
+                self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.', 'message': 'The command is starting.', 'error': 0}
+            else :
+                self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_FAILED, 'error_msg' : 'The command has failed.', 'message': 'The command not started.', 'error': 8}
+
  # TODO: CreateButton , DeleteButton 
  
         elif action['cmd'] =='getState':
-            print '***********'
+            print '*********** UI require State of ctrl action'
             print self.checkActionCtrl() 
             if self.checkActionCtrl() :
                 retval['cmdstate']  = 'stop'
@@ -724,9 +732,6 @@ controller to learn new data.
         self._lastCtrlState["update"]= time.time()
         state = args['state']
         message = args['message']
-        if state == self.SIGNAL_CTRL_WAITING:
-            print 'state :', state, ' -- message :', message, ' -- controller', self
-        
-        print 'state :', state, ' -- message :', message, ' -- controller', self
+        print 'zwcallback Action State :', state, ' -- message :', message, ' -- controller', self
         self._ozwmanager.reportCtrlMsg(self._lastCtrlState)
 
