@@ -35,79 +35,81 @@ Implements
 """
 
 import traceback
-import json
+import zmq
 
-from mq_reqrep_utils import MqRep
+from zmq.eventloop.ioloop import IOLoop
 from domogik.xpl.lib.scenario.manager import ScenarioManager
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.common.mq.reqrep.mq_reqrep_utils import REQ_PREFIX
+from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.message import MQMessage
 
 
-class ScenarioFrontend(XplPlugin):
+class ScenarioFrontend(XplPlugin, MQRep):
     """ This class provides an interface to MQ system to allow Scenarii management.
     """
 
     def __init__(self):
         XplPlugin.__init__(self, name='scenario')
-        self.add_stop_cb(self.shutdown)
-        self.log.info("Scenario manager initialized")
-        self._mq = MqRep()
+        MQRep.__init__(self, zmq.Context(), 'scenario')
         self._backend = ScenarioManager(self.log)
+        self.add_stop_cb(self.end)
         self.add_stop_cb(self.shutdown)
         self.log.info("Scenario Frontend and Manager initialized, let's wait for some work.")
-        self.waitmessages()
+        IOLoop.instance().start()
 
-    def waitmessages(self):
-        """ This method actually wait for some message
-        """
-        while not self.should_stop():
-            j, o = self._mq.wait_for_request()  # This blocks unitl request is received
-            if self.__validate(o):
-                self.log.debug("Process message %s" % j)
-                rep = self.process_message(o)  # Let's process the message
-                self._mq.send_reply(rep)
-            else:
-                self.log.info('Got useless message %s' % j)
-
-    def __validate(self, o):
-        """ Ensure a request is of some interest for us.
-        """
-        return ((o.type == REQ_PREFIX) and
-                (o.category in ['scenario_condition', 'scenario_test', 'scenario_parameter', 'scenario_action']))
-
-    def process_message(self, msg):
+    def on_mdp_request(self, msg):
         """ Do real work with message
-        The message `msg` is supposed to be valid, so we don't care about type/category
-        @param msg : object representation of message
-        The expected format of msg.content is a hash where each key/val pair is a parameter
-        of the inner function
-        @return a string ready to be sent as content to `send_reply`
-        The content will always be of the form  : {'status': 'ok|error', 'details': 'some error message|empty', 'content': some_other_struct}
+        msg.getaction() shoult contain XXXX.YYYYYY
+        with XXXX in [test, condition, parameter]
+        YYYYY in [list, new, etc ...]
         """
         mapping = {'test':
                    {
                    'list': self._backend.list_tests,
-                   'new': self._backend.ask_instance,
+                   'new': self._backend.ask_test_instance,
                    },
                    'condition':
                    {
                    'list': self._backend.list_conditions,
                    'new': self._backend.create_condition,
+                   'get': self._backend.get_parsed_condition,
+                   'evaluate': self._backend.eval_condition
                    },
                    'parameter':
                    {
                    'list': self._backend.list_parameters,
+                   },
+                   'action':
+                   {
+                   'list': self._backend.list_actions,
+                   'new': self._backend.ask_action_instance
                    }
-        }
+                  }
         try:
-            return mapping[msg.category.split('_')[1]][msg.action](msg.content)
+            if msg.getdata() == {}:
+                payload = mapping[msg.getaction().split('.')[0]][msg.getaction().split('.')[1]]()
+            else:
+                payload = mapping[msg.getaction().split('.')[0]][msg.getaction().split('.')[1]](**msg.getdata())
+            self._mdp_reply(msg.getaction(), "ok", payload)
+
         except:
             self.log.error("Exception occured during message processing.")
             trace = str(traceback.format_exc())
             self.log.debug(trace)
-            return json.dumps({'status': 'error', 'details': trace})
+            self._mdp_reply(msg.getaction(), "error", {"details": trace})
 
-    def shutdown(self):
+    def _mdp_reply(self, action, status, payload):
+        msg = MQMessage()
+        msg.setaction(action)
+        msg.adddata('status', status)
+        msg.adddata('payload', payload)
+        self.reply(msg.get())
+
+    def end(self):
         """ Shutdown Scenario
         """
         self._backend.shutdown()
+
+
+if __name__ == "__main__":
+    ScenarioFrontend()

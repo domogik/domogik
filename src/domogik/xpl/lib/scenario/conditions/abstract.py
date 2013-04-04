@@ -27,23 +27,25 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 import json
 from exceptions import ValueError
+
+
 class AbstractCondition:
     """ This class provides base methods for the scenario conditions
     It must not be instanciated directly but need to be extended.
     A condition is a boolean expression composed of tests.
     Some useful methods to create and evaluate the condition are provided here.
-    This class will be only extended by another one at the beginning. This structure of 
+    This class will be only extended by another one at the beginning. This structure of
     abstract class has been chosen to keep it coherent with tests and parameters,
     but usually nobody should need to create a new condition
     The condition is a JSON expression like :
     { "AND" : {
             "OR" : {
-                "one-uuid" : { 
-                    "param_name_1" : { 
+                "one-uuid" : {
+                    "param_name_1" : {
                         "token1" : "value",
                         "token2" : "othervalue"
                     },
-                    "param_name_2" : { 
+                    "param_name_2" : {
                         "token3" : "foo"
                     }
                 },
@@ -62,11 +64,11 @@ class AbstractCondition:
         }
     }
     The UUID will be obtained by a query of the API in ordrer to keep a list of tests used.
-    The worflow is : 
+    The worflow is :
         * The UI make a call to get the list of available tests and parameters. RINOR sends this list with,
         for each tests, the list of needed parameters.
-        * The UI allows the user to create any boolean expression. When a user wants to create 
-        a new instance of some test, the UI call RINOR to say "I want a new instance of $TEST$", 
+        * The UI allows the user to create any boolean expression. When a user wants to create
+        a new instance of some test, the UI call RINOR to say "I want a new instance of $TEST$",
         with $TEST$ the name of the test created. RINOR sends an answer with a generated UUID, at same time
         RINOR keeps a mapping of uuid and test's name. It is not needed to create the instance of the test at this time.
         * The UI lets user fill the parameters for each test
@@ -75,7 +77,7 @@ class AbstractCondition:
         * RINOR create a new Condition with the JSON and the list of uuids/tests, which are parsed by the condition itself
     """
 
-    def __init__(self, log, condition = None, mapping = None):
+    def __init__(self, log, condition=None, mapping=None):
         """ Create the instance
         @param log : A logger instance
         @param condition : A JSON expression
@@ -105,16 +107,13 @@ class AbstractCondition:
         if type(json) == dict:
             for k in json.keys():
                 v = json[k]
-                if k in ["AND","OR"]:
+                if k in ["AND", "OR"]:
                     return "( %s %s %s )" % (self.__parse_boolean(v[0]), k.lower(), self.__parse_boolean(v[1]))
                 elif k == "NOT":
                     return "not %s" % self.__parse_boolean(v)
                 elif type(v) == dict:
                     #declaration of tests
-                    uuid = k
                     test = self._mapping[k]
-                    print test
-                    print json
                     test.fill_parameters(v)
                     return "self._mapping['%s'].evaluate()" % k
 
@@ -122,6 +121,9 @@ class AbstractCondition:
         """Returns the parsed condition
         @return None if parse_condition as never called with a valid condition else the parsed condition
         """
+        if self._parsed_condition is None:
+            self._log.debug("get_parsed_condition called but parsed_condition is empty, try to parse condition first")
+            self.parse_condition()
         return self._parsed_condition
 
     def parse_condition(self):
@@ -138,10 +140,11 @@ class AbstractCondition:
         return True
 
     def eval_condition(self):
-        """ Evaluate the condition. 
+        """ Evaluate the condition.
         @raise ValueError if no parsed condition is avaiable
         @return a boolean representing result of evaluation
         """
         if self._parsed_condition is None:
             raise ValueError("No parsed condition")
+        self._log.debug("_parsed condition is : %s, eval is %s" % (self._parsed_condition, eval(self._parsed_condition)))
         return eval(self._parsed_condition)

@@ -47,7 +47,9 @@ class TextInPageTest(AbstractTest):
         if u.evaluate() == None or t.evaluate() == None:
             return None
         else:
-            return t.evaluate() in u.evaluate()
+            res = t.evaluate() in u.evaluate().decode('utf-8')
+            self._log.debug("Evaluate %s in %s : %s" % (t, u, res))
+            return res
 
 
 TEST = None

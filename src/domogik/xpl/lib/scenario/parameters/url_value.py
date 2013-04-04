@@ -53,7 +53,7 @@ class UrlParameter(AbstractParameter):
             p =  self.get_parameters()
             if "urlpath" in p:
                 try:
-                    u = urlopen(p["urlpath"])  
+                    u = urlopen(p["urlpath"])
                 except:
                     self._log.warn("urlopen : Exception occured : %s" % sys.exc_info()[0])
                     self._result = None
