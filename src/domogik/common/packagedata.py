@@ -51,6 +51,10 @@ class PackageData():
         self._db = DbHelper()
         try:
             self.pkg = PackageJson(path = json_path).json
+        except PackageException as exp:
+            print("Error in json file:")
+            print( exp.value )
+            exit()
         except:
             print(str(traceback.format_exc()))
             return
