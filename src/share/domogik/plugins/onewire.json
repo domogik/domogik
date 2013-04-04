@@ -237,8 +237,8 @@
            "params": [
                {
                    "key": "data",
-                   "value_type": "binary",
-                   "values": [0, 1]
+                   "data_type": "DT_Bool",
+                   "conversion": ""
                }
            ],
            "xpl_command": "switch"
@@ -247,27 +247,23 @@
     "sensors": {
 	"temperature": {
 		"name": "Temperature",
-                "unit": "C",
-                "value_type": "number",
-                "values": ""
+                "data_type": "DT_Temp",
+                "conversion": ""
 	},
 	"serial": {
 		"name": "Serial",
-                "unit": "",
-                "value_type": "string",
-                "values": ""
+                "data_type": "DT_String",
+                "conversion": ""
 	},
        	"gpio": {
                 "name": "gpio",
-                "unit": "",
-                "value_type": "string",
-                "values": ""
+                "data_type": "DT_String",
+                "conversion": ""
         },
 	"humidity": {
 		"name": "Humidity",
-                "unit": "%",
-                "value_type": "number",
-                "values": [0, 100]
+                "data_type": "DT_Humidity",
+                "conversion": ""
 	}
     },
     "device_types": {
