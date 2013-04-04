@@ -34,6 +34,7 @@ ProcessRequest object
 @organization: Domogik
 """
 from domogik.common.utils import ucode, call_package_conversion
+from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper, DbHelperException
@@ -1192,13 +1193,19 @@ class ProcessRequest():
         config = cfg.load()
         conf = dict(config[1])
 
-        json_file = '{0}/domogik/common/datatypes.json'.format()
-        self.json = json.load(open(self.json_file))
+        if conf.has_key('package_path'):
+            json_file = "{0}/domogik/common/datatypes.json".format(conf['package_path'])
+        else:
+            json_file = "{0}/domogik/common/datatypes.json".format(conf['src_prefix'])
+        j_file = open(json_file)
+        data = json.loads(j_file.read())
+        j_file.close()
+        print data
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("datatypes")
-        json_data.add_data(self.json)
+        json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
     def rest_base(self):
