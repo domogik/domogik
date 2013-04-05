@@ -11,7 +11,18 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
+- 0.2b2 : Compatibily library : the same. 
+	- Target : domogik and domoweb
+	- An insert_data or a reinstall is necessary
+	- Change log : 
+		- Check user directory and config directory acces
+		- Realtime improvements for graph neighbors
+		- Add Start/Stop driver function
+		- Add zwave device switch with power meter (Everspring (C.T.) - AN158 full handling)
+		- Fixe ON/OFF sensor return status
+	
 - 0.2b1 : Compatibily library : OpenZwave >= 1.0.645, python_openzwave >= 0.2.5, ws4py >= 0.3.0-beta
+	- Target : domogik and domoweb
 	- Install new dependency `ws4py 0.3.0-beta <dependencies.html#Install WebSocket library for Python>`_
 	- An insert_data or a reinstall is necessary
 	- Enter new wsportserver key (Plugin configuration) and save the config (necessary to restart plugin if is started)
@@ -69,6 +80,8 @@ Following devices are supported :
 - Everspring - ST814
 
 - Everspring (C.T.) - HSM02
+
+- Everspring (C.T.) - AN158
 
 - Fibaro FGS211 - Switch 3KW
 

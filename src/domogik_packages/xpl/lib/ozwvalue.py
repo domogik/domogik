@@ -180,13 +180,34 @@ class ZWaveValueNode:
         return retval
             
     def updateData(self, valueData):
-        """Mise à jour de valueData depuis les arguments du callback """
+        """Mise à jour de valueData depuis les arguments du callback."""
         self._valueData = dict(valueData)
         self._lastUpdate = time.time()
         valueData['homeId'] = int(valueData['homeId']) # Pour etre compatible avec javascript
         valueData['id'] = str(valueData['id']) # Pour etre compatible avec javascript
         self._node.reportToUI({'notifytype': 'value-changed', 'usermsg' :'value has changed', 'data': valueData})
 
+    def convertInType(self,  val):
+        """Convertion de val dans le type de la value."""
+        retval = val
+        valT = type(val)
+        selfT = type(self._valueData['value'])
+        if valT in [int , long, float, complex, bool] :
+            if selfT == bool : retval = bool(val)
+            elif selfT ==int : retval = int(val)
+            elif selfT ==long : retval = long(val)
+            elif selfT ==float : retval = float(val)
+            elif selfT ==complex : retval = complex(val)                    
+        elif  valT ==str :
+            if selfT == bool :
+                Cval = val.capitalize()
+                retval = True if Cval in ['', 'True',  'T',  'Yes',  'Y'] else False
+            elif selfT ==int : retval = int(val)
+            elif selfT ==long : retval = long(val)
+            elif selfT ==float : retval = float(val)
+            elif selfT ==complex : retval = complex(val)
+        return retval
+            
     def _getLabelDomogik(self):
         """ retourne le label OZW formaté pour les listener domogik, en lowcase et espaces remplacés pas '-',
             pour compatibilité adresse web et appel rest."""

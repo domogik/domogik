@@ -44,6 +44,33 @@
 			"id" : "ozwave.dimmer.change",
 			"name" : "Change"
 		}, {
+			"device_type_id" : "ozwave.switchmeter",
+			"feature_type" : "actuator",
+			"id" : "ozwave.switchmeter.switch",
+			"name" : "Switch",
+			"parameters" : "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
+			"return_confirmation" : "1",
+			"stat_key" : "command",
+			"value_type" : "binary"
+		}, {
+			"device_type_id" : "ozwave.switchmeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.switchmeter.power",
+			"name" : "Power",
+			"parameters" : "{&quot;unit&quot;:&quot;W&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "power",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.switchmeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.switchmeter.energy",
+			"name" : "Energy",
+			"parameters" : "{&quot;unit&quot;:&quot;kWh&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "energy",
+			"value_type" : "number"
+		}, {
 			"device_type_id" : "ozwave.humidity",
 			"feature_type" : "sensor",
 			"id" : "ozwave.humidity.humidity",
@@ -84,7 +111,7 @@
 			"feature_type" : "sensor",
 			"id" : "ozwave.sensor.status",
 			"name" : "Status",
-			"parameters" : "{&quot;value0&quot;:&quot;true&quot;,&quot;value1&quot;:&quot;false&quot;}",
+			"parameters" : "{&quot;value0&quot;:&quot;True&quot;,&quot;value1&quot;:&quot;False&quot;}",
 			"return_confirmation" : "0",
 			"stat_key" : "sensor",
 			"value_type" : "boolean"
@@ -216,6 +243,10 @@
 			"name" : "Switch",
 			"id" : "ozwave.switch"
 		}, {
+			"description" : "Switch with power meter, Everspring AN158,...",
+			"name" : "Switch with power meter",
+			"id" : "ozwave.switchmeter"
+		}, {
 			"description" : "Dimmer",
 			"name" : "Dimmer",
 			"id" : "ozwave.dimmer"
@@ -332,7 +363,7 @@
 		"category" : "Z-wave",
 		"documentation" : "http://wiki.domogik.org/tiki-index.php?page=plugin_ozwave",
 		"description" : "Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control",
-		"changelog" : " 0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
+		"changelog" : "0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
 		"author_email" : "nico84dev at gmail.com",
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.3.0",
@@ -341,7 +372,7 @@
 				"type" : "python"
 			}
 		],
-		"version" : "0.2b1",
+		"version" : "0.2b2",
 		"type" : "plugin",
 		"id" : "ozwave"
 	}, "json_version" : 1
