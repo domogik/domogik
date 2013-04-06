@@ -1197,15 +1197,12 @@ class ProcessRequest():
             json_file = "{0}/domogik/common/datatypes.json".format(conf['package_path'])
         else:
             json_file = "{0}/domogik/common/datatypes.json".format(conf['src_prefix'])
-        j_file = open(json_file)
-        data = json.loads(j_file.read())
-        j_file.close()
-        print data
+        data = json.load(open(json_file))
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("datatypes")
-        json_data.add_data(data)
+        json_data.add_data(str(data))
         self.send_http_response_ok(json_data.get())
 
     def rest_base(self):
