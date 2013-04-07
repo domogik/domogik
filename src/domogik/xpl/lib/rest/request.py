@@ -104,7 +104,7 @@ class ProcessRequest():
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
             '^/base/device/list-upgrade$':		                                         '_rest_base_device_list_upgrade',
-            '^/base/device/upgrade/oldid/(?P<oid>[0-9]+)/oldskey/(?P<okey>[a-zA-Z0-9]+)/newdid/(?P<nid>[0-9]+)/newsensorid/(?P<sid>[0-9]+)$':	 '_rest_base_device_upgrade',
+            '^/base/device/upgrade/oldkey/(?P<okey>[0-9a-z\-]+)/newkey/(?P<nkey>[0-9\-]+)$':	 '_rest_base_device_upgrade',
             '^/base/device/params/(?P<dev_type_id>[-_\.a-zA-Z0-9]+)$':                           '_rest_base_deviceparams',
             '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
             '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
@@ -1552,13 +1552,17 @@ class ProcessRequest():
             json_data.add_data(device, exclude=['device_stats'])
         self.send_http_response_ok(json_data.get())
 
-    def _rest_base_device_upgrade(self, oid, okey, nid, sid):
+    def _rest_base_device_upgrade(self, okey, nkey):
         """ do device uprgade
         """
-        print oid
-        print okey
-        print nid
-        print sid
+        old = okey.split('-')
+	new = nkey.split('-')
+        num = self._db.upgrade_do(old[0], old[1], new[0], new[1])
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("devicestats")
+        json_data.add_data(num)
+        self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_list_upgrade(self):
         """ upgrade devices
@@ -1584,12 +1588,12 @@ class ProcessRequest():
             key = []
             key.append( ucode(dev[0]) )
             key.append( '-' )
-            key.append( ucode(dev[2]) )
+            key.append( ucode(dev[3]) )
             val = []
             val.append( 'Device: ' )
             val.append( ucode(dev[1]) )
             val.append( ', Sensor: ' )
-            val.append( ucode(dev[3]) )
+            val.append( ucode(dev[2]) )
             ret['new'].append( (''.join(key), ''.join(val)) )
         # return
         json_data.add_data(ret)
