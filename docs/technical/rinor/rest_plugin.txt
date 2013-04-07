@@ -33,7 +33,7 @@ Result when OK: ::
                     {
                         "status" : "<on/off>",
                         "host" : "<hostname>",
-                        "technology" : "<technology>",
+                        "plugin" : "<plugin>",
                         "id" : "<name>",
                         "type" : "<type : hardware, plugin>",
                     },
@@ -98,7 +98,7 @@ Result example for a plugin with two configuration keys: ::
                     }
                 ],
                 "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
-                "technology" : "service",
+                "plugin" : "<plugin>",
                 "description" : "Get power consumption with teleinfo" 
             } 
         ]
@@ -155,7 +155,7 @@ Result example for a plugin with 3 configuration keys and a group of 2 keys: ::
                     }
                 ],
                 "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
-                "technology" : "service",
+                "plugin" : "<plugin>",
                 "description" : "Get power consumption with teleinfo" 
             } 
         ]
@@ -182,7 +182,7 @@ Result for an external member: ::
                     }
                 ],
                 "documentation" : "http://wiki.domogik.org/plugin_teleinfo",
-                "technology" : "service",
+                "plugin" : "<plugin>",
                 "description" : "Get power consumption with teleinfo" 
             } 
         ]
@@ -356,7 +356,3 @@ Starting and stoping a plugin
 -----------------------------
 
 .. image:: start_and_stop.png
-
-
-
-
