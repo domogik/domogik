@@ -42,7 +42,7 @@ import datetime, hashlib, time
 
 import json
 import sqlalchemy
-from sqlalchemy import Table, MetaData
+from sqlalchemy import Table, MetaData, and_
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker
 
@@ -889,12 +889,32 @@ class DbHelper():
                     distinct()
 
     def upgrade_list_new(self):
-        return self.__session.query(Device.id, Device.name, Sensor.name).\
-                    filter(Device.id==Sensor.device_id).\
-                    filter(Device.address==None).\
-                    order_by(Device.id).\
-                    distinct()
+        return self.__session.query(Device.id, Device.name, Sensor.name, Sensor.id).\
+                     filter(Device.id==Sensor.device_id).\
+                     filter(Device.address==None).\
+                     order_by(Device.id).\
+                     distinct()
 
+    def upgrade_do(self, oid, okey, nid, nsid):
+        self.__session.expire_all()
+        oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
+                     filter(DeviceStats.skey==okey).\
+                     filter(DeviceStats.device_id ==oid)
+        num = 0
+        for val in oldvals:
+            # add the value
+            self.add_sensor_history(nsid, val[1], val[2])
+  	    # increment num
+            num += 1
+        # delete the statas
+        meta = MetaData(bind=DbHelper.__engine)
+        t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
+        self.__session.execute(
+            t_stats.delete().where(and_(t_stats.c.device_id == oid, t_stats.c.skey == okey))
+        )
+        self.__session.commit()
+        return num
+            
 ####
 # Sensor history
 ####

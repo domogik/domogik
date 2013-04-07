@@ -121,44 +121,43 @@ class ZWaveNode:
     def setReceiver(self):
         """Le node a reçu la notification EssentialNodeQueriesComplete , il est relié au controleur et peut recevoir des messages basic."""
         self._receiver = True
-        self.reportToUI({'type': 'init-process', 'usermsg' : 'Waiting for node initializing ', 'data': NodeStatusNW[5]})
+        self.reportToUI({'notifytype': 'init-process', 'usermsg' : 'Waiting for node initializing ', 'data': NodeStatusNW[5]})
         
     def setReady(self):
         """Le node a reçu la notification NodeQueriesComplete, la procédure d'intialisation est complète."""
         self._ready= True
-        self.reportToUI({'type': 'init-process', 'usermsg' : 'Node is now ready', 'data': NodeStatusNW[2]})
+        self.reportToUI({'notifytype': 'init-process', 'usermsg' : 'Node is now ready', 'data': NodeStatusNW[2]})
         
     def setNamed(self):
         """Le node a reçu la notification NodeNaming, le device à été identifié dans la librairie openzwave (config/xml)"."""
         self._updateInfos
         self._named= True
-        self.reportToUI({'type': 'node-state-changed', 'usermsg' : 'Node recognized', 'data': {'typestate': 'model', 'model': self.manufacturer + " -- " + self.product}})
+        self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : 'Node recognized', 'data': {'typestate': 'model', 'model': self.manufacturer + " -- " + self.product}})
         
     def setSleeping(self, state= False):
         """Une notification d'état du node à été recue, awake ou sleep."""
         self._sleeping = state;
         m = 'Device goes to sleep.' if state else 'Sleeping device wakes up.'
-        self.reportToUI({'type': 'node-state-changed', 'usermsg' : m,  'data': {'typestate': 'sleep', 'state sleeping': state}})
+        self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : m,  'data': {'typestate': 'sleep', 'state sleeping': state}})
         
     def markAsFailed(self): 
         """Le node est marqué comme HS."""
         self._ready = False
         self._sleeping = True
         self._failed = True
-        self.reportToUI({'type': 'init-process', 'usermsg' : 'Node marked as fail ', 'data': NodeStatusNW[6]})
+        self.reportToUI({'notifytype': 'init-process', 'usermsg' : 'Node marked as fail ', 'data': NodeStatusNW[6]})
     
-    def markAsOK(self): 
+    def markAsOK(self):
         """Le node est marqué comme Bon, réinit nécéssaire ."""
         self._failed = False
-        self.reportToUI({'type': 'init-process', 'usermsg' : 'Node marked good, should be reinit ', 'data': NodeStatusNW[0]})
+        self.reportToUI({'notifytype': 'init-process', 'usermsg' : 'Node marked good, should be reinit ', 'data': NodeStatusNW[0]})
         
-    def reportToUI(self,  msg):    
+    def reportToUI(self,  msg):
         """ transfert à l'objet controlleur  le message à remonter à l'UI"""
         if msg :
             msg['node'] = self.nodeId
-            print '&&&&&&&&&&&&&&&&&&&&&&& Report vers UI : '
+            print '******** Node Object report vers UI ******** '
             self._ozwmanager.controllerNode.reportChangeToUI(msg)
-        
     
     def _getIsLocked(self):
         return False
@@ -404,7 +403,7 @@ class ZWaveNode:
             self._neighbors = None
         print ('Node [%d] neighbors are: ' %self._nodeId) , self._neighbors
         self._ozwmanager._log.debug('Node [%d] neighbors are: %s', self._nodeId, self._neighbors)
-
+        
     def updateGroup(self,  groupIdx):
         """Mise à jour des informations du group/association du node """
         groups = list()
