@@ -424,6 +424,20 @@ class VelbusDev:
         self._log.info("Found node with address {0} and module_type {1}".format(str(naddress), MODULE_TYPES[ntype]['id']))
         self._nodes[naddress] = ntype
 
+    def _process_251_8(self, data):
+        """
+           Process a 251 Message
+           Specifickly for VMB4RY
+           Switch status => send out when a relay is switched
+        """
+        naddress = ord(data[2])
+        #chan = self._blinchannel_to_byte(data[5])
+        status = ord(data[7])
+        
+        #self._callback("lighting.device",
+        #           {"device" : device,
+        #            "level" : level})
+
     def _process_251(self, data):
         """
            Process a 251 Message
