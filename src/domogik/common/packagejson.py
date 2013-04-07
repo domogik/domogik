@@ -113,13 +113,16 @@ class PackageJson():
                 self.json = json.load(xml_data)
                 self.icon_file = None
 
+            self.validate()
+
             # complete json
             self.json["identity"]["fullname"] = "%s-%s" % (self.json["identity"]["type"],
                                                            self.json["identity"]["id"])
             self.json["identity"]["info_file"] = self.info_file
             self.json["identity"]["icon_file"] = self.icon_file
             self.json["all_files"] = self.json["files"]
-
+        except PackageException as exp:
+            raise PackageException(exp.value)
         except:
             raise PackageException("Error reading json file : %s : %s" % (json_file, str(traceback.format_exc())))
 
@@ -154,6 +157,106 @@ class PackageJson():
     #    my_file = open("%s" % (self.info_file), "w") 
     #    my_file.write(self.xml_content.toxml().encode("utf-8"))
     #    my_file.close()
+
+    def validate(self):
+        if self.json["json_version"] == 2:
+            self._validate_02()
+        else:
+            return True
+
+    def _validate_keys(self, expected, name, lst, optional=[]):
+        for exp in expected:
+            if exp not in lst:
+                raise PackageException("key '{0}' not found in {1}".format(exp, name))
+        explst = expected + optional
+        for item in lst:
+            if item not in explst:
+                raise PackageException("unknown key '{0}' found in {1}".format(item, name))
+
+    def _validate_02(self):
+        try:
+            #check that all main keys are in the file
+            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "files", "json_version"]
+            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules"])
+            #validate the device_type
+            for devtype in self.json["device_types"]:
+                devt = self.json["device_types"][devtype]
+                expected = ['id', 'name', 'description', 'commands', 'sensors', 'xpl_params']
+                self._validate_keys(expected, "device_type {0}".format(devtype), devt.keys())
+                #check that all commands exists inisde each device_type
+                for cmd in devt["commands"]:
+                    if cmd not in self.json["commands"].keys():    
+                        raise PackageException("cmd {0} defined in device_type {1} is not found".format(cmd, devtype))
+                #check that all sensors exists inside each device type
+                for sens in devt["sensors"]:
+                    if sens not in self.json["sensors"].keys():    
+                        raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
+                #see that each xplparam inside device_type has the following keys: key, description, type
+                expected = ["key", "type", "description"]
+                optional = ["max_value", "min_value"]
+                for par in devt["xpl_params"]:
+                    self._validate_keys(expected, "a xpl_param for device_type {0}".format(devtype), par.keys(), optional)
+            #validate the commands
+            for cmdid in self.json["commands"]:
+                cmd = self.json["commands"][cmdid]
+                expected = ['name', 'return_confirmation', 'params', 'xpl_command']
+                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
+                # validate the params
+                expected = ['key', 'values', 'value_type']
+                for par in cmd['params']:
+                    self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
+                # see that the xpl_command is defined
+                if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
+                    raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
+            #validate the sensors
+            for senid in self.json["sensors"]:
+                sens = self.json["sensors"][senid]
+                expected = ['name', 'unit', 'value_type', 'values']
+                self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
+            #validate the xpl command
+            for xcmdid in self.json["xpl_commands"]:
+                xcmd = self.json["xpl_commands"][xcmdid]
+                expected = ["name", "schema", "xplstat_name", "parameters"]
+                self._validate_keys(expected, "xpl_command {0}".format(xcmdid), xcmd.keys())
+                # parameters
+                expected = ["static", "device"]
+                self._validate_keys(expected, "parameters for xpl_command {0}".format(xcmdid), xcmd['parameters'].keys())
+                # static parameter
+                expected = ["key", "value"]
+                for stat in xcmd['parameters']['static']:
+                    self._validate_keys(expected, "a static parameter for xpl_command {0}".format(xcmdid), stat.keys())
+                # device parameter
+                expected = ["key", "description", "type"]
+                for stat in xcmd['parameters']['device']:
+                    self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys())
+                # see that the xpl_stat is defined
+                if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
+                    raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
+            #validate the xpl stats
+            for xstatid in self.json["xpl_stats"]:
+                xstat = self.json["xpl_stats"][xstatid]
+                expected = ["name", "schema", "parameters"]
+                self._validate_keys(expected, "xpl_command {0}".format(xstatid), xstat.keys())
+                # parameters
+                expected = ["static", "device", "dynamic"]
+                self._validate_keys(expected, "parameters for xpl_stat {0}".format(xstatid), xstat['parameters'].keys())
+                # static parameter
+                expected = ["key", "value"]
+                for stat in xstat['parameters']['static']:
+                    self._validate_keys(expected, "a static parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                # device parameter
+                expected = ["key", "description", "type"]
+                for stat in xstat['parameters']['device']:
+                    self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                # dynamic parameter
+                expected = ["key", "sensor"]
+                for stat in xstat['parameters']['dynamic']:
+                    self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                    # check that the sensor exists
+                    if stat['sensor'] not in self.json["sensors"].keys():    
+                        raise PackageException("sensor {0} defined in xpl_stat {1} is not found".format(stat['sensor'], xstatid))
+        except PackageException as exp:
+            raise PackageException("Error validating the json: {0}".format(exp.value))
 
     def set_generated(self, path):
         """ Add generation date info in json data

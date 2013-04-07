@@ -51,6 +51,10 @@ class PackageData():
         self._db = DbHelper()
         try:
             self.pkg = PackageJson(path = json_path).json
+        except PackageException as exp:
+            print("Error in json file:")
+            print( exp.value )
+            exit()
         except:
             print(str(traceback.format_exc()))
             return
@@ -60,82 +64,44 @@ class PackageData():
         if self.pkg["identity"]["type"] not in ["plugin", "external"]:
             print("Error : this package type is not recognized")
             exit()
+        # check if json version is at least 2
+        if self.pkg['json_version'] < 2:
+            print("Error : this package is to old for this version of domogik")
+            exit()
 
     def insert(self):
         """ Insert data for plugin
         """
-        ### Technology
-        print("Technology %s" % self.pkg["technology"]["id"])
-        if self._db.get_device_technology_by_id(self.pkg["technology"]["id"]) == None:
+        ### Plugin
+        print("plugin %s" % self.pkg["identity"]["id"])
+        if self._db.get_plugin(self.pkg["identity"]["id"]) == None:
             # add if not exists
             print("add...")
-            self._db.add_device_technology(self.pkg["technology"]["id"],
-                                           self.pkg["technology"]["name"],
-                                           self.pkg["technology"]["description"])
+            self._db.add_plugin(self.pkg["identity"]["id"],
+                                  self.pkg["identity"]["description"],
+                                  self.pkg["identity"]["version"])
         else:
             # update if exists
             print("update...")
-            self._db.update_device_technology(self.pkg["technology"]["id"],
-                                           self.pkg["technology"]["name"],
-                                           self.pkg["technology"]["description"])
+            self._db.update_plugin(self.pkg["identity"]["id"],
+                                  self.pkg["identity"]["description"],
+                                  self.pkg["identity"]["version"])
  
         ### Device types
-        for device_type in self.pkg["device_types"]:
-            print("Device type %s" % device_type["id"])
+        for device_type in self.pkg["device_types"].keys():
+            print("Device type %s" % device_type)
+            device_type = self.pkg["device_types"][device_type]
             if self._db.get_device_type_by_id(device_type["id"]) == None:
                 # add if not exists
                 print("add...")
                 self._db.add_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg["technology"]["id"],
+                                         self.pkg["identity"]["id"],
                                          device_type["description"])
             else:
                 # update if exists
                 print("update...")
                 self._db.update_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg["technology"]["id"],
+                                         self.pkg["identity"]["id"],
                                          device_type["description"])
- 
-        ### Device feature model
-        for device_feature_model in self.pkg["device_feature_models"]:
-            print("Device feature model %s" % device_feature_model["id"])
-            print("M.P=%s" % device_feature_model["parameters"])
-            if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:
-                # add if not exists
-                print("add...")
-                if device_feature_model["feature_type"] == "sensor":
-                    self._db.add_sensor_feature_model(device_feature_model["id"],
-                                                      device_feature_model["name"],
-                                                      device_feature_model["device_type_id"],
-                                                      device_feature_model["value_type"],
-                                                      device_feature_model["parameters"],
-                                                      device_feature_model["stat_key"])
-                elif device_feature_model["feature_type"] == "actuator":
-                    self._db.add_actuator_feature_model(device_feature_model["id"],
-                                                        device_feature_model["name"],
-                                                        device_feature_model["device_type_id"],
-                                                        device_feature_model["value_type"],
-                                                        device_feature_model["return_confirmation"],
-                                                        device_feature_model["parameters"],
-                                                        device_feature_model["stat_key"])
-            else:
-                # update if exists
-                print("update...")
-                if device_feature_model["feature_type"] == "sensor":
-                    self._db.update_sensor_feature_model(device_feature_model["id"],
-                                                      device_feature_model["name"],
-                                                      device_feature_model["parameters"],
-                                                      device_feature_model["value_type"],
-                                                      device_feature_model["stat_key"])
-                elif device_feature_model["feature_type"] == "actuator":
-                    self._db.update_actuator_feature_model(device_feature_model["id"],
-                                                        device_feature_model["name"],
-                                                        device_feature_model["parameters"],
-                                                        device_feature_model["value_type"],
-                                                        device_feature_model["return_confirmation"],
-                                                        device_feature_model["stat_key"])
-        
-        
-       
-
