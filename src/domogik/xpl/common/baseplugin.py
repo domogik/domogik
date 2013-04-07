@@ -106,12 +106,12 @@ class BasePlugin():
         elif not self.options.run_in_foreground and daemonize:
             createDaemon()
             l = logger.Logger(name)
-            self.log = l.get_logger()
+            self.log = l.get_logger(name)
             self.log.info("Daemonize plugin %s" % name)
             self.is_daemon = True
         else:
             l = logger.Logger(name)
-            self.log = l.get_logger()
+            self.log = l.get_logger(name)
             self.is_daemon = False
 
     def should_stop(self):

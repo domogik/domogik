@@ -1,12 +1,18 @@
 from flask import Flask, g, Response, request
+from domogik.common.logger import Logger
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.lib.rest.jsondata import domogik_encoder
 from functools import wraps
+import time
 import json
+
+# flask logegr
+flaskLogger = Logger('rinor-http')
 
 # url handler itself
 urlHandler = Flask(__name__)
 urlHandler.debug = True
+urlHandler.logger_name = flaskLogger.get_logger('rinor-http')
 
 # DB handler decorator
 def db_helper(action_func):
@@ -16,7 +22,15 @@ def db_helper(action_func):
         return action_func(*args, **kwargs)
     return create_db_helper   
 
-
+# create acces_log
+@urlHandler.after_request
+def write_access_log(response):
+    log = flaskLogger.get_logger('rinor-http')
+    log.info('http request for {0} received'.format(request.path))
+    log.debug(' => response status code: {0}'.format(response.status_code))
+    log.debug(' => response content_type: {0}'.format(response.content_type))
+    log.debug(' => response data: {0}'.format(response.response))
+    return response
 
 # json reponse handler decorator
 # the url handlers funictions can return
@@ -44,8 +58,8 @@ def timeit(action_func):
         ts = time.time()
         result = action_func(*args, **kw)
         te = time.time()
-        print '%r (%r, %r) %2.2f sec' % \
-              (method.__name__, args, kw, te-ts)
+        log = flaskLogger.get_logger('rinor-http')
+        log.debug('url function {0}({1}, {2}) took {3} sec'.format(action_func.__name__, args, kw, te-ts))
         return result
     return timed
 

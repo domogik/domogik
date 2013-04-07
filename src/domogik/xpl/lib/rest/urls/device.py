@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, register_api
+from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, register_api, timeit
 from flask import g as dbHelper
 from flask.views import MethodView
 from domogik.common.packagejson import PackageJson
