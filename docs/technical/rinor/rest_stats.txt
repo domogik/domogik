@@ -2,22 +2,21 @@
 REST /stats
 ===========
 
-**/stats** entry allows to get statistics stored in database (table device_stats).
+**/stats** entry allows to get statistics stored in database (table sensor_history).
 
 Getting data with /stats
 ========================
 
 Parameters description
 ----------------------
-* device id : a device id
-* key : key name for data in table __device_stats__. Could be '*' to return all keys. 
+* sensor id : a sensor id
 * start time (optionnal)
 * end time (optionnal : none = now)
 
 .. note::
     Usage is not yet implemented
 
-/stats/<device id>/<key>/all
+/stats/<sensor id>/<key>/all
 ----------------------------
 
 .. warning ::
@@ -33,9 +32,8 @@ Result: ::
             {
                 "timestamp" : 1286226868,
                 "value" : "HIGH",
-                "skey" : "ping",
                 "date" : "2010-07-21 16:02:14",
-                "device_id" : 3
+                "sensor_id" : 3
             },
             ...
         ]
@@ -44,14 +42,14 @@ Result: ::
 Wildcard usage
 **************
 
-You can use the '*' to get the values for all the keys or all the devices.
+You can use the '*' to get the values for all sensors
 
 Example : 
 
-* Get all stattistics (don''t use it until it is for test purpore) : ``/stat/*/*/all``
-* Return all the values for all the keys of a device : ``/stat/5/*/all``
+* Get all stattistics (don''t use it until it is for test purpore) : ``/stat/*/all``
 
-/stats/<device id>/<key>/latest
+
+/stats/<sensor id>/latest
 -------------------------------
 Get latest value
 
@@ -59,10 +57,9 @@ Result : same than /all but with only one value
 
 Wildcard usage
 **************
-* Return the last value for all the devices : ``/stat/*/*/lastest``
-* Return the last value for all keys of a device : ``/stat/5/*/lastest``
+* Return the last value for all the devices : ``/stat/*/lastest``
 
-/stats/<device id>/<key>/last/<number of item to get>
+/stats/<sensor id>/last/<number of item to get>
 -----------------------------------------------------
 Get the N last values
 
@@ -71,10 +68,9 @@ Result : same than /all but with only N values
 Wildcard usage
 **************
 
-* Return the last 10 values for all the devices : ``/stat/*/*/last/10``
-* Return the last 10 values for all keys of a device : ``/stat/5/*/last/10``
+* Return the last 10 values for all the sensors : ``/stat/*/last/10``
 
-/stats/<device id>/<key>/from/<start time> {/to/<end time>}
+/stats/<sensor id>/from/<start time> {/to/<end time>}
 -----------------------------------------------------------
 
 .. note::
@@ -87,7 +83,7 @@ Result : same than /all but with values between start and end time
 
 Example
 *******
-**/stats/4/temperature/from/1286226613/to/1286500000**
+**/stats/5/from/1286226613/to/1286500000**
 
 .. code-block:: python
 
@@ -101,41 +97,36 @@ Example
                     {
                         "timestamp" : 1286226868,
                         "value" : "22.6875",
-                        "skey" : "temperature",
                         "date" : "2010-10-04 23:14:28",
-                        "device_id" : 4
+                        "sensor_id" : 4
                     },
                     {
                         "timestamp" : 1286226884,
                         "value" : "22.6875",
-                        "skey" : "temperature",
                         "date" : "2010-10-04 23:14:44",
-                        "device_id" : 4
+                        "sensor_id" : 4
                     },
                     {
                         "timestamp" : 1286226899,
                         "value" : "22.6875",
-                        "skey" : "temperature",
                         "date" : "2010-10-04 23:14:59",
-                        "device_id" : 4
+                        "sensor_id" : 4
                     },
                     ...
                 ],
-                "skey" : "temperature",
-                "device_id" : "4"
+                "sensor_id" : "4"
             }
         ]
     }
 
-/stats/<device id>/<key>/from/<start time> {/to/<end time>}/interval/<year, month, week, day, hour, minute, second>/selector/<min(number only), max(number only), avg(number only), first, last, x>
+/stats/<sensor id>/from/<start time> {/to/<end time>}/interval/<year, month, week, day, hour, minute, second>/selector/<min(number only), max(number only), avg(number only), first, last, x>
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 .. note::
     CSV export allowed
 
 Result : for performance issue, the return format is different from /all. Following data are returned:
 
-* key
-* device_id
+* sensor_id
 * values : a list of tuples
 
 Tuples format
@@ -166,7 +157,7 @@ Tuples format
 
 Example 
 ^^^^^^^
-**/stats/4/temperature/from/1286226613/to/1286500000/interval/hour/selector/avg**
+**/stats/4/from/1286226613/to/1286500000/interval/hour/selector/avg**
 
 .. code-block:: python
 
@@ -203,15 +194,14 @@ Example
                     ],
                     ...
                 ],
-                "skey" : "temperature",
-                "device_id" : "4"
+                "sensor_id" : "4"
             }
         ]
     }
 
-/stats/multi/<id1>/<key1>/<id2>/<key2>
+/stats/multi/<id1>/<id2>
 --------------------------------------
-Get last values for multiple id/keys in one request
+Get last values for multiple sensors in one request
 
 Example json response: ::
 
@@ -223,16 +213,15 @@ Example json response: ::
             {
                 "timestamp" : 1286226868,
                 "value" : "HIGH",
-                "skey" : "ping",
                 "date" : "2010-07-21 16:02:14",
-                "device_id" : 3,
+                "sensor_id" : 3,
                 "exists" : "True"
-            },        {
+            },       
+            {
                 "timestamp" : 1286566868,
                 "value" : "LOG",
-                "skey" : "command",
                 "date" : "2010-07-22 16:02:14",
-                "device_id" : 5
+                "sensor_id" : 5
                 "exists" : "True"
             },
             ...
@@ -249,12 +238,12 @@ Example json response with a device which not exists: ::
             {
                 "timestamp" : 1286226868,
                 "value" : "HIGH",
-                "skey" : "ping",
                 "date" : "2010-07-21 16:02:14",
-                "device_id" : 3,
+                "sensor_id" : 3,
                 "exists" : "True"
-            },        {
-                "device_id" : 666,
+            },
+            {
+                "sensor_id" : 666,
                 "exists" : "False"
             },
             ...
