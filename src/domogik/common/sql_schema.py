@@ -217,8 +217,6 @@ class Device(Base):
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
     address = Column(Unicode(255), nullable=True)
-    device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
-    device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=True)
     device_type = relation(DeviceType)
     commands = relationship("Command", backref=__tablename__, cascade="all, delete")
@@ -226,13 +224,12 @@ class Device(Base):
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all, delete")
 
-    def __init__(self, name, reference, device_usage_id, device_type_id, description=None):
+    def __init__(self, name, reference, device_type_id, description=None):
         """Class constructor
 
         @param name : short name of the device
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
-        @param device_usage_id : link to the device usage
         @param device_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param description : extended description, optional
 
@@ -240,14 +237,13 @@ class Device(Base):
         self.name = ucode(name)
         self.reference = ucode(reference)
         self.device_type_id = device_type_id
-        self.device_usage_id = device_usage_id
         self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', usage=%s, commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type, self.device_usage, self.commands, \
+                  self.device_type, self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod

@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 from migrate import *
-from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, Device, Command, CommandParam, Sensor, SensorHistory, DeviceType, Plugin
+from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, Device, Command, CommandParam, Sensor, SensorHistory, DeviceType, Plugin, DeviceUsage
 from domogik.common import database_utils
 
 def upgrade(migrate_engine):
@@ -55,6 +55,18 @@ def upgrade(migrate_engine):
         migrate_engine.execute("DROP table core_device_feature")
     if database_utils.table_exists(migrate_engine, "core_device_feature_model"):
         migrate_engine.execute("DROP table core_device_feature_model")
+    # delete device usage
+    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'address'):
+        dev = Table(Device.__tablename__, meta, autoload=True)
+        # drop the table 
+    if database_utils.table_exists(migrate_engine, "core_device_usage"):
+        dev = Table(Device.__tablename__, meta, autoload=True)
+        devusage = Table(DeviceUsage.__tablename__, meta, autoload=True)
+        cons = ForeignKeyConstraint([dev.c.device_usage_id], [devusage.c.id], name='core_device_ibfk_1')
+        cons.drop()
+        duid = Column('device_usage_id', Unicode(80))
+        duid.drop(dev)
+        migrate_engine.execute("DROP table core_device_usage")
     # technology to plugin renaming
     #0- delete foreign key between device and device_type
     fkey_do = database_utils.foreignkey_exists(migrate_engine, Device.__tablename__, "core_device_ibfk_2")

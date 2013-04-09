@@ -5,50 +5,6 @@ REST /base
 Devices and features management
 ===============================
 
-Device usage
-------------
-
-Reading operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/device_usage/list/
-
-Result: ::
-
-    {
-        "status" : "OK",
-        "code" : 0,
-        "description" : "None",
-        "device_usage" : [
-            {
-                "description" : "Lamp, light usage",
-                "default_options" : "{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }",
-                "id" : "light",
-                "name" : "Light"
-            },
-            ...
-        ]
-    }
-
-* /base/device_usage/list/by-name/<name>
-
-Return: like /list but with only the item filtered
-
-Writing operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/device_usage/add/id/<id>/name/<name>/description/<description>/default_options/<default_options>
-
-Return: like /list but with only the item added
-
-* /base/device_usage/update/id/<id>/name/<name>/description/<description>/default_options/<default_options>
-
-Return: like /list but with only the item updated
-
-* /base/device_usage/del/<id>
-
-Return: like /list but with only the item deleted
-
 Device type
 -----------
 

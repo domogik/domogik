@@ -122,12 +122,6 @@ class ProcessRequest():
             '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
             '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
             '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
-            # /base/device_usage
-            '^/base/device_usage/list$':			                                 '_rest_base_device_usage_list',
-            '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
-            '^/base/device_usage/add/.*$':		 	                                 '_rest_base_device_usage_add',
-            '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
-            '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
             # xpl-command
             '^/base/xpl-command/list$':                                                          '_rest_base_xplcommand_list',
             '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
@@ -1219,56 +1213,8 @@ class ProcessRequest():
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        ### device_usage #############################
-        if self.rest_request[0] == "device_usage":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_device_usage_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_base_device_usage_list(self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_usage_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_usage_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_device_usage_del(du_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
         ### device_type ##############################
-        elif self.rest_request[0] == "device_type":
+        if self.rest_request[0] == "device_type":
 
             ### list
             if self.rest_request[1] == "list":
@@ -1415,81 +1361,6 @@ class ProcessRequest():
         else:
             self.send_http_response_error(999, "Bad date format (YYYYMMDD or YYYYMMDD-HHMM required", self.jsonp, self.jsonp_cb)
         return my_date
-
-######
-# /base/device_usage processing
-######
-
-    def _rest_base_device_usage_list(self, name = None):
-        """ list device usages
-            @param name : name of device usage
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        if name == None:
-            for device_usage in self._db.list_device_usages():
-                json_data.add_data(device_usage)
-        else:
-            device_usage = self._db.get_device_usage_by_name(name)
-            if device_usage is not None:
-                json_data.add_data(device_usage)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_usage_add(self):
-        """ add device_usage
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        try:
-            device_usage = self._db.add_device_usage(self.get_parameters("id"), \
-                                                     self.get_parameters("name"), \
-                                                     self.get_parameters("description"), \
-                                                     self.get_parameters("default_options"))
-            json_data.add_data(device_usage)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_usage_update(self):
-        """ update device usage
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        try:
-            device_usage = self._db.update_device_usage(self.get_parameters("id"), \
-                                                        self.get_parameters("name"), \
-                                                        self.get_parameters("description"), \
-                                                        self.get_parameters("default_options"))
-            json_data.add_data(device_usage)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_device_usage_del(self, du_id=None):
-        """ delete device usage
-            @param du_id : device usage id
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        try:
-            device_usage = self._db.del_device_usage(du_id)
-            json_data.add_data(device_usage)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
 
 ######
 # /base/device_type processing
@@ -1771,7 +1642,6 @@ class ProcessRequest():
             device = self._db.add_device_and_commands( \
                                          name=self.get_parameters("name"), \
                                          type_id=self.get_parameters("type_id"), \
-                                         usage_id=self.get_parameters("usage_id"), \
                                          description=self.get_parameters("description"), \
                                          reference=self.get_parameters("reference"))
             json_data.set_data_type("device")
@@ -1792,7 +1662,6 @@ class ProcessRequest():
         try:
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
-                                         self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
