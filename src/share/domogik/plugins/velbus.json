@@ -121,13 +121,7 @@
             "xplstat_name": "get_level",
             "parameters": {
                     "static": [],
-                    "device": [
-                        {
-                            "key": "dummy",
-                            "description": "a dummy param",
-                            "type": "string"
-                        }
-                    ]
+                    "device": []
                 }
          },
          "set_level_range": {

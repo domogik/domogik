@@ -1196,7 +1196,7 @@ class ProcessRequest():
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("datatypes")
-        json_data.add_data(str(data))
+        json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
     def rest_base(self):
