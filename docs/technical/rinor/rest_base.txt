@@ -210,6 +210,10 @@ Result: ::
     ]
 }
 
+* /base/device/get/id/<id>
+
+Return: same for as /list but only one device returned
+
 
 * /base/device/list-upgrade
 

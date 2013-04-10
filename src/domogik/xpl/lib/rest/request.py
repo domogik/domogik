@@ -104,6 +104,7 @@ class ProcessRequest():
         'base': {
             # /base/device
             '^/base/device/list$':			                                         '_rest_base_device_list',
+            '^/base/device/get/id/(?P<id>[0-9]+)$':			                         '_rest_base_device_get',
             '^/base/device/list-upgrade$':		                                         '_rest_base_device_list_upgrade',
             '^/base/device/upgrade/oldkey/(?P<okey>[0-9a-z\-]+)/newkey/(?P<nkey>[0-9\-]+)$':	 '_rest_base_device_upgrade',
             '^/base/device/params/(?P<dev_type_id>[-_\.a-zA-Z0-9]+)$':                           '_rest_base_deviceparams',
@@ -1450,6 +1451,15 @@ class ProcessRequest():
         json_data.set_data_type("device")
         for device in self._db.list_devices():
             json_data.add_data(device, exclude=['device_stats'])
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_device_get(self, id):
+        """ get one device
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        json_data.add_data(self._db.get_device(id), exclude=['device_stats'])
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_upgrade(self, okey, nkey):
