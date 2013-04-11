@@ -336,7 +336,7 @@ class PkgReview:
         if im.size != ICON_SIZE:
             self.error("The icon size is not good : %s instead of %s" % (im.size, ICON_SIZE), REPO_STABLE)
         else:
-            self.ok("The icon size is OK : %s" % ICON_SIZE)
+            self.ok("The icon size is OK : %s" % str(ICON_SIZE))
 
 
 
