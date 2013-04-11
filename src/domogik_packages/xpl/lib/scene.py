@@ -372,7 +372,7 @@ class Mscene():
         for device in self.devices:
            if self.devices[device]['op'] != '':
               if self.devices[device]['op'] == '=':
-                 if self.devices_stat[device] == self.devices[device]['value']:
+                 if self.devices_stat[device].lower() == self.devices[device]['value'].lower():
                     self.devices_test[device]= True
                  else:
                     self.devices_test[device]= False

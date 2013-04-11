@@ -7,6 +7,38 @@ Plugin documentation
 
 |icon|
 
+Last change
+===========
+New instructions to apply changes from immediatly previous version.
+
+- 0.2b2 : Compatibily library : the same. 
+	- Target : domogik and domoweb
+	- An insert_data or a reinstall is necessary
+	- Change log : 
+		- Check user directory and config directory acces
+		- Realtime improvements for graph neighbors
+		- Add Start/Stop driver function
+		- Add zwave device switch with power meter (Everspring (C.T.) - AN158 full handling)
+		- Fixe ON/OFF sensor return status
+	
+- 0.2b1 : Compatibily library : OpenZwave >= 1.0.645, python_openzwave >= 0.2.5, ws4py >= 0.3.0-beta
+	- Target : domogik and domoweb
+	- Install new dependency `ws4py 0.3.0-beta <dependencies.html#Install WebSocket library for Python>`_
+	- An insert_data or a reinstall is necessary
+	- Enter new wsportserver key (Plugin configuration) and save the config (necessary to restart plugin if is started)
+
+- 0.1b8 : 
+	- An insert_data or a reinstall is necessary.
+	- Created primary controller device for domogik and traced back to the state it to domogik.
+	
+Do an insert data
+-----------------
+In your domogik directory :
+
+.. code-block:: bash
+
+	$sudo src/tools/packages/insert_data.py src/share/domogik/plugins/ozwave.json
+
 Purpose
 =======
 Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control. This plugin allows to control zwave devices.
@@ -31,7 +63,8 @@ Detailed architecture
 Dependencies
 ============
 
-- `Python-openzwave <http://wiki.domogik.org/plugin_pyozw>`_ (>=0.2.5) 
+- `Python-openzwave <http://wiki.domogik.org/plugin_pyozw>`_ (>=0.2.5)
+- `WebSocket library for Python (ws4py). 0.3.0-beta <https://github.com/Lawouach/WebSocket-for-Python>`_
 
 Controller/devices Compatibility List
 =====================================
@@ -47,6 +80,8 @@ Following devices are supported :
 - Everspring - ST814
 
 - Everspring (C.T.) - HSM02
+
+- Everspring (C.T.) - AN158
 
 - Fibaro FGS211 - Switch 3KW
 
@@ -267,6 +302,10 @@ In Domogik administration, go to the ozwave configuration page.
 
 |menuconf|
 
+.. |configuration1| image:: ozwave_configuration1.png
+
+|configuration1|
+
 +----------------+---------------+--------------------------------------------------------------------------------------+
 |Key             | Default value | Description                                                                          |
 +================+===============+======================================================================================+
@@ -291,6 +330,10 @@ In Domogik administration, go to the ozwave configuration page.
 |                |               | This is the path that openzwave xml files are located, it can be shared with others  |
 |                |               | using openzwave C++ library                                                          |
 +----------------+---------------+--------------------------------------------------------------------------------------+
+| wsportserver   | 40470         | Network port for WebSocket plugin server.                                            |
+|                |               |                                                                                      |
+|                |               | To have external access you must open that part on your router                       |
++----------------+---------------+--------------------------------------------------------------------------------------+
 
 * Now you need to configure zwave network link to domogik.
 
@@ -314,14 +357,49 @@ Creating devices for ozwave
 -----------------------------
 In administration, go to Organization > Devices page to create your devices.
 
+Create a device for the primary zwave controller
+************************************************
+
+The device on the controller can be traced back to the state it to domogik, but also to create an automatic link to the user interface domoweb.
+you can create it after starting the plugin, so it is possible to find its address in the devices table of the "controller and devices".
+This is usually the first node and address as: **ZWHome.1.1**
+
+
+.. |creat_ctrldevice| image:: ozwave_create_ctrldevice.png
+    :width: 200px
+	
+.. |example_device2| image:: ozwave_create_device2.png
+    :width: 350px
+
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| |creat_ctrldevice| | Name              | The name you want to give to the device : ...                                              |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | The device address : 'homename-1'.NodeIdOfPrimaryController.1                              |
+|                    |                   | Example : ZwHome.1.1                                                                       |
+|                    |                   |                                                                                            |
+|                    |                   | You can find the reference in the                                                          |
+|                    |                   | `table <ctldevtools.html#Manage devices Commands Class>`_ of command_class                 |
+|                    |                   | of device (node) by pointing the mouse over the star.                                      |
+|                    |                   | |example_device2|                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | Chose : Z-wave.Controller                                                                  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | Chose : Server                                                                             |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+
+
 Feature example
 ***************
 
 .. |example_device1| image:: ozwave_create_device1.png
     :width: 200px
-
-.. |example_device2| image:: ozwave_create_device2.png
-    :width: 350px
 
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
 | Example            | Key               | Description                                                                                |
@@ -329,9 +407,10 @@ Feature example
 | |example_device1|  | Name              | The name you want to give to the device : ...                                              |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Address           | The device address : 'homename-1'.NodeId.instance                                          |
-|                    |                   | Example : ZWHome.5.1                                                                       |
+|                    |                   | Example : ZwHome.5.1                                                                       |
 |                    |                   |                                                                                            |
-|                    |                   | You can find the reference in the `table <ctldevtools.html>`_ of command_class             |
+|                    |                   | You can find the reference in the                                                          |
+|                    |                   | `table <ctldevtools.html#Manage devices Commands Class>`_ of command_class                 |
 |                    |                   | of device (node) by pointing the mouse over the star.                                      |
 |                    |                   | |example_device2|                                                                          |
 |                    +-------------------+--------------------------------------------------------------------------------------------+

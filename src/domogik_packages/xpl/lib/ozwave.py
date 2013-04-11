@@ -42,8 +42,10 @@ from libopenzwave import PyManager
 from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
 from ozwctrl import ZWaveController
+from ozwuiserver import BroadcastServer 
 from ozwdefs import *
 from datetime import timedelta
+import pwd
 # import time
 # from time import sleep
 # import os.path
@@ -62,7 +64,7 @@ class OZWavemanager(threading.Thread):
     ZWave class manager
     """
 
-    def __init__(self, config,  cb_send_xPL, cb_sendxPL_trig, stop , log,  configPath, userPath,  ozwlog = False, msgEndCb =  False):
+    def __init__(self, config,  cb_send_xPL, cb_sendxPL_trig, stop , log,  configPath, userPath,  ozwlog = False):
         """ Ouverture du manager py-openzwave
             @ param config : configuration du plugin pour accès aux valeurs paramètrées"
             @ param cb_send_xpl : callback pour envoi msg xpl
@@ -72,7 +74,6 @@ class OZWavemanager(threading.Thread):
             @ param configPath : chemin d'accès au répertoire de configuration pour la librairie openszwave (déf = "./../plugins/configPath/")
             @ param userPath : chemin d'accès au répertoire de sauvegarde de la config openzwave et du log."
             @ param ozwlog (optionnel) : Activation du log d'openzawe, fichier OZW_Log.txt dans le répertoire user (déf = "--logging false")
-            @ param msgEndCb (désactivée pour l'instant) Envoi d'une notification quand la transaction est complete (defaut = "--NotifyTransactions  false")
         """
         self._device = None
         self._configPlug = config
@@ -82,7 +83,7 @@ class OZWavemanager(threading.Thread):
         self._stop = stop
         self._homeId = 0
         self._activeNodeId = None # node actif courant, pour utilisation dans les fonctions du manager
-        self._ctrlnodeId = -1
+        self._ctrlnodeId = None
         self._controller = None
         self._timeStarted = 0
         self._nodes = dict()
@@ -93,9 +94,9 @@ class OZWavemanager(threading.Thread):
         self._userPath = userPath
         self._ready = False
         self._initFully = False
-        self._ctrlActProgress= None   
-        self.msgToUI=[];
-        # récupération des association nom de réseaux et homeID
+        self._ctrlActProgress= None
+        self._wsPort = int(self._configPlug.query('ozwave', 'wsportserver'))
+        # récupération des associations nom de réseaux et homeID
         self._nameAssoc = {}
         if self._configPlug != None :
             num = 1
@@ -115,13 +116,28 @@ class OZWavemanager(threading.Thread):
                 num += 1                
         print self._nameAssoc
         autoPath = self._configPlug.query('ozwave', 'autoconfpath')
-        print 'autopath : ' , autoPath
+        user = pwd.getpwuid(os.getuid())[0]
         if autoPath and libopenzwave.configPath() :
             self._configPath = libopenzwave.configPath()
         if not os.path.exists(self._configPath) : 
-            self._log.debug("Directory openzwave config not exist : %s" , self._configPath)
+            self._log.error("Directory openzwave config not exist : %s" , self._configPath)
             raise OZwaveManagerException ("Directory openzwave config not exist : %s"  % self._configPath)
-            
+        elif not os.access(self._configPath,  os.R_OK) :
+            self._log.error("User %s haven't write access on openzwave directory : %s"  %(user,  self._configPath))
+            raise OZwaveManagerException ("User %s haven't write access on openzwave directory : %s"  %(user,  self._configPath))
+        print "User : %s, openzwave path : %s"  %(user,  self._configPath)
+        if not os.path.exists(self._userPath) : 
+            self._log.info("Directory openzwave user not exist, trying create : %s" , self._configPath)
+            try : 
+                os.mkdir(self._userPath)
+                print ("User openzwave directory created : %s"  %self._userPath)
+            except OZwaveManagerException as e:
+                self._log.error(e.value)
+                print e.value
+            raise OZwaveManagerException ("Directory openzwave config not exist : %s"  % self._configPath)
+        if not os.access(self._userPath,  os.W_OK) :
+            self._log.error("User %s haven't write access on user openzwave directory : %s"  %(user,  self._configPath))
+            raise OZwaveManagerException ("User %s haven't write access on user openzwave directory : %s"  %(user,  self._configPath))
         # Séquence d'initialisation d'openzwave
         # Spécification du chemain d'accès à la lib open-zwave
         opt = ""
@@ -135,11 +151,15 @@ class OZWavemanager(threading.Thread):
         self._manager.create()
         self._manager.addWatcher(self.cb_openzwave) # ajout d'un callback pour les notifications en provenance d'OZW.
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
-        print ('user config :',  self._userPath,  " Logging openzwave : ",  opts)
+        print 'user config :',  self._userPath,  " Logging openzwave : ",  opts
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
-        thXplUI = threading.Thread(None, self.ctrlMsgToUI, "send_ctrl_msg_to_ui", (), {} )
-        thXplUI.start()
-        
+        self.serverUI =  BroadcastServer(self._wsPort,  self.cb_ServerWS,  self._log) # demarre le websocket server
+        self._cb_send_xPL({'type':'xpl-trig', 'schema':'ozwctrl.basic',
+                                    'data': {'device': self._getCtrlDeviceName(),  
+                                            'type':'plugin-state', 
+                                            'node': 'controller',
+                                            'usermsg': 'Plugin is in intialization process, be patient...',
+                                            'data': {'state':'wsserver_started', 'wsport': self._wsPort}}})
         
      # On accède aux attributs uniquement depuis les property
     device = property(lambda self: self._device)
@@ -160,44 +180,46 @@ class OZWavemanager(threading.Thread):
     def openDevice(self, device):
         """Ajoute un controleur au manager (en developpement 1 seul controleur actuellement)"""
         # TODO: Gérer une liste de controleurs
-        if self._device != None and self._device != device :
+        if self._device != None and self._device != device and self.ready :
             self._log.info("Remove driver from openzwave : %s",  self._device)
             self._manager.removeDriver(self._device)
         self._device = device
         self._log.info("adding driver to openzwave : %s",  self._device)
         self._manager.addDriver(self._device)  # ajout d'un driver dans le manager
         
+    def closeDevice(self, device):
+        """ferme un controleur du manager (en developpement 1 seul controleur actuellement)"""
+        if self._device == device and self._ctrlnodeId :
+            print("Remove driver from openzwave : %s" %self._device)
+            self._log.info("Remove driver from openzwave : %s",  self._device)
+            self._manager.removeDriver(self._device)
+            self._ready = False
+            self._ctrlnodeId = None
+            self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-remove', 'usermsg' : 'Driver removed.', 'data': False})
+            self._controller = None
+        else:
+            print('No controller to close')
+            
     def stop(self):
         """ Stop class OZWManager."""
         print("Stopping plugin, Remove driver from openzwave : %s" %self._device)
         self._log.info("Stopping plugin, Remove driver from openzwave : %s",  self._device)
         sleep(1)
-        self._manager.removeDriver(self.device)
+        self._manager.removeDriver(self._device)
+        self._device = None
         self._ready = False
-        self._controller.reportChangeToUI({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Plugin stopped and driver removed.', 'data': False})
-
-    def ctrlMsgToUI(self):
-        """ Maintient la class OZWManager pour le fonctionnement du plugin.
-        """
-        # tant que le plugins est en cours mais pas lancer pour l'instant, vraiment util ?
-        self._log.info("Start plugin listenner Msg To UI")
-        print ("Start plugin listenner Msg To UI")
-        try:
-            while not self._stop.isSet():
-          #      print ('Handle Process msg to UI')
-                if len(self.msgToUI) != 0 :
-                    msg = self.msgToUI.pop(0)
-                    print 'Handle Process msg to UI send to UI',  msg
-                    self._cb_send_xPL(msg['header'], msg['report'])                    
-                    self._stop.wait(0.5) # ne pas saturer le hub xPL
-                else :
-                    self._stop.wait(0.3) # ne pas saturer le proc
-        except OZwaveManagerException :
-            self._log.error("Error listener Msg To UI is stopped")
-            print ("Error listener Msg To UI is stopped")
-            return
-        print ("Stop plugin listener Msg To UI")
-            
+        self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-remove', 'usermsg' : 'Plugin stopped and driver removed.', 'data': False})
+        self.serverUI.close()
+    
+    def GetPluginInfo(self):
+        retval={"hostport": self._wsPort,  "ctrlready": self._ready}
+        if self._initFully :
+            retval["Init state"] = NodeStatusNW[2] # Completed
+        else :
+            retval["Init state"] = NodeStatusNW[3] # In progress - Devices initializing
+        retval["error"] =""
+        return retval
+        
     def _getPyOZWLibVersion(self):
         """Renvoi les versions des librairies py-openzwave ainsi que la version d'openzwave."""
         try :
@@ -244,6 +266,16 @@ class OZWavemanager(threading.Thread):
             if node and node._product:
                 return node._product.name
         return 'Unknown Controller'
+        
+    def _getCtrlDeviceName(self):
+        if self._controller :
+            return self._controller.ctrlDeviceName
+        else : # TODO: Pour retour du ctrlname, si ctrl pas initialisé hypothèse qu'il en 1.1, voir si possible a récupérer de domogik....
+            n = str(self._nameAssoc.keys() [0])
+            if n : 
+                return "%s.1.1" %(n)
+            else :
+                return None
 
     def cb_openzwave(self,  args):
         """Callback depuis la librairie py-openzwave 
@@ -329,6 +361,7 @@ class OZWavemanager(threading.Thread):
         self._log.info("Device %s ready. homeId is 0x%0.8x, controller node id is %d, using %s library version %s", self._device,  self._homeId, self._activeNodeId, self._libraryTypeName, self._libraryVersion)
         self._log.info('OpenZWave Initialization Begins.')
         self._log.info('The initialization process could take several minutes.  Please be patient.')
+        self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Driver is ready.', 'data': True})
         print ('controleur prêt' )
 
     def _handleNodeLinked(self, args):
@@ -396,13 +429,13 @@ class OZWavemanager(threading.Thread):
         node = self._getNode(self._homeId, args['nodeId'])
         nCode = args['notificationCode']
         if nCode in (0 , 'MsgComplete'):     #      Code_MsgComplete = 0,                                   /**< Completed messages */
-            print ('MsgComplete notification code :', args)
+            print 'MsgComplete notification code :', args
             self._log.info('MsgComplete notification code : {0}'.format(args))
         elif nCode in (1 , 'Timeout'):         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
-            print ('Timeout notification code :', args)
+            print 'Timeout notification on node :',  args['nodeId']
             self._log.info('Timeout notification code : {0}'.format(args))
         elif nCode in (2 , 'NoOperation'):  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
-            print ('NoOperation notification code :', args)
+            print 'NoOperation notification code :', args
             self._log.info('NoOperation notification code : {0}'.format(args))
         elif nCode in (3 , 'Awake'):            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
             if node : 
@@ -448,7 +481,6 @@ class OZWavemanager(threading.Thread):
                         print 'Node %d is affected as primary controller' %(nodeId)
                         self._log.info("Node %d is affected as primary controller)", nodeId)
                         self._controller = retval
-                        self._controller.reportChangeToUI({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Driver is ready.', 'data': True})
                         self._controller.reportChangeToUI({'node': 'controller', 'type': 'init-process', 'usermsg' : 'Zwave network initialization process could take several minutes. ' +
                                                     ' Please be patient...', 'data': NodeStatusNW[3]})
                     else :
@@ -476,7 +508,9 @@ class OZWavemanager(threading.Thread):
         node = self._getNode(args['homeId'], args['nodeId'])
         if node :
             self._nodes.pop(node.id)
+      #      node.__del__()
             self._log.info ('Node %d is removed (homeId %.8x)' , args['nodeId'],  args['homeId'])
+            print ('Node %d is removed (homeId %.8x)' , args['nodeId'],  args['homeId'])
         else :
             self._log.debug ("Node %d unknown, isn't removed (homeId %.8x)" , args['nodeId'],  args['homeId'])
 
@@ -544,7 +578,7 @@ class OZWavemanager(threading.Thread):
                 valuebasic = node.getValuesForCommandClass(PyManager.COMMAND_CLASS_DESC[classId] )
                 args2 = dict(args)
                 del args2['event']
-                valuebasic[0].valueData['value'] = args['event']
+                valuebasic[0].valueData['value'] = valuebasic[0].convertInType(args['event'])
                 args2['valueId'] = valuebasic[0].valueData
                 args2['notificationType'] = 'ValueChanged'
                 break
@@ -592,7 +626,7 @@ class OZWavemanager(threading.Thread):
         
     def handle_ControllerAction(self,  action):
         print ('********************** handle_ControllerAction ***********')
-        print('Action : ',  action)
+        print 'Action : ',  action
         self._ctrlActProgress = action   
         retval = self._controller.handle_Action(action)
         return retval
@@ -747,6 +781,8 @@ class OZWavemanager(threading.Thread):
                 retval = node.getStatistics()
                 if retval : 
                     retval['error'] = ""
+                    for item in retval['ccData'] :
+                        item['commandClassId']  = self.getCommandClassName(item['commandClassId'] ) + ' (' + hex(item['commandClassId'] ) +')'
                 else : retval = {'error' : "Zwave node %d not response" %nodeId}
             else : retval['error'] = "Zwave node %d unknown" %nodeId
             return retval
@@ -757,9 +793,17 @@ class OZWavemanager(threading.Thread):
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
             if node.name != newname :
-                node.setName(newname)
+                try :
+                    node.setName(newname)
+                except OZwaveManagerException as e:
+                    self._log.error('node.setName() :' + e.value)
+                    return {"error" : "Node %d, can't update name, error : %s" %(nodeId, e.value) }
             if node.location != newloc :
-                node.setLocation(newloc)
+                try :
+                    node.setLocation(newloc)
+                except OZwaveManagerException as e:
+                    self._log.error('node.setLocation() :' + e.value)
+                    return {"error" : "Node %d, can't update location, error : %s" %(nodeId, e.value) }
             return node.getInfos()                                
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeId}
         
@@ -789,6 +833,88 @@ class OZWavemanager(threading.Thread):
             else : return {"error" : "Manager not send association changement on node %d." %nodeID}
             return 
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeID}
+        
+    def cb_ServerWS(self, message):
+        """Callback en provenance de l'UI via server Websocket (resquest avec ou sans ack)"""
+        blockAck = False
+        report = {'error':  'message not handle'}
+        ackMsg = {}
+        print("WS - Requete UI")
+        if message['header']['type'] in ('req', 'req-ack'):
+            if message['request'] == 'ctrlAction' :
+                report = self.handle_ControllerAction(message['action'])
+                if message['action']['cmd'] =='getState' and report['cmdstate'] != 'stop' : blockAck = True
+            elif message['request'] == 'ctrlSoftReset' :
+                report = self.handle_ControllerSoftReset()
+            elif message['request'] == 'ctrlHardReset' :
+                report = self.handle_ControllerHardReset()
+            elif message['request'] == 'GetNetworkID' :
+                report = self.getNetworkInfo()
+            elif message['request'] == 'GetNodeInfo' :
+                report = self.getNodeInfos(message['node'])
+                ackMsg['node'] = message['node']
+                print "Refresh node :", report
+            elif message['request'] == 'SaveConfig':
+                report = self.saveNetworkConfig()
+            elif message['request'] == 'SetNodeNameLoc':
+                report = self.setUINodeNameLoc(message['node'], message['newname'],  message['newloc'])
+                ackMsg['node'] = message['node']
+            elif message['request'] == 'GetNodeValuesInfo':
+                report =self.getNodeValuesInfos(message['node'])
+                ackMsg['node'] = message['node']
+      #          print 'Refresh all Values infos : ', report
+            elif message['request'] == 'GetValueInfos':
+                valId = long(message['valueid']) # Pour javascript type string
+                report =self.getValueInfos(message['node'], valId)
+                ackMsg['node'] = message['node']
+                ackMsg['valueid'] = message['valueid']
+                print 'Refresh one Value infos : ', report
+            elif message['request'] == 'GetValueTypes':
+                report = sGetListCmdsCtrlelf.getValueTypes()  
+            elif message['request'] == 'GetListCmdsCtrl':
+                report = self.getListCmdsCtrl()
+            elif message['request'] == 'setValue':
+                valId = long(message['valueid']) # Pour javascript type string
+                report = self.setValue(message['node'], valId, message['newValue'])
+                ackMsg['node'] = message['node']
+                ackMsg['valueid'] = message['valueid']
+                print 'Set command_class Value : ',  report
+            elif message['request'] == 'setGroups':
+                report = self.setMembersGrps(message['node'], message['ngrps'])
+                ackMsg['node'] = message['node']         
+                print 'Set Groups association : ',  report
+            elif message['request'] == 'GetGeneralStats':
+                report = self.getGeneralStatistics()
+                print 'Refresh generale stats : ',  report                
+            elif message['request'] == 'GetNodeStats':
+                report = self.getNodeStatistics(message['node'])
+                ackMsg['node'] = message['node']
+                print 'Refresh node stats : ',  report
+            elif message['request'] == 'StartCtrl':
+                if not self.ready : 
+                    self.openDevice(self.device)
+                    report = {'error':'',  'running': True}
+                else : report = {'error':'Driver already running',  'running': True}
+                print 'Start Driver : ',  report
+            elif message['request'] == 'StopCtrl':
+                if self.device and self._ctrlnodeId : 
+                    self.closeDevice(self.device)
+                    report = {'error':'',  'running': False}
+                else : report = {'error':'No Driver knows',  'running': False}
+                print 'Stop Driver : ',  report                
+            else :
+                report['error'] ='unknown request'
+                print "commande inconnue"
+        if message['header']['type'] == 'req-ack' and not blockAck :
+            ackMsg['header'] = {'type': 'ack',  'idws' : message['header']['idws'], 'ip' : message['header']['ip'] , 'timestamp' : long(time.time()*100)}
+            ackMsg['request'] = message['request']
+            if 'error' in report :
+                ackMsg['error'] = report['error']
+            else :
+                ackMsg['error'] =''
+            ackMsg['data'] = report
+            self.serverUI.sendAck(ackMsg)
+
                 
     def reportCtrlMsg(self, ctrlmsg):
         """Un message de changement d'état a été recu, il est reporté au besoin sur le hub xPL pour l'UI
@@ -833,10 +959,7 @@ class OZWavemanager(threading.Thread):
             report['cmdstate'] = 'stop'                                            
             self._ctrlActProgress= None   
         else :
-            report['cmdstate'] = 'waiting'           
-        header={}   
-        header['type'] = 'xpl-trig'
-        header['schema'] = 'ozwave.basic'
-        header['data'] = {'command' : 'Refresh-ack', 'group' :'UI'}
-        self.msgToUI.append({'header': header,  'report': report})
-        # self._cb_send_xPL(header, report)
+            report['cmdstate'] = 'waiting'
+        msg = {'notifytype': 'ctrlstate'}
+        msg['data'] = report
+        self.serverUI.broadcastMessage(msg)

@@ -44,8 +44,8 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.ozwave import OZWavemanager
 from domogik_packages.xpl.lib.ozwave import OZwaveException
-# from lib.ozwave import OZWave
 
+# import gevent.monkey; gevent.monkey.patch_all()
 
 class OZwave(XplPlugin):
     """ Implement a listener for Zwave command messages
@@ -68,20 +68,20 @@ class OZwave(XplPlugin):
         pathConfig = self._config.query('ozwave', 'configpath') + '/'
         # Initialise le manager Open zwave
         try:
-            self.myzwave = OZWavemanager(self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf,  msgEndCb = True) # ozwlog="")
+            self.myzwave = OZWavemanager(self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf)
         except OZwaveException as e:
             self.log.error(e.value)
             print e.value
             self.force_leave()
             return
-        self.add_stop_cb(self.myzwave.stop)
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
-                                                 'xpltype': 'xpl-cmnd'})
+                                                                        'xpltype': 'xpl-cmnd'})
         # Validation avant l'ouverture du controleur, la découverte du réseaux zwave prends trop de temps -> RINOR Timeout
+        self.add_stop_cb(self.myzwave.stop)
         self.enable_hbeat()
         # Ouverture du controleur principal
-        self.myzwave.openDevice(device)                  
+        self.myzwave.openDevice(device)
 
     def ozwave_cmd_cb(self, message):
         """" Envoie la cmd xpl vers le OZWmanager"""
@@ -162,130 +162,12 @@ class OZwave(XplPlugin):
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'data': info})   
-            elif request['request'] == 'GetNetworkID' :
-                info = self.getUIdata2dict(self.myzwave.getNetworkInfo())
+            elif request['request'] == 'GetPluginInfo' :
+                info = self.getUIdata2dict(self.myzwave.GetPluginInfo())
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
                                     'node' : 0, 
                                     'data': info})
-            elif request['request'] == 'GetNodeInfo' :
-                info = self.myzwave.getNodeInfos(request['node'])
-                gprs = info['Groups']
-                del info['Groups']
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'node' : request['node'],
-                                    'data': self.getUIdata2dict(info), 
-                                    'countgrps': len(gprs)})
-                i=0
-                for gp in gprs :
-                    mbrs=gp['members']
-                    del gp['members']
-                    mess.add_data({'group%d' %i :  self.getUIdata2dict(gp)})
-                    ii=0
-                    for m in mbrs :
-                        print 'insert member'
-                        mess.add_data({'g%dm%d' %(i, ii) : self.getUIdata2dict(m) })
-                        ii=ii+1
-                    i = i +1
-                print "Refresh node :",  request['node'],  mess
-            elif  request['request'] == 'SaveConfig':
-                info = self.getUIdata2dict(self.myzwave.saveNetworkConfig())
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'node' :0, 
-                                    'data': info})
-            elif  request['request'] == 'SetNodeNameLoc':
-                info = self.getUIdata2dict(self.myzwave.setUINodeNameLoc(request['node'], request['newname'],  request['newloc']))
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'node' : request['node'], 
-                                    'data': info})
-            elif  request['request'] == 'GetNodeValuesInfo':
-                info =self.myzwave.getNodeValuesInfos(request['node'])
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'node' : request['node'], 
-                                    'count': len(info['Values']) })
-                i=0
-                for inf in info['Values']:
-                    mess.add_data({'value%d' %i :  self.getUIdata2dict(inf)})
-                    i = i +1
-                print mess
-            elif  request['request'] == 'GetValueInfos':
-                valId = long(request['valueid']) # Pour javascript type string
-                info =self.getUIdata2dict(self.myzwave.getValueInfos(request['node'], valId))
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'valueid' : request['valueid'], 
-                                    'data': info})
-                print mess
-            elif  request['request'] == 'GetValueTypes':
-                info = self.getUIdata2dict(self.myzwave.getValueTypes())
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'listetypes' : 'valuestype', 
-                                    'data': info})               
-            elif  request['request'] == 'GetListCmdsCtrl':
-                listeCmd = self.myzwave.getListCmdsCtrl()
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'listetypes' : 'cmdsctrl'})
-                i=1
-                for item in listeCmd:
-                    if item =='error':
-                        if listeCmd[item] =='' : mess.add_data({'error' :  'no' })
-                        else : mess.add_data({'error' :  listeCmd[item] })
-                    else :
-                        d = {item: listeCmd[item]}
-                        mess.add_data({'item%d'%i : self.getUIdata2dict(d) })
-                        i=i+1
-            elif  request['request'] == 'setValue':
-                valId = long(request['valueid']) # Pour javascript type string
-                newvalue = request['newValue']
-                info = self.getUIdata2dict(self.myzwave.setValue(request['node'], valId, newvalue))
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'listetypes' : 'valuestype', 
-                                    'data': info})
-                print mess
-            elif  request['request'] == 'setGroups':
-                info = self.getUIdata2dict(self.myzwave.setMembersGrps(request['node'], request['ngrps']))
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'node' : request['node'], 
-                                    'data': info})               
-                print mess
-            elif  request['request'] == 'GetGeneralStats':
-                info = self.myzwave.getGeneralStatistics()
-                err = info['error']
-                del info['error']
-                mess.add_data({'command' : 'Refresh-ack', 
-                                    'group' :'UI', 
-                                    'error': err if err != '' else "no", 
-                                    'data': self.getUIdata2dict(info)})               
-                print mess                
-            elif  request['request'] == 'GetNodeStats':
-                info = self.myzwave.getNodeStatistics(request['node'])
-                err = info['error']
-                mess.add_data({'command' : 'Refresh-ack', 
-                    'group' :'UI', 
-                    'node' : request['node'],
-                    'error': err if err != '' else "no"})
-                if err =='' :
-                    ccData = info['ccData']
-                    del info['error']
-                    del info['ccData']
-                    del info['lastReceivedMessage']  # TODO: key supprimée, gerer le message zwave en hex.
-                    for  item in info : info[item] = str (info[item]) # Pour etre compatible avec javascript
-                    mess.add_data({'data': self.getUIdata2dict(info)})
-                    i = 1
-                    for item in ccData :
-                        item['commandClassId'] = self.myzwave.getCommandClassName(item['commandClassId'] ) + ' (' + hex(item['commandClassId'] ) +')'
-                        for  cclass in item: item[cclass] = str (item[cclass])  # Pour etre compatible avec javascript
-                        mess.add_data({'item%d' %i  : self.getUIdata2dict(item)})
-                        i=i+1
-                print mess                             
             else :
                 mess.add_data({'command' : 'Refresh-ack', 
                                     'group' :'UI', 
@@ -315,8 +197,8 @@ class OZwave(XplPlugin):
         elif 'Find' in msgtrig:
             print("node enregistré : %s" % msgtrig['Find'])
         elif 'typexpl' in msgtrig:
-            print ("send xpl-trig")
-            print msgtrig	
+ #          print ("send xpl-trig")
+ #           print msgtrig	
         #    mess.set_type('xpl-trig') # force xpl-trig
             mess.set_type(msgtrig['typexpl'])
             mess.set_schema(msgtrig['schema'])

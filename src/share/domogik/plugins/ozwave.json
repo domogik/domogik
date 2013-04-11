@@ -1,19 +1,5 @@
 {
-	"files" : ["src/share/domogik/design/plugin/ozwave/icon.png",
-		"src/share/domogik/plugins/ozwave.json",
-		"src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml",
-		"src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml",
-		"src/share/domogik/url2xpl/ozwave/level.xml",
-		"src/share/domogik/url2xpl/ozwave/on.xml",
-		"src/share/domogik/url2xpl/ozwave/off.xml",
-		"src/share/domogik/url2xpl/ozwave/Refresh.xml",
-		"src/share/domogik/data/ozwave/ozwconfig/",
-		"src/domogik_packages/xpl/bin/ozwave.py",
-		"src/domogik_packages/xpl/lib/ozwave.py",
-		"src/domogik_packages/xpl/lib/ozwdefs.py",
-		"src/domogik_packages/xpl/lib/ozwvalue.py",
-		"src/domogik_packages/xpl/lib/ozwnode.py"
-	],
+	"files" : ["src/share/domogik/design/plugin/ozwave/icon.png", "src/share/domogik/plugins/ozwave.json", "src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml", "src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml", "src/share/domogik/stats/ozwave/controller.basic-ozwave.xml", "src/share/domogik/url2xpl/ozwave/level.xml", "src/share/domogik/url2xpl/ozwave/on.xml", "src/share/domogik/url2xpl/ozwave/off.xml", "src/share/domogik/url2xpl/ozwave/Refresh.xml", "src/share/domogik/data/ozwave/ozwconfig/", "src/domogik_packages/xpl/bin/ozwave.py", "src/domogik_packages/xpl/lib/ozwave.py", "src/domogik_packages/xpl/lib/ozwdefs.py", "src/domogik_packages/xpl/lib/ozwvalue.py", "src/domogik_packages/xpl/lib/ozwnode.py", "src/domogik_packages/xpl/lib/ozwctrl.py", "src/domogik_packages/xpl/lib/ozwuiserver.py"],
 	"udev-rules" : [{
 			"description" : "Zwave controler",
 			"filename" : "98-usbcp210x.rules",
@@ -22,15 +8,15 @@
 		}
 	],
 	"device_feature_models" : [{
-            "device_type_id": "ozwave.ctrl",
-            "feature_type": "sensor",
-            "id": "ozwave.ctrl.status",
-            "name": "Status",
-            "parameters": "{}",
-            "return_confirmation": "0",
-            "stat_key": "status",
-            "value_type": "string"
-        }, {
+			"device_type_id" : "ozwave.ctrl",
+			"feature_type" : "sensor",
+			"id" : "ozwave.ctrl.status",
+			"name" : "Status",
+			"parameters" : "{}",
+			"return_confirmation" : "0",
+			"stat_key" : "status",
+			"value_type" : "string"
+		}, {
 			"return_confirmation" : "1",
 			"feature_type" : "actuator",
 			"parameters" : "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
@@ -57,6 +43,33 @@
 			"device_type_id" : "ozwave.dimmer",
 			"id" : "ozwave.dimmer.change",
 			"name" : "Change"
+		}, {
+			"device_type_id" : "ozwave.switchmeter",
+			"feature_type" : "actuator",
+			"id" : "ozwave.switchmeter.switch",
+			"name" : "Switch",
+			"parameters" : "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
+			"return_confirmation" : "1",
+			"stat_key" : "command",
+			"value_type" : "binary"
+		}, {
+			"device_type_id" : "ozwave.switchmeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.switchmeter.power",
+			"name" : "Power",
+			"parameters" : "{&quot;unit&quot;:&quot;W&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "power",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.switchmeter",
+			"feature_type" : "sensor",
+			"id" : "ozwave.switchmeter.energy",
+			"name" : "Energy",
+			"parameters" : "{&quot;unit&quot;:&quot;kWh&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "energy",
+			"value_type" : "number"
 		}, {
 			"device_type_id" : "ozwave.humidity",
 			"feature_type" : "sensor",
@@ -98,7 +111,7 @@
 			"feature_type" : "sensor",
 			"id" : "ozwave.sensor.status",
 			"name" : "Status",
-			"parameters" : "{&quot;value0&quot;:&quot;true&quot;,&quot;value1&quot;:&quot;false&quot;}",
+			"parameters" : "{&quot;value0&quot;:&quot;True&quot;,&quot;value1&quot;:&quot;False&quot;}",
 			"return_confirmation" : "0",
 			"stat_key" : "sensor",
 			"value_type" : "boolean"
@@ -230,6 +243,10 @@
 			"name" : "Switch",
 			"id" : "ozwave.switch"
 		}, {
+			"description" : "Switch with power meter, Everspring AN158,...",
+			"name" : "Switch with power meter",
+			"id" : "ozwave.switchmeter"
+		}, {
 			"description" : "Dimmer",
 			"name" : "Dimmer",
 			"id" : "ozwave.dimmer"
@@ -309,6 +326,15 @@
 			"type" : "string",
 			"id" : "4"
 		}, {
+			"description" : "Network port for WebSocket plugin server.",
+			"default" : "40470",
+			"interface" : "no",
+			"key" : "wsportserver",
+			"optionnal" : "no",
+			"options" : [],
+			"type" : "int",
+			"id" : "5"
+		}, {
 			"description" : "Home id name for association with device",
 			"default" : "myHomeId",
 			"options" : [],
@@ -316,7 +342,7 @@
 			"interface" : "yes",
 			"optionnal" : "no",
 			"type" : "string",
-			"id" : "5"
+			"id" : "6"
 		}, {
 			"description" : "Home id refered to special page",
 			"default" : "Copy HomeId from special page",
@@ -325,7 +351,7 @@
 			"interface" : "yes",
 			"optionnal" : "no",
 			"type" : "string",
-			"id" : "6"
+			"id" : "7"
 		}
 	],
 	"technology" : {
@@ -337,7 +363,7 @@
 		"category" : "Z-wave",
 		"documentation" : "http://wiki.domogik.org/tiki-index.php?page=plugin_ozwave",
 		"description" : "Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control",
-		"changelog" : " 0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
+		"changelog" : "0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
 		"author_email" : "nico84dev at gmail.com",
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.3.0",
@@ -346,9 +372,8 @@
 				"type" : "python"
 			}
 		],
-		"version" : "0.1b8",
+		"version" : "0.2b2",
 		"type" : "plugin",
 		"id" : "ozwave"
-	},
-	"json_version" : 1
-}
+	}, "json_version" : 1
+	}
