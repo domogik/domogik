@@ -47,7 +47,8 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 
 .. |awake1| image:: ozwave_awake1.png
 
-.. |awake2| image:: ozwave_awake2.png
+.. |awake2| image:: ozwave_update-sleep.png
+    :width: 150px
 
 .. |det-type| image:: ozwave_detail-type.png
     :width: 150px
@@ -76,9 +77,9 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | **Pointing the mouse over icon in column "Awake" give status of listening mode.**                                                       |
 | |awake1|         +------------------------------------+----------------------------------------------------------------------------------------------------+
-|                  | active                             | Node is awake, message can send immediately.                                                       |
+|                  | Awake                              | Node is awake, message can send immediately.                                                       |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
-| |awake2|         | Unknown                            | Node probably sleeping, message are put on send queue.                                             |
+| |awake2|         | Sleeping                           | Node probably sleeping, message are put on send queue.                                             |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | **Pointing the mouse over icon in column "Type" give capacities of node.**                                                              |
 | |det-type|       +------------------------------------+----------------------------------------------------------------------------------------------------+
@@ -196,12 +197,48 @@ Manage devices Commands Class
 
 |tab-cmdclass2|
 
+- When a value of command class is updated, she his tagged during 5 secondes. Pointing the mouse over value give date of update.
+
+.. |update-cmdclass| image:: ozwave_update-cmdclass.png
+    :width: 750px
+
+|update-cmdclass|
 
 .. todo:: 
     Screen shoot and explanations of other functions......
 
-Controller commands and actions
+Drivers and controller commands
 ===============================
+
+.. |ctrl-cmd-bts| image:: ozwave_ctrl-cmd-bts.png
+
+In this section, orders can be sent directly to the driver
+
+|ctrl-cmd-bts|
+
+Stop and Start driver (controller)
+----------------------------------
+
+.. |ctrl-start-bt| image:: ozwave_ctrl-start-bt.png
+
+.. |ctrl-stop-bt| image:: ozwave_ctrl-stop-bt.png
+
+.. |ctrl-stop-dlg| image:: ozwave_ctrl-stop-dialog.png
+
+Driver automatically starts and start/stop button automatically changes depending on the state of the driver. 
+
+- You can stop it when it's possible : |ctrl-stop-bt|
+
+confimation dialog aks you to continue.
+
+|ctrl-stop-dlg|
+
+- You can Start it when it's possible : |ctrl-start-bt|
+
+Initialization process running, you must be patient ....
+
+Controller commands and actions
+-------------------------------
 
 .. |ctrl-action-bt| image:: ozwave_ctrl-action-bt.png
 
@@ -213,7 +250,7 @@ Controller commands and actions
 |ctrl-action-dialog|
 
 Actions process
----------------
+^^^^^^^^^^^^^^^
 
 - This modal dialog contains informations to guide the user.
 - All actions are not implemented yet and processing is in beta testing.
@@ -257,7 +294,7 @@ Actions process
 +---------------------------+------------------------------------------------------------------------------------------------------------+
 
 Schematic processing
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 - Each action have differents step, some will attempt user action on device, some will take a long time, some must be stop manually.
 - You can stop action, but stop result have some time a fail report.
@@ -268,14 +305,14 @@ Schematic processing
 |ctrl-action-process|
 
 Reset controller
-================
+----------------
 
 .. |ctrl-reset-bt| image:: ozwave_ctrl-reset-bt.png
 
 - Two mode possible with acces by buttons : |ctrl-reset-bt|
 
 Soft reset
-----------
+^^^^^^^^^^
 
 .. |ctrl-reset-dialog1| image:: ozwave_ctrl-reset-dialog1.png
 
@@ -285,7 +322,7 @@ Soft reset
 
 
 Hard reset
-----------
+^^^^^^^^^^
 
 .. |ctrl-reset-dialog2| image:: ozwave_ctrl-reset-dialog2.png
 

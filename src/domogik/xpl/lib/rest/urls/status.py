@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper
+from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, timeit
 import sys
 import os
 import domogik
@@ -7,6 +7,7 @@ from flask import Response
 
 @urlHandler.route('/')
 @json_response
+@timeit
 def api_root():
     # domogik global version
     global_version = sys.modules["domogik"].__version__
