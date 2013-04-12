@@ -35,6 +35,8 @@ DOMOGIK_XPL_HUB="python"
 NAME=dmg_manager
 C_XPLHUB=xPL_Hub
 PYTHON_XPLHUB=dmg_hub
+MQ_BROKER=dmg_broker
+MQ_FORWARDER=dmg_forwarder
 DIETIME=2
 STARTTIME=5
 #PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
@@ -53,12 +55,30 @@ if [ ${UID} != 0 ];then
 fi
 
 function start {
+    start_mq
     if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
         start_xpl
     else
         echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
     fi
     start_daemon
+}
+
+function start_mq {
+    echo -n " * Starting 0MQ broker ..."
+    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during 0MQ broker startup."
+        exit 1
+    fi
+    echo " Done."
+    echo -n " * Starting 0MQ forwarder ..."
+    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during 0MQ forwarder startup."
+        exit 1
+    fi
+    echo " Done."
 }
 
 function start_xpl {
@@ -144,6 +164,26 @@ function status_manager {
     fi
 }
 
+function status_mq {
+    set +e
+    RUNNING=$(/usr/bin/pgrep -c ${MQ_BROKER})
+    set -e
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+        echo " * ${MQ_BROKER} is running"
+    else
+        echo " * ${MQ_BROKER} is not running"
+    fi
+    set +e
+    RUNNING=$(/usr/bin/pgrep -c ${MQ_FORWARDER})
+    set -e
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+        echo " * ${MQ_FORWARDER} is running"
+    else
+        echo " * ${MQ_FORWARDER} is not running"
+    fi
+
+}
+
 function status_xpl {
     if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
         set +e
@@ -179,7 +219,26 @@ function stop {
         echo "Domogik xPL hub disabled : no need to stop Domogik xPL hub"
     fi
     stop_manager
+    stop_mq
     kill_all
+}
+
+function stop_mq {
+    echo -n " * Stopping 0MQ broker..."
+    for pid in `ps ax | grep "${MQ_BROKER}" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+        sleep ${DIETIME}
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    echo " Done."
+    echo -n " * Stopping 0MQ forwarder..."
+    for pid in `ps ax | grep "${MQ_FORWARDER}" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+        sleep ${DIETIME}
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    echo " Done."
+
 }
 
 function stop_xpl {
@@ -262,7 +321,7 @@ kill_all() {
 }
 
 function update_cache {
-    echo -n "* Updating packages cache..."
+    echo -n " * Updating packages cache..."
     /bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
     if [ $? -gt 0 ]; then
         echo " An error occured during packages cache update."
@@ -297,6 +356,9 @@ case "$1" in
             update_cache
         else
             case "$2" in
+		mq)
+                    start_mq
+                ;;
                 xpl)
                     start_xpl
                 ;;
@@ -306,7 +368,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 start [manager|xpl]"
+                    echo "usage: $0 start [manager|xpl|mq]"
                 ;;
             esac
         fi
@@ -316,6 +378,9 @@ case "$1" in
             stop
         else
             case "$2" in
+		mq)
+                    stop_mq
+                ;;
                 xpl)
                     stop_xpl
                 ;;
@@ -326,7 +391,7 @@ case "$1" in
                     stop_manager
                 ;;
                 *)
-                    echo "usage: $0 stop [manager|xpl]"
+                    echo "usage: $0 stop [manager|xpl|mq]"
                 ;;
             esac
         fi
@@ -341,6 +406,11 @@ case "$1" in
             sleep ${STARTTIME}
         else
             case "$2" in
+		mq)
+                    stop_mq
+                    sleep ${DIETIME}
+		    start_mq
+                ;;
                 xpl)
                     stop_xpl
                     sleep ${DIETIME}
@@ -356,7 +426,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 restart [manager|xpl]"
+                    echo "usage: $0 restart [manager|xpl|mq]"
                 ;;
             esac
         fi
@@ -372,14 +442,17 @@ case "$1" in
                 xpl)
                     status_xpl
                 ;;
+                mq)
+		    status_mq
+                ;;
                 *)
-                    echo "usage: $0 status [manager|xpl]"
+                    echo "usage: $0 status [manager|xpl|mq]"
                 ;;
             esac
         fi
         ;;
     *)
-    echo "usage: $0 {start|stop|restart|status} [(xpl|manager|plugins)]"
+    echo "usage: $0 {start|stop|restart|status} [(mq|xpl|manager|plugins)]"
     echo "More help : $0 command help"
 esac
 exit 0

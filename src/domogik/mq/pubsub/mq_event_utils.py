@@ -36,6 +36,8 @@ Implements
 
 import json
 import zmq
+from zmq.eventloop.zmqstream import ZMQStream
+from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from time import sleep, time
 from domogik.common import logger
 from domogik.common.configloader import Loader
@@ -43,20 +45,20 @@ from domogik.common.configloader import Loader
 MSG_VERSION = "0_1"
 
 class MqEvent:
-    def __init__(self, caller_id):
+    def __init__(self, context, caller_id):
         if caller_id is None:
             raise Exception("Caller id can't be empty!")
         self.caller_id = caller_id
-        self.context = zmq.Context()
+        self.context = context
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
 
-class MqEventPub(MqEvent):
-    def __init__(self, caller_id):
-        MqEvent.__init__(self, caller_id)
+class MqPub(MqEvent):
+    def __init__(self, context, caller_id):
+        MqEvent.__init__(self, context, caller_id)
         self.log = logger.Logger('mq_event_pub').get_logger()
         self.s_send = self.context.socket(zmq.PUB)
-        pub_addr = "tcp://localhost:%s" % self.cfg_mq['event_pub_port']
+        pub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_pub_port'])
         self.log.debug("Publishing on address : %s" % pub_addr)
         self.s_send.connect(pub_addr)
         # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
@@ -79,12 +81,12 @@ class MqEventPub(MqEvent):
         self.s_send.send(content)
         self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
 
-class MqEventSub(MqEvent):
-    def __init__(self, caller_id, *category_filters):
-        MqEvent.__init__(self, caller_id)
+class MqSyncSub(MqEvent):
+    def __init__(self, context, caller_id, *category_filters):
+        MqEvent.__init__(self, context, caller_id)
         self.log = logger.Logger('mq_event_sub').get_logger()
         self.s_recv = self.context.socket(zmq.SUB)
-        sub_addr = "tcp://localhost:%s" % self.cfg_mq['event_sub_port']
+        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
 
@@ -115,3 +117,46 @@ class MqEventSub(MqEvent):
             msg_error = "Message not complete (content is missing)!, so leaving..."
             self.log.error(msg_error)
             raise Exception(msg_error)
+
+class MqAsyncSub(MqEvent):
+    def __init__(self, context, caller_id, category_filters):
+        """
+        :param category_filters: a dictionary with the key equal to the filter and the value equal to the callback
+        """
+        MqEvent.__init__(self, context, caller_id)
+        self.log = logger.Logger('mq_event_sub').get_logger()
+        self.s_recv = self.context.socket(zmq.SUB)
+        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
+        self.log.debug("Subscribing to address : %s" % sub_addr)
+        self.s_recv.connect(sub_addr)
+
+        if len(category_filters) == 0:
+	    self.log.debug("%s : with no category filter(s)" % (self.caller_id))
+	    self.s_recv.setsockopt(zmq.SUBSCRIBE, '')
+        else:
+            for category_filter in category_filters:
+	        self.log.debug("%s : category filter : %s" % (self.caller_id, category_filter))
+	        self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
+        ioloop = IOLoop.instance()
+        self.stream = ZMQStream(self.s_recv, ioloop)
+        self.stream.on_recv(self._on_message)
+    
+    def __del__(self):
+        # Not sure this is really mandatory
+        self.s_recv.close()
+    
+    def _on_message(self, msg):
+        """Received an event
+        will lookup the correct callback to use, and call it
+        
+        :param: msg = the message received
+        """
+        self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg[0], msg[1]))
+        self.on_message(msg[0], msg[1])
+  
+    def on_message(self, msg_id, content):
+        """Public method called when a message arrived.
+
+        .. note:: Does nothing. Should be overloaded!
+        """
+        pass
