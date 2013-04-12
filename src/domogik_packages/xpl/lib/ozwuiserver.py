@@ -80,6 +80,7 @@ RespD = {'Value': 454545L, 'long' :'Insensitiveness to temperature changes. This
                 'Bit 0: Auto Send Battery Report at the group time interval (whole HEM)'}
 
 class BroadcastServer(object):
+    """Class de gestion du server websocket pour dialogue plugin UI"""
     def __init__(self,  port=5570,  cb_recept = None,  log = None ):
         global __ctrlServer__
         self.buffer = []
@@ -101,6 +102,7 @@ class BroadcastServer(object):
         print "**************** WebSocket server is started ********************"
         
     def run(self):
+        """Demarre le server en mode forever, methode appelee depuis le start du thread""" 
         # TODO : Ajouter la gestion d'un exception en cas d'erreur sur le server
         print "**************** Starting WebSocket server forever **************"
         self.log.info('Starting WebSocket server forever')
@@ -108,17 +110,20 @@ class BroadcastServer(object):
         self.server.serve_forever()
     
     def close(self):
+        """Ferme le server"""
         self.server.server_close()
         
     def __del__(self):
+        """Destructeur de la class avec arret du server"""
         print ('server stopped')
         self.running = False
-        self.server.stop()
+        self.server.server_close()
         
     def broadcastMessage(self, message):
+        """Diffuse un message à tous les clients"""
         header = {'type':'pub',  'idws' : 'for each' , 'ip' : '0.0.0.0',  'timestamp' : long(time.time()*100)}
         message['header'] = header
-        info = 'Websocket server sending for %d client(s) : %s' %(len(self.server.manager.websockets),  str(message))
+        info = 'Websocket server sending for %d client(s) : %s' % (len(self.server.manager.websockets),  str(message))
      #   print info
         self.log.debug(info)
         for ws in self.server.manager.websockets.itervalues():
@@ -133,6 +138,7 @@ class BroadcastServer(object):
                 continue
                 
     def sendAck(self, ackMsg):
+        """Envoie un message de confirmation 'Ack' à un client"""
         if ackMsg['header'] :
             for ws in self.server.manager.websockets.itervalues():
                 if ws.peer_address[1] == ackMsg['header']['idws'] :
@@ -140,34 +146,35 @@ class BroadcastServer(object):
                     ws.send(json.dumps(ackMsg))
 
 class WebSocketsHandler(WebSocket):
+    """Class client, un objet par client, creer part le serveur, hérite de la class WebSocket."""
     def opened(self):
+        """Appellé à l'ouverture du client."""
         global __ctrlServer__
         print 'Nouveau client WebSocket',  self.peer_address
-        __ctrlServer__ .log.info('A new WebSocket client connected : %s : %s'  % (self.peer_address[0], self.peer_address[1]))
+        __ctrlServer__.log.info('A new WebSocket client connected : %s : %s'  % (self.peer_address[0], self.peer_address[1]))
         self.send(json.dumps({'header': {'type' : 'confirm-connect', 'id' : 'ozwave_serverUI',  'idws': self.peer_address[1]}}))
         self.confirmed = False
 
         
     def closed(self, code,  status):
+        """Appelé à la fermeture ou perte du client"""
         global __ctrlServer__
         print 'Client WebSocket supprimer',  code,  status,  self.connection
-        __ctrlServer__ .log.info('WebSocket client disconnected : %s' % self.connection )
+        __ctrlServer__.log.info('WebSocket client disconnected : %s' % self.connection )
 
         
     def received_message(self, message):
+        """Callback de reception d'un message du client, gère le renvois d'un message de confirmation directe (Ack)."""
         global __ctrlServer__
-        t = time.time()              # Getting date/time
         print 'message recu : ',  message
         session = self.environ.get('REMOTE_ADDR')
-        annonce = '%s connected' % session
         print 'Recept websocket message, session on : ',  session,  ' client : ',  self.peer_address[1]
         try :
             msg = json.loads(str(message))
-     #       print 'parse ok'
             header = msg['header'] 
         except TypeError as e :
             print 'Error parsing websocket msg :',  e
-            __ctrlServer__ .log.debug('WebSocket client error parsing msg : %s , Message : %s' %(e, str(message)))
+            __ctrlServer__.log.debug('WebSocket client error parsing msg : %s , Message : %s' % (e, str(message)))
         else :
             if header['type']  == 'ack-connect':
                 self.confirmed = True 
@@ -178,12 +185,11 @@ class WebSocketsHandler(WebSocket):
                 __ctrlServer__.cb_recept(msg)
                 print 'Send to callback'
             if header['type'] == "ack" : self.sendAck({'msg':msg})
-            if msg =='quit' : running =False
         print '++++++++++++++++++++++++++  fin Websocket reception'
         
         
     def sendAck(self, msg):
-        global __ctrlServer__
+        """Renvoi le message de confirmation (Ack)."""
         print 'WebSocket send Ack'
         msg.update({'header': {'type':'ack', 'idws' : self.peer_address[1] , 'ip' : self.peer_address[0],  'timestamp' : long(time.time()*100)}})
         self.send(json.dumps(msg))

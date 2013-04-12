@@ -253,7 +253,7 @@ Actions process
 ^^^^^^^^^^^^^^^
 
 - This modal dialog contains informations to guide the user.
-- All actions are not implemented yet and processing is in beta testing.
+- Just actions "CreateButton" and "DeleteButton" are not implemented yet.
 
 +---------------------------+------------------------------------------------------------------------------------------------------------+
 | Action / command          | Description                                                                                                |
