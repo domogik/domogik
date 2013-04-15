@@ -83,7 +83,7 @@ DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery
                                   'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint']
 
 # Notifications reportés sur le hub xPL pour l'UI
-UICtrlReportType = ['plugin-state','driver-ready',  'init-process', 'ctrl-error', 'ctrl-action',  'node-state-changed', 'value-changed']
+UICtrlReportType = ['plugin-state', 'driver-ready', 'init-process', 'ctrl-error', 'ctrl-action', 'node-state-changed', 'value-changed']
                                
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
@@ -166,9 +166,11 @@ class OZwaveException(Exception):
     """"Zwave generic exception class.
     """
     def __init__(self, value):
+        """Initialisation"""
         Exception.__init__(self)
         self.msg = "OZwave generic exception:"
         self.value = value
                                 
     def __str__(self):
+        """String format objet"""
         return repr(self.msg+' '+self.value)

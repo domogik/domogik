@@ -35,17 +35,12 @@ Implements
 @organization: Domogik
 """
 
-import sys
-# sys.path.append("/var/lib/domogik")
-
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.ozwave import OZWavemanager
 from domogik_packages.xpl.lib.ozwave import OZwaveException
-
-# import gevent.monkey; gevent.monkey.patch_all()
 
 class OZwave(XplPlugin):
     """ Implement a listener for Zwave command messages
@@ -107,27 +102,22 @@ class OZwave(XplPlugin):
                     
     def getdict2UIdata(self, UIdata):
         """ retourne un format dict en provenance de l'UI (passage outre le format xPL)"""
-#        retval = UIdata.replace('|', '{').replace('\\', '}')
         retval = UIdata.replace('&quot;', '"').replace('&squot;', "'").replace("&ouvr;", '{').replace("&ferm;", '}') ;
         try :
- #           return  eval(retval.replace(';', ','))
             return eval(retval)
-        except :
+        except OZwaveException as e:
             print retval
             self.log.debug ("Format data to UI : eval in getdict2UIdata error : " +   retval)
             return {'error': 'invalid format'}
             
     def getUIdata2dict(self, ddict):
         """Retourne le dict formatter pour UI (passage outre le format xPL)"""
-  #      return str(ddict).replace('{', '|').replace('}', '\\').replace(',',';').replace('False', 'false').replace('True', 'true').replace('None', "''")
         print "conversion pour transfertvers UI , " , str(ddict)
         for k in ddict :   # TODO: pour passer les 1452 chars dans RINOR, à supprimer quand MQ OK, 
-  #          print ('++++',  type(ddict[k]))
             if isinstance(ddict[k], str) :
                 ddict[k] = ddict[k].replace("'", "&squot;")  # remplace les caractères interdits pour rinor
-   #             print ('****Replace quote : ',  ddict[k])
                 if len(str(ddict[k])) >800 : 
-                    ddict[k]=ddict[k][:800]
+                    ddict[k] = ddict[k][:800]
                     print("value raccourccis : ", k, ddict[k])
                     self.log.debug ("Format data to UI : value to large, cut to 800, key : %s, value : %s" % (str(k), str(ddict[k])))
         return str(ddict).replace('{', '&ouvr;').replace('}', '&ferm;').replace('"','&quot;').replace("'",'&quot;').replace('False', 'false').replace('True', 'true').replace('None', '""')
@@ -177,7 +167,7 @@ class OZwave(XplPlugin):
             if response : self.myxpl.send(mess)
                                   
                                     
-    def send_xPL(self, xPLmsg,  args = {}):
+    def send_xPL(self, xPLmsg,  args = None):
         """ Envoie une commande ou message zwave vers xPL"""
         mess = XplMessage()
         mess.set_type(xPLmsg['type']) 
@@ -188,18 +178,15 @@ class OZwave(XplPlugin):
             mess.add_data({'data': self.getUIdata2dict(args)})
         print mess
         self.myxpl.send(mess)
-       # self.get_stop().wait(0.7)  # TODO: A supprimer au passage MQ, l'envois à une cadence trops soutenue fait perdre des messages
         
     def sendxPL_trig(self, msgtrig):
+        """Envoie un message trig sur le hub xPL"""
         mess = XplMessage()
         if 'info' in msgtrig:
             self.log.error ("Error : Node %s unreponsive" % msgtrig['node'])
         elif 'Find' in msgtrig:
             print("node enregistré : %s" % msgtrig['Find'])
         elif 'typexpl' in msgtrig:
- #          print ("send xpl-trig")
- #           print msgtrig	
-        #    mess.set_type('xpl-trig') # force xpl-trig
             mess.set_type(msgtrig['typexpl'])
             mess.set_schema(msgtrig['schema'])
             if msgtrig['genre'] == 'actuator' :

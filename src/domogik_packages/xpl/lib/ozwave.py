@@ -94,7 +94,7 @@ class OZWavemanager(threading.Thread):
         self._userPath = userPath
         self._ready = False
         self._initFully = False
-        self._ctrlActProgress= None
+        self._ctrlActProgress = None
         self._wsPort = int(self._configPlug.query('ozwave', 'wsportserver'))
         # récupération des associations nom de réseaux et homeID
         self._nameAssoc = {}
@@ -125,7 +125,7 @@ class OZWavemanager(threading.Thread):
         elif not os.access(self._configPath,  os.R_OK) :
             self._log.error("User %s haven't write access on openzwave directory : %s"  %(user,  self._configPath))
             raise OZwaveManagerException ("User %s haven't write access on openzwave directory : %s"  %(user,  self._configPath))
-        print "User : %s, openzwave path : %s"  %(user,  self._configPath)
+        print "User : %s, openzwave path : %s"  % (user,  self._configPath)
         if not os.path.exists(self._userPath) : 
             self._log.info("Directory openzwave user not exist, trying create : %s" , self._configPath)
             try : 
@@ -164,7 +164,7 @@ class OZWavemanager(threading.Thread):
      # On accède aux attributs uniquement depuis les property
     device = property(lambda self: self._device)
     homeId = property(lambda self: self._homeId)
-    activeNodeId= property(lambda self: self._activeNodeId)
+    activeNodeId = property(lambda self: self._activeNodeId)
     controllerNode = property(lambda self: self._controller)
     controllerDescription = property(lambda self: self._getControllerDescription())
     nodes = property(lambda self: self._nodes)   
@@ -212,12 +212,12 @@ class OZWavemanager(threading.Thread):
         self.serverUI.close()
     
     def GetPluginInfo(self):
-        retval={"hostport": self._wsPort,  "ctrlready": self._ready}
+        retval = {"hostport": self._wsPort,  "ctrlready": self._ready}
         if self._initFully :
             retval["Init state"] = NodeStatusNW[2] # Completed
         else :
             retval["Init state"] = NodeStatusNW[3] # In progress - Devices initializing
-        retval["error"] =""
+        retval["error"] = ""
         return retval
         
     def _getPyOZWLibVersion(self):
@@ -273,7 +273,7 @@ class OZWavemanager(threading.Thread):
         else : # TODO: Pour retour du ctrlname, si ctrl pas initialisé hypothèse qu'il en 1.1, voir si possible a récupérer de domogik....
             n = str(self._nameAssoc.keys() [0])
             if n : 
-                return "%s.1.1" %(n)
+                return "%s.1.1" % (n)
             else :
                 return None
 
@@ -404,7 +404,7 @@ class OZWavemanager(threading.Thread):
                 print ('controleur node ready pour autorisation dialogue UI')
                 self._log.info('Z-Wave Controller Node {0} is ready, UI dialogue autorised.'.format(node.id))
         else :
-            if args['nodeId']== 255 and not self._ready :
+            if args['nodeId'] == 255 and not self._ready :
                 self._handleInitializationComplete(args) # TODO :depuis la rev 585 pas de 'AwakeNodesQueried' ou  'AllNodesQueried' ? on force l'init
     
     def _handleMarkSomeNodesDead(self,  args):
@@ -478,7 +478,7 @@ class OZWavemanager(threading.Thread):
                 if nodeId == self._ctrlnodeId :
                     if not self._controller : 
                         retval = ZWaveController(self,  homeId, nodeId,  True)
-                        print 'Node %d is affected as primary controller' %(nodeId)
+                        print 'Node %d is affected as primary controller' % (nodeId)
                         self._log.info("Node %d is affected as primary controller)", nodeId)
                         self._controller = retval
                         self._controller.reportChangeToUI({'node': 'controller', 'type': 'init-process', 'usermsg' : 'Zwave network initialization process could take several minutes. ' +
@@ -488,7 +488,7 @@ class OZWavemanager(threading.Thread):
                         retval = ZWaveController(self,  homeId, nodeId,  False)
                 else : 
                     retval = ZWaveNode(self,  homeId, nodeId)
-                print 'Created new node with homeId 0x%0.8x, nodeId %d' %(homeId, nodeId)
+                print 'Created new node with homeId 0x%0.8x, nodeId %d' % (homeId, nodeId)
                 self._log.debug('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
                 self._nodes[nodeId] = retval
             else :
@@ -518,7 +518,7 @@ class OZWavemanager(threading.Thread):
     def _handleValueAdded(self, args):
         """Un valueNode est ajouté au node depuis le réseaux zwave"""
         homeId = args['homeId']
-        activeNodeId= args['nodeId']
+        activeNodeId = args['nodeId']
         valueId = args['valueId']
         node = self._fetchNode(homeId, activeNodeId)
         node._lastUpdate = time.time()
@@ -527,7 +527,7 @@ class OZWavemanager(threading.Thread):
     def _handleValueRemoved(self, args):
         """Un valueNode est retiré au node depuis le réseaux zwave"""
         homeId = args['homeId']
-        activeNodeId= args['nodeId']
+        activeNodeId = args['nodeId']
         valueId = args['valueId']
         node = self._fetchNode(homeId, activeNodeId)
         node._lastUpdate = time.time()
@@ -546,12 +546,12 @@ class OZWavemanager(threading.Thread):
 #        print node.commandClasses 
         # formattage infos générales
         msgtrig = {'typexpl':'xpl-trig',
-                          'device' : "%s.%d.%d" %(self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,                          
+                          'device' : "%s.%d.%d" % (self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,                          
                           'valuetype':  valueId['type'], 
                           'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
                                                                             # les labels sont listés dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
 #        Le traitement pour chaque command_class s'effectue danqs la ValueNode correspondante.
-        msgtrig= valueNode.valueToxPLTrig(msgtrig)
+        msgtrig = valueNode.valueToxPLTrig(msgtrig)
         if msgtrig: self._cb_sendxPL_trig(msgtrig)
         else : print ('commande non  implémentee vers xPL : %s'  % valueId['commandClass'] )
 
@@ -564,7 +564,7 @@ class OZWavemanager(threading.Thread):
   #                                           'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL', ]
         sendxPL = False
         homeId = args['homeId']
-        activeNodeId= args['nodeId']
+        activeNodeId = args['nodeId']
         # recherche de la valueId qui a envoyée le NodeEvent
         node = self._fetchNode(homeId, activeNodeId)
         values = node.getValuesForCommandClass('COMMAND_CLASS_BASIC')
@@ -593,7 +593,7 @@ class OZWavemanager(threading.Thread):
             print"********** Node event handle fin du traitement ******"        
                 
     def _handleInitializationComplete(self, args):
-        # La séquence d'initialisation est terminée
+        """La séquence d'initialisation du controlleur zwave est terminée."""
         controllercaps = set()
         if self._manager.isPrimaryController(self._homeId): controllercaps.add('Primary Controller')
         if self._manager.isStaticUpdateController(self._homeId): controllercaps.add('Static Update Controller')
@@ -616,15 +616,18 @@ class OZWavemanager(threading.Thread):
         node.updateGroup(args['groupIdx'])
          
     def getCommandClassName(self, commandClassCode):
+        """Retourn Le nom de la commande class en fonctionde son code."""
         return PyManager.COMMAND_CLASS_DESC[commandClassCode]
 
     def getCommandClassCode(self, commandClassName):
+        """Retourn Le code de la command class en fonction de son nom."""
         for k, v in PyManager.COMMAND_CLASS_DESC.iteritems():
             if v == commandClassName:
                 return k
         return None
         
     def handle_ControllerAction(self,  action):
+        """Transmet une action controlleur au controlleur primaire."""
         print ('********************** handle_ControllerAction ***********')
         print 'Action : ',  action
         self._ctrlActProgress = action   
@@ -632,12 +635,14 @@ class OZWavemanager(threading.Thread):
         return retval
     
     def  handle_ControllerSoftReset(self):
+        """Transmmet le soft resset au controlleur primaire."""
         retval = {'error': ''}
         if not self._controller.soft_reset() :
             retval['error'] = 'No reset for secondary controller'
         return retval
         
     def  handle_ControllerHardReset(self):
+        """Transmmet le hard resset au controlleur primaire."""
         retval = {'error': ''}
         if not self._controller.hard_reset() :
             retval['error'] = 'No reset for secondary controller'
@@ -652,7 +657,7 @@ class OZWavemanager(threading.Thread):
         
     def getNetworkInfo(self):
         """ Retourne les infos principales du réseau zwave (dict) """
-        retval={}
+        retval = {}
         retval["ConfigPath"] = self._configPath
         retval["UserPath"] = self._userPath
         retval["PYOZWLibVers"] = self.pyOZWLibVersion
@@ -671,7 +676,7 @@ class OZWavemanager(threading.Thread):
                 retval["Init state"] = NodeStatusNW[2] #Completed
             else :
                 retval["Init state"] = NodeStatusNW[3] #In progress - Devices initializing
-            retval["error"] =""
+            retval["error"] = ""
             ln = []
             for n in self.nodes : ln.append(n)
             retval["ListNodeId"] = ln
@@ -687,14 +692,14 @@ class OZWavemanager(threading.Thread):
         retval = {}
         self._manager.writeConfig(self.homeId)
         print "config sauvée"
-        retval["File"] ="confirmed"
+        retval["File"] = "confirmed"
         return retval
 
     def getZWRefFromxPL(self, device):
         """ Retourne  les références Zwave envoyées depuis le xPL domogik 
         @ param : device format : nomReseaux.NodeID.Instance """
         ids = device.split('.')
-        retval ={}
+        retval = {}
         retval['homeId'] = self._nameAssoc[ids[0]] if self._nameAssoc[ids[0]]  else self.homeId
         if (retval['homeId'] == 0) : retval['homeId'] = self.homeId # force le homeid si pas configuré correctement, TODO: gérer un message pour l'utilisateur pour erreur de config.
         retval['nodeId']  = int(ids[1])
@@ -723,7 +728,7 @@ class OZWavemanager(threading.Thread):
         
     def getNodeValuesInfos(self,  nodeID):
         """ Retourne les informations de values d'un device, format dict{} """
-        retval={}
+        retval = {}
         if self.ready :
             node = self._getNode(self.homeId,  nodeID)
             return node.getValuesInfos()
@@ -731,7 +736,7 @@ class OZWavemanager(threading.Thread):
         
     def getValueInfos(self,  nodeId,  valueId):
         """ Retourne les informations d'une value d'un device, format dict{} """
-        retval={}
+        retval = {}
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
             value = node.getValue(valueId)
@@ -751,7 +756,7 @@ class OZWavemanager(threading.Thread):
         
     def getListCmdsCtrl(self):
         """Retourne le liste des commandes possibles du controleur ainsi que la doc associée."""
-        retval={}
+        retval = {}
         if self.ready :
             retval = self._controller.cmdsAvailables()
             retval['error'] = ""
@@ -774,7 +779,7 @@ class OZWavemanager(threading.Thread):
     
     def getNodeStatistics(self, nodeId):
         """Retourne les statistic d'un node"""
-        retval={}
+        retval = {}
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
             if node :
@@ -809,7 +814,7 @@ class OZWavemanager(threading.Thread):
         
     def setValue(self,  nodeId,  valueId,  newValue):
         """Envoie la valeur a l'objet value"""
-        retval={}
+        retval = {}
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
             value = node.getValue(valueId)
@@ -822,7 +827,7 @@ class OZWavemanager(threading.Thread):
 
     def setMembersGrps(self,  nodeID,  newGroups):
         """Envoie les changement des associations de nodes dans les groups d'association."""
-        retval={}
+        retval = {}
         if self.ready :
             node = self._getNode(self.homeId,  nodeID)
             grp =node.setMembersGrps(newGroups)
@@ -911,7 +916,7 @@ class OZWavemanager(threading.Thread):
             if 'error' in report :
                 ackMsg['error'] = report['error']
             else :
-                ackMsg['error'] =''
+                ackMsg['error'] = ''
             ackMsg['data'] = report
             self.serverUI.sendAck(ackMsg)
 
@@ -931,7 +936,7 @@ class OZWavemanager(threading.Thread):
             SIGNAL_CTRL_NODEFAILED = 'NodeFailed'       # Used only with ControllerCommand_HasNodeFailed to indicate that the controller thinks the node has failed.
         """
 
-        report  ={}
+        report  = {}
         if self._ctrlActProgress :
             report = self._ctrlActProgress
         else :            

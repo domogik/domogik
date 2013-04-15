@@ -100,7 +100,7 @@ class ZWaveNode:
     isSleeping = property(lambda self: self._isSleeping())
     isLocked = property(lambda self: self._getIsLocked())
     isLinked = property(lambda self: self._linked)
-    isReceiver= property(lambda self: self._receiver)
+    isReceiver = property(lambda self: self._receiver)
     isReady = property(lambda self: self._ready)
     isNamed = property(lambda self: self._named)
     isFailed = property(lambda self: self._failed)
@@ -125,13 +125,13 @@ class ZWaveNode:
         
     def setReady(self):
         """Le node a reçu la notification NodeQueriesComplete, la procédure d'intialisation est complète."""
-        self._ready= True
+        self._ready = True
         self.reportToUI({'notifytype': 'init-process', 'usermsg' : 'Node is now ready', 'data': NodeStatusNW[2]})
         
     def setNamed(self):
         """Le node a reçu la notification NodeNaming, le device à été identifié dans la librairie openzwave (config/xml)"."""
         self._updateInfos
-        self._named= True
+        self._named = True
         self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : 'Node recognized', 'data': {'typestate': 'model', 'model': self.manufacturer + " -- " + self.product}})
         
     def setSleeping(self, state= False):
@@ -173,9 +173,9 @@ class ZWaveNode:
             group['maxAssociations'] = grp.maxAssociations
             group['members'] = []
             for m in grp.members:
-                mbr={}
-                mbr['id']=m
-                mbr['status']=grp.members[m]
+                mbr = {}
+                mbr['id'] = m
+                mbr['status'] = grp.members[m]
                 group['members'].append(mbr)
                 print group
             grps.append(group)
@@ -222,7 +222,7 @@ class ZWaveNode:
                           6:'Out of operation',
                           7:'In progress - Can receive messages (Not linked)'}
         """      
-        retval =NodeStatusNW[0]
+        retval = NodeStatusNW[0]
         if self.isLinked : retval = NodeStatusNW[4]
         if self.isReceiver : 
             if self.isLinked : retval = NodeStatusNW[5]
@@ -414,7 +414,7 @@ class ZWaveNode:
                 for m in mbrs :
                     dmembers[m] = MemberGrpStatus[1]
                 print("Update groupe avant :"),  grp
-                grp= (GroupInfo(
+                grp = (GroupInfo(
                     index = groupIdx,
                     label = self._manager.getGroupLabel(self._homeId, self._nodeId, groupIdx),
                     maxAssociations = self._manager.getMaxAssociations(self._homeId, self._nodeId, groupIdx),
@@ -510,7 +510,7 @@ class ZWaveNode:
 
     def getInfos(self):
         """ Retourne les informations du device (node), format dict{} """
-        retval={}
+        retval = {}
         self._updateInfos() # mise à jour selon OZW
         self._updateCommandClasses()
         retval["HomeID"] ="0x%.8x" % self.homeId
@@ -530,7 +530,7 @@ class ZWaveNode:
         
     def getValuesInfos(self):
         """ Retourne les informations de values d'un device (node), format dict{} """
-        retval={}
+        retval = {}
         self._updateInfos() # mise à jour selon OZW
         retval['Values'] = []
         for value in self.values.keys():
@@ -579,7 +579,7 @@ class ZWaveNode:
         quality = 0.0
         maxRTT = 10000.0
         S = self.getStatistics()
-        if S and S !={} :
+        if S and S != {} :
             Q1 = float(float(S['sentCnt'] - S['sentFailed'] ) / S['sentCnt'])  if S['sentCnt'] != 0 else 0.0
             Q2 = float(((maxRTT /2) - S['averageRequestRTT']) / (maxRTT / 2))
             Q3 = float((maxRTT - S['averageResponseRTT']) / maxRTT)
@@ -605,7 +605,7 @@ class ZWaveNode:
     def refresh(self):
         """Rafraichis le node, util dans le cas d'un reveil si le node dormait lors de l''init """
         self._manager.refreshNodeInfo(self.homeId, self.id)
-        self._ozwmanager._log.debug('Requesting refresh for node {0}'.format(node.id))
+        self._ozwmanager._log.debug('Requesting refresh for node {0}'.format(self.id))
         
     def addAssociation(self, groupIndex,  targetNodeId):
         """Ajout l'association du targetNode au groupe du node"""
@@ -662,7 +662,7 @@ class ZWaveNode:
    
     def getValue(self, valueId):
         """Renvoi la valueNode valueId du node."""
-        retval= None
+        retval = None
         if self._values.has_key(valueId):
             retval = self._values[valueId]
         else:
@@ -730,13 +730,13 @@ class ZWaveNode:
                 retval['error'] = ("xPL to ozwave unknown command : %s , nodeId : %d",  command,  self.nodeId)
         else : # instance secondaire, ou command class non basic utilisation de set value
             print ("instance secondaire ou pas de COMMAND_CLASS_BASIC")
-            cmdsClass= ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY','COMMAND_CLASS_SWITCH_MULTILEVEL']
+            cmdsClass = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY','COMMAND_CLASS_SWITCH_MULTILEVEL']
             for value in self.values.keys() :
                 val = self.values[value].valueData
                 print ("valeur : " + val['commandClass'])
                 if (val['commandClass'] in cmdsClass)  and val['instance'] == instance :                 
-                    if command=='on' : opt = 255
-                    elif command=='off' : opt = 0
+                    if command == 'on' : opt = 255
+                    elif command == 'off' : opt = 0
                     retval = self.values[value].setValue(opt)
                     break
         if retval['error'] == '' :
