@@ -274,7 +274,7 @@ class DBConnector(XplPlugin):
                 return res
         except:
             msg = "No config found h=%s, t=%s, k=%s" % (hostname, techno, key)
-            prin(msg)
+            print(msg)
             self.log.warn(msg)
             return "None"
 
@@ -288,7 +288,7 @@ class DBConnector(XplPlugin):
         '''
 
         try:
-            self._db.set_plugin_config(techno, hostname, key, value)
+            self._db.set_plugin_config(technology, hostname, key, value)
     
             mess = XplMessage()
             mess.set_type('xpl-stat')
@@ -301,7 +301,7 @@ class DBConnector(XplPlugin):
         except:
             traceback.print_exc()
             msg = "Error while setting h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, value)
-            prin(msg)
+            print(msg)
             self.log.warn(msg)
             return "None"
 
