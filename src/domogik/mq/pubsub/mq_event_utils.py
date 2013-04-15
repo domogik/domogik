@@ -56,7 +56,8 @@ class MqEvent:
 class MqPub(MqEvent):
     def __init__(self, context, caller_id):
         MqEvent.__init__(self, context, caller_id)
-        self.log = logger.Logger('mq_event_pub').get_logger()
+        log = logger.Logger('mq_event_pub')
+        self.log = log.get_logger('mq_event_pub')
         self.s_send = self.context.socket(zmq.PUB)
         pub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_pub_port'])
         self.log.debug("Publishing on address : %s" % pub_addr)
