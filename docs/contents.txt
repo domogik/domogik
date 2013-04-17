@@ -41,6 +41,7 @@ Table Of Content
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
     /technical/rinor/rest_host
+    /technical/mq/used
     /package_development/index
     /package_development/howto
     /package_development/packages_lifecycle

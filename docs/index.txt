@@ -67,7 +67,8 @@ Technical Documentation
     * :doc:`REST /host </technical/rinor/rest_host>`: Hosts informations
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
-
+* **Message Queue:**
+  :doc:`Used messages </technical/mq/used>`
 
 Developers Documentation
 ========================
