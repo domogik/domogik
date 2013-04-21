@@ -21,15 +21,18 @@ if test -n "`which ypwhich 2>/dev/null`"  &&  ypwhich >/dev/null 2>&1; then
   set +e
 fi
 
-if ! getent groups domogik | grep snmp >/dev/null; then
+if ! getent group domogik | grep snmp >/dev/null; then
     usermod \
       --append \
       --groups domogik \
       snmp  >/dev/null
 fi
 
-if ! grep dmg_snmp.pl /etc/snmp/snmpd.conf >/dev/null; then
-    echo "perl do /usr/sbin/dmg_snmp.pl" >> /etc/snmp/snmpd.conf
+chmod 660 /etc/domogik/snmp.cfg
+chown snmp:domogik /etc/domogik/snmp.cfg
+
+if ! grep "^perl do \"/usr/sbin/dmg_snmp.pl\"" /etc/snmp/snmpd.conf >/dev/null; then
+    echo "perl do \"/usr/sbin/dmg_snmp.pl\"" >> /etc/snmp/snmpd.conf
 fi
 
 set -e

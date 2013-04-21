@@ -6,7 +6,7 @@ case "$1" in
   ;;
   remove)
       set +e
-        sed -i "s;^perl do /usr/sbin/dmg_snmp.pl.*$;;" /etc/snmp/snmpd.conf
+        sed -i "s;^perl do \"/usr/sbin/dmg_snmp.pl.*$;;" /etc/snmp/snmpd.conf
       set -e
   ;;
   purge)

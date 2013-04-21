@@ -256,20 +256,21 @@ Description: Apache configuration for domogik.
  be usefull if you want to connect to your home with Domodroid from
  anywhere in the world.
 
-#Package: domogik-snmp
-#Architecture: all
-#Depends: domogik-primary (= ${source:Version}) | domogik-secondary (= ${source:Version}),
-# libchi-perl, libnet-snmp-perl, libproc-processtable-perl,
-# libconfig-simple-perl, libsnmp-perl, liblog-log4perl-perl,
-# liblwp-protocol-https-perl, snmpd, snmp-mibs-downloader
-#Description: SNMP agent for domogik.
-# Domogik/Domoweb is a free home automation solution.
-# It is based on the xPL protocol in order to easily use a lot of
-# different technologies. Domogik is multi hosts and modulable.
-# You can use as many user interfaces you want (actually there are two
-# user interfaces : the web one and the Android one).
-# This package contents an extension to the snmp daemon.
-#
+Package: domogik-snmp
+Architecture: all
+Pre-Depends: snmpd
+Depends: domogik-primary (= ${source:Version}) | domogik-secondary (= ${source:Version}),
+ libchi-perl, libnet-snmp-perl, libproc-processtable-perl,
+ libconfig-simple-perl, libsnmp-perl, liblog-log4perl-perl,
+ liblwp-protocol-https-perl, snmp-mibs-downloader
+Description: SNMP agent for domogik.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This package contents an extension to the snmp daemon.
+
 Package: domogik-developper
 Architecture: all
 Depends: mercurial, gcc,
