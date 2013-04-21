@@ -1,5 +1,8 @@
-etc/default
-etc/domogik
-usr/bin/dmg* /usr/sbin/
+etc/domogik/domogik.cfg
+etc/domogik/sources.list
+usr/bin/dmg_* /usr/sbin/
 usr/lib
-usr/sbin/dmg* /usr/sbin/
+usr/sbin/dmgdisplug /usr/sbin/
+usr/sbin/dmgenplug /usr/sbin/
+usr/sbin/dpkg-* /usr/sbin/
+var/lib/domogik

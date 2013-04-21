@@ -28,10 +28,3 @@ Template: domogik/db_root_pwd
 Type: password
 Description: The password of the admin database
 
-Template: domogik/auto_start
-Type: boolean
-Default: true
-Description: Should we start Domogik on startup.
- Your connection to the database must be effective to says yes.
- Otherwise, you must say no and manualy install/update your database
- and enable automatic startup in /etc/default/domogik.

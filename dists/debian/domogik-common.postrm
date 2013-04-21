@@ -6,15 +6,16 @@ case "$1" in
   ;;
   remove)
       set +e
-      /usr/sbin/deluser domogik
+      deluser domogik
       set -e
   ;;
   purge)
       set +e
-      /bin/rm -Rf /var/lib/domogik
-      /bin/rm -Rf /var/log/domogik
-      /bin/rm -Rf /var/run/domogik
-      /bin/rm -Rf /var/cache/domogik
+      rm -Rf /var/lib/domogik
+      rm -Rf /var/log/domogik
+      rm -Rf /var/run/domogik
+      rm -Rf /var/lock/domogik
+      rm -Rf /var/cache/domogik
       set -e
   ;;
   *)

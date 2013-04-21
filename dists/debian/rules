@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --with bash-completion --with python2
+	dh $@ install --with bash-completion --with python2
 
 override_dh_auto_install:
 	#dh_auto_install
@@ -18,8 +18,18 @@ override_dh_install:
 	/bin/mkdir -p debian/tmp/usr/lib/domogik
 	/bin/cp -Rf install debian/tmp/usr/lib/domogik
 	/bin/cp -Rf src/tools debian/tmp/usr/lib/domogik
+	/bin/mkdir -p debian/tmp/var/lib/domogik
+	/bin/mkdir -p debian/tmp/etc/apache2/sites-available/
+	/usr/bin/install -c -p -m 644 debian/domogik.apache2 debian/tmp/etc/apache2/sites-available/domogik
+	/usr/bin/install -c -p -m 755 debian/dpkg-reconfigure-domogik debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 755 debian/dpkg-preconfigure-domogik debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 755 debian/dmgdb_dump debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 755 debian/dmgdb_restore debian/tmp/usr/sbin/
+	#/usr/bin/install -c -p -m 755 src/domogik/examples/snmp/dmg_snmp.pl debian/tmp/usr/sbin/
+	#/usr/bin/install -c -p -m 640 src/domogik/examples/snmp/snmp.cfg debian/tmp/etc/domogik/
+	/usr/bin/install -c -p -m 755 debian/dmg_snmp.pl debian/tmp/usr/sbin/
+	/usr/bin/install -c -p -m 640 debian/snmp.cfg debian/tmp/etc/domogik/
 	dh_install --sourcedir=debian/tmp
-	#dh_python2 -p zeitgeist-core usr/share/zeitgeist/fts-python
 
 override_dh_installinit:
 	dh_installinit --init-script=domogik

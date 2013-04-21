@@ -27,6 +27,8 @@ case "$1" in
 		RESTIP="$RET"
 		db_get "domogik/rest_port"
 		RESTPORT="$RET"
+        sed -i "s;^package_path.*$;package_path = /var/lib/domogik;" /etc/domogik/domogik.cfg
+        sed -i "s;^#src_prefix.*$;#src_prefix = ;" /etc/domogik/domogik.cfg
 		sed -i "s/^rest_server_ip.*$/rest_server_ip = $RESTIP/" /etc/domogik/domogik.cfg
         sed -i "s/^rest_server_port.*$/rest_server_port = $RESTPORT/" /etc/domogik/domogik.cfg
         sed -i "s;^MANAGER_PARAMS.*$;MANAGER_PARAMS=\"-p\";" /etc/default/domogik
