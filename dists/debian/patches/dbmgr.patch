@@ -1,0 +1,40 @@
+diff -Nru domogik-0.2.0.orig/src/domogik/xpl/bin//dbmgr.py domogik-0.2.0/src/domogik/xpl/bin//dbmgr.py
+--- domogik-0.2.0.orig/src/domogik/xpl/bin//dbmgr.py	2013-04-15 17:02:38.000000000 +0200
++++ domogik-0.2.0/src/domogik/xpl/bin//dbmgr.py	2013-04-15 17:08:56.000000000 +0200
+@@ -242,11 +242,11 @@
+                 return res
+         except:
+             msg = "No config found h=%s, t=%s, k=%s" % (hostname, techno, key)
+-            prin(msg)
++            print(msg)
+             self.log.warn(msg)
+             return "None"
+ 
+-    def _set_config(self, technology, hostname, key, value):
++    def _set_config(self, techno, hostname, key, value):
+         '''
+         Send a config value message for an element's config item
+         @param technology : the technology of the element
+@@ -257,11 +257,11 @@
+ 
+         try:
+             self._db.set_plugin_config(techno, hostname, key, value)
+-    
++
+             mess = XplMessage()
+             mess.set_type('xpl-stat')
+             mess.set_schema('domogik.config')
+-            mess.add_data({'technology' :  technology})
++            mess.add_data({'technology' :  techno})
+             mess.add_data({'hostname' :  hostname})
+             mess.add_data({'key' :  key})
+             mess.add_data({'value' :  value})
+@@ -269,7 +269,7 @@
+         except:
+             traceback.print_exc()
+             msg = "Error while setting h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, value)
+-            prin(msg)
++            print(msg)
+             self.log.warn(msg)
+             return "None"
+ 

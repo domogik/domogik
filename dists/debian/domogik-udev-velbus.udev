@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty" ATTRS(manufacturer)=="Velleman Projects" ATTRS{product}=="VMB1USB Velbus USB interface" SYMLINK+="velbus" MODE="0666"

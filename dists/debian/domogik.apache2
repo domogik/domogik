@@ -1,0 +1,27 @@
+<VirtualHost *:80>
+    ServerName SERVERNAME
+    ServerAlias ALIASNAME
+    DocumentRoot /var/www/domogik
+
+    ErrorLog /var/log/apache2/domogik/error.log
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" common
+    CustomLog /var/log/apache2/domogik/access.log common
+
+    ProxyRequests Off
+    ProxyVia On
+
+    <Location />
+        ProxyPass http://RESTSERVERIP:40405/
+        ProxyPassReverse http://RESTSERVERIP:40405/
+        ProxyHTMLURLMap http://RESTSERVERIP:40405/ /
+        SetOutputFilter proxy-html
+
+        AuthType Basic
+        AuthName "Domogik area"
+        AuthBasicProvider file
+        AuthUserFile /var/www/domogik/.htpass
+        Require user AUTHUSER
+    </Location>
+
+</VirtualHost>
+

@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+case "$1" in
+  upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+      echo "Do nothing"
+  ;;
+  remove)
+      set +e
+        sed -i "s;^perl do \"/usr/sbin/dmg_snmp.pl.*$;;" /etc/snmp/snmpd.conf
+      set -e
+  ;;
+  purge)
+      set +e
+      set -e
+  ;;
+  *)
+    echo "postrm called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+#DEBHELPER#
+
+exit 0

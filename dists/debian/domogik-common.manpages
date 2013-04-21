@@ -1,0 +1,4 @@
+debian/dmg_pkgmgr.8
+debian/dmg_manager.8
+debian/dmg_send.1
+debian/dmg_dump.1

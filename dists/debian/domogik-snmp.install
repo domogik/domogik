@@ -1,0 +1,2 @@
+etc/domogik/snmp.cfg
+usr/sbin/dmg_snmp.pl /usr/sbin/

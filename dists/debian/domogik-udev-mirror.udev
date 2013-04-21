@@ -1,0 +1,1 @@
+KERNEL=="hidraw*", ATTRS{idVendor}=="1da8", ATTRS{idProduct}=="1301", SYMLINK+="mirror", MODE="0666"

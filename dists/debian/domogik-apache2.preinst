@@ -1,0 +1,20 @@
+#!/bin/sh -e
+#
+# summary of how this script can be called:
+#        * <new-preinst> install
+#        * <new-preinst> install <old-version>
+#        * <new-preinst> upgrade <old-version>
+#        * <old-preinst> abort-upgrade <new-version>
+#
+
+set +e
+/usr/sbin/a2enmod proxy
+/usr/sbin/a2enmod proxy_html
+/usr/sbin/a2enmod proxy_http
+/usr/sbin/a2enmod auth_basic
+/usr/sbin/a2enmod authn_file
+set -e
+
+#DEBHELPER#
+
+exit 0
