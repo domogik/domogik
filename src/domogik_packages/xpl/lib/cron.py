@@ -1890,7 +1890,7 @@ class CronAPI:
             caller = message.data['caller']
         data = message.data['data']
         data = data.replace('|','')
-        data = "{" + data + "}"
+        if data[0] != "{" : data = "{" + data + "}"
         data = ast.literal_eval(data)
         self.log.debug("cronAPI._command_start_interval : data %s" % data)
         device = None
@@ -1931,7 +1931,7 @@ class CronAPI:
             caller = message.data['caller']
         data = message.data['data']
         data = data.replace('|','')
-        data = "{" + data + "}"
+        if data[0] != "{" : data = "{" + data + "}"
         data = ast.literal_eval(data)
         self.log.debug("cronAPI._command_start_date : data %s" % data)
         device = None
@@ -1973,7 +1973,7 @@ class CronAPI:
         data = message.data['data']
         data = data.replace('|','')
         self.log.debug("cronAPI._command_start_alarm : data %s" % data)
-        data = "{" + data + "}"
+        if data[0] != "{" : data = "{" + data + "}"
         data = ast.literal_eval(data)
         self.log.debug("cronAPI._command_start_alarm : data %s" % data)
         device = None
@@ -2015,7 +2015,7 @@ class CronAPI:
         data = message.data['data']
         self.log.debug("cronAPI._command_start_dawnalarm : data %s" % data)
         data = data.replace('|','')
-        data = "{" + data + "}"
+        if data[0] != "{" : data = "{" + data + "}"
         data = ast.literal_eval(data)
         self.log.debug("cronAPI._command_start_dawnalarm : data %s" % data)
         device = None

@@ -41,6 +41,7 @@ from ozwvalue import ZWaveValueNode
 from ozwdefs import *
 import time
 from time import sleep
+import threading
 
 class OZwaveNodeException(OZwaveException):
     """"Zwave Node exception class"""
@@ -80,6 +81,7 @@ class ZWaveNode:
         self._productType = None
         self._groups = list()
         self._sleeping = False
+        self._thTest = None
         
     # On accède aux attributs uniquement depuis les property
     # Chaque attribut est une propriétée qui est automatique à jour au besoin via le réseaux Zwave
@@ -564,7 +566,6 @@ class ZWaveNode:
 
         :return: Statistics of the node
         :rtype: dict()
-
         """
        
         return self._manager.getNodeStatistics(self.homeId,  self.nodeId)
@@ -589,9 +590,59 @@ class ZWaveNode:
         else :
             self._ozwmanager._log.debug('GetNodeStatistic return empty for node {0} '.format(self.id,))
             print ('GetNodeStatistic return empty for node {0} '.format(self.id,))
-            quality = 50; 
+            quality = 20; 
         return int(quality)
+    
+    def testNetworkNode(self, count = 1, timeOut = 10000,  allReport = False):
+        """Gère la serie de messages envoyé au node pour tester sa réactivité sur le réseaux.
+        en retour une Notifiction code 2 (NoOperation) est renvoyée pour chaque message."""
+        retval = {}
+        if not self.isSleeping :
+            retval = self.trigTest(count, timeOut, allReport)
+            if retval['error'] =='' : self._manager.testNetworkNode(self.homeId, self.id, count)
+        else :  retval['error'] = "Zwave node %d is sleeping, can't send test." % self.id
+        return  retval
+    
+    def trigTest(self, count = 1, timeOut = 10000,  allReport = False) :
+        """Prépare le node à une serie de messages de test.
+            retourn un message d'erreur si test en cours."""
+        if not self._thTest :
+            retval = ''
+            tparams = {'countMsg': count,  'timeOut': timeOut, 'allReport' : allReport}
+            self._thTest = TestNetworkNode(self, tparams,  self._ozwmanager._stop,  self._ozwmanager._log)
+            self._thTest.start()
+            return {'error': ''}
+        else :
+            return {'error': "Node %d, test allReady launch, can't send an other test." % self.id}
+
+    def recevNoOperation(self,  args):
+        """Gère les notifications NoOperation du manager."""
+        if self._thTest :
+            self._thTest.decMsg()
+            
+    def validateTest(self,  cptMsg, countMsg, dTime) :
+        '''Un message de test a été recu, il est reporté à l'UI.'''
+        # TODO: Crée un journal de report (Possible aussi dan le thread ?)
+        msg = 'Node %d as recevied test message number %d/%d in %d ms.' % (self.id,  cptMsg, countMsg, dTime)
+        self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : msg,
+                               'data': {'typestate': 'receviedtestmsg',  'state': 'processing'}})
         
+    def endTest(self, state, cptMsg, countMsg, dTime):
+        if state == 'finish':
+            msg = 'Node %d as recevied all test messages (%d) in %d ms.' % (self.id,  countMsg, dTime)
+        elif state == 'timeout' :
+            msg = 'Test Node %d as recevied time out, %d/%d received.' % (self.id,  cptMsg, countMsg)
+        self._thTest = None
+        self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : msg,
+                               'data': {'typestate': 'receviedtestmsg',  'state': state}})
+                               
+    def stopTest(self):
+        '''Arrête un test si en cours'''
+        if self._thTest :
+            self._thTest.stopTest()
+            self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : 'Test Node %d is stopped.' % self.id,
+                               'data': {'typestate': 'receviedtestmsg',  'state': 'Stopped'}})
+            
     def setName(self, name):
         """Change le nom du node"""
         self._manager.setNodeName(self.homeId, self.id, name)
@@ -749,4 +800,57 @@ class ZWaveNode:
     def __str__(self):
         return 'homeId: [{0}]  nodeId: [{1}] product: {2}  name: {3}'.format(self._homeId, self._nodeId, self._product, self._name)
 
+class TestNetworkNode(threading.Thread):
+    '''Gère un process de test réseaux du node'''
+    
+    def __init__(self, node, tparams, stop, log = None):
+        '''initialise le test
+        @param node: pointeur sur l'instance du node à tester
+        @param tparams: Paramètres du test
+            @param countMsg : nombre de message à envoyer
+            @param timeOut : Time out total du test
+            @param allReport : Envois un msg de report pour chaque test (True) ou un seul à la fin du test (False)
+        '''
+        threading.Thread.__init__(self)
+        self._node = node
+        self._countMsg = tparams['countMsg']
+        self._cptMsg = 0
+        self._stop = stop
+        self._timeOut = tparams['timeOut']
+        self._allReport = tparams['allReport']
+        self._running = False
+        self._startTime = 0
+        self._log = log
         
+    def run(self):
+        """Demarre le server en mode forever, methode appelee depuis le start du thread""" 
+        print "**************** Starting Test Node %d**************" % self._node.id
+        self._startTime = time.time()
+        if self._log: self._log.info('Starting Test Node %d' % self._node.id)
+        self._running = True
+        state = 'Stopped'
+        while not self._stop.isSet() and self._running:
+            self._stop.wait(0.1)
+            tRef =int((time.time() - self._startTime) * 1000)
+            if tRef >= self._timeOut :
+                state = 'timeout'
+                self._running = False
+#            if self._cptMsg == self._countMsg :
+#                state = 'finish'
+#                self._running = False
+#           print 'Test Node %d, state :%s, depuis : %d ms, running : %s' % (self._node.id,  state,  tRef,  str(self._running))
+        if state == 'timeout' : self._node.endTest(state, self._cptMsg, self._countMsg, tRef)
+        if self._log: self._log.info('Stop Test Node %d, status : %s' % (self._node.id,  state))
+        print "**************** Stopped Test Node %d satus : %s**************" % (self._node.id,  state)
+   
+    def decMsg(self):
+        '''Décrémente le compteur de test'''        
+        self._cptMsg += 1
+        if self._cptMsg == self._countMsg :
+            self._running = False
+            self._node.endTest('finish', self._cptMsg, self._countMsg, int((time.time() - self._startTime) * 1000))
+        elif self._allReport : self._node.validateTest(self._cptMsg, self._countMsg, int((time.time() - self._startTime) * 1000))
+    
+    def stopTest(self):
+        '''Force stop test process.'''
+        self._running = False

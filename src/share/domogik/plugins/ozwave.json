@@ -1,5 +1,5 @@
 {
-	"files" : ["src/share/domogik/design/plugin/ozwave/icon.png", "src/share/domogik/plugins/ozwave.json", "src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml", "src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml", "src/share/domogik/stats/ozwave/controller.basic-ozwave.xml", "src/share/domogik/url2xpl/ozwave/level.xml", "src/share/domogik/url2xpl/ozwave/on.xml", "src/share/domogik/url2xpl/ozwave/off.xml", "src/share/domogik/url2xpl/ozwave/Refresh.xml", "src/domogik_packages/xpl/bin/ozwave.py", "src/domogik_packages/xpl/lib/ozwave.py", "src/domogik_packages/xpl/lib/ozwdefs.py", "src/domogik_packages/xpl/lib/ozwvalue.py", "src/domogik_packages/xpl/lib/ozwnode.py", "src/domogik_packages/xpl/lib/ozwctrl.py", "src/domogik_packages/xpl/lib/ozwuiserver.py"],
+	"files" : ["src/share/domogik/design/plugin/ozwave/icon.png", "src/share/domogik/plugins/ozwave.json", "src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml", "src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml", "src/share/domogik/stats/ozwave/controller.basic-ozwave.xml", "src/share/domogik/url2xpl/ozwave/level.xml", "src/share/domogik/url2xpl/ozwave/on.xml", "src/share/domogik/url2xpl/ozwave/off.xml", "src/share/domogik/url2xpl/ozwave/Refresh.xml", "src/share/domogik/url2xpl/ozwave/log.xml", "src/domogik_packages/xpl/bin/ozwave.py", "src/domogik_packages/xpl/lib/ozwave.py", "src/domogik_packages/xpl/lib/ozwdefs.py", "src/domogik_packages/xpl/lib/ozwvalue.py", "src/domogik_packages/xpl/lib/ozwnode.py", "src/domogik_packages/xpl/lib/ozwctrl.py", "src/domogik_packages/xpl/lib/ozwuiserver.py"],
 	"udev-rules" : [{
 			"description" : "Zwave controler",
 			"filename" : "98-usbcp210x.rules",
@@ -363,7 +363,7 @@
 		"category" : "Z-wave",
 		"documentation" : "http://wiki.domogik.org/tiki-index.php?page=plugin_ozwave",
 		"description" : "Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control",
-		"changelog" : "0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
+		"changelog" : "0.2b3\n - Add test network function\n0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
 		"author_email" : "nico84dev at gmail.com",
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.3.0",
@@ -372,7 +372,7 @@
 				"type" : "python"
 			}
 		],
-		"version" : "0.2b2",
+		"version" : "0.2b3",
 		"type" : "plugin",
 		"id" : "ozwave"
 	}, "json_version" : 1

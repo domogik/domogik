@@ -3,13 +3,20 @@ Plugin documentation
 ====================
 
 .. |icon| image:: icon.png
-    :width: 48px
+    :width: 64px
 
 |icon|
 
 Last change
 ===========
 New instructions to apply changes from immediatly previous version.
+
+- 0.2b3 : Compatibily library : python_openzwave >= 0.2.5 (rev : b434c50b795b)
+	- Target : python_openzwave, domogik and domoweb
+	- Update, compile and install python_openzwave
+	- Change log : 
+		- Add test network and node
+		- Add id message req-ack
 
 - 0.2b2 : Compatibily library : the same. 
 	- Target : domogik and domoweb
@@ -20,7 +27,7 @@ New instructions to apply changes from immediatly previous version.
 		- Add Start/Stop driver function
 		- Add zwave device switch with power meter (Everspring (C.T.) - AN158 full handling)
 		- Fixe ON/OFF sensor return status
-	
+
 - 0.2b1 : Compatibily library : OpenZwave >= 1.0.645, python_openzwave >= 0.2.5, ws4py >= 0.3.0-beta
 	- Target : domogik and domoweb
 	- Install new dependency `ws4py 0.3.0-beta <dependencies.html#Install WebSocket library for Python>`_

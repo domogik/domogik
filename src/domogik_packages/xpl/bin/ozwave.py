@@ -36,20 +36,21 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin
+#from domogik.xpl.common.plugin import XplPlugin
+from domogik_packages.xpl.lib.helperplugin import XplHlpPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik_packages.xpl.lib.ozwave import OZWavemanager
 from domogik_packages.xpl.lib.ozwave import OZwaveException
 
-class OZwave(XplPlugin):
+class OZwave(XplHlpPlugin):
     """ Implement a listener for Zwave command messages
         and launch background  manager to listening zwave events by callback
     """
     def __init__(self):
         """ Create listener and background zwave manager
         """
-        XplPlugin.__init__(self, name = 'ozwave')
+        XplHlpPlugin.__init__(self, name = 'ozwave')
         
         # Récupère la config 
         # - device
@@ -69,6 +70,17 @@ class OZwave(XplPlugin):
             print e.value
             self.force_leave()
             return
+        self.log.debug("__init__ : Enable heplers")
+        self.helpers =   \
+           {
+             "infostate" :
+              {
+                "cb" : self.myzwave.GetPluginInfo,
+                "desc" : "Show Info status. Experimental.",
+                "usage" : "memory",
+              }
+            }
+        self.enable_helper()
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
                                                                         'xpltype': 'xpl-cmnd'})

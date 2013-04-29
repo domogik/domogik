@@ -414,10 +414,11 @@ controller to learn new data.
  
         elif action['cmd'] =='getState':
             print '*********** UI require State of ctrl action'
-            print self.checkActionCtrl() 
-            if self.checkActionCtrl() :
+            chkAction = self.checkActionCtrl()
+            print chkAction
+            if chkAction :
                 retval['cmdstate']  = 'stop'
-                retval.update(self.checkActionCtrl())
+                retval.update(chkAction)
             else : retval['cmdstate']  = 'waiting'
         else :
             retval['error'] = 'Unknown cmd : ' + action['cmd']

@@ -425,34 +425,35 @@ class OZWavemanager(threading.Thread):
 			Code_Dead,						/**< Report when a node is presumed dead */
 			Code_Alive						/**< Report when a node is revived */
         """
-        # TODO: Supprimer code numérique que les notificationCodes seront pris en charge par python-openzwave
         node = self._getNode(self._homeId, args['nodeId'])
-        nCode = args['notificationCode']
-        if nCode in (0 , 'MsgComplete'):     #      Code_MsgComplete = 0,                                   /**< Completed messages */
+        nCode = libopenzwave.PyNotificationCodes[args['notificationCode']]
+        print nCode,  nCode.doc
+        if nCode == 'MsgComplete':     #      Code_MsgComplete = 0,                                   /**< Completed messages */
             print 'MsgComplete notification code :', args
             self._log.info('MsgComplete notification code : {0}'.format(args))
-        elif nCode in (1 , 'Timeout'):         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
+        elif nCode == 'Timeout':         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
             print 'Timeout notification on node :',  args['nodeId']
             self._log.info('Timeout notification code : {0}'.format(args))
-        elif nCode in (2 , 'NoOperation'):  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
+        elif nCode == 'NoOperation':  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
             print 'NoOperation notification code :', args
             self._log.info('NoOperation notification code : {0}'.format(args))
-        elif nCode in (3 , 'Awake'):            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
+            node.recevNoOperation(args)
+        elif nCode == 'Awake':            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
             if node : 
                 node.setSleeping(False)
                 print ('Z-Wave sleeping device Node {0} wakes up.'.format(node.id))
                 self._log.info('Z-Wave sleeping device Node {0} wakes up.'.format(node.id))
-        elif nCode in (4 , 'Sleep'):            #      Code_Sleep,                                                /**< Report when a node goes to sleep */
+        elif nCode == 'Sleep':            #      Code_Sleep,                                                /**< Report when a node goes to sleep */
             if node : 
                 node.setSleeping(True)
                 print ('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
-        elif nCode in (5, 'Dead'):             #       Code_Dead                                               /**< Report when a node is presumed dead */
+        elif nCode == 'Dead':             #       Code_Dead                                               /**< Report when a node is presumed dead */
             if node : 
                 node.markAsFailed()
                 print ('Z-Wave Device Node {0} marked as dead.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} marked as dead.'.format(node.id))
-        elif nCode in (6 , 'Alive'):             #       Code_Alive						/**< Report when a node is revived */
+        elif nCode == 'Alive':             #       Code_Alive						/**< Report when a node is revived */
             if node : 
                 node.markAsOK()
                 print ('Z-Wave Device Node {0} marked as alive.'.format(node.id))
@@ -513,7 +514,6 @@ class OZWavemanager(threading.Thread):
             print ('Node %d is removed (homeId %.8x)' , args['nodeId'],  args['homeId'])
         else :
             self._log.debug ("Node %d unknown, isn't removed (homeId %.8x)" , args['nodeId'],  args['homeId'])
-
 
     def _handleValueAdded(self, args):
         """Un valueNode est ajouté au node depuis le réseaux zwave"""
@@ -762,7 +762,31 @@ class OZWavemanager(threading.Thread):
             retval['error'] = ""
             return retval
         else : return {"error" : "Zwave network not ready, can't find controller"}
-        
+
+    def testNetwork(self, count = 1, timeOut = 10000,  allReport = False):
+        """Envois une serie de messages à tous les nodes pour tester la réactivité du réseaux."""
+        retval = {'error': ''}
+        if self.ready :
+            for i in self._nodes :
+                n = self._nodes[i]
+                if not n.isSleeping : 
+                    error = n.trigTest(count, timeOut,  allReport)
+                    if error['error'] != '' :  retval['error'] = retval['error'] +'/n' + error['error']
+            self._manager.testNetwork(self.homeId, count)
+            if retval['error']  != '': retval['error'] = 'Some node(s) have error :/n' + retval['error'] 
+            return retval
+        else : return {"error" : "Zwave network not ready, can't find controller"}
+
+    def testNetworkNode(self, nodeId, count = 1, timeOut = 10000,  allReport = False):
+        """Envois une serie de messages à un node pour tester sa réactivité sur le réseaux."""
+        retval = {}
+        if self.ready :
+            node = self._getNode(self.homeId,  nodeId)
+            if node : retval = node.testNetworkNode(count, timeOut,  allReport)
+            else : retval['error'] = "Zwave node %d unknown" %nodeId
+            return retval
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
+
     def getGeneralStatistics(self):
         """Retourne les statistic générales du réseaux"""
         retval={}
@@ -776,7 +800,7 @@ class OZWavemanager(threading.Thread):
             retval['elapsedtime'] = str(timedelta(0,time.time()-self._timeStarted))
             return retval
         else : return {"error" : "Zwave network not ready, can't find controller"}        
-    
+
     def getNodeStatistics(self, nodeId):
         """Retourne les statistic d'un node"""
         retval = {}
@@ -792,7 +816,7 @@ class OZWavemanager(threading.Thread):
             else : retval['error'] = "Zwave node %d unknown" %nodeId
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
-        
+
     def setUINodeNameLoc(self,  nodeId,  newname, newloc):
         """Change le nom et/ou le localisation du node dans OZW et dans le decive si celui-ci le supporte """
         if self.ready :
@@ -811,7 +835,7 @@ class OZWavemanager(threading.Thread):
                     return {"error" : "Node %d, can't update location, error : %s" %(nodeId, e.value) }
             return node.getInfos()                                
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeId}
-        
+
     def setValue(self,  nodeId,  valueId,  newValue):
         """Envoie la valeur a l'objet value"""
         retval = {}
@@ -825,20 +849,24 @@ class OZWavemanager(threading.Thread):
             else : return {"value": newValue, "error" : "Unknown value %d" %valId}
         else : return {"value": newValue, "error" : "Zwave network not ready, can't find value %d" %valId}     
 
-    def setMembersGrps(self,  nodeID,  newGroups):
+    def setMembersGrps(self,  nodeId,  newGroups):
         """Envoie les changement des associations de nodes dans les groups d'association."""
         retval = {}
         if self.ready :
-            node = self._getNode(self.homeId,  nodeID)
+            node = self._getNode(self.homeId,  nodeId)
             grp =node.setMembersGrps(newGroups)
             if grp :
                 retval['groups'] = grp
                 retval['error'] = ""
                 return retval
-            else : return {"error" : "Manager not send association changement on node %d." %nodeID}
+            else : return {"error" : "Manager not send association changement on node %d." %nodeId}
             return 
-        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeID}
-        
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
+    
+    def _IsNodeId(self, nodeId):
+        """Verifie le si le format de nodeId est valide"""
+        return True if (type(nodeId) == type(0) and (nodeId >0 and nodeId < 255)) else False
+    
     def cb_ServerWS(self, message):
         """Callback en provenance de l'UI via server Websocket (resquest avec ou sans ack)"""
         blockAck = False
@@ -848,7 +876,7 @@ class OZWavemanager(threading.Thread):
         if message['header']['type'] in ('req', 'req-ack'):
             if message['request'] == 'ctrlAction' :
                 report = self.handle_ControllerAction(message['action'])
-                if message['action']['cmd'] =='getState' and report['cmdstate'] != 'stop' : blockAck = True
+         #       if message['action']['cmd'] =='getState' and report['cmdstate'] != 'stop' : blockAck = True
             elif message['request'] == 'ctrlSoftReset' :
                 report = self.handle_ControllerSoftReset()
             elif message['request'] == 'ctrlHardReset' :
@@ -856,7 +884,9 @@ class OZWavemanager(threading.Thread):
             elif message['request'] == 'GetNetworkID' :
                 report = self.getNetworkInfo()
             elif message['request'] == 'GetNodeInfo' :
-                report = self.getNodeInfos(message['node'])
+                if self._IsNodeId(message['node']):
+                    report = self.getNodeInfos(message['node'])
+                else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
                 print "Refresh node :", report
             elif message['request'] == 'SaveConfig':
@@ -865,12 +895,15 @@ class OZWavemanager(threading.Thread):
                 report = self.setUINodeNameLoc(message['node'], message['newname'],  message['newloc'])
                 ackMsg['node'] = message['node']
             elif message['request'] == 'GetNodeValuesInfo':
-                report =self.getNodeValuesInfos(message['node'])
+                if self._IsNodeId(message['node']):
+                    report =self.getNodeValuesInfos(message['node'])
+                else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
-      #          print 'Refresh all Values infos : ', report
             elif message['request'] == 'GetValueInfos':
-                valId = long(message['valueid']) # Pour javascript type string
-                report =self.getValueInfos(message['node'], valId)
+                if self._IsNodeId(message['node']):
+                    valId = long(message['valueid']) # Pour javascript type string
+                    report =self.getValueInfos(message['node'], valId)
+                else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
                 ackMsg['valueid'] = message['valueid']
                 print 'Refresh one Value infos : ', report
@@ -879,20 +912,26 @@ class OZWavemanager(threading.Thread):
             elif message['request'] == 'GetListCmdsCtrl':
                 report = self.getListCmdsCtrl()
             elif message['request'] == 'setValue':
-                valId = long(message['valueid']) # Pour javascript type string
-                report = self.setValue(message['node'], valId, message['newValue'])
+                if self._IsNodeId(message['node']):
+                    valId = long(message['valueid']) # Pour javascript type string
+                    report = self.setValue(message['node'], valId, message['newValue'])
+                else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
                 ackMsg['valueid'] = message['valueid']
                 print 'Set command_class Value : ',  report
             elif message['request'] == 'setGroups':
-                report = self.setMembersGrps(message['node'], message['ngrps'])
+                if self._IsNodeId(message['node']):
+                    report = self.setMembersGrps(message['node'], message['ngrps'])
+                else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']         
                 print 'Set Groups association : ',  report
             elif message['request'] == 'GetGeneralStats':
                 report = self.getGeneralStatistics()
                 print 'Refresh generale stats : ',  report                
             elif message['request'] == 'GetNodeStats':
-                report = self.getNodeStatistics(message['node'])
+                if self._IsNodeId(message['node']):
+                    report = self.getNodeStatistics(message['node'])
+                else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
                 print 'Refresh node stats : ',  report
             elif message['request'] == 'StartCtrl':
@@ -906,12 +945,20 @@ class OZWavemanager(threading.Thread):
                     self.closeDevice(self.device)
                     report = {'error':'',  'running': False}
                 else : report = {'error':'No Driver knows',  'running': False}
-                print 'Stop Driver : ',  report                
+                print 'Stop Driver : ',  report
+            elif message['request'] == 'TestNetwork':
+                report = self.testNetwork(message['count'],  10000, True)
+            elif message['request'] == 'TestNetworkNode':
+                if self._IsNodeId(message['node']):
+                    report = self.testNetworkNode(message['node'],  message['count'],  10000, True)
+                else : report = {'error':  'Invalide nodeId format.'}
+                ackMsg['node'] = message['node']
             else :
                 report['error'] ='unknown request'
                 print "commande inconnue"
         if message['header']['type'] == 'req-ack' and not blockAck :
-            ackMsg['header'] = {'type': 'ack',  'idws' : message['header']['idws'], 'ip' : message['header']['ip'] , 'timestamp' : long(time.time()*100)}
+            ackMsg['header'] = {'type': 'ack',  'idws' : message['header']['idws'], 'idmsg' : message['header']['idmsg'],
+                                           'ip' : message['header']['ip'] , 'timestamp' : long(time.time()*100)}
             ackMsg['request'] = message['request']
             if 'error' in report :
                 ackMsg['error'] = report['error']
