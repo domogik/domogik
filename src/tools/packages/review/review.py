@@ -392,6 +392,7 @@ class PkgReview:
             doc_file.write("\n\n\n%s\n" % LINE_SEPARATOR)
             doc_file.write("Stdout\n")
             doc_file.write("%s\n" % LINE_SEPARATOR)
+            the_score = 0
             for line in iter(p_cmd.stdout.readline, ''):
                 doc_file.write(line)
                 # Intercept the code rating
