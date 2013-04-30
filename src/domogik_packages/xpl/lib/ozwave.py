@@ -95,6 +95,7 @@ class OZWavemanager(threading.Thread):
         self._ready = False
         self._initFully = False
         self._ctrlActProgress = None
+        self.lastTest = 0
         self._wsPort = int(self._configPlug.query('ozwave', 'wsportserver'))
         # récupération des associations nom de réseaux et homeID
         self._nameAssoc = {}
@@ -437,7 +438,7 @@ class OZWavemanager(threading.Thread):
         elif nCode == 'NoOperation':  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
             print 'NoOperation notification code :', args
             self._log.info('NoOperation notification code : {0}'.format(args))
-            node.recevNoOperation(args)
+            node.recevNoOperation(args,  self.lastTest)
         elif nCode == 'Awake':            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
             if node : 
                 node.setSleeping(False)
@@ -769,9 +770,10 @@ class OZWavemanager(threading.Thread):
         if self.ready :
             for i in self._nodes :
                 n = self._nodes[i]
-                if not n.isSleeping : 
-                    error = n.trigTest(count, timeOut,  allReport)
+                if not n.isSleeping and n != self._controller : 
+                    error = n.trigTest(count, timeOut,  allReport,  False)
                     if error['error'] != '' :  retval['error'] = retval['error'] +'/n' + error['error']
+            self.lastTest = time.time()
             self._manager.testNetwork(self.homeId, count)
             if retval['error']  != '': retval['error'] = 'Some node(s) have error :/n' + retval['error'] 
             return retval
@@ -782,8 +784,10 @@ class OZWavemanager(threading.Thread):
         retval = {}
         if self.ready :
             node = self._getNode(self.homeId,  nodeId)
-            if node : retval = node.testNetworkNode(count, timeOut,  allReport)
-            else : retval['error'] = "Zwave node %d unknown" %nodeId
+            if node != self._controller  :
+                if node : retval = node.testNetworkNode(count, timeOut,  allReport)
+                else : retval['error'] = "Zwave node %d unknown" %nodeId
+            else : retval['error'] = "Can't test primary controller, node %d." %nodeId
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
 

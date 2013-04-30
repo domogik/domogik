@@ -11,9 +11,10 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
-- 0.2b3 : Compatibily library : python_openzwave >= 0.2.5 (rev : b434c50b795b)
+- 0.2b3 : Compatibily library : python_openzwave >= 0.2.5 (rev : b434c50b795b), tailer >=0.2.1
 	- Target : python_openzwave, domogik and domoweb
 	- Update, compile and install python_openzwave
+	- Install tailer : "sudo pip install tailer" or "sudo easy_install tailer"
 	- Change log : 
 		- Add test network and node
 		- Add id message req-ack

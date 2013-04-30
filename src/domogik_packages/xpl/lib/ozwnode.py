@@ -179,8 +179,8 @@ class ZWaveNode:
                 mbr['id'] = m
                 mbr['status'] = grp.members[m]
                 group['members'].append(mbr)
-                print group
             grps.append(group)
+        print grps
         return grps
     
     def _getProductName(self):
@@ -423,8 +423,8 @@ class ZWaveNode:
                     members = dmembers
                     ))
                 print("Update groupe après :"),  grp
-                break
             groups.append(grp)
+        del(self._groups[:])
         self._groups = groups
         print ('Node [%d] groups are: ' %self._nodeId) , self._groups
         self._ozwmanager._log.debug('Node [%d] groups are: %s', self._nodeId, self._groups)        
@@ -443,6 +443,7 @@ class ZWaveNode:
                 maxAssociations = self._manager.getMaxAssociations(self._homeId, self._nodeId, i),
                 members = dmembers
                 ))
+        del(self._groups[:])
         self._groups = groups
         print ('Node [%d] groups are: ' %self._nodeId) , self._groups
         self._ozwmanager._log.debug('Node [%d] groups are: %s', self._nodeId, self._groups)
@@ -598,40 +599,40 @@ class ZWaveNode:
         en retour une Notifiction code 2 (NoOperation) est renvoyée pour chaque message."""
         retval = {}
         if not self.isSleeping :
-            retval = self.trigTest(count, timeOut, allReport)
+            retval = self.trigTest(count, timeOut, allReport,  True)
             if retval['error'] =='' : self._manager.testNetworkNode(self.homeId, self.id, count)
         else :  retval['error'] = "Zwave node %d is sleeping, can't send test." % self.id
         return  retval
     
-    def trigTest(self, count = 1, timeOut = 10000,  allReport = False) :
+    def trigTest(self, count = 1, timeOut = 10000,  allReport = False,  single = True) :
         """Prépare le node à une serie de messages de test.
-            retourn un message d'erreur si test en cours."""
+            retourne un message d'erreur si test en cours."""
         if not self._thTest :
             retval = ''
-            tparams = {'countMsg': count,  'timeOut': timeOut, 'allReport' : allReport}
+            tparams = {'countMsg': count,  'timeOut': timeOut, 'allReport' : allReport, 'single' : single}
             self._thTest = TestNetworkNode(self, tparams,  self._ozwmanager._stop,  self._ozwmanager._log)
             self._thTest.start()
             return {'error': ''}
         else :
             return {'error': "Node %d, test allReady launch, can't send an other test." % self.id}
 
-    def recevNoOperation(self,  args):
+    def recevNoOperation(self,  args,  lastTest):
         """Gère les notifications NoOperation du manager."""
         if self._thTest :
-            self._thTest.decMsg()
+            self._thTest.decMsg(lastTest)
             
     def validateTest(self,  cptMsg, countMsg, dTime) :
         '''Un message de test a été recu, il est reporté à l'UI.'''
         # TODO: Crée un journal de report (Possible aussi dan le thread ?)
-        msg = 'Node %d as recevied test message number %d/%d in %d ms.' % (self.id,  cptMsg, countMsg, dTime)
+        msg = 'Node %d success test %d/%d in %d ms.' % (self.id,  cptMsg, countMsg, dTime)
         self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : msg,
                                'data': {'typestate': 'receviedtestmsg',  'state': 'processing'}})
         
-    def endTest(self, state, cptMsg, countMsg, dTime):
+    def endTest(self, state, cptMsg, countMsg, tTime,  dTime):
         if state == 'finish':
-            msg = 'Node %d as recevied all test messages (%d) in %d ms.' % (self.id,  countMsg, dTime)
+            msg = 'Node %d success last test %d in %d ms, all tests in %d ms.' % (self.id, cptMsg, tTime, dTime)
         elif state == 'timeout' :
-            msg = 'Test Node %d as recevied time out, %d/%d received.' % (self.id,  cptMsg, countMsg)
+            msg = 'Test Node %d as recevied time out (%d ms), %d/%d received.' % (self.id, dTime,  cptMsg, countMsg)
         self._thTest = None
         self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : msg,
                                'data': {'typestate': 'receviedtestmsg',  'state': state}})
@@ -742,6 +743,7 @@ class ZWaveNode:
                         if toAdd : #TODO: vérifier que le status est bien to update
                             self.addAssociation(grp.index, mn['id'])
                             mn['status'] = MemberGrpStatus[2]
+                            grp.members[mn['id']] = MemberGrpStatus[2]
                     break
         print ('set members association add members result :'), newGroups
         for grp in groups :
@@ -758,9 +760,10 @@ class ZWaveNode:
                         if toRemove : #TODO: vérifier que le status est bien to update
                             print ('members remove : '),  m
                             self.removeAssociation(grp.index, m)
+                            mn['status'] = MemberGrpStatus[2]
                             grp.members[m] = MemberGrpStatus[2]
                     break
-        print ('set members association remove members result :'), newGroups 
+        print ('set members association remove members result :'), newGroups
         return newGroups
         
     def sendCmdBasic(self, instance,  command,  opt):
@@ -803,7 +806,7 @@ class ZWaveNode:
 class TestNetworkNode(threading.Thread):
     '''Gère un process de test réseaux du node'''
     
-    def __init__(self, node, tparams, stop, log = None):
+    def __init__(self, node, tparams, stop, log = None ):
         '''initialise le test
         @param node: pointeur sur l'instance du node à tester
         @param tparams: Paramètres du test
@@ -818,20 +821,23 @@ class TestNetworkNode(threading.Thread):
         self._stop = stop
         self._timeOut = tparams['timeOut']
         self._allReport = tparams['allReport']
+        self._single = tparams['single']
         self._running = False
         self._startTime = 0
+        self._lastTime = 0
         self._log = log
         
     def run(self):
         """Demarre le server en mode forever, methode appelee depuis le start du thread""" 
         print "**************** Starting Test Node %d**************" % self._node.id
         self._startTime = time.time()
+        self._lastTime = self._startTime
         if self._log: self._log.info('Starting Test Node %d' % self._node.id)
         self._running = True
         state = 'Stopped'
         while not self._stop.isSet() and self._running:
             self._stop.wait(0.1)
-            tRef =int((time.time() - self._startTime) * 1000)
+            tRef =int((time.time() - self._lastTime) * 1000)
             if tRef >= self._timeOut :
                 state = 'timeout'
                 self._running = False
@@ -843,13 +849,17 @@ class TestNetworkNode(threading.Thread):
         if self._log: self._log.info('Stop Test Node %d, status : %s' % (self._node.id,  state))
         print "**************** Stopped Test Node %d satus : %s**************" % (self._node.id,  state)
    
-    def decMsg(self):
+    def decMsg(self, lastTest = 0):
         '''Décrémente le compteur de test'''        
         self._cptMsg += 1
+        if self._cptMsg == 1 and not self._single and lastTest != 0 :
+            self._lastTime = lastTest
         if self._cptMsg == self._countMsg :
             self._running = False
-            self._node.endTest('finish', self._cptMsg, self._countMsg, int((time.time() - self._startTime) * 1000))
-        elif self._allReport : self._node.validateTest(self._cptMsg, self._countMsg, int((time.time() - self._startTime) * 1000))
+            self._node.endTest('finish', self._cptMsg, self._countMsg, int((time.time() - self._lastTime) * 1000),  int((time.time() - self._startTime) * 1000))
+        elif self._allReport : self._node.validateTest(self._cptMsg, self._countMsg, int((time.time() - self._lastTime) * 1000))
+        self._lastTime = time.time()
+        self._node._ozwmanager.lastTest = self._lastTime
     
     def stopTest(self):
         '''Force stop test process.'''

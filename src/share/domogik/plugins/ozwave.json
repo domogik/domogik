@@ -370,7 +370,11 @@
 		"dependencies" : [{
 				"id" : "python-openzwave-lib (>=0.2.5)",
 				"type" : "python"
-			}
+			},
+            {
+                "id": "tailer (>=0.2.1)",
+                "type": "python"
+            }
 		],
 		"version" : "0.2b3",
 		"type" : "plugin",
