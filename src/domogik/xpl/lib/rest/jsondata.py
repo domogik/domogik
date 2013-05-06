@@ -182,7 +182,7 @@ class JSonHelper():
         # get data type
         data_type = type(data).__name__
         #print("TYPE=%s" % data_type)
-        print(data)
+        #print(data)
 
         if data_type in jsonencoder_types:
             data_json = json.JSONEncoder().encode(data)
@@ -237,8 +237,9 @@ class JSonHelper():
             else:
                 sub_data_elt0_type = type(data[0]).__name__
                 #print("DATA=%s" % data)
+                #print("sub_data_elt0_type=%s" % sub_data_elt0_type)
                 # start table
-                if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
+                if sub_data_elt0_type in ("unicode", "dict", "str", "int", "tuple", "NamedTuple"):
                     data_json += '"%s" : [' % key
                 else:
                     display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
