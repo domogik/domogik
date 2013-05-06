@@ -506,10 +506,14 @@ fi
 check_tools
 check_python
 test_sources $0
-read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE
-while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
-    read -p "Which install mode do you want? [install/develop] : " MODE
-done
+# TODO : we don't want anymore let the user the choice to use 'install' without be sure of this choice
+# on a fresh install from sources. I (fritz) comment this question now and later I will add a new option
+# --install-mode=install/develop on the command line for advanced users
+#read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE
+#while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
+#    read -p "Which install mode do you want? [install/develop] : " MODE
+#done
+MODE=develop
 read -p "If you want to use a proxy, please set it now. It will only be used during installation. (ex: http://1.2.3.4:8080)" http_proxy
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
