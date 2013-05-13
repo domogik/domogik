@@ -38,6 +38,8 @@ from urllib2 import urlopen
 from pprint import pprint
 import datetime
 import math
+import traceback
+import random
 
 # for DemoUi
 import BaseHTTPServer
@@ -57,6 +59,7 @@ class DemoData():
         self.log = log
         self.cb_send_sensor_basic = cb_send_sensor_basic
         self.cb_send_teleinfo_basic = cb_send_teleinfo_basic
+        self.water_volume = 0.0
         pass
 
     # thermometer => temperature
@@ -82,7 +85,7 @@ class DemoData():
                 #pressure
                 self.cb_send_sensor_basic("demo_pressure", "pressure", city['main']['pressure'])
         except:
-            self.log.error("Error while getting weather data")
+            self.log.error("Error while getting weather data : %s" % traceback.format_exc())
 
     def teleinfo_data(self):
         self.log.debug("Simulate teleinfo data")
@@ -208,7 +211,7 @@ class DemoData():
             #print teleinfo
             self.cb_send_teleinfo_basic(teleinfo)
         except:
-            self.log.error("Error while creating teleinfo data")
+            self.log.error("Error while creating teleinfo data : %s" % traceback.format_exc())
       
     # tank
     # level and distance 
@@ -228,7 +231,22 @@ class DemoData():
             #distance : we assume distance = 100-level (a 1m tank)
             self.cb_send_sensor_basic("demo_tank", "distance", 100-level)
         except:
-            self.log.error("Error while creating tank data")
+            self.log.error("Error while creating tank data : %s" % traceback.format_exc())
+
+    # water
+    # water consumption in m3
+    def water_data(self):
+        self.log.debug("Simulate water consumption data")
+        try:
+            #each time we add a random liters value between 0 and 6
+            possible_values = [0., 0., 0., 0., 0., 0., 0., 0., 1., 6.]
+            # 80% of the time : no water consumption
+            # 10% of the time : toilet usage (6 liters)
+            # 10% of the time : washing hand or anything else usage (1 liter)
+            self.water_volume += random.sample(possible_values, 1)[0]/1000
+            self.cb_send_sensor_basic("demo_water", "water", self.water_volume)
+        except:
+            self.log.error("Error while creating water consumption data : %s" % traceback.format_exc())
 
 
     def _get_number_of_days(self, date_from, date_to):

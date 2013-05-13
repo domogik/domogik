@@ -111,6 +111,12 @@ class DemoDataManager(XplPlugin):
                                   self.myxpl)
         self._tank_thr.start()
 
+        # water data each 1min
+        self._water_thr = XplTimer(60, \
+                                  demo.water_data, \
+                                  self.myxpl)
+        self._water_thr.start()
+
         self.log.info("All the data creator threads created")
 
         self.enable_hbeat()
@@ -146,7 +152,7 @@ class DemoDataManager(XplPlugin):
         """
         mess = "sensor.basic { device=%s, type=%s, current=%s}" % (device, type, current)
         print(mess)
-        self.log.debug(msg)
+        self.log.debug(mess)
         if current == "":
             return
         msg = XplMessage()
