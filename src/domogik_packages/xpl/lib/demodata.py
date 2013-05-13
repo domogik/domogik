@@ -239,10 +239,10 @@ class DemoData():
         self.log.debug("Simulate water consumption data")
         try:
             #each time we add a random liters value between 0 and 6
-            possible_values = [0., 0., 0., 0., 0., 0., 0., 0., 1., 6.]
-            # 80% of the time : no water consumption
-            # 10% of the time : toilet usage (6 liters)
-            # 10% of the time : washing hand or anything else usage (1 liter)
+            possible_values = [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 6.]
+            # most of the time : no water consumption
+            # from time to time : toilet usage (6 liters)
+            # from time to time : washing hand or anything else usage (1 liter)
             self.water_volume += random.sample(possible_values, 1)[0]/1000
             self.cb_send_sensor_basic("demo_water", "water", self.water_volume)
         except:
