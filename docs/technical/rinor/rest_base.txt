@@ -61,154 +61,154 @@ Will only return devices where the address field is NULL
 
 Result: ::
 
-{
-    "status": "OK",
-    "code": 0,
-    "description": "None",
-    "device": [
-        {
-            "xpl_stat": [
-                {
-                    "name": "get_level",
-                    "xpl_stat_param": [
-                        {
-                            "xplstat_id": 1,
-                            "value": "81",
-                            "ignore_values": "",
-                            "sensor_id": "",
-                            "static": "True",
-                            "key": "address"
-                        },
-                        {
-                            "xplstat_id": 1,
-                            "value": "1",
-                            "ignore_values": "",
-                            "sensor_id": "",
-                            "static": "True",
-                            "key": "channel"
-                        },
-                        {
-                            "xplstat_id": 1,
-                            "value": "",
-                            "ignore_values": "",
-                            "sensor_id": 1,
-                            "static": "False",
-                            "key": "level"
-                        }
-                    ],
-                    "json_id": "get_level",
-                    "device_id": 2,
-                    "id": 1,
-                    "schema": "lighting.device"
-                }
-            ],
-            "command": [
-                {
-                    "return_confirmation": "True",
-                    "name": "Switch On or Off",
-                    "reference": "set_level_bin",
-                    "command_param": [
-                        {
-                            "values": "[0, 255]",
-                            "value_type": "binary",
-                            "key": "level",
-                            "cmd_id": 1
-                        }
-                    ],
-                    "xpl_command": {
-                        "name": "blah",
-                        "stat_id": 1,
-                        "xpl_command_param": [
-                            {
-                                "value": "81",
-                                "xplcmd_id": 1,
-                                "key": "address"
-                            },
-                            {
-                                "value": "1",
-                                "xplcmd_id": 1,
-                                "key": "channel"
-                            },
-                            {
-                                "value": "dfad",
-                                "xplcmd_id": 1,
-                                "key": "dummy"
-                            }
-                        ],
-                        "cmd_id": 1,
-                        "json_id": "set_level_bin",
-                        "schema": "lighting.basic",
-                        "id": 1,
-                        "device_id": 2
-                    },
-                    "id": 1,
-                    "device_id": 2
-                }
-            ],
-            "description": "",
-            "reference": "",
-            "xpl_command": [
-                {
-                    "name": "blah",
-                    "stat_id": 1,
-                    "xpl_command_param": [
-                        {
-                            "value": "81",
-                            "xplcmd_id": 1,
-                            "key": "address"
-                        },
-                        {
-                            "value": "1",
-                            "xplcmd_id": 1,
-                            "key": "channel"
-                        },
-                        {
-                            "value": "dfad",
-                            "xplcmd_id": 1,
-                            "key": "dummy"
-                        }
-                    ],
-                    "cmd_id": 1,
-                    "json_id": "set_level_bin",
-                    "schema": "lighting.basic",
-                    "id": 1,
-                    "device_id": 2
-                }
-            ],
-            "device_usage_id": "ventilation",
-            "device_type": {
-                "description": "Switch one channel on a device",
-                "plugin_id": "velbus",
-                "id": "velbus.relay",
-                "name": "Switch"
-            },
-            "address": "",
-            "device_type_id": "velbus.relay",
-            "sensor": [
-                {
-                    "name": "level sensor",
-                    "reference": "level",
-                    "last_received": 1365315580,
-                    "value_type": "number",
-                    "values": "[0, 100]",
-                    "last_value": "low",
-                    "id": 1,
-                    "unit": "%",
-                    "device_id": 2
-                }
-            ],
-            "device_usage": {
-                "description": "Ventilation usage",
-                "default_options": "{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }",
-                "id": "ventilation",
-                "name": "Ventilation"
-            },
-            "id": 2,
-            "name": "testn"
-        }
-        ....
-    ]
-}
+	{
+	    "status": "OK",
+	    "code": 0,
+	    "description": "None",
+	    "device": [
+		{
+		    "xpl_stat": [
+			{
+			    "name": "get_level",
+			    "xpl_stat_param": [
+				{
+				    "xplstat_id": 1,
+				    "value": "81",
+				    "ignore_values": "",
+				    "sensor_id": "",
+				    "static": "True",
+				    "key": "address"
+				},
+				{
+				    "xplstat_id": 1,
+				    "value": "1",
+				    "ignore_values": "",
+				    "sensor_id": "",
+				    "static": "True",
+				    "key": "channel"
+				},
+				{
+				    "xplstat_id": 1,
+				    "value": "",
+				    "ignore_values": "",
+				    "sensor_id": 1,
+				    "static": "False",
+				    "key": "level"
+				}
+			    ],
+			    "json_id": "get_level",
+			    "device_id": 2,
+			    "id": 1,
+			    "schema": "lighting.device"
+			}
+		    ],
+		    "command": [
+			{
+			    "return_confirmation": "True",
+			    "name": "Switch On or Off",
+			    "reference": "set_level_bin",
+			    "command_param": [
+				{
+				    "values": "[0, 255]",
+				    "value_type": "binary",
+				    "key": "level",
+				    "cmd_id": 1
+				}
+			    ],
+			    "xpl_command": {
+				"name": "blah",
+				"stat_id": 1,
+				"xpl_command_param": [
+				    {
+					"value": "81",
+					"xplcmd_id": 1,
+					"key": "address"
+				    },
+				    {
+					"value": "1",
+					"xplcmd_id": 1,
+					"key": "channel"
+				    },
+				    {
+					"value": "dfad",
+					"xplcmd_id": 1,
+					"key": "dummy"
+				    }
+				],
+				"cmd_id": 1,
+				"json_id": "set_level_bin",
+				"schema": "lighting.basic",
+				"id": 1,
+				"device_id": 2
+			    },
+			    "id": 1,
+			    "device_id": 2
+			}
+		    ],
+		    "description": "",
+		    "reference": "",
+		    "xpl_command": [
+			{
+			    "name": "blah",
+			    "stat_id": 1,
+			    "xpl_command_param": [
+				{
+				    "value": "81",
+				    "xplcmd_id": 1,
+				    "key": "address"
+				},
+				{
+				    "value": "1",
+				    "xplcmd_id": 1,
+				    "key": "channel"
+				},
+				{
+				    "value": "dfad",
+				    "xplcmd_id": 1,
+				    "key": "dummy"
+				}
+			    ],
+			    "cmd_id": 1,
+			    "json_id": "set_level_bin",
+			    "schema": "lighting.basic",
+			    "id": 1,
+			    "device_id": 2
+			}
+		    ],
+		    "device_usage_id": "ventilation",
+		    "device_type": {
+			"description": "Switch one channel on a device",
+			"plugin_id": "velbus",
+			"id": "velbus.relay",
+			"name": "Switch"
+		    },
+		    "address": "",
+		    "device_type_id": "velbus.relay",
+		    "sensor": [
+			{
+			    "name": "level sensor",
+			    "reference": "level",
+			    "last_received": 1365315580,
+			    "value_type": "number",
+			    "values": "[0, 100]",
+			    "last_value": "low",
+			    "id": 1,
+			    "unit": "%",
+			    "device_id": 2
+			}
+		    ],
+		    "device_usage": {
+			"description": "Ventilation usage",
+			"default_options": "{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }",
+			"id": "ventilation",
+			"name": "Ventilation"
+		    },
+		    "id": 2,
+		    "name": "testn"
+		}
+		....
+	    ]
+	}
 
 * /base/device/get/id/<id>
 

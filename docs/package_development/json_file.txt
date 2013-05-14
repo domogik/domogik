@@ -304,34 +304,34 @@ Package type :                             Plugin  External
 Example
 *******
 ::
- "commands": {
-	"set_level_bin": {
-		"name": "Switch On or Off",
-		"return_confirmation": true,
-		"params": [
-			{
+
+	"commands": {
+		"set_level_bin": {
+			"name": "Switch On or Off",
+			"return_confirmation": true,
+			"params": [{
 				"key": "level",
 				"value_type": "binary",
 				"values": [0, 255]
-			}
-		],
-		"xpl_command": "set_level_bin"
-	},
-	...
- }
+			}],
+			"xpl_command": "set_level_bin"
+		},
+		...
+ 	}
+
 Description
 ***********
 
 * Commands : this section describes the commands needed by this plugin, its a dictionary indexed by the command reference
-  * name : the name of this command
-  * return_confirmation : does rinor need to wait for a confirmation
-  * params : the needed params to be able to complete this command (typically these are the values set by the widget)
-      * key : the name of the parameter
-      * value_type : what type of value we can receive
-      * values : the possible values, the format depends on the value_type
-	* value_type = binary : then values is a list containing the off and on value
-        * value_type = range : then values contains a list of min and max value of the range
-  * xpl_command : what xpl command is linked to this command (this field is optional)
+	* name : the name of this command
+	* return_confirmation : does rinor need to wait for a confirmation
+	* params : the needed params to be able to complete this command (typically these are the values set by the widget)
+		* key : the name of the parameter
+		* value_type : what type of value we can receive
+      		* values : the possible values, the format depends on the value_type
+			* value_type = binary : then values is a list containing the off and on value
+		        * value_type = range : then values contains a list of min and max value of the range
+	* xpl_command : what xpl command is linked to this command (this field is optional)
 
 Sensors
 -------
@@ -345,6 +345,7 @@ Package type :                             Plugin  External
 Example
 *******
 ::
+
     "sensors": {
 	"level": {
 		"name": "level",
@@ -377,8 +378,9 @@ Package type :                             Plugin  External
 ========================================== ======= =========
 
 Example
-+++++++
+*******
 ::
+
     "xpl_commands": {
          "set_level_bin": {
             "name": "blah",

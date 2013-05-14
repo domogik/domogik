@@ -48,7 +48,7 @@ Physical devices and interfaces
 
 * A plugin don't have to be launched as root : if necessary, the plugin documentation must explain how to access the plugin device without needing to be root : this should be done  by providing a sample udev rule in the :doc:`json file <json_file>`.
 
-    Web services or web features 
+Web services or web features 
 ----------------------------
 * A plugin that needs a web service should not keep a connexion (user session) always open : being connected 24H/24 to a webservice is not a good idea in terms of bandwidtch, security, ... So, the plugin should connect to the web service only when it needs it. 
 

@@ -61,42 +61,53 @@ Example
 -------
 The folowiong data is in the DB:
 
-* Device
+Device
+++++++
 .. code-block:: none
+    
     id = 1
     name = test
     usage = ventilation
     type = x10.relay
 
-* Commands
+Commands
+++++++++
 .. code-block:: none
+    
     id = 10
     name = command1
     xpl_command_id = 12
 
-* Command params
+Command params
+++++++++++++++
 .. code-block:: none
+    
     id = 11
     key = level
 
-* Xpl command
+Xpl command
++++++++++++
 .. code-block:: none
+    
     id = 12
     device = 1
     schema = lighting.device
 
-* Xpl command param 
+Xpl command param 
++++++++++++++++++
 .. code-block:: none
+
     command = 12
     key = address
     value = 12
 
 Now if we call the '/cmd/10/level/100 we will generate the folowing xpl command:
 .. code-block:: none
-   lighting.device {
-       level = 100
-       address = 12
-   }
+	
+	lighting.device {
+		level = 100
+		address = 12
+	}
 
 This example demonstrates how the url can generate any type of xpl message, the number of command params or xpl command params is unlimited.
 
