@@ -282,7 +282,7 @@ class SceneManager(XplPlugin):
                                  test["device"]="%s" %(device)
                                  test["xpl_stat"]="%s" %(mapping[i]['name'])
                                  test["filter_key"]="%s" %(mapping[i]['filter_key'])
-                                 test["filter_value"]="%s" %(mapping[i]['filter_value']
+                                 test["filter_value"]="%s" %(mapping[i]['filter_value'])
                                  device_list.append(test)
                            if mapping[i]['name']==key_stat and schema not in device_list:
                               test ={}
