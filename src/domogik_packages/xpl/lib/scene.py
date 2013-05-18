@@ -263,8 +263,8 @@ class Mscene():
           for i in range(len(eval(self.devices[device]['filters']))):
 ###todo add more data to filter like another key and a value for RFXcom for exemple
              if 'filter_key' in eval(self.devices[device]['filters'])[i]:
-                 filte_string= "{'schema':"+ eval(self.devices[device]['filters'])[i]['schema']+",'xpltype':'xpl-trig',"+eval(self.devices[device]['filters'])[i]['device']+":"+self.devices[device]['adr']+","+ eval(self.devices[device]['filter_key'])[i]['device']+":"+eval(self.devices[device]['filter_value'])[i]['device']+"}"
-
+                 filtre_string= "{'schema':"+ eval(self.devices[device]['filters'])[i]['schema']+",'xpltype':'xpl-trig',"+eval(self.devices[device]['filters'])[i]['device']+":"+self.devices[device]['adr']+","+ eval(self.devices[device]['filter_key'])[i]['device']+":"+eval(self.devices[device]['filter_value'])[i]['device']+"}"
+                 self.log_scene("info", filtre_string)
                  self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr'],eval(self.devices[device]['filter_key'])[i]['device']:eval(self.devices[device]['filter_value'])[i]['device']})
              else:
                  self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
