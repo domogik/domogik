@@ -291,9 +291,8 @@ class Mscene():
            
     def scene_stop(self):
 ### del all devices listerner
-       self.scene_log("info", self.listener)
        for element in self.listener:
-          self.scene_log("info", "stop: %s" %self.listener[element])
+          self.log_scene("info", "stop: %s" %self.listener[element])
           print self.listener[element]
           self.myxpl.del_listener(self.listener[element])
        self.listener = {}
