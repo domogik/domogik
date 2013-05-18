@@ -261,7 +261,11 @@ class Mscene():
           if str(type(self.devices[device]['filters']))=="<type 'list'>":
              self.devices[device]['filters']=str(self.devices[device]['filters'])
           for i in range(len(eval(self.devices[device]['filters']))):
-             self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
+###todo add more data to filter like another key and a value for RFXcom for exemple
+             if exit(self.devices[device]['filters'])[i]['filter_key'])):
+                 self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr'],eval(self.devices[device]['filter_key'])[i]['device']:eval(self.devices[device]['filter_value'])[i]['device'] })
+             else:
+                 self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
              liste= liste+1
        self.log_scene("info","All listener start")
 
