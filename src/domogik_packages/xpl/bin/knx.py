@@ -65,13 +65,17 @@ class KNXManager(XplPlugin):
 
         # Configuration : KNX device
         self._config = Query(self.myxpl, self.log)
-#        device = self._config.query('knx', 'device')
-
+        try{
+            device = self._config.query('knx', 'device')
+        }except{
+            self.log.error("Can get device parameter use ipt:192.168.0.148")
+            device = "ipt:192.168.0.148"
+        }
         ### Create KNX object
         try:
             self.knx = KNX(self.log, self.send_xpl)
             self.log.info("Open KNX")
-#            self.knx.open(device)
+            self.knx.open(device)
 
         except KNXException as err:
             self.log.error(err.value)
@@ -104,16 +108,24 @@ class KNXManager(XplPlugin):
         ### test if config file exist
         path = self.get_data_files_directory()
         if os.path.exists(path)== False:
-           os.mkdir(path)
-           print "Création du répertoire %s" %path
+           try:
+               os.mkdir(path)
+               self.log.info("create KNX data folder")
+           except:
+               self.log.error("can't create KNX data folder as %s" %path)
         path = path+"/knx.txt"
         if os.path.exists(path)== False:
-           fichier= open(path,'w')
-           fichier.write('')
-           fichier.close()
-           print "Création du fichier de stockage %s"  %path
+           try:
+               fichier= open(path,'w')
+               fichier.write('')
+               fichier.close()
+               print "Création du fichier de stockage %s"  %path
+               self.log.info("Create KNX data file")
+           except:
+               self.log.error("Can't create KNX data file")
 
         ### Load the configuration file in the plugin
+        self.log.info("Start read knx data file")
         filetoopen= self.get_data_files_directory()
         filetoopen= filetoopen+"/knx.txt"
         fichier=open(filetoopen,"r")
@@ -122,6 +134,7 @@ class KNXManager(XplPlugin):
               listknx.append(ligne)
               print ligne
         fichier.close
+        self.log.info("Finish to read KNX data file")
         for i in range(len(listknx)):
            stat=listknx[i]
            if stat.find("check:true")>=0:
@@ -136,6 +149,7 @@ class KNXManager(XplPlugin):
     def send_xpl(self, data):
         """ Send xpl-trig to give status change
         """
+        self.log.info("receive an xpl message")
         ### Identify the sender of the message
         lignetest=""
         command = ""
@@ -385,8 +399,10 @@ class KNXManager(XplPlugin):
               for ligne in fichier:
                  data.append(ligne[:ligne.find("end")])
               message=""
+              msg.add_data({'dim': len(data)})
               for i in range(len(data)):
                  message=message+data[i]+","
+                 msg.add_data({'data[%s]' %i : data[i]})
               if message=="":
                  message="None"
               msg.add_data({'data': message})

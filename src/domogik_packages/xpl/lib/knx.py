@@ -481,37 +481,49 @@ class KNX:
         self._callback = callback
         self._ser = None
 
-
-    def open(self):
-        """ open
-            @param device :
+    def open(self,device):
+        """ open EIBD demeaon
+            @param device : "ipt:192.168.0.148" for exemple
         """
-        print("Lancement de EIBD")
-#        device example : "ipt:192.168.0.148"
-        command = "eibd -i -d -D %s" 
-        print("lancement de la commande: %s" %command)
-        subp = subprocess.Popen(command, shell=True)
-        self.eibd_pid = subp.pid
-        print("attente du retour")
-        subp.wait()
-        print("Rendu")
-
+        try:
+            print("Lancement de EIBD")
+            command = "eibd -i -d -D %s" %device
+            print("lancement de la commande: %s" %command)
+            self.log.info("Launch command: %s" %command)
+            self.subp = subprocess.Popen(command, shell=True)
+            self.log.info("Waiting return")
+            print("Waiting return")
+            self.subp.wait()
+            self.log.info("Command Done")
+            print("Command Done")
+        except:
+            self.log.error("Can launch EIBD demon")
+        
     def close(self):
-        """ close t
+        """ close listener and eibd deamon
         """
-#        subp = subprocess.Popen("kill -9 %s" % self.eibd_pid, shell=True)
-        subp = subprocess.Popen("pkill groupsock*", shell=True)
-        print("pkill groupsock")
-#        TODO : add check and kill -9 if necessary
+        #subp = subprocess.Popen("kill -9 %s" % self.eibd_pid, shell=True)
+        #subp = subprocess.Popen("pkill groupsock*", shell=True)
+        self.stop_listen()
+        try:
+            self.subp.terminate()
+            self.log.info("EIBD stop")
+            print("kill EIBD deamon")
+        except:
+            self.log.error("Can't stop EIBD")
 
     def listen(self):
+   """ Start a subprocess groupsocketlisten and send the stout to the domogik listener"""
+
         command = "groupsocketlisten ip:127.0.0.1"
+        self.log.info("Launch subprocess groupsocketlisten ip:127.0.0.1")
         self.pipe = subprocess.Popen(command,
                      shell = True,
                      bufsize = 1024,
                      stdout = subprocess.PIPE
                      ).stdout
-        self._read = True                                                       
+        self._read = True   
+                                                            
 
         while self._read:
             data = self.pipe.readline()
@@ -520,11 +532,18 @@ class KNX:
             self._callback(data)
 
     def stop_listen(self):
-        print("Arret du listen")
+   """Stop the listener domogik's process and the sub process groupsocketlisten """
         self._read = False
+        try:
+            self.pipe.terminate()
+            self.log.info("kill groupsocketisten")
+            print("listener stoped")
+        except:
+            self.log.error("Can't terminate groupsocketlisten")
+            print("can't terminate groupsocketlisten")
 
 if __name__ == "__main__":                                                      
-    device = "ipt:192.168.1.148"                                                        
+    device = "ipt:192.168.0.148"                                                        
     obj = KNX(None, decode)                                                     
     obj.open(device)
     obj.listen()           
