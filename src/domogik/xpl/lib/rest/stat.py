@@ -72,7 +72,6 @@ class StatsManager:
             ### Rest data
             self.handler_params = handler_params
             self.handler_params.append(self._log_stats)
-            self.handler_params.append(self._log_stats_unknown)
             self.handler_params.append(self._db)
     
             self._event_requests = self.handler_params[0]._event_requests
@@ -112,12 +111,12 @@ class StatsManager:
                 # xpl-trig
                 self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
                                   "xpl-trig", self._log_stats, \
-                                  self._log_stats_unknown, self._db, \
+                                  self._log_stats, self._db, \
                                   self._event_requests))
                 # xpl-stat
                 self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
                                   "xpl-stat", self._log_stats, \
-                                  self._log_stats_unknown, self._db, \
+                                  self._log_stats, self._db, \
                                   self._event_requests))
         except:
             self._log_stats.error("%s" % traceback.format_exc())
@@ -139,7 +138,7 @@ class StatsManager:
             self._event_requests = event_requests
             self._db = db
             self._log_stats = log_stats
-            self._log_stats_unknown = log_stats_unknown
+            #self._log_stats_unknown = log_stats_unknown
             self._dev = dev
             self._stat = stat
             self._sen = sensor
