@@ -563,14 +563,15 @@ class DbHelper():
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
-        pjson = PackageJson(dt.plugin_id).json
+        pack = PackageJson(dt.plugin_id)
+        pjson = pack.json
         if pjson['json_version'] < 2:
             self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
             return None
         sensors = {}
         addedxplstats = {}
-        for sensor_id in pjson['device_types'][dt.id]['sensors']:
-            # add the command
+        tmp = pack.find_xplstats_for_device_type(dt.id)
+        for sensor_id in tmp:
             sensor = pjson['sensors'][sensor_id]
             sen = Sensor(name=sensor['name'], \
                     device_id=dev.id, reference=sensor_id, \
@@ -578,8 +579,8 @@ class DbHelper():
             self.__session.add(sen)
             self.__session.flush()
             sensors[sensor_id] = sen.id
-            if 'xpl_stat' in sensor:
-                xpl_stat_id = sensor['xpl_stat']
+            for stat in tmp[sensor_id]:
+                xpl_stat_id = stat
                 xpl_stat = pjson['xpl_stats'][xpl_stat_id]
                 xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
                 self.__session.add(xplstat)

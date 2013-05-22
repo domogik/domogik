@@ -288,6 +288,21 @@ class PackageJson():
             print("- %s" % my_file)
         print("---------------------------------------------------------")
 
+    def find_xplstats_for_device_type(self, devtype):
+        if self.json["json_version"] != 2:
+            return "Bad json version for the plugin"
+        ret = {}
+        # loop over all xplstat params and see if the sensor is linked to the above list
+        for xstatid in self.json["xpl_stats"]:
+            xstat = self.json["xpl_stats"][xstatid]
+            for stat in xstat['parameters']['dynamic']:
+                if stat['sensor'] in self.json["device_types"][devtype]['sensors']:
+                    if stat['sensor'] not in ret:
+                        ret[stat['sensor']] = []
+                    ret[stat['sensor']].append( xstatid )
+                        
+        return ret
+
 
 def set_nightly_version(path):
     """ update version for the nightly build
@@ -302,5 +317,8 @@ def set_nightly_version(path):
     my_file.close()
 
 if __name__ == "__main__":
-    pjson = PackageJson("ipx800")
-    print pjson.json
+    pjson = PackageJson("onewire")
+    print pjson.find_xplstats_for_device_type('onewire.thermometer')
+    pjson = PackageJson("velbus")
+    print pjson.find_xplstats_for_device_type('velbus.relay')
+    print pjson.find_xplstats_for_device_type('velbus.temp')
