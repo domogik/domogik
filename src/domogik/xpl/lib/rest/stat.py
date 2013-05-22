@@ -172,9 +172,9 @@ class StatsManager:
                 for p in self._stat.params:
                     if p.sensor_id is not None:
                         if p.key in message.data:
-                            self._log_stats.debug("Key found %s." \
-                                % (p.key))
                             value = message.data[p.key]
+                            self._log_stats.debug("Key found %s with value %s." \
+                                % (p.key, value))
                             store = True
                             if p.ignore_values:
                                 if value in eval(p.ignore_values):
