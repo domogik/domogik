@@ -186,7 +186,7 @@ class StatsManager:
                                 if self._sen.conversion is not None and self._sen.conversion == '':
                                     value = call_package_conversion(\
                                                 self._log_stats, self._dev.device_type.plugin_id, \
-                                                sel._sen.conversion, value)
+                                                self._sen.conversion, value)
                                 # do the store
                                 device_data.append({"value" : value, "sensor": p.sensor_id})
                                 my_db.add_sensor_history(p.sensor_id, value, current_date)
