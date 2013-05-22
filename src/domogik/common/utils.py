@@ -34,6 +34,7 @@ Implements
 """
 
 from socket import gethostname
+from exceptions import ImportError, AttributeError
 
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
@@ -70,7 +71,7 @@ def call_package_conversion(log, plugin, method, value):
     classname = '{0}Conversions'.format(plugin)
     try:
         module = __import__(modulename, fromlist=[classname])
-    except importError as err:
+    except ImportError as err:
         log.critical("Can not import module {0}: {1}".format(modulename, err))
         return None
     try:
