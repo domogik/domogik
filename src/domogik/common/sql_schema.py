@@ -472,6 +472,8 @@ class SensorHistory(Base):
             self.value_num = float(value)
         except ValueError:
             pass
+        except TypeError:
+            pass
         self.value_str = ucode(value)
 
     def __repr__(self):
