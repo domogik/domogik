@@ -11,6 +11,13 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
+- 0.2b4 : Compatibily library : the same. 
+	- Target : domogik and domoweb
+	- Change log :
+		- Add support tools, memory usage and log report to UI.
+		- Change websocket server private plugin to generic usage.
+		- Add load xml open-zwave usage, don't finish coding.
+
 - 0.2b3 : Compatibily library : python_openzwave >= 0.2.5 (rev : b434c50b795b), tailer >=0.2.1
 	- Target : python_openzwave, domogik and domoweb
 	- Update, compile and install python_openzwave

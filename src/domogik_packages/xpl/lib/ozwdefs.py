@@ -40,10 +40,11 @@ from collections import namedtuple
 import time
 from time import sleep
 import os.path
+import sys
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.2b3"
+OZWPLuginVers = "0.2b4"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])

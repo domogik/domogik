@@ -89,6 +89,10 @@ class OZwave(XplHlpPlugin):
         self.enable_hbeat()
         # Ouverture du controleur principal
         self.myzwave.openDevice(device)
+    
+    def __sizeof__(self):
+        return XplHlpPlugin.__sizeof__(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
+    
 
     def ozwave_cmd_cb(self, message):
         """" Envoie la cmd xpl vers le OZWmanager"""

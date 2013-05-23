@@ -42,10 +42,12 @@ from libopenzwave import PyManager
 from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
 from ozwctrl import ZWaveController
-from ozwuiserver import BroadcastServer 
+from wsuiserver import BroadcastServer 
 from ozwdefs import *
 from datetime import timedelta
 import pwd
+import sys
+import resource
 # import time
 # from time import sleep
 # import os.path
@@ -152,6 +154,9 @@ class OZWavemanager(threading.Thread):
         self._manager.create()
         self._manager.addWatcher(self.cb_openzwave) # ajout d'un callback pour les notifications en provenance d'OZW.
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
+        self._log.info('Config path : ' + self._configPath)
+        self._log.info('User path : ' + self._userPath)
+        self._log.info('Logging openzwave : ' + opts)
         print 'user config :',  self._userPath,  " Logging openzwave : ",  opts
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
         self.serverUI =  BroadcastServer(self._wsPort,  self.cb_ServerWS,  self._log) # demarre le websocket server
@@ -185,7 +190,7 @@ class OZWavemanager(threading.Thread):
             self._log.info("Remove driver from openzwave : %s",  self._device)
             self._manager.removeDriver(self._device)
         self._device = device
-        self._log.info("adding driver to openzwave : %s",  self._device)
+        self._log.info("Adding driver to openzwave : %s",  self._device)
         self._manager.addDriver(self._device)  # ajout d'un driver dans le manager
         
     def closeDevice(self, device):
@@ -245,6 +250,18 @@ class OZWavemanager(threading.Thread):
                 retval += 1
         return retval - 1 if retval > 0 else 0
 
+    def getMemoryUsage(self):
+        """Renvoi l'utilisation memoire du plugin"""
+        total = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        tplugin = sys.getsizeof(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
+        for n in self._nodes :
+            tplugin += self._nodes[n].getMemoryUsage()
+        tplugin= tplugin/1024
+        retval = {'Plugin manager with ' + str(len(self._nodes)) + ' nodes' : '%s kbytes' %  tplugin}        
+        retval ['Total memory use'] = '%s Mo' % (total / 1024.0)
+        retval ['Openzwave'] = '%s ko' % (total - tplugin)
+        return retval
+    
     def _getLibraryDescription(self):
         """Renvoi le type de librairie ainsi que la version du controleur du réseaux zwave HomeID"""
         if self._libraryTypeName and self._libraryVersion:
@@ -359,9 +376,8 @@ class OZWavemanager(threading.Thread):
         self._libraryTypeName = self._manager.getLibraryTypeName(self._homeId)
         self._ctrlnodeId =  self._activeNodeId
         self._timeStarted = time.time()
-        self._log.info("Device %s ready. homeId is 0x%0.8x, controller node id is %d, using %s library version %s", self._device,  self._homeId, self._activeNodeId, self._libraryTypeName, self._libraryVersion)
+        self._log.info("Driver %s ready. homeId is 0x%0.8x, controller node id is %d, using %s library version %s", self._device,  self._homeId, self._activeNodeId, self._libraryTypeName, self._libraryVersion)
         self._log.info('OpenZWave Initialization Begins.')
-        self._log.info('The initialization process could take several minutes.  Please be patient.')
         self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-ready', 'usermsg' : 'Driver is ready.', 'data': True})
         print ('controleur prêt' )
 
@@ -431,13 +447,13 @@ class OZWavemanager(threading.Thread):
         print nCode,  nCode.doc
         if nCode == 'MsgComplete':     #      Code_MsgComplete = 0,                                   /**< Completed messages */
             print 'MsgComplete notification code :', args
-            self._log.info('MsgComplete notification code : {0}'.format(args))
+            self._log.info('MsgComplete notification code for Node {0}.'.format(node.id))
         elif nCode == 'Timeout':         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
             print 'Timeout notification on node :',  args['nodeId']
-            self._log.info('Timeout notification code : {0}'.format(args))
+            self._log.info('Timeout notification code for Node {0}.'.format(node.id))
         elif nCode == 'NoOperation':  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
             print 'NoOperation notification code :', args
-            self._log.info('NoOperation notification code : {0}'.format(args))
+            self._log.info('Z-Wave Device Node {0} successful receipt testing message.'.format(node.id))
             node.recevNoOperation(args,  self.lastTest)
         elif nCode == 'Awake':            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
             if node : 
@@ -461,7 +477,7 @@ class OZWavemanager(threading.Thread):
                 self._log.info('Z-Wave Device Node {0} marked as alive.'.format(node.id))
        
         else :
-            self._log.debug('Error notification code unknown : ', args)
+            self._log.error('Error notification code unknown : ', args)
             
     def _getNode(self, homeId, nodeId):
         """ Renvoi l'objet node correspondant"""
@@ -895,6 +911,8 @@ class OZWavemanager(threading.Thread):
                 print "Refresh node :", report
             elif message['request'] == 'SaveConfig':
                 report = self.saveNetworkConfig()
+            elif message['request'] == 'GetMemoryUsage':
+                report = self.getMemoryUsage()
             elif message['request'] == 'SetNodeNameLoc':
                 report = self.setUINodeNameLoc(message['node'], message['newname'],  message['newloc'])
                 ackMsg['node'] = message['node']

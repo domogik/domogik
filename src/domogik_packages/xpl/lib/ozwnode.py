@@ -235,7 +235,13 @@ class ZWaveNode:
         print ('node state linked:',  self.isLinked, ' isReceiver:', self.isReceiver, ' isReady:', self.isReady, 'isNamed:', self.isNamed, ' isFailed:', self.isFailed )
         return retval
         
-        
+    def getMemoryUsage(self):
+        """Renvoi l'utilisation memoire du node en Kbytes"""   
+        size = sys.getsizeof(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
+        for v in self._values :
+            size += self._values[v].getMemoryUsage()
+        return size
+
 # Fonction de renvoie des valeurs des valueNode en fonction des Cmd CLASS zwave
 # C'est ici qu'il faut enrichire la prise en compte des fonctions Zwave
 # COMMAND_CLASS implémentées :
@@ -772,7 +778,8 @@ class ZWaveNode:
         if (opt != "") and (opt != 'None'):
             opt = int(opt)
         else : opt = 0
-        if instance == 1 and self.getValuesForCommandClass('COMMAND_CLASS_BASIC'):
+        blockonoff = True # TODO: Cmd on/off/level désactivé, inspecter bug probable  depuis rev 650 ?"
+        if instance == 1 and self.getValuesForCommandClass('COMMAND_CLASS_BASIC') and not blockonoff :
             if command == 'level':
                 self.setLevel(opt)
             elif command == 'on':

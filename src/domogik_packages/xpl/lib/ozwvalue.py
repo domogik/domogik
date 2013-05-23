@@ -42,7 +42,6 @@ import time
 from time import sleep
 import os.path
 
-
 class OZwaveValueException(OZwaveException):
     """"Zwave ValueNode exception class"""
             
@@ -100,7 +99,11 @@ class ZWaveValueNode:
     lastUpdate = property(lambda self: self._lastUpdate)
     valueData = property(lambda self: self._valueData)
     labelDomogik = property(lambda self: self._getLabelDomogik())
-
+    
+    def getMemoryUsage(self):
+        """Renvoi l'utilisation memoire de la value en octets"""
+        return sys.getsizeof(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
+        
     def getValue(self, key):
         """Retourne la valeur du dict valueData correspondant à key"""
         return self.valueData[key] if self._valueData.has_key(key) else None
