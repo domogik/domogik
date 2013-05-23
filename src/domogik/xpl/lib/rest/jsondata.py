@@ -181,8 +181,8 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        #print("TYPE=%s" % data_type)
-        #print(data)
+        print("TYPE=%s" % data_type)
+        print(data)
 
         if data_type in jsonencoder_types:
             data_json = json.JSONEncoder().encode(data)
