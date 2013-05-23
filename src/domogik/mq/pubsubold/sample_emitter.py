@@ -7,6 +7,7 @@ import json
 from mq_event_utils import MqPub
 from random import choice
 from time import sleep
+import zmq
 
 print("PUB-SUB emitter sample")
 
@@ -41,12 +42,16 @@ categories = {
                                         ]
                                     }
                     ]
-    },    
+    },
+    'statsmgr' : {
+		    'event' : ['received'],   
+                    'content': ['package1', 'package2']
+    },
 }
 
 content = ["Domogik is really cool", "I like Domoweb", "Domogik is magic"]
 
-pub_event = MqPub('sample_emitter')
+pub_event = MqPub('sample_emitter', zmq.Context())
 
 while True:
     category1 = choice(categories.keys()) 

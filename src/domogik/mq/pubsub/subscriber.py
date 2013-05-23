@@ -41,52 +41,17 @@ from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from time import sleep, time
 from domogik.common import logger
 from domogik.common.configloader import Loader
+from domogik.common.configloader import Loader
 
 MSG_VERSION = "0_1"
 
-class MqEvent:
-    def __init__(self, context, caller_id):
-        if caller_id is None:
-            raise Exception("Caller id can't be empty!")
-        self.caller_id = caller_id
-        self.context = context
+class MQSyncSub():
+    def __init__(self, context, caller_id, *category_filters):
+        self.log = logger.Logger('mq_sync_sub').get_logger()
+        self.s_recv = context.socket(zmq.SUB)
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
-
-class MqPub(MqEvent):
-    def __init__(self, context, caller_id):
-        MqEvent.__init__(self, context, caller_id)
-        log = logger.Logger('mq_event_pub')
-        self.log = log.get_logger('mq_event_pub')
-        self.s_send = self.context.socket(zmq.PUB)
-        pub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_pub_port'])
-        self.log.debug("Publishing on address : %s" % pub_addr)
-        self.s_send.connect(pub_addr)
-        # TODO : change me! this is a dirty trick so that the first message is not lost by the receiver
-        # but is not reliable as it depends on machine/network latency
-        sleep(1)
-
-    def __del__(self):
-        # Not sure this is really mandatory
-        self.s_send.close()
-
-    def send_event(self, category, content):
-        """Send an event in in multi-part : first message id and then its content
-
-        @param category : category of the message
-        @param content : content of the message : must be in JSON format
-
-        """
-        msg_id = "%s.%s.%s" %(category, str(time()).replace('.','_'), MSG_VERSION)
-        self.s_send.send(msg_id, zmq.SNDMORE)
-        self.s_send.send(content)
-        self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
-
-class MqSyncSub(MqEvent):
-    def __init__(self, context, caller_id, *category_filters):
-        MqEvent.__init__(self, context, caller_id)
-        self.log = logger.Logger('mq_event_sub').get_logger()
-        self.s_recv = self.context.socket(zmq.SUB)
+        self.caller_id = caller_id
         sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
@@ -119,14 +84,13 @@ class MqSyncSub(MqEvent):
             self.log.error(msg_error)
             raise Exception(msg_error)
 
-class MqAsyncSub(MqEvent):
+class MQAsyncSub():
     def __init__(self, context, caller_id, category_filters):
-        """
-        :param category_filters: a dictionary with the key equal to the filter and the value equal to the callback
-        """
-        MqEvent.__init__(self, context, caller_id)
-        self.log = logger.Logger('mq_event_sub').get_logger()
-        self.s_recv = self.context.socket(zmq.SUB)
+        self.log = logger.Logger('mq_async_sub').get_logger()
+        cfg = Loader('mq').load()
+        self.cfg_mq = dict(cfg[1])
+        self.caller_id = caller_id
+        self.s_recv = context.socket(zmq.SUB)
         sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
