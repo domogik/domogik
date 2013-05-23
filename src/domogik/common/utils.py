@@ -73,12 +73,12 @@ def call_package_conversion(log, plugin, method, value):
         module = __import__(modulename, fromlist=[classname])
     except ImportError as err:
         log.critical("Can not import module {0}: {1}".format(modulename, err))
-        return None
+        return value
     try:
         staticclass = getattr(module, classname)
         staticmethode = getattr(staticclass, method)
     except AttributeError as err:
         log.critical("Can not load class ({0}) or methode ({1}): {2}".format(classname, method, err))
-        return None
+        return value
     return staticmethode(value)
 
