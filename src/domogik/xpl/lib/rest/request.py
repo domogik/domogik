@@ -743,7 +743,7 @@ class ProcessRequest():
             if self.get_parameters(p.key):
                 value = self.get_parameters(p.key)
                 # chieck if we need a conversion
-                if p.conversion is not None and p.conversion == '':
+                if p.conversion is not None and p.conversion != '':
                     value = call_package_conversion(\
                                 self.log, dev.device_type.plugin_id, \
                                 p.conversion, value)
