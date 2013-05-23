@@ -183,7 +183,7 @@ class StatsManager:
                                     store = False
                             if store:
                                 # check if we need a conversion
-                                if self._sen.conversion is not None and self._sen.conversion == '':
+                                if self._sen.conversion is not None and self._sen.conversion != '':
                                     value = call_package_conversion(\
                                                 self._log_stats, self._dev.device_type.plugin_id, \
                                                 self._sen.conversion, value)
