@@ -652,12 +652,16 @@ class ProcessRequest():
                     "element_type" : "item",
                     "optionnal" : "no",
                 }
-            ] 
+            ]
+
+	cfg = Loader('mq').load()
+        config = dict(cfg[1])
 
         data = {"info" : info, 
                 "queue" : queues, 
                 "event" : events,
-                "configuration" : conf}
+                "configuration" : conf,
+                "mq" : config}
         json_data.add_data(data)
 
         self.send_http_response_ok(json_data.get())

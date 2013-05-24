@@ -64,7 +64,7 @@ class MQRep(object):
         my_conf = cfg.load()
         config = dict(my_conf[1])
         self.context = context
-        self.endpoint = "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port'])
+        self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.service = service
         self.stream = None
         self._tmo = None

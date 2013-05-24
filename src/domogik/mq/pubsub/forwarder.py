@@ -57,7 +57,7 @@ def main():
         frontend = context.socket(zmq.SUB)
         # Forwarder subscribes to the emitter *pub* port
         sub_addr = "tcp://{0}:{1}".format(\
-                   config['mq_ip'], config['event_pub_port'])
+                   config['ip'], config['pub_port'])
         frontend.bind(sub_addr)
         log.info("Waiting for messages on {0}".format(sub_addr))
         # We want to get all messages from emitters
@@ -67,7 +67,7 @@ def main():
         backend = context.socket(zmq.PUB)
         # Forwarder publishes to the receiver *sub* port
         pub_addr = "tcp://{0}:{1}".format(\
-                   config['mq_ip'], config['event_sub_port'])
+                   config['ip'], config['sub_port'])
         backend.bind(pub_addr)
         log.info("Sending messages to {0}".format(pub_addr))
         

@@ -298,7 +298,7 @@ function update_user_config {
         sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
         # will be overide on secondary host
         sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $DMG_ETC/domogik.cfg
-        sed -i "s/^mq_ip.*$/mq_ip = $bind_addr/" $DMG_ETC/domogik.cfg
+        sed -i "s/^ip.*$/ip = $bind_addr/" $DMG_ETC/domogik.cfg
     fi
 }
 

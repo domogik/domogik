@@ -60,7 +60,7 @@ class MQSyncReq(object):
         cfg = Loader('mq')
         my_conf = cfg.load()
         config = dict(my_conf[1])
-        endpoint = "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port'])
+        endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.socket = context.socket(zmq.REQ)
         self.socket.connect(endpoint)         
         return
@@ -154,7 +154,7 @@ class MqAsyncReq(object):
         socket = context.socket(zmq.REQ)
         ioloop = IOLoop.instance()
         self.service = service
-        self.endpoint = "tcp://{0}:{1}".format(config['mq_ip'], config['req_rep_port'])
+        self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.stream = ZMQStream(socket, ioloop)
         self.stream.on_recv(self._on_message)
         self.can_send = True

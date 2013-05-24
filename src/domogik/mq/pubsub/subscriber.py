@@ -52,7 +52,7 @@ class MQSyncSub():
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
         self.caller_id = caller_id
-        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
+        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
 
@@ -91,7 +91,7 @@ class MQAsyncSub():
         self.cfg_mq = dict(cfg[1])
         self.caller_id = caller_id
         self.s_recv = context.socket(zmq.SUB)
-        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['mq_ip'], self.cfg_mq['event_sub_port'])
+        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         self.log.debug("Subscribing to address : %s" % sub_addr)
         self.s_recv.connect(sub_addr)
 
