@@ -186,7 +186,8 @@
                     "dynamic": [
                         {
                              "key": "current",
-                             "sensor": "temperature"
+                             "sensor": "temperature",
+			     "ignore_values": ""
                         }
                     ]
                 }
@@ -205,7 +206,8 @@
                     "dynamic": [
                         {
                              "key": "current",
-                             "sensor": "humidity"
+                             "sensor": "humidity",
+			     "ignore_values": ""
                         }
                     ]
                 }
@@ -224,7 +226,8 @@
                     "dynamic": [
                         {
                              "key": "current",
-                             "sensor": "serial"
+                             "sensor": "serial",
+			     "ignore_values": ""
                         }
                     ]
                 }

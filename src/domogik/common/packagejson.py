@@ -249,7 +249,7 @@ class PackageJson():
                 for stat in xstat['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # dynamic parameter
-                expected = ["key", "sensor"]
+                expected = ["key", "sensor", "ignore_values"]
                 for stat in xstat['parameters']['dynamic']:
                     self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys())
                     # check that the sensor exists
@@ -317,8 +317,5 @@ def set_nightly_version(path):
     my_file.close()
 
 if __name__ == "__main__":
-    pjson = PackageJson("onewire")
-    print pjson.find_xplstats_for_device_type('onewire.thermometer')
+    pjson = PackageJson("plcbus")
     pjson = PackageJson("velbus")
-    print pjson.find_xplstats_for_device_type('velbus.relay')
-    print pjson.find_xplstats_for_device_type('velbus.temp')
