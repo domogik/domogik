@@ -1,454 +1,474 @@
 {
-    "configuration": [], 
-    "device_feature_models": [
-        {
-            "device_type_id": "rfxcom.temp", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.temp.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.temp", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.temp.battery", 
-            "name": "Battery", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.th", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.th.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.th", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.th.humidity", 
-            "name": "Humidity", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "humidity", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.th", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.th.humidity-desc", 
-            "name": "Humidity Description", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "humidity-desc", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.th", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.th.battery", 
-            "name": "Battery", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.thb", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.thb.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.thb", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.thb.humidity", 
-            "name": "Humidity", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "humidity", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.thb", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.thb.humidity-desc", 
-            "name": "Humidity Description", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "humidity-desc", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.thb", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.thb.pressure", 
-            "name": "Pressure", 
-            "parameters": "{&quot;unit&quot;:&quot;hPa&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "pressure", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.thb", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.thb.forcast", 
-            "name": "Forcast", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "forcast", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.thb", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.thb.battery", 
-            "name": "Battery", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.wind", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.wind.gust", 
-            "name": "Gust", 
-            "parameters": "{&quot;unit&quot;:&quot;m/sec&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "gust", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.wind", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.wind.average-speed", 
-            "name": "Average Speed", 
-            "parameters": "{&quot;unit&quot;:&quot;m/sec&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "average-speed", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.wind", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.wind.direction", 
-            "name": "Direction", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "direction", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.wind", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.wind.battery", 
-            "name": "Battery", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.uv", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.uv.uv", 
-            "name": "U.V.", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "uv", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.uv", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.uv.battery", 
-            "name": "Battery", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.rain", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.rain.rainrate", 
-            "name": "Rain Rate", 
-            "parameters": "{&quot;unit&quot;:&quot;mm/hr&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "rainrate", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.rain", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.rain.raintotal", 
-            "name": "Rain Total", 
-            "parameters": "{&quot;unit&quot;:&quot;mm&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "raintotal", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.rain", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.rain.battery", 
-            "name": "Battery", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "battery", 
-            "value_type": "string"
-        }, 
-        {
-            "device_type_id": "rfxcom.weight", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.weight.weight", 
-            "name": "Weight", 
-            "parameters": "{&quot;unit&quot;:&quot;kg&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "weight", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.elec1", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.elec1.current", 
-            "name": "Current", 
-            "parameters": "{&quot;unit&quot;:&quot;A&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "current", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.elec2", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.elec2.power", 
-            "name": "Power", 
-            "parameters": "{&quot;unit&quot;:&quot;kW&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "power", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.elec2", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.elec2.energy", 
-            "name": "Energy", 
-            "parameters": "{&quot;unit&quot;:&quot;kWh&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "energy", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.rfxsensor", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.rfxsensor.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.rfxsensor", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.rfxsensor.voltage", 
-            "name": "Voltage", 
-            "parameters": "{&quot;unit&quot;:&quot;V&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "voltage", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.rfxmeter", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.rfxmeter.count", 
-            "name": "Count", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "count", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.digimax", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.digimax.temperature", 
-            "name": "Temperature", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "temperature", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.digimax", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.digimax.setpoint", 
-            "name": "Set Point", 
-            "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "setpoint", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "rfxcom.remote", 
-            "feature_type": "sensor", 
-            "id": "rfxcom.remote.keys", 
-            "name": "Keys", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "keys", 
-            "value_type": "string"
+    "products" : [
+    ],
+    "configuration": [],
+    "xpl_commands": {
+    },
+    "xpl_stats": {
+       "get_battery": {
+            "name": "get_battery",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "battery"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "battery"
+                    }
+                ]
+            }
+       },
+       "get_temp": {
+            "name": "get_temp",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "temp"
+                    },
+                    {
+                        "key": "unit",
+                        "value": "c"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "temperature"
+                    }
+                ]
+            }
+        },
+       "get_humidity": {
+            "name": "get_humidity",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "humidity"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                         "key": "current",
+                         "sensor": "humidity"
+                    },
+                    {
+                         "key": "description",
+                         "sensor": "humidity_description"
+                    }
+                ]
+            }
+        },
+       "get_rainrate": {
+            "name": "get_rainrate",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "rainrate"
+                    },
+                    {
+                        "key": "unit",
+                        "value": "mmh"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "rainrate"
+                    }
+                ]
+            }
+        },
+       "get_raintotal": {
+            "name": "get_raintotal",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "raintotal"
+                    },
+                    {
+                        "key": "unit",
+                        "value": "mm"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "raintotal"
+                    }
+                ]
+            }
+        },
+       "get_gust": {
+            "name": "get_gust",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "gust"
+                    },
+                    {
+                        "key": "unit",
+                        "value": "mms"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "gust"
+                    }
+                ]
+            }
+        },
+       "get_average_speed": {
+            "name": "get_average_speed",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "average-speed"
+                    },
+                    {
+                        "key": "unit",
+                        "value": "mms"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "average_speed"
+                    }
+                ]
+            }
+        },
+       "get_direction": {
+            "name": "get_direction",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "direction"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "direction"
+                    }
+                ]
+            }
+        },
+       "get_uv": {
+            "name": "get_uv",
+            "schema": "sensor.basic",
+            "parameters": {
+                "static": [
+                    {
+                        "key": "type",
+                        "value": "uv"
+                    }
+                ],
+                "device": [],
+                "dynamic": [
+                    {
+                        "key": "current",
+                        "sensor": "uv"
+                    },
+                    {
+                         "key": "description",
+                         "sensor": "uv_description"
+                    }
+                ]
+            }
         }
-    ], 
-    "device_types": [
-        {
+    },
+    "commands": {
+    },
+    "sensors": {
+	"battery": {
+            "name": "Battery",
+            "data_type": "DT_Scaling",
+            "conversion": ""
+	},
+	"temperature": {
+            "name": "Temperature",
+            "data_type": "DT_Temp",
+            "conversion": ""
+	},
+	"humidity": {
+            "name": "Humidity",
+            "data_type": "DT_Humidity",
+            "conversion": ""
+	},
+	"humidity_description": {
+            "name": "Humidity Description",
+            "data_type": "DT_String",
+            "conversion": ""
+	},
+        "rainrate": {
+            "name": "Rain Rate",
+            "data_type": "DT_mMeterHour",
+            "conversion": ""            
+        },
+        "raintotal": {
+            "name": "Rain Total",
+            "data_type": "DT_mMeter",
+            "conversion": ""            
+        },
+        "gust": {
+            "name": "Gust",
+            "data_type": "DT_Speed",
+            "conversion": ""            
+        },
+        "average_speed": {
+            "name": "Average Speed",
+            "data_type": "DT_Speed",
+            "conversion": ""            
+        },
+        "direction": {
+            "name": "Direction",
+            "data_type": "DT_Angle",
+            "conversion": ""            
+        },
+        "uv": {
+            "name": "UV index",
+            "data_type": "DT_Number",
+            "conversion": ""            
+        },
+	"uv_description": {
+            "name": "UV Description",
+            "data_type": "DT_String",
+            "conversion": ""
+	}
+    },
+    "device_types": {
+        "rfxcom.temp": {
+            "id": "rfxcom.temp",
             "description": "Oregon-THR128, Oregon-THR138, Oregon-THC138, Oregon-THC238/268, Oregon-THN122N/132N, Oregon-THWR288A, Oregon-THRN122N, Oregon-AW129, Oregon-AW131, Oregon-THWR800, Oregon-RTHN318", 
-            "id": "rfxcom.temp", 
-            "name": "Oregon Inside/Outside/Water Temperature"
-        }, 
-        {
+            "name": "Oregon Inside/Outside/Water Temperature",
+            "commands": [],
+            "sensors": ["battery", "temperature"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
+        },
+        "rfxcom.th": {
+            "id": "rfxcom.th",
             "description": "Oregon-THGN122N/123N, Oregon-THGR122NX, Oregon-THGR228N, Oregon-THGR238/268, Oregon-THGR810, Oregon-RTGR328N, Oregon-THGR328N, Oregon-WTGR800, Oregon-THGR918, Oregon-THGRN228NX, Oregon-THGN500", 
-            "id": "rfxcom.th", 
-            "name": "Oregon Inside/Outside Temp-Hygro"
-        }, 
-        {
+            "name": "Oregon Inside/Outside Temp-Hygro",
+            "commands": [],
+            "sensors": ["battery", "temperature", "humidity", "humidity_description"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
+        },
+        "rfxcom.thb": {
             "description": "Huger-BTHR918, Oregon-BTHR918N, Oregon-BTHR968", 
             "id": "rfxcom.thb", 
-            "name": "Oregon Inside Temp-Hygro-Baro"
+            "name": "Oregon Inside Temp-Hygro-Baro",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.wind": {
             "description": "Oregon-WTGR800, Oregon-WGR800, Huger-STR918, Oregon-WGR918", 
             "id": "rfxcom.wind", 
-            "name": "Anemometer"
+            "name": "Anemometer",
+            "commands": [],
+            "sensors": ["battery", "gust", "average_speed", "direction"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.uv": {
             "description": "Oregon-UVN128, Oregon-UV138, Oregon-UVN800", 
             "id": "rfxcom.uv", 
-            "name": "UV sensor"
+            "name": "UV sensor",
+            "commands": [],
+            "sensors": ["battery", "uv", "uv_description"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.rain": {
             "description": "Oregon-RGR126, Oregon-RGR682, Oregon-RGR918, Oregon-PCR800", 
             "id": "rfxcom.rain", 
-            "name": "Rain Gauge"
+            "name": "Rain Gauge",
+            "commands": [],
+            "sensors": ["battery", "rainrate", "raintotal"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.weight": {
             "description": "Oregon-BWR102, Oregon-GR101", 
             "id": "rfxcom.weight", 
-            "name": "Body Weight Monitor"
+            "name": "Body Weight Monitor",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.elec1": {
             "description": "cent-a-meter, Electrisave, OWL CM113", 
             "id": "rfxcom.elec1", 
-            "name": "Ampere meter"
+            "name": "Ampere meter",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.elec2": {
             "description": "OWL CM119", 
             "id": "rfxcom.elec2", 
-            "name": "Power meter"
+            "name": "Power meter",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.rfxsensor": {
             "description": "RFXSensor", 
             "id": "rfxcom.rfxsensor", 
-            "name": "RFXSensor"
+            "name": "RFXSensor",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.rfxmeter": {
             "description": "RFXMeter", 
             "id": "rfxcom.rfxmeter", 
-            "name": "RFXMeter"
+            "name": "RFXMeter",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.digimax": {
             "description": "Digimax", 
             "id": "rfxcom.digimax", 
-            "name": "Digimax"
+            "name": "Digimax",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }, 
-        {
+        "rfxcom.remote": {
             "description": "Received X10 RF Remote, Medion remote, ATI Remote or ATI Remote Plus", 
             "id": "rfxcom.remote", 
-            "name": "Remote"
+            "name": "Remote",
+            "commands": [],
+            "sensors": [],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The hexadecimal address",
+                    "type": "string"
+	        }
+            ]
         }
-    ], 
+    },
     "external": {
-        "device_id": "lan", 
+        "device_id": "lan",
         "vendor_id": "rfxcom"
-    }, 
+    },
     "files": [
         "src/share/domogik/design/external/rfxcom/icon.png", 
-        "src/share/domogik/externals/rfxcom.json", 
-        "src/share/domogik/stats/rfxcom/ac.basic-rfxcom-lighting2.xml",
-        "src/share/domogik/stats/rfxcom/sensor.basic-rfxcom.xml",
-        "src/share/domogik/stats/rfxcom/x10.basic-rfxcom-lighting1-lighting3-curtain1.xml",
-        "src/share/domogik/stats/rfxcom/x10.security-rfxcom-security1.xml",
-        "src/share/domogik/url2xpl/rfxcom/curtain1_harrison_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/curtain1_harrison_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/curtain1_harrison_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/curtain1_harrison_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_arc_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_arc_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_arc_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_arc_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_chacon_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_chacon_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_chacon_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_chacon_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_elro_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_elro_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_elro_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_elro_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_impuls_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_impuls_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_impuls_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_impuls_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_waveman_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_waveman_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_waveman_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_waveman_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_x10_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_x10_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_x10_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting1_x10_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_ac_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_ac_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_ac_preset.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_homeeasy_eu_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_homeeasy_eu_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting2_homeeasy_eu_preset.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting3_koppla_bright.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting3_koppla_dim.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting3_koppla_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/lighting3_koppla_on.xml",
-        "src/share/domogik/url2xpl/rfxcom/security1_off.xml",
-        "src/share/domogik/url2xpl/rfxcom/security1_on.xml"
+        "src/share/domogik/externals/rfxcom.json"
     ], 
     "identity": {
         "author": "Ferllings", 
-        "author_email": "ferllings at gmail.com", 
+        "author_email": "cedric at domogik.org", 
         "category": "rfxcom", 
-        "changelog": "0.1\n- create", 
+        "changelog": "0.2\n- adapt plugin for release 0.4.0\n\n0.1\n- create", 
         "dependencies": [], 
         "description": "RFXCOM with xPL support LAN 433.92MHz receiver transmitter", 
         "documentation": "#TODO", 
-        "domogik_min_version": "0.2.0", 
-        "id": "rfxcom", 
+        "domogik_min_version": "0.4.0", 
+        "id": "rfxcom",
         "type": "external", 
-        "version": "0.1a0"
+        "version": "0.2"
     }, 
-    "json_version": 1, 
-    "technology": {
-        "description": "RFXCom", 
-        "id": "rfxcom", 
-        "name": "RFXCom"
-    }, 
+    "json_version": 2, 
     "udev-rules": []
 }

@@ -120,7 +120,9 @@
             "DT_minute",
             "DT_Second",
             "DT_mSecond",
-            "DT_Timestamp"
+            "DT_Timestamp",
+            "DT_mMeter",
+            "DT_mMeterHour"     
         ]
     },
     "DT_Scaling": {
@@ -344,6 +346,20 @@
         "min": null,
         "max": null,
         "unit": null,
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mMeter": {
+        "min": null,
+        "max": null,
+        "unit": "mm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mMeterHour": {
+        "min": null,
+        "max": null,
+        "unit": "mm/h",
         "parent": "DT_Number",
         "childs": []
     },

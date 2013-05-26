@@ -89,20 +89,6 @@
                     ],
                     "device": []
                 }
-         },
-         "set_bright": {
-            "name": "set_bright",
-            "schema": "plcbus.basic",
-            "xplstat_name": "get_bright",
-            "parameters": {
-                    "static": [
-		    	{
-			    "key": "command",
-			    "value": "BRIGHT"
-		    	}
-                    ],
-                    "device": []
-                }
          }
     },
     "xpl_stats": {
@@ -116,7 +102,7 @@
                         {
                              "key": "command",
                              "sensor": "binary_state",
-			     "ignore_value": ["PRESET_DIM", "DIM", "BRIGHT"]
+			     "ignore_values": ["PRESET_DIM", "DIM", "BRIGHT"]
                         }
                     ]
                 }
@@ -135,7 +121,8 @@
 	             "dynamic": [
 	                 {
 	                      "key": "data1",
-	                      "sensor": "dim_level"
+	                      "sensor": "dim_level",
+			     "ignore_values": []
 	                 }
 	             ]
 	        }
@@ -148,8 +135,8 @@
            "params": [
                {
                    "key": "command",
-                   "value_type": "binary",
-                   "values": ["OFF", "ON"]
+                   "data_type": "DT_Switch",
+                   "conversion": "from_DT_Switch_to_command"
                }
            ],
            "xpl_command": "set_binary"
@@ -160,8 +147,8 @@
             "params": [
                 {
                     "key": "data1",
-                    "value_type": "range",
-                    "values": [0, 100]
+                    "data_type": "DT_Scaling",
+                    "conversion": ""
                 }
             ],
             "xpl_command": "set_preset_dim"
@@ -170,17 +157,13 @@
     "sensors": {
 	"binary_state": {
 		"name": "Binary State",
-                "unit": "",
-                "value_type": "string",
-                "values": ["OFF", "ON"],
-                "xpl_stat": "get_binary"
+                "data_type": "DT_Switch",
+                "conversion": "from_command_to_DT_Switch"
 	},
 	"dim_level": {
 		"name": "Dim Level",
-                "unit": "%",
-                "value_type": "number",
-                "values": [0, 100],
-                "xpl_stat": "get_preset_dim"
+                "data_type": "DT_Scaling",
+                "conversion": ""
 	}
     },
     "device_types": {
@@ -216,14 +199,7 @@
     "files": [
         "src/share/domogik/design/plugin/plcbus/icon.png", 
         "src/share/domogik/plugins/plcbus.json", 
-        "src/share/domogik/stats/plcbus/plcbus.basic-plcbus.xml", 
-        "src/share/domogik/url2xpl/plcbus/all_lights_off.xml", 
-        "src/share/domogik/url2xpl/plcbus/all_lights_on.xml", 
-        "src/share/domogik/url2xpl/plcbus/bright.xml", 
-        "src/share/domogik/url2xpl/plcbus/dim.xml", 
-        "src/share/domogik/url2xpl/plcbus/on.xml", 
-        "src/share/domogik/url2xpl/plcbus/off.xml", 
-        "src/share/domogik/url2xpl/plcbus/preset_dim.xml", 
+        "src/domogik_packages/conversions/plcbus.py",
         "src/domogik_packages/xpl/bin/plcbus.py", 
         "src/domogik_packages/xpl/lib/plcbus.py", 
         "src/domogik_packages/xpl/lib/PLCBusSerialHandler.py"
@@ -232,7 +208,7 @@
         "author": "Francois Pinet, Maxence Dunnewind", 
         "author_email": "domopyx at gmail.com ; maxence at dunnewind.net", 
         "category": "plcbus", 
-        "changelog": "0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "changelog": "0.3\n- adapt plugin for release 0.4.0\n\n0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
         "dependencies": [
             {
                 "id": "pyserial (>=2.5)", 
@@ -241,10 +217,10 @@
         ], 
         "description": "Plcbus is a CPL based protocol to control lights, appliances and others things in your house", 
         "documentation": "http://wiki.domogik.org/plugin_plcbus", 
-        "domogik_min_version": "0.2.0", 
+        "domogik_min_version": "0.4.0", 
         "id": "plcbus", 
         "type": "plugin", 
-        "version": "0.2a0"
+        "version": "0.3"
     }, 
     "json_version": 2,
     "udev-rules": [
