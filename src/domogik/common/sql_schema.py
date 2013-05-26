@@ -528,11 +528,11 @@ class XplStatParam(Base):
         self.value = ucode(value)
         self.static = static
         self.sensor_id = sensor_id
-        self.ignore_values = ignore_values
+        self.ignore_values = ucode(ignore_values)
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s sensor_id=%s ignore=%s)>"\
+        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s sensor_id=%s ignore='%s')>"\
                % (self.xplstat_id, self.key, self.value, self.static, self.sensor_id, self.ignore_values)
 
     @staticmethod
