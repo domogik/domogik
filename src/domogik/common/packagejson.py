@@ -177,7 +177,7 @@ class PackageJson():
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "files", "json_version"]
-            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules"])
+            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules", "external"])
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
@@ -249,9 +249,10 @@ class PackageJson():
                 for stat in xstat['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # dynamic parameter
-                expected = ["key", "sensor", "ignore_values"]
+                expected = ["key", "sensor"]
+                opt = ["ignore_values"]
                 for stat in xstat['parameters']['dynamic']:
-                    self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                    self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys(), opt)
                     # check that the sensor exists
                     if stat['sensor'] not in self.json["sensors"].keys():    
                         raise PackageException("sensor {0} defined in xpl_stat {1} is not found".format(stat['sensor'], xstatid))
