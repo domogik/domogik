@@ -827,8 +827,8 @@ class DbHelper():
             to = int(time.time())
         return self.__session.query(SensorHistory
                   ).filter_by(sensor_id=sid
-                  ).filter("date >= "+str(frm)
-                  ).filter("date <= "+str(to)
+                  ).filter("date >= " + _datetime_string_from_tstamp(frm)
+                  ).filter("date <= " + _datetime_string_from_tstamp(to)
                   ).order_by(sqlalchemy.asc(SensorHistory.date)
                   ).all()
        
