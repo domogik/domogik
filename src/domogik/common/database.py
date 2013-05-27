@@ -832,11 +832,11 @@ class DbHelper():
                   ).order_by(sqlalchemy.asc(SensorHistory.date)
                   ).all()
        
-    def list_sensor_history_filter(self, sid, frm, to, step, function_used):
+    def list_sensor_history_filter(self, sid, frm, to, step_used, function_used):
         if not frm:
             self.__raise_dbhelper_exception("You have to provide a start date")
         if to:
-            if to > frm:
+            if to < frm:
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
         else:
             to = int(time.time())
@@ -845,9 +845,9 @@ class DbHelper():
         if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
             self.__raise_dbhelper_exception("'period' parameter should be one of : minute, hour, day, week, month, year")
         function = {
-            'min': func.min(SensorHistory._SensorHistory_value_num),
-            'max': func.max(SensorHistory._SensorHistory__value_num),
-            'avg': func.avg(SensorHistory._SensorHistory__value_num),
+            'min': func.min(SensorHistory.value_num),
+            'max': func.max(SensorHistory.value_num),
+            'avg': func.avg(SensorHistory.value_num),
         }
         sql_query = {
             'minute' : {
@@ -952,8 +952,8 @@ class DbHelper():
                         )
         }
         if self.get_db_type() in ('mysql', 'postgresql'):
-            cond_min = "date >= '" + frm + "'"
-            cond_max = "date < '" + to + "'"
+            cond_min = "date >= '" + str(frm) + "'"
+            cond_max = "date < '" + str(to) + "'"
             query = sql_query[step_used][self.get_db_type()]
             query = query.filter_by(sensor_id=sid
                         ).filter(cond_min
