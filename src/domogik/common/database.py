@@ -801,7 +801,7 @@ class DbHelper():
 	sensor = self.__session.query(Sensor).filter_by(id=sid).first()
 	if sensor is not None:
             # insert new recored in core_sensor_history
-            h = SensorHistory(sensor.id, date, value)
+            h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
             self.__session.add(h)
 	    sensor.last_received = date
             sensor.last_value = str(value)
@@ -952,8 +952,8 @@ class DbHelper():
                         )
         }
         if self.get_db_type() in ('mysql', 'postgresql'):
-            cond_min = "date >= '" + str(frm) + "'"
-            cond_max = "date < '" + str(to) + "'"
+            cond_min = "date >= '" + _datetime_string_from_tstamp(frm) + "'"
+            cond_max = "date < '" + _datetime_string_from_tstamp(to) + "'"
             query = sql_query[step_used][self.get_db_type()]
             query = query.filter_by(sensor_id=sid
                         ).filter(cond_min
