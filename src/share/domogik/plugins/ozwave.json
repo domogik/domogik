@@ -1,5 +1,22 @@
 {
-	"files" : ["src/share/domogik/design/plugin/ozwave/icon.png", "src/share/domogik/plugins/ozwave.json", "src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml", "src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml", "src/share/domogik/stats/ozwave/controller.basic-ozwave.xml", "src/share/domogik/url2xpl/ozwave/level.xml", "src/share/domogik/url2xpl/ozwave/on.xml", "src/share/domogik/url2xpl/ozwave/off.xml", "src/share/domogik/url2xpl/ozwave/Refresh.xml", "src/share/domogik/url2xpl/ozwave/log.xml", "src/domogik_packages/xpl/bin/ozwave.py", "src/domogik_packages/xpl/lib/ozwave.py", "src/domogik_packages/xpl/lib/ozwdefs.py", "src/domogik_packages/xpl/lib/ozwvalue.py", "src/domogik_packages/xpl/lib/ozwnode.py", "src/domogik_packages/xpl/lib/ozwctrl.py", "src/domogik_packages/xpl/lib/wsuiserver.py","src/domogik_packages/xpl/lib/ozwxmlfiles.py"],
+	"files" : [ "src/share/domogik/design/plugin/ozwave/icon.png",
+			    "src/share/domogik/plugins/ozwave.json",
+ 				"src/share/domogik/stats/ozwave/zwave.basic-ozwave.xml",
+ 				"src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml",
+				"src/share/domogik/stats/ozwave/controller.basic-ozwave.xml",
+ 				"src/share/domogik/url2xpl/ozwave/level.xml",
+ 				"src/share/domogik/url2xpl/ozwave/on.xml",
+				"src/share/domogik/url2xpl/ozwave/off.xml",
+				"src/share/domogik/url2xpl/ozwave/Refresh.xml",
+				"src/share/domogik/url2xpl/ozwave/log.xml",
+				"src/domogik_packages/xpl/bin/ozwave.py",
+				"src/domogik_packages/xpl/lib/ozwave.py",
+ 				"src/domogik_packages/xpl/lib/ozwdefs.py",
+				"src/domogik_packages/xpl/lib/ozwvalue.py",
+				"src/domogik_packages/xpl/lib/ozwnode.py",
+				"src/domogik_packages/xpl/lib/ozwctrl.py",
+				"src/domogik_packages/xpl/lib/wsuiserver.py",
+				"src/domogik_packages/xpl/lib/ozwxmlfiles.py"],
 	"udev-rules" : [{
 			"description" : "Zwave controler",
 			"filename" : "98-usbcp210x.rules",
@@ -376,7 +393,7 @@
                 "type": "python"
             }
 		],
-		"version" : "0.2b3",
+		"version" : "0.2b4",
 		"type" : "plugin",
 		"id" : "ozwave"
 	}, "json_version" : 1

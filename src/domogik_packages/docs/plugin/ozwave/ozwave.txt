@@ -11,9 +11,11 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
-- 0.2b4 : Compatibily library : the same. 
+- 0.2b4 : (05-28-2013) Compatibily library : the same. 
 	- Target : domogik and domoweb
 	- Change log :
+		- Fixe bug plugin starting with package installation
+		- Add Domoweb version. (first 0.2.b4)
 		- Add support tools, memory usage and log report to UI.
 		- Change websocket server private plugin to generic usage.
 		- Add load xml open-zwave usage, don't finish coding.
