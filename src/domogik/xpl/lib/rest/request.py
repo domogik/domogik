@@ -711,7 +711,7 @@ class ProcessRequest():
         # get the command
         cmd = self._db.get_command(self.get_parameters('id'))
         if cmd == None:
-            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd)
+            json_data = JSonHelper("ERROR", 999, "Command {0} does not exists".format(self.get_parameters('id')))
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
@@ -768,13 +768,12 @@ class ProcessRequest():
                 filters[p.key] = p.value
             for p in cmd.params:
                 if self.get_parameters(p.key):
-                    filters[p.key] = self.get_parameters(p.key)
+                    filters[p.key] = str(value)
                 else:
 		    json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device stats msg is not provided in the url" % p.key)
 		    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
 		    self.send_http_response_ok(json_data.get())
 		    return
-            print stat_msg
             # get xpl message from queue
             try:
                 self.log.debug("Command : wait for answer...")
