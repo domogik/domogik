@@ -181,7 +181,7 @@
 	"level": {
 		"name": "level sensor",
                 "data_type": "DT_Scaling",
-                "conversion": ""
+                "conversion": "from_level_to_DT_Scaling"
 	}
     },
     "device_types": {
