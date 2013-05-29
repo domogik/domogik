@@ -39,6 +39,7 @@ Implements
 """
 
 import logging
+import sys
 from domogik.common.configloader import Loader
 
 
@@ -87,8 +88,15 @@ class Logger():
             formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
             hdlr.setFormatter(formatter)
             my_logger.addHandler(hdlr)
-            my_logger.setLevel(LEVELS[level])
 
+	    # if loglevvel is set to debug (all log entries also go to stdout)
+            if level == 'debug':
+               print "adding debughandler"
+               dhdlr = logging.StreamHandler(sys.stdout)
+               dhdlr.setFormatter(formatter)
+               my_logger.addHandler(dhdlr)
+
+            my_logger.setLevel(LEVELS[level])
             self.logger[component_name] = my_logger
 
     def get_logger(self, logger_name = None):
