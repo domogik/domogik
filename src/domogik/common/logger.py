@@ -90,8 +90,9 @@ class Logger():
             my_logger.addHandler(hdlr)
 
 	    # if loglevvel is set to debug (all log entries also go to stdout)
-            if level == 'debug':
-               print "adding debughandler"
+            if level == 'debug' and component_name.find('sqlalchemy') == -1:
+               print component_name
+               print component_name.find('sqlalchemy')
                dhdlr = logging.StreamHandler(sys.stdout)
                dhdlr.setFormatter(formatter)
                my_logger.addHandler(dhdlr)
