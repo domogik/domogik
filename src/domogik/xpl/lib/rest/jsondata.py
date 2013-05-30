@@ -38,9 +38,18 @@ JSonHelper object
 import re
 import json
 
-
 MAX_DEPTH = 10
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
+        elif isinstance(obj, datetime.timedelta):
+            return (datetime.datetime.min + obj).time().isoformat()
+        else:
+            return super(DateTimeEncoder, self).default(obj)
 
 class JSonHelper():
     """ Easy way to create a json or jsonp structure
@@ -107,7 +116,7 @@ class JSonHelper():
                      "device_config",  \
                      "device_stats",  \
                      "device_stats_value",  \
-                     "device_technology",  \
+                     "plugin",  \
                      "plugin_config",  \
                      "plugin_config_param",  \
                      "device_type",  \
@@ -151,25 +160,36 @@ class JSonHelper():
                    "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
                    "DeviceType", "UserAccount", \
-                   "SensorReferenceData", "Person", 
-                   "DeviceFeatureModel") 
+                   "SensorReferenceData", "Person", \
+                   "Command", "CommandParam", \
+                   "XplCommandParam", "XplStatParam", "XplCommand", "XplStat", \
+                   "Sensor", "SensorHistory")
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple", "NamedTuple")
-        list_type = ("list")
+        list_type = ("list", "InstrumentedList", "pluginProducts")
         dict_type = ("dict")
+        # new definitions
+        jsonencoder_types = ("dict", "tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
+        jsonencoder_types = ("tuple", "str", "unicode", "int", "float", "long", "NoneType", "bool")
+        jsonencoder_types = ()
+        datetimeencoder_types = ("date", "datetime")
 
         data_json = ""
 
         # get data type
         data_type = type(data).__name__
-        #print("TYPE=%s" % data_type)
-        #print(data)
+        print("TYPE=%s" % data_type)
+        print(data)
 
+        if data_type in jsonencoder_types:
+            data_json = json.JSONEncoder().encode(data)
+        elif data_type in datetimeencoder_types:
+            date_json = DateTimeEncoder().encode(data)
         ### type instance (sql object)
-        if data_type in instance_type:
+        elif data_type in instance_type:
             # get <object>._type value
             try:
                 sub_data_type = data._type.lower()
@@ -193,7 +213,7 @@ class JSonHelper():
             data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : SQL table
-        elif data_type in db_type: 
+        elif data_type in db_type:
             data_json += "{" 
             for key in data.__dict__: 
                 sub_data_key = key 
@@ -217,8 +237,9 @@ class JSonHelper():
             else:
                 sub_data_elt0_type = type(data[0]).__name__
                 #print("DATA=%s" % data)
+                #print("sub_data_elt0_type=%s" % sub_data_elt0_type)
                 # start table
-                if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
+                if sub_data_elt0_type in ("unicode", "dict", "str", "int", "tuple", "NamedTuple"):
                     data_json += '"%s" : [' % key
                 else:
                     display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",

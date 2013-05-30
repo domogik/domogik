@@ -37,11 +37,18 @@ Implements
 import zmq
 from domogik.common.configloader import Loader
 from domogik.common import logger
+from domogik.common.daemonize import createDaemon
 
 def main():
+    """
+       Main loop for the forwarder
+    """
+    createDaemon()
+
     cfg = Loader('mq').load()
-    cfg_messaging = dict(cfg[1])
-    log = logger.Logger('mq_event_fwd').get_logger()
+    config = dict(cfg[1])
+    log = logger.Logger('mq_forwarder').get_logger()
+    log.info("Starting the forwarder")
     
     try:
         context = zmq.Context(1)
@@ -49,30 +56,32 @@ def main():
         # Socket facing emitters
         frontend = context.socket(zmq.SUB)
         # Forwarder subscribes to the emitter *pub* port
-        sub_addr = "tcp://*:%s" % cfg_messaging['event_pub_port']
+        sub_addr = "tcp://{0}:{1}".format(\
+                   config['ip'], config['pub_port'])
         frontend.bind(sub_addr)
-        log.debug("Waiting for messages on %s" % sub_addr)
+        log.info("Waiting for messages on {0}".format(sub_addr))
         # We want to get all messages from emitters
         frontend.setsockopt(zmq.SUBSCRIBE, "")
         
         # Socket facing receivers
         backend = context.socket(zmq.PUB)
         # Forwarder publishes to the receiver *sub* port
-        pub_addr = "tcp://*:%s" % cfg_messaging['event_sub_port']
+        pub_addr = "tcp://{0}:{1}".format(\
+                   config['ip'], config['sub_port'])
         backend.bind(pub_addr)
-        log.debug("Sending messages to %s" % pub_addr)
+        log.info("Sending messages to {0}".format(pub_addr))
         
-        log.debug("Forwarding messages...")
+        log.info("Forwarding messages...")
         zmq.device(zmq.FORWARDER, frontend, backend)
-    except Exception as e:
-        log.error(e)
+    except Exception as exp:
+        log.error(exp)
         log.error("Bringing down ZMQ device")
         raise Exception("Error with forwarder device")
     finally:
-        pass
         frontend.close()
         backend.close()
         context.term()
+        log.info("Forwarder stopped")
 
 if __name__ == "__main__":
     main()

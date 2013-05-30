@@ -29,7 +29,7 @@ Implements
 
 - DBConnector.__init__(self)
 - DBConnector._request_config_cb(self, message)
-- DBConnector._send_config(self, technology, hostname, key, value, plugin, element = None)
+- DBConnector._send_config(self, plugin, hostname, key, value, plugin, element = None)
 - DBConnector._fetch_elmt_config(self, techno, element, key)
 - DBConnector._fetch_techno_config(self, hostname, techno, key)
 - DBConnector._update_stat(self, message)
@@ -46,12 +46,16 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
+from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.message import MQMessage
+from zmq.eventloop.ioloop import IOLoop
 import time
+import zmq
 
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
 
-class DBConnector(XplPlugin):
+class DBConnector(XplPlugin, MQRep):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object along with the StatsManager to access to the database on the core side
@@ -62,6 +66,7 @@ class DBConnector(XplPlugin):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
+        MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug("Init database_manager instance")
 
         # Check for database connexion
@@ -101,6 +106,37 @@ class DBConnector(XplPlugin):
 
         Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
+        IOLoop.instance().start() 
+
+    def on_mdp_request(self, msg):
+        if msg._action == "config.get":
+            plugin = msg._data['plugin']
+            hostname = msg._data['hostname']
+            key = msg._data['key']
+            if 'element' in msg._data.keys():
+                element = msg._data['element']
+            else:
+                element = None
+            if element:
+                self._mdp_reply(plugin, hostname, key, self._fetch_elmt_config(plugin, element, key), element)
+            elif not key:
+                print 'TODO'
+            else:
+                self._mdp_reply(plugin, hostname, key, self._fetch_techno_config(plugin, hostname, key))
+        elif msg._action == "config.set":
+            print 'TODO'
+
+    def _mdp_reply(self, plugin, hostname, key, value, element=None):
+        msg = MQMessage()
+        msg.setaction( 'config.result' )
+        msg.adddata('plugin', plugin)
+        msg.adddata('hostname', hostname)
+        msg.adddata('key', key)
+        msg.adddata('value', value)
+        if element:
+            msg.adddata('element', element)
+        print msg.get()
+        self.reply(msg.get())
 
     def _request_config_cb(self, message):
         '''
@@ -109,7 +145,7 @@ class DBConnector(XplPlugin):
         '''
         #try:
         self._db = DbHelper(engine=self._engine)
-        techno = message.data['technology']
+        techno = message.data['plugin']
         hostname = message.data['hostname']
         key = message.data['key']
         msg = "Request  h=%s, t=%s, k=%s" % (hostname, techno, key)
@@ -161,22 +197,22 @@ class DBConnector(XplPlugin):
                     self.log.debug(msg)
                     self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
 
-    def _send_config(self, technology, hostname, key, value, element = None):
+    def _send_config(self, plugin, hostname, key, value, element = None):
         '''
         Send a config value message for an element's config item
-        @param technology : the technology of the element
+        @param plugin : the plugin of the element
         @param hostname : hostname
         @param element :  the name of the element
         @param key : the key or list of keys of the config tuple(s) to fetch
         @param value : the value or list of values corresponding to the key(s)
         '''
-        msg = "Response h=%s, t=%s, k=%s, v=%s" % (hostname, technology, key, value)
+        msg = "Response h=%s, t=%s, k=%s, v=%s" % (hostname, plugin, key, value)
         print(msg)
         self.log.debug(msg)
         mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
-        mess.add_data({'technology' :  technology})
+        mess.add_data({'plugin' :  plugin})
         mess.add_data({'hostname' :  hostname})
         if element:
             mess.add_data({'element' :  element})
@@ -192,7 +228,7 @@ class DBConnector(XplPlugin):
     def _fetch_elmt_config(self, techno, element, key):
         '''
         Fetch an element's config value in the database
-        @param techno : the technology of the element
+        @param techno : the plugin of the element
         @param element :  the name of the element
         @param key : the key of the config tuple to fetch
         '''
@@ -205,8 +241,8 @@ class DBConnector(XplPlugin):
 
     def _fetch_techno_config(self, techno, hostname, key):
         '''
-        Fetch a technology global config value in the database
-        @param techno : the technology of the element
+        Fetch a plugin global config value in the database
+        @param techno : the plugin of the element
         @param hostname : hostname
         @param key : the key of the config tuple to fetch
         '''
@@ -250,7 +286,7 @@ class DBConnector(XplPlugin):
                     while result.id != techno or \
                        result.hostname != hostname or \
                        result.key != key:
-                        self.log.debug("Bad result : %s/%s != %s/%s" % (result.id, result.key, technology, key))
+                        self.log.debug("Bad result : %s/%s != %s/%s" % (result.id, result.key, plugin, key))
                         result = self._db.get_plugin_config(techno, hostname, key)
                     self.log.debug("Get plg conf for %s / %s / %s Result=%s" % (techno, hostname, key, result))
                     val = result.value
@@ -278,10 +314,10 @@ class DBConnector(XplPlugin):
             self.log.warn(msg)
             return "None"
 
-    def _set_config(self, technology, hostname, key, value):
+    def _set_config(self, plugin, hostname, key, value):
         '''
         Send a config value message for an element's config item
-        @param technology : the technology of the element
+        @param plugin : the plugin of the element
         @param hostname : hostname
         @param key : the key to set
         @param value : the value to set
@@ -293,7 +329,7 @@ class DBConnector(XplPlugin):
             mess = XplMessage()
             mess.set_type('xpl-stat')
             mess.set_schema('domogik.config')
-            mess.add_data({'technology' :  technology})
+            mess.add_data({'plugin' :  plugin})
             mess.add_data({'hostname' :  hostname})
             mess.add_data({'key' :  key})
             mess.add_data({'value' :  value})

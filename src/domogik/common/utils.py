@@ -33,6 +33,14 @@ Implements
 @organization: Domogik
 """
 
+from socket import gethostname
+from exceptions import ImportError, AttributeError
+
+def get_sanitized_hostname():
+    """ Get the sanitized hostname of the host 
+    This will lower it and keep only the part before the first dot
+    """
+    return gethostname().lower().split('.')[0].replace('-','')[0:16]
 
 def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
@@ -48,3 +56,29 @@ def ucode(my_string):
             return my_string.decode("utf-8")
     else:
         return None
+
+def call_package_conversion(log, plugin, method, value):
+    """Load the correct module, and encode the value
+
+    @param log: an instalce of a Logger
+    @param plugin: the plugin (package) name
+    @param method: what methode to load from the conversion class
+    @param value: the value to convert
+    @return the converted value or None on error
+ 
+    """
+    modulename = 'domogik_packages.conversions.{0}'.format(plugin)
+    classname = '{0}Conversions'.format(plugin)
+    try:
+        module = __import__(modulename, fromlist=[classname])
+    except ImportError as err:
+        log.critical("Can not import module {0}: {1}".format(modulename, err))
+        return value
+    try:
+        staticclass = getattr(module, classname)
+        staticmethode = getattr(staticclass, method)
+    except AttributeError as err:
+        log.critical("Can not load class ({0}) or methode ({1}): {2}".format(classname, method, err))
+        return value
+    return staticmethode(value)
+

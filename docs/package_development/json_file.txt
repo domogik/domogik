@@ -1,6 +1,9 @@
 =================
 Package json file
 =================
+.. warning ::
+   This docmentation is only valid for json version 2 and up.
+   To learn how to upgrade read the json file :doc:`upgrade <json_file_upgrade>` documentation
 
 .. |yes| image:: yes.png
 .. |no|  image:: no.png
@@ -29,7 +32,7 @@ Example
 ::
 
     {
-        "json_version": 1,
+        "json_version": 2,
         "identity": {
             "type": "plugin",
             "id": "onwire",
@@ -135,70 +138,41 @@ Example
 *******
 ::
 
-        "device_types": [
-            {
+        "device_types": {
+            "onewire.thermometer" {
                 "description": "Thermometer",
                 "id": "onewire.thermometer",
-                "name": "Thermometer"
+                "name": "Thermometer",
+		"commands": ["set_level_bin"],
+		"sensors": ["level"],
+		"xpl_params": [
+			{
+				"key": "channel",
+				"description": "The channel number",
+				"type": "integer",
+			},
+     			...
+		]
             },
             ...
-        ]
+        }
 
 Description
 ***********
 These data will be inserted in database during the package installation.
 
-* device_types : list of the device types allowed by the package
+* device_types : dictionary of device types, indexed on device_type id
 
   * id : device type id
   * name : device type name
   * description :  short description of the device type
-
-
-Device feature models
----------------------
-
-========================================== ======= =========
-Package type :                             Plugin  External 
-========================================== ======= =========
-**Is section required for package type :** |yes|   |yes|
-========================================== ======= =========
-
-Example
-*******
-::
-
-        "device_feature_models": [
-            {
-                "device_type_id": "onewire.thermometer",
-                "id": "onewire.thermometer.temperature",
-                "name": "Temperature",
-                "feature_type": "sensor",
-                "parameters": "{&quot;unit&quot;:&quot;\\u00B0C&quot;}",
-                "return_confirmation": "0",
-                "stat_key": "temperature",
-                "value_type": "number"
-            },
-            ...
-        ]
-
-Description
-***********
-These data will be inserted in database during the package installation.
-
-* device_feature_models : list of the device features models allowed by the package
-
-  * device_type_id : device type to which the model is related to.
-  * id : device feature model id
-  * name : name of the device feature model.
-  * feature_type : *sensor* or *actuator* : type of the feature.
-  * parameters : parameters of the feature. 
-  * return_confirmation: *0* or *1* : does the device will give a confirmation after an action has been request ?
-  * stat_key : associated stat key in database (this is related to the key defined in :doc:`the stat files <stats_files>`.
-  * value_type : *number*, *string*, *boolean*, *binary*. The type of the value.
-
-.. todo::
-    Give more details about parameters
+  * commands : list of commands supported by this device type
+  * sensors : list of sensors supported by this device type
+  * xpl_params : list of parameters that are common to ALL xpl messages for this device type
+	* key : the xpl key for the message
+        * description :  short description of this field
+        * type : the value type for this field 
+        * depending on the type the are other posibilitys (like min_value, max_value, ....)
 
 Configuration elements
 ----------------------
@@ -293,10 +267,6 @@ Description
   * model : related device model.
   * rule : the udev rule.
 
-
-
-
-
 External members identification
 -------------------------------
 
@@ -321,6 +291,140 @@ Description
 * external : description of the vendor and device id of the external member. This is used to identify a specific external member model.
   * device_id : device id.
   * vendor_id : vendor id.
+
+Commands
+--------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|    |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+	"commands": {
+		"set_level_bin": {
+			"name": "Switch On or Off",
+			"return_confirmation": true,
+			"params": [{
+				"key": "level",
+				"value_type": "binary",
+				"values": [0, 255]
+			}],
+			"xpl_command": "set_level_bin"
+		},
+		...
+ 	}
+
+Description
+***********
+
+* Commands : this section describes the commands needed by this plugin, its a dictionary indexed by the command reference
+	* name : the name of this command
+	* return_confirmation : does rinor need to wait for a confirmation
+	* params : the needed params to be able to complete this command (typically these are the values set by the widget)
+		* key : the name of the parameter
+		* value_type : what type of value we can receive
+      		* values : the possible values, the format depends on the value_type
+			* value_type = binary : then values is a list containing the off and on value
+		        * value_type = range : then values contains a list of min and max value of the range
+	* xpl_command : what xpl command is linked to this command (this field is optional)
+
+Sensors
+-------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|    |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+    "sensors": {
+	"level": {
+		"name": "level",
+                "unit": "%",
+                "value_type": "range",
+                "values": [0, 100]
+	},
+        ...
+    },
+
+Description
+***********
+
+* Sensors : this section describes the sensors supported by this plugin, its a dictionary indexed by the command reference
+   * name : the name of the sensor
+   * unit : the unit of this value, needed for ui display
+   * value_type: what type of value we can receive
+   * values : the possible values, the format depends on the value_type
+       * value_type = binary : then values is a list containing the off and on value
+       * value_type = range : then values contains a list of min and max value of the range
+
+
+Xpl_commands
+------------
+
+========================================== ======= =========
+Package type :                             Plugin  External 
+========================================== ======= =========
+**Is section required for package type :** |yes|    |yes|
+========================================== ======= =========
+
+Example
+*******
+::
+
+    "xpl_commands": {
+         "set_level_bin": {
+            "name": "blah",
+            "schema": "lighting.basic",
+            "xplstat_name": "get_level",
+            "parameters": {
+                    "static": [
+                        {  
+                            "key": "stat",
+                            "value": "stat"
+                        }
+                    ],
+                    "device": [
+                        {  
+                            "key": "dummy",
+                            "description": "a dummy param",
+                            "type": "string"
+                        }
+                    ]
+                }
+         },
+         ...
+    },
+
+Description
+***********
+
+* xpl_command : this section describes the xpl_command to sent when a command is triggered
+   * name : the name of the command
+   * schema : the xpl schema to use
+   * xplstat_name : the xplstat that will be expected as a confirmation
+   * parameters : the key/value pairs for the xpl message
+      * static : values that are static, these key/value pairs are always there and not changeable
+         * key : xpl key
+         * value : xpl value
+      * device : parameter that can be changed on a per device basis, will be displayed in the create device interface
+         * key : xpl key
+         * description : the description that will be displayed
+         * type : the value type
+         
+Xpl_stats
+---------
+
+TODO
 
 How to insert the data in database
 ==================================

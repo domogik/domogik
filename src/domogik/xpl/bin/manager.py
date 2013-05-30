@@ -759,7 +759,6 @@ class SysManager(XplPlugin):
                     self._external_models.append({"type" : pkg_json["identity"]["type"],
                                       "name" : pkg_json["identity"]["id"], 
                                       "description" : pkg_json["identity"]["description"], 
-                                      "technology" : pkg_json["identity"]["category"],
                                       "version" : pkg_json["identity"]["version"],
                                       "documentation" : pkg_json["identity"]["documentation"],
                                       "vendor_id" : pkg_json["external"]["vendor_id"],
@@ -817,7 +816,6 @@ class SysManager(XplPlugin):
                     self._externals.append({"type" : external_model["type"],
                               "name" : external_model["name"], 
                               "description" : external_model["description"], 
-                              "technology" : external_model["technology"],
                               "status" : "ON",
                               "host" : instance,
                               "version" : external_model["version"],
@@ -846,7 +844,6 @@ class SysManager(XplPlugin):
                 self._externals.append({"type" : "external",
                           "name" : vendor_device,
                           "description" : " ",
-                          "technology" : "unknown",
                           "status" : "ON",
                           "host" : instance,
                           "version" : "n/a",
@@ -891,8 +888,7 @@ class SysManager(XplPlugin):
         """
         tmp_externals = []
         for external in self._externals:
-            if external["technology"].lower() != "unknown":
-                tmp_externals.append(external)
+            tmp_externals.append(external)
         self._externals = tmp_externals
 
     def _check_external_status(self):
@@ -938,7 +934,6 @@ class SysManager(XplPlugin):
                     self._plugins.append({"type" : pkg_json["identity"]["type"],
                                       "name" : pkg_json["identity"]["id"], 
                                       "description" : pkg_json["identity"]["description"], 
-                                      "technology" : pkg_json["identity"]["category"],
                                       "status" : "OFF",
                                       "host" : self.get_sanitized_hostname(), 
                                       "version" : pkg_json["identity"]["version"],
@@ -982,8 +977,6 @@ class SysManager(XplPlugin):
             for plugin in self._plugins:
                 mess.add_data({'plugin'+str(idx)+'-name' : plugin["name"]})
                 mess.add_data({'plugin'+str(idx)+'-type' : plugin["type"]})
-                mess.add_data({'plugin'+str(idx)+'-techno' : plugin["technology"]})
-                #mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
                 mess.add_data({'plugin'+str(idx)+'-status' : plugin["status"]})
                 mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
                 idx += 1
@@ -991,8 +984,6 @@ class SysManager(XplPlugin):
             for external in self._externals:
                 mess.add_data({'plugin'+str(idx)+'-name' : external["name"]})
                 mess.add_data({'plugin'+str(idx)+'-type' : external["type"]})
-                mess.add_data({'plugin'+str(idx)+'-techno' : external["technology"]})
-                #mess.add_data({'plugin'+str(idx)+'-desc' : external["description"]})
                 mess.add_data({'plugin'+str(idx)+'-status' : external["status"]})
                 mess.add_data({'plugin'+str(idx)+'-host' : external["host"]})
                 idx += 1
@@ -1034,7 +1025,6 @@ class SysManager(XplPlugin):
                 for elt_desc in cut_desc:
                     mess.add_data({'description%s' % idx :  elt_desc})
                     idx += 1
-                mess.add_data({'technology' :  plugin["technology"]})
                 mess.add_data({'status' :  plugin["status"]})
                 mess.add_data({'version' :  plugin["version"]})
                 mess.add_data({'documentation' :  plugin["documentation"]})
@@ -1056,7 +1046,6 @@ class SysManager(XplPlugin):
                 for elt_desc in cut_desc:
                     mess.add_data({'description%s' % idx :  elt_desc})
                     idx += 1
-                mess.add_data({'technology' :  external["technology"]})
                 mess.add_data({'status' :  external["status"]})
                 mess.add_data({'version' :  external["version"]})
                 mess.add_data({'documentation' :  external["documentation"]})

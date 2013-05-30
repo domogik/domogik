@@ -227,6 +227,7 @@ class VelbusDev:
             if dimmer => level can be anything from 0 to 100
         """
         address = int(address)
+        self._log.debug("received set_level for {0}".format(address))
         if address in self._nodes.keys():
             mtype = self._nodes[address] 
         else:
@@ -244,7 +245,7 @@ class VelbusDev:
             level = (255 / 100) * level
             data = chr(0x07) + self._channels_to_byte(channel) + chr(int(level)) + chr(0x00) + chr(0x01)
             self.write_packet(address, data)
-        elif int(level) == 100 and ltype == "RELAY":
+        elif int(level) == 255 and ltype == "RELAY":
             """ Send relay on message
             """
             data = chr(0x02) + self._channels_to_byte(channel)
@@ -255,7 +256,7 @@ class VelbusDev:
             data = chr(0x01) + self._channels_to_byte(channel)
             self.write_packet(address, data)
         else:
-            self._log.error("This methode should only be called for dimmers or relays and with level 0 tot 100")
+            self._log.error("This methode should only be called for dimmers or relays and with level 0 to 255")
         return 
         
     def send_moduletyperequest(self, address):
@@ -444,15 +445,17 @@ class VelbusDev:
            Switch status => send out when a relay is switched
         """
         for channel in self._byte_to_channels(data[5]):
-            device = str(ord(data[2])) + "-" + str(channel)
+            address = str(ord(data[2]))
+            channel = str(channel)
             level = -1
             if (ord(data[7]) & 0x03) == 0:
                 level = 0
             if (ord(data[7]) & 0x03) == 1:
-                level = 100
+                level = 255
             if level != -1:
                 self._callback("lighting.device",
-                    {"device" : device,
+                    {"address" : str(ord(data[2])),
+                    "channel" : str(channel),
                     "level" : level})
 
     def _process_238(self, data):

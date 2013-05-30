@@ -27,7 +27,7 @@ Implements
 ==========
 
 - Query.__init__(self, xpl)
-- Query.query(self, technology, key, result, element = '')
+- Query.query(self, plugin, key, result, element = '')
 - Query._query_cb(self, message)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -40,13 +40,90 @@ from threading import Event
 #from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
+
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_sanitized_hostname 
+
+import zmq
+from domogik.mq.message import MQMessage
+from domogik.mq.reqrep.client import MQSyncReq
 
 QUERY_CONFIG_NUM_TRY = 20
 QUERY_CONFIG_WAIT = 5
 
-
 class Query():
+
+    def __init__(self, xpl, log):
+        cfg = Loader('mq')
+        config = cfg.load()
+        conf = dict(config[1])
+        if conf.has_key('query_mq'):
+            self.mq = True
+        else:
+            self.mq = False
+
+        if self.mq:
+            self.qry = QueryMQ(None, log)
+        else:
+            self.qry = QueryXPL(xpl, log)
+
+    def set(self, technology, key, value):
+        return self.qry.set(technology, key, value)
+
+    def query(self, technology, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
+        return self.qry.query(technology, key, element, nb_test)
+
+class QueryMQ():
+    '''
+    Query to the mq to find the config
+    '''
+    def __init__(self, xpl, log):
+        '''
+        Init the query system and connect it to xPL network
+        @param xpl : Will not be used
+        @param log : a Logger instance (usually took from self.log))
+        '''
+        self.log = log
+        self.log.debug("Init config query(mq) instance")
+        self.cli = MQSyncReq(zmq.Context())
+
+    def set(self, plugin, key, value):
+        '''
+        Send a xpl message to set value for a param
+
+        @param technology : the technology of the item
+        @param key : the key to set corresponding value,
+        @param value : the value to set
+        '''
+        msg = MQMessage()
+        msg._action = 'config.set'
+        self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
+
+    def query(self, plugin, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
+        '''
+        Ask the config system for the value. Calling this function will make
+        your program wait until it got an answer
+
+        @param plugin : the plugin of the item requesting the value,
+        must exists in the config database
+        @param element : the name of the element which requests config, None if
+        it's a technolgy global parameter
+        @param key : the key to fetch corresponding value, if it's an empty string,
+        all the config items for this technology will be fetched
+        '''
+        msg = MQMessage()
+        msg._action = 'config.get'
+        msg._data = {'plugin': plugin, 'key': key, 'element': element, 'hostname': get_sanitized_hostname()}
+        ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
+        if ret is None:
+            return None
+        else:
+            if 'value' in ret._data.keys():
+                return ret._data['value']
+            else:
+                return None
+
+class QueryXPL():
     '''
     Query throw xPL network to get a config item
     '''
@@ -92,11 +169,11 @@ class Query():
     #def __del__(self):
     #    print("Query config : end query")
 
-    def set(self, technology, key, value):
+    def set(self, plugin, key, value):
         '''
         Send a xpl message to set value for a param
 
-        @param technology : the technology of the item
+        @param plugin : the plugin of the item
         @param key : the key to set corresponding value,
         @param value : the value to set
         '''
@@ -104,35 +181,35 @@ class Query():
         mess.set_type('xpl-cmnd')
         mess.set_target(self.target)
         mess.set_schema('domogik.config')
-        mess.add_data({'technology': technology})
+        mess.add_data({'plugin': plugin})
         mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
         mess.add_data({'key': key})
         mess.add_data({'value': value})
         self.__myxpl.send(mess)
 
-    def query(self, technology, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
+    def query(self, plugin, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
         '''
         Ask the config system for the value. Calling this function will make
         your program wait until it got an answer
 
-        @param technology : the technology of the item requesting the value,
+        @param plugin : the plugin of the item requesting the value,
         must exists in the config database
         @param element : the name of the element which requests config, None if
         it's a technolgy global parameter
         @param key : the key to fetch corresponding value, if it's an empty string,
-        all the config items for this technology will be fetched
+        all the config items for this plugin will be fetched
         '''
         if nb_test == 0:
             raise RuntimeError("Maximum tries to get config reached")
          
 
         msg = "QC : ask > h=%s, t=%s, k=%s" % \
-            (self.__myxpl.p.get_sanitized_hostname(), technology, key)
+            (self.__myxpl.p.get_sanitized_hostname(), plugin, key)
         print(msg)
         self.log.debug(msg)
         l = Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config',
                                                     'xpltype': 'xpl-stat',
-                                                    'technology': technology,
+                                                    'plugin': plugin,
                                                     'hostname' : self.__myxpl.p.get_sanitized_hostname()})
         self._keys[key] = Event()
         self._l[key] = l
@@ -140,7 +217,7 @@ class Query():
         mess.set_type('xpl-cmnd')
         mess.set_target(self.target)
         mess.set_schema('domogik.config')
-        mess.add_data({'technology': technology})
+        mess.add_data({'plugin': plugin})
         mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
         if element:
             mess.add_data({'element': element})
@@ -151,10 +228,10 @@ class Query():
             self._keys[key].wait(self.query_timeout)
             if not self._keys[key].is_set():
                 msg = "No answer received for t = %s, k = %s, check your xpl setup" % \
-                    (technology, key)
+                    (plugin, key)
                 self.log.error(msg)
                 #raise RuntimeError(msg)
-                self.query(technology, key, element, nb_test - 1)
+                self.query(plugin, key, element, nb_test - 1)
         except KeyError:
             pass
 
@@ -172,7 +249,7 @@ class Query():
         for r in self._keys:
             try:
                 msg = "QC : res > h=%s, t=%s, k=%s, v=%s" % \
-                    (result["hostname"], result["technology"], r, result[r])
+                    (result["hostname"], result["plugin"], r, result[r])
 
             except KeyError:
                 errMsg = "It seems that you received configuration elements from 2 dbmgr components. Please check if you have 2 domogik main hosts on your lan. If so, you should configure 'config_provider' in /etc/domogik/domogik.cfg. Waiting for '%s', received '%s'" % (r, result)

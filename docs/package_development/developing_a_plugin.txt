@@ -17,14 +17,9 @@ At least, a plugin consist of the following files :
 * :doc:`src/domogik_packages/xpl/bin/myplg.py <plugin_bin_part>` : the python part that is the link between the library and the xPL network. This is called the *bin* part. 
 * :doc:`src/domogik_packages/xpl/lib/myplg.py <plugin_library_part>` : the python part that contains all the functions/classes related to the device/service the plugin will handle. This is called the *library* part. 
 * :doc:`src/share/domogik/plugins/myplg.json <json_file>` : a json file which describe the plugin and the features it handles.
-
-Then, a plugin should have at least one file on one of the following folders :
-
-* :doc:`src/share/domogik/stats/ <stats_files>` : in this folder are stored the xml files that describes the way data in xPL messages are inserted in the database.
-* :doc:`src/share/domogik/url2xpl/ <url2xpl_files>` : in this folder are stored the xml files that describes how the rest server will create and send a xPL message when it receives a command from a user interface.
+* :doc:`src/domogik_packages/conversions/myplg.py <plugin_conversion_part>` : the python part that contains one class called myplgConversions with static methods to convert specifick info
 
 Sometimes a plugin could also need :doc:`some data files <data_files>`.
-
 
 With which part should I begin ?
 ================================
@@ -53,7 +48,7 @@ Physical devices and interfaces
 
 * A plugin don't have to be launched as root : if necessary, the plugin documentation must explain how to access the plugin device without needing to be root : this should be done  by providing a sample udev rule in the :doc:`json file <json_file>`.
 
-    Web services or web features 
+Web services or web features 
 ----------------------------
 * A plugin that needs a web service should not keep a connexion (user session) always open : being connected 24H/24 to a webservice is not a good idea in terms of bandwidtch, security, ... So, the plugin should connect to the web service only when it needs it. 
 

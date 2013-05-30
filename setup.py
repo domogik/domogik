@@ -80,7 +80,7 @@ else:
 
 setup(
     name = 'Domogik',
-    version = '0.3.0',
+    version = '0.4.0',
     url = 'http://www.domogik.org/',
     description = 'OpenSource home automation software',
     author = 'Domogik team',
@@ -119,6 +119,8 @@ setup(
             dmg_dump = domogik.xpl.bin.dump_xpl:main
             dmg_version = domogik.xpl.bin.version:main
             dmg_hub = domogik.xpl.bin.hub:main
+            dmg_broker = domogik.mq.reqrep.broker:main
+            dmg_forwarder = domogik.mq.pubsub.forwarder:main
             """
         ],
     },

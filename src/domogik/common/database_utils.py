@@ -74,3 +74,13 @@ def column_exists(db_engine, table_name, column_name):
 def table_exists(db_engine, table_name):
     insp = reflection.Inspector.from_engine(db_engine)
     return table_name in insp.get_table_names()
+
+def foreignkey_exists(db_engine, table_name, key_name):
+    insp = reflection.Inspector.from_engine(db_engine)
+    fkeys = insp.get_foreign_keys(table_name)
+    fkey_found = False
+    for k in fkeys:
+        if k['name'] == key_name:
+            fkey_found = True
+            break
+    return fkey_found

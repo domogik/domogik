@@ -75,178 +75,196 @@
             "options": [], 
             "type": "password"
         }
-    ], 
-    "device_feature_models": [
-        {
-            "device_type_id": "relayboard.relay", 
-            "feature_type": "actuator", 
-            "id": "relayboard.relay.switch", 
-            "name": "Switch", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "output", 
-            "value_type": "binary"
-        }, 
-        {
-            "device_type_id": "relayboard.relay", 
-            "feature_type": "actuator", 
-            "id": "relayboard.relay.trigger", 
-            "name": "Trigger", 
-            "parameters": "{&quot;command&quot;:&quot;pulse&quot;}", 
-            "return_confirmation": "1", 
-            "stat_key": "output", 
-            "value_type": "trigger"
-        }, 
-        {
-            "device_type_id": "relayboard.digital_input", 
-            "feature_type": "sensor", 
-            "id": "relayboard.digital_input.digital_input", 
-            "name": "Digital input", 
-            "parameters": "{&quot;value0&quot;:&quot;low&quot;,&quot;value1&quot;:&quot;high&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "input", 
-            "value_type": "boolean"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "voltage", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input_anselect0", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input_anselect0.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "generic", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input_anselect1", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input_anselect1.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "voltage", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input_anselect2", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input_anselect2.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "temp", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input_anselect3", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input_anselect3.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "percent", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input_anselect4", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input_anselect4.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "temp", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.analog_input_anselect5", 
-            "feature_type": "sensor", 
-            "id": "relayboard.analog_input_anselect5.analog_input", 
-            "name": "Analog input", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "percent", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "relayboard.counter", 
-            "feature_type": "sensor", 
-            "id": "relayboard.counter.counter", 
-            "name": "Counter", 
-            "parameters": "{}", 
-            "return_confirmation": "0", 
-            "stat_key": "count", 
-            "value_type": "number"
+    ],
+    "xpl_stats": {
+         "get_output": {
+            "name": "blah",
+            "schema": "control.basic",
+            "xplstat_name": "get_level",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "type",
+                            "value": "output"
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                    ]
+                }
+         }
+    },
+    "xpl_commands": {
+         "send_command": {
+            "name": "blah",
+            "schema": "control.basic",
+            "xplstat_name": "get_level",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "type",
+                            "value": "output"
+                        }
+                    ],
+                    "device": []
+                }
+         },
+         "send_pulse": {
+            "name": "blah",
+            "schema": "control.basic",
+            "xplstat_name": "get_level",
+            "parameters": {
+                    "static": [
+                        {
+                            "key": "type",
+                            "value": "output"
+                        },
+                        {
+                            "key": "command",
+                            "value": "pulse"
+                        }
+                    ],
+                    "device": []
+                }
+         }
+ 
+    },
+    "commands": {
+       "switch": {
+           "name": "Switch On or Off",
+           "return_confirmation": true,
+           "params": [
+               {
+                   "key": "current",
+                   "value_type": "binary",
+                   "values": ["low", "high"]
+               }
+           ],
+           "xpl_command": "send_command"
+        },
+        "pulse": {
+           "name": "Set to a level",
+           "return_confirmation": true,
+           "params": [],
+           "xpl_command": "send_pulse"
         }
-    ], 
-    "device_types": [
-        {
+    },
+    "sensors": {
+        "state": {
+                "name": "state",
+                "unit": "",
+                "value_type": "binary",
+                "values": ["Low", "High"]
+        },
+        "voltage": {
+                "name": "voltage",
+                "unit": "V",
+                "value_type": "number",
+                "values": [0, 100]
+        },
+        "count": {
+                "name": "count",
+                "unit": "%",
+                "value_type": "integer"
+        }
+    },
+    "device_types": {
+        "relayboard.relay": {
             "description": "Relay", 
             "id": "relayboard.relay", 
-            "name": "Relay"
+            "name": "Relay",
+            "commands": ["switch", "pulse"],
+            "sensors": ["state"],
+            "xpl_params": [
+                {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 4,
+                    "min_value": 1
+                },
+                {
+                    "key": "address",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }, 
-        {
+        "relayboard.digital_input": {
             "description": "Digital input", 
             "id": "relayboard.digital_input", 
-            "name": "Digital input"
+            "name": "Digital input",
+            "sensors": ["state"],
+            "commands": [],
+            "xpl_params": [
+                {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 4,
+                    "min_value": 1
+                },
+                {
+                    "key": "address",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }, 
-        {
-            "description": "Analog input (ipx800 v1, pro, v2)", 
+        "relayboard.analog_input": {
+            "description": "Analog input", 
             "id": "relayboard.analog_input", 
-            "name": "Analog input (ipx800 v1, pro, v2)"
+            "name": "Analog input",
+            "sensors": ["input"],
+            "commands": [],
+            "xpl_params": [
+                {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 4,
+                    "min_value": 1
+                },
+                {
+                    "key": "address",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }, 
-        {
-            "description": "Analog input (ipx800 v3) : Analog", 
-            "id": "relayboard.analog_input_anselect0", 
-            "name": "Analog input (ipx800 v3) : Analog"
-        }, 
-        {
-            "description": "Analog input (ipx800 v3) : Volt", 
-            "id": "relayboard.analog_input_anselect1", 
-            "name": "Analog input (ipx800 v3) : Volt"
-        }, 
-        {
-            "description": "Analog input (ipx800 v3) : Temperature (TC4012 Sensor)", 
-            "id": "relayboard.analog_input_anselect2", 
-            "name": "Analog input (ipx800 v3) : Temperature (TC4012 Sensor)"
-        }, 
-        {
-            "description": "Analog input (ipx800 v3) : Percent (SHT-X3:Light-LS100)", 
-            "id": "relayboard.analog_input_anselect3", 
-            "name": "Analog input (ipx800 v3) : Percent (SHT-X3:Light-LS100)"
-        }, 
-        {
-            "description": "Analog input (ipx800 v3) : Temperature (SHT-X3:Temp-TC5050)",
-            "id": "relayboard.analog_input_anselect4", 
-            "name": "Analog input (ipx800 v3) : Temperature (SHT-X3:Temp-TC5050)"
-        }, 
-        {
-            "description": "Analog input (ipx800 v3) : Percent (SHT-X3:RH-SH100)", 
-            "id": "relayboard.analog_input_anselect5", 
-            "name": "Analog input (ipx800 v3) : Percent (SHT-X3:RH-SH100)"
-        }, 
-        {
+        "relayboard.counter": {
             "description": "Counter", 
             "id": "relayboard.counter", 
-            "name": "Counter"
+            "name": "Counter",
+            "sensors": ["count"],
+            "commands": [],
+            "xpl_params": [
+                {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 4,
+                    "min_value": 1
+                },
+                {
+                    "key": "address",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }
-    ], 
+    }, 
     "files": [
         "src/share/domogik/design/plugin/ipx800/icon.png", 
         "src/share/domogik/plugins/ipx800.json", 
-        "src/share/domogik/stats/relayboard/sensor.basic-ipx800.xml", 
-        "src/share/domogik/url2xpl/relayboard/high.xml", 
-        "src/share/domogik/url2xpl/relayboard/low.xml", 
-        "src/share/domogik/url2xpl/relayboard/pulse.xml", 
         "src/domogik_packages/xpl/bin/ipx800.py", 
         "src/domogik_packages/xpl/lib/ipx800.py",
         "src/domogik_packages/xpl/helpers/ipx800.py"
@@ -264,7 +282,7 @@
         "type": "plugin", 
         "version": "0.2"
     }, 
-    "json_version": 1, 
+    "json_version": 2, 
     "technology": {
         "description": "Relay boards monitoring and controlling", 
         "id": "relayboard", 

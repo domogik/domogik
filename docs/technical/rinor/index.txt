@@ -12,7 +12,7 @@ For example you can run: ::
 This will run the request and show you the results (thanks to the *-qO-* parameter).
 
 Configuration section in /etc/domogik/domogik.cfg 
-=======================================
+=================================================
 In Domogik configuration file, there are several options about REST in **[rest]** section:
 
 * rest_server_ip (default : 127.0.0.1) : ip of REST HTTP server 
