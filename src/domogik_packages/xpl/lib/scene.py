@@ -261,7 +261,14 @@ class Mscene():
           if str(type(self.devices[device]['filters']))=="<type 'list'>":
              self.devices[device]['filters']=str(self.devices[device]['filters'])
           for i in range(len(eval(self.devices[device]['filters']))):
-             self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
+             if 'filter_key' in eval(self.devices[device]['filters'])[i]:
+                 filtre_string= "{'schema':"+ eval(self.devices[device]['filters'])[i]['schema']+",'xpltype':'xpl-trig',"+eval(self.devices[device]['filters'])[i]['device']+":"+self.devices[device]['adr']+","+ eval(self.devices[device]['filters'])[i]['filter_key']+":"+eval(self.devices[device]['filters'])[i]['filter_value']+"}"
+                 self.log_scene("info", filtre_string)
+                 self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr'],eval(self.devices[device]['filters'])[i]['filter_key']:eval(self.devices[device]['filters'])[i]['filter_value']})
+             else:
+                 filtre_string= "{'schema':"+ eval(self.devices[device]['filters'])[i]['schema']+",'xpltype':'xpl-trig',"+eval(self.devices[device]['filters'])[i]['device']+":"+self.devices[device]['adr']+"}"
+                 self.log_scene("info", filtre_string)
+                 self.listener[liste]=Listener(self.cmd_device,self.myxpl,{'schema':eval(self.devices[device]['filters'])[i]['schema'],'xpltype':'xpl-trig',eval(self.devices[device]['filters'])[i]['device']:self.devices[device]['adr']})
              liste= liste+1
        self.log_scene("info","All listener start")
 
@@ -285,6 +292,7 @@ class Mscene():
     def scene_stop(self):
 ### del all devices listerner
        for element in self.listener:
+          self.log_scene("info", "stop: %s" %self.listener[element])
           print self.listener[element]
           self.myxpl.del_listener(self.listener[element])
        self.listener = {}

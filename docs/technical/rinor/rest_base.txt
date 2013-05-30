@@ -5,50 +5,6 @@ REST /base
 Devices and features management
 ===============================
 
-Device usage
-------------
-
-Reading operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/device_usage/list/
-
-Result: ::
-
-    {
-        "status" : "OK",
-        "code" : 0,
-        "description" : "None",
-        "device_usage" : [
-            {
-                "description" : "Lamp, light usage",
-                "default_options" : "{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }",
-                "id" : "light",
-                "name" : "Light"
-            },
-            ...
-        ]
-    }
-
-* /base/device_usage/list/by-name/<name>
-
-Return: like /list but with only the item filtered
-
-Writing operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/device_usage/add/id/<id>/name/<name>/description/<description>/default_options/<default_options>
-
-Return: like /list but with only the item added
-
-* /base/device_usage/update/id/<id>/name/<name>/description/<description>/default_options/<default_options>
-
-Return: like /list but with only the item updated
-
-* /base/device_usage/del/<id>
-
-Return: like /list but with only the item deleted
-
 Device type
 -----------
 
@@ -66,9 +22,9 @@ Result: ::
         "device_type" : [
             {
                 "description" : "None",
-                "device_technology_id" : "x10",
+                "device_plugin_id" : "x10",
                 "id" : "x10.switch.switch",
-                "device_technology" : {
+                "device_plugin" : {
                     "description" : "",
                     "id" : "x10",
                     "name" : "X10"
@@ -81,62 +37,15 @@ Result: ::
 Writing operations
 ^^^^^^^^^^^^^^^^^^
 
-* /base/device_type/add/id/<id>/name/<name>/description/<description>/technology_id/<technology_id>
+* /base/device_type/add/id/<id>/name/<name>/description/<description>/plugin_id/<plugin_id>
 
 Return: like /list but with only the item added
 
-* /base/device_type/update/id/<id>/name/<name>/description/<description>/technology_id/<technology_id>
+* /base/device_type/update/id/<id>/name/<name>/description/<description>/plugin_id/<plugin_id>
 
 Return: like /list but with only the item updated
 
 * /base/device_type/del/<id>
-
-Return: like /list but with only the item deleted
-
-Device technology
------------------
-
-Parameters description
-^^^^^^^^^^^^^^^^^^^^^^
-Here the id is not numeric. The format is **[a-z0-9]**. This id is used for doing an explicit reference to technology : in xml stats and commands files.
-
-Reading operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/device_technology/list
-
-Result: ::
-
-    {
-        "status" : "OK",
-        "code" : 0,
-        "description" : "None",
-        "device_technology" : [
-            {
-                "description" : "Telephony, videophone, mails, messaging",
-                "id" : "communication",
-                "name" : "Communication"
-            },
-            ...
-        ]
-    }
-
-* /base/device_technology/list/by-id/<name>
-
-Return: like /list but with only the item filtered
-
-Writing operations
-^^^^^^^^^^^^^^^^^^
-
-* /base/device_technology/add/id/<id>name/<name>/description/<description>
-
-Return: like /list but with only the item added
-
-* /base/device_technology/update/id/<id>/name/<name>/description/<description>
-
-Return: like /list but with only the item updated
-
-* /base/device_technology/del/id/<id>
 
 Return: like /list but with only the item deleted
 
@@ -152,35 +61,159 @@ Will only return devices where the address field is NULL
 
 Result: ::
 
-    {
-        "status" : "OK",
-        "code" : 0,
-        "description" : "None",
-        "device" : [
-            {
-                "description" : "Lampe murale",
-                "reference" : "AM12",
-                "device_usage_id" : 1,
-                "device_type" : {
-                    "description" : "None",
-                    "id" : 1,
-                    "name" : "Switch",
-                    "device_technology_id" : "x10"
-                },
-                "address" : "A1",
-                "device_type_id" : 1,
-                "device_usage" : {
-                    "description" : "Lamp, light usage",
-                    "default_options" : "{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }",
-                    "id" : 1,
-                    "name" : "Light"
-                },
-                "id" : 1,
-                "name" : "Lampe"
-            },
-            ...
-        ]
-    }
+	{
+	    "status": "OK",
+	    "code": 0,
+	    "description": "None",
+	    "device": [
+		{
+		    "xpl_stat": [
+			{
+			    "name": "get_level",
+			    "xpl_stat_param": [
+				{
+				    "xplstat_id": 1,
+				    "value": "81",
+				    "ignore_values": "",
+				    "sensor_id": "",
+				    "static": "True",
+				    "key": "address"
+				},
+				{
+				    "xplstat_id": 1,
+				    "value": "1",
+				    "ignore_values": "",
+				    "sensor_id": "",
+				    "static": "True",
+				    "key": "channel"
+				},
+				{
+				    "xplstat_id": 1,
+				    "value": "",
+				    "ignore_values": "",
+				    "sensor_id": 1,
+				    "static": "False",
+				    "key": "level"
+				}
+			    ],
+			    "json_id": "get_level",
+			    "device_id": 2,
+			    "id": 1,
+			    "schema": "lighting.device"
+			}
+		    ],
+		    "command": [
+			{
+			    "return_confirmation": "True",
+			    "name": "Switch On or Off",
+			    "reference": "set_level_bin",
+			    "command_param": [
+				{
+				    "values": "[0, 255]",
+				    "value_type": "binary",
+				    "key": "level",
+				    "cmd_id": 1
+				}
+			    ],
+			    "xpl_command": {
+				"name": "blah",
+				"stat_id": 1,
+				"xpl_command_param": [
+				    {
+					"value": "81",
+					"xplcmd_id": 1,
+					"key": "address"
+				    },
+				    {
+					"value": "1",
+					"xplcmd_id": 1,
+					"key": "channel"
+				    },
+				    {
+					"value": "dfad",
+					"xplcmd_id": 1,
+					"key": "dummy"
+				    }
+				],
+				"cmd_id": 1,
+				"json_id": "set_level_bin",
+				"schema": "lighting.basic",
+				"id": 1,
+				"device_id": 2
+			    },
+			    "id": 1,
+			    "device_id": 2
+			}
+		    ],
+		    "description": "",
+		    "reference": "",
+		    "xpl_command": [
+			{
+			    "name": "blah",
+			    "stat_id": 1,
+			    "xpl_command_param": [
+				{
+				    "value": "81",
+				    "xplcmd_id": 1,
+				    "key": "address"
+				},
+				{
+				    "value": "1",
+				    "xplcmd_id": 1,
+				    "key": "channel"
+				},
+				{
+				    "value": "dfad",
+				    "xplcmd_id": 1,
+				    "key": "dummy"
+				}
+			    ],
+			    "cmd_id": 1,
+			    "json_id": "set_level_bin",
+			    "schema": "lighting.basic",
+			    "id": 1,
+			    "device_id": 2
+			}
+		    ],
+		    "device_usage_id": "ventilation",
+		    "device_type": {
+			"description": "Switch one channel on a device",
+			"plugin_id": "velbus",
+			"id": "velbus.relay",
+			"name": "Switch"
+		    },
+		    "address": "",
+		    "device_type_id": "velbus.relay",
+		    "sensor": [
+			{
+			    "name": "level sensor",
+			    "reference": "level",
+			    "last_received": 1365315580,
+			    "value_type": "number",
+			    "values": "[0, 100]",
+			    "last_value": "low",
+			    "id": 1,
+			    "unit": "%",
+			    "device_id": 2
+			}
+		    ],
+		    "device_usage": {
+			"description": "Ventilation usage",
+			"default_options": "{ &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }",
+			"id": "ventilation",
+			"name": "Ventilation"
+		    },
+		    "id": 2,
+		    "name": "testn"
+		}
+		....
+	    ]
+	}
+
+* /base/device/get/id/<id>
+
+Return: same for as /list but only one device returned
+
 
 * /base/device/list-upgrade
 

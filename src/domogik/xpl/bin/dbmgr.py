@@ -46,12 +46,16 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
+from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.message import MQMessage
+from zmq.eventloop.ioloop import IOLoop
 import time
+import zmq
 
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
 
-class DBConnector(XplPlugin):
+class DBConnector(XplPlugin, MQRep):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object along with the StatsManager to access to the database on the core side
@@ -62,6 +66,7 @@ class DBConnector(XplPlugin):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
+        MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug("Init database_manager instance")
 
         # Check for database connexion
@@ -101,6 +106,37 @@ class DBConnector(XplPlugin):
 
         Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
+        IOLoop.instance().start() 
+
+    def on_mdp_request(self, msg):
+        if msg._action == "config.get":
+            plugin = msg._data['plugin']
+            hostname = msg._data['hostname']
+            key = msg._data['key']
+            if 'element' in msg._data.keys():
+                element = msg._data['element']
+            else:
+                element = None
+            if element:
+                self._mdp_reply(plugin, hostname, key, self._fetch_elmt_config(plugin, element, key), element)
+            elif not key:
+                print 'TODO'
+            else:
+                self._mdp_reply(plugin, hostname, key, self._fetch_techno_config(plugin, hostname, key))
+        elif msg._action == "config.set":
+            print 'TODO'
+
+    def _mdp_reply(self, plugin, hostname, key, value, element=None):
+        msg = MQMessage()
+        msg.setaction( 'config.result' )
+        msg.adddata('plugin', plugin)
+        msg.adddata('hostname', hostname)
+        msg.adddata('key', key)
+        msg.adddata('value', value)
+        if element:
+            msg.adddata('element', element)
+        print msg.get()
+        self.reply(msg.get())
 
     def _request_config_cb(self, message):
         '''
@@ -274,7 +310,7 @@ class DBConnector(XplPlugin):
                 return res
         except:
             msg = "No config found h=%s, t=%s, k=%s" % (hostname, techno, key)
-            prin(msg)
+            print(msg)
             self.log.warn(msg)
             return "None"
 
@@ -288,7 +324,7 @@ class DBConnector(XplPlugin):
         '''
 
         try:
-            self._db.set_plugin_config(techno, hostname, key, value)
+            self._db.set_plugin_config(technology, hostname, key, value)
     
             mess = XplMessage()
             mess.set_type('xpl-stat')
@@ -301,7 +337,7 @@ class DBConnector(XplPlugin):
         except:
             traceback.print_exc()
             msg = "Error while setting h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, value)
-            prin(msg)
+            print(msg)
             self.log.warn(msg)
             return "None"
 

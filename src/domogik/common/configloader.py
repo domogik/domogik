@@ -86,12 +86,17 @@ class Loader():
             except:
                 raise Exception, "ConfigLoader : unable to create the lock file '%s'" % LOCK_FILE
         file = open(LOCK_FILE, "r+")
-        fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+        fcntl.lockf(file, fcntl.LOCK_EX)
 
         # read config file
         self.config = ConfigParser.ConfigParser()
         cfg_file = open(CONFIG_FILE)
         self.config.readfp(cfg_file)
+        cfg_file.close()
+
+        # release the file lock
+        fcntl.lockf(file, fcntl.LOCK_UN)
+        file.close()
 
         # get 'domogik' config part
         result = self.config.items('domogik')
@@ -107,8 +112,6 @@ class Loader():
         if self.part_name:
             result =  (domogik_part, self.config.items(self.part_name))
 
-        cfg_file.close()
-        file.close()
         return result
 
     def set(self, section, key, value):

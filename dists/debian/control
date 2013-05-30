@@ -6,7 +6,8 @@ Build-Depends: debhelper (>= 7.0.50~), python (>= 2.6.6-3~),
  python2.6 | python2.7, python-dev, python2.6-dev | python2.7-dev,
  libmysqlclient-dev, libssl-dev, libpq-dev,
  python-sqlalchemy (>= 0.7.5~), python-sqlalchemy (<< 0.8~),
- python-sqlalchemy-migrate (>= 0.7.2~), python-sqlalchemy-migrate (<< 0.7.3),
+ python-sqlalchemy-migrate (>= 0.7.2~) | python-migrate (>= 0.7.2~),
+ python-sqlalchemy-migrate (<< 0.7.3) | python-migrate (<< 0.7.3)
  python-setuptools, python-distutils2, python-openssl, python-serial (>= 2.5~),
  python-simplejson (>= 1.9.2~), python-pyinotify (>= 0.8.9~), python-pip (>= 1.0~),
  python-httplib2 (>= 0.6.0~), python-psutil (>= 0.1.3~), python-mimeparse
@@ -256,20 +257,21 @@ Description: Apache configuration for domogik.
  be usefull if you want to connect to your home with Domodroid from
  anywhere in the world.
 
-#Package: domogik-snmp
-#Architecture: all
-#Depends: domogik-primary (= ${source:Version}) | domogik-secondary (= ${source:Version}),
-# libchi-perl, libnet-snmp-perl, libproc-processtable-perl,
-# libconfig-simple-perl, libsnmp-perl, liblog-log4perl-perl,
-# liblwp-protocol-https-perl, snmpd, snmp-mibs-downloader
-#Description: SNMP agent for domogik.
-# Domogik/Domoweb is a free home automation solution.
-# It is based on the xPL protocol in order to easily use a lot of
-# different technologies. Domogik is multi hosts and modulable.
-# You can use as many user interfaces you want (actually there are two
-# user interfaces : the web one and the Android one).
-# This package contents an extension to the snmp daemon.
-#
+Package: domogik-snmp
+Architecture: all
+Pre-Depends: snmpd
+Depends: domogik-primary (= ${source:Version}) | domogik-secondary (= ${source:Version}),
+ libchi-perl, libnet-snmp-perl, libproc-processtable-perl,
+ libconfig-simple-perl, libsnmp-perl, liblog-log4perl-perl,
+ liblwp-protocol-https-perl, snmp-mibs-downloader
+Description: SNMP agent for domogik.
+ Domogik/Domoweb is a free home automation solution.
+ It is based on the xPL protocol in order to easily use a lot of
+ different technologies. Domogik is multi hosts and modulable.
+ You can use as many user interfaces you want (actually there are two
+ user interfaces : the web one and the Android one).
+ This package contents an extension to the snmp daemon.
+
 Package: domogik-developper
 Architecture: all
 Depends: mercurial, gcc,

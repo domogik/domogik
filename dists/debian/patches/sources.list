@@ -1,0 +1,7 @@
+# Domogik stable and official repositories
+# Greater priority implies a prefered package
+# priority   # url
+500          http://repo.domogik.org/repository/stable/
+400          http://repo.domogik.org/repository/testing/
+300          http://repo.domogik.org/repository/experimental/
+100          http://repo.domogik.org/repository/nightly/

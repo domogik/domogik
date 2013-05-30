@@ -558,6 +558,7 @@ class PackageManager():
                 #copytree("%s/src/share/domogik/url2xpl/" % pkg_dir, "%s/url2xpl/" % plg_path, self.log)
                 #copytree("%s/src/share/domogik/stats/" % pkg_dir, "%s/stats/" % plg_path, self.log)
                 copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
+                copytree("%s/src/domogik_packages/conversions" % pkg_dir, "%s/conversions" % plg_path, self.log)
         except:
             msg = "Error while copying %s files : %s" % (pkg_type, traceback.format_exc())
             self.log(msg)

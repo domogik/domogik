@@ -177,7 +177,7 @@ class PackageJson():
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "files", "json_version"]
-            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules"])
+            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules", "external"])
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
@@ -202,7 +202,7 @@ class PackageJson():
                 expected = ['name', 'return_confirmation', 'params', 'xpl_command']
                 self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
                 # validate the params
-                expected = ['key', 'values', 'value_type']
+                expected = ['key', 'data_type', 'conversion']
                 for par in cmd['params']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
@@ -211,7 +211,7 @@ class PackageJson():
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'unit', 'value_type', 'values']
+                expected = ['name', 'data_type', 'conversion']
                 self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
             #validate the xpl command
             for xcmdid in self.json["xpl_commands"]:
@@ -250,8 +250,9 @@ class PackageJson():
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # dynamic parameter
                 expected = ["key", "sensor"]
+                opt = ["ignore_values"]
                 for stat in xstat['parameters']['dynamic']:
-                    self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                    self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys(), opt)
                     # check that the sensor exists
                     if stat['sensor'] not in self.json["sensors"].keys():    
                         raise PackageException("sensor {0} defined in xpl_stat {1} is not found".format(stat['sensor'], xstatid))
@@ -288,6 +289,21 @@ class PackageJson():
             print("- %s" % my_file)
         print("---------------------------------------------------------")
 
+    def find_xplstats_for_device_type(self, devtype):
+        if self.json["json_version"] != 2:
+            return "Bad json version for the plugin"
+        ret = {}
+        # loop over all xplstat params and see if the sensor is linked to the above list
+        for xstatid in self.json["xpl_stats"]:
+            xstat = self.json["xpl_stats"][xstatid]
+            for stat in xstat['parameters']['dynamic']:
+                if stat['sensor'] in self.json["device_types"][devtype]['sensors']:
+                    if stat['sensor'] not in ret:
+                        ret[stat['sensor']] = []
+                    ret[stat['sensor']].append( xstatid )
+                        
+        return ret
+
 
 def set_nightly_version(path):
     """ update version for the nightly build
@@ -302,5 +318,5 @@ def set_nightly_version(path):
     my_file.close()
 
 if __name__ == "__main__":
-    pjson = PackageJson("ipx800")
-    print pjson.json
+    pjson = PackageJson("plcbus")
+    pjson = PackageJson("velbus")

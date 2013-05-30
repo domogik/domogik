@@ -33,7 +33,8 @@ ProcessRequest object
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.common.utils import ucode
+from domogik.common.utils import ucode, call_package_conversion
+from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper, DbHelperException
@@ -147,6 +148,8 @@ class ProcessRequest():
 #            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
 #            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
 #            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
+            # return the datatype json
+            '^/base/datatype$':                                                                  '_rest_base_datatype',
         },
         'cmd': {
             '^/cmd/.*$':                         		                                 'rest_ncommand',
@@ -656,12 +659,16 @@ class ProcessRequest():
                     "element_type" : "item",
                     "optionnal" : "no",
                 }
-            ] 
+            ]
+
+	cfg = Loader('mq').load()
+        config = dict(cfg[1])
 
         data = {"info" : info, 
                 "queue" : queues, 
                 "event" : events,
-                "configuration" : conf}
+                "configuration" : conf,
+                "mq" : config}
         json_data.add_data(data)
 
         self.send_http_response_ok(json_data.get())
@@ -711,7 +718,7 @@ class ProcessRequest():
         # get the command
         cmd = self._db.get_command(self.get_parameters('id'))
         if cmd == None:
-            json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd.id)
+            json_data = JSonHelper("ERROR", 999, "Command {0} does not exists".format(self.get_parameters('id')))
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
@@ -721,7 +728,7 @@ class ProcessRequest():
             self.send_http_response_ok(json_data.get())
             return
         # get the xpl* stuff from db
-        xplcmd = cmd.xpl_command[0]
+        xplcmd = cmd.xpl_command
         if xplcmd == None:
             json_data = JSonHelper("ERROR", 999, "Command %s does not exists" % cmd_id)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -733,6 +740,8 @@ class ProcessRequest():
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
+        # get the device from the db
+        dev = self._db.get_device(int(cmd.device_id))
         # cmd will have all needed info now
         msg = XplMessage()
         msg.set_type("xpl-cmnd")
@@ -741,11 +750,16 @@ class ProcessRequest():
         for p in xplcmd.params:
             msg.add_data({p.key : p.value})
         # dynamic params
-        print cmd
         for p in cmd.params:
-            print p
             if self.get_parameters(p.key):
-                msg.add_data({p.key : self.get_parameters(p.key)})
+                value = self.get_parameters(p.key)
+                # chieck if we need a conversion
+                if p.conversion is not None and p.conversion != '':
+                    value = call_package_conversion(\
+                                self.log, dev.device_type.plugin_id, \
+                                p.conversion, value)
+                # pluginName.conversion.<proc name>
+                msg.add_data({p.key : value})
             else:
 	        json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device command msg is not provided in the url" % p.key)
 		json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -753,7 +767,6 @@ class ProcessRequest():
 		return
         # send out the msg
         self.myxpl.send(msg)   
-        print msg
         ### Wait for answer
         stat_msg = None
         if xplstat != None:
@@ -762,13 +775,12 @@ class ProcessRequest():
                 filters[p.key] = p.value
             for p in cmd.params:
                 if self.get_parameters(p.key):
-                    filters[p.key] = self.get_parameters(p.key)
+                    filters[p.key] = str(value)
                 else:
 		    json_data = JSonHelper("ERROR", 999, "Parameter (%s) for device stats msg is not provided in the url" % p.key)
 		    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
 		    self.send_http_response_ok(json_data.get())
 		    return
-            print stat_msg
             # get xpl message from queue
             try:
                 self.log.debug("Command : wait for answer...")
@@ -1178,6 +1190,26 @@ class ProcessRequest():
 # /base processing
 ######
 
+    def _rest_base_datatype(self):
+        """ return the datatypes json file
+            /src/domogik/common/datatypes.json
+        """
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+
+        if conf.has_key('package_path'):
+            json_file = "{0}/domogik/common/datatypes.json".format(conf['package_path'])
+        else:
+            json_file = "{0}/domogik/common/datatypes.json".format(conf['src_prefix'])
+        data = json.load(open(json_file))
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("datatypes")
+        json_data.add_data(data)
+        self.send_http_response_ok(json_data.get())
+
     def rest_base(self):
         """ Get data in database
             - Decode and check URL format
@@ -1192,56 +1224,8 @@ class ProcessRequest():
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        ### device_usage #############################
-        if self.rest_request[0] == "device_usage":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_device_usage_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_base_device_usage_list(self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_usage_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_usage_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_device_usage_del(du_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
         ### device_type ##############################
-        elif self.rest_request[0] == "device_type":
+        if self.rest_request[0] == "device_type":
 
             ### list
             if self.rest_request[1] == "list":
@@ -1390,81 +1374,6 @@ class ProcessRequest():
         return my_date
 
 ######
-# /base/device_usage processing
-######
-
-    def _rest_base_device_usage_list(self, name = None):
-        """ list device usages
-            @param name : name of device usage
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        if name == None:
-            for device_usage in self._db.list_device_usages():
-                json_data.add_data(device_usage)
-        else:
-            device_usage = self._db.get_device_usage_by_name(name)
-            if device_usage is not None:
-                json_data.add_data(device_usage)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_usage_add(self):
-        """ add device_usage
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        try:
-            device_usage = self._db.add_device_usage(self.get_parameters("id"), \
-                                                     self.get_parameters("name"), \
-                                                     self.get_parameters("description"), \
-                                                     self.get_parameters("default_options"))
-            json_data.add_data(device_usage)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_usage_update(self):
-        """ update device usage
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        try:
-            device_usage = self._db.update_device_usage(self.get_parameters("id"), \
-                                                        self.get_parameters("name"), \
-                                                        self.get_parameters("description"), \
-                                                        self.get_parameters("default_options"))
-            json_data.add_data(device_usage)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_device_usage_del(self, du_id=None):
-        """ delete device usage
-            @param du_id : device usage id
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_usage")
-        try:
-            device_usage = self._db.del_device_usage(du_id)
-            json_data.add_data(device_usage)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
-        self.send_http_response_ok(json_data.get())
-
-
-
-######
 # /base/device_type processing
 ######
 
@@ -1552,6 +1461,15 @@ class ProcessRequest():
         json_data.set_data_type("device")
         for device in self._db.list_devices():
             json_data.add_data(device, exclude=['device_stats'])
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_base_device_get(self, id):
+        """ get one device
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        json_data.add_data(self._db.get_device(id), exclude=['device_stats'])
         self.send_http_response_ok(json_data.get())
 
     def _rest_base_device_upgrade(self, okey, nkey):
@@ -1744,7 +1662,6 @@ class ProcessRequest():
             device = self._db.add_device_and_commands( \
                                          name=self.get_parameters("name"), \
                                          type_id=self.get_parameters("type_id"), \
-                                         usage_id=self.get_parameters("usage_id"), \
                                          description=self.get_parameters("description"), \
                                          reference=self.get_parameters("reference"))
             json_data.set_data_type("device")
@@ -1765,7 +1682,6 @@ class ProcessRequest():
         try:
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
-                                         self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)

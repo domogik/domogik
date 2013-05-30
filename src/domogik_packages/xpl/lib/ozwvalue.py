@@ -42,7 +42,6 @@ import time
 from time import sleep
 import os.path
 
-
 class OZwaveValueException(OZwaveException):
     """"Zwave ValueNode exception class"""
             
@@ -100,7 +99,11 @@ class ZWaveValueNode:
     lastUpdate = property(lambda self: self._lastUpdate)
     valueData = property(lambda self: self._valueData)
     labelDomogik = property(lambda self: self._getLabelDomogik())
-
+    
+    def getMemoryUsage(self):
+        """Renvoi l'utilisation memoire de la value en octets"""
+        return sys.getsizeof(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
+        
     def getValue(self, key):
         """Retourne la valeur du dict valueData correspondant à key"""
         return self.valueData[key] if self._valueData.has_key(key) else None
@@ -132,11 +135,11 @@ class ZWaveValueNode:
                 v = bool(val)
                 print type(value), value,   "----",  type(v),  v
             elif self.valueData['type'] == 'Byte' : value = int(val)
-            elif self.valueData['type'] == 'Decimal' : value= float(val)
+            elif self.valueData['type'] == 'Decimal' : value = float(val)
             elif self.valueData['type'] == 'Int' : value = int(val)
             elif self.valueData['type'] == 'List' : value = str(val)
             elif self.valueData['type'] == 'Schedule' : value = int(val)  # TODO: Corriger le type schedule dans setvalue
-            elif self.valueData['type'] == 'Short' : value = short(val)
+            elif self.valueData['type'] == 'Short' : value = long(val)
             elif self.valueData['type'] == 'String' : value = str(val)
             elif self.valueData['type'] == 'Button' : # TODO: type button set value ?
                 button = True
@@ -194,18 +197,18 @@ class ZWaveValueNode:
         selfT = type(self._valueData['value'])
         if valT in [int , long, float, complex, bool] :
             if selfT == bool : retval = bool(val)
-            elif selfT ==int : retval = int(val)
-            elif selfT ==long : retval = long(val)
-            elif selfT ==float : retval = float(val)
-            elif selfT ==complex : retval = complex(val)                    
-        elif  valT ==str :
+            elif selfT == int : retval = int(val)
+            elif selfT == long : retval = long(val)
+            elif selfT == float : retval = float(val)
+            elif selfT == complex : retval = complex(val)                    
+        elif  valT == str :
             if selfT == bool :
                 Cval = val.capitalize()
                 retval = True if Cval in ['', 'True',  'T',  'Yes',  'Y'] else False
-            elif selfT ==int : retval = int(val)
-            elif selfT ==long : retval = long(val)
-            elif selfT ==float : retval = float(val)
-            elif selfT ==complex : retval = complex(val)
+            elif selfT == int : retval = int(val)
+            elif selfT == long : retval = long(val)
+            elif selfT == float : retval = float(val)
+            elif selfT == complex : retval = complex(val)
         return retval
             
     def _getLabelDomogik(self):
@@ -217,18 +220,18 @@ class ZWaveValueNode:
         """Determine si la value peut être un device domogik et retourne le format du nom de device"""
         if (self.valueData['commandClass'] in  CmdsClassAvailable) and (self.labelDomogik in  DomogikTypeAvailable) :
             nameAssoc = self._node._ozwmanager._nameAssoc
-            retval = "%s.%d.%d" %(nameAssoc.keys()[nameAssoc.values().index(self.valueData['homeId'])] , self._node.nodeId, self.valueData['instance'])        
+            retval = "%s.%d.%d" % (nameAssoc.keys()[nameAssoc.values().index(self.valueData['homeId'])] , self._node.nodeId, self.valueData['instance'])        
         else: retval = ""
         return retval
 
     def getInfos(self):
         """ Retourne les informations de la value , format dict{} """
-        retval={}
+        retval = {}
         retval = dict(self.valueData)
         retval['homeId'] = int(retval['homeId']) # Pour etre compatible avec javascript
         retval['id'] = str(retval['id']) # Pour etre compatible avec javascript
         retval['domogikdevice']  = self.getDomogikDevice()
-        retval['help'] =self.getHelp()
+        retval['help'] = self.getHelp()
         retval['listElems'] = list(self.getListItems()) if (self.valueData['type'] == 'List')  else None
         return retval
     
@@ -268,59 +271,59 @@ class ZWaveValueNode:
             sendxPL = True
             if self.valueData['readOnly'] :
                 msgtrig['genre'] = 'sensor'
-                msgtrig['schema'] ='sensor.basic'
+                msgtrig['schema'] = 'sensor.basic'
             else : 
                 msgtrig['genre'] = 'actuator'
-                msgtrig['schema'] ='ozwave.basic'
-            msgtrig['level']=  self.valueData['value']
+                msgtrig['schema'] = 'ozwave.basic'
+            msgtrig['level'] =  self.valueData['value']
         if self.valueData['commandClass'] == 'COMMAND_CLASS_SWITCH_BINARY' :
             if self.valueData['type'] == 'Bool' :
                 sendxPL = True
-                msgtrig['schema'] ='ozwave.basic'
+                msgtrig['schema'] = 'ozwave.basic'
                 msgtrig['genre'] = 'actuator'
-                msgtrig['level']=  self.valueData['value']
+                msgtrig['level'] =  self.valueData['value']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_SWITCH_MULTILEVEL' :
             sendxPL = True
             if self.valueData['readOnly'] :
                 msgtrig['genre'] = 'sensor'
-                msgtrig['schema'] ='sensor.basic'
+                msgtrig['schema'] = 'sensor.basic'
             else : 
                 msgtrig['genre'] = 'actuator'
-                msgtrig['schema'] ='ozwave.basic'
-            msgtrig['level']=  self.valueData['value']
+                msgtrig['schema'] = 'ozwave.basic'
+            msgtrig['level'] =  self.valueData['value']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_BINARY' : 
             if self.valueData['type'] == 'Bool' :
                 sendxPL = True
-                msgtrig['schema'] ='sensor.basic'
+                msgtrig['schema'] = 'sensor.basic'
                 msgtrig ['genre'] = 'sensor'
                 msgtrig ['type'] = 'status'
                 msgtrig ['value'] = self.valueData['value']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
             sendxPL = True
-            msgtrig['schema'] ='sensor.basic'
+            msgtrig['schema'] = 'sensor.basic'
             msgtrig ['genre'] = 'sensor'
             if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
-                msgtrig['value'] = round(self.valueData['value'],2)
+                msgtrig['value'] = round(self.valueData['value'], 2)
             else:
                 msgtrig ['value'] = self.valueData['value']
             msgtrig ['type'] = self.labelDomogik
-            msgtrig ['units']= self.valueData['units']
+            msgtrig ['units'] = self.valueData['units']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_BATTERY' :
             sendxPL = True
-            msgtrig['schema'] ='sensor.basic'
+            msgtrig['schema'] = 'sensor.basic'
             msgtrig ['genre'] = 'sensor'
             msgtrig ['value'] = self.valueData['value']
-            msgtrig ['units']= self.valueData['units']
+            msgtrig ['units'] = self.valueData['units']
         elif self.valueData['commandClass'] == 'COMMAND_CLASS_METER' :
             sendxPL = True
-            msgtrig['schema'] ='sensor.basic'
+            msgtrig['schema'] = 'sensor.basic'
             msgtrig ['genre'] = 'sensor'
             msgtrig ['type'] = self.labelDomogik
             if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
-                msgtrig['value'] = round(self.valueData['value'],2)
+                msgtrig['value'] = round(self.valueData['value'], 2)
             else:
                 msgtrig ['value'] = self.valueData['value']
-            msgtrig ['units']= self.valueData['units']
+            msgtrig ['units'] = self.valueData['units']
 
         msgtrig ['type'] = self.labelDomogik  #TODO: supprimer les autres msgtrig ['type'] si placé ici est OK
     

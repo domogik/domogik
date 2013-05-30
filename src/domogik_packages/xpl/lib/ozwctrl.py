@@ -152,12 +152,13 @@ controller to learn new data.
     ctrlDeviceName = property(lambda self: self._getCtrlDeviceName())
                               
     def _getCtrlDeviceName(self):
+        """Retourne le nom du controlleur sous la forme d'adresse de device de domogik."""
         vBasic = self._getValuesForCommandClass(0x20)   # COMMAND_CLASS_BASIC
         if vBasic :
             name = vBasic[0].getDomogikDevice()
         else  :
             nameAssoc = self._ozwmanager._nameAssoc
-            name = "%s.%d.1" %(nameAssoc.keys()[nameAssoc.values().index(self.homeId)] , self.nodeId)
+            name = "%s.%d.1" % (nameAssoc.keys()[nameAssoc.values().index(self.homeId)] , self.nodeId)
         return name
         
     def __str__(self):
@@ -413,10 +414,11 @@ controller to learn new data.
  
         elif action['cmd'] =='getState':
             print '*********** UI require State of ctrl action'
-            print self.checkActionCtrl() 
-            if self.checkActionCtrl() :
+            chkAction = self.checkActionCtrl()
+            print chkAction
+            if chkAction :
                 retval['cmdstate']  = 'stop'
-                retval.update(self.checkActionCtrl())
+                retval.update(chkAction)
             else : retval['cmdstate']  = 'waiting'
         else :
             retval['error'] = 'Unknown cmd : ' + action['cmd']

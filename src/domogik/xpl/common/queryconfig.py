@@ -40,13 +40,90 @@ from threading import Event
 #from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
+
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_sanitized_hostname 
+
+import zmq
+from domogik.mq.message import MQMessage
+from domogik.mq.reqrep.client import MQSyncReq
 
 QUERY_CONFIG_NUM_TRY = 20
 QUERY_CONFIG_WAIT = 5
 
-
 class Query():
+
+    def __init__(self, xpl, log):
+        cfg = Loader('mq')
+        config = cfg.load()
+        conf = dict(config[1])
+        if conf.has_key('query_mq'):
+            self.mq = True
+        else:
+            self.mq = False
+
+        if self.mq:
+            self.qry = QueryMQ(None, log)
+        else:
+            self.qry = QueryXPL(xpl, log)
+
+    def set(self, technology, key, value):
+        return self.qry.set(technology, key, value)
+
+    def query(self, technology, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
+        return self.qry.query(technology, key, element, nb_test)
+
+class QueryMQ():
+    '''
+    Query to the mq to find the config
+    '''
+    def __init__(self, xpl, log):
+        '''
+        Init the query system and connect it to xPL network
+        @param xpl : Will not be used
+        @param log : a Logger instance (usually took from self.log))
+        '''
+        self.log = log
+        self.log.debug("Init config query(mq) instance")
+        self.cli = MQSyncReq(zmq.Context())
+
+    def set(self, plugin, key, value):
+        '''
+        Send a xpl message to set value for a param
+
+        @param technology : the technology of the item
+        @param key : the key to set corresponding value,
+        @param value : the value to set
+        '''
+        msg = MQMessage()
+        msg._action = 'config.set'
+        self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
+
+    def query(self, plugin, key, element = '', nb_test = QUERY_CONFIG_NUM_TRY):
+        '''
+        Ask the config system for the value. Calling this function will make
+        your program wait until it got an answer
+
+        @param plugin : the plugin of the item requesting the value,
+        must exists in the config database
+        @param element : the name of the element which requests config, None if
+        it's a technolgy global parameter
+        @param key : the key to fetch corresponding value, if it's an empty string,
+        all the config items for this technology will be fetched
+        '''
+        msg = MQMessage()
+        msg._action = 'config.get'
+        msg._data = {'plugin': plugin, 'key': key, 'element': element, 'hostname': get_sanitized_hostname()}
+        ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
+        if ret is None:
+            return None
+        else:
+            if 'value' in ret._data.keys():
+                return ret._data['value']
+            else:
+                return None
+
+class QueryXPL():
     '''
     Query throw xPL network to get a config item
     '''

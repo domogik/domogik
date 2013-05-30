@@ -186,7 +186,8 @@
                     "dynamic": [
                         {
                              "key": "current",
-                             "sensor": "temperature"
+                             "sensor": "temperature",
+			     "ignore_values": ""
                         }
                     ]
                 }
@@ -205,7 +206,8 @@
                     "dynamic": [
                         {
                              "key": "current",
-                             "sensor": "humidity"
+                             "sensor": "humidity",
+			     "ignore_values": ""
                         }
                     ]
                 }
@@ -224,7 +226,8 @@
                     "dynamic": [
                         {
                              "key": "current",
-                             "sensor": "serial"
+                             "sensor": "serial",
+			     "ignore_values": ""
                         }
                     ]
                 }
@@ -237,8 +240,8 @@
            "params": [
                {
                    "key": "data",
-                   "value_type": "binary",
-                   "values": [0, 1]
+                   "data_type": "DT_Bool",
+                   "conversion": ""
                }
            ],
            "xpl_command": "switch"
@@ -247,27 +250,23 @@
     "sensors": {
 	"temperature": {
 		"name": "Temperature",
-                "unit": "C",
-                "value_type": "number",
-                "values": ""
+                "data_type": "DT_Temp",
+                "conversion": ""
 	},
 	"serial": {
 		"name": "Serial",
-                "unit": "",
-                "value_type": "string",
-                "values": ""
+                "data_type": "DT_String",
+                "conversion": ""
 	},
        	"gpio": {
                 "name": "gpio",
-                "unit": "",
-                "value_type": "string",
-                "values": ""
+                "data_type": "DT_String",
+                "conversion": ""
         },
 	"humidity": {
 		"name": "Humidity",
-                "unit": "%",
-                "value_type": "number",
-                "values": [0, 100]
+                "data_type": "DT_Humidity",
+                "conversion": ""
 	}
     },
     "device_types": {
@@ -347,7 +346,7 @@
         "author": "Fritz", 
         "author_email": "fritz.smh at gmail.com", 
         "category": "onewire", 
-        "changelog": "0.3.b\n- Add DS2406 & DS2405 & DS2413 support\n\n0.3.a\n- Add DS2408 support\n\n0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
+        "changelog": "0.4\n- adapt plugin for release 0.4.0\n\n0.3.b\n- Add DS2406 & DS2405 & DS2413 support\n\n0.3.a\n- Add DS2408 support\n\n0.2\n- adapt plugin for release 0.2.0\n\n0.1\n- plugin creation", 
         "dependencies": [
             {
                 "id": "owfs (>=2.8.4)", 
@@ -356,10 +355,10 @@
         ], 
         "description": "Manage 1-wire devices.\nList of supported devices : \n- DS18B20\n- DS18S20\n- DS2401\n- DS2438\n- DS2408\n- DS2406\n- DS2405\n- DS2413", 
         "documentation": "http://wiki.domogik.org/plugin_onewire", 
-        "domogik_min_version": "0.2.0", 
+        "domogik_min_version": "0.4.0", 
         "id": "onewire", 
         "type": "plugin", 
-        "version": "0.3b1"
+        "version": "0.4"
     }, 
     "json_version": 2, 
     "udev-rules": [

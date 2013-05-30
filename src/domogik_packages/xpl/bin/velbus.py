@@ -130,22 +130,7 @@ class VelbusManager(XplPlugin):
         chan = message.data['channel']
         if message.data["level"] == 'None':
             message.data["level"] = 0
-<<<<<<< local
-        if message.data["level"] == str(255):
-            self.log.debug("set relay on / dim to max")
-            self.manager.send_relayon( address, chan )
-            #self.manager.send_setdimmervalue( address, chan, 255 )
-        elif message.data["level"] == str(0):
-            self.log.debug("set relay off / dim to min")
-            self.manager.send_relayoff( address, chan )
-            #self.manager.send_setdimmervalue( address, chan, 0 )
-        else:
-            self.log.debug("set dimmer value")
-            self.manager.send_setdimmervalue( address, chan, message.data["level"] )
-
-=======
         self.manager.send_level( address, chan, message.data["level"])
->>>>>>> other
 
     def process_shutter_basic(self, message):
         """ Process xpl chema shutter.basic

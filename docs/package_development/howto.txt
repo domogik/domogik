@@ -16,7 +16,6 @@ Plugin is the main package type in Domogik. It allows you to use some devices (x
 A plugin is made of :
 
 * A json file which describes the plugin, the features, ...
-* Some xml files to describe the way the database and the user interfaces will communicate with the xPL network.
 * Some python files.
 
 External members
@@ -31,7 +30,6 @@ An external member is a xPL client not linked to Domogik. It can be a product li
 To interact with Domogik, some files must be created for an external member :
 
 * A json file which describes the member and the features of the external member.
-* Some xml files to describe the way the database and the user interfaces will speak with the xPL network.
 
 .. warning ::
     Currently, for each external member you have to create some json and xml files. We will create a generic external member with some common features in order to handle some external members with classic features (temperature, ...). So, people won't have to create a package for each external client.

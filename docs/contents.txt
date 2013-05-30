@@ -13,18 +13,23 @@ Table Of Content
     /enduser/terms
     /enduser/installation/index
     /enduser/installation/external
+    /enduser/installation/repositories
+    /enduser/installation/uninstall
+    /enduser/packages/installation
+    /enduser/packages/plugin_configuration_and_startup
+    /enduser/packages/plugin_helpers
+    /enduser/packages/repositories
     /enduser/configuration/index
-    /enduser/configuration/plugins/index
-    /enduser/configuration/plugins/install
-    /enduser/configuration/plugins/helpers
     /enduser/configuration/devices
     /enduser/administration/device
-    /enduser/administration/plugin
     /enduser/administration/account
     /releases/0.1.0
     /releases/0.2.0
+    /releases/0.3.0
+    /releases/0.4.0
     /various/udev_rule
-    /technical/actuator
+    /technical/packages
+    /technical/command
     /technical/sensor
     /technical/device_feature_usage
     /technical/database
@@ -41,6 +46,15 @@ Table Of Content
     /technical/rinor/rest_repository
     /technical/rinor/rest_helper
     /technical/rinor/rest_host
+    /technical/rinor/rest_package
+    /technical/rinor/rest_xplcmnd
+    /xplhub/index
+    /technical/xpl/internal
+    /technical/xpl/plcbus.basic
+    /technical/xpl/teleinfo
+    /technical/xpl/weather.basic
+    /technical/xpl_domogik_system
+    /technical/mq/used
     /package_development/index
     /package_development/howto
     /package_development/packages_lifecycle
@@ -61,6 +75,7 @@ Table Of Content
     /package_development/data_files
     /package_development/icon
     /package_development/review
+    /package_development/json_file_upgrade
     /tools/index
     /tools/others
 

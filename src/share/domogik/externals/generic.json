@@ -250,7 +250,17 @@
             "return_confirmation": "0", 
             "stat_key": "phone", 
             "value_type": "string"
-        }
+        },
+        {
+            "device_type_id": "generic.water", 
+            "feature_type": "sensor", 
+            "id": "generic.water.m3", 
+            "name": "m3", 
+            "parameters": "{&quot;unit&quot;:&quot;m3&quot;}", 
+            "return_confirmation": "0", 
+            "stat_key": "water", 
+            "value_type": "number"
+        } 
     ], 
     "device_types": [
         {
@@ -302,6 +312,11 @@
             "description": "Caller id", 
             "id": "generic.caller_id", 
             "name": "Caller id"
+        },
+        {
+            "description": "Water consumption", 
+            "id": "generic.water", 
+            "name": "Water consumption"
         }
     ], 
     "external": {
@@ -323,6 +338,7 @@
         "src/share/domogik/stats/generic/sensor.basic-generic-pressure.xml",
         "src/share/domogik/stats/generic/sensor.basic-generic-tank.xml",
         "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml",
+        "src/share/domogik/stats/generic/sensor.basic-generic-water.xml",
         "src/share/domogik/stats/generic/teleinfo.basic-teleinfo.xml",
         "src/share/domogik/stats/generic/teleinfo.short-teleinfo.xml"
     ], 
