@@ -31,59 +31,131 @@
             "type": "string"
         }
     ], 
-    "device_feature_models": [
-        {
-            "device_type_id": "computer.disk_usage", 
-            "feature_type": "sensor", 
-            "id": "computer.disk_usage.free_space", 
-            "name": "Free space", 
-            "parameters": "{&quot;unit&quot;:&quot;ko&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "free_space", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "computer.disk_usage", 
-            "feature_type": "sensor", 
-            "id": "computer.disk_usage.used_space", 
-            "name": "Used space", 
-            "parameters": "{&quot;unit&quot;:&quot;ko&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "used_space", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "computer.disk_usage", 
-            "feature_type": "sensor", 
-            "id": "computer.disk_usage.total_space", 
-            "name": "Total space", 
-            "parameters": "{&quot;unit&quot;:&quot;ko&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "total_space", 
-            "value_type": "number"
-        }, 
-        {
-            "device_type_id": "computer.disk_usage", 
-            "feature_type": "sensor", 
-            "id": "computer.disk_usage.percent_used", 
-            "name": "Percent used", 
-            "parameters": "{&quot;unit&quot;:&quot;%&quot;}", 
-            "return_confirmation": "0", 
-            "stat_key": "percent_used", 
-            "value_type": "number"
-        }
-    ], 
-    "device_types": [
-        {
+    "commands": [],
+    "xpl_commands": [], 
+    "sensors": {
+    	"get_free_space": {
+		"name": "Free Space",
+                "data_type": "DT_Scaling",
+                "conversion": ""
+	},
+    	"get_used_space": {
+		"name": "Used Space",
+                "data_type": "DT_Scaling",
+                "conversion": ""
+	},
+    	"get_total_space": {
+		"name": "Total Space",
+                "data_type": "DT_Scaling",
+                "conversion": ""
+	},
+    	"get_percent_used": {
+		"name": "Percent used",
+                "data_type": "DT_Scaling",
+                "conversion": ""
+	}
+    },
+    "xpl_stats": {
+       "get_total_space": {
+            "name": "get_percent_used",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+			{
+				"key": "type",
+				"value": "percent_used"
+			}
+		    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "ignore_values": "",
+                             "sensor": "get_percent_used"
+                        }
+                    ]
+       	    }
+       },
+       "get_used_space": {
+            "name": "get_used_space",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+			{
+				"key": "type",
+				"value": "used_space"
+			}
+		    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "ignore_values": "",
+                             "sensor": "get_used_space"
+                        }
+                    ]
+       	    }
+       },
+       "get_total_space": {
+            "name": "get_total_space",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+			{
+				"key": "type",
+				"value": "total_space"
+			}
+		    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "ignore_values": "",
+                             "sensor": "get_total_space"
+                        }
+                    ]
+       	    }
+       },
+       "get_free_space": {
+            "name": "get_free_space",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+			{
+				"key": "type",
+				"value": "free_space"
+			}
+		    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "ignore_values": "",
+                             "sensor": "get_free_space"
+                        }
+                    ]
+       	    }
+       }
+    },
+    "device_types": {
+        "diskfree.disk_usage": {
             "description": "Disk usage", 
-            "id": "computer.disk_usage", 
-            "name": "Disk usage"
+            "id": "diskfree.disk_usage", 
+            "name": "Disk usage",
+            "commands": [],
+            "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The path to look at",
+                    "type": "string"
+                }
+            ]
         }
-    ], 
+    }, 
     "files": [
         "src/share/domogik/design/plugin/diskfree/icon.png", 
         "src/share/domogik/plugins/diskfree.json", 
-        "src/share/domogik/stats/computer/sensor.basic-diskfree.xml", 
         "src/domogik_packages/xpl/bin/diskfree.py", 
         "src/domogik_packages/xpl/lib/diskfree.py"
     ], 
@@ -100,11 +172,6 @@
         "type": "plugin", 
         "version": "0.1a0"
     }, 
-    "json_version": 1, 
-    "technology": {
-        "description": "Computer", 
-        "id": "computer", 
-        "name": "Computer"
-    }, 
+    "json_version": 2,
     "udev-rules": []
 }
