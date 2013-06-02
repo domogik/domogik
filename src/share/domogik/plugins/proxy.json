@@ -75,8 +75,11 @@
             "type": "string"
         }
     ],
-    "device_feature_models": [],
-    "device_types": [],
+    "device_types": {},
+    "commands": {},
+    "sensors": {},
+    "xpl_commands": {},
+    "xpl_stats": {},
     "files": [
         "src/share/domogik/design/plugin/proxy/icon.png",
         "src/share/domogik/plugins/proxy.json",
@@ -96,11 +99,6 @@
         "type": "plugin",
         "version": "0.1a0"
     },
-    "json_version": 1,
-    "technology": {
-        "description": "Rest auth",
-        "id": "proxy",
-        "name": "Proxy"
-    },
+    "json_version": 2,
     "udev-rules": []
 }
