@@ -748,6 +748,15 @@ class DbHelper():
         self.__session.execute(
             t_stats.delete().where(t_stats.c.device_id == d_id)
         )
+
+        # delete sensor history data
+        ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
+        meta = MetaData(bind=DbHelper.__engine)
+        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
+        for sen in ssens:
+            self.__session.execute(
+                t_hist.delete().where(t_hist.c.sensor_id == sen.id)
+            )
         
         self.__session.delete(device)
         try:
