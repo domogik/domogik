@@ -11,8 +11,11 @@
             "type": "boolean"
         }
     ], 
-    "device_feature_models": [], 
-    "device_types": [], 
+    "device_types": {},
+    "commands": {},
+    "sensors": {},
+    "xpl_commands": {},
+    "xpl_stats": {}, 
     "files": [
         "src/share/domogik/design/plugin/xpl_time/icon.png", 
         "src/share/domogik/plugins/xpl_time.json", 
@@ -31,11 +34,6 @@
         "type": "plugin", 
         "version": "0.3"
     }, 
-    "json_version": 1, 
-    "technology": {
-        "description": "Domogik", 
-        "id": "domogik", 
-        "name": "Domogik"
-    }, 
+    "json_version": 2, 
     "udev-rules": []
 }
