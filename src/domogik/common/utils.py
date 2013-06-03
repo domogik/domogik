@@ -80,5 +80,6 @@ def call_package_conversion(log, plugin, method, value):
     except AttributeError as err:
         log.critical("Can not load class ({0}) or methode ({1}): {2}".format(classname, method, err))
         return value
+    log.debug("calling {0}.{1}".format(staticclass, staticmethode))
     return staticmethode(value)
 

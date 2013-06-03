@@ -187,6 +187,8 @@ class StatsManager:
                                     value = call_package_conversion(\
                                                 self._log_stats, self._dev.device_type.plugin_id, \
                                                 self._sen.conversion, value)
+                                    self._log_stats.debug("Key found %s with value %s after conversion." \
+                                        % (p.key, value))
                                 # do the store
                                 device_data.append({"value" : value, "sensor": p.sensor_id})
                                 my_db.add_sensor_history(p.sensor_id, value, current_date)
