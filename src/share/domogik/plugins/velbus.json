@@ -118,7 +118,7 @@
          "set_level_bin": {
             "name": "blah",
             "schema": "lighting.basic",
-            "xplstat_name": "get_level",
+            "xplstat_name": "get_level_bin",
             "parameters": {
                     "static": [],
                     "device": []
@@ -127,7 +127,7 @@
          "set_level_range": {
             "name": "set_level_range",
             "schema": "lighting.basic",
-            "xplstat_name": "get_level",
+            "xplstat_name": "get_level_range",
             "parameters": {
                     "static": [],
                     "device": []
@@ -135,8 +135,8 @@
          }
     },
     "xpl_stats": {
-       "get_level": {
-            "name": "get_level",
+       "get_level_bin": {
+            "name": "get_level_bin",
             "schema": "lighting.device",
             "parameters": {
                     "static": [],
@@ -145,7 +145,22 @@
                         {
                              "key": "level",
                              "ignore_values": "",
-                             "sensor": "level"
+                             "sensor": "level_bin"
+                        }
+                    ]
+                }
+       },
+       "get_level_range": {
+            "name": "get_level_range",
+            "schema": "lighting.device",
+            "parameters": {
+                    "static": [],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "level",
+                             "ignore_values": "",
+                             "sensor": "level_range"
                         }
                     ]
                 }
@@ -170,19 +185,29 @@
            "params": [
                {
                    "key": "level",
-                   "data_type": "DT_Switch",
-                   "conversion": ""
+                   "data_type": "DT_Scale",
+                   "conversion": "from_DT_Scale_to_level"
                }
            ],
-           "xpl_command": "set_level_bin"
+           "xpl_command": "set_level_range"
         }
     },
     "sensors": {
-	"level": {
+	"level_bin": {
+		"name": "level sensor",
+                "data_type": "DT_Switch",
+                "conversion": "from_level_to_DT_Switch"
+	},
+	"level_range": {
 		"name": "level sensor",
                 "data_type": "DT_Scaling",
                 "conversion": "from_level_to_DT_Scaling"
-	}
+	},
+        "temp": {
+               "name": "temp_sensor",
+               "data_type": "DT_Temp",
+               "conversion": ""
+        }
     },
     "device_types": {
         "velbus.relay": {
@@ -190,7 +215,7 @@
             "description": "Switch one channel on a device", 
             "name": "Switch",
             "commands": ["set_level_bin"],
-            "sensors": ["level"],
+            "sensors": ["level_bin"],
             "xpl_params": [
                 {
                     "key": "channel",
@@ -213,8 +238,8 @@
             "description": "Dim one channel on a device", 
             "id": "velbus.dimmer", 
             "name": "Dimmer",
-            "commands": ["set_level_bin", "set_level_range"],
-            "sensors": ["level"],
+            "commands": ["set_level_range"],
+            "sensors": ["level_range"],
             "xpl_params": [
                 {
                     "key": "channel",
@@ -232,18 +257,26 @@
                 }
             ]
         }, 
-        "velbus.shutter": {
-            "id": "velbus.shutter",
-            "description": "Shutter control (up, down)", 
-            "name": "Shutter",
-            "commands": [],
-            "sensors": [],
-            "xpl_params": []
-        },
         "velbus.temp": {
             "id": "velbus.temp",
             "description": "Temperature Sensor", 
             "name": "Temperature",
+            "commands": [],
+            "sensors": ["temp"],
+            "xpl_params": [
+                {
+                    "key": "device",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
+        },
+        "velbus.shutter": {
+            "id": "velbus.shutter",
+            "description": "Shutter control (up, down)", 
+            "name": "Shutter",
             "commands": [],
             "sensors": [],
             "xpl_params": []
