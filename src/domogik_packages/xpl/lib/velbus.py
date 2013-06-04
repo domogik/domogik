@@ -454,7 +454,7 @@ class VelbusDev:
                 level = 255
             if level != -1:
                 self._callback("lighting.device",
-                    {"address" : str(ord(data[2])),
+                    {"device" : str(ord(data[2])),
                     "channel" : str(channel),
                     "level" : level})
 
@@ -463,12 +463,12 @@ class VelbusDev:
            Process a 251 Message
            Dimmer status => send out when the dimmer status is changed
         """
-        device = str(ord(data[2])) + "-" + str(ord(data[5]) - 1)
         level = -1
         level = (100 / 255 ) * ord(data[7])
         if level != -1:
             self._callback("lighting.device",
-                {"device" : device,
+                {"device" : str(ord(data[2])),
+                "channel": str(ord(data[5]) - 1),
                 "level" : level})
 
     def _process_184(self, data):
@@ -477,12 +477,12 @@ class VelbusDev:
            Dimmer channel status => send out when the dimmer status is changed
         """
         for channel in self._byte_to_channels(data[5]):
-            device = str(ord(data[2])) + "-" + str(channel)
             level = -1
             level = (100 / 255 ) * ord(data[7])
             if level != -1:
                 self._callback("lighting.device",
-                    {"device" : device,
+                    {"device" : str(ord(data[2])),
+                    "channel": str(channel),
                     "level" : level})
   
     def _process_0(self, data):
@@ -499,13 +499,13 @@ class VelbusDev:
         chanlpres = self._byte_to_channels(data[7])
         for chan in chanpres:
             self._callback("sensor.basic",
-               {"device": str(device) + "-" + str(chan), "type": "input", "current": "HIGH" })
+               {"device": str(device), "channel": str(chan), "type": "input", "current": "HIGH" })
         for chan in chanlpres:
             self._callback("sensor.basic",
-               {"device": str(device) + "-" + str(chan), "type": "input", "current": "LONG" })
+               {"device": str(device), "channel": str(chan), "type": "input", "current": "LONG" })
         for chan in chanrel:
             self._callback("sensor.basic",
-               {"device": str(device) + "-" + str(chan), "type": "input", "current": "LOW" })
+               {"device": str(device), "channel": str(chan), "type": "input", "current": "LOW" })
 
     def _process_236(self, data):
         """

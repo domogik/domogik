@@ -164,6 +164,50 @@
                         }
                     ]
                 }
+       },
+       "get_temp": {
+            "name": "get_temp",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+			{
+			     "key": "type",
+                             "value": "temp"
+                        },
+			{
+			     "key": "units",
+                             "value": "c"
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "ignore_values": "",
+                             "sensor": "temp"
+                        }
+                    ]
+            }
+       },
+       "get_input": {
+            "name": "get_input",
+            "schema": "sensor.basic",
+            "parameters": {
+                    "static": [
+			{
+			     "key": "type",
+                             "value": "input"
+                        }
+                    ],
+                    "device": [],
+                    "dynamic": [
+                        {
+                             "key": "current",
+                             "ignore_values": "",
+                             "sensor": "input"
+                        }
+                    ]
+            }
        }
     },
     "commands": {
@@ -203,6 +247,11 @@
                 "data_type": "DT_Scaling",
                 "conversion": "from_level_to_DT_Scaling"
 	},
+        "input": {
+               "name": "sensor_sensor",
+               "data_type": "DT_State",
+               "conversion": "from_input_to_DT_State"
+        },
         "temp": {
                "name": "temp_sensor",
                "data_type": "DT_Temp",
@@ -225,7 +274,7 @@
                     "min_value": 1
                 },
                 {
-                    "key": "address",
+                    "key": "device",
                     "description": "The decimal address",
                     "type": "integer",
                     "max_value": 255,
@@ -249,7 +298,7 @@
                     "min_value": 1
                 },
                 {
-                    "key": "address",
+                    "key": "device",
                     "description": "The decimal address",
                     "type": "integer",
                     "max_value": 255,
@@ -286,8 +335,23 @@
             "description": "Input contact", 
             "name": "Input",
             "commands": [],
-            "sensors": [],
-            "xpl_params": []
+            "sensors": ["input"],
+            "xpl_params": [
+	        {
+                    "key": "channel",
+                    "description": "The channel number",
+                    "type": "integer",
+                    "max_value": 8,
+                    "min_value": 1
+                },
+                {
+                    "key": "device",
+                    "description": "The decimal address",
+                    "type": "integer",
+                    "max_value": 255,
+                    "min_value": 0
+                }
+            ]
         }
     }, 
     "files": [
