@@ -809,16 +809,18 @@ class DbHelper():
 	self.__session.expire_all()
 	sensor = self.__session.query(Sensor).filter_by(id=sid).first()
 	if sensor is not None:
-            # insert new recored in core_sensor_history
-            h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
-            self.__session.add(h)
-	    sensor.last_received = date
-            sensor.last_value = str(value)
-            self.__session.add(sensor)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            # only store stats if the value is different
+            if sensor.last_value is not str(value):
+                # insert new recored in core_sensor_history
+                h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
+                self.__session.add(h)
+	        sensor.last_received = date
+                sensor.last_value = str(value)
+                self.__session.add(sensor)
+                try:
+                    self.__session.commit()
+                except Exception as sql_exception:
+                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         else:
             self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
 
