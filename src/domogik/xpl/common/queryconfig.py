@@ -119,7 +119,7 @@ class QueryMQ():
             return None
         else:
             if 'value' in ret._data.keys():
-                return ret._data['value']
+                return str(ret._data['value'])
             else:
                 return None
 

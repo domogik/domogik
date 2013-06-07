@@ -215,6 +215,7 @@ class ProcessRequest():
             '^/stats/(?P<sensor_id>[0-9]+)/latest$':				     '_rest_stats_last',
             '^/stats/(?P<sensor_id>[0-9]+)/last/(?P<num>[0-9]+)$':		     '_rest_stats_last',
             '^/stats/(?P<sensor_id>[0-9]+)/from/.*$':     		             '_rest_stats_from',
+            '^/stats/reload$':     		                                     '_rest_stats_reload',
         },
    }
 
@@ -307,8 +308,7 @@ class ProcessRequest():
         self._event_dmg =  self.handler_params[0]._event_dmg
         self._event_requests =  self.handler_params[0]._event_requests
 
-        self.stat_mgr =  self.handler_params[0].stat_mgr
-
+        self.reload_stats = self.handler_params[0].reload_stats
         self._hosts_list = self.handler_params[0]._hosts_list
         self.get_installed_packages = self.handler_params[0].get_installed_packages
         self._get_installed_packages_from_manager = self.handler_params[0]._get_installed_packages_from_manager
@@ -890,7 +890,11 @@ class ProcessRequest():
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
-
+    def _rest_stats_reload(self):
+        self.reload_stats()
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
 
     def _rest_stats_from(self, sensor_id):
         """ Get the values for device/key in database for an start time to ...
@@ -1523,8 +1527,8 @@ class ProcessRequest():
         for x in self._db.get_xpl_stat_by_device_id(id):
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
     def _rest_base_device_updateglobal(self, id):
         json_data = JSonHelper("OK")
@@ -1539,8 +1543,8 @@ class ProcessRequest():
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_stat_param(statid=x.id, key=p.key, value=self.get_parameters(p.key), static=True)
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
    
     def _rest_base_device_addxplcmdparams(self, id):
         json_data = JSonHelper("OK")
@@ -1581,8 +1585,8 @@ class ProcessRequest():
 	        return
             # go and add the param
             self._db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
     def _rest_base_device_updatexplcmdparams(self, id):
         json_data = JSonHelper("OK")
@@ -1591,8 +1595,8 @@ class ProcessRequest():
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
  
     def _rest_base_device_updatexplstatparams(self, id):
         json_data = JSonHelper("OK")
@@ -1601,8 +1605,8 @@ class ProcessRequest():
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_stat_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
  
     def _rest_base_device_addxplstatparams(self, id):
         json_data = JSonHelper("OK")
@@ -1643,8 +1647,8 @@ class ProcessRequest():
 	        return
             # go and add the param
             self._db.add_xpl_stat_param(statid=cmd.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
     def _rest_base_device_add(self):
         """ add devices
@@ -1697,8 +1701,8 @@ class ProcessRequest():
             json_data.add_data(device)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
 ######
 # /plugin processing

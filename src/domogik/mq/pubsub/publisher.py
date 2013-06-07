@@ -1,5 +1,6 @@
 
 import zmq
+import json
 from time import time
 from domogik.common import logger
 from domogik.common.configloader import Loader
@@ -30,6 +31,6 @@ class MQPub(object):
         """
         msg_id = "%s.%s.%s" %(category, str(time()).replace('.','_'), MSG_VERSION)
         self.s_send.send(msg_id, zmq.SNDMORE)
-        self.s_send.send(content)
+        self.s_send.send( json.dumps(content) )
         self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg_id, content))
 

@@ -125,7 +125,12 @@ class SysManager(XplPlugin):
                           action="store_true", 
                           dest="start_rest", 
                           default=False, \
-                          help="Start scenario manager if not already running.")
+                          help="Start rest manager if not already running.")
+        parser.add_option("-x", 
+                          action="store_true", 
+                          dest="start_xplevent", 
+                          default=False, \
+                          help="Start xpl events manager if not already running.")
         parser.add_option("-p", 
                           action="store_true", 
                           dest="allow_ping", 
@@ -227,6 +232,22 @@ class SysManager(XplPlugin):
                                        {"ping" : False, "startup" : True})
                     self.register_thread(thr_dbmgr)
                     thr_dbmgr.start()
+            
+            #Start xplevent
+            if self.options.start_xplevent:
+                self._inc_startup_lock()
+                if self._check_component_is_running("xplevent", startup = True):
+                    self.log.warning("Manager started with -s, but a xpl events is already running")
+                    self._write_fifo("WARN", "Manager started with -s, but a xpl events is already running\n")
+                    self._dec_startup_lock()
+                else:
+                    thr_xplevent = Thread(None,
+                                       self._start_plugin,
+                                       "start_plugin_xplevent",
+                                       ("xplevent",),
+                                       {"ping" : False, "startup" : True})
+                    self.register_thread(thr_xplevent)
+                    thr_xplevent.start()
     
             #Start rest
             if self.options.start_rest:
@@ -452,19 +473,19 @@ class SysManager(XplPlugin):
             self.log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, self.get_sanitized_hostname()))
 
             # start plugin
-            if cmd == "start" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
+            if cmd == "start" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "xplevent", "*"]:
                 self._start_plugin(plg)
 
             # stop plugin
-            if cmd == "stop" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
+            if cmd == "stop" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "xplevent", "*"]:
                 self._stop_plugin(plg)
 
             # enable plugin
-            if cmd == "enable" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
+            if cmd == "enable" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "xplevent", "*"]:
                 self._enable_plugin(plg)
 
             # disable plugin
-            if cmd == "disable" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "*"]:
+            if cmd == "disable" and host == self.get_sanitized_hostname() and plg not in ["rest", "dbmgr", "xplevent", "*"]:
                 self._disable_plugin(plg)
 
             # list plugin
@@ -655,7 +676,7 @@ class SysManager(XplPlugin):
             if message.source_vendor_id == "domogik":
                 name = message.source_device_id
                 # hardcoded values for no plugin part of domogik
-                if name not in ("manager", "rest", "dbmgr"):
+                if name not in ("manager", "rest", "dbmgr", "statmanager"):
                     self._set_status(name, "ON")
 
     def _set_component_not_running(self, message):
@@ -676,7 +697,7 @@ class SysManager(XplPlugin):
         """
         self.log.info("Start the component %s" % name)
         print("Start %s" % name)
-        if name == "dbmgr" or name == "rest":
+        if name == "dbmgr" or name == "rest" or name == "xplevent":
             plg_path = "domogik.xpl.bin." + name
         else:
             plg_path = "domogik_packages.xpl.bin." + name
