@@ -11,7 +11,6 @@ syntax: glob
 *.pyc
 *.pyoeggs/*
 eggs
-bin
 .installed.cfg
 src/Domogik.egg-info/
 develop-eggs/
