@@ -28,13 +28,17 @@
             "parameters": {
                     "static": [],
                     "device": [
-                {
-                    "key": "device",
-                    "description": "groups address",
-                    "type": "string"
-	        }
-			],
-			"dynamic": []
+                	{
+                    		"key": "device",
+                    		"description": "groups address",
+                    		"type": "string"
+	        	},
+                	{
+                    		"key": "datatype",
+                    		"description": "Datatypes for the group addrss",
+                    		"type": "string"
+	        	}
+		    ]
                 }
          }
     },
@@ -46,17 +50,17 @@
             "parameters": {
                     "static": [],
                     "device": [
-                {
-                    "key": "device",
-                    "description": "groups address",
-                    "type": "string"
-	        }
+			{
+			    "key": "device",
+			    "description": "groups address",
+			    "type": "string"
+			}
                     ],
                     "dynamic": [
                         {
                              "key": "data",
                              "sensor": "binary_state",
-			     "ignore_value": ""
+			     "ignore_values": ""
                         }
                     ]
                 }
@@ -70,8 +74,8 @@
            "params": [
                {
                    "key": "data",
-                   "value_type": "binary",
-                   "values": ["off", "on"]
+                   "data_type": "DT_Switch",
+                   "conversion": ""
                }
            ],
            "xpl_command": "set_binary"
@@ -81,10 +85,8 @@
     "sensors": {
 	"binary_state": {
 		"name": "Binary State",
-                "unit": "",
-                "value_type": "string",
-                "values": ["off", "on"],
-                "xpl_stat": "get_binary"
+                "data_type": "DT_Switch",
+                "conversion": ""
 	}
     },
 
