@@ -1,0 +1,141 @@
+=========================
+Request Reply MQ messages
+=========================
+
+The system is based on mdp (http://rfc.zeromq.org/spec:7)
+
+Frame format
+============
+
+   * null frame
+   * protocol (MDPC01 or MDPW01) = what protocol to use (Client or Worker)
+   * service = the service where we want the request to (rinor, dbmanager, host.pluginname, host.manager) 
+      * for services that can only run once (rest, dbmanager, scenario manager) its just there name
+      * for services that can run multiple times (on multiple hosts) its in the format <host>.<service> 
+   * action = the action to perform (config.get, config.set, plugin.start, plugin.stop, plugin.install, ...) 
+   * data = the data (json format) for the action 
+
+Clients
+=======
+
+There are 2 clients provided, an async and a sync client
+
+Async
+-----
+
+The async object is supposed to be used as an extension of another class, the on_mdp_message methode can then be overloaded.
+
+Sync
+----
+
+::
+
+	z = zmq.context()
+	m = MQMessage('config.get', {'ikke':'blah'})
+	c = MQSyncReq(z)
+	print c.request('dbmgr', m.get())
+
+Workers
+=======
+* all plugins => for helper commands
+* dbmanager
+* packagemanager
+* manager => start/stop a plugin for example 
+
+anything that needs to act as req/rep worker can extend the MQRep class
+
+the mdpworker needs to be initialized:
+MQRep.init(self, zmq.Context(), 'dbmgr')
+the first argument is the zmq context
+the second argument is the workers name
+
+then you can override the on_mdp_request methode
+def on_mdp_request(self, msg)
+the msg argument is an object of type MQMessage
+
+the MQMessage has 2 main items:
+- the action field
+- the data file (python dict)
+
+How to Use
+----------
+
+::
+
+	class DBConnector(MQRep):
+	    def __init__(self):
+		MQRep.__init__(self, zmq.Context(), 'dbmgr')
+		....
+		IOLoop.instance().start()
+
+	    def on_mdp_request(self, msg):
+		if msg._action == "config.get":
+		    plugin = msg._data['plugin']
+		    hostname = msg._data['hostname']
+		    key = msg._data['key']
+		    self._mdp_reply(plugin, hostname, key, self._fetch_elmt_config(plugin, element, key), element)
+		    
+	    def _mdp_reply(self, plugin, hostname, key, value, element=None):
+		msg = MQMessage()
+		msg.setaction( 'config.result' )
+		msg.adddata('plugin', plugin)
+		msg.adddata('hostname', hostname)
+		msg.adddata('key', key)
+		msg.adddata('value', value)
+		self.reply(msg.get())
+
+
+Examples
+========
+
+Example plugin requests config on dbmanager
+-------------------------------------------
+
+=> only the bold part is seen by the domogik components
+
+client sends the following message:
+
+::
+
+    empty
+    MDPC01
+    dbmanager
+    **config.get**
+    **{ host = igor, plugin = velbus, key = protocol}**
+
+
+the dbmanager will then receive the following packet:
+
+::
+
+    Null
+    MDPW01
+    0x02
+    envelopp (used to generate the reply
+    empty
+    **config.get**
+    **{ host=igor, plugin = velbus, key = protocol}**
+
+
+the dbmanager then does its action and will sent the following packet:
+
+::
+
+    Null
+    MDPW01
+    0x03
+    envelop (copy from the receiving packet)
+    empty
+    **config.result**
+    **{ data }**
+
+
+the plugin will on its turn receive the following reply:
+
+::
+
+    empty
+    MDPC01
+    dbmanager
+    **config.result**
+    **{ data }**

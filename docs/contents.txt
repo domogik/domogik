@@ -55,6 +55,9 @@ Table Of Content
     /technical/xpl/weather.basic
     /technical/xpl_domogik_system
     /technical/mq/used
+    /technical/mq/overview
+    /technical/mq/reqrep
+    /technical/mq/pubsub
     /package_development/index
     /package_development/howto
     /package_development/packages_lifecycle

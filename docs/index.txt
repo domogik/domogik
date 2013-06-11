@@ -68,7 +68,10 @@ Technical Documentation
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
 * **Message Queue:**
-  :doc:`Used messages </technical/mq/used>`
+        * :doc:`Overview </technical/mq/overview>`
+        * :doc:`Request Reply </technical/mq/reqrep>`
+        * :doc:`Publish Subscribe </technical/mq/pubsub>`
+        * :doc:`Used messages </technical/mq/used>`
 
 Developers Documentation
 ========================
