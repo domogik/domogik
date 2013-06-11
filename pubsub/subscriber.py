@@ -117,7 +117,7 @@ class MQAsyncSub():
         :param: msg = the message received
         """
         self.log.debug("%s : id = %s - content = %s" % (self.caller_id, msg[0], msg[1]))
-        self.on_message(msg[0], msg[1])
+        self.on_message(msg[0], json.loads(msg[1]))
   
     def on_message(self, msg_id, content):
         """Public method called when a message arrived.
