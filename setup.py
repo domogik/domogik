@@ -117,6 +117,7 @@ setup(
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
             dmg_dump = domogik.xpl.bin.dump_xpl:main
+            dmg_mq_dump = domogik.mq.dump:main
             dmg_version = domogik.xpl.bin.version:main
             dmg_hub = domogik.xpl.bin.hub:main
             dmg_broker = domogik.mq.reqrep.broker:main
