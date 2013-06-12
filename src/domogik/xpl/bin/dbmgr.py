@@ -109,7 +109,7 @@ class DBConnector(XplPlugin, MQRep):
         IOLoop.instance().start() 
 
     def on_mdp_request(self, msg):
-        if msg._action == "config.get":
+        if msg.get_action() == "config.get":
             plugin = msg._data['plugin']
             hostname = msg._data['hostname']
             key = msg._data['key']
@@ -129,12 +129,12 @@ class DBConnector(XplPlugin, MQRep):
     def _mdp_reply(self, plugin, hostname, key, value, element=None):
         msg = MQMessage()
         msg.setaction( 'config.result' )
-        msg.adddata('plugin', plugin)
-        msg.adddata('hostname', hostname)
-        msg.adddata('key', key)
-        msg.adddata('value', value)
+        msg.add_data('plugin', plugin)
+        msg.add_data('hostname', hostname)
+        msg.add_data('key', key)
+        msg.add_data('value', value)
         if element:
-            msg.adddata('element', element)
+            msg.add_data('element', element)
         print msg.get()
         self.reply(msg.get())
 
