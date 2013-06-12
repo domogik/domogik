@@ -44,31 +44,25 @@ from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
+from domogik.mq.pubsub.publisher import MQPub
+import zmq
+
+
+# clients (plugins, etc) status
+STATUS_UNKNOWN = "unknown"
+STATUS_STARTING = "starting"
+STATUS_ALIVE = "alive"
+STATUS_STOPPED = "stopped"
+STATUS_DEAD = "dead"
+
+# folder for the packages in package_path folder (/var/lib/domogik/)
+PACKAGES_DIR = "packages"
+
+# domogik vendor id (for xpl)
+DMG_VENDOR_ID = "domogik"
 
 # time between each read of cpu/memory usage for process
 TIME_BETWEEN_EACH_PROCESS_STATUS = 60
-
-def load_plugin_library(name, element):
-    '''
-    Function to call in the bin part of each plugin to load the appropriate library :  from the sources in development mode and from packages folder in package mode
-    To do a : from foo import bar
-    Do      : bar = load_plugin_library("foo", "bar")
-    '''
-
-    # Read config files to get mode
-    cfg = Loader('domogik')
-    config = cfg.load()
-    conf = dict(config[1])
-    if conf.has_key('package_path'):
-        print("Load library from packages")
-        sys.path.append(conf["package_path"])
-        lib_path = "packages.xpl.lib." + name
-    else:
-        print("Load library from sources")
-        lib_path = "domogik.xpl.lib." + name
-    imp = __import__(lib_path, globals(), locals(), element)
-    ret = "imp." + element
-    return eval(ret)
 
 class XplPlugin(BasePlugin):
     '''
@@ -99,8 +93,16 @@ class XplPlugin(BasePlugin):
         Watcher(self)
         self.log.info("----------------------------------")
         self.log.info("Starting plugin '%s' (new manager instance)" % name)
-        self._is_manager = is_manager
         self._name = name
+
+        # MQ publisher
+        self._pub = MQPub(zmq.Context(), self._name)
+        self._pub.send_event('plugin', 
+                             {"type" : "plugin",
+                              "id" : self._name,
+                              "event" : STATUS_STARTING})
+
+        self._is_manager = is_manager
         cfg = Loader('domogik')
         my_conf = cfg.load()
         self._config_files = CONFIG_FILE
@@ -123,8 +125,11 @@ class XplPlugin(BasePlugin):
             self.myxpl = Manager(config['bind_interface'], broadcast = broadcast, plugin = self, nohub = nohub)
         else:
             self.myxpl = Manager(broadcast = broadcast, plugin = self, nohub = nohub)
-        self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
-                                                               'xpltype':'xpl-cmnd'})
+
+        # TODO : remove
+        #self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
+        #                                                       'xpltype':'xpl-cmnd'})
+
         self._reload_cb = reload_cb
         self._dump_cb = dump_cb
 
@@ -137,7 +142,17 @@ class XplPlugin(BasePlugin):
         #                                 self.myxpl)
         #self._process_info.start()
 
+
         self.log.debug("end single xpl plugin")
+
+    def send_stopped_status(self):
+        """ Send the STATUS_STOPPED status over the MQ
+        """ 
+        if hasattr(self, "_pub"):
+            self._pub.send_event('plugin', 
+                                 {"type" : "plugin",
+                                  "id" : self._name,
+                                  "event" : STATUS_STOPPED})
 
     def get_config_files(self):
        """ Return list of config files
@@ -154,10 +169,7 @@ class XplPlugin(BasePlugin):
        cfg = Loader('domogik')
        my_conf = cfg.load()
        config = dict(my_conf[1])
-       if config.has_key('package_path'):
-           path = "%s/domogik_packages/data/%s" % (config['package_path'], self._name)
-       else:
-           path = "%s/share/domogik/data/%s" % (config['src_prefix'], self._name)
+       path = "{0}/{1}/{2}_{3}/data/" % (config['package_path'], PACKAGES_DIR, "plugin", self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
                raise OSError("Can't write in directory %s" % path)
@@ -181,21 +193,30 @@ class XplPlugin(BasePlugin):
            raise IOError("Can't create a file in directory %s." % path)
        return path
 
-    def get_stats_files_directory(self):
-       """ Return the directory where a plugin developper can store data files
-       """
-       cfg = Loader('domogik')
-       my_conf = cfg.load()
-       config = dict(my_conf[1])
-       if config.has_key('package_path'):
-           path = "%s/domogik_packages/stats/%s" % (config['package_path'], self._name)
-       else:
-           path = "%s/share/domogik/stats/%s" % (config['src_prefix'], self._name)
-       return path
+    # TODO :remove
+    #def get_stats_files_directory(self):
+    #   """ Return the directory where a plugin developper can store data files
+    #   """
+    #   cfg = Loader('domogik')
+    #   my_conf = cfg.load()
+    #   config = dict(my_conf[1])
+    #   if config.has_key('package_path'):
+    #       path = "%s/domogik_packages/stats/%s" % (config['package_path'], self._name)
+    #   else:
+    #       path = "%s/share/domogik/stats/%s" % (config['src_prefix'], self._name)
+    #   return path
 
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()
         """
+        # TODO : why the dbmgr has no self.name defined ???????
+        # temporary set as unknown to avoir blocking bugs
+        if not hasattr(self, 'name'):
+            self.name = "unknown"
+        self._pub.send_event('plugin', 
+                             {"type" : "plugin",
+                              "id" : self.name,
+                              "event" : STATUS_ALIVE})
         self.myxpl.enable_hbeat(lock)
 
     def _send_process_info(self, pid, data):
@@ -225,46 +246,48 @@ class XplPlugin(BasePlugin):
         fil.write(str(pid))
         fil.close()
 
-    def _system_handler(self, message):
-        """ Handler for domogik system messages
-        """
-        cmd = message.data['command']
-        if not self._is_manager and cmd in ["stop", "reload", "dump"]:
-            self._client_handler(message)
-        else:
-            self._manager_handler(message)
+    # TODO : remove
+    #def _system_handler(self, message):
+    #    """ Handler for domogik system messages
+    #    """
+    #    cmd = message.data['command']
+    #    if not self._is_manager and cmd in ["stop", "reload", "dump"]:
+    #        self._client_handler(message)
+    #    else:
+    #        self._manager_handler(message)
 
-    def _client_handler(self, message):
-        """ Handle domogik system request for an xpl client
-        @param message : the Xpl message received
-        """
-        try:
-            cmd = message.data["command"]
-            plugin = message.data["plugin"]
-            host = message.data["host"]
-            if host != self.get_sanitized_hostname():
-                return
-        except KeyError as e:
-            self.log.error("command, plugin or host key does not exist : %s", e)
-            return
-        if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
-            self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
-            self._answer_stop()
-            self.force_leave()
-        elif cmd == "reload":
-            if self._reload_cb is None:
-                self.log.info("Someone asked to reload config of %s, but the plugin \
-                isn't able to do it." % self.get_plugin_name())
-            else:
-                self._reload_cb()
-        elif cmd == "dump":
-            if self._dump_cb is None:
-                self.log.info("Someone asked to dump config of %s, but the plugin \
-                isn't able to do it." % self.get_plugin_name())
-            else:
-                self._dump_cb()
-        else: #Command not known
-            self.log.info("domogik.system command not recognized : %s" % cmd)
+    # TODO : remove
+    #def _client_handler(self, message):
+    #    """ Handle domogik system request for an xpl client
+    #    @param message : the Xpl message received
+    #    """
+    #    try:
+    #        cmd = message.data["command"]
+    #        plugin = message.data["plugin"]
+    #        host = message.data["host"]
+    #        if host != self.get_sanitized_hostname():
+    #            return
+    #    except KeyError as e:
+    #        self.log.error("command, plugin or host key does not exist : %s", e)
+    #        return
+    #    if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
+    #        self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
+    #        self._answer_stop()
+    #        self.force_leave()
+    #    elif cmd == "reload":
+    #        if self._reload_cb is None:
+    #            self.log.info("Someone asked to reload config of %s, but the plugin \
+    #            isn't able to do it." % self.get_plugin_name())
+    #        else:
+    #            self._reload_cb()
+    #    elif cmd == "dump":
+    #        if self._dump_cb is None:
+    #            self.log.info("Someone asked to dump config of %s, but the plugin \
+    #            isn't able to do it." % self.get_plugin_name())
+    #        else:
+    #            self._dump_cb()
+    #    else: #Command not known
+    #        self.log.info("domogik.system command not recognized : %s" % cmd)
 
     def __del__(self):
         if hasattr(self, "log"):
@@ -272,18 +295,19 @@ class XplPlugin(BasePlugin):
             # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
-    def _answer_stop(self):
-        """ Ack a stop request
-        """
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("domogik.system")
-        #mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-        #    "host": self.get_sanitized_hostname()})
-        mess.add_data({"command":"stop", 
-                       "host": self.get_sanitized_hostname(),
-                       "plugin": self.get_plugin_name()})
-        self.myxpl.send(mess)
+    # TODO : remove
+    #def _answer_stop(self):
+    #    """ Ack a stop request
+    #    """
+    #    mess = XplMessage()
+    #    mess.set_type("xpl-trig")
+    #    mess.set_schema("domogik.system")
+    #    #mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
+    #    #    "host": self.get_sanitized_hostname()})
+    #    mess.add_data({"command":"stop", 
+    #                   "host": self.get_sanitized_hostname(),
+    #                   "plugin": self.get_plugin_name()})
+    #    self.myxpl.send(mess)
 
     def _send_hbeat_end(self):
         """ Send the hbeat.end message
@@ -310,6 +334,8 @@ class XplPlugin(BasePlugin):
         '''
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
+        # send stopped status over the MQ
+        self.send_stopped_status()
         # send hbeat.end message
         self._send_hbeat_end()
         self.get_stop().set()

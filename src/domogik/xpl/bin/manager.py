@@ -74,10 +74,16 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, PACKAGES_DIR, DMG_VENDOR_ID
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
+
+import zmq
+from domogik.mq.pubsub.subscriber import MQAsyncSub
+from zmq.eventloop.ioloop import IOLoop
+from domogik.mq.reqrep.worker import MQRep
+
 
 ##### packages management #####
 # TODO : use later : package management related
@@ -96,20 +102,13 @@ from ConfigParser import NoSectionError
 
 ### constants
 FIFO_DIR = "/var/run/domogik/"
-DMG_VENDOR_ID = "domogik"
-PACKAGES_DIR = "packages"
 
-# clients status
-STATUS_UNKNOWN = "unknown"
-STATUS_ALIVE = "alive"
-STATUS_STOPPED = "stopped"
-STATUS_DEAD = "dead"
 
 PYTHON = sys.executable
 
 
 
-class Manager(XplPlugin):
+class Manager(XplPlugin, MQRep):
     """ Domogik manager
     """
 
@@ -144,13 +143,14 @@ class Manager(XplPlugin):
 
         ### Call the XplPlugin init  
         XplPlugin.__init__(self, name = 'manager', parser=parser)
+        MQRep.__init__(self, zmq.Context(), 'manager')
 
         ### Logger
         self.log.info("Manager startup")
-        self.log.info("Host : %s" % self.get_sanitized_hostname())
-        self.log.info("Start dbmgr : %s" % self.options.start_dbmgr)
-        self.log.info("Start rest : %s" % self.options.start_rest)
-        self.log.info("Start xplevent : %s" % self.options.start_xplevent)
+        self.log.info("Host : {0}".format(self.get_sanitized_hostname()))
+        self.log.info("Start dbmgr : {0}".format(self.options.start_dbmgr))
+        self.log.info("Start rest : {0}".format(self.options.start_rest))
+        self.log.info("Start xplevent : {0}".format(self.options.start_xplevent))
 
         ### create a Fifo to communicate with the init script
         self.log.info("Create the figo to communicate with the init script")
@@ -169,10 +169,10 @@ class Manager(XplPlugin):
             # packages module path : /var/lib/domogik
             self._package_module_path = conf['package_path']
             # packages installation path : /var/lib/domogik/packages
-            self._package_path = "%s/%s" % (self._package_module_path, PACKAGES_DIR)
-            self.log.info("Package path : %s" % self._package_path)
+            self._package_path = "{0}/{1}".format(self._package_module_path, PACKAGES_DIR)
+            self.log.info("Package path : {0}".format(self._package_path))
         except:
-            self.log.error("Error while reading the configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
+            self.log.error("Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
 
         ### Create the clients list
@@ -218,16 +218,16 @@ class Manager(XplPlugin):
             self.log.error("Error while checking available packages. Exiting!")
             sys.exit(1)
         for pkg in pkg_list:
-            self.log.debug("Package available : %s" % pkg)
+            self.log.debug("Package available : {0}".format(pkg))
             [type, id] = pkg.split("_")
-            self.log.debug("Type : %s      / Id : %s" % (type, id))
+            self.log.debug("Type : {0}     / Id : {1}".format(type, id))
           
             ### type = plugin
             if type == "plugin":
                 if self._plugins.has_key(id):
-                    self.log.debug("The plugin '%s' is already registered." % id)
+                    self.log.debug("The plugin '{0}' is already registered.".format(id))
                 else:
-                    self.log.info("New plugin available : %s" % id)
+                    self.log.info("New plugin available : {0}".format(id))
                     self._plugins[id] = Plugin(id, 
                                                self.get_sanitized_hostname(), 
                                                self._clients, 
@@ -237,19 +237,19 @@ class Manager(XplPlugin):
                     # currently we will start each plugin on startup as the manager is still in dev
                     pid = self._plugins[id].start()
                     if pid:
-                        self.log.info("Plugin %s started" % id)
+                        self.log.info("Plugin {0} started".format(id))
                     else:
-                        self.log.error("Plugin %s failed to start" % id)
+                        self.log.error("Plugin {0} failed to start".format(id))
             
 
 
     def _create_fifo(self):
         """ Create the fifo
         """
-        if os.path.exists("%s/dmg-manager-state" % FIFO_DIR):
-            mode = os.stat("%s/dmg-manager-state" % FIFO_DIR).st_mode
+        if os.path.exists("{0}/dmg-manager-state".format(FIFO_DIR)):
+            mode = os.stat("0}/dmg-manager-state".format(FIFO_DIR)).st_mode
             if mode & stat.S_IFIFO == stat.S_IFIFO:
-                self._state_fifo = open("%s/dmg-manager-state" % FIFO_DIR,"w")    
+                self._state_fifo = open("{0}/dmg-manager-state".format(FIFO_DIR),"w")    
                 self._startup_count = 0
                 self._startup_count_lock = Lock()
                 self._write_fifo("NONE","\n")
@@ -261,13 +261,13 @@ class Manager(XplPlugin):
         """
         self._inc_startup_lock()
         component = CoreComponent(id, self.get_sanitized_hostname(), self._clients)
-        self._write_fifo("INFO", "Start %s..." % id)
+        self._write_fifo("INFO", "Start {0}...".format(id))
         pid = component.start()
         if pid:
-            self._write_fifo("OK", "%s started with pid %s\n" % (id, pid))
+            self._write_fifo("OK", "{0} started with pid {1}\n".format(id, pid))
             self._dec_startup_lock()
         else:
-            self._write_fifo("ERROR", "%s failed to start. Please check logs" % id)
+            self._write_fifo("ERROR", "{0} failed to start. Please check logs".format(id))
             return False
         return True
 
@@ -292,7 +292,7 @@ class Manager(XplPlugin):
             if level == "NONE":
                 self._state_fifo.write(message)
             else:
-                self._state_fifo.write("%s[%s] %s %s" % (colors[level], level, message, colors["ENDC"]))
+                self._state_fifo.write("{0}[{1}] {2} {3}".format(colors[level], level, message, colors["ENDC"]))
             self._state_fifo.flush()
     
     def _inc_startup_lock(self):
@@ -300,22 +300,22 @@ class Manager(XplPlugin):
         """
         if self._state_fifo == None:
             return
-        self.log.info("lock++ acquire : %s" % self._startup_count)
+        self.log.info("lock++ acquire : {0}".format(self._startup_count))
         self._startup_count_lock.acquire()
         self._startup_count = self._startup_count + 1
         self._startup_count_lock.release()
-        self.log.info("lock++ released: %s" % self._startup_count)
+        self.log.info("lock++ released: {0}".format(self._startup_count))
     
     def _dec_startup_lock(self):
         """ Decrement self._startup_count
         """
         if self._state_fifo == None:
             return
-        self.log.info("lock-- acquire : %s" % self._startup_count)
+        self.log.info("lock-- acquire : {0}".format(self._startup_count))
         self._startup_count_lock.acquire()
         self._startup_count = self._startup_count - 1
         self._startup_count_lock.release()
-        self.log.info("lock-- released: %s" % self._startup_count)
+        self.log.info("lock-- released: {0}".format(self._startup_count))
 
 
     def _list_packages(self):
@@ -329,12 +329,28 @@ class Manager(XplPlugin):
                 for dir in dirs:
                     list.append(dir)
         except:
-            msg = "Error accessing packages directory : %s. You should create it" % str(traceback.format_exc())
+            msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
             self.log.error(msg)
             return False, None
         return True, list
 
 
+    def on_mdp_request(self, msg):
+        """ Handle Requests over MQ 
+            @param msg : MQ req message
+        """
+        self.log.debug("MQ Request received : {0}" . format(str(msg)))
+        ### client.list.get
+        # retrieve the clients list
+        if msg._action == "client.list.get":
+            self._mdp_reply_client_list()
+
+    def _mdp_reply_client_list(self):
+        msg = MQMessage()
+        msg.setaction('client.list.result')
+        msg.adddata(self._clients.get_list())
+        print msg.get()
+        self.reply(msg.get())
 
 
 
@@ -359,7 +375,7 @@ class GenericComponent():
         ### init vars
         self.id = id
         self.host = host
-        self.xpl_source = "%s-%s.%s" % (DMG_VENDOR_ID, self.id, self.host)
+        self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.id, self.host)
         self.type = "unknown - not setted yet"
         self._clients = clients
 
@@ -373,6 +389,13 @@ class GenericComponent():
         """
         self._clients.add(self.type, self.id, self.xpl_source, self.data)
         self._clients.set_status(self.xpl_source, STATUS_STOPPED)
+
+
+    def set_status(self, new_status):
+        """ set the status of the component
+            @param status : new status
+        """
+        self._clients.set_status(self.xpl_source, new_status)
 
 
 
@@ -393,7 +416,7 @@ class CoreComponent(GenericComponent):
             @param clients : clients list 
         """
         GenericComponent.__init__(self, id = id, host = host, clients = clients)
-        self.log.info("New core component : %s" % self.id)
+        self.log.info("New core component : {0}".format(self.id))
 
         ### set the component type
         self.type = "core"
@@ -410,9 +433,9 @@ class CoreComponent(GenericComponent):
             @return : None if ko
                       the pid if ok
         """
-        self.log.info("Request to start core component : %s" % self.id)
+        self.log.info("Request to start core component : {0}".format(self.id))
         pid = self.exec_component("domogik.xpl.bin")
-        self._clients.set_status(self.xpl_source, STATUS_ALIVE)
+        self.set_status(STATUS_ALIVE)
        
         # TODO : add a step to check if the component successfully started
 
@@ -424,16 +447,16 @@ class CoreComponent(GenericComponent):
             @param python_component_basepackage : domogik.xpl.bin, packages
         """
         ### get python package path for the component
-        pkg = "%s.%s" % (python_component_basepackage, self.id)
-        self.log.debug("Try to import module : %s" % pkg)
+        pkg = "{0}.{1}".format(python_component_basepackage, self.id)
+        self.log.debug("Try to import module : {0}".format(pkg))
         __import__(pkg)
         component_path = sys.modules[pkg].__file__
         
         ### Generate command
-        cmd = "%s %s" % (PYTHON, component_path)
+        cmd = "{0} {1}".format(PYTHON, component_path)
  
         ### Execute command
-        self.log.info("Execute command : %s" % cmd)
+        self.log.info("Execute command : {0}".format(cmd))
         subp = Popen(cmd, 
                      shell=True)
         pid = subp.pid
@@ -443,8 +466,9 @@ class CoreComponent(GenericComponent):
 
 
 
-class Plugin(GenericComponent):
+class Plugin(GenericComponent, MQAsyncSub):
     """ This helps to handle plugins discovered on the host filesystem
+        The MQAsyncSub helps to set the status 
     """
 
     def __init__(self, id, host, clients, package_module_path, package_path):
@@ -456,7 +480,7 @@ class Plugin(GenericComponent):
             @param package_path : path in which are stored the packages : /var/lib/domogik/packages/
         """
         GenericComponent.__init__(self, id = id, host = host, clients = clients)
-        self.log.info("New plugin : %s" % self.id)
+        self.log.info("New plugin : {0}".format(self.id))
 
         ### set the component type
         self.type = "plugin"
@@ -472,19 +496,33 @@ class Plugin(GenericComponent):
         ### register the plugin as a client
         self.register_component()
 
+        ### subscribe the the MQ for category = plugin and id = self.id
+        MQAsyncSub.__init__(self, zmq.Context(), 'manager', 'plugin')
+        IOLoop.instance().start()
+
+
+    # when a message is received from the MQ
+    def on_message(self, msgid, content):
+        print("New pub message {0}".format(msgid))
+        print("{0}".format(content))
+        if content["id"] == self.id:
+            self.log.info("New status received from {0} : {1}".format(self.id, content["event"]))
+            self.set_status(content["event"])
+  
+
 
     def start(self):
         """ to call to start the plugin
             @return : None if ko
                       the pid if ok
         """
-        self.log.info("Request to start plugin : %s" % self.id)
-        pid = self.exec_component(py_file = "%s/plugin-%s/bin/%s.py" % (self._package_path, self.id, self.id), \
+        self.log.info("Request to start plugin : {0}".format(self.id))
+        pid = self.exec_component(py_file = "{0}/plugin-{1}/bin/{2}.py".format(self._package_path, self.id, self.id), \
                                   env_pythonpath = self._package_module_path)
 
         # TODO : add a step to check if the component successfully started
 
-        self._clients.set_status(self.xpl_source, STATUS_ALIVE)
+        self.set_status(STATUS_ALIVE)
         return pid
 
 
@@ -496,11 +534,11 @@ class Plugin(GenericComponent):
         ### Generate command
         cmd = ""
         if env_pythonpath:
-            cmd += "export PYTHONPATH=%s && " % env_pythonpath
-        cmd += "%s %s" % (PYTHON, py_file)
+            cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
+        cmd += "{0} {1}".format(PYTHON, py_file)
  
         ### Execute command
-        self.log.info("Execute command : %s" % cmd)
+        self.log.info("Execute command : {0}".format(cmd))
         subp = Popen(cmd, 
                      shell=True)
         pid = subp.pid
@@ -512,9 +550,10 @@ class Plugin(GenericComponent):
         """ request the plugin to stop
             check if the plugin stops
         """
-        self.log.info("Request to stop plugin : %s" % self.id)
+        self.log.info("Request to stop plugin : {0}".format(self.id))
         # TODO : request to stop plugin
         # TODO : check if the plugin has stopped
+        #self.set_status(STATUS_STOPPED)
  
 
 
@@ -558,7 +597,7 @@ class Clients():
             @param xpl_source : client xpl source
             @param data : client data
         """
-        self.log.info("Add new client : type=%s, id=%s, xpl_source=%s, data=%s" % (type, id, xpl_source, str(data)))
+        self.log.info("Add new client : type={0}, id={1}, xpl_source={2}, data={3}".format(type, id, xpl_source, str(data)))
         client = { "type" : type,
                    "id" : id,
                    "status" : STATUS_UNKNOWN,
@@ -568,16 +607,21 @@ class Clients():
     def set_status(self, xpl_source, new_status):
         """ Set a new status to a client
         """
-        self.log.debug("Try to set a new status : %s => %s" % (xpl_source, new_status))
-        if new_status not in (STATUS_UNKNOWN, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD):
-            self.log.error("Invalid status : %s" % new_status)
+        self.log.debug("Try to set a new status : {0} => {1}".format(xpl_source, new_status))
+        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD):
+            self.log.error("Invalid status : {0}".format(new_status))
             return
         old_status = self._clients[xpl_source]['status']
         if old_status == new_status:
-            self.log.debug("The status was already %s : nothing to do" % old_status) 
+            self.log.debug("The status was already {0} : nothing to do".format(old_status))
             return
         self._clients[xpl_source]['status'] = new_status
-        self.log.info("Status set : %s => %s" % (xpl_source, new_status))
+        self.log.info("Status set : {0} => {1}".format(xpl_source, new_status))
+
+    def get_list(self):
+        """ Return the clients list
+        """
+        return self._clients
 
 
 

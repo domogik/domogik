@@ -1,0 +1,36 @@
+==================
+Manager MQ dialogs
+==================
+
+Plugins (pub) => Manager (sub)
+==============================
+
+Each domogik plugin sends over the MQ its status. The manager subscribe to the category *plugin* to get the plugin status in real time.
+
+On plugin startup (see XplPlugin.__init__()), a plugin sends the *STATUS_STARTING* (*starting* value): ::
+
+    self._pub.send_event('plugin',
+                         {"type" : "plugin",
+                          "id" : self._name,
+                          "event" : STATUS_STARTING})
+
+When the plugin is ready and *XplPlugin.enable_hbeat()* is called, the *STATUS_ALIVE* (*alive* value) is sent: ::
+
+    self._pub.send_event('plugin',
+                         {"type" : "plugin",
+                          "id" : self.name,
+                          "event" : STATUS_ALIVE})
+
+..todo ::
+
+    send a stopped status 
+
+
+
+In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin* category and when a message is catched, if *type == 'plugin' and id == <plugin id>* then the plugin status is set to the catched value.
+
+
+Plugins (pub) => User interfaces (sub)
+======================================
+
+The UI should subscribe in the same way than the manager to the *plugin* category and update the plugin status by catching the messages from this category.
