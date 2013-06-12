@@ -24,25 +24,25 @@ class MQMessage():
         if data:
             self._data = data
 
-    def setaction(self, action):
+    def set_action(self, action):
         """ setAction
             sets the action field
         """
         self._action = action
 
-    def adddata(self, key, value):
+    def add_data(self, key, value):
         """ addData
             append a data element to the stack
         """
         self._data[key] = value
 
-    def getaction(self):
+    def get_action(self):
         """ getAction
             returns the current action
         """
         return self._action
 
-    def getdata(self):
+    def get_data(self):
         """ getData
             returns the current data
         """
