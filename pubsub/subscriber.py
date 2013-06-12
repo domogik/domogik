@@ -47,7 +47,7 @@ MSG_VERSION = "0_1"
 
 class MQSyncSub():
     def __init__(self, context, caller_id, *category_filters):
-        self.log = logger.Logger('mq_sync_sub').get_logger()
+        self.log = logger.Logger('mq_sync_sub').get_logger('mq_sync_sub')
         self.s_recv = context.socket(zmq.SUB)
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
@@ -86,7 +86,7 @@ class MQSyncSub():
 
 class MQAsyncSub():
     def __init__(self, context, caller_id, category_filters):
-        self.log = logger.Logger('mq_async_sub').get_logger()
+        self.log = logger.Logger('mq_async_sub').get_logger('mq_async_sub')
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
         self.caller_id = caller_id
