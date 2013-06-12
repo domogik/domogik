@@ -83,6 +83,8 @@ import zmq
 from domogik.mq.pubsub.subscriber import MQAsyncSub
 from zmq.eventloop.ioloop import IOLoop
 from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.message import MQMessage
+
 
 
 ##### packages management #####
@@ -143,7 +145,6 @@ class Manager(XplPlugin, MQRep):
 
         ### Call the XplPlugin init  
         XplPlugin.__init__(self, name = 'manager', parser=parser)
-        MQRep.__init__(self, zmq.Context(), 'manager')
 
         ### Logger
         self.log.info("Manager startup")
@@ -208,6 +209,13 @@ class Manager(XplPlugin, MQRep):
         # wait for 1 minute or more between each check
         # in 'install' mode, when a new package will be installed, a signal will be sent over MQ, so we will be able to call this function when needed
         self._check_available_packages()
+
+        ### Start the MQ for rep/req
+        print "@@@@@ BEFORE"
+        MQRep.__init__(self, zmq.Context(), 'manager')
+        IOLoop.instance().start() 
+        print "@@@@@ AFTER"
+
 
 
     def _check_available_packages(self):
@@ -347,9 +355,8 @@ class Manager(XplPlugin, MQRep):
 
     def _mdp_reply_client_list(self):
         msg = MQMessage()
-        msg.setaction('client.list.result')
-        msg.adddata(self._clients.get_list())
-        print msg.get()
+        msg.set_action('client.list.result')
+        msg.add_data('list', self._clients.get_list())
         self.reply(msg.get())
 
 
@@ -497,8 +504,11 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.register_component()
 
         ### subscribe the the MQ for category = plugin and id = self.id
-        MQAsyncSub.__init__(self, zmq.Context(), 'manager', 'plugin')
+        # TODO : move this in Manager later to avoir to get to much threads
+        MQAsyncSub.__init__(self, zmq.Context(), 'manager', ['plugin'])
+        print "@@@BEFORE IOLoop"
         IOLoop.instance().start()
+        print "@@@AFTER IOLoop"
 
 
     # when a message is received from the MQ

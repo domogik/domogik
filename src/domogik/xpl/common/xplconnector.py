@@ -267,7 +267,9 @@ class Manager:
                     raise
             else:
                 self._fragment_uid = self._fragment_uid + 1
-            self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
+            # TODO : reactivate
+            # commented by fritz in 0.4 for dev purpose
+            #self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
             self.p.log.warning("Error during send of message")
             self.p.log.debug(traceback.format_exc())
