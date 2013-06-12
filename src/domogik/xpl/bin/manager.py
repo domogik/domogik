@@ -84,6 +84,7 @@ from domogik.mq.pubsub.subscriber import MQAsyncSub
 from zmq.eventloop.ioloop import IOLoop
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
+from domogik.mq.pubsub.publisher import MQPub
 
 
 
@@ -176,6 +177,10 @@ class Manager(XplPlugin, MQRep):
             self.log.error("Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
 
+        ### MQ
+        self._zmq_context = zmq.Context()
+        MQRep.__init__(self, self._zmq_context, 'manager')
+
         ### Create the clients list
         self._clients = Clients()
         # note that a core component or plugin are also clients but for the self._clients object is managed directly from the Plugin and CoreComponent objects
@@ -210,11 +215,8 @@ class Manager(XplPlugin, MQRep):
         # in 'install' mode, when a new package will be installed, a signal will be sent over MQ, so we will be able to call this function when needed
         self._check_available_packages()
 
-        ### Start the MQ for rep/req
-        print "@@@@@ BEFORE"
-        MQRep.__init__(self, zmq.Context(), 'manager')
+        ### Start the MQ 
         IOLoop.instance().start() 
-        print "@@@@@ AFTER"
 
 
 
@@ -240,14 +242,15 @@ class Manager(XplPlugin, MQRep):
                                                self.get_sanitized_hostname(), 
                                                self._clients, 
                                                self._package_module_path,
-                                               self._package_path)
+                                               self._package_path,
+                                               self._zmq_context)
                     # TODO : start only if the plugin is configured to
                     # currently we will start each plugin on startup as the manager is still in dev
-                    pid = self._plugins[id].start()
-                    if pid:
-                        self.log.info("Plugin {0} started".format(id))
-                    else:
-                        self.log.error("Plugin {0} failed to start".format(id))
+                    #pid = self._plugins[id].start()
+                    #if pid:
+                    #    self.log.info("Plugin {0} started".format(id))
+                    #else:
+                    #    self.log.error("Plugin {0} failed to start".format(id))
             
 
 
@@ -350,13 +353,28 @@ class Manager(XplPlugin, MQRep):
         self.log.debug("MQ Request received : {0}" . format(str(msg)))
         ### client.list.get
         # retrieve the clients list
-        if msg._action == "client.list.get":
-            self._mdp_reply_client_list()
+        if msg._action == "clients.list.get":
+            self._mdp_reply_clients_list()
+        # retrieve the clients details
+        if msg._action == "clients.detail.get":
+            self._mdp_reply_clients_detail()
 
-    def _mdp_reply_client_list(self):
+
+    def _mdp_reply_clients_list(self):
+        """ Reply on the MQ
+        """
         msg = MQMessage()
-        msg.set_action('client.list.result')
-        msg.add_data('list', self._clients.get_list())
+        msg.set_action('clients.list.result')
+        msg.add_data('clients', self._clients.get_list())
+        self.reply(msg.get())
+
+
+    def _mdp_reply_clients_detail(self):
+        """ Reply on the MQ
+        """
+        msg = MQMessage()
+        msg.set_action('clients.detail.result')
+        msg.add_data('clients', self._clients.get_detail())
         self.reply(msg.get())
 
 
@@ -394,7 +412,7 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.type, self.id, self.xpl_source, self.data)
+        self._clients.add(self.host, self.type, self.id, self.xpl_source, self.data)
         self._clients.set_status(self.xpl_source, STATUS_STOPPED)
 
 
@@ -478,13 +496,14 @@ class Plugin(GenericComponent, MQAsyncSub):
         The MQAsyncSub helps to set the status 
     """
 
-    def __init__(self, id, host, clients, package_module_path, package_path):
+    def __init__(self, id, host, clients, package_module_path, package_path, zmq_context):
         """ Init a plugin 
             @param id : plugin id (ipx800, onewire, ...)
             @param host : hostname
             @param clients : clients list 
             @param package_module_path : path for the base python module for packages : /var/lib/domogik/
             @param package_path : path in which are stored the packages : /var/lib/domogik/packages/
+            @param zmq_context : zmq context
         """
         GenericComponent.__init__(self, id = id, host = host, clients = clients)
         self.log.info("New plugin : {0}".format(self.id))
@@ -496,19 +515,22 @@ class Plugin(GenericComponent, MQAsyncSub):
         self._package_path = package_path
         self._package_module_path = package_module_path
 
+        ### zmq context
+        self._zmq_context = zmq_context
+
         ### get the plugin data (from the json file)
         # TODO
         self.data = {}
+
+        ### check if the plugin is configured (get key 'configured' in database over queryconfig)
+        # TODO
+        self.configured = False
 
         ### register the plugin as a client
         self.register_component()
 
         ### subscribe the the MQ for category = plugin and id = self.id
-        # TODO : move this in Manager later to avoir to get to much threads
-        MQAsyncSub.__init__(self, zmq.Context(), 'manager', ['plugin'])
-        print "@@@BEFORE IOLoop"
-        IOLoop.instance().start()
-        print "@@@AFTER IOLoop"
+        MQAsyncSub.__init__(self, self._zmq_context, 'manager', ['plugin'])
 
 
     # when a message is received from the MQ
@@ -527,7 +549,7 @@ class Plugin(GenericComponent, MQAsyncSub):
                       the pid if ok
         """
         self.log.info("Request to start plugin : {0}".format(self.id))
-        pid = self.exec_component(py_file = "{0}/plugin-{1}/bin/{2}.py".format(self._package_path, self.id, self.id), \
+        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._package_path, self.id, self.id), \
                                   env_pythonpath = self._package_module_path)
 
         # TODO : add a step to check if the component successfully started
@@ -575,15 +597,19 @@ class Clients():
           xpl_source : for a domogik plugin : domogik-<id>.<hostname>
                        for an external member : <vendor id>-<device id>.<instance>
         { xplsource = { 
+                        host : hostname or ip
                         type : plugin, ...
                         id : package name (onewire, ipx800, ...)
                         status : alive, stopped, dead, unknown
+                        configured : True/False (plugins) or None (other types)
                         data : { 
                                  ....
                                }
                        },
           ... = {}
         }
+
+        The data part is related to the type
 
         WARNING : the 'primary key' is the xpl_source as you may have several clients with the same {type,id}
         So, all updates will be done on a xpl_source
@@ -594,25 +620,39 @@ class Clients():
         """
         ### init vars
         self._clients = {}
+        self._clients_with_details = {}
 
         ### init logger
         log = logger.Logger('manager')
         self.log = log.get_logger('manager')
         self.log.info("Clients initialisation")
+        self._pub = MQPub(zmq.Context(), 'manager')
 
-    def add(self, type, id, xpl_source, data):
+    def add(self, host, type, id, xpl_source, data, configured = None):
         """ Add a client to the list of clients
+            @param host : client hostname or ip or dns
             @param type : client type
             @param id : client id
             @param xpl_source : client xpl source
-            @param data : client data
+            @param data : client data : only for clients details
+            @param configured : True/False : for a plugin : True if the plugin is configured, else False
+                                None : for type != 'plugin'
         """
-        self.log.info("Add new client : type={0}, id={1}, xpl_source={2}, data={3}".format(type, id, xpl_source, str(data)))
-        client = { "type" : type,
+        self.log.info("Add new client : host={0}, type={1}, id={2}, xpl_source={3}, data={4}".format(host, type, id, xpl_source, str(data)))
+        client = { "host" : host,
+                   "type" : type,
                    "id" : id,
                    "status" : STATUS_UNKNOWN,
+                   "configured" : configured}
+        client_with_details = { "host" : host,
+                   "type" : type,
+                   "id" : id,
+                   "status" : STATUS_UNKNOWN,
+                   "configured" : configured,
                    "data" : data}
         self._clients[xpl_source] = client
+        self._clients_with_details[xpl_source] = client_with_details
+        self._publish_update()
 
     def set_status(self, xpl_source, new_status):
         """ Set a new status to a client
@@ -627,11 +667,26 @@ class Clients():
             return
         self._clients[xpl_source]['status'] = new_status
         self.log.info("Status set : {0} => {1}".format(xpl_source, new_status))
+        self._publish_update()
 
     def get_list(self):
         """ Return the clients list
         """
         return self._clients
+
+    def get_detail(self):
+        """ Return the clients details
+        """
+        return self._clients_with_details
+
+    def _publish_update(self):
+        """ Publish the clients list update over the MQ
+        """
+        # MQ publisher
+        self._pub.send_event('clients.list', 
+                             self._clients)
+        self._pub.send_event('clients.detail', 
+                             self._clients_with_details)
 
 
 
