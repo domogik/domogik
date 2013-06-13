@@ -63,9 +63,6 @@ import math
 import tempfile
 import re
 
-# TODO : needed ?
-#import domogik.xpl.bin
-
 from threading import Event, Thread, Lock, Semaphore
 from optparse import OptionParser
 from subprocess import Popen, PIPE
@@ -74,7 +71,7 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, PACKAGES_DIR, DMG_VENDOR_ID
+from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, PACKAGES_DIR, DMG_VENDOR_ID
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
@@ -87,12 +84,12 @@ from domogik.mq.message import MQMessage
 from domogik.mq.pubsub.publisher import MQPub
 
 
+from domogik.common.packagejson import PackageJson, PackageException
 
 ##### packages management #####
 # TODO : use later : package management related
 #from distutils2.version import VersionPredicate, IrrationalVersionError
 #from domogik.common.packagemanager import PackageManager, PKG_PART_XPL
-#from domogik.common.packagejson import PackageJson, PackageException
 ## the try/except it to handle http://bugs.python.org/issue14317
 #try:
 #    from distutils2.index.simple import Crawler
@@ -409,11 +406,14 @@ class GenericComponent():
         self.log = log.get_logger('manager')
 
 
-    def register_component(self):
+    def register_component(self, status = None):
         """ register the component as a client
+            @param status : set a status
         """
+        if status == None:
+            status = STATUS_UNKNOWN
         self._clients.add(self.host, self.type, self.id, self.xpl_source, self.data)
-        self._clients.set_status(self.xpl_source, STATUS_STOPPED)
+        self._clients.set_status(self.xpl_source, status)
 
 
     def set_status(self, new_status):
@@ -520,14 +520,28 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### get the plugin data (from the json file)
         # TODO
+        status = None
         self.data = {}
+        try:
+            self.log.info("Plugin {0} : read the json file and validate id".format(self.id))
+            pkg_json = PackageJson(pkg_type = "plugin", id = self.id)
+            # check if json is valid
+            if pkg_json.validate() == False:
+                status = STATUS_INVALID
+                # TODO : how to get the reason ?
+                self.log.error("Plugin {0} : invalid json file".format(self.id))
+            else:
+                self.data = pkg_json.get_json()
+        except:
+            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.id, traceback.format_exc()))
+            status = STATUS_INVALID
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
         # TODO
         self.configured = False
 
         ### register the plugin as a client
-        self.register_component()
+        self.register_component(status = status)
 
         ### subscribe the the MQ for category = plugin and id = self.id
         MQAsyncSub.__init__(self, self._zmq_context, 'manager', ['plugin'])
@@ -658,7 +672,7 @@ class Clients():
         """ Set a new status to a client
         """
         self.log.debug("Try to set a new status : {0} => {1}".format(xpl_source, new_status))
-        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD):
+        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID):
             self.log.error("Invalid status : {0}".format(new_status))
             return
         old_status = self._clients[xpl_source]['status']
@@ -666,6 +680,7 @@ class Clients():
             self.log.debug("The status was already {0} : nothing to do".format(old_status))
             return
         self._clients[xpl_source]['status'] = new_status
+        self._clients_with_details[xpl_source]['status'] = new_status
         self.log.info("Status set : {0} => {1}".format(xpl_source, new_status))
         self._publish_update()
 

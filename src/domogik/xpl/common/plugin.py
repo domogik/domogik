@@ -54,6 +54,7 @@ STATUS_STARTING = "starting"
 STATUS_ALIVE = "alive"
 STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
+STATUS_INVALID = "invalid"
 
 # folder for the packages in package_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"

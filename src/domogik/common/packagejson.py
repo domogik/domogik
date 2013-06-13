@@ -39,6 +39,7 @@ import traceback
 import urllib2
 import datetime
 import json
+from domogik.xpl.common.plugin import PACKAGES_DIR
 
 
 
@@ -78,49 +79,37 @@ class PackageJson():
                 conf = dict(config[1])
 
                 if pkg_type == "plugin":
-                    if conf.has_key('package_path'):
-                        json_directory = "%s/domogik_packages/plugins/" % (conf['package_path'])
-                    else:
-                        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/plugins/")
-                elif pkg_type == "external":
-                    if conf.has_key('package_path'):
-                        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
-                    else:
-                        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
+                    json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['package_path'], PACKAGES_DIR, pkg_type, id)
+                    icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['package_path'], PACKAGES_DIR, pkg_type, id)
+                # TODO : reactivate later
+                #elif pkg_type == "external":
+                #    if conf.has_key('package_path'):
+                #        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
+                #    else:
+                #        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '%s' doesn't exists" % pkg_type)
-                json_file = "%s/%s.json" % (json_directory, id)
+                #json_file = "%s/%s.json" % (json_directory, id)
 
-                self.info_file = json_file
-                self.json = json.load(open(self.info_file))
+                self.json = json.load(open(json_file))
 
-                # icon file
-                if conf.has_key('package_path'):
-                    self.icon_file = "%s/domogik_packages/design/%s/%s/icon.png" % (conf['package_path'], pkg_type, id)
-                else:
-                    self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['src_prefix'], "share/domogik/design/", pkg_type, id)
-    
             elif path != None:
                 json_file = path
-                self.info_file = json_file
-                self.json = json.load(open(self.info_file))
-                self.icon_file = None
+                icon_file = None
+                self.json = json.load(open(json_file))
 
             elif url != None:
                 json_file = url
-                self.info_file = json_file
+                icon_file = None
                 json_data = urllib2.urlopen(json_file)
                 self.json = json.load(xml_data)
-                self.icon_file = None
 
             self.validate()
 
             # complete json
             self.json["identity"]["fullname"] = "%s-%s" % (self.json["identity"]["type"],
                                                            self.json["identity"]["id"])
-            self.json["identity"]["info_file"] = self.info_file
-            self.json["identity"]["icon_file"] = self.icon_file
-            self.json["all_files"] = self.json["files"]
+            self.json["identity"]["icon_file"] = icon_file
         except PackageException as exp:
             raise PackageException(exp.value)
         except:
@@ -176,7 +165,7 @@ class PackageJson():
     def _validate_02(self):
         try:
             #check that all main keys are in the file
-            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "files", "json_version"]
+            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
             self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules", "external"])
             #validate the device_type
             for devtype in self.json["device_types"]:
@@ -269,6 +258,11 @@ class PackageJson():
         my_file.write(json.dumps(my_json))
         my_file.close()
 
+    def get_json(self):
+        """ Return the json data
+        """
+        return self.json
+
     def display(self):
         """ Display xml data in a fine way
         """
@@ -284,9 +278,6 @@ class PackageJson():
         print("Author              : %s" % self.json["identity"]["author"])
         print("Author's email      : %s" % self.json["identity"]["author_email"])
         print("Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
-        print("----- Package files -------------------------------------")
-        for my_file in self.json["files"]:
-            print("- %s" % my_file)
         print("---------------------------------------------------------")
 
     def find_xplstats_for_device_type(self, devtype):
