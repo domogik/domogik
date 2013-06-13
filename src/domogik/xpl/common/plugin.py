@@ -45,6 +45,9 @@ from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 from domogik.mq.pubsub.publisher import MQPub
+from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.message import MQMessage
+from zmq.eventloop.ioloop import IOLoop
 import zmq
 
 
@@ -52,6 +55,7 @@ import zmq
 STATUS_UNKNOWN = "unknown"
 STATUS_STARTING = "starting"
 STATUS_ALIVE = "alive"
+STATUS_STOP_REQUEST = "stop-request"
 STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
@@ -65,7 +69,7 @@ DMG_VENDOR_ID = "domogik"
 # time between each read of cpu/memory usage for process
 TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
-class XplPlugin(BasePlugin):
+class XplPlugin(BasePlugin, MQRep):
     '''
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL plugin
@@ -96,12 +100,17 @@ class XplPlugin(BasePlugin):
         self.log.info("Starting plugin '%s' (new manager instance)" % name)
         self._name = name
 
-        # MQ publisher
-        self._pub = MQPub(zmq.Context(), self._name)
+        # MQ publisher and REP
+        self._zmq = zmq.Context()
+        self._pub = MQPub(self._zmq, self._name)
         self._pub.send_event('plugin', 
                              {"type" : "plugin",
                               "id" : self._name,
                               "event" : STATUS_STARTING})
+        ### MQ
+        # for stop requests
+        MQRep.__init__(self, self._zmq, self._name)
+
 
         self._is_manager = is_manager
         cfg = Loader('domogik')
@@ -143,8 +152,75 @@ class XplPlugin(BasePlugin):
         #                                 self.myxpl)
         #self._process_info.start()
 
+        self.enable_hbeat_called = False
 
         self.log.debug("end single xpl plugin")
+
+    def ready(self):
+        """ to call at the end of the __init__ of classes that inherits of XplPlugin
+        """
+        ### activate xpl hbeat
+        if self.enable_hbeat_called == True:
+            self.log.error("in ready() : enable_hbeat() function already called : the plugin may not be fully converted to the 0.4+ Domogik format")
+        else:
+            self.enable_hbeat()
+
+        ### send plugin status : STATUS_ALIVE
+        # TODO : why the dbmgr has no self.name defined ???????
+        # temporary set as unknown to avoir blocking bugs
+        if not hasattr(self, '_name'):
+            self.name = "unknown"
+        self._pub.send_event('plugin', 
+                             {"type" : "plugin",
+                              "id" : self._name,
+                              "event" : STATUS_ALIVE})
+
+        ### Instantiate the MQ
+        # nothing can be launched after this line (blocking call!!!!)
+        self.log.info("Start IOLoop for MQ : nothing else can be executed in the __init__ after this! Make sure that the self.ready() call is the last line of your init!!!!")
+        IOLoop.instance().start()
+
+
+    def on_mdp_request(self, msg):
+        """ Handle Requests over MQ
+            @param msg : MQ req message
+        """
+        self.log.debug("MQ Request received : {0}" . format(str(msg)))
+
+        ### stop the plugin
+        if msg._action == "plugin.stop.do":
+            self.log.info("Plugin stop request : {0}".format(msg))
+            self._mdp_reply_plugin_stop(msg)
+
+    def _mdp_reply_plugin_stop(self, data):
+        """ Stop the plugin
+            @param data : MQ req message
+
+            First, send the MQ Rep to 'ack' the request
+            Then, change the plugin status to STATUS_STOP_REQUEST
+            Then, quit the plugin by calling force_leave(). This should make the plugin send a STATUS_STOPPED if all is ok
+
+            Notice that no check is done on the MQ req content : we need nothing in it as it is directly addressed to a plugin
+        """
+        ### Send the ack over MQ Rep
+        msg = MQMessage()
+        msg.set_action('plugin.stop.result')
+        status = True
+        reason = ""
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
+        self.reply(msg.get())
+
+        ### Change the plugin status
+        self._pub.send_event('plugin', 
+                             {"type" : "plugin",
+                              "id" : self._name,
+                              "event" : STATUS_STOP_REQUEST})
+
+        ### Try to stop the plugin
+        # if it fails, the manager should try to kill the plugin
+        self.force_leave()
+
 
     def send_stopped_status(self):
         """ Send the STATUS_STOPPED status over the MQ
@@ -210,15 +286,8 @@ class XplPlugin(BasePlugin):
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()
         """
-        # TODO : why the dbmgr has no self.name defined ???????
-        # temporary set as unknown to avoir blocking bugs
-        if not hasattr(self, 'name'):
-            self.name = "unknown"
-        self._pub.send_event('plugin', 
-                             {"type" : "plugin",
-                              "id" : self.name,
-                              "event" : STATUS_ALIVE})
         self.myxpl.enable_hbeat(lock)
+        self.enable_hbeat_called = True
 
     def _send_process_info(self, pid, data):
         """ Send process info (cpu, memory) on xpl

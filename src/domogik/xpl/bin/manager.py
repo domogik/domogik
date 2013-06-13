@@ -71,7 +71,7 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, PACKAGES_DIR, DMG_VENDOR_ID
+from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, PACKAGES_DIR, DMG_VENDOR_ID
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
@@ -79,7 +79,7 @@ from ConfigParser import NoSectionError
 import zmq
 from domogik.mq.pubsub.subscriber import MQAsyncSub
 from zmq.eventloop.ioloop import IOLoop
-from domogik.mq.reqrep.worker import MQRep
+#from domogik.mq.reqrep.worker import MQRep   # moved in XplPlugin
 from domogik.mq.message import MQMessage
 from domogik.mq.pubsub.publisher import MQPub
 
@@ -107,8 +107,11 @@ FIFO_DIR = "/var/run/domogik/"
 PYTHON = sys.executable
 
 
+# MQ
 
-class Manager(XplPlugin, MQRep):
+
+
+class Manager(XplPlugin):
     """ Domogik manager
     """
 
@@ -175,8 +178,9 @@ class Manager(XplPlugin, MQRep):
             return
 
         ### MQ
-        self._zmq_context = zmq.Context()
-        MQRep.__init__(self, self._zmq_context, 'manager')
+        # self._zmq = zmq.Context() is aleady define in XplPlugin
+        # notice that Xplugin plugins already inherits of MQRep
+        # notice that MQRep.__init__(self, self._zmq, self.name) is already done in XplPlugin
 
         ### Create the clients list
         self._clients = Clients()
@@ -213,7 +217,11 @@ class Manager(XplPlugin, MQRep):
         self._check_available_packages()
 
         ### Start the MQ 
-        IOLoop.instance().start() 
+        # Already done in XplPlugin
+        #IOLoop.instance().start() 
+
+        ### Component is ready
+        self.ready()
 
 
 
@@ -240,7 +248,7 @@ class Manager(XplPlugin, MQRep):
                                                self._clients, 
                                                self._package_module_path,
                                                self._package_path,
-                                               self._zmq_context)
+                                               self._zmq)
                     # TODO : start only if the plugin is configured to
                     # currently we will start each plugin on startup as the manager is still in dev
                     #pid = self._plugins[id].start()
@@ -347,14 +355,32 @@ class Manager(XplPlugin, MQRep):
         """ Handle Requests over MQ 
             @param msg : MQ req message
         """
-        self.log.debug("MQ Request received : {0}" . format(str(msg)))
-        ### client.list.get
+        # XplPlugin handles soe MQ Req/rep also
+        XplPlugin.on_mdp_request(self, msg)
+
+        ### clients list and details
         # retrieve the clients list
         if msg._action == "clients.list.get":
+            self.log.info("Clients list request : {0}".format(msg))
             self._mdp_reply_clients_list()
+
         # retrieve the clients details
-        if msg._action == "clients.detail.get":
+        elif msg._action == "clients.detail.get":
+            self.log.info("Clients details request : {0}".format(msg))
             self._mdp_reply_clients_detail()
+
+        # start clients
+        elif msg._action == "plugin.start.do":
+            self.log.info("Plugin startup request : {0}".format(msg))
+            self._mdp_reply_plugin_start(msg)
+
+        # stop clients
+        # nothing is done in the manager directly :
+        # a stop request is sent to a plugin
+        # the plugin publish  new status : STATUS_STOP_REQUEST
+        # TODO : 
+        # for each STOP_REQUEST, the manager should launch an action N seconds after the request to check if the plugin is stopped (with ts pid)
+        # if not, kill -9 the plugin and report this
 
 
     def _mdp_reply_clients_list(self):
@@ -372,6 +398,34 @@ class Manager(XplPlugin, MQRep):
         msg = MQMessage()
         msg.set_action('clients.detail.result')
         msg.add_data('clients', self._clients.get_detail())
+        self.reply(msg.get())
+
+
+    def _mdp_reply_plugin_start(self, data):
+        """ Reply on the MQ
+            @param data : msg REQ received
+        """
+        msg = MQMessage()
+        msg.set_action('plugin.start.result')
+
+        if 'id' not in data._data.keys():
+            status = False
+            reason = "Plugin startup request : missing 'id' field"
+            self.log.error(reason)
+        else:
+            id = data._data['id']
+            msg.add_data('id', id)
+
+            # try to start the plugin
+            if self._plugins[id].start():
+                status = True
+                reason = ""
+            else:
+                status = False
+                reason = "Plugin '{0}' startup failed".format(id)
+
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
         self.reply(msg.get())
 
 
@@ -406,14 +460,10 @@ class GenericComponent():
         self.log = log.get_logger('manager')
 
 
-    def register_component(self, status = None):
+    def register_component(self):
         """ register the component as a client
-            @param status : set a status
         """
-        if status == None:
-            status = STATUS_UNKNOWN
         self._clients.add(self.host, self.type, self.id, self.xpl_source, self.data)
-        self._clients.set_status(self.xpl_source, status)
 
 
     def set_status(self, new_status):
@@ -421,6 +471,13 @@ class GenericComponent():
             @param status : new status
         """
         self._clients.set_status(self.xpl_source, new_status)
+
+
+    def set_pid(self, pid):
+        """ set the pid of the component (for those with a pid)
+            @param status : new status
+        """
+        self._clients.set_pid(self.xpl_source, pid)
 
 
 
@@ -461,6 +518,7 @@ class CoreComponent(GenericComponent):
         self.log.info("Request to start core component : {0}".format(self.id))
         pid = self.exec_component("domogik.xpl.bin")
         self.set_status(STATUS_ALIVE)
+        self.set_pid(pid)
        
         # TODO : add a step to check if the component successfully started
 
@@ -516,7 +574,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self._package_module_path = package_module_path
 
         ### zmq context
-        self._zmq_context = zmq_context
+        self._zmq = zmq_context
 
         ### get the plugin data (from the json file)
         # TODO
@@ -541,10 +599,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.configured = False
 
         ### register the plugin as a client
-        self.register_component(status = status)
+        self.register_component()
 
         ### subscribe the the MQ for category = plugin and id = self.id
-        MQAsyncSub.__init__(self, self._zmq_context, 'manager', ['plugin'])
+        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin'])
 
 
     # when a message is received from the MQ
@@ -565,10 +623,12 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.log.info("Request to start plugin : {0}".format(self.id))
         pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._package_path, self.id, self.id), \
                                   env_pythonpath = self._package_module_path)
+        pid = pid
 
         # TODO : add a step to check if the component successfully started
 
         self.set_status(STATUS_ALIVE)
+        self.set_pid(pid)
         return pid
 
 
@@ -656,11 +716,13 @@ class Clients():
         client = { "host" : host,
                    "type" : type,
                    "id" : id,
+                   "pid" : 0,
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured}
         client_with_details = { "host" : host,
                    "type" : type,
                    "id" : id,
+                   "pid" : 0,
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured,
                    "data" : data}
@@ -672,7 +734,7 @@ class Clients():
         """ Set a new status to a client
         """
         self.log.debug("Try to set a new status : {0} => {1}".format(xpl_source, new_status))
-        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID):
+        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST):
             self.log.error("Invalid status : {0}".format(new_status))
             return
         old_status = self._clients[xpl_source]['status']
@@ -682,6 +744,15 @@ class Clients():
         self._clients[xpl_source]['status'] = new_status
         self._clients_with_details[xpl_source]['status'] = new_status
         self.log.info("Status set : {0} => {1}".format(xpl_source, new_status))
+        self._publish_update()
+
+    def set_pid(self, xpl_source, pid):
+        """ Set a pid to a client
+        """
+        self.log.debug("Try to set the pid : {0} => {1}".format(xpl_source, pid))
+        self._clients[xpl_source]['pid'] = pid
+        self._clients_with_details[xpl_source]['pid'] = pid
+        self.log.info("Pid set : {0} => {1}".format(xpl_source, pid))
         self._publish_update()
 
     def get_list(self):
