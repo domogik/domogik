@@ -27,14 +27,11 @@ Manage connection to the database
 Implements
 ==========
 
-- DBConnector.__init__(self)
-- DBConnector._request_config_cb(self, message)
-- DBConnector._send_config(self, plugin, hostname, key, value, plugin, element = None)
-- DBConnector._fetch_elmt_config(self, techno, element, key)
-- DBConnector._fetch_techno_config(self, hostname, techno, key)
-- DBConnector._update_stat(self, message)
+- DBConnector
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
+         Fritz SMH <fritz.smh@gmail.com>
+         Cereal
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -42,9 +39,7 @@ Implements
 
 import traceback
 
-from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
@@ -57,7 +52,7 @@ DATABASE_CONNECTION_WAIT = 30
 
 class DBConnector(XplPlugin, MQRep):
     '''
-    Manage the connection between database and the xPL stuff
+    Manage the connection between database and the plugins
     Should be the *only* object along with the StatsManager to access to the database on the core side
     '''
 
@@ -66,7 +61,8 @@ class DBConnector(XplPlugin, MQRep):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
-        MQRep.__init__(self, zmq.Context(), 'dbmgr')
+        # Already done in XplPlugin
+        #MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug("Init database_manager instance")
 
         # Check for database connexion
@@ -79,268 +75,125 @@ class DBConnector(XplPlugin, MQRep):
                 self._db.list_user_accounts()
                 db_ok = True
             except:
-                msg = "The database is not responding. Check your configuration of if the database is up. Test %s/%s" % (nb_test, DATABASE_CONNECTION_NUM_TRY)
-                print(msg)
+                msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}".format(nb_test, DATABASE_CONNECTION_NUM_TRY)
                 self.log.error(msg)
-                msg = "Waiting for %s seconds" % DATABASE_CONNECTION_WAIT
-                print(msg)
+                msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
                 self.log.info(msg)
                 time.sleep(DATABASE_CONNECTION_WAIT)
 
         if nb_test >= DATABASE_CONNECTION_NUM_TRY:
             msg = "Exiting dbmgr!"
-            print(msg)
             self.log.error(msg)
             self.force_leave()
             return
 
         msg = "Connected to the database"
-        print(msg)
         self.log.info(msg)
         try:
             self._engine = self._db.get_engine()
         except:
-            self.log.error("Error while starting database engine : %s" % traceback.format_exc())
+            self.log.error("Error while starting database engine : {0}".format(traceback.format_exc()))
             self.force_leave()
             return
 
-        Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
-        self.enable_hbeat()
-        IOLoop.instance().start() 
+        self.ready()
+        # Already done in ready()
+        #IOLoop.instance().start() 
+
 
     def on_mdp_request(self, msg):
-        if msg._action == "config.get":
-            plugin = msg._data['plugin']
-            hostname = msg._data['hostname']
-            key = msg._data['key']
-            if 'element' in msg._data.keys():
-                element = msg._data['element']
-            else:
-                element = None
-            if element:
-                self._mdp_reply(plugin, hostname, key, self._fetch_elmt_config(plugin, element, key), element)
-            elif not key:
-                print 'TODO'
-            else:
-                self._mdp_reply(plugin, hostname, key, self._fetch_techno_config(plugin, hostname, key))
-        elif msg._action == "config.set":
-            print 'TODO'
+        """ Handle Requests over MQ
+            @param msg : MQ req message
+        """
+        # XplPlugin handles MQ Req/rep also
+        XplPlugin.on_mdp_request(self, msg)
 
-    def _mdp_reply(self, plugin, hostname, key, value, element=None):
+        if msg.get_action() == "config.get":
+            self._mdp_reply(msg)
+
+        elif msg.get_action() == "config.set":
+            # TODO
+            self.log.error("config.set action is not yet developped")
+
+
+    def _mdp_reply(self, data):
+        """ Reply to config.get MQ req
+            @param data : MQ req message
+        """
         msg = MQMessage()
-        msg.setaction( 'config.result' )
-        msg.adddata('plugin', plugin)
-        msg.adddata('hostname', hostname)
-        msg.adddata('key', key)
-        msg.adddata('value', value)
-        if element:
-            msg.adddata('element', element)
-        print msg.get()
+        msg.set_action('config.result')
+        status = True
+
+        msg_data = data.get_data()
+        print msg_data
+        if 'type' not in msg_data:
+            status = False
+            reason = "Config request : missing 'type' field : {0}".format(data)
+
+        if 'id' not in msg_data:
+            status = False
+            reason = "Config request : missing 'id' field : {0}".format(data)
+
+        if 'host' not in msg_data:
+            status = False
+            reason = "Config request : missing 'host' field : {0}".format(data)
+
+        if 'key' not in msg_data:
+            status = False
+            reason = "Config request : missing 'key' field : {0}".format(data)
+
+        if status == False:
+            self.log.error(reason)
+        else:
+            reason = ""
+            type = msg_data['type']
+            id = msg_data['id']
+            host = msg_data['host']
+            key = msg_data['key']
+            value = self._fetch_techno_config(id, host, key)
+            self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, id, key, value))
+
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('type', type)
+            msg.add_data('id', id)
+            msg.add_data('host', host)
+            msg.add_data('key', key)
+            msg.add_data('value', value)
+
+        self.log.debug(msg.get())
         self.reply(msg.get())
 
-    def _request_config_cb(self, message):
-        '''
-        Callback to receive a request for some config stuff
-        @param message : the xPL message
-        '''
-        #try:
-        self._db = DbHelper(engine=self._engine)
-        techno = message.data['plugin']
-        hostname = message.data['hostname']
-        key = message.data['key']
-        msg = "Request  h=%s, t=%s, k=%s" % (hostname, techno, key)
-        print(msg)
-        self.log.debug(msg)
-        if "value" in message.data:
-            new_value = message.data['value']
-        else:
-            new_value = None
-        if "element" in message.data:
-            element = message.data['element']
-        else:
-            element = None
 
-        msg = "Request  h=%s, t=%s, k=%s (2)" % (hostname, techno, key)
-        print(msg)
-        self.log.debug(msg)
-        # Set configuration
-        if new_value:
-            msg = "Set config h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, new_value)
-            print msg
-            self.log.debug(msg)
-            self._set_config(techno, hostname, key, new_value)
-
-        # Send configuration
-        else:
-            msg = "Request  h=%s, t=%s, k=%s (send)" % (hostname, techno, key)
-            print(msg)
-            self.log.debug(msg)
-            if element:
-                msg = "Request  h=%s, t=%s, k=%s (send if element)" % (hostname, techno, key)
-                print(msg)
-                self.log.debug(msg)
-                self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
-            else:
-                msg = "Request  h=%s, t=%s, k=%s (send else)" % (hostname, techno, key)
-                print(msg)
-                self.log.debug(msg)
-                if not key:
-                    msg = "Request  h=%s, t=%s, k=%s (send if not key)" % (hostname, techno, key)
-                    print(msg)
-                    self.log.debug(msg)
-                    keys = self._fetch_techno_config(techno, hostname, key).keys()
-                    values = self._fetch_techno_config(techno, hostname, key).values()
-                    self._send_config(techno, hostname, keys, values)
-                else:
-                    msg = "Request  h=%s, t=%s, k=%s (send else of if not key)" % (hostname, techno, key)
-                    print(msg)
-                    self.log.debug(msg)
-                    self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
-
-    def _send_config(self, plugin, hostname, key, value, element = None):
-        '''
-        Send a config value message for an element's config item
-        @param plugin : the plugin of the element
-        @param hostname : hostname
-        @param element :  the name of the element
-        @param key : the key or list of keys of the config tuple(s) to fetch
-        @param value : the value or list of values corresponding to the key(s)
-        '''
-        msg = "Response h=%s, t=%s, k=%s, v=%s" % (hostname, plugin, key, value)
-        print(msg)
-        self.log.debug(msg)
-        mess = XplMessage()
-        mess.set_type('xpl-stat')
-        mess.set_schema('domogik.config')
-        mess.add_data({'plugin' :  plugin})
-        mess.add_data({'hostname' :  hostname})
-        if element:
-            mess.add_data({'element' :  element})
-        # If key/value are lists, then we add a key=value for each item
-        if isinstance(key, list):
-            for (_key, _val) in zip(key, value):
-                mess.add_data({_key :  _val})
-        else:
-            mess.add_data({key :  value})
-        # mess.set_conf_key('target', plugin)
-        self.myxpl.send(mess)
-
-    def _fetch_elmt_config(self, techno, element, key):
-        '''
-        Fetch an element's config value in the database
-        @param techno : the plugin of the element
-        @param element :  the name of the element
-        @param key : the key of the config tuple to fetch
-        '''
-        #TODO : use the database
-        vals = {'x10': {'a3': {},
-                        'a2': {},
-                       }
-                }
-        return vals[techno][element][key]
-
-    def _fetch_techno_config(self, techno, hostname, key):
+    def _fetch_techno_config(self, id, host, key):
         '''
         Fetch a plugin global config value in the database
-        @param techno : the plugin of the element
-        @param hostname : hostname
+        @param id : the plugin of the element
+        @param host : hostname
         @param key : the key of the config tuple to fetch
         '''
-        # This array is here for information only but is not used anymore
-        # Values are now on the database
-        #vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
-        #                'heyu-file-0': 'TTY /dev/ttyUSB0',
-        #                'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
-        #                'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
-        #        'global': {'pid-dir-path': '/var/run/'},
-        #        'onewire': {'temperature_refresh_delay' : '10'},
-        #        'cidmodem': {'device' : '/dev/ttyUSB1',
-        #                   'nbmaxtry' : '10',
-        #                   'interval' : '15'},
-        #        'mirror': {'device' : '/dev/hidraw0',
-        #                   'nbmaxtry' : '10',
-        #                   'interval' : '15'},
-        #        'xbmc_not': {'address' : '192.168.0.20:8080',
-        #                 'delay' : '15',
-        #                 'maxdelay' : '20'},
-        #        'gagenda': {'email' : "fritz.smh@gmail.com",
-        #                 'password' : 'XXXXXXXX',
-        #                 'calendarname' : 'fritz.smh@gmail.com',
-        #                 'startup-plugin':'True'},
-        #        'teleinfo' : {'device' : '/dev/teleinfo',
-        #            'interval' : '30'},
-        #            'dawndusk' : {'startup-plugin':'True'},
-        #            'plcbus' : {'device':'/dev/ttyUSB0'},
-        #        }
-        self.log.debug("FTC 1")
         try:
-            if key:
-                self.log.debug("FTC 2")
-                try:
-                    self.log.debug("Get plg conf for %s / %s / %s" % (techno, hostname, key))
-                    result = self._db.get_plugin_config(techno, hostname, key)
-                    # tricky loop as workaround for a (sqlalchemy?) bug :
-                    # sometimes the given result is for another plugin/key
-                    # so while we don't get the good data, we loop
-                    # This bug happens rarely
-                    while result.id != techno or \
-                       result.hostname != hostname or \
-                       result.key != key:
-                        self.log.debug("Bad result : %s/%s != %s/%s" % (result.id, result.key, plugin, key))
-                        result = self._db.get_plugin_config(techno, hostname, key)
-                    self.log.debug("Get plg conf for %s / %s / %s Result=%s" % (techno, hostname, key, result))
-                    val = result.value
-                    self.log.debug("Get plg conf for %s / %s / %s = %s" % (techno, hostname, key, val))
-                    if val == '':
-                        val = "None"
-                    self.log.debug("Get plg conf for %s / %s / %s = %s (2)" % (techno, hostname, key, val))
-                    return val
-                except AttributeError:
-                    self.log.debug("Attribute error for %s / %s / %s" % (techno, hostname, key))
-                    return "None"
-            else:
-                self.log.debug("FTC 3")
-                vals = self._db.list_plugin_config(techno, hostname)
-                res = {}
-                for val in vals:
-                    if val == '':
-                        res[val.key] = "None"
-                    else:
-                        res[val.key] = val.value
-                return res
+            try:
+                result = self._db.get_plugin_config(id, host, key)
+                # tricky loop as workaround for a (sqlalchemy?) bug :
+                # sometimes the given result is for another plugin/key
+                # so while we don't get the good data, we loop
+                # This bug happens rarely
+                while result.id != id or \
+                   result.hostname != host or \
+                   result.key != key:
+                    self.log.debug("Bad result : {0}/{1} != {2}/{3}".format(result.id, result.key, plugin, key))
+                    result = self._db.get_plugin_config(id, host, key)
+                val = result.value
+                if val == '':
+                    val = "None"
+                return val
+            except AttributeError:
+                return "None"
         except:
-            msg = "No config found h=%s, t=%s, k=%s" % (hostname, techno, key)
-            print(msg)
+            msg = "No config found host={0}, plugin={1}, key={2}" % (host, id, key)
             self.log.warn(msg)
             return "None"
-
-    def _set_config(self, plugin, hostname, key, value):
-        '''
-        Send a config value message for an element's config item
-        @param plugin : the plugin of the element
-        @param hostname : hostname
-        @param key : the key to set
-        @param value : the value to set
-        '''
-
-        try:
-            self._db.set_plugin_config(technology, hostname, key, value)
-    
-            mess = XplMessage()
-            mess.set_type('xpl-stat')
-            mess.set_schema('domogik.config')
-            mess.add_data({'plugin' :  plugin})
-            mess.add_data({'hostname' :  hostname})
-            mess.add_data({'key' :  key})
-            mess.add_data({'value' :  value})
-            self.myxpl.send(mess)
-        except:
-            traceback.print_exc()
-            msg = "Error while setting h=%s, t=%s, k=%s, v=%s" % (hostname, techno, key, value)
-            print(msg)
-            self.log.warn(msg)
-            return "None"
-
 
 if __name__ == "__main__":
     DBC = DBConnector()

@@ -355,22 +355,22 @@ class Manager(XplPlugin):
         """ Handle Requests over MQ 
             @param msg : MQ req message
         """
-        # XplPlugin handles soe MQ Req/rep also
+        # XplPlugin handles MQ Req/rep also
         XplPlugin.on_mdp_request(self, msg)
 
         ### clients list and details
         # retrieve the clients list
-        if msg._action == "clients.list.get":
+        if msg.get_action() == "clients.list.get":
             self.log.info("Clients list request : {0}".format(msg))
             self._mdp_reply_clients_list()
 
         # retrieve the clients details
-        elif msg._action == "clients.detail.get":
+        elif msg.get_action() == "clients.detail.get":
             self.log.info("Clients details request : {0}".format(msg))
             self._mdp_reply_clients_detail()
 
         # start clients
-        elif msg._action == "plugin.start.do":
+        elif msg.get_action() == "plugin.start.do":
             self.log.info("Plugin startup request : {0}".format(msg))
             self._mdp_reply_plugin_start(msg)
 
@@ -408,12 +408,12 @@ class Manager(XplPlugin):
         msg = MQMessage()
         msg.set_action('plugin.start.result')
 
-        if 'id' not in data._data.keys():
+        if 'id' not in data.get_data().keys():
             status = False
             reason = "Plugin startup request : missing 'id' field"
             self.log.error(reason)
         else:
-            id = data._data['id']
+            id = data.get_data('id')
             msg.add_data('id', id)
 
             # try to start the plugin

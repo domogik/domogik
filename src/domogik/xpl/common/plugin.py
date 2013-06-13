@@ -188,7 +188,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.log.debug("MQ Request received : {0}" . format(str(msg)))
 
         ### stop the plugin
-        if msg._action == "plugin.stop.do":
+        if msg.get_action() == "plugin.stop.do":
             self.log.info("Plugin stop request : {0}".format(msg))
             self._mdp_reply_plugin_stop(msg)
 
