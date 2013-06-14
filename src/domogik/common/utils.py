@@ -35,6 +35,9 @@ Implements
 
 from socket import gethostname
 from exceptions import ImportError, AttributeError
+from subprocess import Popen, PIPE
+import os
+import sys
 
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
@@ -82,4 +85,27 @@ def call_package_conversion(log, plugin, method, value):
         return value
     log.debug("calling {0}.{1}".format(staticclass, staticmethode))
     return staticmethode(value)
+
+def is_already_launched(log, id):
+    """ Check if there are already some process for the component launched
+        @param log : logger
+        @param id : plugin id to check with pgrep
+    """
+    my_pid = os.getpid()
+    cmd = "pgrep -lf {0} | grep python | grep -v pgrep | grep -v {1}".format(id, my_pid)
+    # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
+
+    log.info("Looking for already launched instances of '{0}'".format(id))
+    is_launched = False
+    subp = Popen(cmd, shell=True, stdout=PIPE)
+    for line in subp.stdout:
+        is_launched = True
+        log.info("Process found : {0}".format(line.rstrip("\n")))
+    subp.wait()  
+    if is_launched:
+        log.error("There are already existing processes. Exiting")
+    else:
+        log.info("No existing process.")
+    return is_launched
+
 

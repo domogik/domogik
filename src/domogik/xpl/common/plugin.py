@@ -154,6 +154,7 @@ class XplPlugin(BasePlugin, MQRep):
 
         self.log.debug("end single xpl plugin")
 
+
     def check_configured(self):
         """ For a plugin only
             To be call in the plugin __init__()
@@ -432,29 +433,41 @@ class XplPlugin(BasePlugin, MQRep):
             self.send_not_configured_status()
         else:
             self.send_stopped_status()
+
         # send hbeat.end message
         self._send_hbeat_end()
-        self.get_stop().set()
-        for t in self._timers:
-            if hasattr(self, "log"):
-                self.log.debug("Try to stop timer %s"  % t)
-            t.stop()
-            if hasattr(self, "log"):
-                self.log.debug("Timer stopped %s" % t)
-        for cb in self._stop_cb:
-            if hasattr(self, "log"):
-                self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
-            cb()
-        for t in self._threads:
-            if hasattr(self, "log"):
-                self.log.debug("Try to stop thread %s" % t)
-            try:
-                t.join()
-            except RuntimeError:
-                pass
-            if hasattr(self, "log"):
-                self.log.debug("Thread stopped %s" % t)
-            #t._Thread__stop()
+
+        # try to stop the thread
+        try:
+            self.get_stop().set()
+        except AttributeError:
+            pass
+
+        if hasattr(self, "_timers"):
+            for t in self._timers:
+                if hasattr(self, "log"):
+                    self.log.debug("Try to stop timer %s"  % t)
+                t.stop()
+                if hasattr(self, "log"):
+                    self.log.debug("Timer stopped %s" % t)
+
+        if hasattr(self, "_stop_cb"):
+            for cb in self._stop_cb:
+                if hasattr(self, "log"):
+                    self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
+                cb()
+    
+        if hasattr(self, "_threads"):
+            for t in self._threads:
+                if hasattr(self, "log"):
+                    self.log.debug("Try to stop thread %s" % t)
+                try:
+                    t.join()
+                except RuntimeError:
+                    pass
+                if hasattr(self, "log"):
+                    self.log.debug("Thread stopped %s" % t)
+                #t._Thread__stop()
         #Finally, we try to delete all remaining threads
         for t in threading.enumerate():
             if t != threading.current_thread() and t.__class__ != threading._MainThread:

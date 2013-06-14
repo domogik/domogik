@@ -42,6 +42,7 @@ import pwd
 
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
+from domogik.common.utils import is_already_launched
 from optparse import OptionParser
 from domogik.common.daemonize import createDaemon
 
@@ -58,7 +59,7 @@ class BasePlugin():
         on the command line. If set to True (default), will check if -f was added.
         '''
 
-        # First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
+        ### First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
         # in the file /etc/default/domogik : DOMOGIK_USER
         Default = DefaultLoader()
         dmg_user = Default.get("DOMOGIK_USER")
@@ -67,11 +68,20 @@ class BasePlugin():
             print("ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : %s" % dmg_user)
             sys.exit(1)
 
-        # Then, start the plugin...
-        self._threads = []
-        self._timers = []
         if name is not None:
             self._plugin_name = name
+
+        l = logger.Logger(name)
+        self.log = l.get_logger()
+
+        ### Check if the plugin is not already launched
+        # notice that when the plugin is launched from the manager, this call is not done as the manager already does this test before starting a plugin
+        if is_already_launched(self.log, name):
+            sys.exit(2)
+
+        ### Start the plugin...
+        self._threads = []
+        self._timers = []
         self._stop = threading.Event()
         self._lock_add_thread = threading.Semaphore()
         self._lock_add_timer = threading.Semaphore()
@@ -81,7 +91,7 @@ class BasePlugin():
         else:
             self._stop_cb = []
 
-        # options management
+        ### options management
         if p is not None and isinstance(p, OptionParser):
             parser = p
         else:
@@ -104,14 +114,15 @@ class BasePlugin():
             print global_release
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
+            self.log.info("Starting the plugin in background...")
             createDaemon()
-            l = logger.Logger(name)
-            self.log = l.get_logger()
+            #l = logger.Logger(name)
+            #self.log = l.get_logger()
             self.log.info("Daemonize plugin %s" % name)
             self.is_daemon = True
         else:
-            l = logger.Logger(name)
-            self.log = l.get_logger()
+            #l = logger.Logger(name)
+            #self.log = l.get_logger()
             self.is_daemon = False
 
     def should_stop(self):

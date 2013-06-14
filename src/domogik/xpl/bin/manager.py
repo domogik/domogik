@@ -69,6 +69,7 @@ from subprocess import Popen, PIPE
 
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
+from domogik.common.utils import is_already_launched
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
@@ -485,8 +486,6 @@ class GenericComponent():
 
 
 
-
-
 class CoreComponent(GenericComponent):
     """ This helps to handle core components startup
         Notice that there is currently no need to stop a core component, we just want to be able to start them
@@ -516,6 +515,14 @@ class CoreComponent(GenericComponent):
             @return : None if ko
                       the pid if ok
         """
+        ### Check if the component is not already launched
+        # notice that this test is not really needed as the plugin also test this in startup...
+        # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
+        # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
+        if is_already_launched(self.log, self.id):
+            return 0
+
+        ### Start the component
         self.log.info("Request to start core component : {0}".format(self.id))
         pid = self.exec_component("domogik.xpl.bin")
         self.set_status(STATUS_ALIVE)
@@ -598,7 +605,6 @@ class Plugin(GenericComponent, MQAsyncSub):
             status = STATUS_INVALID
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
-        #self.configured = False
         configured = self._config.query(self.id, 'configured')
         if configured == '1':
             configured = True
@@ -612,6 +618,20 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### subscribe the the MQ for category = plugin and id = self.id
         MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin'])
+
+        ### check if the plugin must be started on manager startup
+        startup = self._config.query(self.id, 'startup')
+        if startup == '1':
+            startup = True
+        if startup == True:
+            self.log.info("Plugin {0} configured to be started on manager startup. Starting...".format(id))
+            pid = self.start()
+            if pid:
+                self.log.info("Plugin {0} started".format(id))
+            else:
+                self.log.error("Plugin {0} failed to start".format(id))
+        else:
+            self.log.info("Plugin {0} not configured to be started on manager startup.".format(id))
 
 
     # when a message is received from the MQ
@@ -629,12 +649,20 @@ class Plugin(GenericComponent, MQAsyncSub):
             @return : None if ko
                       the pid if ok
         """
+        ### Check if the plugin is not already launched
+        # notice that this test is not really needed as the plugin also test this in startup...
+        # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
+        # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
+        if is_already_launched(self.log, self.id):
+            return 0
+
+        ### Try to start the plugin
         self.log.info("Request to start plugin : {0}".format(self.id))
         pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._package_path, self.id, self.id), \
                                   env_pythonpath = self._package_module_path)
         pid = pid
 
-        # TODO : add a step to check if the component successfully started
+        # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
 
         self.set_status(STATUS_ALIVE)
         self.set_pid(pid)
@@ -669,6 +697,13 @@ class Plugin(GenericComponent, MQAsyncSub):
         # TODO : request to stop plugin
         # TODO : check if the plugin has stopped
         #self.set_status(STATUS_STOPPED)
+
+        ### Launch a timer
+        # TODO : call a function after N seconds
+
+        ### Check if the component is not already launched
+        #if is_already_launched(self.log, self.id):
+        #    DO_SOMETHING_TO_KILL_THE_pids
  
 
 
