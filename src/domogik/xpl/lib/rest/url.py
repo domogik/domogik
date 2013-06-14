@@ -78,6 +78,8 @@ def register_api(view, endpoint, url, pk='id', pk_type=None):
 
 # import the flask urls
 import domogik.xpl.lib.rest.urls.status
+import domogik.xpl.lib.rest.urls.command
+import domogik.xpl.lib.rest.urls.datatype
 
 # more complex URLS
 from domogik.xpl.lib.rest.urls.device import *
@@ -88,4 +90,3 @@ from domogik.xpl.lib.rest.urls.helper import *
 from domogik.xpl.lib.rest.urls.device_type import deviceTypeAPI
 from domogik.xpl.lib.rest.urls.person import personAPI
 from domogik.xpl.lib.rest.urls.account import AccountAPI
-from domogik.xpl.lib.rest.urls.host import hostAPI
