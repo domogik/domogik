@@ -53,6 +53,9 @@ from domogik.xpl.lib.rest.event import DmgEvents
 from domogik.xpl.lib.rest.eventrequest import RequestEvents
 from domogik.xpl.lib.rest.stat import StatsManager
 from domogik.xpl.lib.rest.url import urlHandler
+from domogik.xpl.lib.rest.request import ProcessRequest
+from domogik.mq.reqrep.client import MQSyncReq
+from domogik.mq.message import MQMessage
 from domogik.common.configloader import Loader
 from domogik.common.packagemanager import PackageManager
 from xml.dom import minidom
@@ -75,6 +78,7 @@ from threading import Semaphore
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
+import zmq
 
 REST_API_VERSION = "0.7"
 #REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
@@ -394,8 +398,6 @@ class Rest(XplPlugin):
             self.log.info("REST Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
-            self.start_stats()
-
             self.start_http()
         except :
             self.log.error("%s" % self.get_exception())
@@ -713,22 +715,12 @@ class Rest(XplPlugin):
         IOLoop.instance().stop()
         return
 
-    def start_stats(self):
-        """ Start Statistics manager
-        """
-        print("Start Stats")
-        self.log.info("Starting statistics manager. Its logs will be in a dedicated log file")
-        self.stat_mgr = StatsManager(handler_params = [self], xpl = self.myxpl)
-        self.stat_mgr.load()
-        self.log.info("Stat manager started")
-
     def reload_stats(self):
-        """ Reload Statistics manager
-        """
-        time.sleep(1)
-        print("Reload Stats")
-        self.log.info("Reloading statistics manager. Its logs will be in a dedicated log file")
-        self.stat_mgr.load()
+        self.log.debug("=============== reload stats")
+        req = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.setaction( 'reload' )
+        req.request('statmgr', msg.get())
 
     def get_exception(self):
         """ Get exception and display it on stdout
