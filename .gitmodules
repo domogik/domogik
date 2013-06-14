@@ -1,0 +1,3 @@
+[submodule "src/domogik/mq"]
+	path = src/domogik/mq
+	url = https://github.com/domogik/zmq.git
