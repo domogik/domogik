@@ -71,7 +71,7 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, PACKAGES_DIR, DMG_VENDOR_ID
+from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
@@ -734,7 +734,7 @@ class Clients():
         """ Set a new status to a client
         """
         self.log.debug("Try to set a new status : {0} => {1}".format(xpl_source, new_status))
-        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST):
+        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED):
             self.log.error("Invalid status : {0}".format(new_status))
             return
         old_status = self._clients[xpl_source]['status']

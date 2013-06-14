@@ -57,7 +57,7 @@ class Query():
     def __init__(self, zmq, log):
         self.qry = QueryMQ(zmq, log)
 
-    def query(self, id, key)
+    def query(self, id, key):
         return self.qry.query(id, key)
 
     def set(self, id, key, value):
@@ -96,7 +96,7 @@ class QueryMQ():
         msg.add_data('id', id)
         msg.add_data('host', get_sanitized_hostname())
         msg.add_data('key', key)
-        self.log.info("Request query config for key {0}".format(key)
+        self._log.info("Request query config for key {0}".format(key))
         ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
 
         ### no response from dbmgr

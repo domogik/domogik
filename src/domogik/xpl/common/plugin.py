@@ -42,6 +42,7 @@ import os
 import sys
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
+from domogik.xpl.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 from domogik.mq.pubsub.publisher import MQPub
@@ -54,6 +55,7 @@ import zmq
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
 STATUS_STARTING = "starting"
+STATUS_NOT_CONFIGURED = "not-configured"
 STATUS_ALIVE = "alive"
 STATUS_STOP_REQUEST = "stop-request"
 STATUS_STOPPED = "stopped"
@@ -136,10 +138,6 @@ class XplPlugin(BasePlugin, MQRep):
         else:
             self.myxpl = Manager(broadcast = broadcast, plugin = self, nohub = nohub)
 
-        # TODO : remove
-        #self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
-        #                                                       'xpltype':'xpl-cmnd'})
-
         self._reload_cb = reload_cb
         self._dump_cb = dump_cb
 
@@ -155,6 +153,22 @@ class XplPlugin(BasePlugin, MQRep):
         self.enable_hbeat_called = False
 
         self.log.debug("end single xpl plugin")
+
+    def check_configured(self):
+        """ For a plugin only
+            To be call in the plugin __init__()
+            Check in database (over queryconfig) if the key 'configured' is set to True for the plugin
+            if not, stop the plugin and log this
+        """
+        self._config = Query(self._zmq, self.log)
+        configured = self._config.query(self._name, 'configured')
+        if configured == '1':
+            configured = True
+        if configured != True:
+            self.log.error("The plugin is not configured (configured = '{0}'. Stopping the plugin...".format(configured))
+            self.force_leave(not_configured = True)
+        self.log.info("The plugin is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
+
 
     def ready(self):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin
@@ -221,6 +235,15 @@ class XplPlugin(BasePlugin, MQRep):
         # if it fails, the manager should try to kill the plugin
         self.force_leave()
 
+
+    def send_not_configured_status(self):
+        """ Send the STATUS_NOT_CONFIGURED status over the MQ
+        """ 
+        if hasattr(self, "_pub"):
+            self._pub.send_event('plugin', 
+                                 {"type" : "plugin",
+                                  "id" : self._name,
+                                  "event" : STATUS_NOT_CONFIGURED})
 
     def send_stopped_status(self):
         """ Send the STATUS_STOPPED status over the MQ
@@ -398,14 +421,17 @@ class XplPlugin(BasePlugin, MQRep):
         """
         self.myxpl._network.join()
 
-    def force_leave(self):
+    def force_leave(self, not_configured = False):
         '''
         Leave threads & timers
         '''
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
         # send stopped status over the MQ
-        self.send_stopped_status()
+        if not_configured:
+            self.send_not_configured_status()
+        else:
+            self.send_stopped_status()
         # send hbeat.end message
         self._send_hbeat_end()
         self.get_stop().set()
