@@ -453,6 +453,7 @@ class GenericComponent():
         self.host = host
         self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.id, self.host)
         self.type = "unknown - not setted yet"
+        self.configured = None
         self._clients = clients
 
         ### init logger
@@ -463,7 +464,7 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.host, self.type, self.id, self.xpl_source, self.data)
+        self._clients.add(self.host, self.type, self.id, self.xpl_source, self.data, self.configured)
 
 
     def set_status(self, new_status):
@@ -576,8 +577,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### zmq context
         self._zmq = zmq_context
 
+        ### config
+        self._config = Query(self._zmq, self.log)
+
         ### get the plugin data (from the json file)
-        # TODO
         status = None
         self.data = {}
         try:
@@ -595,8 +598,14 @@ class Plugin(GenericComponent, MQAsyncSub):
             status = STATUS_INVALID
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
-        # TODO
-        self.configured = False
+        #self.configured = False
+        configured = self._config.query(self.id, 'configured')
+        if configured == '1':
+            configured = True
+        if configured == True:
+            self.configured = True
+        else:
+            self.configured = False
 
         ### register the plugin as a client
         self.register_component()

@@ -37,12 +37,6 @@ Implements
 """
 
 from threading import Event
-#from domogik.common import logger
-
-# TODO : remove
-#from domogik.xpl.common.xplconnector import Listener
-#from domogik.xpl.common.xplmessage import XplMessage
-#from domogik.common.configloader import Loader
 
 from domogik.common.utils import get_sanitized_hostname 
 
