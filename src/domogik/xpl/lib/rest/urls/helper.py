@@ -1,9 +1,7 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, register_api
-from flask import g as dbHelper
+from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api
 from flask.views import MethodView
 
 @urlHandler.route('/helper', methods=['GET'])
-@db_helper
 @json_response
 def helper():
     output = None

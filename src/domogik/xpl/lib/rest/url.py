@@ -1,6 +1,5 @@
 from flask import Flask, g, Response, request
 from domogik.common.logger import Logger
-from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.lib.rest.jsondata import domogik_encoder
 from functools import wraps
 import time
@@ -8,13 +7,13 @@ import json
 
 # url handler itself
 urlHandler = Flask(__name__)
-urlHandler.debug = True
+#urlHandler.debug = True
 
 # DB handler decorator
 def db_helper(action_func):
     @wraps(action_func)
     def create_db_helper(*args, **kwargs):
-        g.db = DbHelper()
+#        g.db = DbHelper()
         return action_func(*args, **kwargs)
     return create_db_helper   
 

@@ -1,22 +1,19 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, register_api, timeit
-from flask import g as dbHelper
+from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
 from domogik.common.packagejson import PackageJson
 
 @urlHandler.route('/device/old/', methods=['GET'])
-@db_helper
 @json_response
 def device_list_old():
-    b = dbHelper.db.list_old_devices()
+    b = urlHandler.db.list_old_devices()
     return 200, b
 
 @urlHandler.route('/device/params/<dev_type_id>', methods=['GET'])
-@db_helper
 @json_response
 def device_params(dev_type_id):
     print "ikke"
     try:
-        dt = dbHelper.db.get_device_type_by_id(dev_type_id)
+        dt = urlHandler.db.get_device_type_by_id(dev_type_id)
         if dt == None:
             return "This device type does not exists"
         # get the json
@@ -73,35 +70,33 @@ def device_params(dev_type_id):
     return 200, ret
 
 @urlHandler.route('/device/addglobal/<int:did>', methods=['PUT'])
-@db_helper
 @json_response
 def device_globals(did):
-    dev = dbHelper.db.get_device(id)
+    dev = urlHandler.db.get_device(id)
     js = device_params_get(dev.device_type_id, json=False)
-    for x in dbHelper.db.get_xpl_command_by_device_id(id):
+    for x in urlHandler.db.get_xpl_command_by_device_id(id):
         for p in js['global']:
-            dbHelper.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
+            urlHandler.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
     for x in self._db.get_xpl_stat_by_device_id(id):
         for p in js['global']:
-            dbHelper.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
+            urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
     return 204, ""
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])
-@db_helper
 @json_response
 def device_xplcmd_params(did):
     # get the command
-    cmd = dbHelper.db.get_xpl_command(did)
+    cmd = urlHandler.db.get_xpl_command(did)
     if cmd == None:
         # ERROR
         return
     # get the device
-    dev = dbHelper.db.get_device(cmd.device_id)
+    dev = urlHandler.db.get_device(cmd.device_id)
     if dev == None:
         # ERROR
         return
     # get the device_type
-    dt = dbHelper.db.get_device_type_by_id(dev.device_type_id)
+    dt = urlHandler.db.get_device_type_by_id(dev.device_type_id)
     if dt == None:
         # ERROR
         return
@@ -119,24 +114,23 @@ def device_xplcmd_params(did):
             # ERROR
             return
         # go and add the param
-        dbHelper.db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=request.form.get(p['key']))
+        urlHandler.db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=request.form.get(p['key']))
     return 204, ""
 
 @urlHandler.route('/device/xplstatparams/<int:did>', methods=['PUT'])
-@db_helper
 @json_response
 def device_xplstat_params(did):
-    cmd = dbHelper.db.get_xpl_stat(device_id)
+    cmd = urlHandler.db.get_xpl_stat(device_id)
     if cmd == None:
         # ERROR
         return
     # get the device
-    dev = dbHelper.db.get_device(cmd.device_id)
+    dev = urlHandler.db.get_device(cmd.device_id)
     if dev == None:
         # ERROR
         return
     # get the device_type
-    dt = dbHelper.db.get_device_type_by_id(dev.device_type_id)
+    dt = urlHandler.db.get_device_type_by_id(dev.device_type_id)
     if dt == None:
         # ERROR
         return
@@ -154,26 +148,26 @@ def device_xplstat_params(did):
             # ERROR
             return
         # go and add the param
-        dbHelper.db.add_xpl_stat_param(cmd_id=cmd.id, key=p['key'], value=request.form.get(['key']))
+        urlHandler.db.add_xpl_stat_param(cmd_id=cmd.id, key=p['key'], value=request.form.get(['key']))
     return 204, ""
 
 class deviceAPI(MethodView):
-    decorators = [db_helper, json_response]
+    decorators = [json_response]
 
     def get(self, did):
         if did != None:
-            b = dbHelper.db.list_device_types(did)
+            b = urlHandler.db.list_device_types(did)
             print b
         else:
-            b = dbHelper.db.list_devices()
+            b = urlHandler.db.list_devices()
         return 200, b
 
     def delete(self, did):
-        b = dbHelper.db.del_devic(did)
+        b = urlHandler.db.del_devic(did)
         return 204, b
 
     def post(self):
-        b = dbHelper.db.add_device_and_commands(
+        b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             type_id=request.form.get('type_id'),
             usage_id=request.form.get('usage_id'),
@@ -183,7 +177,7 @@ class deviceAPI(MethodView):
         return 201, b
 
     def put(self, did):
-        b = dbHelper.db.update_device(
+        b = urlHandler.db.update_device(
             did,
             request.form.get('name'),
             request.form.get('type_id'),

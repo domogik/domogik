@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, timeit
+from domogik.xpl.lib.rest.url import urlHandler, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -6,15 +6,15 @@ import domogik
 from subprocess import Popen, PIPE
 from flask import Response
 
-@urlHandler.route('/cmd/', methods=['GET'])
-@db_helper
+@urlHandler.route('/cmd/id/<int:cid>', methods=['GET'])
 @json_response
 @timeit
-def api_command():
-    urlHandler.log.debug("test =============")
-    urlHandler.log.debug("Process /ncommand")
+def api_command(cid):
+    urlHandler.logger.debug("test =============")
+    urlHandler.logger.debug("Process /ncommand")
     # get the command
-    cmd = dbHelper.db.get_command(cid)
+    cmd = urlHandler.db.get_command(cid)
+    print cmd
     if cmd == None:
         return "Command {0} does not exists".format(self.get_parameters('id'))
     if cmd.xpl_command is None:
@@ -23,11 +23,11 @@ def api_command():
     xplcmd = cmd.xpl_command
     if xplcmd == None:
         return 400, {msg: "Command {0} does not exists".format(cmd_id)}
-    xplstat = dbHelper.db.get_xpl_stat(xplcmd.stat_id)
+    xplstat = urlHandler.db.get_xpl_stat(xplcmd.stat_id)
     if xplstat == None:
         return 400, {msg: "Stat {0} does not exists".format(xplcmd.stat_id)}
     # get the device from the db
-    dev = dbHelper.db.get_device(int(cmd.device_id))
+    dev = urlHandler.db.get_device(int(cmd.device_id))
     # cmd will have all needed info now
     msg = XplMessage()
     msg.set_type("xpl-cmnd")

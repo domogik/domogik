@@ -28,15 +28,14 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.lib.rest.url import db_helper, json_response, register_api, urlHandler
-from flask import g as dbHelper, request
+from domogik.xpl.lib.rest.url import json_response, register_api, urlHandler
+from flask import request
 from flask.views import MethodView
 
 @urlHandler.route('/account/user/password/', methods=['GET'])
-@db_helper
 @json_response
 def user_password():
-    change_ok = dbHelper.db.change_password(request.args.get("id"), \
+    change_ok = urlHandler.db.change_password(request.args.get("id"), \
                                           request.args.get("old"), \
                                           request.args.get("new"))
     if change_ok == True:
@@ -46,37 +45,36 @@ def user_password():
         return 204, ""
 
 @urlHandler.route('/account/auth/<login>/<password>/', methods=['GET'])
-@db_helper
 @json_response
 def account_auth(login, password):
-        login_ok = dbHelper.db.authenticate(login, password)
+        login_ok = urlHandler.db.authenticate(login, password)
         if login_ok == True:
-            account = dbHelper.db.get_user_account_by_login(login)
+            account = urlHandler.db.get_user_account_by_login(login)
             return 200, account
         else:
             return 204, ""
 
 class AccountAPI(MethodView):
     """ class to handle all /account urls """
-    decorators = [db_helper, json_response]
+    decorators = [json_response]
 
     def get(self, aid):
         """ GET /account/<aid> """
         if aid != None:
-            dbr = dbHelper.db.get_user_account(aid)
+            dbr = urlHandler.db.get_user_account(aid)
         else:
-            dbr = dbHelper.db.list_user_accounts()
+            dbr = urlHandler.db.list_user_accounts()
         return 200, dbr
 
     def delete(self, aid):
         """ DELETE /account/<aid> """
-        dbr = dbHelper.db.del_user_account(aid)
+        dbr = urlHandler.db.del_user_account(aid)
         return 204, dbr
 
     def post(self):
         """ POST /account/ """
         if request.form.get('person_id') != None:
-            dbr = dbHelper.db.add_user_account(
+            dbr = urlHandler.db.add_user_account(
                 request.form.get('login'),
                 request.form.get('password'),
                 request.form.get('person_id'),
@@ -84,7 +82,7 @@ class AccountAPI(MethodView):
                 request.form.get('skin_used'),
             )
         else:
-            dbr = dbHelper.db.add_user_account_with_person(
+            dbr = urlHandler.db.add_user_account_with_person(
                 request.form.get('login'),
                 request.form.get('password'),
                 request.form.get('first_name'),
@@ -98,7 +96,7 @@ class AccountAPI(MethodView):
     def put(self, aid):
         """ PUT /account/ """
         if request.form.get('person_id') != None:
-            dbr = dbHelper.db.add_user_account(
+            dbr = urlHandler.db.add_user_account(
                 aid,
                 request.form.get('login'),
                 request.form.get('person_id'),
@@ -106,7 +104,7 @@ class AccountAPI(MethodView):
                 request.form.get('skin_used'),
             )
         else:
-            dbr = dbHelper.db.update_user_account_with_person(
+            dbr = urlHandler.db.update_user_account_with_person(
                 aid,
                 request.form.get('login'),
                 request.form.get('first_name'),

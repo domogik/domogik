@@ -34,6 +34,7 @@ class Rest(XplPlugin):
 @license: GPL(v3)
 @organization: Domogik
 """
+from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from domogik.xpl.lib.rest.event import DmgEvents
@@ -170,6 +171,8 @@ class Rest(XplPlugin):
         # logger
         for log in self.log.handlers:
             urlHandler.logger.addHandler(log)
+        # db access
+        urlHandler.db = DbHelper()
         # needed for status
         urlHandler.apiversion = self._rest_api_version
         urlHandler.use_ssl = self.use_ssl
