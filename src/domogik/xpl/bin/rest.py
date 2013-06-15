@@ -51,6 +51,7 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 import zmq
+import signal
 
 REST_API_VERSION = "0.7"
 USE_SSL = False
@@ -166,27 +167,47 @@ class Rest(XplPlugin):
         self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
         # Temp fix, once MQ is used, queues are removed, so we basically only need the API version
         urlHandler.rest = self
+        # logger
+        for log in self.log.handlers:
+            urlHandler.logger.addHandler(log)
         # needed for status
         urlHandler.apiversion = self._rest_api_version
         urlHandler.use_ssl = self.use_ssl
         urlHandler.hostname = self.get_sanitized_hostname()
         # xpl handler
         urlHandler.xpl = self.myxpl 
+        # reload statsmanager helper
+        urlHandler.reload_stats = self.reload_stats
         
-        http_server = HTTPServer(WSGIContainer(urlHandler))
+        self.http_server = HTTPServer(WSGIContainer(urlHandler))
         # for ssl, extra parameter to HTTPServier init
         #ssl_options={
              #"certfile": os.path.join(data_dir, "mydomain.crt"),
              #"keyfile": os.path.join(data_dir, "mydomain.key"),
         #}) 
-        http_server.listen(int(self.server_port), address=self.server_ip)
+        self.http_server.listen(int(self.server_port), address=self.server_ip)
+        
         IOLoop.instance().start()
 	return
 
     def stop_http(self):
         """ Stop HTTP Server
         """
-        IOLoop.instance().stop()
+        self.log.info('Stopping http server')
+        selg.http_server.stop()
+ 
+        self.log.info('Will shutdown in <F2>0 seconds ...' )
+        io_loop = tornado.ioloop.IOLoop.instance()
+        deadline = time.time() + 10
+ 
+        def stop_loop():
+            now = time.time()
+            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
+                io_loop.add_timeout(now + 1, stop_loop)
+            else:
+                io_loop.stop()
+                logging.info('Shutdown')
+        stop_loop()
         return
 
     def reload_stats(self):

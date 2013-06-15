@@ -6,13 +6,9 @@ from functools import wraps
 import time
 import json
 
-# flask logegr
-flaskLogger = Logger('rinor-http')
-
 # url handler itself
 urlHandler = Flask(__name__)
 urlHandler.debug = True
-urlHandler.logger_name = flaskLogger.get_logger('rinor-http')
 
 # DB handler decorator
 def db_helper(action_func):
@@ -25,11 +21,10 @@ def db_helper(action_func):
 # create acces_log
 @urlHandler.after_request
 def write_access_log(response):
-    log = flaskLogger.get_logger('rinor-http')
-    log.info('http request for {0} received'.format(request.path))
-    log.debug(' => response status code: {0}'.format(response.status_code))
-    log.debug(' => response content_type: {0}'.format(response.content_type))
-    log.debug(' => response data: {0}'.format(response.response))
+    urlHandler.logger.info('http request for {0} received'.format(request.path))
+    urlHandler.logger.debug(' => response status code: {0}'.format(response.status_code))
+    urlHandler.logger.debug(' => response content_type: {0}'.format(response.content_type))
+    urlHandler.logger.debug(' => response data: {0}'.format(response.response))
     return response
 
 # json reponse handler decorator
@@ -38,15 +33,30 @@ def json_response(action_func):
     @wraps(action_func)
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
-        if (type(ret) is list or type(ret) is tuple) and len(ret) == 2:
-            code = ret[0]
-            resp = ret[1]
+        # if list is 2 entries long
+        if (type(ret) is list or type(ret) is tuple):
+            if len(ret) == 2:
+                # return httpcode data
+                #  code = httpcode
+                #  data = data
+                rcode = ret[0]
+                rdata = ret[1]
+            elif len(ret) == 1:
+                # return errorStr
+                #  code = 400
+                #  data = {msg: <errorStr>}
+                rcode = 400
+                rdata = {error: ret[0]}
         else:
-            code = 204
-            resp = None
+            # just return
+            # code = 204 = No content
+            # data = empty
+            rcode = 204
+            rdata = None
+        # do the actual return
         return Response(
-            response=json.dumps(resp, cls=domogik_encoder(), check_circular=False),
-            status=code,
+            response=json.dumps(rdata, cls=domogik_encoder(), check_circular=False),
+            status=rcode,
             content_type='application/json'
         )
     return create_json_response
@@ -58,8 +68,7 @@ def timeit(action_func):
         ts = time.time()
         result = action_func(*args, **kw)
         te = time.time()
-        log = flaskLogger.get_logger('rinor-http')
-        log.debug('url function {0}({1}, {2}) took {3} sec'.format(action_func.__name__, args, kw, te-ts))
+        urlHandler.logger.debug('url function {0}({1}, {2}) took {3} sec'.format(action_func.__name__, args, kw, te-ts))
         return result
     return timed
 
