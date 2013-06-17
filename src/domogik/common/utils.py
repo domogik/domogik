@@ -39,6 +39,9 @@ from subprocess import Popen, PIPE
 import os
 import sys
 
+# used by is_already_launched
+STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
+
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
     This will lower it and keep only the part before the first dot
@@ -90,22 +93,28 @@ def is_already_launched(log, id):
     """ Check if there are already some process for the component launched
         @param log : logger
         @param id : plugin id to check with pgrep
+        @return : is_launched : True/False
+                  pid_list : list of the already launched processes pid
     """
     my_pid = os.getpid()
-    cmd = "pgrep -lf {0} | grep python | grep -v pgrep | grep -v {1}".format(id, my_pid)
+ 
+    # the manager add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+    cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2}".format(id, STARTED_BY_MANAGER, my_pid)
     # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
 
     log.info("Looking for already launched instances of '{0}'".format(id))
     is_launched = False
     subp = Popen(cmd, shell=True, stdout=PIPE)
+    pid_list = []
     for line in subp.stdout:
         is_launched = True
         log.info("Process found : {0}".format(line.rstrip("\n")))
+        pid_list.append(line.rstrip("\n").split(" ")[0])
     subp.wait()  
     if is_launched:
-        log.error("There are already existing processes. Exiting")
+        log.info("There are already existing processes.")
     else:
         log.info("No existing process.")
-    return is_launched
+    return is_launched, pid_list
 
 

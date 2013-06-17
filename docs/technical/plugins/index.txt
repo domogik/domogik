@@ -1,0 +1,25 @@
+===============================
+Plugins technical documentation
+===============================
+
+Overview
+========
+
+Plugins developpers don't need to read this page to be able to develop some plugins. This page is mainly for core developpers to understand internal features of the plugins.
+
+
+Plugins status
+==============
+
+During its life, a plugin will get various statuts.  All these status are availble:
+
+* STATUS_STARTING : the client is started but not yet ready (waiting for configuration or still doing some init stuff)
+* STATUS_NOT_CONFIGURED : the client is not configured and so can't be started
+* STATUS_ALIVE : the client is ready for use
+* STATUS_STO_REQUEST : the client has been requested to stop itself
+* STATUS_STOPPED : the client as been stopped in the appropriate way
+* STATUS_DEAD : the client has disappeared
+* STATUS_UKNOWN : the client is in an unknown status (client detected but status not setted to anything : for a plugin it may be a syntax error)
+* STATUS_INVALID : the client is invalid (for a plugin, this may be an invalid json file)
+
+To get the associated values, please check in Domogik sources : *src/domogik/xpl/common/plugin.py*

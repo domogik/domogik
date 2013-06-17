@@ -76,7 +76,8 @@ class BasePlugin():
 
         ### Check if the plugin is not already launched
         # notice that when the plugin is launched from the manager, this call is not done as the manager already does this test before starting a plugin
-        if is_already_launched(self.log, name):
+        res, pid_list = is_already_launched(self.log, name)
+        if res:
             sys.exit(2)
 
         ### Start the plugin...

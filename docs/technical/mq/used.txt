@@ -2,25 +2,65 @@
 Used MQ messages
 ========================
 
+You can find examples for req and sub in *src/domogik/examples/mq-python/*
+
+The detailed informations are available in:
+
+* :doc:`pub/sub detailed informations <pubsub_detailed>`
+* :doc:`req/rep detailed informations <reqrep_detailed>`
+ 
+
 List of MQ messages used for req/rep pattern
 ============================================
 
-======================= =========== =========== =============
-Source			Destination action req 	action rep
-======================= =========== ===========	=============
-Rest			statManager reload     	reload.result
------------------------ ----------- ----------- -------------
-Plugin			dbManager   config.get  config.result
------------------------ ----------- ----------- -------------
-Plugin			dbManager   config.set  config.result
-======================= =========== =========== =============
+* source : the one which makes the REQ request
+* destination : the one which replies a REP reply to the REQ request
+
+Rules to apply
+--------------
+
+* An *action request header* ends by *.get* if its purpose si to get informations/data.
+* An *action request header* ends by *.do* if its purpose is to launch an action.
+* In all cases, the *reply header* will ends by *.result*
+* For all *.do*, the reply must contains these keys : 
+
+  * status = True / False
+  * reason = "a reason if status = False, empty is status = True"
+
+======================= =================== =================== ===================== =====================
+Source                  Destination         action req          action rep            Python example
+======================= =================== =================== ===================== =====================
+rest                    xplevent            reload              reload.result
+----------------------- ------------------- ------------------- --------------------- ---------------------
+plugin (any)            dbmgr               config.get          config.result         req_config.py
+----------------------- ------------------- ------------------- --------------------- ---------------------
+plugin (any) (inactive) dbmgr               config.set          config.result
+----------------------- ------------------- ------------------- --------------------- ---------------------
+UIs                     manager             clients.list.get    clients.list.result   req_clients_list.py
+----------------------- ------------------- ------------------- --------------------- ---------------------
+UIs                     manager             clients.detail.get  clients.detail.result req_clients_detail.py
+----------------------- ------------------- ------------------- --------------------- ---------------------
+UIs                     manager             plugin.start.do     plugin.start.result   req_plugin_start.py
+----------------------- ------------------- ------------------- --------------------- ---------------------
+UIs                     plugin (by id)      plugin.stop.do      plugin.stop.result    req_plugin_stop.py
+======================= =================== =================== ===================== =====================
 
 
 List of MQ messages used for pub/sub pattern
 ============================================
 
-======================= =========== ========================
-Source			Destination Header
-======================= =========== ========================
-statManager		Rest	    statmgr.received
-======================= =========== ========================
+* source : the one which publishes messages over the MQ
+* destination : used by : the ones which subscribe to the published data
+
+======================= =================== =================== =====================
+Source                  Used by             Header              Python example
+======================= =================== =================== =====================
+xplevent                rest                statmgr.received
+----------------------- ------------------- ------------------- ---------------------
+plugin (any)            manager             plugin.status       sub_plugin_status.py
+                        UIs
+----------------------- ------------------- ------------------- ---------------------
+manager                 UIs                 clients.list        sub_clients_list.py
+----------------------- ------------------- ------------------- ---------------------
+manager                 UIs                 clients.detail      sub_clients_detail.py
+======================= =================== =================== =====================

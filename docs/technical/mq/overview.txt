@@ -4,6 +4,20 @@ MQ Overview
 
 Library
 =======
-For the Message Queue domogik is using the 0MQ (zero MQ) library.
 
+For the Message Queue domogik is using the 0MQ (zero MQ) library.
 More info about this system can be found at http://www.zeromq.org/.
+
+General informations
+====================
+
+* `:doc: pub/sub <pubsub>`
+* `:doc: req/rep <reqrep>`
+
+MQ messages used in Domogik
+===========================
+
+`:doc: See this page <used>` 
+
+The details about all Domogik pub/sub are `:doc: described here <pubsub_detailed>`.
+The details about all Domogik req/rep are `:doc: described here <reqrep_detailed>`.

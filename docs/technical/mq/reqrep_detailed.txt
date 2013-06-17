@@ -1,0 +1,83 @@
+=============================
+Req/rep detailed informations
+=============================
+
+
+clients.list.get
+================
+
+Request : UIs
+Reply : manager
+
+To get the clients list, the UI may send a MQ request *clients.list.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *clients.list*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_clients_list.py*.
+
+You will get a reply like this: ::
+
+    ['clients.list.result', '{"host": "darkstar", "clients": {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "id": "diskfree"}}, "type": "plugin", "id": "diskfree", "key": "startup"}']
+
+
+clients.detail.get
+==================
+
+Request : UIs
+Reply : manager
+
+To get the clients detail, the UI may send a MQ request *clients.detail.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *clients.detail*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_clients_detail.py*.
+
+You will get a reply like this: ::
+
+    ['clients.detail.result', '{"host": "darkstar", "clients": {"domogik-diskfree.darkstar": {"status": "alive", "type": "plugin", "configured": true, "pid": 0, "host": "darkstar", "data": {"xpl_stats": {"get_total_space": {"name": "get_total_space", "parameters": {"device": [], "static": [{"key": "type", "value": "total_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_total_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_free_space": {"name": "get_free_space", "parameters": {"device": [], "static": [{"key": "type", "value": "free_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_free_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_used_space": {"name": "get_used_space", "parameters": {"device": [], "static": [{"key": "type", "value": "used_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_used_space", "key": "current"}]}, "schema": "sensor.basic"}}, "commands": [], "udev-rules": [], "device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "xpl_commands": [], "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Scaling"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Scaling"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Scaling"}, "get_percent_used": {"conversion": "", "name": "Percent used", "data_type": "DT_Scaling"}}, "configuration": [{"description": "Automatically start plugin at Domogik startup", "default": "False", "id": "0", "key": "startup-plugin", "interface": "no", "optionnal": "no", "type": "boolean", "options": []}, {"description": "Interval between each poll (minute)", "default": null, "id": "1", "key": "interval", "interface": "no", "optionnal": "no", "type": "string", "options": []}, {"description": "Path on filesystem", "default": null, "id": "2", "key": "path", "interface": "yes", "optionnal": "no", "type": "string", "options": []}], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "fullname": "plugin-diskfree", "type": "plugin", "id": "diskfree"}, "json_version": 2}, "id": "diskfree"}}, "type": "plugin", "id": "diskfree", "key": "startup"}']
+
+
+
+plugin.start.do
+===============
+
+Request : UIs
+Reply : manager
+
+To request a plugin to start, the UI may send a MQ request *plugin.start.do* to the manager: ::
+
+    request : plugin.start.do
+    data : id = <plugin id : ipx800, 1wire, ...>
+
+To get updates on the plugin status after the request, the UI should subscribe to the appropriate MQ publisher : *plugin.status*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_plugin_start.py*.
+
+You will get a reply like this: ::
+
+    ['plugin.start.result', '{"status": true, "reason": "", "host": "darkstar", "key": "startup", "type": "plugin", "id": "diskfree"}']
+
+
+
+plugin.stop.do
+===============
+
+Request : UIs
+Reply : the plugin to stop
+
+To request a plugin to stop, the UI may send a MQ request *plugin.start.do* to the plugin: ::
+
+    request : plugin.stop.do
+    data : id = <plugin id : ipx800, 1wire, ...>
+
+To get updates on the plugin status after the request, the UI should subscribe to the appropriate MQ publisher : *plugin.status*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_plugin_stop.py*.
+
+You will get a reply like this: ::
+
+    ['plugin.stop.result', '{"status": true, "reason": "", "host": "darkstar", "key": "configured", "type": "plugin", "id": "diskfree"}']
+
+
+
+

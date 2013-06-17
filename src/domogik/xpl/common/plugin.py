@@ -105,7 +105,7 @@ class XplPlugin(BasePlugin, MQRep):
         # MQ publisher and REP
         self._zmq = zmq.Context()
         self._pub = MQPub(self._zmq, self._name)
-        self._pub.send_event('plugin', 
+        self._pub.send_event('plugin.status', 
                              {"type" : "plugin",
                               "id" : self._name,
                               "event" : STATUS_STARTING})
@@ -168,7 +168,9 @@ class XplPlugin(BasePlugin, MQRep):
         if configured != True:
             self.log.error("The plugin is not configured (configured = '{0}'. Stopping the plugin...".format(configured))
             self.force_leave(not_configured = True)
+            return False
         self.log.info("The plugin is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
+        return True
 
 
     def ready(self):
@@ -185,7 +187,7 @@ class XplPlugin(BasePlugin, MQRep):
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self.name = "unknown"
-        self._pub.send_event('plugin', 
+        self._pub.send_event('plugin.status', 
                              {"type" : "plugin",
                               "id" : self._name,
                               "event" : STATUS_ALIVE})
@@ -227,7 +229,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.reply(msg.get())
 
         ### Change the plugin status
-        self._pub.send_event('plugin', 
+        self._pub.send_event('plugin.status', 
                              {"type" : "plugin",
                               "id" : self._name,
                               "event" : STATUS_STOP_REQUEST})
@@ -241,7 +243,7 @@ class XplPlugin(BasePlugin, MQRep):
         """ Send the STATUS_NOT_CONFIGURED status over the MQ
         """ 
         if hasattr(self, "_pub"):
-            self._pub.send_event('plugin', 
+            self._pub.send_event('plugin.status', 
                                  {"type" : "plugin",
                                   "id" : self._name,
                                   "event" : STATUS_NOT_CONFIGURED})
@@ -250,7 +252,7 @@ class XplPlugin(BasePlugin, MQRep):
         """ Send the STATUS_STOPPED status over the MQ
         """ 
         if hasattr(self, "_pub"):
-            self._pub.send_event('plugin', 
+            self._pub.send_event('plugin.status', 
                                  {"type" : "plugin",
                                   "id" : self._name,
                                   "event" : STATUS_STOPPED})

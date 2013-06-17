@@ -62,6 +62,7 @@ import traceback
 import math
 import tempfile
 import re
+import signal
 
 from threading import Event, Thread, Lock, Semaphore
 from optparse import OptionParser
@@ -69,7 +70,7 @@ from subprocess import Popen, PIPE
 
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
-from domogik.common.utils import is_already_launched
+from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
@@ -103,12 +104,8 @@ from domogik.common.packagejson import PackageJson, PackageException
 
 ### constants
 FIFO_DIR = "/var/run/domogik/"
-
-
 PYTHON = sys.executable
-
-
-# MQ
+WAIT_AFTER_STOP_REQUEST = 15
 
 
 
@@ -249,14 +246,9 @@ class Manager(XplPlugin):
                                                self._clients, 
                                                self._package_module_path,
                                                self._package_path,
-                                               self._zmq)
-                    # TODO : start only if the plugin is configured to
-                    # currently we will start each plugin on startup as the manager is still in dev
-                    #pid = self._plugins[id].start()
-                    #if pid:
-                    #    self.log.info("Plugin {0} started".format(id))
-                    #else:
-                    #    self.log.error("Plugin {0} failed to start".format(id))
+                                               self._zmq,
+                                               self.get_stop())
+                    # The automatic startup is handled in the Plugin class in __init__
             
 
 
@@ -280,7 +272,7 @@ class Manager(XplPlugin):
         component = CoreComponent(id, self.get_sanitized_hostname(), self._clients)
         self._write_fifo("INFO", "Start {0}...".format(id))
         pid = component.start()
-        if pid:
+        if pid != 0:
             self._write_fifo("OK", "{0} started with pid {1}\n".format(id, pid))
             self._dec_startup_lock()
         else:
@@ -379,9 +371,7 @@ class Manager(XplPlugin):
         # nothing is done in the manager directly :
         # a stop request is sent to a plugin
         # the plugin publish  new status : STATUS_STOP_REQUEST
-        # TODO : 
-        # for each STOP_REQUEST, the manager should launch an action N seconds after the request to check if the plugin is stopped (with ts pid)
-        # if not, kill -9 the plugin and report this
+        # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
 
 
     def _mdp_reply_clients_list(self):
@@ -418,7 +408,8 @@ class Manager(XplPlugin):
             msg.add_data('id', id)
 
             # try to start the plugin
-            if self._plugins[id].start():
+            pid = self._plugins[id].start()
+            if pid != 0:
                 status = True
                 reason = ""
             else:
@@ -519,16 +510,17 @@ class CoreComponent(GenericComponent):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        if is_already_launched(self.log, self.id):
+        res, pid_list = is_already_launched(self.log, self.id)
+        if res:
             return 0
 
         ### Start the component
         self.log.info("Request to start core component : {0}".format(self.id))
         pid = self.exec_component("domogik.xpl.bin")
-        self.set_status(STATUS_ALIVE)
         self.set_pid(pid)
        
         # TODO : add a step to check if the component successfully started
+        # no need as the status is given to the user directly by the pub/sub 'plugin.status'
 
         return pid
 
@@ -544,7 +536,8 @@ class CoreComponent(GenericComponent):
         component_path = sys.modules[pkg].__file__
         
         ### Generate command
-        cmd = "{0} {1}".format(PYTHON, component_path)
+        # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+        cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
  
         ### Execute command
         self.log.info("Execute command : {0}".format(cmd))
@@ -562,7 +555,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         The MQAsyncSub helps to set the status 
     """
 
-    def __init__(self, id, host, clients, package_module_path, package_path, zmq_context):
+    def __init__(self, id, host, clients, package_module_path, package_path, zmq_context, stop):
         """ Init a plugin 
             @param id : plugin id (ipx800, onewire, ...)
             @param host : hostname
@@ -570,6 +563,7 @@ class Plugin(GenericComponent, MQAsyncSub):
             @param package_module_path : path for the base python module for packages : /var/lib/domogik/
             @param package_path : path in which are stored the packages : /var/lib/domogik/packages/
             @param zmq_context : zmq context
+            @param stop : get_stop()
         """
         GenericComponent.__init__(self, id = id, host = host, clients = clients)
         self.log.info("New plugin : {0}".format(self.id))
@@ -583,6 +577,9 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### zmq context
         self._zmq = zmq_context
+
+        ### XplPlugin
+        self._stop = stop
 
         ### config
         self._config = Query(self._zmq, self.log)
@@ -617,7 +614,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.register_component()
 
         ### subscribe the the MQ for category = plugin and id = self.id
-        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin'])
+        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status'])
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.id, 'startup')
@@ -634,14 +631,23 @@ class Plugin(GenericComponent, MQAsyncSub):
             self.log.info("Plugin {0} not configured to be started on manager startup.".format(id))
 
 
-    # when a message is received from the MQ
     def on_message(self, msgid, content):
-        print("New pub message {0}".format(msgid))
-        print("{0}".format(content))
+        """ when a message is received from the MQ 
+        """
+        self.log.debug("New pub message {0}".format(msgid))
+        self.log.debug("{0}".format(content))
         if content["id"] == self.id:
             self.log.info("New status received from {0} : {1}".format(self.id, content["event"]))
             self.set_status(content["event"])
-  
+            # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to checl if the plugin was able to shut alone
+            if content["event"] == STATUS_STOP_REQUEST:
+                self.log.info("The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.id))
+                thr_check_if_stopped = Thread(None,
+                                              self._check_if_stopped,
+                                              "check_if_{0}_is_stopped".format(self.id),
+                                              (),
+                                              {})
+                thr_check_if_stopped.start()
 
 
     def start(self):
@@ -653,7 +659,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        if is_already_launched(self.log, self.id):
+        res, pid_list = is_already_launched(self.log, self.id)
+        if res:
             return 0
 
         ### Try to start the plugin
@@ -664,7 +671,6 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
 
-        self.set_status(STATUS_ALIVE)
         self.set_pid(pid)
         return pid
 
@@ -675,7 +681,8 @@ class Plugin(GenericComponent, MQAsyncSub):
             @param env_pythonpath (optionnal): custom PYTHONPATH if needed (for packages it is needed)
         """
         ### Generate command
-        cmd = ""
+        # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+        cmd = "{0} && ".format(STARTED_BY_MANAGER)
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
         cmd += "{0} {1}".format(PYTHON, py_file)
@@ -689,24 +696,20 @@ class Plugin(GenericComponent, MQAsyncSub):
         return pid
 
 
-    def stop(self):
-        """ request the plugin to stop
-            check if the plugin stops
+    def _check_if_stopped(self):
+        """ Check if the plugin is stopped. If not, kill it
         """
-        self.log.info("Request to stop plugin : {0}".format(self.id))
-        # TODO : request to stop plugin
-        # TODO : check if the plugin has stopped
-        #self.set_status(STATUS_STOPPED)
-
-        ### Launch a timer
-        # TODO : call a function after N seconds
-
-        ### Check if the component is not already launched
-        #if is_already_launched(self.log, self.id):
-        #    DO_SOMETHING_TO_KILL_THE_pids
- 
-
-
+        self._stop.wait(WAIT_AFTER_STOP_REQUEST)
+        res, pid_list = is_already_launched(self.log, self.id)
+        if res:
+            for the_pid in pid_list:
+                self.log.info("Try to kill pid {0}...".format(the_pid))
+                os.kill(int(the_pid), signal.SIGKILL)
+                # TODO : add one more check ?
+                # do a while loop over is_already.... ?
+            self.log.info("The plugin {0} should be killed now (kill -9)".format(self.id))
+        else:
+            self.log.info("The plugin {0} has stopped itself properly.".format(self.id))
 
 
 
