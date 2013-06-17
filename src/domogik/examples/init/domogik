@@ -321,14 +321,15 @@ kill_all() {
 }
 
 function update_cache {
-    echo -n " * Updating packages cache..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
-    if [ $? -gt 0 ]; then
-        echo " An error occured during packages cache update."
-        exit 1
-    else
-        echo " Done"
-    fi
+    echo -n " * Updating cache temporary disabled in 0.4"
+    #echo -n " * Updating packages cache..."
+    #/bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
+    #if [ $? -gt 0 ]; then
+    #    echo " An error occured during packages cache update."
+    #    exit 1
+    #else
+    #    echo " Done"
+    #fi
 }
 
 # Check if the directory for lock exists
