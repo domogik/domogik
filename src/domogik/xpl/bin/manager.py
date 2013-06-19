@@ -334,9 +334,11 @@ class Manager(XplPlugin):
         """
         try:
             list = []
-            for root, dirs, files in os.walk(self._package_path):
-                for dir in dirs:
-                    list.append(dir)
+            #for root, dirs, files in os.walk(self._package_path):
+            #    for dir in dirs:
+            for a_file in os.listdir(self._package_path):
+                if os.path.isdir(os.path.join(self._package_path, a_file)):
+                    list.append(a_file)
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
             self.log.error(msg)
