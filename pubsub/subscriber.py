@@ -36,20 +36,29 @@ Implements
 
 import json
 import zmq
+import sys
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from time import sleep, time
-from domogik.common.configloader import Loader
+try:
+        from domogik.common.configloader import Loader
+except ImportError:
+        from domoweb.models import Parameter
 
 MSG_VERSION = "0_1"
 
 class MQSyncSub():
     def __init__(self, context, caller_id, *category_filters):
+        if ("Loader" in sys.modules):
+            cfg = Loader('mq').load()
+            self.cfg_mq = dict(cfg[1])
+            sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
+        else:
+            ip = Parameter.objects.get(key='mq-ip')
+            port = Parameter.objects.get(key='mq-sub_port')
+            sub_addr= "tcp://{0}:{1}".format(ip.value, port.value)
         self.s_recv = context.socket(zmq.SUB)
-        cfg = Loader('mq').load()
-        self.cfg_mq = dict(cfg[1])
         self.caller_id = caller_id
-        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         self.s_recv.connect(sub_addr)
 
         for category_filter in category_filters:
@@ -78,11 +87,16 @@ class MQSyncSub():
 
 class MQAsyncSub():
     def __init__(self, context, caller_id, category_filters):
-        cfg = Loader('mq').load()
-        self.cfg_mq = dict(cfg[1])
+        if ("Loader" in sys.modules):
+            cfg = Loader('mq').load()
+            self.cfg_mq = dict(cfg[1])
+            sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
+        else:
+            ip = Parameter.objects.get(key='mq-ip')
+            port = Parameter.objects.get(key='mq-sub_port')
+            sub_addr= "tcp://{0}:{1}".format(ip.value, port.value)
         self.caller_id = caller_id
         self.s_recv = context.socket(zmq.SUB)
-        sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         self.s_recv.connect(sub_addr)
 
         if len(category_filters) == 0:

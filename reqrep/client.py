@@ -26,11 +26,15 @@ __email__ = 'gst-py@a-nugget.de'
 
 
 import zmq
+import sys
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from zmq import select
-from domogik.common.configloader import Loader
 from domogik.mq.message import MQMessage
+try:
+        from domogik.common.configloader import Loader
+except ImportError:
+        from domoweb.models import Parameter
 
 ###
 
@@ -57,10 +61,14 @@ class MQSyncReq(object):
     def __init__(self, context):
         """Initialize the MDPClient.
         """
-        cfg = Loader('mq')
-        my_conf = cfg.load()
-        config = dict(my_conf[1])
-        endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
+        if ("Loader" in sys.modules):
+            cfg = Loader('mq').load()
+            confi = dict(cfg[1])
+            endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
+        else:
+            ip = Parameter.objects.get(key='mq-ip')
+            port = Parameter.objects.get(key='mq-req_rep_port')
+            endpoint = "tcp://{0}:{1}".format(ip.value, port.value)
         self.socket = context.socket(zmq.REQ)
         self.socket.connect(endpoint)         
         return
