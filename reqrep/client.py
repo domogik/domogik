@@ -61,7 +61,7 @@ class MQSyncReq(object):
     def __init__(self, context):
         """Initialize the MDPClient.
         """
-        if ("Loader" in sys.modules):
+        if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             confi = dict(cfg[1])
             endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
@@ -156,13 +156,17 @@ class MqAsyncReq(object):
     def __init__(self, context, service):
         """Initialize the MDPClient.
         """
-        cfg = Loader('mq')
-        my_conf = cfg.load()
-        config = dict(my_conf[1])
+        if ("domogik.common.configloader" in sys.modules):
+            cfg = Loader('mq').load()
+            confi = dict(cfg[1])
+            self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
+        else:
+            ip = Parameter.objects.get(key='mq-ip')
+            port = Parameter.objects.get(key='mq-req_rep_port')
+            self.endpoint = "tcp://{0}:{1}".format(ip.value, port.value)
         socket = context.socket(zmq.REQ)
         ioloop = IOLoop.instance()
         self.service = service
-        self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.stream = ZMQStream(socket, ioloop)
         self.stream.on_recv(self._on_message)
         self.can_send = True

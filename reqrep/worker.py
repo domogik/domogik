@@ -63,7 +63,7 @@ class MQRep(object):
         context is the zmq context to create the socket from.
         service is a byte-string with the service name.
         """
-        if ("Loader" in sys.modules):
+        if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             confi = dict(cfg[1])
             endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])

@@ -49,7 +49,7 @@ MSG_VERSION = "0_1"
 
 class MQSyncSub():
     def __init__(self, context, caller_id, *category_filters):
-        if ("Loader" in sys.modules):
+        if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
             sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
@@ -87,7 +87,7 @@ class MQSyncSub():
 
 class MQAsyncSub():
     def __init__(self, context, caller_id, category_filters):
-        if ("Loader" in sys.modules):
+        if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
             sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
