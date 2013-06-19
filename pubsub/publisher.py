@@ -15,7 +15,7 @@ class MQPub(object):
         if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
-            sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['pub_port'])
+            pub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['pub_port'])
         else:
             ip = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-pub_port')

@@ -66,11 +66,11 @@ class MQRep(object):
         if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             confi = dict(cfg[1])
-            endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
+            self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         else:
             ip = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-req_rep_port')
-            endpoint = "tcp://{0}:{1}".format(ip.value, port.value)
+            self.endpoint = "tcp://{0}:{1}".format(ip.value, port.value)
         self.context = context
         self.service = service
         self.stream = None
