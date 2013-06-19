@@ -108,15 +108,20 @@ class DBConnector(XplPlugin, MQRep):
         # XplPlugin handles MQ Req/rep also
         XplPlugin.on_mdp_request(self, msg)
 
+        # configuration
         if msg.get_action() == "config.get":
-            self._mdp_reply(msg)
+            self._mdp_reply_config_result(msg)
 
         elif msg.get_action() == "config.set":
             # TODO
             self.log.error("config.set action is not yet developped")
 
+        # devices list
+        if msg.get_action() == "devices.get":
+            self._mdp_reply_devices_result(msg)
 
-    def _mdp_reply(self, data):
+
+    def _mdp_reply_config_result(self, data):
         """ Reply to config.get MQ req
             @param data : MQ req message
         """
@@ -194,6 +199,44 @@ class DBConnector(XplPlugin, MQRep):
             msg = "No config found host={0}, plugin={1}, key={2}" % (host, id, key)
             self.log.warn(msg)
             return "None"
+
+
+    def _mdp_reply_devices_result(self, data):
+        """ Reply to devices.get MQ req
+            @param data : MQ req message
+        """
+
+        # TODO : NOT FINISHED
+
+        msg = MQMessage()
+        msg.set_action('devices.result')
+        status = True
+
+        msg_data = data.get_data()
+        print msg_data
+        if 'type' not in msg_data:
+            status = False
+            reason = "Devices request : missing 'type' field : {0}".format(data)
+
+        if 'id' not in msg_data:
+            status = False
+            reason = "Devices request : missing 'id' field : {0}".format(data)
+
+        if status == False:
+            self.log.error(reason)
+        else:
+            reason = ""
+            type = msg_data['type']
+            id = msg_data['id']
+            dev_list = self._db.list_devices()
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('type', type)
+            msg.add_data('id', id)
+            msg.add_data('devices', dev_list)
+
+        self.log.debug(msg.get())
+        self.reply(msg.get())
 
 if __name__ == "__main__":
     DBC = DBConnector()
