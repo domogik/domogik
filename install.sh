@@ -154,7 +154,9 @@ function copy_sample_files {
     # create /var/lib/domogik
     if [ ! -d $DMG_LIB ];then
         mkdir $DMG_LIB
-        chown $d_user:root $DMG_LIB
+        mkdir $DMG_LIB/packages/
+        touch $DMG_LIB/packages/__init__.py
+        chown -R $d_user:root $DMG_LIB
     fi
     # create /var/lock/domogik
     if [ ! -d $DMG_LOCK ];then
