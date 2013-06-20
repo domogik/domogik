@@ -21,8 +21,12 @@ class MQMessage():
         """
         if action:
             self._action = action
+        else:
+            self._action = None
         if data:
             self._data = data
+        else:
+            self._data = {}
 
     def set_action(self, action):
         """ setAction
