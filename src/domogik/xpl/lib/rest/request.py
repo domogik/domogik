@@ -84,63 +84,70 @@ class ProcessRequest():
     """
 
     urls = {
-	# /account
-        'account': {
-            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
-            '^/account/user/list$':						                 '_rest_account_user_list',
-            '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		         '_rest_account_user_list',
-            '^/account/user/add/.*$':						                 '_rest_account_user_add',
-            '^/account/user/update/.*$':				                         '_rest_account_user_update',
-            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
-            '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
-            '^/account/person/list$':						                 '_rest_account_person_list',
-            '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
-            '^/account/person/add/.*$':					                         '_rest_account_person_add',
-            '^/account/person/update/.*$':					                 '_rest_account_person_update',
-            '^/account/person/password/.*$':				                         '_rest_account_person_password',
-            '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
-        },
+#	# /account
+#        'account': {
+#            '^/account/auth/(?P<login>[a-z]+)/(?P<password>[0-9]+)$':			         '_rest_account_auth',
+#            '^/account/user/list$':						                 '_rest_account_user_list',
+#            '^/account/user/list/by-id/(?P<id>[0-9]+)$':                  		         '_rest_account_user_list',
+#            '^/account/user/add/.*$':						                 '_rest_account_user_add',
+#            '^/account/user/update/.*$':				                         '_rest_account_user_update',
+#            '^/account/user/password/.*$':				        	         '_rest_account_user_password',
+#            '^/account/user/del/(?P<id>[0-9]+)$':    				                 '_rest_account_user_del',
+#            '^/account/person/list$':						                 '_rest_account_person_list',
+#            '^/account/person/list/by-id/(?P<id>[0-9]+)$':   			                 '_rest_account_person_list',
+#            '^/account/person/add/.*$':					                         '_rest_account_person_add',
+#            '^/account/person/update/.*$':					                 '_rest_account_person_update',
+#            '^/account/person/password/.*$':				                         '_rest_account_person_password',
+#            '^/account/person/del/(?P<id>[0-9]+)$':  			                         '_rest_account_person_del',
+#        },
         # /base
         'base': {
             # /base/device
-            '^/base/device/list$':			                                         '_rest_base_device_list',
-            '^/base/device/get/id/(?P<id>[0-9]+)$':			                         '_rest_base_device_get',
-            '^/base/device/list-upgrade$':		                                         '_rest_base_device_list_upgrade',
-            '^/base/device/upgrade/oldkey/(?P<okey>[0-9a-z\-]+)/newkey/(?P<nkey>[0-9\-]+)$':	 '_rest_base_device_upgrade',
-            '^/base/device/params/(?P<dev_type_id>[-_\.a-zA-Z0-9]+)$':                           '_rest_base_deviceparams',
-            '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
-            '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
-            '^/base/device/updateglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_updateglobal',
-            '^/base/device/update/.*$':		                                                 '_rest_base_device_update',
-            '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
-            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                  '_rest_base_device_addxplcmdparams',
-            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplstatparams',
-            '^/base/device/updatexplcmdparams/id/(?P<id>[0-9]+)/.*$':                            '_rest_base_device_updatexplcmdparams',
-            '^/base/device/udpatexplstatparams/id/(?P<id>[0-9]+)/.*$':                           '_rest_base_device_updatexplstatparams',
+#            '^/base/device/list$':			                                         '_rest_base_device_list',
+#            '^/base/device/list-old$':			                                         '_rest_base_device_list_old',
+#            '^/base/device/params/(?P<dev_type_id>[\.a-z0-9]+)$':                                '_rest_base_deviceparams',
+#            '^/base/device/add/.*$':		 	                                         '_rest_base_device_add',
+#            '^/base/device/addglobal/id/(?P<id>[0-9]+)/.*$':	                                 '_rest_base_device_addglobal',
+#            '^/base/device/update/.*$':		                                         '_rest_base_device_update',
+#            '^/base/device/del/(?P<id>[0-9]+)$':		                                 '_rest_base_device_del',
+#            '^/base/device/xplcmdparams/id/(?P<id>[0-9]+)/.*$':                                 '_rest_base_device_addxplcmdparams',
+#            '^/base/device/xplstatparams/id/(?P<id>[0-9]+)/.*$':                                '_rest_base_device_addxplstatparams',
+            # /base/device_technology
+#            '^/base/device_technology/list$':			                                 '_rest_base_device_technology_list',
+#            '^/base/device_technology/list/by-id/(?P<id>[0-9]+)$':   			         '_rest_base_device_technology_list',
+#            '^/base/device_technology/add/.*$':		 	                                 '_rest_base_device_technology_add',
+#            '^/base/device_technology/update/.*$':		                                 '_rest_base_device_technology_update',
+#            '^/base/device_technology/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_technology_del',
             # /base/device_type
-            '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
-            '^/base/device_type/list/by-plugin/(?P<name>[a-z0-9]+)$':			         '_rest_base_device_type_list_by_plugin',
-            '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
-            '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
-            '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
+#            '^/base/device_type/list$':			                                         '_rest_base_device_type_list',
+#            '^/base/device_type/list/by-plugin/(?P<name>[a-z0-9]+)$':			         '_rest_base_device_type_list_by_plugin',
+#            '^/base/device_type/add/.*$':		 	                                 '_rest_base_device_type_add',
+#            '^/base/device_type/update/.*$':		                                         '_rest_base_device_type_update',
+#            '^/base/device_type/del/(?P<dt_id>[0-9]+)$':		                         '_rest_base_device_type_del',
+            # /base/device_usage
+#            '^/base/device_usage/list$':			                                 '_rest_base_device_usage_list',
+#            '^/base/device_usage/list/by-name/(?P<name>[a-z0-9]+)$':	                         '_rest_base_device_usage_list',
+#            '^/base/device_usage/add/.*$':		 	                                 '_rest_base_device_usage_add',
+#            '^/base/device_usage/update/.*$':		                                         '_rest_base_device_usage_update',
+#            '^/base/device_usage/del/(?P<du_id>[0-9]+)$':		                         '_rest_base_device_usage_del',
             # xpl-command
-            '^/base/xpl-command/list$':                                                          '_rest_base_xplcommand_list',
-            '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
-            '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
-            '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
+#            '^/base/xpl-command/list$':                                                          '_rest_base_xplcommand_list',
+#            '^/base/xpl-command/del/(?P<id>[0-9]+)$':                                            '_rest_base_xplcommand_del',
+#            '^/base/xpl-command/update/.*$':                                                     '_rest_base_xplcommand_update',
+#            '^/base/xpl-command/add/.*$':                                                        '_rest_base_xplcommand_add',
             # xpl-command-params
-            '^/base/xpl-command-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_xplcommandparam_del',
-            '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
-            '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
+#            '^/base/xpl-command-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                   '_rest_base_xplcommandparam_del',
+#            '^/base/xpl-command-param/update/.*$':                                               '_rest_base_xplcommandparam_update',
+#            '^/base/xpl-command-param/add/.*$':                                                  '_rest_base_xplcommandparam_add',
             # xpl-stat
-            '^/base/xpl-stat/list$':                                                             '_rest_base_xplstat_list',
-            '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
-            '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
-            '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
+#            '^/base/xpl-stat/list$':                                                             '_rest_base_xplstat_list',
+#            '^/base/xpl-stat/del/(?P<id>[0-9]+)$':                                               '_rest_base_xplstat_del',
+#            '^/base/xpl-stat/update/.*$':                                                        '_rest_base_xplstat_update',
+#            '^/base/xpl-stat/add/.*$':                                                           '_rest_base_xplstat_add',
             # xpl-stat-params
-            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
-            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
-            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
+#            '^/base/xpl-stat-param/del/(?P<id>[0-9]+)/(?P<key>[a-z0-9]+)$':                      '_rest_base_xplstatparam_del',
+#            '^/base/xpl-stat-param/update/.*$':                                                  '_rest_base_xplstatparam_update',
+#            '^/base/xpl-stat-param/add/.*$':                                                     '_rest_base_xplstatparam_add',
             # return the datatype json
             '^/base/datatype$':                                                                  '_rest_base_datatype',
         },
@@ -156,26 +163,26 @@ class ProcessRequest():
             '^/events/request/get/(?P<ticket_id>[0-9]+)$':				         '_rest_events_request_get',
             '^/events/request/free/(?P<ticket_id>[0-9]+)$':			                 '_rest_events_request_free',
         },
-        # /helper
-        'helper': {
-            '^/helper/.*$':			                                                 'rest_helper',
-        },
-        # /host
-        'host': {
-            '^/host/.*$':			                                                 'rest_host',
-        },
-        # /log
-        'log': {
-            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
-            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
-        },
+#        # /helper
+#        'helper': {
+#            '^/helper/.*$':			                                                 'rest_helper',
+#        },
+#        # /host
+#        'host': {
+#            '^/host/.*$':			                                                 'rest_host',
+#        },
+#        # /log
+#        'log': {
+#            '^/log/tail/txt/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_txt',
+#            '^/log/tail/html/(?P<host>[a-z]+)/(?P<file>[a-z\.]+)/(?P<number>[0-9]+)/(?P<ofset>[0-9]+)$': '_rest_log_tail_html',
+#        },
         # /package
         'package': {
-            '^/package/get-mode$':								 '_rest_package_get_mode',
-            '^/package/list-repo$':							         '_rest_package_list_repo',
+#            '^/package/get-mode$':								 '_rest_package_get_mode',
+#            '^/package/list-repo$':							         '_rest_package_list_repo',
             '^/package/install_from_path/(?P<host>[a-z]+)$':    				 '_rest_package_install_from_path',
             '^/package/download/(?P<type>[a-z]+)/(?P<id>[a-z]+)/(?P<version>[a-z0-9\.]+)$':	 '_rest_package_download',
-            '^/package/update-cache$':								 '_rest_package_update_cache',
+#            '^/package/update-cache$':								 '_rest_package_update_cache',
             '^/package/available/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)$':		 '_rest_package_available',
             '^/package/installed/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)$':		 '_rest_package_installed',
             '^/package/dependency/(?P<host>[a-z]+)/(?P<pkg_type>[plugin|external]+)/(?P<id>[^/]+)/(?P<version>[^/]+)$': '_rest_package_dependency',
@@ -215,6 +222,7 @@ class ProcessRequest():
             '^/stats/(?P<sensor_id>[0-9]+)/latest$':				     '_rest_stats_last',
             '^/stats/(?P<sensor_id>[0-9]+)/last/(?P<num>[0-9]+)$':		     '_rest_stats_last',
             '^/stats/(?P<sensor_id>[0-9]+)/from/.*$':     		             '_rest_stats_from',
+            '^/stats/reload$':     		                                     '_rest_stats_reload',
         },
    }
 
@@ -307,8 +315,7 @@ class ProcessRequest():
         self._event_dmg =  self.handler_params[0]._event_dmg
         self._event_requests =  self.handler_params[0]._event_requests
 
-        self.stat_mgr =  self.handler_params[0].stat_mgr
-
+        self.reload_stats = self.handler_params[0].reload_stats
         self._hosts_list = self.handler_params[0]._hosts_list
         self.get_installed_packages = self.handler_params[0].get_installed_packages
         self._get_installed_packages_from_manager = self.handler_params[0]._get_installed_packages_from_manager
@@ -890,7 +897,11 @@ class ProcessRequest():
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
-
+    def _rest_stats_reload(self):
+        self.reload_stats()
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
 
     def _rest_stats_from(self, sensor_id):
         """ Get the values for device/key in database for an start time to ...
@@ -1523,8 +1534,8 @@ class ProcessRequest():
         for x in self._db.get_xpl_stat_by_device_id(id):
             for p in js['global']: 
                 self._db.add_xpl_stat_param(statid=x.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
     def _rest_base_device_updateglobal(self, id):
         json_data = JSonHelper("OK")
@@ -1539,8 +1550,8 @@ class ProcessRequest():
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_stat_param(statid=x.id, key=p.key, value=self.get_parameters(p.key), static=True)
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
    
     def _rest_base_device_addxplcmdparams(self, id):
         json_data = JSonHelper("OK")
@@ -1581,8 +1592,8 @@ class ProcessRequest():
 	        return
             # go and add the param
             self._db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=self.get_parameters(p['key']))
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
     def _rest_base_device_updatexplcmdparams(self, id):
         json_data = JSonHelper("OK")
@@ -1591,8 +1602,8 @@ class ProcessRequest():
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_command_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
  
     def _rest_base_device_updatexplstatparams(self, id):
         json_data = JSonHelper("OK")
@@ -1601,8 +1612,8 @@ class ProcessRequest():
              for p in x.params:
                  if self.get_parameters(p.key) is not None:
                      self._db.update_xpl_stat_param(cmd_id=x.id, key=p.key, value=self.get_parameters(p.key))
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
  
     def _rest_base_device_addxplstatparams(self, id):
         json_data = JSonHelper("OK")
@@ -1643,8 +1654,8 @@ class ProcessRequest():
 	        return
             # go and add the param
             self._db.add_xpl_stat_param(statid=cmd.id, key=p['key'], value=self.get_parameters(p['key']), static=True)
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
     def _rest_base_device_add(self):
         """ add devices
@@ -1697,8 +1708,8 @@ class ProcessRequest():
             json_data.add_data(device)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
+        self.reload_stats()
         self.send_http_response_ok(json_data.get())
-        self.stat_mgr.load()
 
 ######
 # /plugin processing

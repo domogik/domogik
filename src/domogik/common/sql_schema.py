@@ -74,7 +74,6 @@ _config = None
 _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
-
 # Define objects
 class DeviceUsage(Base):
     """Usage of a device (temperature, heating, lighting, music...)"""

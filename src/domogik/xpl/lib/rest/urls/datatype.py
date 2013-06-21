@@ -1,0 +1,28 @@
+from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, timeit
+from domogik.common.configloader import Loader
+import sys
+import os
+import domogik
+from subprocess import Popen, PIPE
+from flask import Response
+import json
+
+@urlHandler.route('/datatype')
+@json_response
+@timeit
+def api_datatype():
+    """ return the datatypes json file
+        /src/domogik/common/datatypes.json
+    """
+    urlHandler.logger.debug("test =============")
+    cfg = Loader('domogik')
+    config = cfg.load()
+    conf = dict(config[1])
+
+    if conf.has_key('package_path'):
+        json_file = "{0}/domogik/common/datatypes.json".format(conf['package_path'])
+    else:
+        json_file = "{0}/domogik/common/datatypes.json".format(conf['src_prefix'])
+    data = json.load(open(json_file))
+
+    return 200, data

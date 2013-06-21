@@ -97,8 +97,10 @@ setup(
                       'pip >= 1.0', 
                       'Distutils2',
                       'pyserial >= 2.5',
-                      'netifaces>=0.8',
-                      'Twisted>=12.1.0'],
+                      'netifaces >= 0.8',
+                      'Twisted >= 12.1.0',
+                      'Flask >= 0.9',
+                      'tornado >= 2.4.1'],
     zip_safe = False,
     license = 'GPL v3',
     # namespace_packages = ['domogik', 'mpris', 'tools'],
@@ -117,6 +119,7 @@ setup(
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
             dmg_dump = domogik.xpl.bin.dump_xpl:main
+            dmg_mq_dump = domogik.mq.dump:main
             dmg_version = domogik.xpl.bin.version:main
             dmg_hub = domogik.xpl.bin.hub:main
             dmg_broker = domogik.mq.reqrep.broker:main

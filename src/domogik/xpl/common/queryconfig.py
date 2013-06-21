@@ -102,7 +102,7 @@ class QueryMQ():
         else:
             if ret._data['status']:
                 self._log.debug("Query config : successfull response : {0}".format(ret))
-                return ret._data['value']
+                return str(ret._data['value'])
             else:
                 self._log.error("Query config : error returned. Reason : {0}".format(ret._data['reason']))
                 return None

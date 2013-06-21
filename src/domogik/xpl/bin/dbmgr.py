@@ -128,7 +128,6 @@ class DBConnector(XplPlugin, MQRep):
         msg = MQMessage()
         msg.set_action('config.result')
         status = True
-
         msg_data = data.get_data()
         print msg_data
         if 'type' not in msg_data:
