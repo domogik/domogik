@@ -48,6 +48,8 @@ from datetime import timedelta
 import pwd
 import sys
 import resource
+import traceback
+import tailer
 # import time
 # from time import sleep
 # import os.path
@@ -242,6 +244,30 @@ class OZWavemanager(threading.Thread):
         else:
             return 'Unknown'
             
+    def getLoglines(self, message):
+        """Renvoi les lignes Start à End du fichier de log."""
+        retval = {'error': ""}
+        try :
+            if 'lines' in message:
+                lines = int(message['lines'])
+        except :
+            lines = 50
+        try:
+           # filename = os.path.join("/var/log/domogik/ozwave.log")
+            for h in self._log.__dict__['handlers']:
+                if h.__class__.__name__ in ['FileHandler', 'TimedRotatingFileHandler','RotatingFileHandler', 'WatchedFileHandler']:
+                    filename = h.baseFilename
+            
+            if message['from'] == 'top':
+                retval['data'] = tailer.head(open(filename), lines)
+            elif message['from'] == 'end':
+                retval['data'] = tailer.tail(open(filename), lines)
+            else: return {'error': "No from direction define."}
+        except:
+                retval['error'] = "Exception : %s" % (traceback.format_exc())
+                self._log.error("Get log lines : " + retval['error'])
+        return retval
+
     def _getSleepingNodeCount(self):
         """ Renvoi le nombre de node en veille."""
         retval = 0
@@ -975,6 +1001,8 @@ class OZWavemanager(threading.Thread):
                     report = self.testNetworkNode(message['node'],  message['count'],  10000, True)
                 else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
+            elif message['request'] == 'GetLog':
+                report = self.getLoglines(message)
             else :
                 report['error'] ='unknown request'
                 print "commande inconnue"

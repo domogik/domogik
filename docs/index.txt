@@ -2,6 +2,12 @@
 Domogik
 =======
 
+
+.. todo::
+    This release is actually in development.
+    Some parts of this documentation still need to be updated!
+
+
 Overview
 ========
 
@@ -12,6 +18,9 @@ End User Documentation
 ======================
 
 * :doc:`Release 0.4.0 </releases/0.4.0>`
+* :doc:`Release 0.3.0 </releases/0.3.0>`
+* :doc:`Release 0.2.0 </releases/0.2.0>`
+* :doc:`Release 0.1.0 </releases/0.1.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**
 
@@ -72,6 +81,8 @@ Technical Documentation
         * :doc:`Request Reply </technical/mq/reqrep>`
         * :doc:`Publish Subscribe </technical/mq/pubsub>`
         * :doc:`Used messages </technical/mq/used>`
+        * :doc:`Detail on Request Reply used messages </technical/mq/reqrep_detailed>`
+        * :doc:`detail on Publish Subscribe used messages</technical/mq/pubsub_detailed>`
 
 Developers Documentation
 ========================
