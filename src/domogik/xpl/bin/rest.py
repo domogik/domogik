@@ -94,19 +94,12 @@ class Rest(XplPlugin):
             self.log_dir_path = conf['log_dir_path']
 
             # plugin installation path
-            if conf.has_key('package_path'):
-                self._package_path = conf['package_path']
-                self._src_prefix = None
-                self.log.info("Set package path to '%s' " % self._package_path)
-                print("Set package path to '%s' " % self._package_path)
-                self._design_dir = "%s/domogik_packages/design/" % self._package_path
-                self.package_mode = True
-            else:
-                self.log.info("No package path defined in config file")
-                self._package_path = None
-                self._src_prefix = conf['src_prefix']
-                self._design_dir = "%s/share/domogik/design/" % conf['src_prefix']
-                self.package_mode = False
+            self._package_path = conf['package_path']
+            self._src_prefix = None
+            self.log.info("Set package path to '%s' " % self._package_path)
+            print("Set package path to '%s' " % self._package_path)
+            self._design_dir = "%s/domogik_packages/design/" % self._package_path
+            self.package_mode = True
     
             # HTTP server ip and port
             try:
@@ -151,8 +144,8 @@ class Rest(XplPlugin):
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR
 
-            # Enable hbeat
-            self.enable_hbeat()
+            ### Component is ready
+            self.ready()
             
  	    # Launch server, stats
             self.log.info("REST Initialisation OK")
@@ -224,9 +217,10 @@ class Rest(XplPlugin):
         """ Get exception and display it on stdout
         """
         my_exception =  str(traceback.format_exc()).replace('"', "'")
-        print("==== Error in REST ====")
-        print(my_exception)
-        print("=======================")
+        # TODO : to delete : no more need to print this as log are in stdout
+        #print("==== Error in REST ====")
+        #print(my_exception)
+        #print("=======================")
         return my_exception
 
 if __name__ == '__main__':
