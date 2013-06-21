@@ -117,7 +117,7 @@ class DBConnector(XplPlugin, MQRep):
             self.log.error("config.set action is not yet developped")
 
         # devices list
-        if msg.get_action() == "devices.get":
+        elif msg.get_action() == "devices.get":
             self._mdp_reply_devices_result(msg)
 
 
