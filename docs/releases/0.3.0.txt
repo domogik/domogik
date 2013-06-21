@@ -19,7 +19,7 @@ The main screen
 
 You can notice that a theme is used on this screenshot (petals in the title bar and curved lines in the page body). Each page can have its own theme and it is easy to create them.
 
-Between the title bar and the body there are several round buttons. From left to right: ::
+Between the title bar and the body there are several round buttons. From left to right: 
 
 * Grid : to edit the page and set widgets
 * Gears : page settings
