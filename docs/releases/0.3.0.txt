@@ -19,37 +19,38 @@ The main screen
 
 You can notice that a theme is used on this screenshot (petals in the title bar and curved lines in the page body). Each page can have its own theme and it is easy to create them.
 
-Between the title bar and the body there are several round buttons. From left to right :
+Between the title bar and the body there are several round buttons. From left to right: ::
+
 * Grid : to edit the page and set widgets
 * Gears : page settings
 * Shield : access to administration
 * Padlock : log in / out
 
-On the bottom a breadcrumb displays the current page and links to its ancestors :
+On the bottom a breadcrumb displays the current page and links to its ancestors:
 
 .. image:: 0.3/dmg_0.3_06_ariane.png
 
-The first item of the breadcrumb is a selector to jump to a specific page :
+The first item of the breadcrumb is a selector to jump to a specific page:
 
 .. image:: 0.3/dmg_0.3_06_ariane_circle.png
 
 Right now you can change the pages only by using the breadcrumb or the page selector. Some widgets will be added to make this easier.
 
-Error notifications are now displayed in another way :
+Error notifications are now displayed in another way:
 
 .. image:: 0.3/dmg_0.3_02_error.png
 
-To create pages there is a dedicated section in the administration panel. It just allows to create the pages tree :
+To create pages there is a dedicated section in the administration panel. It just allows to create the pages tree:
 
 .. image:: 0.3/dmg_0.3_03_admin_page.png
 
-The accurate settings of a page are accessed through the *gears* button which then shows this screen :
+The accurate settings of a page are accessed through the *gears* button which then shows this screen:
 
 .. image:: 0.3/dmg_0.3_04_page_config.png
 
 Here you can change the name of a page, add a description choose an icon and a theme. It is possible to add our own icons set.
 
-You can select a theme through a list :
+You can select a theme through a list:
 
 .. image:: 0.3/dmg_0.3_05_page_config_theme.png
 
