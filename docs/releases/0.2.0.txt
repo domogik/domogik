@@ -2,9 +2,6 @@
 Release 0.2.0
 =============
 
-.. todo::
-    This release is actually in alpha/beta/rc status. This page will be updated soon.
-
 New features 
 ============
 
