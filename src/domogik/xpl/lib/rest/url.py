@@ -71,6 +71,22 @@ def timeit(action_func):
         return result
     return timed
 
+# custom error pages
+@urlHandler.errorhandler(404)
+@json_response
+def page_not_found(e):
+    return 404, {'error': "Not found"}
+
+@urlHandler.errorhandler(403)
+@json_response
+def page_not_found(e):
+    return 403, {'error': "Forbidden"}
+
+@urlHandler.errorhandler(500)
+@json_response
+def page_not_found(e):
+    return 500, {'error': "Application error see rest.log"}
+
 # view class registration
 def register_api(view, endpoint, url, pk='id', pk_type=None):
     view_func = view.as_view(endpoint)
