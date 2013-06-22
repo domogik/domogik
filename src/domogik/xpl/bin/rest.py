@@ -97,7 +97,6 @@ class Rest(XplPlugin):
             self._package_path = conf['package_path']
             self._src_prefix = None
             self.log.info("Set package path to '%s' " % self._package_path)
-            print("Set package path to '%s' " % self._package_path)
             self._design_dir = "%s/domogik_packages/design/" % self._package_path
             self.package_mode = True
     
@@ -144,14 +143,15 @@ class Rest(XplPlugin):
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR
 
-            ### Component is ready
-            self.ready()
-            
  	    # Launch server, stats
             self.log.info("REST Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
             self.start_http()
+
+            ### Component is ready
+            #self.ready()
+            
         except :
             self.log.error("%s" % self.get_exception())
 
@@ -183,7 +183,9 @@ class Rest(XplPlugin):
         #}) 
         self.http_server.listen(int(self.server_port), address=self.server_ip)
         
-        IOLoop.instance().start()
+        # already done in XplPlugin
+        #IOLoop.instance().start()
+
 	return
 
     def stop_http(self):
