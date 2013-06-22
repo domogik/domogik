@@ -10,6 +10,7 @@ from flask import Response
 @json_response
 @timeit
 def api_root():
+    print "@@@@@ /"
     # domogik global version
     global_version = sys.modules["domogik"].__version__
     # domogik src version
