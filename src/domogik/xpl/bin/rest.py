@@ -52,9 +52,8 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 import zmq
 import signal
-from zmq.eventloop import ioloop
-ioloop.install()
-from tornado import httpserver
+zmq.eventloop.ioloop.install()
+from tornado.ioloop import IOLoop 
 
 REST_API_VERSION = "0.7"
 USE_SSL = False
@@ -96,11 +95,11 @@ class Rest(XplPlugin):
             self.log_dir_path = conf['log_dir_path']
 
             # plugin installation path
-            self._package_path = conf['package_path']
-            self._src_prefix = None
-            self.log.info("Set package path to '%s' " % self._package_path)
-            self._design_dir = "%s/domogik_packages/design/" % self._package_path
-            self.package_mode = True
+            #self._package_path = conf['package_path']
+            #self._src_prefix = None
+            #self.log.info("Set package path to '%s' " % self._package_path)
+            #self._design_dir = "%s/domogik_packages/design/" % self._package_path
+            #self.package_mode = True
     
             # HTTP server ip and port
             try:
@@ -153,8 +152,8 @@ class Rest(XplPlugin):
             self.start_http()
             
             ### Component is ready
-            # calls th zmq.eventloop.ioloop.instance().start()
-            self.ready()
+            self.ready(0)
+            IOLoop.instance().start()
         except :
             self.log.error("%s" % self.get_exception())
 
@@ -185,8 +184,6 @@ class Rest(XplPlugin):
              #"keyfile": os.path.join(data_dir, "mydomain.key"),
         #}) 
         self.http_server.listen(int(self.server_port), address=self.server_ip)
-        # already done in XplPlugin
-        #IOLoop.instance().start()
 	return
 
     def stop_http(self):

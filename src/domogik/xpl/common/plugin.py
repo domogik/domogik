@@ -173,7 +173,7 @@ class XplPlugin(BasePlugin, MQRep):
         return True
 
 
-    def ready(self):
+    def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin
         """
         ### activate xpl hbeat
@@ -195,7 +195,8 @@ class XplPlugin(BasePlugin, MQRep):
         ### Instantiate the MQ
         # nothing can be launched after this line (blocking call!!!!)
         self.log.info("Start IOLoop for MQ : nothing else can be executed in the __init__ after this! Make sure that the self.ready() call is the last line of your init!!!!")
-        IOLoop.instance().start()
+        if ioloopstart == 1:
+            IOLoop.instance().start()
 
 
     def on_mdp_request(self, msg):
