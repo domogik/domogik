@@ -95,11 +95,11 @@ class Rest(XplPlugin):
             self.log_dir_path = conf['log_dir_path']
 
             # plugin installation path
-            #self._package_path = conf['package_path']
-            #self._src_prefix = None
-            #self.log.info("Set package path to '%s' " % self._package_path)
-            #self._design_dir = "%s/domogik_packages/design/" % self._package_path
-            #self.package_mode = True
+            self._package_path = conf['package_path']
+            self._src_prefix = None
+            self.log.info("Set package path to '%s' " % self._package_path)
+            self._design_dir = "%s/domogik_packages/design/" % self._package_path
+            self.package_mode = True
     
             # HTTP server ip and port
             try:
