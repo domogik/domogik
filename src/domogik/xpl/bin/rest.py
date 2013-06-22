@@ -50,9 +50,11 @@ import datetime
 import errno
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
 import zmq
 import signal
+from zmq.eventloop import ioloop
+ioloop.install()
+from tornado import httpserver
 
 REST_API_VERSION = "0.7"
 USE_SSL = False
@@ -94,12 +96,12 @@ class Rest(XplPlugin):
             self.log_dir_path = conf['log_dir_path']
 
             # plugin installation path
-            self._package_path = conf['package_path']
-            self._src_prefix = None
-            self.log.info("Set package path to '%s' " % self._package_path)
-            print("Set package path to '%s' " % self._package_path)
-            self._design_dir = "%s/domogik_packages/design/" % self._package_path
-            self.package_mode = True
+           # self._package_path = conf['package_path']            
+           # self._src_prefix = None
+           # self.log.info("Set package path to '%s' " % self._package_path)
+           # print("Set package path to '%s' " % self._package_path)
+           # self._design_dir = "%s/domogik_packages/design/" % self._package_path
+           # self.package_mode = True
     
             # HTTP server ip and port
             try:
@@ -144,14 +146,16 @@ class Rest(XplPlugin):
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR
 
-            ### Component is ready
-            self.ready()
-            
  	    # Launch server, stats
             self.log.info("REST Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
+            # calls the tornado.ioloop.instance().start()
             self.start_http()
+            
+            ### Component is ready
+            # calls th zmq.eventloop.ioloop.instance().start()
+            self.ready()
         except :
             self.log.error("%s" % self.get_exception())
 
@@ -182,8 +186,6 @@ class Rest(XplPlugin):
              #"keyfile": os.path.join(data_dir, "mydomain.key"),
         #}) 
         self.http_server.listen(int(self.server_port), address=self.server_ip)
-        
-        IOLoop.instance().start()
 	return
 
     def stop_http(self):
