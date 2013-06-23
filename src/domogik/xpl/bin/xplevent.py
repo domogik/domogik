@@ -58,14 +58,12 @@ class XplEvent(XplPlugin, MQRep):
         """ Initiate DbHelper, Logs and config
         """
         XplPlugin.__init__(self, 'xplevent')
-        MQRep.__init__(self, zmq.Context(), 'xplevent')
         self.log.info("XPL Events manager initialisation...")
         self._db = DbHelper()
         self.pub = MQPub(zmq.Context(), 'xplevent')
         self.stats = None
         self.load()
-        self.enable_hbeat()
-        IOLoop.instance().start()
+        self.ready()
 
     def on_mdp_request(self, msg):
         if msg._action == "reload":
