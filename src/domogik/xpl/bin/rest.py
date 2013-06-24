@@ -95,10 +95,10 @@ class Rest(XplPlugin):
             self.log_dir_path = conf['log_dir_path']
 
             # plugin installation path
-            self._package_path = conf['package_path']
-            self._src_prefix = None
-            self.log.info("Set package path to '%s' " % self._package_path)
-            self._design_dir = "%s/domogik_packages/design/" % self._package_path
+            #self._package_path = conf['package_path']
+            #self._src_prefix = None
+            #self.log.info("Set package path to '%s' " % self._package_path)
+            #self._design_dir = "%s/domogik_packages/design/" % self._package_path
             self.package_mode = True
     
             # HTTP server ip and port
@@ -161,8 +161,6 @@ class Rest(XplPlugin):
         """ Start HTTP Server
         """
         self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
-        # Temp fix, once MQ is used, queues are removed, so we basically only need the API version
-        urlHandler.rest = self
         # logger
         for log in self.log.handlers:
             urlHandler.logger.addHandler(log)
@@ -176,6 +174,8 @@ class Rest(XplPlugin):
         urlHandler.xpl = self.myxpl 
         # reload statsmanager helper
         urlHandler.reload_stats = self.reload_stats
+        # handler for getting the paths
+        urlHandler.resources_directory = self.get_resources_directory()
         
         self.http_server = HTTPServer(WSGIContainer(urlHandler))
         # for ssl, extra parameter to HTTPServier init

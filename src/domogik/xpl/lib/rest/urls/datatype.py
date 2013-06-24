@@ -18,11 +18,7 @@ def api_datatype():
     cfg = Loader('domogik')
     config = cfg.load()
     conf = dict(config[1])
-
-    if conf.has_key('package_path'):
-        json_file = "{0}/domogik/common/datatypes.json".format(conf['package_path'])
-    else:
-        json_file = "{0}/domogik/common/datatypes.json".format(conf['src_prefix'])
+    json_file = "{0}/datatypes.json".format(urlHandler.resources_directory)
     data = json.load(open(json_file))
 
     return 200, data
