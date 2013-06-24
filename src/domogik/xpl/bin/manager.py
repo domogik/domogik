@@ -521,8 +521,7 @@ class CoreComponent(GenericComponent):
         pid = self.exec_component("domogik.xpl.bin")
         self.set_pid(pid)
        
-        # TODO : add a step to check if the component successfully started
-        # no need as the status is given to the user directly by the pub/sub 'plugin.status'
+        # no need to add a step to check if the composent is started as the status is given to the user directly by the pub/sub 'plugin.status'
 
         return pid
 
