@@ -155,6 +155,7 @@ function copy_sample_files {
     if [ ! -d $DMG_LIB ];then
         mkdir $DMG_LIB
         mkdir $DMG_LIB/packages/
+        mkdir $DMG_LIB/resources/
         touch $DMG_LIB/packages/__init__.py
         chown -R $d_user:root $DMG_LIB
     fi
