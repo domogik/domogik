@@ -62,8 +62,9 @@ STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
-# folder for the packages in package_path folder (/var/lib/domogik/)
+# folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"
+RESOURCES_DIR = "resources"
 
 # domogik vendor id (for xpl)
 DMG_VENDOR_ID = "domogik"
@@ -119,6 +120,10 @@ class XplPlugin(BasePlugin, MQRep):
         my_conf = cfg.load()
         self._config_files = CONFIG_FILE
         config = dict(my_conf[1])
+ 
+        self.libraries_directory = config['libraries_path']
+        self.packages_directory = "{0}/{1}".format(config['libraries_path'], PACKAGES_DIR)
+        self.resources_directory = "{0}/{1}".format(config['libraries_path'], RESOURCES_DIR)
 
         # Get pid and write it in a file
         self._pid_dir_path = config['pid_dir_path']
@@ -263,6 +268,21 @@ class XplPlugin(BasePlugin, MQRep):
        """
        return self._config_files
 
+    def get_libraries_directory(self):
+       """ getter 
+       """
+       return self.libraries_directory
+
+    def get_packages_directory(self):
+       """ getter 
+       """
+       return self.packages_directory
+
+    def get_resources_directory(self):
+       """ getter 
+       """
+       return self.resources_directory
+
     def get_data_files_directory(self):
        """
        Return the directory where a plugin developper can store data files.
@@ -273,7 +293,7 @@ class XplPlugin(BasePlugin, MQRep):
        cfg = Loader('domogik')
        my_conf = cfg.load()
        config = dict(my_conf[1])
-       path = "{0}/{1}/{2}_{3}/data/" % (config['package_path'], PACKAGES_DIR, "plugin", self._name)
+       path = "{0}/{1}/{2}_{3}/data/" % (self.librairies_directory, PACKAGES_DIR, "plugin", self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
                raise OSError("Can't write in directory %s" % path)

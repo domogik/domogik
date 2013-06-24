@@ -167,13 +167,15 @@ class Manager(XplPlugin):
             self._pid_dir_path = conf['pid_dir_path']
        
             # packages module path : /var/lib/domogik
-            self._package_module_path = conf['package_path']
+            #self._package_module_path = conf['package_path']
             # packages installation path : /var/lib/domogik/packages
-            self._package_path = "{0}/{1}".format(self._package_module_path, PACKAGES_DIR)
-            self.log.info("Package path : {0}".format(self._package_path))
+            #self._package_path = "{0}/{1}".format(self._package_module_path, PACKAGES_DIR)
+            #self.log.info("Package path : {0}".format(self._package_path))
         except:
             self.log.error("Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
+
+        self.log.info("Packages path : {0}".format(self.get_packages_directory()))
 
         ### MQ
         # self._zmq = zmq.Context() is aleady define in XplPlugin
@@ -244,8 +246,8 @@ class Manager(XplPlugin):
                     self._plugins[id] = Plugin(id, 
                                                self.get_sanitized_hostname(), 
                                                self._clients, 
-                                               self._package_module_path,
-                                               self._package_path,
+                                               self.get_libraries_directory(),
+                                               self.get_packages_directory(),
                                                self._zmq,
                                                self.get_stop())
                     # The automatic startup is handled in the Plugin class in __init__
@@ -328,16 +330,16 @@ class Manager(XplPlugin):
 
 
     def _list_packages(self):
-        """ List the packages available in self._package_path
+        """ List the packages available in the packages directory
             @return status : True/False
                     list : a list of packages directory names
         """
         try:
             list = []
-            #for root, dirs, files in os.walk(self._package_path):
+            #for root, dirs, files in os.walk(self.get_packages_directory()):
             #    for dir in dirs:
-            for a_file in os.listdir(self._package_path):
-                if os.path.isdir(os.path.join(self._package_path, a_file)):
+            for a_file in os.listdir(self.get_packages_directory()):
+                if os.path.isdir(os.path.join(self.get_packages_directory(), a_file)):
                     list.append(a_file)
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
@@ -556,13 +558,13 @@ class Plugin(GenericComponent, MQAsyncSub):
         The MQAsyncSub helps to set the status 
     """
 
-    def __init__(self, id, host, clients, package_module_path, package_path, zmq_context, stop):
+    def __init__(self, id, host, clients, libraries_directory, packages_directory, zmq_context, stop):
         """ Init a plugin 
             @param id : plugin id (ipx800, onewire, ...)
             @param host : hostname
             @param clients : clients list 
-            @param package_module_path : path for the base python module for packages : /var/lib/domogik/
-            @param package_path : path in which are stored the packages : /var/lib/domogik/packages/
+            @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
+            @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
             @param zmq_context : zmq context
             @param stop : get_stop()
         """
@@ -573,8 +575,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.type = "plugin"
 
         ### set package path
-        self._package_path = package_path
-        self._package_module_path = package_module_path
+        self._packages_directory = packages_directory
+        self._libraries_directory = libraries_directory
 
         ### zmq context
         self._zmq = zmq_context
@@ -666,8 +668,8 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### Try to start the plugin
         self.log.info("Request to start plugin : {0}".format(self.id))
-        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._package_path, self.id, self.id), \
-                                  env_pythonpath = self._package_module_path)
+        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._packages_directory, self.id, self.id), \
+                                  env_pythonpath = self._librairies_directory)
         pid = pid
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
