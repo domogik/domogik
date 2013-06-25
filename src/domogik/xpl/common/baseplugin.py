@@ -39,12 +39,12 @@ from socket import gethostname
 import sys
 import os
 import pwd
+import daemon
 
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
 from domogik.common.utils import is_already_launched
 from optparse import OptionParser
-from domogik.common.daemonize import createDaemon
 
 class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
@@ -116,9 +116,9 @@ class BasePlugin():
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
             self.log.info("Starting the plugin in background...")
-            createDaemon()
-            #l = logger.Logger(name)
-            #self.log = l.get_logger()
+            ctx = daemon.DaemonContext()
+            ctx.files_preserve = l.get_fds([name])
+            ctx.open()
             self.log.info("Daemonize plugin %s" % name)
             self.is_daemon = True
         else:
