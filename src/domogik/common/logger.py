@@ -110,3 +110,13 @@ class Logger():
             return self.__class__.logger[self.__class__.logger.keys()[0]]
         else:
             raise AttributeError, "You must specify a loggger name"
+
+    def get_fds(self, logger_names):
+        openFiles = []
+        for name in logger_names:
+            logger = self.logger[name]
+            for handler in logger.handlers:
+                if hasattr(handler, 'stream') and \
+                    hasattr(handler.stream, 'fileno'):
+                    openFiles.append(handler.stream) 
+        return openFiles
