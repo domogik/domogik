@@ -107,3 +107,4 @@ class QueryMQ():
                 self._log.error("Query config : error returned. Reason : {0}".format(ret._data['reason']))
                 return None
 
+

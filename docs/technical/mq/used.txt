@@ -32,9 +32,11 @@ Source                  Destination         action req          action rep      
 ======================= =================== =================== ===================== =====================
 rest                    xplevent            reload              reload.result
 ----------------------- ------------------- ------------------- --------------------- ---------------------
-plugin (any)            dbmgr               config.get          config.result         req_config.py
+plugin (any)            dbmgr               config.get          config.result         req_config_get.py
 ----------------------- ------------------- ------------------- --------------------- ---------------------
-plugin (any) (inactive) dbmgr               config.set          config.result
+UIs                     dbmgr               config.set          config.result         req_config_set.py
+----------------------- ------------------- ------------------- --------------------- ---------------------
+UIs                     dbmgr               config.delete       config.result         req_config_delete.py
 ----------------------- ------------------- ------------------- --------------------- ---------------------
 UIs                     manager             clients.list.get    clients.list.result   req_clients_list.py
 ----------------------- ------------------- ------------------- --------------------- ---------------------

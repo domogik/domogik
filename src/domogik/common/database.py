@@ -441,7 +441,6 @@ class DbHelper():
         @return a PluginConfig object
 
         """
-        self.log.debug("GPC %s, %s, %s" % (pl_id, pl_hostname, pl_key)) 
         try:
             ret = self.__session.query(
                         PluginConfig
@@ -449,7 +448,6 @@ class DbHelper():
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).filter_by(key=ucode(pl_key)
                     ).first()
-            self.log.debug("GPC %s, %s, %s => %s=%s" % (pl_id, pl_hostname, pl_key, ret.key, ret.value)) 
         except:
             self.log.Debug("oups")
         return ret

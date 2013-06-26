@@ -7,10 +7,9 @@ from domogik.mq.message import MQMessage
 
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
-msg.set_action('config.get')
+msg.set_action('config.delete')
 msg.add_data('type', 'plugin')
 msg.add_data('host', 'darkstar')
 msg.add_data('id', 'diskfree')
-msg.add_data('key', 'interval')
 print cli.request('dbmgr', msg.get(), timeout=10).get()
 

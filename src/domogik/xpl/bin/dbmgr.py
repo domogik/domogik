@@ -110,18 +110,20 @@ class DBConnector(XplPlugin, MQRep):
 
         # configuration
         if msg.get_action() == "config.get":
-            self._mdp_reply_config_result(msg)
+            self._mdp_reply_config_get(msg)
 
         elif msg.get_action() == "config.set":
-            # TODO
-            self.log.error("config.set action is not yet developped")
+            self._mdp_reply_config_set(msg)
+
+        elif msg.get_action() == "config.delete":
+            self._mdp_reply_config_delete(msg)
 
         # devices list
         elif msg.get_action() == "devices.get":
             self._mdp_reply_devices_result(msg)
 
 
-    def _mdp_reply_config_result(self, data):
+    def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req
             @param data : MQ req message
         """
@@ -129,10 +131,13 @@ class DBConnector(XplPlugin, MQRep):
         msg.set_action('config.result')
         status = True
         msg_data = data.get_data()
-        print msg_data
         if 'type' not in msg_data:
             status = False
             reason = "Config request : missing 'type' field : {0}".format(data)
+
+        if msg_data['type'] != "plugin":
+            status = False
+            reason = "Config request not available for type={0}".format(msg_data['type'])
 
         if 'id' not in msg_data:
             status = False
@@ -143,8 +148,11 @@ class DBConnector(XplPlugin, MQRep):
             reason = "Config request : missing 'host' field : {0}".format(data)
 
         if 'key' not in msg_data:
-            status = False
-            reason = "Config request : missing 'key' field : {0}".format(data)
+            get_all_keys = True
+            key = "*"
+        else:
+            get_all_keys = False
+            key = msg_data['key']
 
         if status == False:
             self.log.error(reason)
@@ -153,17 +161,137 @@ class DBConnector(XplPlugin, MQRep):
             type = msg_data['type']
             id = msg_data['id']
             host = msg_data['host']
-            key = msg_data['key']
-            value = self._fetch_techno_config(id, host, key)
-            self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, id, key, value))
-
-            msg.add_data('status', status)
-            msg.add_data('reason', reason)
             msg.add_data('type', type)
             msg.add_data('id', id)
             msg.add_data('host', host)
             msg.add_data('key', key)
-            msg.add_data('value', value)
+            try:
+                if get_all_keys == True:
+                    config = self._db.list_plugin_config(id, host)
+                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, id, key, config))
+                    json_config = {}
+                    for elt in config:
+                        json_config[elt.key] = self.convert(elt.value)
+                    msg.add_data('data', json_config)
+                else:
+                    value = self._fetch_techno_config(id, host, key)
+                    # temporary fix : should be done in a better way (on db side)
+                    value = self.convert(value)
+                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, id, key, value))
+                    msg.add_data('value', value)
+            except:
+                status = False
+                reason = "Error while getting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, id, host, key, traceback.format_exc())
+                self.log.error(reason)
+
+        msg.add_data('reason', reason)
+        msg.add_data('status', status)
+
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
+
+    def _mdp_reply_config_set(self, data):
+        """ Reply to config.set MQ req
+            @param data : MQ req message
+        """
+        msg = MQMessage()
+        msg.set_action('config.result')
+        status = True
+        msg_data = data.get_data()
+        if 'type' not in msg_data:
+            status = False
+            reason = "Config set : missing 'type' field : {0}".format(data)
+
+        if msg_data['type'] != "plugin":
+            status = False
+            reason = "Config set not available for type={0}".format(msg_data['type'])
+
+        if 'id' not in msg_data:
+            status = False
+            reason = "Config set : missing 'id' field : {0}".format(data)
+
+        if 'host' not in msg_data:
+            status = False
+            reason = "Config set : missing 'host' field : {0}".format(data)
+
+        if 'data' not in msg_data:
+            status = False
+            reason = "Config set : missing 'data' field : {0}".format(data)
+
+        if status == False:
+            self.log.error(reason)
+        else:
+            reason = ""
+            type = msg_data['type']
+            id = msg_data['id']
+            host = msg_data['host']
+            data = msg_data['data']
+            msg.add_data('type', type)
+            msg.add_data('id', id)
+            msg.add_data('host', host)
+            try: 
+                # we add a configured key set to true to tell the UIs and plugins that there are some configuration elements
+                self._db.set_plugin_config(id, host, "configured", True)
+                for key in msg_data['data']:
+                    self._db.set_plugin_config(id, host, key, data[key])
+            except:
+                reason = "Error while setting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, id, host, key, traceback.format_exc())
+                status = False
+                self.log.error(reason)
+
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
+
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
+
+    def _mdp_reply_config_delete(self, data):
+        """ Reply to config.delete MQ req
+            Delete all the config items for the given type, id and host
+            @param data : MQ req message
+        """
+        msg = MQMessage()
+        msg.set_action('config.result')
+        status = True
+        msg_data = data.get_data()
+        if 'type' not in msg_data:
+            status = False
+            reason = "Config request : missing 'type' field : {0}".format(data)
+
+        if msg_data['type'] != "plugin":
+            status = False
+            reason = "Config request not available for type={0}".format(msg_data['type'])
+
+        if 'id' not in msg_data:
+            status = False
+            reason = "Config request : missing 'id' field : {0}".format(data)
+
+        if 'host' not in msg_data:
+            status = False
+            reason = "Config request : missing 'host' field : {0}".format(data)
+
+        if status == False:
+            self.log.error(reason)
+        else:
+            reason = ""
+            type = msg_data['type']
+            id = msg_data['id']
+            host = msg_data['host']
+            msg.add_data('type', type)
+            msg.add_data('id', id)
+            msg.add_data('host', host)
+            try:
+                self._db.del_plugin_config(id, host)
+                self.log.info("Delete config for {0} {1}".format(type, id))
+            except:
+                status = False
+                reason = "Error while deleting configuration for '{0} {1} on {2} : {3}".format(type, id, host, traceback.format_exc())
+                self.log.error(reason)
+
+        msg.add_data('reason', reason)
+        msg.add_data('status', status)
 
         self.log.debug(msg.get())
         self.reply(msg.get())
@@ -212,7 +340,6 @@ class DBConnector(XplPlugin, MQRep):
         status = True
 
         msg_data = data.get_data()
-        print msg_data
         if 'type' not in msg_data:
             status = False
             reason = "Devices request : missing 'type' field : {0}".format(data)
@@ -236,6 +363,17 @@ class DBConnector(XplPlugin, MQRep):
 
         self.log.debug(msg.get())
         self.reply(msg.get())
+
+
+    def convert(self, data):
+        """ Do some conversions on data
+        """
+        if data == "True":
+            data = True
+        if data == "False":
+            data = False
+        return data
+
 
 if __name__ == "__main__":
     DBC = DBConnector()

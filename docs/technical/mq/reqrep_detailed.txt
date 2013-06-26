@@ -37,6 +37,83 @@ You will get a reply like this: ::
     ['clients.detail.result', '{"host": "darkstar", "clients": {"domogik-diskfree.darkstar": {"status": "alive", "type": "plugin", "configured": true, "pid": 0, "host": "darkstar", "data": {"xpl_stats": {"get_total_space": {"name": "get_total_space", "parameters": {"device": [], "static": [{"key": "type", "value": "total_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_total_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_free_space": {"name": "get_free_space", "parameters": {"device": [], "static": [{"key": "type", "value": "free_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_free_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_used_space": {"name": "get_used_space", "parameters": {"device": [], "static": [{"key": "type", "value": "used_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_used_space", "key": "current"}]}, "schema": "sensor.basic"}}, "commands": [], "udev-rules": [], "device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "xpl_commands": [], "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Scaling"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Scaling"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Scaling"}, "get_percent_used": {"conversion": "", "name": "Percent used", "data_type": "DT_Scaling"}}, "configuration": [{"description": "Automatically start plugin at Domogik startup", "default": "False", "id": "0", "key": "startup-plugin", "interface": "no", "optionnal": "no", "type": "boolean", "options": []}, {"description": "Interval between each poll (minute)", "default": null, "id": "1", "key": "interval", "interface": "no", "optionnal": "no", "type": "string", "options": []}, {"description": "Path on filesystem", "default": null, "id": "2", "key": "path", "interface": "yes", "optionnal": "no", "type": "string", "options": []}], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "fullname": "plugin-diskfree", "type": "plugin", "id": "diskfree"}, "json_version": 2}, "id": "diskfree"}}, "type": "plugin", "id": "diskfree", "key": "startup"}']
 
 
+config.get
+==========
+
+Request : Plugins, UIs
+Reply : dbmgr
+
+To get *one* configuration elements, the clients may send a MQ request *config.get* to the dbmgr: ::
+
+    request : config.get
+    data : type = plugin
+           id = <plugin id>
+           host = <hostname>
+           key = <configuration key>
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_get.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "reason": "", "value": 5, "host": "darkstar", "key": "interval", "type": "plugin", "id": "diskfree"}']
+
+To get *all* configuration elements for a plugin, you can use the same MQ request without the *key* element. 
+ll the values will be returned as a json dictionnary in the *data* key :
+
+    request : config.get
+    data : type = plugin
+           id = <plugin id>
+           host = <hostname>
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_get_all.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "type": "plugin", "reason": "", "host": "darkstar", "key": "*", "data": {"interval": 5, "configured": true, ....}, "id": "diskfree"}']
+
+
+config.set
+==========
+
+Request : UIs
+Reply : dbmgr
+
+To set values the configuration elements, the UI may send a MQ request *config.set* to the dbmgr: ::
+
+    request : config.set
+    data : type = plugin
+           id = <plugin id>
+           host = <hostname>
+           data = <dictionnary : { 'key1' : 'value1', 'key2' : 'value2', ....} >
+
+Notice that a 'configured' key (value = True) will be silently added as configuration element : it indicates that the plugin has been configured and is used by the plugins and the UIs.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_set.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "id": "diskfree"}']
+
+
+config.delete
+=============
+
+Request : UIs
+Reply : dbmgr
+
+To delete all the values for a type/id/host configuration elements, the UI may send a MQ request *config.delete* to the dbmgr: ::
+
+    request : config.delete
+    data : type = plugin
+           id = <plugin id>
+           host = <hostname>
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_delete.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "id": "diskfree"}']
+
 
 plugin.start.do
 ===============
