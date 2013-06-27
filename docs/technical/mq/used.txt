@@ -54,15 +54,18 @@ List of MQ messages used for pub/sub pattern
 * source : the one which publishes messages over the MQ
 * destination : used by : the ones which subscribe to the published data
 
-======================= =================== =================== =====================
+======================= =================== ====================== =====================
 Source                  Used by             Header              Python example
-======================= =================== =================== =====================
+======================= =================== ====================== =====================
 xplevent                rest                statmgr.received
------------------------ ------------------- ------------------- ---------------------
-plugin (any)            manager             plugin.status       sub_plugin_status.py
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            manager             plugin.status          sub_plugin_status.py
                         UIs
------------------------ ------------------- ------------------- ---------------------
-manager                 UIs                 clients.list        sub_clients_list.py
------------------------ ------------------- ------------------- ---------------------
-manager                 UIs                 clients.detail      sub_clients_detail.py
-======================= =================== =================== =====================
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            manager             plugin.configuration   sub_plugin_configuration.py
+                        UIs
+----------------------- ------------------- ---------------------- ---------------------
+manager                 UIs                 clients.list           sub_clients_list.py
+----------------------- ------------------- ---------------------- ---------------------
+manager                 UIs                 clients.detail         sub_clients_detail.py
+======================= =================== ====================== =====================

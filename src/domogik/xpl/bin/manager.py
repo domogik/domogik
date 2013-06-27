@@ -249,7 +249,8 @@ class Manager(XplPlugin):
                                                self.get_libraries_directory(),
                                                self.get_packages_directory(),
                                                self._zmq,
-                                               self.get_stop())
+                                               self.get_stop,
+                                               self.get_sanitized_hostname())
                     # The automatic startup is handled in the Plugin class in __init__
             
 
@@ -556,9 +557,13 @@ class CoreComponent(GenericComponent):
 class Plugin(GenericComponent, MQAsyncSub):
     """ This helps to handle plugins discovered on the host filesystem
         The MQAsyncSub helps to set the status 
+
+        Notice that some actions can't be done if the plugin host is not the server host! :
+        * check if a plugin has stopped and kill it if needed
+        * start the plugin
     """
 
-    def __init__(self, id, host, clients, libraries_directory, packages_directory, zmq_context, stop):
+    def __init__(self, id, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
         """ Init a plugin 
             @param id : plugin id (ipx800, onewire, ...)
             @param host : hostname
@@ -567,9 +572,24 @@ class Plugin(GenericComponent, MQAsyncSub):
             @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
             @param zmq_context : zmq context
             @param stop : get_stop()
+            @param local_host : get_sanitized_hostname()
         """
         GenericComponent.__init__(self, id = id, host = host, clients = clients)
         self.log.info("New plugin : {0}".format(self.id))
+
+        ### check if the plugin is on he local host
+        if self.host == local_host:
+            self.local_plugin = True
+        else:
+            self.local_plugin = False
+
+        ### TODO : this will be to handle later : multi host (multihost)
+        # * how to find available plugins on other hosts ?
+        # * how to start/stop plugins on other hosts ?
+        # * ...
+        if self.local_plugin == False:
+            self.log.error("Currently, the multi host feature for plugins is not yet developped. This plugin will not be registered")
+            return
 
         ### set the component type
         self.type = "plugin"
@@ -590,19 +610,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### get the plugin data (from the json file)
         status = None
         self.data = {}
-        try:
-            self.log.info("Plugin {0} : read the json file and validate id".format(self.id))
-            pkg_json = PackageJson(pkg_type = "plugin", id = self.id)
-            # check if json is valid
-            if pkg_json.validate() == False:
-                status = STATUS_INVALID
-                # TODO : how to get the reason ?
-                self.log.error("Plugin {0} : invalid json file".format(self.id))
-            else:
-                self.data = pkg_json.get_json()
-        except:
-            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.id, traceback.format_exc()))
-            status = STATUS_INVALID
+        self.fill_data()
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
         configured = self._config.query(self.id, 'configured')
@@ -617,7 +625,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.register_component()
 
         ### subscribe the the MQ for category = plugin and id = self.id
-        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status'])
+        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status', 'plugin.configuration'])
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.id, 'startup')
@@ -639,19 +647,60 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         self.log.debug("New pub message {0}".format(msgid))
         self.log.debug("{0}".format(content))
-        if content["id"] == self.id:
-            self.log.info("New status received from {0} : {1}".format(self.id, content["event"]))
-            self.set_status(content["event"])
-            # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to checl if the plugin was able to shut alone
-            if content["event"] == STATUS_STOP_REQUEST:
-                self.log.info("The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.id))
-                thr_check_if_stopped = Thread(None,
-                                              self._check_if_stopped,
-                                              "check_if_{0}_is_stopped".format(self.id),
-                                              (),
-                                              {})
-                thr_check_if_stopped.start()
+        if msgid == "plugin.status":
+            if content["id"] == self.id and content["host"] == self.host:
+                self.log.info("New status received from {0} on {1} : {2}".format(self.id, self.host, content["event"]))
+                self.set_status(content["event"])
+                # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
+                if content["event"] == STATUS_STOP_REQUEST:
+                    self.log.info("The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.id))
+                    thr_check_if_stopped = Thread(None,
+                                                  self._check_if_stopped,
+                                                  "check_if_{0}_is_stopped".format(self.id),
+                                                  (),
+                                                  {})
+                    thr_check_if_stopped.start()
+        elif msgid == "plugin.configuration":
+             self.add_configuration_values_to_data()
 
+
+    def fill_data(self):
+        """ Fill the client data by reading the json file
+        """
+        try:
+            self.log.info("Plugin {0} : read the json file and validate id".format(self.id))
+            pkg_json = PackageJson(pkg_type = "plugin", id = self.id)
+            # check if json is valid
+            if pkg_json.validate() == False:
+                self.set_status(STATUS_INVALID)
+                # TODO : how to get the reason ?
+                self.log.error("Plugin {0} : invalid json file".format(self.id))
+            else:
+                self.data = pkg_json.get_json()
+                # and finally, add the configuration values in the data
+                self.add_configuration_values_to_data()
+        except:
+            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.id, traceback.format_exc()))
+            self.set_status(STATUS_INVALID)
+
+    def add_configuration_values_to_data(self):
+        """
+        """
+        # grab all the config elements for the plugin
+        config = self._config.query(self.id)
+        for key in config:
+            # filter on the 'configured' key
+            if key != 'configured':
+                # check if the key exists in the plugin configuration
+                key_found = False
+                # search the key in the configuration json part
+                for idx in range(len(self.data['configuration'])):
+                    if self.data['configuration'][idx]['key'] == key:
+                        key_found = True
+                        # key found : insert value in the json
+                        self.data['configuration'][idx]['value'] = config[key]
+                if key_found == False:
+                    self.log.warning("A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.id, self.host))
 
     def start(self):
         """ to call to start the plugin

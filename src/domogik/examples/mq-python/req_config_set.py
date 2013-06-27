@@ -11,6 +11,6 @@ msg.set_action('config.set')
 msg.add_data('type', 'plugin')
 msg.add_data('host', 'darkstar')
 msg.add_data('id', 'diskfree')
-msg.add_data('data', {'tata' : 'valtata', 'tutu' : 'valtutu'})
+msg.add_data('data', {'interval' : 5, 'dummy' : 'foo'})
 print cli.request('dbmgr', msg.get(), timeout=10).get()
 

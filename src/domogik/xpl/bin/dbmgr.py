@@ -235,6 +235,7 @@ class DBConnector(XplPlugin, MQRep):
                 self._db.set_plugin_config(id, host, "configured", True)
                 for key in msg_data['data']:
                     self._db.set_plugin_config(id, host, key, data[key])
+                self.publish_config_updated(type, id, host)
             except:
                 reason = "Error while setting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, id, host, key, traceback.format_exc())
                 status = False
@@ -285,6 +286,7 @@ class DBConnector(XplPlugin, MQRep):
             try:
                 self._db.del_plugin_config(id, host)
                 self.log.info("Delete config for {0} {1}".format(type, id))
+                self.publish_config_updated(type, id, host)
             except:
                 status = False
                 reason = "Error while deleting configuration for '{0} {1} on {2} : {3}".format(type, id, host, traceback.format_exc())
@@ -373,6 +375,18 @@ class DBConnector(XplPlugin, MQRep):
         if data == "False":
             data = False
         return data
+
+    def publish_config_updated(self, type, id, host):
+        """ Publish over the MQ a message to inform that a plugin configuration has been updated
+            @param type : package type (plugin)
+            @param id : package id
+            @param host : host
+        """
+        self._pub.send_event('plugin.configuration',
+                             {"type" : type,
+                              "id" : id,
+                              "host" : host,
+                              "event" : "updated"})
 
 
 if __name__ == "__main__":

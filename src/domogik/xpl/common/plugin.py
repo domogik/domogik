@@ -109,6 +109,7 @@ class XplPlugin(BasePlugin, MQRep):
         self._pub.send_event('plugin.status', 
                              {"type" : "plugin",
                               "id" : self._name,
+                              "host" : self.get_sanitized_hostname(),
                               "event" : STATUS_STARTING})
         ### MQ
         # for stop requests
@@ -195,6 +196,7 @@ class XplPlugin(BasePlugin, MQRep):
         self._pub.send_event('plugin.status', 
                              {"type" : "plugin",
                               "id" : self._name,
+                              "host" : self.get_sanitized_hostname(),
                               "event" : STATUS_ALIVE})
 
         ### Instantiate the MQ
@@ -238,6 +240,7 @@ class XplPlugin(BasePlugin, MQRep):
         self._pub.send_event('plugin.status', 
                              {"type" : "plugin",
                               "id" : self._name,
+                              "host" : self.get_sanitized_hostname(),
                               "event" : STATUS_STOP_REQUEST})
 
         ### Try to stop the plugin
@@ -252,6 +255,7 @@ class XplPlugin(BasePlugin, MQRep):
             self._pub.send_event('plugin.status', 
                                  {"type" : "plugin",
                                   "id" : self._name,
+                                  "host" : self.get_sanitized_hostname(),
                                   "event" : STATUS_NOT_CONFIGURED})
 
     def send_stopped_status(self):
@@ -261,6 +265,7 @@ class XplPlugin(BasePlugin, MQRep):
             self._pub.send_event('plugin.status', 
                                  {"type" : "plugin",
                                   "id" : self._name,
+                                  "host" : self.get_sanitized_hostname(),
                                   "event" : STATUS_STOPPED})
 
     def get_config_files(self):

@@ -51,7 +51,7 @@ class Query():
     def __init__(self, zmq, log):
         self.qry = QueryMQ(zmq, log)
 
-    def query(self, id, key):
+    def query(self, id, key = None):
         return self.qry.query(id, key)
 
     def set(self, id, key, value):
@@ -76,20 +76,25 @@ class QueryMQ():
         self._log.debug("Init config query(mq) instance")
         self.cli = MQSyncReq(self._zmq)
 
-    def query(self, id, key):
+    def query(self, id, key = None):
         '''
         Ask the config system for the value. Calling this function will make
         your program wait until it got an answer
 
         @param id : the plugin of the item requesting the value, must exists in the config database
         @param key : the key to fetch corresponding value
+        @return : the value if key != None
+                  a dictionnary will all keys/values if key = None
         '''
         msg = MQMessage()
         msg.set_action('config.get')
         msg.add_data('type', 'plugin')
         msg.add_data('id', id)
         msg.add_data('host', get_sanitized_hostname())
-        msg.add_data('key', key)
+        if key != None:
+            msg.add_data('key', key)
+        else:
+            key = "*"
         self._log.info("Request query config for key {0}".format(key))
         ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
 
@@ -102,7 +107,10 @@ class QueryMQ():
         else:
             if ret._data['status']:
                 self._log.debug("Query config : successfull response : {0}".format(ret))
-                return str(ret._data['value'])
+                if key == "*":
+                    return ret._data['data']
+                else:
+                    return str(ret._data['value'])
             else:
                 self._log.error("Query config : error returned. Reason : {0}".format(ret._data['reason']))
                 return None
