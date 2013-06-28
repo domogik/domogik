@@ -480,6 +480,13 @@ class Package():
                 self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
             else:
                 self.json = pkg_json.get_json()
+                del(self.json['configuration'])
+                del(self.json['xpl_stats'])
+                del(self.json['commands'])
+                del(self.json['xpl_commands'])
+                del(self.json['sensors'])
+                del(self.json['identity'])
+                del(self.json['json_version'])
         except:
             self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.name, traceback.format_exc()))
 
