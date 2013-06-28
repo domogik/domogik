@@ -119,7 +119,19 @@ You will get a reply like this: ::
 packages.detail.get
 ===================
 
-TODO
+Request : UIs
+Reply : manager
+
+To get the packages detail, the UI may send a MQ request *packages.detail.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *packages.detail*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_packages_detail.py*.
+
+You will get a reply like this: ::
+
+    ['packages.detail.result', '{"plugin-diskfree": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
+
 
 plugin.start.do
 ===============

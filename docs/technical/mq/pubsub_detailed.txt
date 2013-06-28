@@ -19,7 +19,7 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-     id = plugin.configuration.1372234803_28.0_1 - content = {"host": "darkstar", "type": "plugin", "id": "diskfree", "event": "updated"}
+    {"host": "darkstar", "type": "plugin", "id": "diskfree", "event": "updated"}
 
 The only *event* value is *updated*.
 
@@ -50,7 +50,7 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    id = plugin.status.1371476851_54.0_1 - content = {"host": "darkstar", "type": "plugin", "id": "diskfree", "event": "alive"}
+    {"host": "darkstar", "type": "plugin", "id": "diskfree", "event": "alive"}
 
 Find here `:doc:the full list of available status.</technical/plugins/index>`
 
@@ -72,7 +72,7 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    id = clients.list.1371478478_22.0_1 - content = {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "id": "diskfree"}}
+    {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "id": "diskfree"}}
 
 clients.detail
 ==============
@@ -91,7 +91,25 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    id = clients.detail.1371478534_97.0_1 - content = {"domogik-diskfree.darkstar": {"status": "alive", "data": {"xpl_stats": {"get_total_space": {"name": "get_total_space", "parameters": {"device": [], "dynamic": [{"ignore_values": "", "sensor": "get_total_space", "key": "current"}], "static": [{"value":"total_space", "key": "type"}]}, "schema": "sensor.basic"}, "get_free_space": {"name": "get_free_space", "parameters":{"device": [], "dynamic": [{"ignore_values": "", "sensor": "get_free_space", "key": "current"}], "static": [{"value": "free_space", "key": "type"}]}, "schema": "sensor.basic"}, "get_used_space": {"name": "get_used_space", "parameters": {"device": [], "dynamic": [{"ignore_values": "", "sensor": "get_used_space", "key": "current"}], "static": [{"value": "used_space", "key": "type"}]}, "schema": "sensor.basic"}}, "commands": [], "udev-rules": [], "device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to lookat", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "xpl_commands": [], "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Scaling"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Scaling"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Scaling"}, "get_percent_used":{"conversion": "", "name": "Percent used", "data_type": "DT_Scaling"}}, "configuration": [{"description": "Automatically start plugin at Domogik startup", "default": "False", "options": [], "key": "startup-plugin", "interface": "no", "optionnal": "no", "type": "boolean", "id": "0"}, {"description": "Interval between each poll (minute)", "default": null, "options": [], "key": "interval", "interface": "no", "optionnal": "no", "type": "string", "id": "1"}, {"description": "Path on filesystem", "default": null, "options": [], "key": "path", "interface": "yes", "optionnal": "no", "type": "string", "id": "2"}], "identity": {"category": "computer", "documentation": "http://wiki.domogik.org/plugin_diskfree", "description": "Send over xPL disk usage", "changelog": "0.1\n- plugin creation", "author_email": "fritz.smh at gmail.com", "author": "Fritz", "domogik_min_version": "0.2.0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "dependencies": [], "version": "0.1a0", "fullname": "plugin-diskfree", "type": "plugin", "id": "diskfree"}, "json_version": 2}, "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "id": "diskfree"}}
+    {u'domogik-diskfree.darkstar': {u'status': u'unknown', u'name': u'diskfree', u'data': {u'configuration': [{u'description': u'Automatically start plugin at Domogik startup', u'default': False, u'required': False, u'options': [], u'key': u'startup-plugin', u'type': u'boolean', u'id': u'0'}, {u'description': u'Interval between each poll (minute)', u'default': 5, u'required': False, u'value': u'7', u'options': [], u'key': u'interval', u'type': u'integer', u'id': u'1'}]}, u'configured': True, u'pid': 0, u'package_id': u'plugin-diskfree', u'host': u'darkstar', u'type': u'plugin'}}
 
+
+
+packages.detail
+===============
+
+Publisher: 
+* manager
+
+Subscriber: any member who wants to be aware of the packages details
+* UIs
+
+The manager publishes over the MQ the packages detail when there is something new.
+
+An example to catch these messages is available as *src/domogik/examples/mq-python/sub_packages_detail.py*.
+
+You will get messages like this: ::
+
+    {u'plugin-diskfree': {u'device_types': {u'diskfree.disk_usage': {u'commands': [], u'description': u'Disk usage', u'xpl_params': [{u'type': u'string', u'description': u'The path to look at', u'key': u'device'}], u'sensors': [u'get_total_space', u'get_percent_used', u'get_free_space', u'get_used_space'], u'id': u'diskfree.disk_usage', u'name': u'Disk usage'}}, u'udev_rules': []}}
 
 

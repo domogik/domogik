@@ -70,4 +70,6 @@ plugin (any)            manager             plugin.configuration   sub_plugin_co
 manager                 UIs                 clients.list           sub_clients_list.py
 ----------------------- ------------------- ---------------------- ---------------------
 manager                 UIs                 clients.detail         sub_clients_detail.py
+----------------------- ------------------- ---------------------- ---------------------
+manager                 UIs                 packages.detail        sub_packages_detail.py
 ======================= =================== ====================== =====================
