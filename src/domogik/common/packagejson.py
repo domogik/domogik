@@ -169,7 +169,7 @@ class PackageJson():
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
-            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules", "external"])
+            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev_rules", "external"])
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]

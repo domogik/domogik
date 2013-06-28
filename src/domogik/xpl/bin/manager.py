@@ -739,6 +739,14 @@ class Plugin(GenericComponent, MQAsyncSub):
                 self.log.error("Plugin {0} : invalid json file".format(self.name))
             else:
                 self.data = pkg_json.get_json()
+                del(self.data['xpl_stats'])
+                del(self.data['udev_rules'])
+                del(self.data['device_types'])
+                del(self.data['commands'])
+                del(self.data['xpl_commands'])
+                del(self.data['sensors'])
+                del(self.data['identity'])
+                del(self.data['json_version'])
                 # and finally, add the configuration values in the data
                 self.add_configuration_values_to_data()
         except:
