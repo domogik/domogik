@@ -39,7 +39,10 @@ import traceback
 import urllib2
 import datetime
 import json
-from domogik.xpl.common.plugin import PACKAGES_DIR
+#TODO : why this import fails ?
+#from domogik.xpl.common.plugin import PACKAGES_DIR
+PACKAGES_DIR = "packages"
+
 
 
 

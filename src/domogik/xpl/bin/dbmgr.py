@@ -164,7 +164,7 @@ class DBConnector(XplPlugin, MQRep):
             msg.add_data('type', type)
             msg.add_data('id', id)
             msg.add_data('host', host)
-            msg.add_data('key', key)
+            msg.add_data('key', key)  # we let this here to display key or * depending on the case
             try:
                 if get_all_keys == True:
                     config = self._db.list_plugin_config(id, host)

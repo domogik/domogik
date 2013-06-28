@@ -49,7 +49,9 @@ from domogik.mq.pubsub.publisher import MQPub
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
+from domogik.common.packagejson import PackageJson, PackageException
 import zmq
+import traceback
 
 
 # clients (plugins, etc) status
@@ -106,11 +108,7 @@ class XplPlugin(BasePlugin, MQRep):
         # MQ publisher and REP
         self._zmq = zmq.Context()
         self._pub = MQPub(self._zmq, self._name)
-        self._pub.send_event('plugin.status', 
-                             {"type" : "plugin",
-                              "id" : self._name,
-                              "host" : self.get_sanitized_hostname(),
-                              "event" : STATUS_STARTING})
+        self._send_status(STATUS_STARTING)
         ### MQ
         # for stop requests
         MQRep.__init__(self, self._zmq, self._name)
@@ -158,6 +156,11 @@ class XplPlugin(BasePlugin, MQRep):
 
         self.enable_hbeat_called = False
 
+        # for all no core elements, load the json
+        # TODO find a way to do it nicer ??
+        if self._name not in ('dbmgr', 'manager', 'rest', 'xplevent'):
+            self._load_json()
+
         self.log.debug("end single xpl plugin")
 
 
@@ -173,11 +176,93 @@ class XplPlugin(BasePlugin, MQRep):
             configured = True
         if configured != True:
             self.log.error("The plugin is not configured (configured = '{0}'. Stopping the plugin...".format(configured))
-            self.force_leave(not_configured = True)
+            self.force_leave(status = STATUS_NOT_CONFIGURED)
             return False
         self.log.info("The plugin is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
         return True
 
+
+    def _load_json(self):
+        """ Load the plugin json file
+        """
+        try:
+            self.log.info("Read the json file and validate id".format(self._name))
+            pkg_json = PackageJson(pkg_type = "plugin", id = self._name)
+            # check if json is valid
+            if pkg_json.validate() == False:
+                # TODO : how to get the reason ?
+                self.log.error("Invalid json file")
+                self.force_leave(status = STATUS_INVALID)
+            else:
+                # if valid, store the data so that it can be used later
+                self.log.info("The json file is valid")
+                self.json_data = pkg_json.get_json()
+        except:
+            self.log.error("Error while trying to read the json file : {1}".format(self._name, traceback.format_exc()))
+            self.force_leave(status = STATUS_INVALID)
+
+    def get_config(self, key):
+        """ Try to get the config over the MQ. If value is None, get the default value
+        """
+        value = self._config.query(self._name, key)
+        if value == None or value == 'None':
+            self.log.info("Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
+            value = self.get_config_default_value(key)
+        self.log.info("Value for '{0}' is : {1}".format(key, value))
+        return value
+
+    def get_config_default_value(self, key):
+        """ Get the default value for a config key from the json file
+            @param key : configuration key
+        """
+        for idx in range(len(self.json_data['configuration'])):
+            if self.json_data['configuration'][idx]['key'] == key:
+                default = self.json_data['configuration'][idx]['default']
+                self.log.info("Default value required for key '{0}' = {1}".format(key, default))
+                return default
+
+    def cast_config_value(self, key, value):
+        """ Cast the config value as the given type in the json file
+            @param key : configuration key
+            @param value : configuration value to cast and return
+            @return : the casted value
+        """
+        for idx in range(len(self.json_data['configuration'])):
+            if self.json_data['configuration'][idx]['key'] == key:
+                type = self.json_data['configuration'][idx]['default']
+                self.log.info("Casting value for key '{0}' in type '{1}'...".format(key, type)) 
+                try:
+                    if type == "boolean":
+                        # just in case, the "True"/"False" are not already converted in True/False
+                        # this is (currently) done on queryconfig side
+                        if value == "True":
+                            return True
+                        elif value ==  "False":
+                            return False
+                    # type == choice : nothing to do
+                    if type == "date": 
+                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+                    if type == "datetime": 
+                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+                    # type == email : nothing to do
+                    if type == "float":
+                        return float(value)
+                    if type == "integer":
+                        return float(value)
+                    # type == ipv4 : nothing to do
+                    # type == multiple choice : nothing to do
+                    # type == string : nothing to do
+                    if type == "time": 
+                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+                    # type == url : nothing to do
+
+                except:
+                    # if an error occurs : return the default value and log a warning
+                    self.log.warning("Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
+                    return value
+
+        # no cast operation : return the value
+        return value
 
     def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin
@@ -189,15 +274,11 @@ class XplPlugin(BasePlugin, MQRep):
             self.enable_hbeat()
 
         ### send plugin status : STATUS_ALIVE
-        # TODO : why the dbmgr has no self.name defined ???????
+        # TODO : why the dbmgr has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
-            self.name = "unknown"
-        self._pub.send_event('plugin.status', 
-                             {"type" : "plugin",
-                              "id" : self._name,
-                              "host" : self.get_sanitized_hostname(),
-                              "event" : STATUS_ALIVE})
+            self._name = "unknown"
+        self._send_status(STATUS_ALIVE)
 
         ### Instantiate the MQ
         # nothing can be launched after this line (blocking call!!!!)
@@ -237,36 +318,22 @@ class XplPlugin(BasePlugin, MQRep):
         self.reply(msg.get())
 
         ### Change the plugin status
-        self._pub.send_event('plugin.status', 
-                             {"type" : "plugin",
-                              "id" : self._name,
-                              "host" : self.get_sanitized_hostname(),
-                              "event" : STATUS_STOP_REQUEST})
+        self._send_status(STATUS_STOP_REQUEST)
 
         ### Try to stop the plugin
         # if it fails, the manager should try to kill the plugin
         self.force_leave()
 
 
-    def send_not_configured_status(self):
-        """ Send the STATUS_NOT_CONFIGURED status over the MQ
+    def _send_status(self, status):
+        """ Send the plugin status over the MQ
         """ 
         if hasattr(self, "_pub"):
             self._pub.send_event('plugin.status', 
                                  {"type" : "plugin",
                                   "id" : self._name,
                                   "host" : self.get_sanitized_hostname(),
-                                  "event" : STATUS_NOT_CONFIGURED})
-
-    def send_stopped_status(self):
-        """ Send the STATUS_STOPPED status over the MQ
-        """ 
-        if hasattr(self, "_pub"):
-            self._pub.send_event('plugin.status', 
-                                 {"type" : "plugin",
-                                  "id" : self._name,
-                                  "host" : self.get_sanitized_hostname(),
-                                  "event" : STATUS_STOPPED})
+                                  "event" : status})
 
     def get_config_files(self):
        """ Return list of config files
@@ -450,17 +517,17 @@ class XplPlugin(BasePlugin, MQRep):
         """
         self.myxpl._network.join()
 
-    def force_leave(self, not_configured = False):
+    def force_leave(self, status = False):
         '''
         Leave threads & timers
         '''
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
         # send stopped status over the MQ
-        if not_configured:
-            self.send_not_configured_status()
+        if status:
+            self._send_status(status)
         else:
-            self.send_stopped_status()
+            self._send_status(STATUS_STOPPED)
 
         # send hbeat.end message
         self._send_hbeat_end()

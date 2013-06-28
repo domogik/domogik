@@ -110,7 +110,7 @@ class QueryMQ():
                 if key == "*":
                     return ret._data['data']
                 else:
-                    return str(ret._data['value'])
+                    return ret._data['value']
             else:
                 self._log.error("Query config : error returned. Reason : {0}".format(ret._data['reason']))
                 return None

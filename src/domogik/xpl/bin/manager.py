@@ -647,6 +647,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         self.log.debug("New pub message {0}".format(msgid))
         self.log.debug("{0}".format(content))
+        print "@@@@" + str(msgid)
         if msgid == "plugin.status":
             if content["id"] == self.id and content["host"] == self.host:
                 self.log.info("New status received from {0} on {1} : {2}".format(self.id, self.host, content["event"]))
@@ -661,6 +662,7 @@ class Plugin(GenericComponent, MQAsyncSub):
                                                   {})
                     thr_check_if_stopped.start()
         elif msgid == "plugin.configuration":
+             print "@@@@"
              self.add_configuration_values_to_data()
 
 
@@ -688,19 +690,20 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         # grab all the config elements for the plugin
         config = self._config.query(self.id)
-        for key in config:
-            # filter on the 'configured' key
-            if key != 'configured':
-                # check if the key exists in the plugin configuration
-                key_found = False
-                # search the key in the configuration json part
-                for idx in range(len(self.data['configuration'])):
-                    if self.data['configuration'][idx]['key'] == key:
-                        key_found = True
-                        # key found : insert value in the json
-                        self.data['configuration'][idx]['value'] = config[key]
-                if key_found == False:
-                    self.log.warning("A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.id, self.host))
+        if config != None:
+            for key in config:
+                # filter on the 'configured' key
+                if key != 'configured':
+                    # check if the key exists in the plugin configuration
+                    key_found = False
+                    # search the key in the configuration json part
+                    for idx in range(len(self.data['configuration'])):
+                        if self.data['configuration'][idx]['key'] == key:
+                            key_found = True
+                            # key found : insert value in the json
+                            self.data['configuration'][idx]['value'] = config[key]
+                    if key_found == False:
+                        self.log.warning("A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.id, self.host))
 
     def start(self):
         """ to call to start the plugin
