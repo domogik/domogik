@@ -19,12 +19,15 @@ def db_helper(action_func):
 
 # create acces_log
 @urlHandler.after_request
-def write_access_log(response):
-    urlHandler.logger.info('http request for {0} received'.format(request.path))
+def write_access_log_after(response):
     urlHandler.logger.debug(' => response status code: {0}'.format(response.status_code))
     urlHandler.logger.debug(' => response content_type: {0}'.format(response.content_type))
     urlHandler.logger.debug(' => response data: {0}'.format(response.response))
     return response
+
+@urlHandler.before_request
+def write_acces_log_before():
+    urlHandler.logger.info('http request for {0} received'.format(request.path))
 
 # json reponse handler decorator
 # the url handlers funictions can return
@@ -85,6 +88,7 @@ def page_not_found(e):
 @urlHandler.errorhandler(500)
 @json_response
 def page_not_found(e):
+    urlHandler.exception(e)
     return 500, {'error': "Application error see rest.log"}
 
 # view class registration
