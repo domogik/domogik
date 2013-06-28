@@ -8,8 +8,8 @@ A user is a logical account wich allows to acces to Domogik features. A person i
 Authenticate
 ============
 
-/account/auth/<login>/<password>
---------------------------------
+GET /account/auth/<login>/<password>
+------------------------------------
 Try to login as <login> with password <password>
 When authentication is ok reply is: ::
     
@@ -26,7 +26,7 @@ Users
 --------------------------------------------------------------------
 Change the password from <old_password> to <new_password> for user id <id>
 
-/account/user/list
+GET /account/user/
 ------------------
 List all user accounts
 
@@ -57,40 +57,56 @@ Result: ::
 -----------------------------
 Result : same as /list with only the user associated to the id
 
-/account/user/add/login/<login>/password/<password>/is_admin/<True,False>/skin_used/<skin to use (optional)>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Add user account + person 
+POST /account/user/
+------------------
+Add user account + person (if needed)
+
+HTTP content (for only adding account):
+    * login
+    * password
+    * is_admin
+    * skin_used
+    * person_id
+
+HTTP content (for account and person):
+    * login
+    * password
+    * is_admin
+    * skin_used
+    * first_name
+    * last_name
+    * birthday (optional)
 
 Result : same as /list with only the user added
 
-/account/user/add/login/<login>/password/<password>/is_admin/<True,False>/skin_used/<skin to use (optional)>/person_id/<person id>
-----------------------------------------------------------------------------------------------------------------------------------
-Add user account for an existing person 
-
-Result : same as /list with only the user added
-
-/account/user/update/id/<id>/login/<login>/is_admin/<True,False>/skin_used/<skin to use (optional)>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PUT /account/user/update/
+-------------------------
 Update account + person 
 
+HTTP content (passed parameters are updated):
+    * login
+    * password
+    * is_admin
+    * skin_used
+    * first_name
+    * last_name
+    * birthday
+
 Result : same as /list with only the user updated
 
-/account/user/update/id/<id>/login/<login>/is_admin/<True,False>/skin_used/<skin to use (optional)>/person_id/<person id>
--------------------------------------------------------------------------------------------------------------------------
-Update account for an existing person 
-
-Result : same as /list with only the user updated
-
-/account/user/del/<id>
-----------------------
+DELETE /account/user/
+---------------------
 Del account (user account only) 
+
+HTTP content:
+    * id
 
 Result : same as /list with only the user deleted
 
 Persons 
 =======
 
-/account/person/list
+GET /account/person/
 --------------------
 List all persons
 

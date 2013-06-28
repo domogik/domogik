@@ -20,24 +20,6 @@ In Domogik configuration file, there are several options about REST in **[rest]*
 * rest_use_ssl (default : False) : use (True) or not (False) HTTPS instead of HTTP
 * rest_ssl_certificate (default : empty) : path of certificate file (.pem)
 
-Configuration in database
-=========================
-With the User Interface administration, you can configure Rest parameters :
-
-* q-timeout : Maximum wait time for getting data froma queue
-* q-size : Size for 'classic' queues. You should not have to change this value
-* q-cmd-size : Size for /command queue
-* q-life-exp : Life expectancy for a xpl message in queues. You sould not have to change this value
-* q-sleep : Time between each unsuccessfull look for a xpl data in a queue
-* q-evt-timeout : Maximum wait time for getting event from queue
-* q-evt-size : Size for /event queue
-* q-evt-life-exp : Life expectancy for an event in event queues
-
-If you don't know what you are doing, you shouldn't set these parameters. Changing these parameters implies to restart REST server.
-
-.. note::
-    These parameters may be moved in /etc/domogik/domogik.cfg file in a following release.
-
 How to use REST with SSL?
 =========================
 Generate certificate 
@@ -74,75 +56,34 @@ If this is OK with **"SSL" : "True"**, it works :)
 
 Status 
 ======
-Json response status: ::
 
-    {status : 'OK/ERROR', code : '408', description : 'bla bla bla...'}
+Rest uses http status codes to identify the error:
 
-Code is a number in order to get cleaner error types
-* OK : code = 0, description = ""
-* ERROR : code = 999 (default), description = "Error description"
+get:
+    code = 200
+    data = the returned data from the get request (json)
 
-This status is sent for each REST request.
+delete:
+    code = 204
+    data = empty
+ 
+put (update):
+    code = 200
+    data = the updated object (json)
+ 
+post (create):
+    code = 201
+    data = the new object (json)
+ 
+error:
+    code = 400
+    data = {msg: "string describing the error"}
+ 
+action ok, no content returnd:
+    code = 204
+    data = Empty
 
-Options
-=======
-After a REST url, you can pass optional parameters. Here is the list :
-
-callback=name
--------------
-This forces the response to be a Jsonp response. This is needed for calling REST from jQuery.
-
-Example response without callback: ::
-
-    /base/device/list
-    {"status" : "OK", "code" : 0, "description" : "" "device: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]}
-
-And the result with callback=foo: ::
-
-    /base/device/list?callback=foo
-    foo ({"status" : "OK", "code" : 0, "description" : "" "device: [{"description" : "Rez de chausse","id" : 1,"name" : "RDC"},...]})
-
-export=csv
-----------
-With **export=csv** option, if available, REST will give you data in CSV format instead of Json format. Entries that allows it are indicated.
-
-Debug options 
-=============
-After a REST url, you can pass optionnal debug parameters. Here is the list :
-
-* debug-sleep=N : make REST waiting N seconds seconds before answering to the request.
-
-Test long polling
-=================
-If you want to test longpolling features in your UI, you can try to access : **http://ip:port/testlongpoll**
-
-This will return you a simple json structure like this: ::
-    
-    {'number' : 7}
-
-The number indicatte the time REST took to answer (a random time between 1 and 15 seconds)
-
-View queues content
-===================
-For debugging some stuff, you could need to see what is present in REST queues. You can access to this with **http://ip:port/queuecontent/<queue name>**
-Queues names:
-
-* system_list
-* system_detail
-* system_start
-* system_stop
-* command
-* event
-
-TinyWebDb
-=========
-To allow users to create small apps with google Appinventor, we add a /getvalue entry to REST.
-You just have to POST the url you want REST to process with /getvalue entry. This will return you a json formated data.
-
-.. warning::
-    On jan 2011, json result is too complex for Appinventor for analysis. You should use /getvalue only for sending commands without any check.
-
-How REST interacts with other Domogik parts
+REST interacts with other Domogik parts
 ===========================================
 .. image:: interactions-EN.png
 
