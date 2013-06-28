@@ -255,6 +255,14 @@ class Manager(XplPlugin):
                                                self.get_sanitized_hostname())
                     # The automatic startup is handled in the Plugin class in __init__
             
+        # publish packages list
+        msg_data = {}
+        for pkg in self._packages:
+            msg_data[pkg] = self._packages[pkg].get_json()
+        self._pub.send_event('packages.detail', 
+                             msg_data)
+
+
 
 
     def _create_fifo(self):
