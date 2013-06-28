@@ -187,12 +187,11 @@ class Manager(XplPlugin):
         # note that a core component or plugin are also clients but for the self._clients object is managed directly from the Plugin and CoreComponent objects
         # so, self._clients here is only the reference to the Clients object refreshed by all plugins and core components
 
+        ### Create the packages list
+        self._packages = {}
+
         ### Create the plugins list
         self._plugins = {}
-        # { 'onewire' : Plugin('onewire'),
-        #   'ipx800' : Plugin('ipx800'),
-        #   ...
-        # }
 
         ### Start the dbmgr
         if self.options.start_dbmgr:
@@ -237,6 +236,9 @@ class Manager(XplPlugin):
             [type, id] = pkg.split("_")
             self.log.debug("Type : {0}     / Id : {1}".format(type, id))
           
+            ### Create a package object in order to get packages details over MQ
+            self._packages["{0}-{1}".format(type, id)] = Package(type, id)
+ 
             ### type = plugin
             if type == "plugin":
                 if self._plugins.has_key(id):
@@ -356,9 +358,15 @@ class Manager(XplPlugin):
         # XplPlugin handles MQ Req/rep also
         XplPlugin.on_mdp_request(self, msg)
 
+        ### packages details
+        # retrieve the clients details
+        if msg.get_action() == "packages.detail.get":
+            self.log.info("Packages details request : {0}".format(msg))
+            self._mdp_reply_packages_detail()
+
         ### clients list and details
         # retrieve the clients list
-        if msg.get_action() == "clients.list.get":
+        elif msg.get_action() == "clients.list.get":
             self.log.info("Clients list request : {0}".format(msg))
             self._mdp_reply_clients_list()
 
@@ -379,12 +387,24 @@ class Manager(XplPlugin):
         # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
 
 
+    def _mdp_reply_packages_detail(self):
+        """ Reply on the MQ
+        """
+        msg = MQMessage()
+        msg.set_action('packages.detail.result')
+        for pkg in self._packages:
+            msg.add_data(pkg, self._packages[pkg].get_json())
+        self.reply(msg.get())
+
+
     def _mdp_reply_clients_list(self):
         """ Reply on the MQ
         """
         msg = MQMessage()
         msg.set_action('clients.list.result')
-        msg.add_data('clients', self._clients.get_list())
+        clients = self._clients.get_list() 
+        for key in clients:
+            msg.add_data(key, clients[key])
         self.reply(msg.get())
 
 
@@ -393,7 +413,9 @@ class Manager(XplPlugin):
         """
         msg = MQMessage()
         msg.set_action('clients.detail.result')
-        msg.add_data('clients', self._clients.get_detail())
+        clients = self._clients.get_detail() 
+        for key in clients:
+            msg.add_data(key, clients[key])
         self.reply(msg.get())
 
 
@@ -427,6 +449,45 @@ class Manager(XplPlugin):
 
 
 
+
+
+class Package():
+    """ This class is used to create a package object which contains the packages information (parts of the json).
+        This is needed for the packages.detais MQ dialog
+    """
+
+    def __init__(self, type, id):
+        """ Init a plugin 
+            @param id : pakcage type
+            @param id : package id
+        """
+        self.type = type
+        self.id = id
+        self.json = None
+
+        ### init logger
+        log = logger.Logger('manager')
+        self.log = log.get_logger('manager')
+
+        self.log.info("Registering a new package (warning, not a package instance but the package model) : {0}-{1}".format(self.type, self.id))
+
+        self.log.info("Package {0} : read the json file and validate id".format(self.id))
+        try:
+            pkg_json = PackageJson(pkg_type = self.type, id = self.id)
+            # check if json is valid
+            if pkg_json.validate() == False:
+                # TODO : how to get the reason ?
+                self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.id))
+            else:
+                self.json = pkg_json.get_json()
+        except:
+            self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.id, traceback.format_exc()))
+
+
+    def get_json(self):
+        """ Return the json data (after some cleanup)
+        """
+        return self.json
 
 
 
@@ -647,7 +708,6 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         self.log.debug("New pub message {0}".format(msgid))
         self.log.debug("{0}".format(content))
-        print "@@@@" + str(msgid)
         if msgid == "plugin.status":
             if content["id"] == self.id and content["host"] == self.host:
                 self.log.info("New status received from {0} on {1} : {2}".format(self.id, self.host, content["event"]))
@@ -662,7 +722,6 @@ class Plugin(GenericComponent, MQAsyncSub):
                                                   {})
                     thr_check_if_stopped.start()
         elif msgid == "plugin.configuration":
-             print "@@@@"
              self.add_configuration_values_to_data()
 
 
