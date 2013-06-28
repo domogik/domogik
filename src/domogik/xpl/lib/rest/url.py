@@ -70,7 +70,7 @@ def timeit(action_func):
         ts = time.time()
         result = action_func(*args, **kw)
         te = time.time()
-        urlHandler.logger.debug('url function {0}({1}, {2}) took {3} sec'.format(action_func.__name__, args, kw, te-ts))
+        urlHandler.logger.debug('performcae|{0}|{1}|{2}|{3}'.format(action_func.__name__, args, kw, te-ts))
         return result
     return timed
 
