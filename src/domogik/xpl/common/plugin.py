@@ -187,7 +187,7 @@ class XplPlugin(BasePlugin, MQRep):
         """
         try:
             self.log.info("Read the json file and validate id".format(self._name))
-            pkg_json = PackageJson(pkg_type = "plugin", id = self._name)
+            pkg_json = PackageJson(pkg_type = "plugin", name = self._name)
             # check if json is valid
             if pkg_json.validate() == False:
                 # TODO : how to get the reason ?

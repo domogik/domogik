@@ -473,7 +473,7 @@ class Package():
 
         self.log.info("Package {0} : read the json file and validate it".format(self.name))
         try:
-            pkg_json = PackageJson(pkg_type = self.type, id = self.name)
+            pkg_json = PackageJson(pkg_type = self.type, name = self.name)
             # check if json is valid
             if pkg_json.validate() == False:
                 # TODO : how to get the reason ?
@@ -731,7 +731,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         try:
             self.log.info("Plugin {0} : read the json file and validate it".format(self.name))
-            pkg_json = PackageJson(pkg_type = "plugin", id = self.name)
+            pkg_json = PackageJson(pkg_type = "plugin", name = self.name)
             # check if json is valid
             if pkg_json.validate() == False:
                 self.set_status(STATUS_INVALID)

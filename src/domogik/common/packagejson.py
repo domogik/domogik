@@ -64,26 +64,26 @@ class PackageJson():
     """ PackageJson class
         load the file into a json and complete it
     """
-    def __init__(self, id = None, url = None, path = None, pkg_type = "plugin"):
+    def __init__(self, name = None, url = None, path = None, pkg_type = "plugin"):
         """ Read json file of a plugin and make an object from it
-            @param id : name of package
+            @param name : name of package
             @param url : url of file
             @param path : path of file
             @param pkg_type : package type (default : 'plugin')
-                          To use only with id != None
+                          To use only with name != None
         """
         json_file = None
         try:
             # load from sources repository
-            if id != None:
+            if name != None:
                 # get config
                 cfg = Loader('domogik')
                 config = cfg.load()
                 conf = dict(config[1])
 
                 if pkg_type == "plugin":
-                    json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['package_path'], PACKAGES_DIR, pkg_type, id)
-                    icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['package_path'], PACKAGES_DIR, pkg_type, id)
+                    json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['package_path'], PACKAGES_DIR, pkg_type, name)
+                    icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['package_path'], PACKAGES_DIR, pkg_type, name)
                 # TODO : reactivate later
                 #elif pkg_type == "external":
                 #    if conf.has_key('package_path'):
@@ -92,7 +92,7 @@ class PackageJson():
                 #        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '%s' doesn't exists" % pkg_type)
-                #json_file = "%s/%s.json" % (json_directory, id)
+                #json_file = "%s/%s.json" % (json_directory, name)
 
                 self.json = json.load(open(json_file))
 
@@ -110,8 +110,8 @@ class PackageJson():
             self.validate()
 
             # complete json
-            self.json["identity"]["fullname"] = "%s-%s" % (self.json["identity"]["type"],
-                                                           self.json["identity"]["id"])
+            self.json["identity"]["package_id"] = "%s-%s" % (self.json["identity"]["type"],
+                                                           self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
         except PackageException as exp:
             raise PackageException(exp.value)
@@ -271,8 +271,8 @@ class PackageJson():
         """
         print("---- Package informations -------------------------------")
         print("Type                : %s" % self.json["identity"]["type"])
-        print("Id                  : %s" % self.json["identity"]["id"])
-        print("Full name           : %s" % self.json["identity"]["fullname"])
+        print("Name                : %s" % self.json["identity"]["name"])
+        print("Package id          : %s" % self.json["identity"]["package_id"])
         print("Version             : %s" % self.json["identity"]["version"])
         print("Category            : %s" % self.json["identity"]["category"])
         print("Link for doc        : %s" % self.json["identity"]["documentation"])
