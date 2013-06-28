@@ -7,7 +7,7 @@ import json
 
 # url handler itself
 urlHandler = Flask(__name__)
-#urlHandler.debug = True
+urlHandler.debug = True
 
 # DB handler decorator
 def db_helper(action_func):
