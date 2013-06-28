@@ -15,11 +15,11 @@ class MQPub(object):
         if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
-            pub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['pub_port'])
+            pub_addr = "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['pub_port'])
         else:
-            ip = Parameter.objects.get(key='mq-ip')
+            ipaddr = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-pub_port')
-            pub_addr= "tcp://{0}:{1}".format(ip.value, port.value)
+            pub_addr = "tcp://{0}:{1}".format(ipaddr.value, port.value)
         self.caller_id = caller_id
         self.s_send = context.socket(zmq.PUB)
         self.s_send.connect(pub_addr)
@@ -34,7 +34,7 @@ class MQPub(object):
         @param content : content of the message : must be in JSON format
 
         """
-        msg_id = "%s.%s.%s" %(category, str(time()).replace('.','_'), MSG_VERSION)
+        msg_id = "{0}.{1}.{2}".format(category, str(time()).replace('.','_'), MSG_VERSION)
         self.s_send.send(msg_id, zmq.SNDMORE)
         self.s_send.send( json.dumps(content) )
 

@@ -38,12 +38,11 @@ import json
 import zmq
 import sys
 from zmq.eventloop.zmqstream import ZMQStream
-from zmq.eventloop.ioloop import IOLoop, DelayedCallback
-from time import sleep, time
+from zmq.eventloop.ioloop import IOLoop
 try:
-        from domogik.common.configloader import Loader
+    from domogik.common.configloader import Loader
 except ImportError:
-        from domoweb.models import Parameter
+    from domoweb.models import Parameter
 
 MSG_VERSION = "0_1"
 
@@ -52,11 +51,11 @@ class MQSyncSub():
         if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
-            sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
+            sub_addr = "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         else:
-            ip = Parameter.objects.get(key='mq-ip')
+            ipaddr = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-sub_port')
-            sub_addr= "tcp://{0}:{1}".format(ip.value, port.value)
+            sub_addr = "tcp://{0}:{1}".format(ipaddr.value, port.value)
         self.s_recv = context.socket(zmq.SUB)
         self.caller_id = caller_id
         self.s_recv.connect(sub_addr)
@@ -90,20 +89,20 @@ class MQAsyncSub():
         if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
-            sub_addr= "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
+            sub_addr = "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         else:
-            ip = Parameter.objects.get(key='mq-ip')
+            ipaddr = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-sub_port')
-            sub_addr= "tcp://{0}:{1}".format(ip.value, port.value)
+            sub_addr = "tcp://{0}:{1}".format(ipaddr.value, port.value)
         self.caller_id = caller_id
         self.s_recv = context.socket(zmq.SUB)
         self.s_recv.connect(sub_addr)
 
         if len(category_filters) == 0:
-	    self.s_recv.setsockopt(zmq.SUBSCRIBE, '')
+            self.s_recv.setsockopt(zmq.SUBSCRIBE, '')
         else:
             for category_filter in category_filters:
-	        self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
+                self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
         ioloop = IOLoop.instance()
         self.stream = ZMQStream(self.s_recv, ioloop)
         self.stream.on_recv(self._on_message)
@@ -118,7 +117,16 @@ class MQAsyncSub():
         
         :param: msg = the message received
         """
-        self.on_message(msg[0], json.loads(msg[1]))
+        mid = msg[0]
+        mid = mid.split('.')
+        # delete msg version
+        del mid[-1]
+        # delete timestamp
+        del mid[-1]
+        # build up the id again
+        mid = '.'.join(mid)
+
+        self.on_message(mid, json.loads(msg[1]))
   
     def on_message(self, msg_id, content):
         """Public method called when a message arrived.
