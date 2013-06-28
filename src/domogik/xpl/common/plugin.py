@@ -331,7 +331,7 @@ class XplPlugin(BasePlugin, MQRep):
         if hasattr(self, "_pub"):
             self._pub.send_event('plugin.status', 
                                  {"type" : "plugin",
-                                  "id" : self._name,
+                                  "name" : self._name,
                                   "host" : self.get_sanitized_hostname(),
                                   "event" : status})
 
