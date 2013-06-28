@@ -79,7 +79,7 @@ HTTP content (for account and person):
 
 Result : same as /list with only the user added
 
-PUT /account/user/update/
+PUT /account/user/
 -------------------------
 Update account + person 
 
@@ -130,20 +130,34 @@ Result: ::
 -------------------------------
 Result : same as /list with only the person filtered
 
-/account/person/add/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
--------------------------------------------------------------------------------------------------
+PUT /account/person/
+--------------------
 Add a person
+
+HTTP content:
+    * first_name
+    * last_name
+    * birthday (optional)
 
 Result : same as /list with only the person added
 
-/account/person/update/id/<id>/first_name/<first name>/last_name/<last name>/birthday/<birth day (optional)>
-------------------------------------------------------------------------------------------------------------
+POST /account/person/
+---------------------
 Update person
+
+HTTP content:
+    * id
+    * first_name
+    * last_name
+    * birthday (optional)
 
 Result : same as /list with only the person updated
 
-/account/person/del/<id>
-------------------------
+DELETE /account/person/
+-----------------------
 Del person (and user account linked if it exists) 
+
+HTTP content:
+    * id
 
 Result : same as /list with only the person deleted
