@@ -139,9 +139,9 @@ class DBConnector(XplPlugin, MQRep):
             status = False
             reason = "Config request not available for type={0}".format(msg_data['type'])
 
-        if 'id' not in msg_data:
+        if 'name' not in msg_data:
             status = False
-            reason = "Config request : missing 'id' field : {0}".format(data)
+            reason = "Config request : missing 'name' field : {0}".format(data)
 
         if 'host' not in msg_data:
             status = False
@@ -159,29 +159,29 @@ class DBConnector(XplPlugin, MQRep):
         else:
             reason = ""
             type = msg_data['type']
-            id = msg_data['id']
+            name = msg_data['name']
             host = msg_data['host']
             msg.add_data('type', type)
-            msg.add_data('id', id)
+            msg.add_data('name', name)
             msg.add_data('host', host)
             msg.add_data('key', key)  # we let this here to display key or * depending on the case
             try:
                 if get_all_keys == True:
-                    config = self._db.list_plugin_config(id, host)
-                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, id, key, config))
+                    config = self._db.list_plugin_config(name, host)
+                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, config))
                     json_config = {}
                     for elt in config:
                         json_config[elt.key] = self.convert(elt.value)
                     msg.add_data('data', json_config)
                 else:
-                    value = self._fetch_techno_config(id, host, key)
+                    value = self._fetch_techno_config(name, host, key)
                     # temporary fix : should be done in a better way (on db side)
                     value = self.convert(value)
-                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, id, key, value))
+                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, value))
                     msg.add_data('value', value)
             except:
                 status = False
-                reason = "Error while getting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, id, host, key, traceback.format_exc())
+                reason = "Error while getting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, name, host, key, traceback.format_exc())
                 self.log.error(reason)
 
         msg.add_data('reason', reason)
@@ -207,9 +207,9 @@ class DBConnector(XplPlugin, MQRep):
             status = False
             reason = "Config set not available for type={0}".format(msg_data['type'])
 
-        if 'id' not in msg_data:
+        if 'name' not in msg_data:
             status = False
-            reason = "Config set : missing 'id' field : {0}".format(data)
+            reason = "Config set : missing 'name' field : {0}".format(data)
 
         if 'host' not in msg_data:
             status = False
@@ -224,20 +224,20 @@ class DBConnector(XplPlugin, MQRep):
         else:
             reason = ""
             type = msg_data['type']
-            id = msg_data['id']
+            name = msg_data['name']
             host = msg_data['host']
             data = msg_data['data']
             msg.add_data('type', type)
-            msg.add_data('id', id)
+            msg.add_data('name', name)
             msg.add_data('host', host)
             try: 
                 # we add a configured key set to true to tell the UIs and plugins that there are some configuration elements
-                self._db.set_plugin_config(id, host, "configured", True)
+                self._db.set_plugin_config(name, host, "configured", True)
                 for key in msg_data['data']:
-                    self._db.set_plugin_config(id, host, key, data[key])
-                self.publish_config_updated(type, id, host)
+                    self._db.set_plugin_config(name, host, key, data[key])
+                self.publish_config_updated(type, name, host)
             except:
-                reason = "Error while setting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, id, host, key, traceback.format_exc())
+                reason = "Error while setting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, name, host, key, traceback.format_exc())
                 status = False
                 self.log.error(reason)
 
@@ -250,7 +250,7 @@ class DBConnector(XplPlugin, MQRep):
 
     def _mdp_reply_config_delete(self, data):
         """ Reply to config.delete MQ req
-            Delete all the config items for the given type, id and host
+            Delete all the config items for the given type, name and host
             @param data : MQ req message
         """
         msg = MQMessage()
@@ -265,9 +265,9 @@ class DBConnector(XplPlugin, MQRep):
             status = False
             reason = "Config request not available for type={0}".format(msg_data['type'])
 
-        if 'id' not in msg_data:
+        if 'name' not in msg_data:
             status = False
-            reason = "Config request : missing 'id' field : {0}".format(data)
+            reason = "Config request : missing 'name' field : {0}".format(data)
 
         if 'host' not in msg_data:
             status = False
@@ -278,18 +278,18 @@ class DBConnector(XplPlugin, MQRep):
         else:
             reason = ""
             type = msg_data['type']
-            id = msg_data['id']
+            name = msg_data['name']
             host = msg_data['host']
             msg.add_data('type', type)
-            msg.add_data('id', id)
+            msg.add_data('name', name)
             msg.add_data('host', host)
             try:
-                self._db.del_plugin_config(id, host)
-                self.log.info("Delete config for {0} {1}".format(type, id))
-                self.publish_config_updated(type, id, host)
+                self._db.del_plugin_config(name, host)
+                self.log.info("Delete config for {0} {1}".format(type, name))
+                self.publish_config_updated(type, name, host)
             except:
                 status = False
-                reason = "Error while deleting configuration for '{0} {1} on {2} : {3}".format(type, id, host, traceback.format_exc())
+                reason = "Error while deleting configuration for '{0} {1} on {2} : {3}".format(type, name, host, traceback.format_exc())
                 self.log.error(reason)
 
         msg.add_data('reason', reason)
@@ -299,25 +299,25 @@ class DBConnector(XplPlugin, MQRep):
         self.reply(msg.get())
 
 
-    def _fetch_techno_config(self, id, host, key):
+    def _fetch_techno_config(self, name, host, key):
         '''
         Fetch a plugin global config value in the database
-        @param id : the plugin of the element
+        @param name : the plugin of the element
         @param host : hostname
         @param key : the key of the config tuple to fetch
         '''
         try:
             try:
-                result = self._db.get_plugin_config(id, host, key)
+                result = self._db.get_plugin_config(name, host, key)
                 # tricky loop as workaround for a (sqlalchemy?) bug :
                 # sometimes the given result is for another plugin/key
                 # so while we don't get the good data, we loop
                 # This bug happens rarely
-                while result.id != id or \
+                while result.id != name or \
                    result.hostname != host or \
                    result.key != key:
                     self.log.debug("Bad result : {0}/{1} != {2}/{3}".format(result.id, result.key, plugin, key))
-                    result = self._db.get_plugin_config(id, host, key)
+                    result = self._db.get_plugin_config(name, host, key)
                 val = result.value
                 if val == '':
                     val = "None"
@@ -325,7 +325,7 @@ class DBConnector(XplPlugin, MQRep):
             except AttributeError:
                 return "None"
         except:
-            msg = "No config found host={0}, plugin={1}, key={2}" % (host, id, key)
+            msg = "No config found host={0}, plugin={1}, key={2}" % (host, name, key)
             self.log.warn(msg)
             return "None"
 
@@ -346,21 +346,21 @@ class DBConnector(XplPlugin, MQRep):
             status = False
             reason = "Devices request : missing 'type' field : {0}".format(data)
 
-        if 'id' not in msg_data:
+        if 'name' not in msg_data:
             status = False
-            reason = "Devices request : missing 'id' field : {0}".format(data)
+            reason = "Devices request : missing 'name' field : {0}".format(data)
 
         if status == False:
             self.log.error(reason)
         else:
             reason = ""
             type = msg_data['type']
-            id = msg_data['id']
+            name = msg_data['name']
             dev_list = self._db.list_devices()
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('type', type)
-            msg.add_data('id', id)
+            msg.add_data('name', name)
             msg.add_data('devices', dev_list)
 
         self.log.debug(msg.get())
@@ -376,15 +376,15 @@ class DBConnector(XplPlugin, MQRep):
             data = False
         return data
 
-    def publish_config_updated(self, type, id, host):
+    def publish_config_updated(self, type, name, host):
         """ Publish over the MQ a message to inform that a plugin configuration has been updated
             @param type : package type (plugin)
-            @param id : package id
+            @param name : package name
             @param host : host
         """
         self._pub.send_event('plugin.configuration',
                              {"type" : type,
-                              "id" : id,
+                              "name" : name,
                               "host" : host,
                               "event" : "updated"})
 

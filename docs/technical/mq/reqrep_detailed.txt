@@ -17,7 +17,8 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['clients.list.result', '{"host": "darkstar", "clients": {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "id": "diskfree"}}, "type": "plugin", "id": "diskfree", "key": "startup"}']
+    ['clients.list.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "configured": true, "pid": 0, "host": "darkstar", "package_id": "plugin-diskfree", "type": "plugin"}}']
+
 
 
 clients.detail.get
@@ -34,7 +35,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['clients.detail.result', '{"host": "darkstar", "clients": {"domogik-diskfree.darkstar": {"status": "alive", "type": "plugin", "configured": true, "pid": 0, "host": "darkstar", "data": {"xpl_stats": {"get_total_space": {"name": "get_total_space", "parameters": {"device": [], "static": [{"key": "type", "value": "total_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_total_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_free_space": {"name": "get_free_space", "parameters": {"device": [], "static": [{"key": "type", "value": "free_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_free_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_used_space": {"name": "get_used_space", "parameters": {"device": [], "static": [{"key": "type", "value": "used_space"}], "dynamic": [{"ignore_values": "", "sensor": "get_used_space", "key": "current"}]}, "schema": "sensor.basic"}}, "commands": [], "udev-rules": [], "device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "xpl_commands": [], "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Scaling"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Scaling"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Scaling"}, "get_percent_used": {"conversion": "", "name": "Percent used", "data_type": "DT_Scaling"}}, "configuration": [{"description": "Automatically start plugin at Domogik startup", "default": "False", "id": "0", "key": "startup-plugin", "interface": "no", "optionnal": "no", "type": "boolean", "options": []}, {"description": "Interval between each poll (minute)", "default": null, "id": "1", "key": "interval", "interface": "no", "optionnal": "no", "type": "string", "options": []}, {"description": "Path on filesystem", "default": null, "id": "2", "key": "path", "interface": "yes", "optionnal": "no", "type": "string", "options": []}], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "fullname": "plugin-diskfree", "type": "plugin", "id": "diskfree"}, "json_version": 2}, "id": "diskfree"}}, "type": "plugin", "id": "diskfree", "key": "startup"}']
+    ['clients.detail.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "data": {"configuration": [{"description": "Automatically start plugin at Domogik startup", "default": false, "required": false, "options": [], "key": "startup-plugin", "type": "boolean", "id": "0"}, {"description": "Interval between each poll (minute)", "default": 5, "required": false, "value": "7", "options": [], "key": "interval", "type": "integer", "id": "1"}]}, "configured": true, "pid": 0, "package_id": "plugin-diskfree", "host": "darkstar", "type": "plugin"}}']
 
 
 config.get
@@ -113,6 +114,23 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 You will get a reply like this: ::
 
     ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "id": "diskfree"}']
+
+
+packages.detail.get
+===================
+
+Request : UIs
+Reply : manager
+
+To get the packages detail, the UI may send a MQ request *packages.detail.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *packages.detail*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_packages_detail.py*.
+
+You will get a reply like this: ::
+
+    ['packages.detail.result', '{"plugin-diskfree": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
 
 
 plugin.start.do

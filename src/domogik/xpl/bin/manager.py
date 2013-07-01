@@ -187,12 +187,11 @@ class Manager(XplPlugin):
         # note that a core component or plugin are also clients but for the self._clients object is managed directly from the Plugin and CoreComponent objects
         # so, self._clients here is only the reference to the Clients object refreshed by all plugins and core components
 
+        ### Create the packages list
+        self._packages = {}
+
         ### Create the plugins list
         self._plugins = {}
-        # { 'onewire' : Plugin('onewire'),
-        #   'ipx800' : Plugin('ipx800'),
-        #   ...
-        # }
 
         ### Start the dbmgr
         if self.options.start_dbmgr:
@@ -234,16 +233,19 @@ class Manager(XplPlugin):
             sys.exit(1)
         for pkg in pkg_list:
             self.log.debug("Package available : {0}".format(pkg))
-            [type, id] = pkg.split("_")
-            self.log.debug("Type : {0}     / Id : {1}".format(type, id))
+            [type, name] = pkg.split("_")
+            self.log.debug("Type : {0}     / Id : {1}".format(type, name))
           
+            ### Create a package object in order to get packages details over MQ
+            self._packages["{0}-{1}".format(type, name)] = Package(type, name)
+ 
             ### type = plugin
             if type == "plugin":
-                if self._plugins.has_key(id):
-                    self.log.debug("The plugin '{0}' is already registered.".format(id))
+                if self._plugins.has_key(name):
+                    self.log.debug("The plugin '{0}' is already registered.".format(name))
                 else:
-                    self.log.info("New plugin available : {0}".format(id))
-                    self._plugins[id] = Plugin(id, 
+                    self.log.info("New plugin available : {0}".format(name))
+                    self._plugins[name] = Plugin(name, 
                                                self.get_sanitized_hostname(), 
                                                self._clients, 
                                                self.get_libraries_directory(),
@@ -253,6 +255,14 @@ class Manager(XplPlugin):
                                                self.get_sanitized_hostname())
                     # The automatic startup is handled in the Plugin class in __init__
             
+        # publish packages list
+        msg_data = {}
+        for pkg in self._packages:
+            msg_data[pkg] = self._packages[pkg].get_json()
+        self._pub.send_event('packages.detail', 
+                             msg_data)
+
+
 
 
     def _create_fifo(self):
@@ -267,19 +277,19 @@ class Manager(XplPlugin):
                 self._write_fifo("NONE","\n")
 
 
-    def _start_core_component(self, id):
+    def _start_core_component(self, name):
         """ Start a core component
-            @param id : component id : dbmgr, rest
+            @param name : component name : dbmgr, rest
         """
         self._inc_startup_lock()
-        component = CoreComponent(id, self.get_sanitized_hostname(), self._clients)
-        self._write_fifo("INFO", "Start {0}...".format(id))
+        component = CoreComponent(name, self.get_sanitized_hostname(), self._clients)
+        self._write_fifo("INFO", "Start {0}...".format(name))
         pid = component.start()
         if pid != 0:
-            self._write_fifo("OK", "{0} started with pid {1}\n".format(id, pid))
+            self._write_fifo("OK", "{0} started with pid {1}\n".format(name, pid))
             self._dec_startup_lock()
         else:
-            self._write_fifo("ERROR", "{0} failed to start. Please check logs".format(id))
+            self._write_fifo("ERROR", "{0} failed to start. Please check logs".format(name))
             return False
         return True
 
@@ -356,9 +366,15 @@ class Manager(XplPlugin):
         # XplPlugin handles MQ Req/rep also
         XplPlugin.on_mdp_request(self, msg)
 
+        ### packages details
+        # retrieve the clients details
+        if msg.get_action() == "packages.detail.get":
+            self.log.info("Packages details request : {0}".format(msg))
+            self._mdp_reply_packages_detail()
+
         ### clients list and details
         # retrieve the clients list
-        if msg.get_action() == "clients.list.get":
+        elif msg.get_action() == "clients.list.get":
             self.log.info("Clients list request : {0}".format(msg))
             self._mdp_reply_clients_list()
 
@@ -379,12 +395,24 @@ class Manager(XplPlugin):
         # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
 
 
+    def _mdp_reply_packages_detail(self):
+        """ Reply on the MQ
+        """
+        msg = MQMessage()
+        msg.set_action('packages.detail.result')
+        for pkg in self._packages:
+            msg.add_data(pkg, self._packages[pkg].get_json())
+        self.reply(msg.get())
+
+
     def _mdp_reply_clients_list(self):
         """ Reply on the MQ
         """
         msg = MQMessage()
         msg.set_action('clients.list.result')
-        msg.add_data('clients', self._clients.get_list())
+        clients = self._clients.get_list() 
+        for key in clients:
+            msg.add_data(key, clients[key])
         self.reply(msg.get())
 
 
@@ -393,7 +421,9 @@ class Manager(XplPlugin):
         """
         msg = MQMessage()
         msg.set_action('clients.detail.result')
-        msg.add_data('clients', self._clients.get_detail())
+        clients = self._clients.get_detail() 
+        for key in clients:
+            msg.add_data(key, clients[key])
         self.reply(msg.get())
 
 
@@ -404,22 +434,22 @@ class Manager(XplPlugin):
         msg = MQMessage()
         msg.set_action('plugin.start.result')
 
-        if 'id' not in data.get_data().keys():
+        if 'name' not in data.get_data().keys():
             status = False
-            reason = "Plugin startup request : missing 'id' field"
+            reason = "Plugin startup request : missing 'name' field"
             self.log.error(reason)
         else:
-            id = data.get_data('id')
-            msg.add_data('id', id)
+            name = data.get_data('name')
+            msg.add_data('name', name)
 
             # try to start the plugin
-            pid = self._plugins[id].start()
+            pid = self._plugins[name].start()
             if pid != 0:
                 status = True
                 reason = ""
             else:
                 status = False
-                reason = "Plugin '{0}' startup failed".format(id)
+                reason = "Plugin '{0}' startup failed".format(name)
 
         msg.add_data('status', status)
         msg.add_data('reason', reason)
@@ -427,6 +457,51 @@ class Manager(XplPlugin):
 
 
 
+
+
+class Package():
+    """ This class is used to create a package object which contains the packages information (parts of the json).
+        This is needed for the packages.detais MQ dialog
+    """
+
+    def __init__(self, type, name):
+        """ Init a plugin 
+            @param type : package type
+            @param name : package name
+        """
+        self.type = type
+        self.name = name
+        self.json = None
+
+        ### init logger
+        log = logger.Logger('manager')
+        self.log = log.get_logger('manager')
+
+        self.log.info("Registering a new package (warning, not a package instance but the package model) : {0}-{1}".format(self.type, self.name))
+
+        self.log.info("Package {0} : read the json file and validate it".format(self.name))
+        try:
+            pkg_json = PackageJson(pkg_type = self.type, name = self.name)
+            # check if json is valid
+            if pkg_json.validate() == False:
+                # TODO : how to get the reason ?
+                self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
+            else:
+                self.json = pkg_json.get_json()
+                del(self.json['configuration'])
+                del(self.json['xpl_stats'])
+                del(self.json['commands'])
+                del(self.json['xpl_commands'])
+                del(self.json['sensors'])
+                del(self.json['json_version'])
+        except:
+            self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.name, traceback.format_exc()))
+
+
+    def get_json(self):
+        """ Return the json data (after some cleanup)
+        """
+        return self.json
 
 
 
@@ -439,16 +514,16 @@ class GenericComponent():
     """ This is a sample class to be used for plugins and core components
     """
 
-    def __init__(self, id, host, clients):
+    def __init__(self, name, host, clients):
         """ Init a component 
-            @param id : plugin id (ipx800, onewire, ...)
+            @param name : plugin name (ipx800, onewire, ...)
             @param host : hostname
             @param clients : clients list 
         """
         ### init vars
-        self.id = id
+        self.name = name
         self.host = host
-        self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.id, self.host)
+        self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.name, self.host)
         self.type = "unknown - not setted yet"
         self.configured = None
         self._clients = clients
@@ -461,7 +536,7 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.host, self.type, self.id, self.xpl_source, self.data, self.configured)
+        self._clients.add(self.host, self.type, self.name, self.xpl_source, self.data, self.configured)
 
 
     def set_status(self, new_status):
@@ -487,14 +562,14 @@ class CoreComponent(GenericComponent):
         Notice that there is currently no need to stop a core component, we just want to be able to start them
     """
 
-    def __init__(self, id, host, clients):
+    def __init__(self, name, host, clients):
         """ Init a component
-            @param id : component id (dbmgr, rest)
+            @param name : component name (dbmgr, rest)
             @param host : hostname
             @param clients : clients list 
         """
-        GenericComponent.__init__(self, id = id, host = host, clients = clients)
-        self.log.info("New core component : {0}".format(self.id))
+        GenericComponent.__init__(self, name = name, host = host, clients = clients)
+        self.log.info("New core component : {0}".format(self.name))
 
         ### set the component type
         self.type = "core"
@@ -515,12 +590,12 @@ class CoreComponent(GenericComponent):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        res, pid_list = is_already_launched(self.log, self.id)
+        res, pid_list = is_already_launched(self.log, self.name)
         if res:
             return 0
 
         ### Start the component
-        self.log.info("Request to start core component : {0}".format(self.id))
+        self.log.info("Request to start core component : {0}".format(self.name))
         pid = self.exec_component("domogik.xpl.bin")
         self.set_pid(pid)
        
@@ -534,7 +609,7 @@ class CoreComponent(GenericComponent):
             @param python_component_basepackage : domogik.xpl.bin, packages
         """
         ### get python package path for the component
-        pkg = "{0}.{1}".format(python_component_basepackage, self.id)
+        pkg = "{0}.{1}".format(python_component_basepackage, self.name)
         self.log.debug("Try to import module : {0}".format(pkg))
         __import__(pkg)
         component_path = sys.modules[pkg].__file__
@@ -563,9 +638,9 @@ class Plugin(GenericComponent, MQAsyncSub):
         * start the plugin
     """
 
-    def __init__(self, id, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
+    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
         """ Init a plugin 
-            @param id : plugin id (ipx800, onewire, ...)
+            @param name : plugin name (ipx800, onewire, ...)
             @param host : hostname
             @param clients : clients list 
             @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
@@ -574,8 +649,8 @@ class Plugin(GenericComponent, MQAsyncSub):
             @param stop : get_stop()
             @param local_host : get_sanitized_hostname()
         """
-        GenericComponent.__init__(self, id = id, host = host, clients = clients)
-        self.log.info("New plugin : {0}".format(self.id))
+        GenericComponent.__init__(self, name = name, host = host, clients = clients)
+        self.log.info("New plugin : {0}".format(self.name))
 
         ### check if the plugin is on he local host
         if self.host == local_host:
@@ -613,7 +688,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.fill_data()
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
-        configured = self._config.query(self.id, 'configured')
+        configured = self._config.query(self.name, 'configured')
         if configured == '1':
             configured = True
         if configured == True:
@@ -624,22 +699,22 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### register the plugin as a client
         self.register_component()
 
-        ### subscribe the the MQ for category = plugin and id = self.id
+        ### subscribe the the MQ for category = plugin and name = self.name
         MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status', 'plugin.configuration'])
 
         ### check if the plugin must be started on manager startup
-        startup = self._config.query(self.id, 'startup')
+        startup = self._config.query(self.name, 'startup')
         if startup == '1':
             startup = True
         if startup == True:
-            self.log.info("Plugin {0} configured to be started on manager startup. Starting...".format(id))
+            self.log.info("Plugin {0} configured to be started on manager startup. Starting...".format(name))
             pid = self.start()
             if pid:
-                self.log.info("Plugin {0} started".format(id))
+                self.log.info("Plugin {0} started".format(name))
             else:
-                self.log.error("Plugin {0} failed to start".format(id))
+                self.log.error("Plugin {0} failed to start".format(name))
         else:
-            self.log.info("Plugin {0} not configured to be started on manager startup.".format(id))
+            self.log.info("Plugin {0} not configured to be started on manager startup.".format(name))
 
 
     def on_message(self, msgid, content):
@@ -647,49 +722,56 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         self.log.debug("New pub message {0}".format(msgid))
         self.log.debug("{0}".format(content))
-        print "@@@@" + str(msgid)
         if msgid == "plugin.status":
-            if content["id"] == self.id and content["host"] == self.host:
-                self.log.info("New status received from {0} on {1} : {2}".format(self.id, self.host, content["event"]))
+            if content["name"] == self.name and content["host"] == self.host:
+                self.log.info("New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
-                    self.log.info("The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.id))
+                    self.log.info("The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
                     thr_check_if_stopped = Thread(None,
                                                   self._check_if_stopped,
-                                                  "check_if_{0}_is_stopped".format(self.id),
+                                                  "check_if_{0}_is_stopped".format(self.name),
                                                   (),
                                                   {})
                     thr_check_if_stopped.start()
         elif msgid == "plugin.configuration":
-             print "@@@@"
-             self.add_configuration_values_to_data()
+            self.add_configuration_values_to_data()
+            self._clients.publish_update()
 
 
     def fill_data(self):
         """ Fill the client data by reading the json file
         """
         try:
-            self.log.info("Plugin {0} : read the json file and validate id".format(self.id))
-            pkg_json = PackageJson(pkg_type = "plugin", id = self.id)
+            self.log.info("Plugin {0} : read the json file and validate it".format(self.name))
+            pkg_json = PackageJson(pkg_type = "plugin", name = self.name)
             # check if json is valid
             if pkg_json.validate() == False:
                 self.set_status(STATUS_INVALID)
                 # TODO : how to get the reason ?
-                self.log.error("Plugin {0} : invalid json file".format(self.id))
+                self.log.error("Plugin {0} : invalid json file".format(self.name))
             else:
                 self.data = pkg_json.get_json()
+                del(self.data['xpl_stats'])
+                del(self.data['udev_rules'])
+                del(self.data['device_types'])
+                del(self.data['commands'])
+                del(self.data['xpl_commands'])
+                del(self.data['sensors'])
+                del(self.data['identity'])
+                del(self.data['json_version'])
                 # and finally, add the configuration values in the data
                 self.add_configuration_values_to_data()
         except:
-            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.id, traceback.format_exc()))
+            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.name, traceback.format_exc()))
             self.set_status(STATUS_INVALID)
 
     def add_configuration_values_to_data(self):
         """
         """
         # grab all the config elements for the plugin
-        config = self._config.query(self.id)
+        config = self._config.query(self.name)
         if config != None:
             for key in config:
                 # filter on the 'configured' key
@@ -703,7 +785,7 @@ class Plugin(GenericComponent, MQAsyncSub):
                             # key found : insert value in the json
                             self.data['configuration'][idx]['value'] = config[key]
                     if key_found == False:
-                        self.log.warning("A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.id, self.host))
+                        self.log.warning("A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
     def start(self):
         """ to call to start the plugin
@@ -714,13 +796,13 @@ class Plugin(GenericComponent, MQAsyncSub):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        res, pid_list = is_already_launched(self.log, self.id)
+        res, pid_list = is_already_launched(self.log, self.name)
         if res:
             return 0
 
         ### Try to start the plugin
-        self.log.info("Request to start plugin : {0}".format(self.id))
-        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._packages_directory, self.id, self.id), \
+        self.log.info("Request to start plugin : {0}".format(self.name))
+        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._packages_directory, self.name, self.name), \
                                   env_pythonpath = self._librairies_directory)
         pid = pid
 
@@ -755,27 +837,28 @@ class Plugin(GenericComponent, MQAsyncSub):
         """ Check if the plugin is stopped. If not, kill it
         """
         self._stop.wait(WAIT_AFTER_STOP_REQUEST)
-        res, pid_list = is_already_launched(self.log, self.id)
+        res, pid_list = is_already_launched(self.log, self.name)
         if res:
             for the_pid in pid_list:
                 self.log.info("Try to kill pid {0}...".format(the_pid))
                 os.kill(int(the_pid), signal.SIGKILL)
                 # TODO : add one more check ?
                 # do a while loop over is_already.... ?
-            self.log.info("The plugin {0} should be killed now (kill -9)".format(self.id))
+            self.log.info("The plugin {0} should be killed now (kill -9)".format(self.name))
         else:
-            self.log.info("The plugin {0} has stopped itself properly.".format(self.id))
+            self.log.info("The plugin {0} has stopped itself properly.".format(self.name))
 
 
 
 class Clients():
     """ The clients list
-          xpl_source : for a domogik plugin : domogik-<id>.<hostname>
+          xpl_source : for a domogik plugin : domogik-<name>.<hostname>
                        for an external member : <vendor id>-<device id>.<instance>
         { xplsource = { 
                         host : hostname or ip
                         type : plugin, ...
-                        id : package name (onewire, ipx800, ...)
+                        name : package name (onewire, ipx800, ...)
+                        package_id : [type]+[name]
                         status : alive, stopped, dead, unknown
                         configured : True/False (plugins) or None (other types)
                         data : { 
@@ -787,7 +870,7 @@ class Clients():
 
         The data part is related to the type
 
-        WARNING : the 'primary key' is the xpl_source as you may have several clients with the same {type,id}
+        WARNING : the 'primary key' is the xpl_source as you may have several clients with the same {type,name}
         So, all updates will be done on a xpl_source
     """
 
@@ -804,33 +887,35 @@ class Clients():
         self.log.info("Clients initialisation")
         self._pub = MQPub(zmq.Context(), 'manager')
 
-    def add(self, host, type, id, xpl_source, data, configured = None):
+    def add(self, host, type, name, xpl_source, data, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
             @param type : client type
-            @param id : client id
+            @param name : client name
             @param xpl_source : client xpl source
             @param data : client data : only for clients details
             @param configured : True/False : for a plugin : True if the plugin is configured, else False
                                 None : for type != 'plugin'
         """
-        self.log.info("Add new client : host={0}, type={1}, id={2}, xpl_source={3}, data={4}".format(host, type, id, xpl_source, str(data)))
+        self.log.info("Add new client : host={0}, type={1}, name={2}, xpl_source={3}, data={4}".format(host, type, name, xpl_source, str(data)))
         client = { "host" : host,
                    "type" : type,
-                   "id" : id,
+                   "name" : name,
+                   "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured}
         client_with_details = { "host" : host,
                    "type" : type,
-                   "id" : id,
+                   "name" : name,
+                   "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured,
                    "data" : data}
         self._clients[xpl_source] = client
         self._clients_with_details[xpl_source] = client_with_details
-        self._publish_update()
+        self.publish_update()
 
     def set_status(self, xpl_source, new_status):
         """ Set a new status to a client
@@ -846,7 +931,7 @@ class Clients():
         self._clients[xpl_source]['status'] = new_status
         self._clients_with_details[xpl_source]['status'] = new_status
         self.log.info("Status set : {0} => {1}".format(xpl_source, new_status))
-        self._publish_update()
+        self.publish_update()
 
     def set_pid(self, xpl_source, pid):
         """ Set a pid to a client
@@ -855,7 +940,7 @@ class Clients():
         self._clients[xpl_source]['pid'] = pid
         self._clients_with_details[xpl_source]['pid'] = pid
         self.log.info("Pid set : {0} => {1}".format(xpl_source, pid))
-        self._publish_update()
+        self.publish_update()
 
     def get_list(self):
         """ Return the clients list
@@ -867,7 +952,7 @@ class Clients():
         """
         return self._clients_with_details
 
-    def _publish_update(self):
+    def publish_update(self):
         """ Publish the clients list update over the MQ
         """
         # MQ publisher
