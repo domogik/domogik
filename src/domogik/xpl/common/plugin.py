@@ -64,6 +64,9 @@ STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
+# core components
+CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplevent']
+
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"
 RESOURCES_DIR = "resources"
@@ -329,8 +332,12 @@ class XplPlugin(BasePlugin, MQRep):
         """ Send the plugin status over the MQ
         """ 
         if hasattr(self, "_pub"):
+            if self._name in CORE_COMPONENTS:
+                type = "core"
+            else:
+                type = "plugin"
             self._pub.send_event('plugin.status', 
-                                 {"type" : "plugin",
+                                 {"type" : type,
                                   "name" : self._name,
                                   "host" : self.get_sanitized_hostname(),
                                   "event" : status})
