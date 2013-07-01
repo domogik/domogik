@@ -1,0 +1,15 @@
+package.*.sh  export-ignore
+.hg_archival.txt   export-ignore
+.coverage   export-ignore
+.hgignore   export-ignore
+.gitignore   export-ignore
+dists/   export-ignore
+src/domogik/ui/   export-ignore
+src/domogik_packages/  export-ignore
+src/external/  export-ignore
+src/mpris/  export-ignore
+src/share/  export-ignore
+src/tools/demo/  export-ignore
+src/tools/drm/  export-ignore
+src/tools/drm-yii/  export-ignore
+src/tools/ipx800/  export-ignore
