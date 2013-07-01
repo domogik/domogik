@@ -8,6 +8,7 @@ Installation
 .. note::
     * These examples assume Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to stop it before installation.
+    * The package you will use to install Domogik must be uncompress in a folder in which the user you will use for Domogik will have read permissions. Please avoid unpacking the Domogik package in the */root* folder.
 
 .. todo:: Mac installation
 
