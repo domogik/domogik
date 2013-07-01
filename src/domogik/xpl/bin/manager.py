@@ -196,17 +196,17 @@ class Manager(XplPlugin):
         ### Start the dbmgr
         if self.options.start_dbmgr:
             if not self._start_core_component("dbmgr"):
-                return
+                self.log.error("Unable to start dbmgr")
 
         ### Start rest
         if self.options.start_rest:
             if not self._start_core_component("rest"):
-                return
+                self.log.error("Unable to start rest")
 
         ### Start xplevent
         if self.options.start_xplevent:
             if not self._start_core_component("xplevent"):
-                return
+                self.log.error("Unable to start xplevent")
 
         ### Check for the available packages
         # TODO : call it with a timer !
@@ -282,7 +282,7 @@ class Manager(XplPlugin):
             @param name : component name : dbmgr, rest
         """
         self._inc_startup_lock()
-        component = CoreComponent(name, self.get_sanitized_hostname(), self._clients)
+        component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self._zmq)
         self._write_fifo("INFO", "Start {0}...".format(name))
         pid = component.start()
         if pid != 0:
@@ -557,16 +557,17 @@ class GenericComponent():
 
 
 
-class CoreComponent(GenericComponent):
+class CoreComponent(GenericComponent, MQAsyncSub):
     """ This helps to handle core components startup
         Notice that there is currently no need to stop a core component, we just want to be able to start them
     """
 
-    def __init__(self, name, host, clients):
+    def __init__(self, name, host, clients, zmq_context):
         """ Init a component
             @param name : component name (dbmgr, rest)
             @param host : hostname
             @param clients : clients list 
+            @param zmq_context : 0MQ context
         """
         GenericComponent.__init__(self, name = name, host = host, clients = clients)
         self.log.info("New core component : {0}".format(self.name))
@@ -579,6 +580,12 @@ class CoreComponent(GenericComponent):
 
         ### register the component as a client
         self.register_component()
+
+        ### zmq context
+        self._zmq = zmq_context
+
+        ### subscribe the the MQ for category = plugin and name = self.name
+        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status'])
 
 
     def start(self):
@@ -598,8 +605,13 @@ class CoreComponent(GenericComponent):
         self.log.info("Request to start core component : {0}".format(self.name))
         pid = self.exec_component("domogik.xpl.bin")
         self.set_pid(pid)
+        if pid != 0:
+            # Notice : we whould not need to do this as this information should be provided by the MQ plugin.status.
+            # But as the IOLoop is not started when core components are launched with -r, -d or -x options, we don't
+            # have the plugin.status message.
+            self.set_status(STATUS_ALIVE)
        
-        # no need to add a step to check if the composent is started as the status is given to the user directly by the pub/sub 'plugin.status'
+        # no need to add a step to check if the component is started as the status is given to the user directly by the pub/sub 'plugin.status'
 
         return pid
 
@@ -626,6 +638,28 @@ class CoreComponent(GenericComponent):
         subp.communicate()
         return pid
 
+
+    def on_message(self, msgid, content):
+        """ when a message is received from the MQ 
+
+            WARNING : for core components : 
+            notice that this function is not called when the manager starts with -r, -d, -x options as the IOLoop is not yet started. This function is only used after manager startup
+        """
+        #self.log.debug("New pub message received {0}".format(msgid))
+        #self.log.debug("{0}".format(content))
+        if msgid == "plugin.status":
+            if content["name"] == self.name and content["host"] == self.host:
+                self.log.info("New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
+                self.set_status(content["event"])
+                # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
+                if content["event"] == STATUS_STOP_REQUEST:
+                    self.log.info("The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
+                    thr_check_if_stopped = Thread(None,
+                                                  self._check_if_stopped,
+                                                  "check_if_{0}_is_stopped".format(self.name),
+                                                  (),
+                                                  {})
+                    thr_check_if_stopped.start()
 
 
 
@@ -720,8 +754,8 @@ class Plugin(GenericComponent, MQAsyncSub):
     def on_message(self, msgid, content):
         """ when a message is received from the MQ 
         """
-        self.log.debug("New pub message {0}".format(msgid))
-        self.log.debug("{0}".format(content))
+        #self.log.debug("New pub message received {0}".format(msgid))
+        #self.log.debug("{0}".format(content))
         if msgid == "plugin.status":
             if content["name"] == self.name and content["host"] == self.host:
                 self.log.info("New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
