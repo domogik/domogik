@@ -1,0 +1,34 @@
+=================
+REST /device_type
+=================
+
+GET /device_type
+------------------
+List all device types known by domogik
+
+Result: ::
+
+    [
+        {
+            "plugin_id": "diskfree",
+            "plugin": {
+                "version": "0.1a0",
+                "description": "Send over xPL disk usage",
+                "id": "diskfree"
+            },
+            "description": "Disk usage",
+            "name": "Disk usage",
+            "id": "diskfree.disk_usage"
+        },
+        {
+            "plugin_id": "knx",
+            "plugin": {
+                "version": "0.1",
+                "description": "KNX support for domogik",
+                "id": "knx"
+            },
+            "description": "ON/OFF Binary Switch",
+            "name": "Switch",
+            "id": "knx.switch"
+        }
+    ]
