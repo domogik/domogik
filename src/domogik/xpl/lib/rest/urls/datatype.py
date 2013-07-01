@@ -12,9 +12,7 @@ import json
 @timeit
 def api_datatype():
     """ return the datatypes json file
-        /src/domogik/common/datatypes.json
     """
-    urlHandler.logger.debug("test =============")
     cfg = Loader('domogik')
     config = cfg.load()
     conf = dict(config[1])
