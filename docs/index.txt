@@ -67,7 +67,9 @@ Technical Documentation
 	* :doc:`REST /device_type </technical/rinor/rest_device_type>`: Get device types data from the database
 	* :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
 	* :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
-	* :doc:`REST /account </technical/rinor/rest_account>`: List accounts, login, etc
+	* :doc:`REST /account </technical/rinor/rest_account>`: Login and password changes
+	* :doc:`REST /user </technical/rinor/rest_user>`: List users
+	* :doc:`REST /person </technical/rinor/rest_person>`: List persons
 	* :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
 	* :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
 	* :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
