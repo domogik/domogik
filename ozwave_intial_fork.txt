@@ -1,0 +1,1 @@
+Update developing_a_plugin doc + Initial fork for ozwave plugin : see doc for changelog
