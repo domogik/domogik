@@ -126,6 +126,8 @@ setup(
             dmg_hub = domogik.xpl.bin.hub:main
             dmg_broker = domogik.mq.reqrep.broker:main
             dmg_forwarder = domogik.mq.pubsub.forwarder:main
+            dmg_insert_data = domogik.tools.packages.insert_data:main
+            dmg_review = domogik.tools.packages.review.review:main
             """
         ],
     },

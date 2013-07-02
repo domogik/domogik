@@ -19,37 +19,34 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
-Call rest module for inserting data
+Insert plugin data in database
 
 Implements
 ==========
 
-@author: Friz <fritz.smh@gmail.com>
+PluginData
+
+@author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
-import urllib
 
-
-if __name__ == '__main__':
-    ip = "192.168.0.10"
-    port = "8080"
-    data_file = "./demo_data.txt"
-
-    file = open(data_file, "r")
-
-    for request in file.read().split('\n'):
-        print("len=" + str(len(request)))
-        print(request[0:1])
-        if request[0:1] != "#" and len(request) != 0:
-            print("[ " + request + " ]")
-            data = urllib.urlopen("http://%s:%s%s" % (ip, port, request))
-            print(data.read())
-    file.close()
+from domogik.common.packagedata import PackageData
+import sys
 
 
 
+def main():
+    if len(sys.argv) != 2:
+        print("Usage : %s <plugin json file>" % sys.argv[0])
+        quit()
+    PD = PackageData(sys.argv[1])
+    PD.insert()
+
+
+if __name__ == "__main__":
+    main()
