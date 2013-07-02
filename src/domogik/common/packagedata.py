@@ -73,17 +73,17 @@ class PackageData():
         """ Insert data for plugin
         """
         ### Plugin
-        print("plugin %s" % self.pkg["identity"]["id"])
-        if self._db.get_plugin(self.pkg["identity"]["id"]) == None:
+        print("plugin %s" % self.pkg["identity"]["name"])
+        if self._db.get_plugin(self.pkg["identity"]["name"]) == None:
             # add if not exists
             print("add...")
-            self._db.add_plugin(self.pkg["identity"]["id"],
+            self._db.add_plugin(self.pkg["identity"]["name"],
                                   self.pkg["identity"]["description"],
                                   self.pkg["identity"]["version"])
         else:
             # update if exists
             print("update...")
-            self._db.update_plugin(self.pkg["identity"]["id"],
+            self._db.update_plugin(self.pkg["identity"]["name"],
                                   self.pkg["identity"]["description"],
                                   self.pkg["identity"]["version"])
  
@@ -96,12 +96,12 @@ class PackageData():
                 print("add...")
                 self._db.add_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg["identity"]["id"],
+                                         self.pkg["identity"]["name"],
                                          device_type["description"])
             else:
                 # update if exists
                 print("update...")
                 self._db.update_device_type(device_type["id"],
                                          device_type["name"],
-                                         self.pkg["identity"]["id"],
+                                         self.pkg["identity"]["name"],
                                          device_type["description"])
