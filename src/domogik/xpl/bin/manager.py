@@ -190,6 +190,9 @@ class Manager(XplPlugin):
         ### Create the packages list
         self._packages = {}
 
+        ### Create the device types list
+        self._device_types = {}
+
         ### Create the plugins list
         self._plugins = {}
 
@@ -238,7 +241,7 @@ class Manager(XplPlugin):
           
             ### Create a package object in order to get packages details over MQ
             self._packages["{0}-{1}".format(type, name)] = Package(type, name)
- 
+
             ### type = plugin
             if type == "plugin":
                 if self._plugins.has_key(name):
@@ -255,14 +258,17 @@ class Manager(XplPlugin):
                                                self.get_sanitized_hostname())
                     # The automatic startup is handled in the Plugin class in __init__
             
+        ### Create a DeviceType collection in order to send them over MQ
+        for pkg in self._packages:
+            for device_type in self._packages[pkg].get_device_types():
+                self._device_types[device_type] = self._packages[pkg].get_json()
+ 
         # publish packages list
         msg_data = {}
         for pkg in self._packages:
             msg_data[pkg] = self._packages[pkg].get_json()
         self._pub.send_event('packages.detail', 
                              msg_data)
-
-
 
 
     def _create_fifo(self):
@@ -372,6 +378,12 @@ class Manager(XplPlugin):
             self.log.info("Packages details request : {0}".format(msg))
             self._mdp_reply_packages_detail()
 
+        ### device_types
+        # retrieve the device_types
+        elif msg.get_action() == "device_types.get":
+            self.log.info("Device types request : {0}".format(msg))
+            self._mdp_reply_device_types()
+
         ### clients list and details
         # retrieve the clients list
         elif msg.get_action() == "clients.list.get":
@@ -402,6 +414,16 @@ class Manager(XplPlugin):
         msg.set_action('packages.detail.result')
         for pkg in self._packages:
             msg.add_data(pkg, self._packages[pkg].get_json())
+        self.reply(msg.get())
+
+
+    def _mdp_reply_device_types(self):
+        """ Reply on the MQ
+        """
+        msg = MQMessage()
+        msg.set_action('device_types.result')
+        for dev in self._device_types:
+            msg.add_data(dev, self._device_types[dev])
         self.reply(msg.get())
 
 
@@ -502,6 +524,14 @@ class Package():
         """ Return the json data (after some cleanup)
         """
         return self.json
+
+    def get_device_types(self):
+        """ Return all the device types available or the package
+        """
+        dt_list = []
+        for dt in self.json['device_types']:
+            dt_list.append(dt)
+        return dt_list
 
 
 

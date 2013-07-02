@@ -42,6 +42,8 @@ UIs                     manager             clients.list.get    clients.list.res
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     manager             clients.detail.get  clients.detail.result  req_clients_detail.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
+Rest                    manager             device_types.get    device_types.result    req_device_types.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     manager             packages.detail.get packages.detail.result req_packages_detail.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     manager             plugin.start.do     plugin.start.result    req_plugin_start.py
