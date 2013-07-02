@@ -65,7 +65,7 @@ import re
 import signal
 
 from threading import Event, Thread, Lock, Semaphore
-from optparse import OptionParser
+from argparse import ArgumentParser
 from subprocess import Popen, PIPE
 
 from domogik.common.configloader import Loader, CONFIG_FILE
@@ -124,18 +124,18 @@ class Manager(XplPlugin):
         # logger init is done after the parser setup because it is setup in the XplPlugin.__init__() call
 
         ### Option parser
-        parser = OptionParser()
-        parser.add_option("-d", 
+        parser = ArgumentParser()
+        parser.add_argument("-d", 
                           action="store_true", 
                           dest="start_dbmgr", 
                           default=False, \
                           help="Start database manager if not already running.")
-        parser.add_option("-r", 
+        parser.add_argument("-r", 
                           action="store_true", 
                           dest="start_rest", 
                           default=False, \
                           help="Start rest if not already running.")
-        parser.add_option("-x", 
+        parser.add_argument("-x", 
                           action="store_true", 
                           dest="start_xplevent", 
                           default=False, \

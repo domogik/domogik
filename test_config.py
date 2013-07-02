@@ -266,8 +266,8 @@ def test_init():
 def test_version():
     info("Check python version")
     v = sys.version_info
-    assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
-    ok("Python version is >= 2.6")
+    assert not (v[0] == 2 and v[1] < 7), "Python version is %s.%s, it must be >= 2.7, please upgrade" % (v[0], v[1])
+    ok("Python version is >= 2.7")
 
 def test_hostname():
     info("Check hostname")

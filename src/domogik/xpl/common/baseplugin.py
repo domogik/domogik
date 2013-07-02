@@ -44,7 +44,7 @@ import daemon
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
 from domogik.common.utils import is_already_launched
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
@@ -52,8 +52,8 @@ class BasePlugin():
     """
     def __init__(self, name, stop_cb = None, p = None, daemonize = True):
         ''' 
-        @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
-        create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+        @param p : An instance of ArgumentParser. If you want to add extra options to the generic option parser,
+        create your own ArgumentParser instance, use parser.add_argument and then pass your parser instance as parameter.
         Your options/params will then be available on self.options and self.args
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
@@ -93,22 +93,22 @@ class BasePlugin():
             self._stop_cb = []
 
         ### options management
-        if p is not None and isinstance(p, OptionParser):
+        if p is not None and isinstance(p, ArgumentParser):
             parser = p
         else:
-            parser = OptionParser()
-        parser.add_option("-V", 
+            parser = ArgumentParser()
+        parser.add_argument("-V", 
                           "--version", 
                           action="store_true", 
                           dest="display_version", 
                           default=False, 
                           help="Display Domogik version.")
-        parser.add_option("-f", 
+        parser.add_argument("-f", 
                           action="store_true", 
                           dest="run_in_foreground", 
                           default=False, 
                           help="Run the plugin in foreground, default to background.")
-        (self.options, self.args) = parser.parse_args()
+        self.options = parser.parse_args()
         if self.options.display_version:
             __import__("domogik")
             global_release = sys.modules["domogik"].__version__

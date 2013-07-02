@@ -40,7 +40,7 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-import optparse
+from argparse import ArgumentParser
 
 
 class Sender(XplPlugin):
@@ -54,11 +54,12 @@ class Sender(XplPlugin):
                          "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self):
-        parser = optparse.OptionParser()
-        parser.add_option("-t", "--target", type="string",
-                dest="target", default=None)
-        parser.add_option("-s", "--source", type="string",
-                dest="source", default=None)
+        parser = ArgumentParser()
+        parser.add_argument(dest="type", help="XPL message type.")
+        parser.add_argument(dest="schema", help="XPL message schema.")
+        parser.add_argument(dest="message", help="XPL message data, comma seperated list (key=val,key2=val2).")
+        parser.add_argument("-t", "--target", dest="target", default=None, help="XPL message target.")
+        parser.add_argument("-s", "--source", dest="source", default=None, help="XPL message source.")
         XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser, nohub = True)
         mess = self.forge_message()
         self.log.debug("Send message : %s" % mess)
@@ -71,15 +72,15 @@ class Sender(XplPlugin):
         Create the message based on script arguments
         '''
         message = XplMessage()
-        message.set_type(self.args[0])
+        message.set_type(self.options.type)
         if self.options.source != None:
             print("Source forced : %s" % self.options.source)
             message.set_source(self.options.source)
         if self.options.target != None:
             print("Target forced : %s" % self.options.target)
             message.set_target(self.options.target)
-        message.set_schema(self.args[1])
-        datas = self.args[2].split(',')
+        message.set_schema(self.options.schema)
+        datas = self.options.message.split(',')
         for data in datas:
             if "=" not in data:
                 self.log.error("Bad formatted commands. Must be key=value")

@@ -41,28 +41,19 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 import datetime
 from time import localtime
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 class Sniffer(XplPlugin):
     '''Sniff xpl network and dump all messages
     '''
 
     def __init__(self):
-        parser = OptionParser()
-        parser.add_option("-c", action="store_true", dest="compress", \
-		default=False, help="Diaply data in a compress way")
-        parser.add_option("-t", action="store", dest="xpltype", \
-                default=None, type="string", \
-                help="Filter messages on XPL message type")
-        parser.add_option("-s", action="store", dest="xplsource", \
-                default=None, type="string", \
-                help="Filter messages on XPL source field")
-        parser.add_option("-S", action="store", dest="xplschema", \
-                default=None, type="string", \
-                help="Filter messages on XPL schema field")
-        parser.add_option("-i", action="store", dest="xplinstance", \
-                default=None, type="string", \
-                help="Filter messages on XPL instance")
+        parser = ArgumentParser()
+        parser.add_argument("-c", action="store_true", dest="compress", default=False, help="Compress the ouput.")
+        parser.add_argument("-t", action="store",  dest="xpltype", default=None, help="Filter messages on XPL message type.")
+        parser.add_argument("-s", action="store",  dest="xplsource", default=None, help="Filter messages on XPL source.")
+        parser.add_argument("-S", action="store",  dest="xplschema", default=None, help="Filter messages on XPL schema.")
+        parser.add_argument("-i", action="store",  dest="xplinstance", default=None, help="Filter messages on XPL schema.")
         XplPlugin.__init__(self, name='dump_xpl', daemonize=False, \
                 parser=parser)
         fil = {}
@@ -82,14 +73,14 @@ class Sniffer(XplPlugin):
         Print received message
         '''
         if self.options.compress == False:
-            print("%s - %s" % (datetime.datetime.now(), message))
+            #print("%s - %s" % (datetime.datetime.now(), message))
             self.log.info("%s - %s" % (datetime.datetime.now(), message))
         else:
             ldt = localtime()
             date = "%s/%s/%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
             time = "%s:%s:%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
             display = "%s" % time
-            self.log.info("%s - %s" % (datetime.datetime.now(), message))
+            #self.log.info("%s - %s" % (datetime.datetime.now(), message))
             print("%s - %s %s hop=%s source=%s target=%s" % (display,
                                                           message.type,
                                                           message.schema,

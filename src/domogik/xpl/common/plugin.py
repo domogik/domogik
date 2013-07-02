@@ -65,7 +65,7 @@ STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
 # core components
-CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplevent']
+CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplevent', 'send', 'dump_xpl']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"
@@ -95,8 +95,8 @@ class XplPlugin(BasePlugin, MQRep):
         nothing will happen
         @param dump_cb : Callback to call when a "DUMP" order is received, if None,
         nothing will happen
-        @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
-        create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+        @param parser : An instance of ArgumentParser. If you want to add extra options to the generic option parser,
+        create your own ArgumentParser instance, use parser.add_argument and then pass your parser instance as parameter.
         Your options/params will then be available on self.options and self.args
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
@@ -161,7 +161,7 @@ class XplPlugin(BasePlugin, MQRep):
 
         # for all no core elements, load the json
         # TODO find a way to do it nicer ??
-        if self._name not in ('dbmgr', 'manager', 'rest', 'xplevent'):
+        if self._name not in CORE_COMPONENTS:
             self._load_json()
 
         self.log.debug("end single xpl plugin")
