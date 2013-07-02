@@ -19,16 +19,16 @@ Check your Python version with: ::
     python -V
 
 .. warning::
-    Right now Domogik **requires Python 2.6/2.7**. Python 3 is not (yet) supported.
+    Right now Domogik **requires Python 2.7**. Python 3 is not (yet) supported.
 
-If you don't already have Python 2.6/2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
+If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
 
-    $ apt-get install python2.6
-    $ ln -sf /usr/bin/python2.6 /usr/bin/python
+    $ apt-get install python2.7
+    $ ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Even if you have python2.6 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
+Even if you have python2.7 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
 
-    $ apt-get install python2.X-dev gcc
+    $ apt-get install python2.7-dev gcc
 
 Install SSL librairies: ::
 

@@ -546,7 +546,7 @@ copy_tools
 create_log_dir
 if [ $MAIN_INSTALL = "y" ] ; then
     call_app_installer
-    install_plugins
+    #install_plugins
 fi
 modify_hosts   
 

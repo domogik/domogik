@@ -531,6 +531,8 @@ class PkgReview:
                 lines_found.append("%4d:%s" % (line_num, line))
         return found, lines_found
 
-if __name__ == "__main__":
+def main():
     review = PkgReview(sys.argv[1])
 
+if __name__ == "__main__":
+    main()
