@@ -39,7 +39,6 @@ ez_setup.use_setuptools()
 
 import os
 from setuptools import setup, find_packages
-from install.get_arch import *
 import platform
 
 def list_all_files(path, dst):
@@ -59,8 +58,6 @@ def list_all_files(path, dst):
     d.append((dst, files))
     return d
 
-arch = get_path()
-
 d_files = [
         ('/usr/sbin/', ['src/tools/dmgenplug']),
         ('/usr/sbin/', ['src/tools/dmgdisplug']),
@@ -68,6 +65,24 @@ d_files = [
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
 
+def get_path(dir_only=False):
+    arch = platform.machine()
+    hub = {
+        'x86_64' : 'src/domogik/xpl/tools/64bit/',
+        'i686' : 'src/domogik/xpl/tools/32bit/',
+        'arm' : 'src/domogik/xpl/tools/arm/',
+        'armv5tel' : 'src/domogik/xpl/tools/arm/',
+        'armv6l' : 'src/domogik/xpl/tools/arm/'
+    }
+    if arch not in hub.keys():
+        return None
+    else:
+        if not dir_only:
+            return hub[arch] + "xPL_Hub"
+        else:
+            return hub[arch]
+
+arch = get_path()
 if arch != None:
     d_files.append(('/usr/sbin/', [arch]))
 else:
@@ -108,12 +123,15 @@ setup(
     # namespace_packages = ['domogik', 'mpris', 'tools'],
     # include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
-    package_dir = {'': 'src'},
+    package_dir = {
+        '': 'src',
+        'install': 'install'
+    },
     test_suite = 'domogik.tests',
     package_data = {
     },
     data_files = d_files,
-
+    scripts=['install.sh'],
     entry_points = {
         'console_scripts': [
             """
@@ -129,4 +147,13 @@ setup(
             """
         ],
     },
+    classifiers=[
+        "Topic :: Home Automation",
+        "Environment :: No Input/Output (Daemon)",
+        "Programming Language :: Python",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: End Users/Desktop",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Natural Language :: English",
+    ]
 )
