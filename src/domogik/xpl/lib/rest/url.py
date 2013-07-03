@@ -115,6 +115,5 @@ from domogik.xpl.lib.rest.urls.package import *
 from domogik.xpl.lib.rest.urls.helper import *
 
 # Pure REST API
-from domogik.xpl.lib.rest.urls.device_type import deviceTypeAPI
 from domogik.xpl.lib.rest.urls.person import personAPI
 from domogik.xpl.lib.rest.urls.account import AccountAPI

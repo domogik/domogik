@@ -64,7 +64,6 @@ Technical Documentation
 	* :doc:`Overview </technical/rinor/index>`
 	* :doc:`XPL Events </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
 	* :doc:`REST /device </technical/rinor/rest_device>`: Get device data from the database
-	* :doc:`REST /device_type </technical/rinor/rest_device_type>`: Get device types data from the database
 	* :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
 	* :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
 	* :doc:`REST /account </technical/rinor/rest_account>`: Login and password changes
