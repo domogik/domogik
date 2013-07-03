@@ -154,7 +154,7 @@ class PackageJson():
         if self.json["json_version"] == 2:
             self._validate_02()
         else:
-            return True
+            return False
 
     def _validate_keys(self, expected, name, lst, optional=[]):
         for exp in expected:
