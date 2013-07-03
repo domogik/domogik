@@ -82,8 +82,8 @@ class PackageJson():
                 conf = dict(config[1])
 
                 if pkg_type == "plugin":
-                    json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['package_path'], PACKAGES_DIR, pkg_type, name)
-                    icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['package_path'], PACKAGES_DIR, pkg_type, name)
+                    json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
+                    icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                 # TODO : reactivate later
                 #elif pkg_type == "external":
                 #    if conf.has_key('package_path'):
