@@ -51,9 +51,8 @@ from domogik.common import logger
 from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        Device,
-        DeviceUsage, DeviceStats,
-        Plugin, PluginConfig, DeviceType, Person,
+        Device, DeviceStats,
+        PluginConfig, Person,
         UserAccount,
         Command, CommandParam,
         Sensor, SensorHistory,
@@ -188,224 +187,6 @@ class DbHelper():
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()
-
-####
-# Device type
-####
-    def list_device_types(self, plugin=None):
-        """Return a list of device types
-
-        @return a list of DeviceType objects
-
-        """
-        if plugin is not None:
-            return self.__session.query(DeviceType).filter_by(plugin_id=ucode(plugin)).all()
-        else:
-            return self.__session.query(DeviceType).all()
-
-    def get_device_type_by_name(self, dty_name):
-        """Return information about a device type
-
-        @param dty_name : The device type name
-        @return a DeviceType object
-
-        """
-        return self.__session.query(
-                        DeviceType
-                    ).filter(func.lower(DeviceType.name)==ucode(dty_name.lower())
-                    ).first()
-    
-    def get_device_type_by_id(self, dty_id):
-        """Return information about a device type
-
-        @param dty_id : The device type id
-        @return a DeviceType object
-
-        """
-        return self.__session.query(
-                        DeviceType
-                    ).filter(func.lower(DeviceType.id)==ucode(dty_id)
-                    ).first()
-
-    def add_device_type(self, dty_id, dty_name, dt_id, dty_description=None):
-        """Add a device_type (Switch, Dimmer, WOL...)
-
-        @param dty_id : device type id
-        @param dty_name : device type name
-        @param dt_id : plugin id (x10, plcbus,...)
-        @param dty_description : device type description (optional)
-        @return a DeviceType (the newly created one)
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        if not self.__session.query(Plugin).filter_by(id=dt_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device type with plugin id %s. It does not exist" % dt_id)
-        dty = DeviceType(id=ucode(dty_id), name=ucode(dty_name), description=ucode(dty_description),
-                         plugin_id=dt_id)
-        self.__session.add(dty)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dty
-
-    def update_device_type(self, dty_id, dty_name=None, dt_id=None, dty_description=None):
-        """Update a device type
-
-        @param dty_id : device type id to be updated
-        @param dty_name : device type name (optional)
-        @param dt_id : id of the associated plugin (optional)
-        @param dty_description : device type detailed description (optional)
-        @return a DeviceType object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        device_type = self.__session.query(DeviceType).filter_by(id=dty_id).first()
-        if device_type is None:
-            self.__raise_dbhelper_exception("DeviceType with id %s couldn't be found" % dty_id)
-        if dty_id is not None:
-            device_type.id = ucode(dty_id)
-        if dty_name is not None:
-            device_type.name = ucode(dty_name)
-        if dt_id is not None:
-            if not self.__session.query(Plugin).filter_by(id=dt_id).first():
-                self.__raise_dbhelper_exception("Couldn't find plugin id %s. It does not exist" % dt_id)
-            device_type.plugin_id = dt_id
-        self.__session.add(device_type)
-        if dty_description is not None:
-            if dty_description == '': dty_description = None
-            device_type.description = ucode(dty_description)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception)
-        return device_type
-
-    def del_device_type(self, dty_id, cascade_delete=False):
-        """Delete a device type
-
-        @param dty_id : device type id
-        @param cascade_delete : if set to True records of binded tables will be deleted (default is False)
-        @return the deleted DeviceType object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dty = self.__session.query(DeviceType).filter_by(id=ucode(dty_id)).first()
-        if dty:
-            if cascade_delete:
-                for device in self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all():
-                    self.del_device(device.id)
-            else:
-                device_list = self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all()
-                if len(device_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete device type %s : there are associated device(s)" % dty_id)
-            self.__session.delete(dty)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return dty
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
-
-####
-# Plugin
-####
-    def get_plugin(self, id=None):
-        """Return a list of device technologies
-
-        @return a list of DeviceTechnology objects
-
-        """
-        if id == None:
-            return self.__session.query(Plugin).all()
-        else:
-            return self.__session.query(Plugin).filter_by(id=ucode(id)).first()
-
-    def add_plugin(self, name, description=None, version=None):
-        """Add a plugin
-
-        @param name : plugin name
-        @param description : extended description of the plugin
-        @param version : version of the plugin
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dt = Plugin(id=name, description=description, version=version)
-        self.__session.add(dt)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return dt
-
-    def update_plugin(self, id, description=None, version=None):
-        """Update a plugin
-
-        @param name : plugin name
-        @param description : extended description of the plugin
-        @param version : version of the plugin
-        @return a plugin object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        plugin = self.__session.query(
-                                Plugin
-                            ).filter_by(id=ucode(id)
-                            ).first()
-        if plugin is None:
-            self.__raise_dbhelper_exception("Plugin with id %s couldn't be found" % id)
-        if description is not None:
-            if description == '': description = None
-            plugin.description = ucode(description)
-        if version is not None:
-            if version == '': version = None
-            plugin.version = ucode(version)
-        self.__session.add(plugin)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return plugin
-
-    def del_plugin(self, pid, cascade_delete=False):
-        """Delete a plugin
-
-        @param id : id of the plugin to delete
-        @param cascade_delete : True if related objects should be deleted, optional default set to False
-        @return the deleted plugin  object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        dt = self.__session.query(Plugin).filter_by(id=ucode(pid)).first()
-        if dt:
-            if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(plugin_id=ucode(dt.id)).all():
-                    self.del_device_type(device_type.id, cascade_delete=True)
-                    self.__session.commit()
-            else:
-                device_type_list = self.__session.query(
-                                            DeviceType
-                                        ).filter_by(plugin_id=ucode(dt.id)
-                                        ).all()
-                if len(device_type_list) > 0:
-                    self.__raise_dbhelper_exception("Couldn't delete plugin %s : there are associated device types"
-                                               % dt_id)
-
-            self.__session.delete(dt)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return dt
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete plugin with id %s : it doesn't exist" % dt_id)
 
 ####
 # Plugin config
@@ -552,8 +333,6 @@ class DbHelper():
 
     def add_device_and_commands(self, name, type_id, description, reference):
         # first add the device itself
-        if not self.__session.query(DeviceType).filter_by(id=type_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % type_id)
         dt = self.get_device_type_by_id(type_id)
         self.__session.expire_all()
         dev = Device(name=name, description=description, reference=reference, \
@@ -683,8 +462,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        if not self.__session.query(DeviceType).filter_by(id=d_type_id).first():
-            self.__raise_dbhelper_exception("Couldn't add device with device type id %s It does not exist" % d_type_id)
         device = Device(name=d_name, description=d_description, reference=d_reference, \
                         device_type_id=d_type_id)
         self.__session.add(device)

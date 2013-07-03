@@ -26,12 +26,8 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-- class DeviceUsage
-- class Plugin
 - class PluginConfig
-- class DeviceType
 - class Device
-- class DeviceFeature
 - class DeviceStats
 - class Person
 - class UserAccount
@@ -75,78 +71,14 @@ _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
 # Define objects
-class DeviceUsage(Base):
-    """Usage of a device (temperature, heating, lighting, music...)"""
-
-    __tablename__ = '%s_device_usage' % _db_prefix
-    id = Column(Unicode(80), primary_key=True)
-    name = Column(Unicode(30), nullable=False)
-    description = Column(UnicodeText())
-    default_options = Column(UnicodeText())
-
-    def __init__(self, id, name, description=None, default_options=None):
-        """Class constructor
-
-        @param id : usage id
-        @param name : short name of the usage
-        @param description : extended description, optional
-        @param default_options : default options, optional
-
-        """
-        self.id = ucode(id)
-        self.name = ucode(name)
-        self.description = ucode(description)
-        self.default_options = ucode(default_options)
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>"\
-                % (self.id, self.name, self.description, self.default_options)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceUsage.__tablename__
-
-
-class Plugin(Base):
-    """Plugins"""
-
-    __tablename__ = '%s_plugin' % _db_prefix
-    id = Column(Unicode(30), primary_key=True, nullable=False)
-    description = Column(UnicodeText())
-    version = Column(Unicode(30))
-
-    def __init__(self, id, description=None, version=None):
-        """Class constructor
-
-        @param id : plugin id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
-        @param description : extended description, optional
-        @param version : version number, optional
-
-        """
-        self.id = ucode(id)
-        self.description = ucode(description)
-        self.version = ucode(version)
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Plugin(id='%s', desc='%s', version='%s')>" % (self.id, self.description, self.version)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return Plugin.__tablename__
-
-
 class PluginConfig(Base):
     """Configuration for a plugin (x10, plcbus, ...)"""
 
     __tablename__ = '%s_plugin_config' % _db_prefix
     id = Column(Unicode(30), primary_key=True)
     hostname = Column(Unicode(40), primary_key=True)
-    key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
+    key = Column(Unicode(255), primary_key=True)
+    value = Column(UnicodeText(), nullable=False)
 
     def __init__(self, id, hostname, key, value):
         """Class constructor
@@ -171,42 +103,6 @@ class PluginConfig(Base):
         """Return the table name associated to the class"""
         return PluginConfig.__tablename__
 
-
-class DeviceType(Base):
-    """Type of a device (x10.Switch, x10.Dimmer, Computer.WOL...)"""
-
-    __tablename__ = '%s_device_type' % _db_prefix
-    id = Column(Unicode(80), primary_key=True)
-    plugin_id = Column(Unicode(30), ForeignKey('%s.id' % Plugin.get_tablename()), nullable=False)
-    plugin = relation(Plugin)
-    name = Column(Unicode(80), nullable=False)
-    description = Column(UnicodeText())
-
-    def __init__(self, id, name, plugin_id, description=None):
-        """Class constructor
-
-        @paral id : device type id
-        @param name : short name of the type
-        @param description : extended description, optional
-        @param plugin_id : plugin id
-
-        """
-        self.id = ucode(id)
-        self.name = ucode(name)
-        self.description = ucode(description)
-        self.plugin_id = ucode(plugin_id)
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceType(id='%s', name='%s', desc='%s', plugin='%s')>"\
-               % (self.id, self.name, self.description, self.plugin)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceType.__tablename__
-
-
 class Device(Base):
     """Device"""
 
@@ -216,8 +112,7 @@ class Device(Base):
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
     address = Column(Unicode(255), nullable=True)
-    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=True)
-    device_type = relation(DeviceType)
+    device_type_id = Column(Unicode(80), nullable=False)
     commands = relationship("Command", backref=__tablename__, cascade="all, delete")
     sensors = relationship("Sensor", backref=__tablename__, cascade="all, delete")
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")

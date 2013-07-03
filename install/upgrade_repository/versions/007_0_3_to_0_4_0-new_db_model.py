@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 from migrate import *
-from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, Device, Command, CommandParam, Sensor, SensorHistory, DeviceType, Plugin, DeviceUsage
+from domogik.common.sql_schema import XplStat, XplStatParam, XplCommand, XplCommandParam, Device, Command, CommandParam, Sensor, SensorHistory, PluginConfig
 from domogik.common import database_utils
 
 def upgrade(migrate_engine):
@@ -37,68 +37,44 @@ def upgrade(migrate_engine):
     if database_utils.column_exists(migrate_engine, Device.__tablename__, 'address'):
         dev = Table(Device.__tablename__, meta, autoload=True)
         dev.c.address.alter(nullable=True)
-    # device device_type_id make nullable
-    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'device_type_id'):
-        dev = Table(Device.__tablename__, meta, autoload=True)
-        dev.c.device_type_id.alter(nullable=True)
-        # set deviceType to Null for existing devices
-        Session = sessionmaker(bind=migrate_engine)
-        session = Session()
-        session.query(Device).update({'device_type_id': None}) 
-        session.commit()
-        session = None
-        Session = None
-    # delete feature and featureModels
-    if database_utils.table_exists(migrate_engine, "core_device_feature_association"):
-        migrate_engine.execute("DROP table core_device_feature_association")
+    # delete some foreign keys
+    dev = Table(Device.__tablename__, meta, autoload=True)
+    devu = Table('core_device_usage', meta, autoload=True)
+    devt = Table('core_device_type', meta, autoload=True)
+    devtt = Table('core_device_technology', meta, autoload=True)
+    cons = ForeignKeyConstraint([dev.c.device_usage_id], [devu.c.id], name='core_device_ibfk_1').drop()
+    cons = ForeignKeyConstraint([dev.c.device_type_id], [devt.c.id], name='core_device_ibfk_2').drop()
+    cons = ForeignKeyConstraint([devt.c.device_technology_id], [devtt.c.id], name='core_device_type_ibfk_1').drop()
+    dev.c.device_usage_id.drop()
+    dev.c.device_type_id.drop()
+    # drop device_usage in device table and the table itself
+    #if database_utils.table_exists(migrate_engine, "core_device_feature_association"):
+    #    devt = Table('core_device_feature_association', meta, autoload=True)
+    #    devt.drop()
     if database_utils.table_exists(migrate_engine, "core_device_feature"):
-        migrate_engine.execute("DROP table core_device_feature")
+        tab = Table('core_device_feature', meta, autoload=True)
+        tab.drop()
+        tab = None
     if database_utils.table_exists(migrate_engine, "core_device_feature_model"):
-        migrate_engine.execute("DROP table core_device_feature_model")
-    # delete device usage
-    if database_utils.column_exists(migrate_engine, Device.__tablename__, 'address'):
-        dev = Table(Device.__tablename__, meta, autoload=True)
-        # drop the table 
-    if database_utils.table_exists(migrate_engine, "core_device_usage"):
-        dev = Table(Device.__tablename__, meta, autoload=True)
-        devusage = Table(DeviceUsage.__tablename__, meta, autoload=True)
-        cons = ForeignKeyConstraint([dev.c.device_usage_id], [devusage.c.id], name='core_device_ibfk_1')
-        cons.drop()
-        duid = Column('device_usage_id', Unicode(80))
-        duid.drop(dev)
-        migrate_engine.execute("DROP table core_device_usage")
-    # technology to plugin renaming
-    #0- delete foreign key between device and device_type
-    fkey_do = database_utils.foreignkey_exists(migrate_engine, Device.__tablename__, "core_device_ibfk_2")
-    if fkey_do:
-        dev = Table(Device.__tablename__, meta, autoload=True)
-        devtype = Table(DeviceType.__tablename__, meta, autoload=True)
-        cons = ForeignKeyConstraint([dev.c.device_type_id], [devtype.c.id], name='core_device_ibfk_2')
-        cons.drop()
-        cons = None
-        dev = None
-        devtype = None
-    #1- delete device_type
-    if database_utils.table_exists(migrate_engine, "core_device_type"):
-        migrate_engine.execute("DROP table core_device_type")
-    #2- delete technology
+        tab = Table('core_device_feature_model', meta, autoload=True)
+        tab.drop()
+        tab = None
     if database_utils.table_exists(migrate_engine, "core_device_technology"):
-        migrate_engine.execute("DROP table core_device_technology")
-    #3- create device_type
-    if not database_utils.table_exists(migrate_engine, Plugin.__tablename__):
-        table = Plugin.__table__
-        table.create(bind=migrate_engine)
-    #5- create plugin
-    if not database_utils.table_exists(migrate_engine, DeviceType.__tablename__):
-        table = DeviceType.__table__
-        table.create(bind=migrate_engine)
-    #6- re-add the foreign key
-    if fkey_do:
-        dev = Table(Device.__tablename__, meta, autoload=True)
-        devtype = Table(DeviceType.__tablename__, meta, autoload=True)
-        cons = ForeignKeyConstraint([dev.c.device_type_id], [devtype.c.id], name='core_device_ibfk_2')
-        cons.create()
-
+        devtt.drop()
+        devtt = None
+    if database_utils.table_exists(migrate_engine, "core_device_type"):
+        devt.drop()
+        devt = None
+    if database_utils.table_exists(migrate_engine, "core_device_usage"):
+        devu.drop()
+        devu = None
+    dev = None
+    # pluginConfig => key to length 255
+    # pluginConfig => value to text
+    pluginConfig = Table(PluginConfig.__tablename__, meta, autoload=True)
+    pluginConfig.c.key.alter(type=Unicode(255))
+    pluginConfig.c.value.alter(type=UnicodeText())
+ 
 def downgrade(migrate_engine):
     # bind the engine
     meta = MetaData(bind=migrate_engine)
