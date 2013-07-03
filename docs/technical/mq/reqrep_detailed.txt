@@ -126,6 +126,9 @@ To get the device_types associated data, Rest may send a MQ request *device_type
 The result is build in this way : 
 * for each package detected by the manager, all *device_types* in the json file are listed. Then, each is added in a dictionnary with the package json file content as value.
 
+    request : device_types.get
+    data : device_type = <a device type>  (optionnal : if not provided, all the device_types are returned)
+
 An example to send the request is available as *src/domogik/examples/mq-python/req_device_types.py*.
 
 You will get a reply like this: ::

@@ -384,7 +384,7 @@ class Manager(XplPlugin):
         # retrieve the device_types
         elif msg.get_action() == "device_types.get":
             self.log.info("Device types request : {0}".format(msg))
-            self._mdp_reply_device_types()
+            self._mdp_reply_device_types(msg)
 
         ### clients list and details
         # retrieve the clients list
@@ -419,13 +419,18 @@ class Manager(XplPlugin):
         self.reply(msg.get())
 
 
-    def _mdp_reply_device_types(self):
+    def _mdp_reply_device_types(self, data):
         """ Reply on the MQ
+            @param data : message data
         """
         msg = MQMessage()
         msg.set_action('device_types.result')
-        for dev in self._device_types:
-            msg.add_data(dev, self._device_types[dev])
+        if 'device_type' not in data.get_data():
+            for dev in self._device_types:
+                msg.add_data(dev, self._device_types[dev])
+        else:
+            device_type = data.get_data()['device_type']
+            msg.add_data(device_type, self._device_types[device_type])
         self.reply(msg.get())
 
 
