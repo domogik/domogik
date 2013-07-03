@@ -88,7 +88,7 @@ def page_not_found(e):
 @urlHandler.errorhandler(500)
 @json_response
 def page_not_found(e):
-    urlHandler.logger.exception(e)
+    urlHandler.logger.debug(e)
     return 500, {'error': "Application error see rest.log"}
 
 # view class registration
