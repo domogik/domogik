@@ -323,9 +323,11 @@ class DBConnector(XplPlugin, MQRep):
                     val = "None"
                 return val
             except AttributeError:
+                # if no result is found
+                #self.log.error("Attribute error : {0}".format(traceback.format_exc()))
                 return "None"
         except:
-            msg = "No config found host={0}, plugin={1}, key={2}" % (host, name, key)
+            msg = "No config found host={0}, plugin={1}, key={2}".format(host, name, key)
             self.log.warn(msg)
             return "None"
 

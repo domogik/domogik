@@ -142,7 +142,7 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', 
                                                              pool_recycle=7200, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
-            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
+            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True, autocommit=True)
         self.__session = DbHelper.__session_object()
 
     def get_engine(self):
@@ -230,7 +230,7 @@ class DbHelper():
                     ).filter_by(key=ucode(pl_key)
                     ).first()
         except:
-            self.log.Debug("oups")
+            self.log.debug("oups : {0}".format(traceback.format-exc()))
         return ret
 
     def set_plugin_config(self, pl_id, pl_hostname, pl_key, pl_value):
