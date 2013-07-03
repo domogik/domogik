@@ -26,3 +26,13 @@ Show log file informations
 - You can display n lines from beginning or until end of ozwave plugin log file. 
     
 |logfile|
+
+List of manufacturers and product compatibilities
+=================================================
+
+.. |listproducts| image:: ozwave_listproducts.png
+    :width: 750px
+
+- You can check all manufacturers and products reognized by openzwave library. 
+    
+|listproducts|

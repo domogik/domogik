@@ -3,7 +3,9 @@
     <schema name="ozwctrl.basic">
         <xpltype type="xpl-trig">
             <listener>
-                <filter/>
+                <filter>
+                    <key name="type" value="status"/>
+                </filter>
             </listener>
             <mapping>
                 <device field="device"/>
@@ -11,6 +13,7 @@
 				<value field="node"/>
 				<value field="usermsg"/>
 				<value field="data"/>
+                <value field="status"/>
             </mapping>
         </xpltype>
     </schema>

@@ -91,6 +91,7 @@ class ZWaveValueNode:
         self._node = node
         self._valueData = valueData
         self._lastUpdate = time.time()
+        self._tempConv = True # Conversion forcée de F en °C, a mettre en option.
         
     # On accède aux attributs uniquement depuis les property
   
@@ -99,6 +100,7 @@ class ZWaveValueNode:
     lastUpdate = property(lambda self: self._lastUpdate)
     valueData = property(lambda self: self._valueData)
     labelDomogik = property(lambda self: self._getLabelDomogik())
+    isPolled = property(lambda self:self._node._manager.isPolled(self.valueData['id']))
     
     def getMemoryUsage(self):
         """Renvoi l'utilisation memoire de la value en octets"""
@@ -184,6 +186,13 @@ class ZWaveValueNode:
             
     def updateData(self, valueData):
         """Mise à jour de valueData depuis les arguments du callback."""
+        if self._tempConv and valueData['label'].lower() == 'temperature' and valueData['units'] == 'F': # TODO: Conversion forcée de F en °C, a mettre en option.
+            valueData['units'] = '°C'
+            print '************** Convertion : ',  float(valueData['value'])
+            print float(valueData['value'])*(5.0/9)
+            valueData['value'] = (float(valueData['value'])*(5.0/9))-(160.0/9)
+            print valueData['value']
+
         self._valueData = dict(valueData)
         self._lastUpdate = time.time()
         valueData['homeId'] = int(valueData['homeId']) # Pour etre compatible avec javascript
@@ -213,7 +222,7 @@ class ZWaveValueNode:
             
     def _getLabelDomogik(self):
         """ retourne le label OZW formaté pour les listener domogik, en lowcase et espaces remplacés pas '-',
-            pour compatibilité adresse web et appel rest."""
+            pour compatibilité adresse web et appel rest (spec Xpl)."""
         return self.valueData['label'].lower().replace(" ", "-")
         
     def getDomogikDevice(self):
@@ -232,6 +241,8 @@ class ZWaveValueNode:
         retval['id'] = str(retval['id']) # Pour etre compatible avec javascript
         retval['domogikdevice']  = self.getDomogikDevice()
         retval['help'] = self.getHelp()
+        retval['polled'] = self.isPolled
+        retval['pollintensity'] = self.getPollIntensity()
         retval['listElems'] = list(self.getListItems()) if (self.valueData['type'] == 'List')  else None
         return retval
     
@@ -260,6 +271,51 @@ class ZWaveValueNode:
         """Retourne l'aide utilisateur concernant la fonctionnalité du device"""
         return self._node._manager.getValueHelp(self.valueData['id'])
         
+    def enablePoll(self, intensity = 1):    
+        """Enable the polling of a device's state.
+
+            :param id: The ID of the value to start polling
+            :type id: int
+            :param intensity: The intensity of the poll
+            :type intensity: int
+            :return: True if polling was enabled.
+            :rtype: bool"""
+        try :
+            intensity = int(intensity)
+        except OZwaveValueException as e:
+            self._log.error('value.enablePoll(intensity) :' + e.value)
+            return {"error" : "Enable poll, error : %s" %e.value}
+        return self._node._manager.enablePoll(self.valueData['id'], intensity)
+        
+    def disablePoll(self):
+        """Disable polling of a value.
+
+            :param id: The ID of the value to disable polling.
+            :type id: int
+            :return: True if polling was disabled.
+            :rtype: bool """
+        return self._node._manager.disablePoll(self.valueData['id'])
+           
+    def getPollIntensity(self):
+        """Get the intensity with which this value is polled (0=none, 1=every time through the list, 2-every other time, etc).
+            :param id: The ID of a value.
+            :type id: int
+            :return: A integer containing the poll intensity
+            :rtype: int"""
+        #TODO: A réactiver dans la libopenzwave.pyx
+        return self._node._manager.getPollIntensity(self.valueData['id'])
+
+    def setPollIntensity(self, intensity):
+        """Set the frequency of polling (0=none, 1=every time through the set, 2-every other time, etc)
+
+            :param id: The ID of the value whose intensity should be set
+            :type id: int
+            :param intensity: the intensity of the poll
+            :type intensity: int
+            :return: True if polling is active.
+            :rtype: bool"""
+        return self._node._manager.setPollIntensity(self.valueData['id'], intensity)
+    
     def valueToxPLTrig(self, msgtrig):
         """Renvoi le message xPL à trigger en fonction de la command_class de la value
         @param mstrig: Dict avec les infos générales déja renseignées

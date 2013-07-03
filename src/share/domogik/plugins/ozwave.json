@@ -5,6 +5,7 @@
  				"src/share/domogik/stats/ozwave/sensor.basic-ozwave.xml",
 				"src/share/domogik/stats/ozwave/controller.basic-ozwave.xml",
  				"src/share/domogik/url2xpl/ozwave/level.xml",
+ 				"src/share/domogik/url2xpl/ozwave/preset_dim.xml",
  				"src/share/domogik/url2xpl/ozwave/on.xml",
 				"src/share/domogik/url2xpl/ozwave/off.xml",
 				"src/share/domogik/url2xpl/ozwave/Refresh.xml",
@@ -34,32 +35,32 @@
 			"stat_key" : "status",
 			"value_type" : "string"
 		}, {
-			"return_confirmation" : "1",
-			"feature_type" : "actuator",
-			"parameters" : "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
-			"stat_key" : "command",
-			"value_type" : "binary",
 			"device_type_id" : "ozwave.switch",
+			"feature_type" : "actuator",
 			"id" : "ozwave.switch.switch",
-			"name" : "Switch"
-		}, {
-			"return_confirmation" : "1",
-			"feature_type" : "actuator",
+			"name" : "Switch",
 			"parameters" : "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
-			"stat_key" : "command",
-			"value_type" : "binary",
-			"device_type_id" : "ozwave.dimmer",
-			"id" : "ozwave.dimmer.switch",
-			"name" : "Dimmer"
-		}, {
 			"return_confirmation" : "1",
-			"feature_type" : "actuator",
-			"parameters" : "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}",
-			"stat_key" : "level",
-			"value_type" : "range",
+			"stat_key" : "command",
+			"value_type" : "binary"
+		}, {
 			"device_type_id" : "ozwave.dimmer",
+			"feature_type" : "actuator",
+			"id" : "ozwave.dimmer.switch",
+			"name" : "Dimmer",
+			"parameters" : "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}",
+			"return_confirmation" : "1",
+			"stat_key" : "command",
+			"value_type" : "binary"
+		}, {
+			"device_type_id" : "ozwave.dimmer",
+			"feature_type" : "actuator",
 			"id" : "ozwave.dimmer.change",
-			"name" : "Change"
+			"name" : "Change",
+			"parameters" : "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}",
+			"return_confirmation" : "1",
+			"stat_key" : "level",
+			"value_type" : "range"
 		}, {
 			"device_type_id" : "ozwave.switchmeter",
 			"feature_type" : "actuator",
@@ -249,6 +250,51 @@
 			"return_confirmation" : "0",
 			"stat_key" : "battery",
 			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.4in1-motionbin",
+			"feature_type" : "sensor",
+			"id" : "ozwave.4in1-motionbin.sensor",
+			"name" : "Motion",
+			"parameters" : "{&quot;value0&quot;:&quot;True&quot;,&quot;value1&quot;:&quot;False&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "sensor",
+			"value_type" : "boolean"
+		}, {
+			"device_type_id" : "ozwave.4in1-motionbin",
+			"feature_type" : "sensor",
+			"id" : "ozwave.motionbin.battery",
+			"name" : "Battery",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "battery",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.4in1-motionbin",
+			"feature_type" : "sensor",
+			"id" : "ozwave.4in1-motionbin.temperature",
+			"name" : "Temperature",
+			"parameters" : "{&quot;unit&quot;:&quot;\\u00B0C&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "temperature",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.4in1-motionbin",
+			"feature_type" : "sensor",
+			"id" : "ozwave.4in1-motionbin.humidity",
+			"name" : "relative humidity",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "humidity",
+			"value_type" : "number"
+		}, {
+			"device_type_id" : "ozwave.4in1-motionbin",
+			"feature_type" : "sensor",
+			"id" : "ozwave.4in1-motionbin.luminance",
+			"name" : "Luminance",
+			"parameters" : "{&quot;unit&quot;:&quot;%&quot;}",
+			"return_confirmation" : "0",
+			"stat_key" : "luminance",
+			"value_type" : "number"
 		}
 	],
 	"device_types" : [{
@@ -292,9 +338,13 @@
 			"name" : "Luminance",
 			"id" : "ozwave.luminance"
 		}, {
-			"description" : "4 in 1, Ex. motion sensor (Temperature/Humidity/Luminance)",
-			"name" : "4in1-Motion",
+			"description" : "4 in 1, Motion sensor numeric (+ Temperature/Humidity/Luminance)",
+			"name" : "4in1-Motion Numeric",
 			"id" : "ozwave.4in1-motion"
+		}, {
+			"description" : "4 in 1, Motion sensor binary (+ Temperature/Humidity/Luminance)",
+			"name" : "4in1-Motion Binary",
+			"id" : "ozwave.4in1-motionbin"
 		}
 	],
 	"configuration" : [{
@@ -380,7 +430,7 @@
 		"category" : "Z-wave",
 		"documentation" : "http://wiki.domogik.org/tiki-index.php?page=plugin_ozwave",
 		"description" : "Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control",
-		"changelog" : "0.2b4\n - Add support-tools, Change WebSocket server to generic\n0.2b3\n - Add test network function\n0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
+		"changelog" : "0.2b5\n - Add poll service, Force conversion degre F to C\n0.2b4\n - Add support-tools, Change WebSocket server to generic\n0.2b3\n - Add test network function\n0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
 		"author_email" : "nico84dev at gmail.com",
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.3.0",
@@ -393,7 +443,7 @@
                 "type": "python"
             }
 		],
-		"version" : "0.2b4",
+		"version" : "0.2b5",
 		"type" : "plugin",
 		"id" : "ozwave"
 	}, "json_version" : 1
