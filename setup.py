@@ -121,10 +121,7 @@ setup(
     # namespace_packages = ['domogik', 'mpris', 'tools'],
     # include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
-    package_dir = {
-        '': 'src',
-        'install': 'install'
-    },
+    package_dir = { '': 'src' },
     test_suite = 'domogik.tests',
     package_data = {
     },
