@@ -1,6 +1,9 @@
 from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
 from domogik.common.packagejson import PackageJson
+import zmq
+from domogik.mq.reqrep.client import MQSyncReq
+from domogik.mq.message import MQMessage
 
 @urlHandler.route('/device/old/', methods=['GET'])
 @json_response
@@ -11,15 +14,14 @@ def device_list_old():
 @urlHandler.route('/device/params/<dev_type_id>', methods=['GET'])
 @json_response
 def device_params(dev_type_id):
-    print "ikke"
     try:
-        dt = urlHandler.db.get_device_type_by_id(dev_type_id)
-        if dt == None:
-            return "This device type does not exists"
-        # get the json
-        pjson = PackageJson(dt.plugin_id).json
-        if pjson['json_version'] < 2:
-            return "This plugin does not support this command, json_version should at least be 2"
+        cli = MQSyncReq(urlHandler.zmq_context)
+        msg = MQMessage()
+        msg.set_action('device_types.get')
+        msg.add_data('device_type', dev_type_id)
+        print msg
+        print cli.request('manager', msg.get(), timeout=10).get()
+        # parse the data
         ret = {}
         ret['commands'] = []
         ret['global'] = []
@@ -156,7 +158,7 @@ class deviceAPI(MethodView):
 
     def get(self, did):
         if did != None:
-            b = urlHandler.db.list_device_types(did)
+            b = urlHandler.db.list_devices(did)
             print b
         else:
             b = urlHandler.db.list_devices()
@@ -186,4 +188,4 @@ class deviceAPI(MethodView):
         )
         return 200, b
 
-register_api(deviceAPI, 'device', '/device/', pk='did')
+register_api(deviceAPI, 'device', '/device/', pk='did', pk_type='int')
