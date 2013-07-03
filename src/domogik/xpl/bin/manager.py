@@ -236,7 +236,11 @@ class Manager(XplPlugin):
             sys.exit(1)
         for pkg in pkg_list:
             self.log.debug("Package available : {0}".format(pkg))
-            [type, name] = pkg.split("_")
+            try:
+                [type, name] = pkg.split("_")
+            except:
+                self.log.warning("Invalid package : {0}".format(pkg))
+                continue
             self.log.debug("Type : {0}     / Id : {1}".format(type, name))
           
             ### Create a package object in order to get packages details over MQ
