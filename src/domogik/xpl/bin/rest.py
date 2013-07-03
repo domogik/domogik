@@ -174,6 +174,7 @@ class Rest(XplPlugin):
         urlHandler.xpl = self.myxpl 
         # reload statsmanager helper
         urlHandler.reload_stats = self.reload_stats
+        urlHandler.zmq_context = self._zmq
         # handler for getting the paths
         urlHandler.resources_directory = self.get_resources_directory()
         
