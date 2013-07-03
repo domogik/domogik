@@ -1,5 +1,6 @@
 from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
+from flask import request
 import zmq
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
