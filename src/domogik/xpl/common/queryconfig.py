@@ -51,10 +51,10 @@ class Query():
     def __init__(self, zmq, log):
         self.qry = QueryMQ(zmq, log)
 
-    def query(self, id, key = None):
-        return self.qry.query(id, key)
+    def query(self, name, key = None):
+        return self.qry.query(name, key)
 
-    def set(self, id, key, value):
+    def set(self, name, key, value):
         # TODO
         self.log.error("Config set feature not yet implemented")
 
@@ -76,12 +76,12 @@ class QueryMQ():
         self._log.debug("Init config query(mq) instance")
         self.cli = MQSyncReq(self._zmq)
 
-    def query(self, id, key = None):
+    def query(self, name, key = None):
         '''
         Ask the config system for the value. Calling this function will make
         your program wait until it got an answer
 
-        @param id : the plugin of the item requesting the value, must exists in the config database
+        @param name : the plugin of the item requesting the value, must exists in the config database
         @param key : the key to fetch corresponding value
         @return : the value if key != None
                   a dictionnary will all keys/values if key = None
@@ -89,7 +89,7 @@ class QueryMQ():
         msg = MQMessage()
         msg.set_action('config.get')
         msg.add_data('type', 'plugin')
-        msg.add_data('id', id)
+        msg.add_data('name', name)
         msg.add_data('host', get_sanitized_hostname())
         if key != None:
             msg.add_data('key', key)
@@ -100,7 +100,7 @@ class QueryMQ():
 
         ### no response from dbmgr
         if ret is None:
-            self._log.error("Query config for plugin {0} on host {1}, key {2} : no response from dbmgr".format(id, get_sanitized_hostname(), key))
+            self._log.error("Query config for plugin {0} on host {1}, key {2} : no response from dbmgr".format(name, get_sanitized_hostname(), key))
             return None
 
         ### response from dbmgr
