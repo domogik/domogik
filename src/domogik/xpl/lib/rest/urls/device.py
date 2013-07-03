@@ -1,6 +1,5 @@
 from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
-from domogik.common.packagejson import PackageJson
 import zmq
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
@@ -24,7 +23,6 @@ def device_params(dev_type_id):
             return "Bad device type"
         pjson = res.get_data()
         pjson = pjson[dev_type_id]
-        print pjson
         # parse the data
         ret = {}
         ret['commands'] = []
@@ -107,7 +105,14 @@ def device_xplcmd_params(did):
         # ERROR
         return
     # get the json
-    pjson = PackageJson(dt.device_technology_id).json
+    cli = MQSyncReq(urlHandler.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev.device_type_id)
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is None:
+        return "Bad device type"
+    pjson = res.get_data()
     if pjson['json_version'] < 2:
         # ERROR
         return
@@ -141,7 +146,15 @@ def device_xplstat_params(did):
         # ERROR
         return
     # get the json
-    pjson = PackageJson(dt.device_technology_id).json
+    cli = MQSyncReq(urlHandler.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev.device_type_id)
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is None:
+        return "Bad device type"
+    pjson = res.get_data()
+ 
     if pjson['json_version'] < 2:
         # ERROR
         return
