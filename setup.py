@@ -59,8 +59,6 @@ def list_all_files(path, dst):
     return d
 
 d_files = [
-        ('/usr/sbin/', ['src/tools/dmgenplug']),
-        ('/usr/sbin/', ['src/tools/dmgdisplug']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
