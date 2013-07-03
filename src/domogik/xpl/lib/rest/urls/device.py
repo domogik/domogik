@@ -187,11 +187,21 @@ class deviceAPI(MethodView):
         return 204, b
 
     def post(self):
+        cli = MQSyncReq(urlHandler.zmq_context)
+        msg = MQMessage()
+        msg.set_action('device_types.get')
+        msg.add_data('device_type', dev_type_id)
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is None:
+            return "Bad device type"
+        pjson = res.get_data()
+        pjson = pjson[dev_type_id]
         b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             type_id=request.form.get('type_id'),
             description=request.form.get('description'),
             reference=request.form.get('reference'),
+            pjson=pjson
         )
         return 201, b
 

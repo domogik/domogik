@@ -331,15 +331,13 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def add_device_and_commands(self, name, type_id, description, reference):
+    def add_device_and_commands(self, name, type_id, description, reference, pjson):
         # first add the device itself
         self.__session.expire_all()
         dev = Device(name=name, device_type_id=type_id, description=description, reference=reference)
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
-        pack = PackageJson(dt.plugin_id)
-        pjson = pack.json
         if pjson['json_version'] < 2:
             self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
             return None
