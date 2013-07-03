@@ -145,8 +145,8 @@ controller to learn new data.
             nodeId = 1
         ZWaveNode.__init__(self, ozwmanager,  homeId, nodeId)
         self._isPrimaryCtrl = isPrimaryCtrl
-        self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_NORMAL, 'error_msg' : 'None.', 'message': 'No command in progress.', 'error': 0}
-
+        self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_NORMAL, 'error_msg' : 'None.', 'message': 'No command in progress.', 'nodeid': nodeId, 'error': 0}
+ 
 # On accède aux attributs uniquement depuis les property
     isPrimaryCtrl = property(lambda self: self._isPrimaryCtrl)
     ctrlDeviceName = property(lambda self: self._getCtrlDeviceName())
@@ -238,7 +238,7 @@ controller to learn new data.
         retval = action
         retval['error'] = ''
         errorCom = {'cmdstate': 'not running' , 'error': 'not started', 'message': 'check your controller.'}
-        errotNode ={'cmdstate': 'not running',  'error': 'Unknown node : ' + str(action['nodeid']), 'message': 'check input options.'}
+        errorNode ={'cmdstate': 'not running',  'error': 'Unknown node : ' + str(action['nodeid']), 'message': 'check input options.'}
         if action['highpower'] =='True' : highpower = True
         else : highpower = False
         if action['cmd'] == 'Stop action' :
@@ -260,7 +260,8 @@ controller to learn new data.
                 if self.begin_command_add_device(highpower) :
                     retval['cmdstate'] ='running'
                     retval['message'] ='It is up to you to perform the action on the local device(s) to add. Usually a switch to actuate 2 or 3 times.'
-                    self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.', 'message': 'The command is starting.', 'error': 0}
+                    self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.',
+                                                  'message': 'The command is starting.', 'nodeid': action['nodeid'], 'error': 0}
 
                 else : retval.update(errorCom)
                 
@@ -294,7 +295,7 @@ controller to learn new data.
                         retval['cmdstate'] ='running'
                         retval['message'] ='wait for removing node , be patient....'
                     else : retval.update(errorCom)
-                else : retval.update(errotNode)            
+                else : retval.update(errorNode)            
                 
             elif action['action'] =='HasNodeFailed':
                 if action['nodeid'] == 0 :
@@ -308,7 +309,7 @@ controller to learn new data.
                         retval['cmdstate'] ='running'
                         retval['message'] ='wait for research , be patient....'
                     else : retval.update(errorCom)
-                else : retval.update(errotNode)
+                else : retval.update(errorNode)
                     
             elif action['action'] =='ReplaceFailedNode':
                 if action['nodeid'] == 0 :
@@ -322,7 +323,7 @@ controller to learn new data.
                         retval['cmdstate'] ='running'
                         retval['message'] ='wait for replace node failed, be patient....'
                     else : retval.update(errorCom)
-                else : retval.update(errotNode)                    
+                else : retval.update(errorNode)                    
                     
             elif action['action'] == 'TransferPrimaryRole' :
                 if self.begin_command_transfer_primary_role(highpower) :
@@ -348,7 +349,7 @@ controller to learn new data.
                         retval['cmdstate'] ='running'
                         retval['message'] ='Wait for refresh, be patient....'
                     else : retval.update(errorCom)
-                else : retval.update(errotNode)
+                else : retval.update(errorNode)
  
             elif action['action'] =='AssignReturnRoute':
                 if action['nodeid'] == 0 :
@@ -369,7 +370,7 @@ controller to learn new data.
                         retval['message'] ='Wait for route assign, be patient....'
                     else : retval.update(errorCom)
                 else : 
-                    retval.update(errotNode)
+                    retval.update(errorNode)
                     retval['error'] = retval['error'] + ' and (or) node to : ' + action['arg']
 
             elif action['action'] =='DeleteAllReturnRoutes':
@@ -384,7 +385,7 @@ controller to learn new data.
                         retval['cmdstate'] ='running'
                         retval['message'] ='Wait for deleting return route, be patient....'
                     else : retval.update(errorCom)
-                else : retval.update(errotNode)
+                else : retval.update(errorNode)
  
             elif action['action'] =='SendNodeInformation':
                 if action['nodeid'] == 0 :
@@ -398,7 +399,7 @@ controller to learn new data.
                         retval['cmdstate'] ='running'
                         retval['message'] ='Wait get node information, be patient....'
                     else : retval.update(errorCom)
-                else : retval.update(errotNode)
+                else : retval.update(errorNode)
                 
             elif action['action'] == 'ReplicationSend' :
                 if self.begin_command_replication_send(highpower) :
@@ -406,9 +407,11 @@ controller to learn new data.
                     retval['message'] ='Wait for sending information from primary to secondary.'
                 else : retval.update(errorCom)
             if retval['error'] == '' :
-                self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.', 'message': 'The command is starting.', 'error': 0}
+                self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.',
+                                              'message': 'The command is starting.', 'nodeid': action['nodeid'], 'error': 0}
             else :
-                self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_FAILED, 'error_msg' : 'The command has failed.', 'message': 'The command not started.', 'error': 8}
+                self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_FAILED, 'error_msg' : 'The command has failed.',
+                                              'message': 'The command not started.', 'nodeid': action['nodeid'], 'error': 8}
 
  # TODO: CreateButton , DeleteButton 
  
@@ -419,11 +422,15 @@ controller to learn new data.
             if chkAction :
                 retval['cmdstate']  = 'stop'
                 retval.update(chkAction)
-            else : retval['cmdstate']  = 'waiting'
+            else :
+                retval['cmdstate']  = 'waiting'
+                retval['state']  = 'Waiting'
+                retval['message'] ='Wait for controller response, be patient....'
         else :
             retval['error'] = 'Unknown cmd : ' + action['cmd']
             retval['cmdstate'] ='Unknown'
             retval['message'] ='Command error'
+            retval['state']  = 'Stop'
         return retval
         
     def _getValue(self, valueId):
@@ -718,7 +725,6 @@ controller to learn new data.
             return self._lastCtrlState
         else : return None
 
-
     def zwcallback(self, args):
         """
         The Callback Handler used when sendig commands to the controller.
@@ -730,10 +736,62 @@ controller to learn new data.
 
         """
         self._ozwmanager._log.debug('Controller state change : %s' % (args))
+        if self._lastCtrlState.has_key ('nodeid') : args['nodeid'] = self._lastCtrlState['nodeid']
         self._lastCtrlState = args
         self._lastCtrlState["update"]= time.time()
         state = args['state']
         message = args['message']
         print 'zwcallback Action State :', state, ' -- message :', message, ' -- controller', self
         self._ozwmanager.reportCtrlMsg(self._lastCtrlState)
+        
+# -----------------------------------------------------------------------------
+# Polling Z-Wave devices
+# -----------------------------------------------------------------------------
+# Methods for controlling the polling of Z-Wave devices.  Modern devices will
+# not require polling.  Some old devices need to be polled as the only way to
+# detect status changes.
+#
+    def getPollInterval(self):
+        """Get the time period between polls of a nodes state
+            
+            :return: The number of milliseconds between polls
+            :rtype: int"""
+        return self._manager.getPollInterval()
 
+    def setPollInterval(self, milliseconds, bIntervalBetweenPolls = False ):
+        """Set the time period between polls of a nodes state.
+            Due to patent concerns, some devices do not report state changes automatically
+            to the controller.  These devices need to have their state polled at regular
+            intervals.  The length of the interval is the same for all devices.  To even
+            out the Z-Wave network traffic generated by polling, OpenZWave divides the
+            polling interval by the number of devices that have polling enabled, and polls
+            each in turn.  It is recommended that if possible, the interval should not be
+            set shorter than the number of polled devices in seconds (so that the network
+            does not have to cope with more than one poll per second).
+
+            :param milliseconds: The length of the polling interval in milliseconds.
+            :type milliseconds: int
+            :param bIntervalBetweenPolls: If True, the library intersperses m_pollInterval between polls.
+                                                           If False, the library attempts to complete all polls within m_pollInterval
+            :type bIntervalBetweenPolls: bool"""
+        self._manager.setPollInterval(milliseconds, bIntervalBetweenPolls)
+        self.pollInterval = milliseconds
+
+    def enablePoll(self, nodeId,  valueId,  intensity = 1):
+        node = self._ozwmanager._getNode(self.homeId,  nodeId)
+        value = node.getValue(valueId)
+        if value :
+            retval = value.enablePoll(intensity)
+            if retval == True :
+                return {'error': ""}
+            else: {"error" : "Fail enable poll %d" % valueId + retval["error"]}
+        else : return {"error" : "Unknown value %d" % valueId}
+    
+    def disablePoll(self, nodeId,  valueId):
+        node = self._ozwmanager._getNode(self.homeId,  nodeId)
+        value = node.getValue(valueId)
+        if value :
+            if value.disablePoll() :
+                return {'error': ""}
+            else: {"error" : "Fail disable poll %d" % valueId}
+        else : return {"error" : "Unknown value %d" % valueId}

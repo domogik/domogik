@@ -11,50 +11,23 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
-- 0.2b4 : (05-28-2013) Compatibily library : the same. 
-	- Target : domogik and domoweb
-	- Change log :
-		- Fixe bug plugin starting with package installation
-		- Add Domoweb version. (first 0.2.b4)
-		- Add support tools, memory usage and log report to UI.
-		- Change websocket server private plugin to generic usage.
-		- Add load xml open-zwave usage, don't finish coding.
+- 0.2b5 : (02-07-2013) Compatibily library : OpenZwave >= 1.0.663, python_openzwave >= 0.2.5 (rev : 18832df1dd95).
+    - Target : python_openzwave, domogik and domoweb.
+    - Update, compile and install python_openzwave.
+    - An insert_data or a reinstall is necessary.
+    - Change log :
+        - Add device motion binary multi sensor 4-in-1.
+        - Add polling command_class. Some limitations : there is an issue with getPollIntensity openzwave lib so for moment function is deactivated and value 1 is always received. Some command class like COMMAND_CLASS_POWERLEVEL seem to enable but the polling is not in effect.
+        - Forced unit conversion F -> °C for temperature device in F.
+        - Fix some report controller action.
+        - Fix accent on node name and location.
+        - Add timer reporting controller status on widget (every 60s) and report status "started plugin, started, init, lock, no-ctrl, ok, stop".
+        - Double xPL message for switch multi-level. (for testing-not sure it's a good idea !)
+        - UI dialog node associations improvement.
+        - Add list of recognized manufacturers and products by openzwave in "support tools" tab.
+        - Update doc.
 
-- 0.2b3 : Compatibily library : python_openzwave >= 0.2.5 (rev : b434c50b795b), tailer >=0.2.1
-	- Target : python_openzwave, domogik and domoweb
-	- Update, compile and install python_openzwave
-	- Install tailer : "sudo pip install tailer" or "sudo easy_install tailer"
-	- Change log : 
-		- Add test network and node
-		- Add id message req-ack
-
-- 0.2b2 : Compatibily library : the same. 
-	- Target : domogik and domoweb
-	- An insert_data or a reinstall is necessary
-	- Change log : 
-		- Check user directory and config directory acces
-		- Realtime improvements for graph neighbors
-		- Add Start/Stop driver function
-		- Add zwave device switch with power meter (Everspring (C.T.) - AN158 full handling)
-		- Fixe ON/OFF sensor return status
-
-- 0.2b1 : Compatibily library : OpenZwave >= 1.0.645, python_openzwave >= 0.2.5, ws4py >= 0.3.0-beta
-	- Target : domogik and domoweb
-	- Install new dependency `ws4py 0.3.0-beta <dependencies.html#Install WebSocket library for Python>`_
-	- An insert_data or a reinstall is necessary
-	- Enter new wsportserver key (Plugin configuration) and save the config (necessary to restart plugin if is started)
-
-- 0.1b8 : 
-	- An insert_data or a reinstall is necessary.
-	- Created primary controller device for domogik and traced back to the state it to domogik.
-	
-Do an insert data
------------------
-In your domogik directory :
-
-.. code-block:: bash
-
-	$sudo src/tools/packages/insert_data.py src/share/domogik/plugins/ozwave.json
+- `Previous change <changelog.html>`_
 
 Purpose
 =======
@@ -94,19 +67,23 @@ Others controllers are supported by openzwave, `you can check here <http://code.
 
 Following devices are supported :
 
-- Everspring - ST814
+- Everspring
+	- ST814 - Temperature, Humidity Sensor 
 
-- Everspring (C.T.) - HSM02
+- Everspring (C.T.)
+	- HSM02 - Door windows sensor
+	- AN158 - Switch Meter Plugin 
 
-- Everspring (C.T.) - AN158
+- Fibaro
+	- FGS211 - Relay Switch 3KW
+	- FGS221 - Double Relay Switch 2x1,5kW
 
-- Fibaro FGS211 - Switch 3KW
+- Aeon Labs
+	- HEM - Home Energy Metter
+	- DSB05 - Motion Multi Sensor, 
 
-- Fibaro FGS221 - Double Relay Switch 2x1,5kW
-
-- Aeon Labs - Home Energy Metter
-
-- Express Controls - EZMotion
+- Express Controls
+	- HSM100 - EZMotion luminosity and temperature sensor
 
 Create the udev rule for controller
 ===================================
@@ -381,6 +358,8 @@ The device on the controller can be traced back to the state it to domogik, but 
 you can create it after starting the plugin, so it is possible to find its address in the devices table of the "controller and devices".
 This is usually the first node and address as: **ZWHome.1.1**
 
+.. note ::
+   -  Create this device is necessary but widget not
 
 .. |creat_ctrldevice| image:: ozwave_create_ctrldevice.png
     :width: 200px

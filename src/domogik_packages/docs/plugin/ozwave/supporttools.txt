@@ -1,0 +1,38 @@
+===================
+Zwave network tools
+===================
+
+.. |menu4| image:: ozwave_menu-supporttools.png
+    :width: 500px
+
+|menu4|
+
+Memory usage
+============
+
+.. |memusage| image:: ozwave_memory-usage.png
+    :width: 750px
+    
+|memusage|
+
+- A click on button "refresh" show you how memory is use by plugin. It is an estimation.
+
+Show log file informations
+==========================
+
+.. |logfile| image:: ozwave_display-log.png
+    :width: 750px
+
+- You can display n lines from beginning or until end of ozwave plugin log file. 
+    
+|logfile|
+
+List of manufacturers and product compatibilities
+=================================================
+
+.. |listproducts| image:: ozwave_listproducts.png
+    :width: 750px
+
+- You can check all manufacturers and products reognized by openzwave library. 
+    
+|listproducts|

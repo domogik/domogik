@@ -34,13 +34,24 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
+# A debugging code checking import error
+try:
+    from domogik.xpl.common.xplconnector import Listener
+    from domogik.xpl.common.plugin import XplPlugin
+    from domogik.xpl.common.xplmessage import XplMessage
+    from domogik.xpl.common.xplconnector import XplTimer
+    from domogik.xpl.common.queryconfig import Query
+    from domogik_packages.xpl.lib.ozwave import OZWavemanager
+    from domogik_packages.xpl.lib.ozwdefs import OZwaveException
+    import threading
+    import sys
+except ImportError as exc :
+    import logging
+    logging.basicConfig(filename='/var/log/domogik/ozwave_start_error.log',level=logging.DEBUG)
+    err = "Error: Plugin Starting failed to import module ({})".format(exc) 
+    print err
+    logging.error(err)
 
-from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.queryconfig import Query
-from domogik_packages.xpl.lib.ozwave import OZWavemanager
-from domogik_packages.xpl.lib.ozwave import OZwaveException
 
 class OZwave(XplPlugin):
     """ Implement a listener for Zwave command messages
@@ -63,7 +74,8 @@ class OZwave(XplPlugin):
         pathConfig = self._config.query('ozwave', 'configpath') + '/'
         # Initialise le manager Open zwave
         try:
-            self.myzwave = OZWavemanager(self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf)
+            self.myzwave = OZWavemanager(self, self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf)
+            print 'manager demarré'
         except OZwaveException as e:
             self.log.error(e.value)
             print e.value
@@ -75,12 +87,13 @@ class OZwave(XplPlugin):
         # Validation avant l'ouverture du controleur, la découverte du réseaux zwave prends trop de temps -> RINOR Timeout
         self.add_stop_cb(self.myzwave.stop)
         self.enable_hbeat()
+        self._ctrlHBeat = XplTimer(60, self.myzwave._getXplCtrlState, self.myxpl)
+        self._ctrlHBeat.start()
         # Ouverture du controleur principal
         self.myzwave.openDevice(device)
     
-    def __sizeof__(self):
-        return XplHlpPlugin.__sizeof__(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
-    
+    def getsize(self):
+        return sys.getsizeof(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
 
     def ozwave_cmd_cb(self, message):
         """" Envoie la cmd xpl vers le OZWmanager"""
@@ -186,21 +199,39 @@ class OZwave(XplPlugin):
     def sendxPL_trig(self, msgtrig):
         """Envoie un message trig sur le hub xPL"""
         mess = XplMessage()
+        messDup = None
         if 'info' in msgtrig:
             self.log.error ("Error : Node %s unreponsive" % msgtrig['node'])
         elif 'Find' in msgtrig:
             print("node enregistré : %s" % msgtrig['Find'])
-        elif 'typexpl' in msgtrig:
+        elif 'typexpl' in msgtrig :
+            print "sendxPL_trig  +++++++++++++++++++ ", msgtrig
             mess.set_type(msgtrig['typexpl'])
             mess.set_schema(msgtrig['schema'])
             if msgtrig['genre'] == 'actuator' :
-                if msgtrig['level'] in [0, 'False', False] : cmd ="off"
-                elif msgtrig['level'] in [255, 'True',  True]: cmd ="on"
-                else: cmd ='level'
-                mess.add_data({'device' : msgtrig['device'],
-                            'command' : cmd,
-                            'level': msgtrig['level']})
-                if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
+                if msgtrig['type']  == 'level' :
+                    if msgtrig['level'] in [0, 'False', False] :
+                        cmd ="off"
+                        messDup = {'cmd': 'level'}
+                    elif msgtrig['level'] in [99, 255, 'True',  True] :
+                        cmd ="on"
+                        messDup = {'cmd': 'level'}
+                    else: 
+                        cmd ='level'
+                        if msgtrig['level'] != 0 : messDup = {'cmd': 'off'}
+                        else : messDup = {'cmd': 'on'}
+                    mess.add_data({'device' : msgtrig['device'],
+                                'command' : cmd,
+                                'level': msgtrig['level']})
+                
+                if msgtrig['type']  == 'switch' :
+                    if msgtrig['level'] in ['False', False] : cmd ="off"
+                    elif msgtrig['level'] in ['True',  True] : cmd ="on"
+                    else : raise OZwaveException("Error format in sendxPL_trig : %s" %str(msgtrig))
+                    mess.add_data({'device' : msgtrig['device'],
+                                'command' : cmd,
+                                'level': msgtrig['level']})
+                    if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
             elif msgtrig['genre'] == 'sensor' :  # tout sensor
                 if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget binary
                     mess.add_data({'device' : msgtrig['device'],
@@ -212,6 +243,9 @@ class OZwave(XplPlugin):
             if msgtrig.has_key('units') and msgtrig['units'] !='' : mess.add_data({'units' : msgtrig['units'] })
             print mess
             self.myxpl.send(mess)
+            if messDup : # envoi d'un message dupliqué avec des keys differentes (pour un dimmer le level sur on/off)
+                mess.add_data(mesDup)
+                self.myxpl.send(mess)
         elif 'command' in msgtrig and msgtrig['command'] == 'Info':
             print("Home ID is %s" % msgtrig['Home ID'])
 

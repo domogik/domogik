@@ -8,6 +8,8 @@ Table Of Content
 
     /index
     /ozwave
+    /changelog
     /dependencies
     /ctldevtools
     /networktools
+    /supporttools
