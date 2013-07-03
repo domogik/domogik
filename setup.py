@@ -59,8 +59,6 @@ def list_all_files(path, dst):
     return d
 
 d_files = [
-        ('/usr/sbin/', ['src/tools/dmgenplug']),
-        ('/usr/sbin/', ['src/tools/dmgdisplug']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
@@ -123,10 +121,7 @@ setup(
     # namespace_packages = ['domogik', 'mpris', 'tools'],
     # include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
-    package_dir = {
-        '': 'src',
-        'install': 'install'
-    },
+    package_dir = { '': 'src' },
     test_suite = 'domogik.tests',
     package_data = {
     },

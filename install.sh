@@ -263,7 +263,7 @@ function update_default_config {
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_XPL_HUB.*$;DOMOGIK_XPL_HUB=${DOMOGIK_XPL_HUB};" /etc/default/domogik
 
     if [ "$MODE" = "develop" ];then
-        arch_path=$(python install/get_arch.py)
+        arch_path=$(python src/domogik/install/get_arch.py)
         d_custom_path=$PWD/$arch_path
         [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik
     fi
@@ -419,7 +419,7 @@ function update_user_config_db {
 
 function call_app_installer {
     echo "** Calling Application Installer"
-    /bin/su -c "python ./install/installer.py" $d_user
+    /bin/su -c "python ./src/domogik/install/installer.py" $d_user
     if [ $? -ne 0 ];then
         echo "ERROR : An error occured during app_installer execution, read the previous lines for detail."
         exit 1
@@ -450,10 +450,6 @@ function check_python {
             exit 12
         fi
     fi
-}
-
-function copy_tools {
-    [ -d "/usr/sbin" ] && (cp -f src/tools/dmg* /usr/sbin;chmod +x /usr/sbin/dmg*)
 }
 
 function modify_hosts {
@@ -542,7 +538,6 @@ if [ $MAIN_INSTALL = "y" ] ; then
 else
     update_rest_config_for_secondary_host
 fi
-copy_tools
 create_log_dir
 if [ $MAIN_INSTALL = "y" ] ; then
     call_app_installer
