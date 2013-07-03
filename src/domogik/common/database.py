@@ -334,7 +334,7 @@ class DbHelper():
     def add_device_and_commands(self, name, type_id, description, reference):
         # first add the device itself
         self.__session.expire_all()
-        dev = Device(name=name, description=description, reference=reference)
+        dev = Device(name=name, device_type_id=type_id, description=description, reference=reference)
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
