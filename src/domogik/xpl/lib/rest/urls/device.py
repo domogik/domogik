@@ -19,18 +19,22 @@ def device_params(dev_type_id):
         msg = MQMessage()
         msg.set_action('device_types.get')
         msg.add_data('device_type', dev_type_id)
-        print msg
-        print cli.request('manager', msg.get(), timeout=10).get()
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is None:
+            return "Bad device type"
+        pjson = res.get_data()
+        pjson = pjson[dev_type_id]
+        print pjson
         # parse the data
         ret = {}
         ret['commands'] = []
         ret['global'] = []
-        if 'xpl_params' in pjson['device_types'][dt.id]:
-            ret['global']  = pjson['device_types'][dt.id]['xpl_params']
+        if 'xpl_params' in pjson['device_types'][dev_type_id]:
+            ret['global']  = pjson['device_types'][dev_type_id]['xpl_params']
         ret['xpl_stat'] = []
         ret['xpl_cmd'] = []
         # find all features for this device
-        for c in pjson['device_types'][dt.id]['commands']:
+        for c in pjson['device_types'][dev_type_id]['commands']:
             if not c in pjson['commands']:
                 break
             cm = pjson['commands'][c]
