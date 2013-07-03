@@ -111,7 +111,6 @@ import domogik.xpl.lib.rest.urls.datatype
 
 # more complex URLS
 from domogik.xpl.lib.rest.urls.device import *
-from domogik.xpl.lib.rest.urls.package import *
 from domogik.xpl.lib.rest.urls.helper import *
 
 # Pure REST API
