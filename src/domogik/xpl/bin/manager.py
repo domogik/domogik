@@ -434,7 +434,10 @@ class Manager(XplPlugin):
                 msg.add_data(dev, self._device_types[dev])
         else:
             device_type = data.get_data()['device_type']
-            msg.add_data(device_type, self._device_types[device_type])
+            if self._device_types.has_key(device_type):
+                msg.add_data(device_type, self._device_types[device_type])
+            else:
+                msg.add_data(device_type, None)
         self.reply(msg.get())
 
 
