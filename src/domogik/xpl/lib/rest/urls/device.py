@@ -190,7 +190,6 @@ class deviceAPI(MethodView):
         b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             type_id=request.form.get('type_id'),
-            usage_id=request.form.get('usage_id'),
             description=request.form.get('description'),
             reference=request.form.get('reference'),
         )
