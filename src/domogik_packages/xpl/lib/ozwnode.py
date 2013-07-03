@@ -110,12 +110,13 @@ class ZWaveNode:
     isOn = property(lambda self: self._getIsOn())
     batteryLevel = property(lambda self: self._getBatteryLevel())
     signalStrength = property(lambda self: self._getSignalStrength())
-    basic = property(lambda self:  BasicDeviceType[self._nodeInfos.basic] if self._nodeInfos else None)
-    generic = property(lambda self:  GenericDeviceType[self._nodeInfos.generic] if self._nodeInfos else None)
-    specific = property(lambda self:  SpecificDeviceType[self._nodeInfos.generic][self._nodeInfos.specific] if self._nodeInfos else None)
+    basic = property(lambda self: BasicDeviceType[self._nodeInfos.basic] if self._nodeInfos else None)
+    generic = property(lambda self: GenericDeviceType[self._nodeInfos.generic] if self._nodeInfos else None)
+    specific = property(lambda self: SpecificDeviceType[self._nodeInfos.generic][self._nodeInfos.specific] if self._nodeInfos else None)
     security = property(lambda self: self._nodeInfos.security if self._nodeInfos else None)
-    version = property(lambda self:  self._nodeInfos.version if self._nodeInfos else None)
-
+    version = property(lambda self: self._nodeInfos.version if self._nodeInfos else None)
+    isPolled = property(lambda self: self._hasValuesPolled())
+    
     def setLinked(self):
         """Le node a reçu la notification NodeProtocolInfo , il est relié au controleur."""
         self_linked = True
@@ -534,6 +535,7 @@ class ZWaveNode:
         retval["Groups"] = self._getGroupsDict()
         retval["Capabilities"] = list(self._capabilities) if  self._capabilities else list(['No one'])
         retval["InitState"] = self.GetNodeStateNW()
+        retval["Polled"] = self.isPolled
         retval["ComQuality"] = self.getComQuality()
         return retval
         
@@ -545,6 +547,12 @@ class ZWaveNode:
         for value in self.values.keys():
             retval['Values'].append(self.values[value].getInfos())
         return retval
+        
+    def _hasValuesPolled(self):
+        """Retourne True siau moins une des values du node est polled."""
+        for value in self.values.keys():
+            if self.values[value].isPolled: return True
+        return False
 
     def getStatistics(self):
         """
@@ -652,13 +660,27 @@ class ZWaveNode:
             
     def setName(self, name):
         """Change le nom du node"""
-        self._manager.setNodeName(self.homeId, self.id, name)
-        self._ozwmanager._log.debug('Requesting setNodeName for node {0} with new name {1}'.format(self.id, name))
- 
+        try :
+            name = name.encode('utf_8', 'replace')
+            self._manager.setNodeName(self.homeId, self.id, name)
+            self._ozwmanager._log.debug('Requesting setNodeName for node {0} with new name {1}'.format(self.id, name))
+            return True
+        except OZwaveNodeException as e :
+            self._ozwmanager._log.error('Node {0} naming error with name : {1}. '.format(self.id, name) + e.value)
+            print('Node {0} naming error with name : {1}. '.format(self.id, name) + e.value)
+            return False
+            
     def setLocation(self, loc):
         """"Change la localisation du node"""
-        self._manager.setNodeLocation(self.homeId, self.id, loc)   
-        self._ozwmanager._log.debug('Requesting setNodeLocation for node {0} with new location {1}'.format(self.id, loc))
+        try :
+            loc = loc.encode('utf_8', 'replace')
+            self._manager.setNodeLocation(self.homeId, self.id, loc)   
+            self._ozwmanager._log.debug('Requesting setNodeLocation for node {0} with new location {1}'.format(self.id, loc))
+            return True
+        except OZwaveNodeException as e :
+            self._ozwmanager._log.error('Node {0} naming error with location : {1}. '.format(self.id, loc) + e.value)
+            print('Node {0} naming error with location : {1}. '.format(self.id, loc) + e.value)
+            return False
 
     def refresh(self):
         """Rafraichis le node, util dans le cas d'un reveil si le node dormait lors de l''init """
@@ -835,7 +857,7 @@ class TestNetworkNode(threading.Thread):
         self._log = log
         
     def run(self):
-        """Demarre le server en mode forever, methode appelee depuis le start du thread""" 
+        """Demarre le test en mode forever, methode appelee depuis le start du thread, Sortie sur fin de test ou timeout""" 
         print "**************** Starting Test Node %d**************" % self._node.id
         self._startTime = time.time()
         self._lastTime = self._startTime
@@ -848,11 +870,7 @@ class TestNetworkNode(threading.Thread):
             if tRef >= self._timeOut :
                 state = 'timeout'
                 self._running = False
-#            if self._cptMsg == self._countMsg :
-#                state = 'finish'
-#                self._running = False
-#           print 'Test Node %d, state :%s, depuis : %d ms, running : %s' % (self._node.id,  state,  tRef,  str(self._running))
-        if state == 'timeout' : self._node.endTest(state, self._cptMsg, self._countMsg, tRef)
+        if state == 'timeout' : self._node.endTest(state, self._cptMsg, self._countMsg, tRef,  self._timeOut)
         if self._log: self._log.info('Stop Test Node %d, status : %s' % (self._node.id,  state))
         print "**************** Stopped Test Node %d satus : %s**************" % (self._node.id,  state)
    

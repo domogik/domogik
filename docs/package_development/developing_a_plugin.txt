@@ -374,6 +374,24 @@ When you want to stop the timer, just do: ::
 Best practices
 ==============
 
+Additional stuff for plugin start and debugging helper 
+------------------------------------------------------
+To check import library add header code: ::
+
+    try:
+       from domogik.xpl.common.plugin import XplPlugin
+       from domogik.xpl.common.xplmessage import XplMessage
+       from domogik_packages.xpl.lib.myplugin import MyClass
+       .......
+    except ImportError as exc :
+       import logging
+       logging.basicConfig(filename='/var/log/domogik/myplugin_start_error.log',level=logging.DEBUG)
+       err = "Error: Plugin Starting failed to import module ({})".format(exc) 
+       print err
+       logging.error(err)
+
+In case of import error, this will be report in log file /var/log/domogik/myplugin_start_error.log
+
 Test plugins in a nutshell
 --------------------------
 During a plugin development, instead of launching a plugin from the user interface, you can launch it from a nutshell: ::
