@@ -128,9 +128,21 @@ setup(
     package_data = {
         'domogik': [
             'examples/*/*/*/*/*/*/*/*',
+            'install/README.txt',
+            'install/uninstall.sh',
+            'install/upgrade_repository/README',
+            'install/version',
+            'mq/pubsub/README.txt',
+            'mq/reqrep/README.txt',
+            'mq/README.md',
             'install/upgrade_repository/migrate.cfg',
             'install/upgrade_repository/versions/*',
-            'xplhub/examples/*/*'
+            'xplhub/README.txt',
+            'xplhub/examples/*',
+            'xplhub/examples/*/*',
+            'xpl/tools/32bit/xPL_Hub',
+            'xpl/tools/64bit/xPL_Hub',
+            'xpl/tools/arm/xPL_Hub',
         ]
     },
     data_files = d_files,
