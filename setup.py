@@ -127,7 +127,10 @@ setup(
     test_suite = 'domogik.tests',
     package_data = {
         'domogik': [
-            'examples/*/*/*/*/*/*/*/*'
+            'examples/*/*/*/*/*/*/*/*',
+            'install/upgrade_repository/migrate.cfg',
+            'install/upgrade_repository/versions/*',
+            'xplhub/examples/*/*'
         ]
     },
     data_files = d_files,
