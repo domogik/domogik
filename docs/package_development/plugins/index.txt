@@ -16,16 +16,14 @@ Packages development
   * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
   * :doc:`Identity part <json/identity>`
   * :doc:`Configuration part <json/configuration>`
-  * Configuration part
-
-    * Data types for the configuration
-
+  * ...
+  * :doc:`Udev rules part <json/udev_rules>`
   * ...
 
 * Python part
   
   * :doc:`__init__.py files <python/init_files>`
-  * Bin part
+  * :doc:`Bin part <python/bin_part>`
   * Library
   * How to ...
 
