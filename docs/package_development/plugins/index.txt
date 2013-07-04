@@ -5,15 +5,40 @@ Packages development
 * :doc:`What is new in 0.4 about Domogik plugins format ? <what_is_new_in_0.4>`
 
 
+* :doc:`Release numbers rules <releases/release_numbers_rules>`
 * :doc:`Create the plugin repository on GitHub <create_repository/index>`
 * :doc:`Plugin file tree <plugin_file_tree/index>`
 * :doc:`Readme and changelog files <readme_and_changelog/index>`
 * :doc:`.gitignore file <git/gitignore>`
 * :doc:`start.sh file <start_file/index>`
-* Json file
+* :doc:`Json file <json/index>`
+
+  * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
+  * :doc:`Identity part <json/identity>`
+  * :doc:`Configuration part <json/configuration>`
+  * Configuration part
+
+    * Data types for the configuration
+
+  * ...
+
 * Python part
   
   * :doc:`__init__.py files <python/init_files>`
+  * Bin part
+  * Library
+  * How to ...
+
+    * get a configuration value
+    * get the devices lists (if needed)
+    * log in a file
+    * manage infinite loop without *while True*
+    * create a timer
+    * ...
+
+  * Helpers
+
+    * ...
 
 * Graphical resources
 
