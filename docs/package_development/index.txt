@@ -2,9 +2,15 @@
 Packages development
 ====================
 
-* :doc:`Steps to follow to create a package <howto>`
+* :doc:`What is new in 0.4 about Domogik plugins format ? <what_is_new_in_0.4>`
 
 
-
-
-
+* :doc:`Create the plugin repository on GitHub <create_repository/create_repository>`
+* :doc:`Plugin file tree <plugin_file_tree/plugin_file_tree>`
+* Json file
+* Python part
+* Graphical resources
+* Data files
+* Documentation
+* Tests
+* Nightly builds
