@@ -99,7 +99,7 @@ function copy_sample_files {
         chmod 755 $HUB_ETC
     fi
     if [ ! -f $HUB_ETC/xplhub.cfg ];then
-        cp -f src/xplhub/examples/config/xplhub.cfg $HUB_ETC/xplhub.cfg
+        cp -f src/domogik/xplhub/examples/config/xplhub.cfg $HUB_ETC/xplhub.cfg
         chown $d_user:root $HUB_ETC/xplhub.cfg
         chmod 640 $HUB_ETC/xplhub.cfg
     else
@@ -110,21 +110,21 @@ function copy_sample_files {
             keep="y"
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp -f src/xplhub/examples/config/xplhub.cfg $HUB_ETC/xplhub.cfg
+            cp -f src/domogik/xplhub/examples/config/xplhub.cfg $HUB_ETC/xplhub.cfg
             chown $d_user:root $HUB_ETC/xplhub.cfg
             chmod 640 $HUB_ETC/xplhub.cfg
         fi
     fi
     if [ -d "/etc/default/" ];then
         if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp src/xplhub/examples/default/xplhub /etc/default/
+            cp src/domogik/xplhub/examples/default/xplhub /etc/default/
         fi
     else
         echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
         exit 6
     fi
     if [ -d "/etc/logrotate.d/" ];then
-        cp src/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
+        cp src/domogik/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/xplhub
     fi
 }

@@ -1,1 +1,8 @@
 include ez_setup.py
+include setup.py
+include install.sh
+include install_xplhub.sh
+include README.txt
+include COPYING
+include test_config.py
+

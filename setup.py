@@ -41,22 +41,22 @@ import os
 from setuptools import setup, find_packages
 import platform
 
-def list_all_files(path, dst):
-    """
-    List all files and subdirectories contained in a path
-    @param path : the path from where to get files and subdirectories
-    @param dst : The based destination path
-    @return : a list of tuples for each directory in path (including path itself)
-    """
-    d = []
-    files = []
-    for i in os.listdir(path):
-        if not os.path.isdir(os.path.join(path, i)):
-            files.append(os.path.join(path, i))
-        else:
-            d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
-    d.append((dst, files))
-    return d
+#def list_all_files(path, dst):
+#    """
+#    List all files and subdirectories contained in a path
+#    @param path : the path from where to get files and subdirectories
+#    @param dst : The based destination path
+#    @return : a list of tuples for each directory in path (including path itself)
+#    """
+#    d = []
+#    files = []
+#    for i in os.listdir(path):
+#        if not os.path.isdir(os.path.join(path, i)):
+#            files.append(os.path.join(path, i))
+#        else:
+#            d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
+#    d.append((dst, files))
+#    return d
 
 d_files = [
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
@@ -121,12 +121,17 @@ setup(
     # namespace_packages = ['domogik', 'mpris', 'tools'],
     # include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
-    package_dir = { '': 'src' },
+    package_dir = { 
+        '': 'src'
+    },
     test_suite = 'domogik.tests',
     package_data = {
+        'domogik': [
+            'examples/*/*/*/*/*/*/*/*'
+        ]
     },
     data_files = d_files,
-    scripts=['install.sh'],
+    scripts=['install.sh', 'test_config.py'],
     entry_points = {
         'console_scripts': [
             """

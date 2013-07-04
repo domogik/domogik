@@ -194,7 +194,7 @@ function copy_sample_files {
     fi
     if [ ! -f $DMG_ETC/domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+        cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
         chown $d_user:root $DMG_ETC/*.cfg
         chmod 640 $DMG_ETC/*.cfg
         if [ $MAIN_INSTALL = "y" ] ; then
@@ -211,7 +211,7 @@ function copy_sample_files {
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-            cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+            cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
             chown $d_user:root $DMG_ETC/*.cfg
             chmod 640 $DMG_ETC/*.cfg
             if [ $MAIN_INSTALL = "y" ] ; then
@@ -224,7 +224,7 @@ function copy_sample_files {
     # Add the xplhub.cfg config file in an existing configuration it it does not exists
     if [ ! -f $DMG_ETC/xplhub.cfg ] ; then
         echo "No existing xplhub.cfg file : creating it"
-        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+        cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
         chown $d_user:root $DMG_ETC/xplhub.cfg
         chmod 640 $DMG_ETC/xplhub.cfg
     fi
@@ -238,7 +238,7 @@ function copy_sample_files {
     fi
     if [ -d "/etc/logrotate.d/" ];then
         cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
-        cp src/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
+        cp src/domogik/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
         chmod 644 /etc/logrotate.d/domogik
         chmod 644 /etc/logrotate.d/xplhub
     fi
