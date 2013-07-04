@@ -136,122 +136,122 @@ function copy_sample_files {
         fi
     fi
     # For upgrade with 0.1.0
-    d_home=$(getent passwd $d_user |cut -d ':' -f 6)
+    #d_home=$(getent passwd $d_user |cut -d ':' -f 6)
 
-    keep="n"
-    already_cfg=
+    #keep="n"
+    #already_cfg=
     # create /etc/domogik entry
-    if [ ! -d $DMG_ETC ];then
-        mkdir $DMG_ETC
-        chown $d_user:root $DMG_ETC
-        chmod 755 $DMG_ETC
-    fi
+    #if [ ! -d $DMG_ETC ];then
+    #    mkdir $DMG_ETC
+    #    chown $d_user:root $DMG_ETC
+    #    chmod 755 $DMG_ETC
+    #fi
     # create /var/cache/domogik
-    if [ ! -d $DMG_CACHE ];then
-        mkdir $DMG_CACHE
-        chown $d_user:root $DMG_CACHE
-    fi
+    #if [ ! -d $DMG_CACHE ];then
+    #    mkdir $DMG_CACHE
+    #    chown $d_user:root $DMG_CACHE
+    #fi
     # create /var/lib/domogik
-    if [ ! -d $DMG_LIB ];then
-        mkdir $DMG_LIB
-        mkdir $DMG_LIB/packages/
-        mkdir $DMG_LIB/resources/
-        touch $DMG_LIB/packages/__init__.py
-        chown -R $d_user:root $DMG_LIB
-    fi
+    #if [ ! -d $DMG_LIB ];then
+    #    mkdir $DMG_LIB
+    #    mkdir $DMG_LIB/packages/
+    #    mkdir $DMG_LIB/resources/
+    #    touch $DMG_LIB/packages/__init__.py
+    #    chown -R $d_user:root $DMG_LIB
+    #fi
     # create /var/lock/domogik
-    if [ ! -d $DMG_LOCK ];then
-        mkdir $DMG_LOCK
-        chown $d_user:root $DMG_LOCK
-    fi
+    #if [ ! -d $DMG_LOCK ];then
+    #    mkdir $DMG_LOCK
+    #    chown $d_user:root $DMG_LOCK
+    #fi
     # create folders for packages management
-    for pkg_rep in pkg-cache cache 
-      do
-        if [ ! -d $DMG_CACHE/$pkg_rep ];then
-            mkdir $DMG_CACHE/$pkg_rep
-            chown $d_user:root $DMG_CACHE/$pkg_rep
-        fi
-    done
+    #for pkg_rep in pkg-cache cache 
+    #  do
+    #    if [ ! -d $DMG_CACHE/$pkg_rep ];then
+    #        mkdir $DMG_CACHE/$pkg_rep
+    #        chown $d_user:root $DMG_CACHE/$pkg_rep
+    #    fi
+    #done
     # create folders for packages management
-    for pkg_rep in domogik_packages domogik_packages/plugins domogik_packages/externals domogik_packages/stats domogik_packages/url2xpl domogik_packages/design domogik_packages/data
-      do
-        if [ ! -d $DMG_LIB/$pkg_rep ];then
-            mkdir $DMG_LIB/$pkg_rep
-            chown $d_user:root $DMG_LIB/$pkg_rep
-        fi
-    done
+    #for pkg_rep in domogik_packages domogik_packages/plugins domogik_packages/externals domogik_packages/stats domogik_packages/url2xpl domogik_packages/design domogik_packages/data
+    #  do
+    #    if [ ! -d $DMG_LIB/$pkg_rep ];then
+    #        mkdir $DMG_LIB/$pkg_rep
+    #        chown $d_user:root $DMG_LIB/$pkg_rep
+    #    fi
+    #done
 
     # For upgrade with 0.1
-    if [ -f $d_home/.domogik/domogik.cfg ];then
-        mv $d_home/.domogik/domogik.cfg $DMG_ETC/domogik.cfg
-        chown $d_user:root $DMG_ETC/domogik.cfg
-        chmod 640 $DMG_ETC/domogik.cfg
-        if [ $MAIN_INSTALL = "y" ] ; then
-            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-            chown $d_user:root $DMG_ETC/sources.list
-            chmod 640 $DMG_ETC/sources.list
-        fi
-    fi
-    if [ ! -f $DMG_ETC/domogik.cfg ];then
-        cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
-        chown $d_user:root $DMG_ETC/*.cfg
-        chmod 640 $DMG_ETC/*.cfg
-        if [ $MAIN_INSTALL = "y" ] ; then
-            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-            chown $d_user:root $DMG_ETC/sources.list
-            chmod 640 $DMG_ETC/sources.list
-        fi
-    else
-        keep="y"
-        already_cfg=1
-        read -p "You already have Domogik configuration files. Do you want to keep them ? [Y/n]" keep
-        if [ "x$keep" = "x" ];then
-            keep="y"
-        fi
-        if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-            cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
-            chown $d_user:root $DMG_ETC/*.cfg
-            chmod 640 $DMG_ETC/*.cfg
-            if [ $MAIN_INSTALL = "y" ] ; then
-                cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-                chown $d_user:root $DMG_ETC/sources.list
-                chmod 640 $DMG_ETC/sources.list
-            fi
-        fi
-    fi
+    #if [ -f $d_home/.domogik/domogik.cfg ];then
+    #    mv $d_home/.domogik/domogik.cfg $DMG_ETC/domogik.cfg
+    #    chown $d_user:root $DMG_ETC/domogik.cfg
+    #    chmod 640 $DMG_ETC/domogik.cfg
+    #    if [ $MAIN_INSTALL = "y" ] ; then
+    #        cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+    #        chown $d_user:root $DMG_ETC/sources.list
+    #        chmod 640 $DMG_ETC/sources.list
+    #    fi
+    #fi
+    #if [ ! -f $DMG_ETC/domogik.cfg ];then
+    #    cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
+    #    cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+    #    chown $d_user:root $DMG_ETC/*.cfg
+    #    chmod 640 $DMG_ETC/*.cfg
+    #    if [ $MAIN_INSTALL = "y" ] ; then
+    #        cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+    #        chown $d_user:root $DMG_ETC/sources.list
+    #        chmod 640 $DMG_ETC/sources.list
+    #    fi
+    #else
+    #    keep="y"
+    #    already_cfg=1
+    #    read -p "You already have Domogik configuration files. Do you want to keep them ? [Y/n]" keep
+    #    if [ "x$keep" = "x" ];then
+    #        keep="y"
+    #    fi
+    #    if [ "$keep" = "n" -o "$keep" = "N" ];then
+    #        cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
+    #        cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+    #        chown $d_user:root $DMG_ETC/*.cfg
+    #        chmod 640 $DMG_ETC/*.cfg
+    #        if [ $MAIN_INSTALL = "y" ] ; then
+    #            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
+    #            chown $d_user:root $DMG_ETC/sources.list
+    #            chmod 640 $DMG_ETC/sources.list
+    #        fi
+    #    fi
+    #fi
     # Add the xplhub.cfg config file in an existing configuration it it does not exists
-    if [ ! -f $DMG_ETC/xplhub.cfg ] ; then
-        echo "No existing xplhub.cfg file : creating it"
-        cp -f src/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
-        chown $d_user:root $DMG_ETC/xplhub.cfg
-        chmod 640 $DMG_ETC/xplhub.cfg
-    fi
-    if [ -d "/etc/default/" ];then
-        if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp src/domogik/examples/default/domogik /etc/default/
-        fi
-    else
-        echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
-        exit 6
-    fi
-    if [ -d "/etc/logrotate.d/" ];then
-        cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
-        cp src/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
-        chmod 644 /etc/logrotate.d/domogik
-        chmod 644 /etc/logrotate.d/xplhub
-    fi
-    if [ -d "/etc/init.d/" ];then
-        cp src/domogik/examples/init/domogik /etc/init.d/
-        chmod +x /etc/init.d/domogik
-    elif [ -d "/etc/rc.d/" ];then
-        cp src/domogik/examples/init/domogik /etc/rc.d/
-        chmod +x /etc/rc.d/domogik
-    else
-        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
-        exit 7
-    fi
+    #if [ ! -f $DMG_ETC/xplhub.cfg ] ; then
+    #    echo "No existing xplhub.cfg file : creating it"
+    #    cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
+    #    chown $d_user:root $DMG_ETC/xplhub.cfg
+    #    chmod 640 $DMG_ETC/xplhub.cfg
+    #fi
+    #if [ -d "/etc/default/" ];then
+    #    if [ "$keep" = "n" -o "$keep" = "N" ];then
+    #        cp src/domogik/examples/default/domogik /etc/default/
+    #    fi
+    #else
+    #    echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
+    #    exit 6
+    #fi
+    #if [ -d "/etc/logrotate.d/" ];then
+    #    cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
+    #    cp src/domogik/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
+    #    chmod 644 /etc/logrotate.d/domogik
+    #    chmod 644 /etc/logrotate.d/xplhub
+    #fi
+    #if [ -d "/etc/init.d/" ];then
+    #    cp src/domogik/examples/init/domogik /etc/init.d/
+    #    chmod +x /etc/init.d/domogik
+    #elif [ -d "/etc/rc.d/" ];then
+    #    cp src/domogik/examples/init/domogik /etc/rc.d/
+    #    chmod +x /etc/rc.d/domogik
+    #else
+    #    echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
+    #    exit 7
+    #fi
 }
 
 function update_default_config {
@@ -460,32 +460,32 @@ function modify_hosts {
     fi
 }
 
-function create_log_dir {
-    mkdir -p /var/log/domogik
-    chown -R $d_user: /var/log/domogik 
-    mkdir -p /var/log/xplhub
-    chown -R $d_user: /var/log/xplhub 
-}
+#function create_log_dir {
+    #mkdir -p /var/log/domogik
+    #chown -R $d_user: /var/log/domogik 
+    #mkdir -p /var/log/xplhub
+    #chown -R $d_user: /var/log/xplhub 
+#}
 
-function install_plugins {
-    if [ "$MODE" = "develop" ];then
-        chmod +x src/tools/packages/insert_data.py 
-        for file in src/share/domogik/plugins/*.json;do
-            if [[ $file != "src/share/domogik/plugins/*.json" ]] ; then
-                echo "** Parse $file"
-                su -c "src/tools/packages/insert_data.py $file" $d_user
-                echo "** File $file parsed"
-            fi
-        done
-        for file in src/share/domogik/externals/*.json;do
-            if [[ $file != "src/share/domogik/externals/*.json" ]] ; then
-                echo "** Parse $file"
-                su -c "src/tools/packages/insert_data.py $file" $d_user
-                echo "** File $file parsed"
-            fi
-        done
-    fi
-}
+#function install_plugins {
+#    if [ "$MODE" = "develop" ];then
+#        chmod +x src/tools/packages/insert_data.py 
+#        for file in src/share/domogik/plugins/*.json;do
+#            if [[ $file != "src/share/domogik/plugins/*.json" ]] ; then
+#                echo "** Parse $file"
+#                su -c "src/tools/packages/insert_data.py $file" $d_user
+#                echo "** File $file parsed"
+#            fi
+#        done
+#        for file in src/share/domogik/externals/*.json;do
+#            if [[ $file != "src/share/domogik/externals/*.json" ]] ; then
+#                echo "** Parse $file"
+#                su -c "src/tools/packages/insert_data.py $file" $d_user
+#                echo "** File $file parsed"
+#            fi
+#        done
+#    fi
+#}
 
 #Main part
 if [ $UID -ne 0 ];then
@@ -538,7 +538,7 @@ if [ $MAIN_INSTALL = "y" ] ; then
 else
     update_rest_config_for_secondary_host
 fi
-create_log_dir
+#create_log_dir
 if [ $MAIN_INSTALL = "y" ] ; then
     call_app_installer
     #install_plugins

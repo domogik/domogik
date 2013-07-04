@@ -41,27 +41,35 @@ import os
 from setuptools import setup, find_packages
 import platform
 
-def list_all_files(path, dst):
-    """
-    List all files and subdirectories contained in a path
-    @param path : the path from where to get files and subdirectories
-    @param dst : The based destination path
-    @return : a list of tuples for each directory in path (including path itself)
-    """
-    d = []
-    files = []
-    for i in os.listdir(path):
-        if not os.path.isdir(os.path.join(path, i)):
-            files.append(os.path.join(path, i))
-        else:
-            d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
-    d.append((dst, files))
-    return d
-
 d_files = [
-        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
-        ('/etc/default/', ['src/domogik/examples/default/domogik'])
+        ('/etc/default/', ['src/domogik/examples/default/domogik']),
+        ('/etc/domogik', ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
+        ('/var/cache/domogik', []),
+        ('/var/cache/domogik/pkg-cache', []),
+        ('/var/cache/domogik/cache', []),
+        ('/var/lib/domogik', []),
+        ('/var/lib/domogik/packages', ['src/domogik/common/__init__.py']),
+        ('/var/lib/domogik/resources', []),
+        ('/var/lib/domogik/resources', ['src/domogik/common/datatypes.json']),
+        ('/var/lock/domogik', []),
 ]
+
+if os.path.exists('/etc/default'):
+    d_files.append(('/etc/default/', ['src/domogik/examples/default/domogik']))
+else:
+    print "Can't find directory where i can copy system wide config"
+    exit(0)
+
+if os.path.exists('/etc/logrotate.d'):
+    d_files.append(('/etc/logrotate.d', ['src/domogik/examples/logrotate/domogik', 'src/domogik/xplhub/examples/logrotate/xplhub']))
+
+if os.path.exists('/etc/init.d'):
+    d_files.append(('/etc/init.d/', ['src/domogik/examples/init/domogik']))
+elif os.path.exists('/etc/rc.d'):
+    d_files.append(('/etc/rc.d/', ['src/domogik/examples/init/domogik']))
+else:
+    print("Can't find firectory for init script")
+    exit(0)
 
 def get_path(dir_only=False):
     arch = platform.machine()
@@ -118,15 +126,35 @@ setup(
                       'python-daemon >= 1.5.5'],
     zip_safe = False,
     license = 'GPL v3',
-    # namespace_packages = ['domogik', 'mpris', 'tools'],
-    # include_package_data = True,
-    packages = find_packages('src', exclude=["mpris"]),
-    package_dir = { '': 'src' },
+    include_package_data = True,
+    packages = find_packages('src/domogik'),
+    package_dir = { 
+        '': 'src/domogik'
+    },
     test_suite = 'domogik.tests',
     package_data = {
+        'domogik': [
+            #'examples/config/domogik.cfg',
+            'examples/init/domogik',
+            'examples/default/domogik',
+            'examples/logrotate/domogik',
+            'examples/snmp/snmp.cfg',
+            'examples/snmp/dmg_snmp',
+            'examples/snmp/dmg_snmp.pl',
+            'install/uninstall.sh',
+            'install/version',
+            'common/datatypes.json',
+            'install/upgrade_repository/migrate.cfg',
+            'install/upgrade_repository/versions/*',
+            'xplhub/examples/logrotate/xplhub',
+            'xplhub/examples/config/xplhub.cfg',
+            'xpl/tools/32bit/xPL_Hub',
+            'xpl/tools/64bit/xPL_Hub',
+            'xpl/tools/arm/xPL_Hub',
+        ]
     },
     data_files = d_files,
-    scripts=['install.sh'],
+    scripts=['install.sh', 'test_config.py'],
     entry_points = {
         'console_scripts': [
             """
