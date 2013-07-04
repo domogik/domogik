@@ -1,0 +1,12 @@
+===
+Git
+===
+
+.gitignore file
+===============
+
+For each plugin, a .gitignore file must be created in the root directory. Create it like this: ::
+
+    $ echo "*.py[cod]
+    *.swp" > .gitignore
+

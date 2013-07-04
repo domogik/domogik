@@ -31,26 +31,3 @@ Some other items may be added:
 
 
 
-
-
-A ceci nous allons ajouter quelques fichiers pour simplifier la vie du développeur.
-
-Tout d’abord, créons un fichier start.sh (adaptez la 1ère ligne avec l’id de votre plugin) :
-
-PLUGIN_ID=ipx800
-echo "export PYTHONPATH=/var/lib/domogik && /usr/bin/python bin/$PLUGIN_ID.py" > start.sh
-chmod u+x start.sh
-
-Ce fichier servira à lancer le plugin en ligne de commande. Le plugin ne sera pas lancé en tâche de fond et vous verrez tous ses logs défiler sur la sortir standard. Pour l’arrêter, un (CTRL)-(C) suffira.
-La directive export PYTHONPATH=/var/lib/domogik permet à python de chercher des librairies dans ce dossier, ce qui est nécessaire pour le chargement des librairies de notre plugin.
-
-Ensuite, créons un fichier insert_data.sh :
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO
-
-Ce fichier aura pour effet de charger les données du fichier json dans la base de données. En cas de modifications des parties du fichier json qui vont en base, il faudra lancer ce script.
-
-!!!!!!!!!!!!!!! TODO : penser à lister quelles parties sont concernées
-
-!!!!! changelog ????
-!!!!! readme ????

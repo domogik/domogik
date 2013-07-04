@@ -5,11 +5,20 @@ Packages development
 * :doc:`What is new in 0.4 about Domogik plugins format ? <what_is_new_in_0.4>`
 
 
-* :doc:`Create the plugin repository on GitHub <create_repository/create_repository>`
-* :doc:`Plugin file tree <plugin_file_tree/plugin_file_tree>`
+* :doc:`Create the plugin repository on GitHub <create_repository/index>`
+* :doc:`Plugin file tree <plugin_file_tree/index>`
+* :doc:`Readme and changelog files <readme_and_changelog/index>`
+* :doc:`.gitignore file <git/gitignore>`
+* :doc:`start.sh file <start_file/index>`
 * Json file
 * Python part
+  
+  * :doc:`__init__.py files <python/init_files>`
+
 * Graphical resources
+
+  * :doc:`Icon <graphical/icon_file>`
+
 * Data files
 * Documentation
 * Tests
