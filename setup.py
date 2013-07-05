@@ -40,7 +40,16 @@ ez_setup.use_setuptools()
 import os
 from setuptools import setup, find_packages
 import platform
+import sys
 
+# check python version
+print "== check python version =="
+if sys.version_info < (2,6):
+    print "Python version is to low, at least python 2.6 is needed"
+    exit(0)
+
+# build file list
+print "== build file list =="
 d_files = [
         ('/etc/default/', ['src/domogik/examples/default/domogik']),
         ('/etc/domogik', ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
@@ -71,34 +80,28 @@ else:
     print("Can't find firectory for init script")
     exit(0)
 
-def get_path(dir_only=False):
-    arch = platform.machine()
-    hub = {
-        'x86_64' : 'src/domogik/xpl/tools/64bit/',
-        'i686' : 'src/domogik/xpl/tools/32bit/',
-        'arm' : 'src/domogik/xpl/tools/arm/',
-        'armv5tel' : 'src/domogik/xpl/tools/arm/',
-        'armv6l' : 'src/domogik/xpl/tools/arm/'
-    }
-    if arch not in hub.keys():
-        return None
-    else:
-        if not dir_only:
-            return hub[arch] + "xPL_Hub"
-        else:
-            return hub[arch]
-
-arch = get_path()
-if arch != None:
-    d_files.append(('/usr/sbin/', [arch]))
+# install c-hub files
+hub = {
+    'x86_64' : 'src/domogik/xpl/tools/64bit/',
+    'i686' : 'src/domogik/xpl/tools/32bit/',
+    'arm' : 'src/domogik/xpl/tools/arm/',
+    'armv5tel' : 'src/domogik/xpl/tools/arm/',
+    'armv6l' : 'src/domogik/xpl/tools/arm/'
+}
+arch = platform.machine()
+if arch in hub.keys():
+    d_files.append(('/usr/sbin/', hub[arch]))
 else:
     print("*************** WARNING ***************")
     print("* Can't find an xPL Hub for your arch *")
-    print("* Please check documentation in :     *")
-    print("*  src/domogik/xpl/tools/COMPILE.txt  *")
-    print("* to get the sources and compile them.*")
+    print("* C hub will not be possible on this  *")
+    print("*            system                   *")
     print("***************************************")
+hub = None
+arch = None
 
+# runsetup
+print "== run python setup =="
 setup(
     name = 'Domogik',
     version = '0.4.0',
@@ -127,9 +130,9 @@ setup(
     zip_safe = False,
     license = 'GPL v3',
     include_package_data = True,
-    packages = find_packages('src/domogik'),
+    packages = find_packages('src'),
     package_dir = { 
-        '': 'src/domogik'
+        '': 'src'
     },
     test_suite = 'domogik.tests',
     package_data = {
@@ -154,7 +157,7 @@ setup(
         ]
     },
     data_files = d_files,
-    scripts=['install.sh', 'test_config.py'],
+    scripts=['install.sh'],
     entry_points = {
         'console_scripts': [
             """
