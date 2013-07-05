@@ -114,14 +114,6 @@ function run_setup_py {
     esac
 }
 
-function test_sources {
-    FILENAME=$1
-    [ -d "$PWD/src" ] ||( echo "Can't find src/ directory, are you running this script from the sources main directory? (with ./$FILENAME" && exit 2 )
-    [ -f "src/domogik/examples/config/domogik.cfg" ] ||( echo "Can't find src/domogik/examples/config/domogik.cfg file!" && exit 3 )
-    [ -f "src/domogik/examples/default/domogik" ] ||( echo "Can't find src/domogik/examples/default/domogik file!" && exit 4 )
-    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik/examples/init/domogik!" && exit 5 )
-}
-
 function copy_sample_files {
     read -p "Which user will run domogik, it will be created if it does not exist yet? (default : domogik) " d_user
     d_user=${d_user:-domogik}
@@ -135,123 +127,6 @@ function copy_sample_files {
             exit 9
         fi
     fi
-    # For upgrade with 0.1.0
-    #d_home=$(getent passwd $d_user |cut -d ':' -f 6)
-
-    #keep="n"
-    #already_cfg=
-    # create /etc/domogik entry
-    #if [ ! -d $DMG_ETC ];then
-    #    mkdir $DMG_ETC
-    #    chown $d_user:root $DMG_ETC
-    #    chmod 755 $DMG_ETC
-    #fi
-    # create /var/cache/domogik
-    #if [ ! -d $DMG_CACHE ];then
-    #    mkdir $DMG_CACHE
-    #    chown $d_user:root $DMG_CACHE
-    #fi
-    # create /var/lib/domogik
-    #if [ ! -d $DMG_LIB ];then
-    #    mkdir $DMG_LIB
-    #    mkdir $DMG_LIB/packages/
-    #    mkdir $DMG_LIB/resources/
-    #    touch $DMG_LIB/packages/__init__.py
-    #    chown -R $d_user:root $DMG_LIB
-    #fi
-    # create /var/lock/domogik
-    #if [ ! -d $DMG_LOCK ];then
-    #    mkdir $DMG_LOCK
-    #    chown $d_user:root $DMG_LOCK
-    #fi
-    # create folders for packages management
-    #for pkg_rep in pkg-cache cache 
-    #  do
-    #    if [ ! -d $DMG_CACHE/$pkg_rep ];then
-    #        mkdir $DMG_CACHE/$pkg_rep
-    #        chown $d_user:root $DMG_CACHE/$pkg_rep
-    #    fi
-    #done
-    # create folders for packages management
-    #for pkg_rep in domogik_packages domogik_packages/plugins domogik_packages/externals domogik_packages/stats domogik_packages/url2xpl domogik_packages/design domogik_packages/data
-    #  do
-    #    if [ ! -d $DMG_LIB/$pkg_rep ];then
-    #        mkdir $DMG_LIB/$pkg_rep
-    #        chown $d_user:root $DMG_LIB/$pkg_rep
-    #    fi
-    #done
-
-    # For upgrade with 0.1
-    #if [ -f $d_home/.domogik/domogik.cfg ];then
-    #    mv $d_home/.domogik/domogik.cfg $DMG_ETC/domogik.cfg
-    #    chown $d_user:root $DMG_ETC/domogik.cfg
-    #    chmod 640 $DMG_ETC/domogik.cfg
-    #    if [ $MAIN_INSTALL = "y" ] ; then
-    #        cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-    #        chown $d_user:root $DMG_ETC/sources.list
-    #        chmod 640 $DMG_ETC/sources.list
-    #    fi
-    #fi
-    #if [ ! -f $DMG_ETC/domogik.cfg ];then
-    #    cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-    #    cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
-    #    chown $d_user:root $DMG_ETC/*.cfg
-    #    chmod 640 $DMG_ETC/*.cfg
-    #    if [ $MAIN_INSTALL = "y" ] ; then
-    #        cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-    #        chown $d_user:root $DMG_ETC/sources.list
-    #        chmod 640 $DMG_ETC/sources.list
-    #    fi
-    #else
-    #    keep="y"
-    #    already_cfg=1
-    #    read -p "You already have Domogik configuration files. Do you want to keep them ? [Y/n]" keep
-    #    if [ "x$keep" = "x" ];then
-    #        keep="y"
-    #    fi
-    #    if [ "$keep" = "n" -o "$keep" = "N" ];then
-    #        cp -f src/domogik/examples/config/domogik.cfg $DMG_ETC/domogik.cfg
-    #        cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
-    #        chown $d_user:root $DMG_ETC/*.cfg
-    #        chmod 640 $DMG_ETC/*.cfg
-    #        if [ $MAIN_INSTALL = "y" ] ; then
-    #            cp -f src/domogik/examples/packages/sources.list $DMG_ETC/sources.list
-    #            chown $d_user:root $DMG_ETC/sources.list
-    #            chmod 640 $DMG_ETC/sources.list
-    #        fi
-    #    fi
-    #fi
-    # Add the xplhub.cfg config file in an existing configuration it it does not exists
-    #if [ ! -f $DMG_ETC/xplhub.cfg ] ; then
-    #    echo "No existing xplhub.cfg file : creating it"
-    #    cp -f src/domogik/xplhub/examples/config/xplhub.cfg $DMG_ETC/xplhub.cfg
-    #    chown $d_user:root $DMG_ETC/xplhub.cfg
-    #    chmod 640 $DMG_ETC/xplhub.cfg
-    #fi
-    #if [ -d "/etc/default/" ];then
-    #    if [ "$keep" = "n" -o "$keep" = "N" ];then
-    #        cp src/domogik/examples/default/domogik /etc/default/
-    #    fi
-    #else
-    #    echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
-    #    exit 6
-    #fi
-    #if [ -d "/etc/logrotate.d/" ];then
-    #    cp src/domogik/examples/logrotate/domogik /etc/logrotate.d/
-    #    cp src/domogik/xplhub/examples/logrotate/xplhub /etc/logrotate.d/
-    #    chmod 644 /etc/logrotate.d/domogik
-    #    chmod 644 /etc/logrotate.d/xplhub
-    #fi
-    #if [ -d "/etc/init.d/" ];then
-    #    cp src/domogik/examples/init/domogik /etc/init.d/
-    #    chmod +x /etc/init.d/domogik
-    #elif [ -d "/etc/rc.d/" ];then
-    #    cp src/domogik/examples/init/domogik /etc/rc.d/
-    #    chmod +x /etc/rc.d/domogik
-    #else
-    #    echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
-    #    exit 7
-    #fi
 }
 
 function update_default_config {
@@ -426,32 +301,6 @@ function call_app_installer {
     fi
 }
 
-function check_tools {
-    if [ -x "$(which ip)" ];then
-        CMD_NET='ip addr show'
-    else
-	if [  -x "$(which ifconfig)" ];then
-		CMD_NET='ifconfig'
-	else
-		echo "no network command found"
-            	exit 21
-        fi
-    fi
-}
-
-
-function check_python {
-    if [ ! -x "$(which python)" ];then
-        echo "No python binary found, please install at least python2.6";
-        exit 11
-    else
-        if python -V 2>&1|grep -qs "Python 2.[345]";then
-            echo "Bad python version used, please install at least 2.6, and check /usr/bin/python starts the good version."
-            exit 12
-        fi
-    fi
-}
-
 function modify_hosts {
     [ -f "/etc/hosts" ] || touch /etc/hosts
     if ! grep localhost /etc/hosts|grep -qs 127.0.0.1;then
@@ -459,33 +308,6 @@ function modify_hosts {
         echo "127.0.0.1 localhost" >> /etc/hosts
     fi
 }
-
-#function create_log_dir {
-    #mkdir -p /var/log/domogik
-    #chown -R $d_user: /var/log/domogik 
-    #mkdir -p /var/log/xplhub
-    #chown -R $d_user: /var/log/xplhub 
-#}
-
-#function install_plugins {
-#    if [ "$MODE" = "develop" ];then
-#        chmod +x src/tools/packages/insert_data.py 
-#        for file in src/share/domogik/plugins/*.json;do
-#            if [[ $file != "src/share/domogik/plugins/*.json" ]] ; then
-#                echo "** Parse $file"
-#                su -c "src/tools/packages/insert_data.py $file" $d_user
-#                echo "** File $file parsed"
-#            fi
-#        done
-#        for file in src/share/domogik/externals/*.json;do
-#            if [[ $file != "src/share/domogik/externals/*.json" ]] ; then
-#                echo "** Parse $file"
-#                su -c "src/tools/packages/insert_data.py $file" $d_user
-#                echo "** File $file parsed"
-#            fi
-#        done
-#    fi
-#}
 
 #Main part
 if [ $UID -ne 0 ];then
@@ -501,18 +323,9 @@ if [ "$(pwd | cut -d"/" -f2)" == "root" ];then
     exit 20
 fi
 
-#stop_domogik
-check_tools
-check_python
-test_sources $0
-# TODO : we don't want anymore let the user the choice to use 'install' without be sure of this choice
-# on a fresh install from sources. I (fritz) comment this question now and later I will add a new option
-# --install-mode=install/develop on the command line for advanced users
-#read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE
-#while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
-#    read -p "Which install mode do you want? [install/develop] : " MODE
-#done
 MODE=develop
+keep=n
+CMD_NET='ip addr show'
 read -p "If you want to use a proxy, please set it now. It will only be used during installation. (ex: http://1.2.3.4:8080)" http_proxy
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
@@ -549,7 +362,7 @@ modify_hosts
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
 read -p "Please press Enter when ready."
-chmod +x ./test_config.py && ./test_config.py
+chmod +x ./src/domogik/install/test_config.py && ./src/domogik/install/test_config.py
 if [ "$SUDO_USER" ];then
     [ -d "$HOME/.python-eggs" ] && chown -R $SUDO_USER: $HOME/.python-eggs/ 
 else
