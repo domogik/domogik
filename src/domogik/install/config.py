@@ -96,8 +96,6 @@ def write_configfile(advanced_mode):
                     # need to write it to config file
                     config.set(sect, item[0], newValue)
                     newvalues = True
-            else:
-                break
     if newvalues:
         # write the config file
         with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
