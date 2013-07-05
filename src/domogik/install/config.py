@@ -109,12 +109,18 @@ def config():
                           dest="adv",
                           default=False, \
                           help="Run in advanced mode")
+    parser.add_argument("-notest",
+                          action="store_true",
+                          dest="notest",
+                          default=False, \
+                          help="Don't test the config")
+ 
     options = parser.parse_args()
-    print(options)
     try:
         am_i_root()
         write_configfile(options.adv)
-        test_config()
+        if not options.notest:
+            test_config()
     except:
         fail(sys.exc_info())
 
