@@ -279,20 +279,23 @@ def test_hostname():
     else:
         ok("Hostname characters are OK")
 
-try:
-    am_i_root()
-    test_imports()
-    test_hostname()
-    test_config_files()
-    test_init()
-    test_version()
-    print("\n\n")
-    ok("================================================== <==")
-    ok(" Everything seems ok, you should be able to start  <==")
-    ok("      Domogik with /etc/init.d/domogik start       <==")
-    ok("            or /etc/rc.d/domogik start             <==")
-    ok(" You can now install Domoweb User Interface        <==")
-    ok("================================================== <==")
-except:
-    fail(sys.exc_info()[1])
+def test_config():
+    try:
+        am_i_root()
+        test_imports()
+        test_hostname()
+        test_config_files()
+        test_init()
+        test_version()
+        print("\n\n")
+        ok("================================================== <==")
+        ok(" Everything seems ok, you should be able to start  <==")
+        ok("      Domogik with /etc/init.d/domogik start       <==")
+        ok("            or /etc/rc.d/domogik start             <==")
+        ok(" You can now install Domoweb User Interface        <==")
+        ok("================================================== <==")
+    except:
+        fail(sys.exc_info()[1])
 
+if __name__ == "__main__":
+    test_config()
