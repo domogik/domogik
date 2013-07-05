@@ -38,6 +38,7 @@ import os
 import pwd
 import sys
 import ConfigParser
+from argparse import ArgumentParser
 from multiprocessing import Process, Pipe
 from socket import gethostbyname, gethostname
 from domogik.install.test_config import test_config
@@ -48,7 +49,23 @@ WARNING = '\033[93m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
 
-user = ''
+def is_advanced(advanced_mode, sect, key):
+    advanced_keys = {
+        'domogik': ['libraries_path', 'src_prefix', 'log_dir_path', 'pid_dir_path', 'broadcast'],
+        'database': ['db_prefix'],
+        'rest': ['rest_server_port', 'rest_use_ssl', 'rest_ssl_certificate'],
+        'mq': ['req_rep_port', 'pub_port', 'sub_port'],
+    }
+    if advanced_mode:
+        return True
+    else:
+        if sect not in advanced_keys:
+            return True
+        else:
+            if key not in advanced_keys[sect]:
+                return True
+            else:
+                return False
 
 def info(msg):
     print("%s [ %s ] %s" % (BLUE,msg,ENDC))
@@ -58,15 +75,13 @@ def warning(msg):
     print("%s ==> %s  %s" % (WARNING,msg,ENDC))
 def fail(msg):
     print("%s ==> %s  %s" % (FAIL,msg,ENDC))
-def getInput(sect, item, value):
-    newvalue = input ("Key {0} [{1}]: ".format(item, value))
 
 def am_i_root():
     info("Check this script is started as root")
     assert os.getuid() == 0, "This script must be started as root"
     ok("Correctly started with root privileges.")
 
-def write_configfile():
+def write_configfile(advanced_mode):
     # read the config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
@@ -74,12 +89,15 @@ def write_configfile():
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            print("Key {0} [{1}]: ".format(item[0], item[1])),
-            newValue = sys.stdin.readline().rstrip('\n')
-            if newValue != item[1] and newValue != '':
-                # need to write it to config file
-                config.set(sect, item[0], newValue)
-                newvalues = True
+            if is_advanced(advanced_mode, sect, item[0]):
+                print("Key {0} [{1}]: ".format(item[0], item[1])),
+                newValue = sys.stdin.readline().rstrip('\n')
+                if newValue != item[1] and newValue != '':
+                    # need to write it to config file
+                    config.set(sect, item[0], newValue)
+                    newvalues = True
+            else:
+                break
     if newvalues:
         # write the config file
         with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
@@ -87,12 +105,20 @@ def write_configfile():
             config.write(configfile)     
     
 def config():
+    parser = ArgumentParser()
+    parser.add_argument("-a",
+                          action="store_true",
+                          dest="adv",
+                          default=False, \
+                          help="Run in advanced mode")
+    options = parser.parse_args()
+    print(options)
     try:
         am_i_root()
-        write_configfile()
+        write_configfile(options.adv)
         test_config()
     except:
-        fail(sys.exc_info()[1])
+        fail(sys.exc_info())
 
 
 if __name__ == "__main__":
