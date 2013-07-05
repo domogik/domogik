@@ -1,0 +1,32 @@
+============================
+Plugin json file : info.json
+============================
+
+The **info.json** file is maybe the most important part of a plugin : it will describe the plugin, the configuration items and all interactions with xPL world. This file is divided in several sections: ::
+
+    {
+        "json_version": 2,
+        "identity": {...},
+        "configuration": [...],
+        "commands": [...],
+        "xpl_commands": [...],
+        "sensors": {...},
+        "xpl_stats": {...},
+        "device_types": {...},
+        "udev_rules": [...]
+        "products": [...],
+    }
+
+
+The **json_version** must be set to **2** for Domogik 0.4 compliant plugins.
+
+.. warning ::
+   In json, you must write *\\n* each time you want to create a newline in the data.
+
+You will find detailed instructions about each part in this chapters:
+
+* :doc:`identity <identity>`
+* :doc:`configuration <configuration>`
+* ...
+* :doc:`udev_rules <udev_rules>`
+

@@ -1,0 +1,53 @@
+==================
+Plugin binary part
+==================
+
+
+TODO : "helpers" for special pages
+
+
+Purpose
+=======
+
+The binary part of a plugin will in all cases be a single file. Assuming your plugin name is *myplugin*, the file name will be **bin/myplugin.py**.
+
+This file is the gateway between the library and Domogik. Basically it will:
+
+* import the needed libraries
+* check if the plugin is configured
+* get the plugin configuration values
+* instantiate the library class
+* use the library and thanks to callback functions communicate wih Domogik
+* set the plugin as ready when it is fully started
+
+
+Depending on your plugin, more actions may be done:
+
+* after getting the configuration, get the devices list from the database (over the MQ). This is needed when the plugin can't know the devices addresses, for example a yeather plugin don't know in which town you live, so it will check the yeather for already created devices.
+* register a newly detected device. For example, if a new sensor is plugged on your onewire network or if you add a new temperature sensor compliant with RFXCOM devices, the related plugins (*onewire* and *rfxcom*) will be able to detect the new devices, and if the device is not known, it will be registered, so a notification will be send to the user interfaces over MQ.
+
+XplPlugin and its usefull functions
+===================================
+
+TODO : overview
+
+Hidden but usefull features
+---------------------------
+
+TODO : check plugin not laucnhed, status, ...
+
+On demande features
+-------------------
+
+TODO : ready, config, library, packages, resources, data getter functions
+
+TODO : logging, force_leave,
+
+TODO : MQ usage
+
+Create the binary part
+======================
+
+TODO : example template for a dummy plugin
+
+

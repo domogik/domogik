@@ -274,7 +274,7 @@ class PackageJson():
         print("Name                : %s" % self.json["identity"]["name"])
         print("Package id          : %s" % self.json["identity"]["package_id"])
         print("Version             : %s" % self.json["identity"]["version"])
-        print("Category            : %s" % self.json["identity"]["category"])
+        print("Tags                : %s" % self.json["identity"]["tags"])
         print("Link for doc        : %s" % self.json["identity"]["documentation"])
         print("Description         : %s" % self.json["identity"]["description"])
         print("Changelog           : %s" % self.json["identity"]["changelog"])
