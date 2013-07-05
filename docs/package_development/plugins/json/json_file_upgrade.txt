@@ -12,11 +12,15 @@ TODO : finish
 
 * configuration
 
+  * id => sort
+  * minus => underscore in keys
   * yes/no => true/false
   * empty => null
   * no more interface
   * optionnal => required
-  * startup-plugin => auto-startup
+  * startup-plugin => auto_startup
+  * ajout de name
+  * option optionnelles en fonction de type
 
 * no more files section
 * identity
