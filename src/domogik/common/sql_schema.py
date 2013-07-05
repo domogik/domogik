@@ -137,7 +137,7 @@ class Device(Base):
         """Return an internal representation of the class"""
         return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type, self.commands, \
+                  self.device_type_id, self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod
