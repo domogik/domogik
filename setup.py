@@ -157,7 +157,7 @@ setup(
         ]
     },
     data_files = d_files,
-    scripts=['install.sh'],
+    scripts=[],
     entry_points = {
         'console_scripts': [
             """
@@ -172,6 +172,8 @@ setup(
             dmg_forwarder = domogik.mq.pubsub.forwarder:main
             dmg_insert_data = domogik.tools.packages.insert_data:main
             dmg_review = domogik.tools.packages.review.review:main
+            dmg_config = domogik.install.config:config
+            dmg_test_config = domogik.install.test_config:test_config
             """
         ],
     },
