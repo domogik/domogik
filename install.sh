@@ -121,5 +121,5 @@ if [ "x$http_proxy" != "x" ];then
 fi
 create_domogik_user
 python src/domogik/install/config.py -notest
-python src/domogik/install/installer.py $d_user
+python src/domogik/install/installer.py
 python src/domogik/install/test_config.py
