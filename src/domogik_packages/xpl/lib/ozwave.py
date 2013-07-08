@@ -731,10 +731,15 @@ class OZWavemanager(threading.Thread):
         """Transmet une action controlleur au controlleur primaire."""
         print ('********************** handle_ControllerAction ***********')
         print 'Action : ',  action
-        self._ctrlActProgress = action   
-        retval = self._controller.handle_Action(action)
-        return retval
-    
+        if self._controller :
+            self._ctrlActProgress = action   
+            retval = self._controller.handle_Action(action)
+        else :
+            self._ctrlActProgress = None
+            retval = action
+            retval.update({'cmdstate': 'not running' , 'error': 'not controller', 'error_msg': 'check your controller.'})
+        return retval    
+        
     def  handle_ControllerSoftReset(self):
         """Transmmet le soft resset au controlleur primaire."""
         retval = {'error': ''}
@@ -829,6 +834,30 @@ class OZWavemanager(threading.Thread):
             else : return {"error" : "Unknown Node %d" % nodeId}
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
         
+    def refreshNodeDynamic(self,  nodeId):
+        """ Force un rafraichissement des informations du node depuis le reseaux zwave"""
+        if self.ready :
+            node = self._getNode(self.homeId,  nodeId)
+            if node : return node.requestNodeDynamic()
+            else : return {"error" : "Unknown Node %d" % nodeId}
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
+        
+    def refreshNodeInfo(self,  nodeId):
+        """ Force un rafraichissement des informations du node depuis le reseaux zwave"""
+        if self.ready :
+            node = self._getNode(self.homeId,  nodeId)
+            if node : return node.requestNodeInfo()
+            else : return {"error" : "Unknown Node %d" % nodeId}
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
+        
+    def refreshNodeState(self,  nodeId):
+        """ Force un rafraichissement des informations primaires du node depuis le reseaux zwave"""
+        if self.ready :
+            node = self._getNode(self.homeId,  nodeId)
+            if node : return node.requestNodeState()
+            else : return {"error" : "Unknown Node %d" % nodeId}
+        else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
+
     def getNodeValuesInfos(self,  nodeId):
         """ Retourne les informations de values d'un device, format dict{} """
         retval = {}
@@ -999,6 +1028,22 @@ class OZWavemanager(threading.Thread):
             elif message['request'] == 'GetNodeInfo' :
                 if self._IsNodeId(message['node']):
                     report = self.getNodeInfos(message['node'])
+                else : report = {'error':  'Invalide nodeId format.'}
+                ackMsg['node'] = message['node']
+                print "Refresh node :", report
+            elif message['request'] == 'RefreshNodeDynamic' :
+                if self._IsNodeId(message['node']):
+                    report = self.refreshNodeDynamic(message['node'])
+                else : report = {'error':  'Invalide nodeId format.'}
+                ackMsg['node'] = message['node']
+            elif message['request'] == 'RefreshNodeInfo' :
+                if self._IsNodeId(message['node']):
+                    report = self.refreshNodeInfo(message['node'])
+                else : report = {'error':  'Invalide nodeId format.'}
+                ackMsg['node'] = message['node']
+            elif message['request'] == 'RefreshNodeState' :
+                if self._IsNodeId(message['node']):
+                    report = self.refreshNodeState(message['node'])
                 else : report = {'error':  'Invalide nodeId format.'}
                 ackMsg['node'] = message['node']
                 print "Refresh node :", report

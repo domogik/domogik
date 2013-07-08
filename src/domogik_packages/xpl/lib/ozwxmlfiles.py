@@ -231,7 +231,10 @@ class Manufacturers():
             try:
                 for p in m['products']:
                     if p['name'] not in products :
-                        products.append(p['name'])
+                        prod = {'name': p['name']}
+                        if p.has_key('config') :
+                            prod .update({'config': p['config']})
+                        products.append(prod)
             except: pass
             manufacturers.append({'manufacturer': m['name'],  'products': products})
         return manufacturers
