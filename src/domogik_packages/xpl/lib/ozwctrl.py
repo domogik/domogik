@@ -237,8 +237,8 @@ controller to learn new data.
         """Gestion des actions du controlleur et des messages de retour"""    
         retval = action
         retval['error'] = ''
-        errorCom = {'cmdstate': 'not running' , 'error': 'not started', 'message': 'check your controller.'}
-        errorNode ={'cmdstate': 'not running',  'error': 'Unknown node : ' + str(action['nodeid']), 'message': 'check input options.'}
+        errorCom = {'cmdstate': 'not running' , 'error': 'not started', 'error_msg': 'check your controller.'}
+        errorNode ={'cmdstate': 'not running',  'error': 'Unknown node : ' + str(action['nodeid']), 'error_msg': 'check input options.'}
         if action['highpower'] =='True' : highpower = True
         else : highpower = False
         if action['cmd'] == 'Stop action' :
@@ -247,11 +247,13 @@ controller to learn new data.
                 retval['error'] = ''
                 retval['message'] = 'User have stop command.'
             else :
-                retval['cmdstate'] ='not running'
                 retval['error'] = 'Fail to stop controller commande'
                 if self._lastCtrlState['state'] == self.SIGNAL_CTRL_NORMAL : 
-                    retval['message'] = 'User have try stop command. But no action processing.'
-                else : retval['message'] = 'User have try stop command. ' + self._lastCtrlState['message'] 
+                    retval['cmdstate'] ='not running'
+                    retval['error_msg'] = 'User have try stop command. But no action processing.'
+                else : 
+                    retval['cmdstate'] ='running'
+                    retval['error_msg'] = 'User have try stop command. ' + self._lastCtrlState['message'] 
         elif action['cmd'] == 'Start action' :
             retval['cmdstate'] ='TODO'
             retval['message'] ='Command will be root soon as possible, be patient....'
@@ -285,7 +287,7 @@ controller to learn new data.
                 
             elif action['action'] =='RemoveFailedNode':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
@@ -299,7 +301,7 @@ controller to learn new data.
                 
             elif action['action'] =='HasNodeFailed':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
@@ -313,7 +315,7 @@ controller to learn new data.
                     
             elif action['action'] =='ReplaceFailedNode':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
@@ -339,7 +341,7 @@ controller to learn new data.
                     
             elif action['action'] =='RequestNodeNeighborUpdate':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
@@ -353,29 +355,29 @@ controller to learn new data.
  
             elif action['action'] =='AssignReturnRoute':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
                     node = self._ozwmanager._getNode(self.homeId, action['nodeid'])
-                if action['arg'] == 0 :
-                    self._log.error('No action.arg for controleur command, quit')
+                if not action['arg']  or action['arg'] not in range (1,  255) :
+                    self._ozwmanager._log.error('No action.arg for controleur command, quit')
                     print ('ERROR : No action.arg for controleur command, quit')
                     nodeDest = None
                 else :
                     nodeDest = self._ozwmanager._getNode(self.homeId, action['arg'])
-                if node :
-                    if self.begin_command_assign_return_route(action['nodeid'],  action['arg'][0]) :
+                if node and nodeDest :
+                    if self.begin_command_assign_return_route(action['nodeid'],  action['arg']) :
                         retval['cmdstate'] ='running'
                         retval['message'] ='Wait for route assign, be patient....'
                     else : retval.update(errorCom)
                 else : 
                     retval.update(errorNode)
-                    retval['error'] = retval['error'] + ' and (or) node to : ' + action['arg']
+                    retval['error'] = retval['error'] + ' and (or) node to : ' + str(action['arg'])
 
             elif action['action'] =='DeleteAllReturnRoutes':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
@@ -389,7 +391,7 @@ controller to learn new data.
  
             elif action['action'] =='SendNodeInformation':
                 if action['nodeid'] == 0 :
-                    self._log.error('No action.nodeid for controleur command, quit')
+                    self._ozwmanager._log.error('No action.nodeid for controleur command, quit')
                     print ('ERROR : No action.nodeid for controleur command, quit')
                     node = None
                 else :
@@ -434,7 +436,7 @@ controller to learn new data.
         return retval
         
     def _getValue(self, valueId):
-        """Return l'objet Value correspondant au valueId"""
+        """Retourn l'objet Value correspondant au valueId"""
         retval= None
         for node in self._nodes.values():
             if node._values.has_key(valueId):
@@ -713,7 +715,9 @@ controller to learn new data.
         Cancels any in-progress command running on a controller.
 
         """
-        self._manager.cancelControllerCommand(self.homeId)
+        retval = self._manager.cancelControllerCommand(self.homeId)
+        print '************* cancel ctrl action ************** ', retval 
+        return retval
         
     def checkActionCtrl(self):
         """

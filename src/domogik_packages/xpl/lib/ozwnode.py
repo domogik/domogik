@@ -242,6 +242,27 @@ class ZWaveNode:
         for v in self._values :
             size += self._values[v].getMemoryUsage()
         return size
+        
+    def  requestNodeDynamic(self)  :
+        """Force un rafraichissement des informations du node depuis le reseaux zwave"""
+        if self._manager.requestNodeDynamic(self._homeId,  self._nodeId):
+            return {'erreur': ""}
+        else :
+            return {'erreur': "Failed request refresh node %d Dynamic." % self._nodeId}
+
+    def  requestNodeInfo(self)  :
+        """Force un rafraichissement des informations du node depuis le reseaux zwave"""
+        if self._manager.refreshNodeInfo(self._homeId,  self._nodeId):
+            return {'erreur': ""}
+        else :
+            return {'erreur': "Failed request refresh node %d information." % self._nodeId}
+
+    def  requestNodeState(self) :
+        """Force un rafraichissement des valeurs primaires du node depuis le reseaux zwave"""
+        if self._manager.requestNodeState(self._homeId,  self._nodeId):
+            return {'erreur': ""}
+        else :
+            return {'erreur': "Failed request node %d state." % self._nodeId}
 
 # Fonction de renvoie des valeurs des valueNode en fonction des Cmd CLASS zwave
 # C'est ici qu'il faut enrichire la prise en compte des fonctions Zwave
