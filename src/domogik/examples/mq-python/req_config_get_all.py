@@ -10,6 +10,6 @@ msg = MQMessage()
 msg.set_action('config.get')
 msg.add_data('type', 'plugin')
 msg.add_data('host', 'darkstar')
-msg.add_data('id', 'diskfree')
+msg.add_data('name', 'diskfree')
 print cli.request('dbmgr', msg.get(), timeout=10).get()
 

@@ -48,7 +48,7 @@ To get *one* configuration elements, the clients may send a MQ request *config.g
 
     request : config.get
     data : type = plugin
-           id = <plugin id>
+           name = <plugin name>
            host = <hostname>
            key = <configuration key>
 
@@ -56,21 +56,21 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['config.result', '{"status": true, "reason": "", "value": 5, "host": "darkstar", "key": "interval", "type": "plugin", "id": "diskfree"}']
+    ['config.result', '{"status": true, "reason": "", "value": 5, "host": "darkstar", "key": "interval", "type": "plugin", "name": "diskfree"}']
 
 To get *all* configuration elements for a plugin, you can use the same MQ request without the *key* element. 
 ll the values will be returned as a json dictionnary in the *data* key :
 
     request : config.get
     data : type = plugin
-           id = <plugin id>
+           name = <plugin name>
            host = <hostname>
 
 An example to send the request is available as *src/domogik/examples/mq-python/req_config_get_all.py*.
 
 You will get a reply like this: ::
 
-    ['config.result', '{"status": true, "type": "plugin", "reason": "", "host": "darkstar", "key": "*", "data": {"interval": 5, "configured": true, ....}, "id": "diskfree"}']
+    ['config.result', '{"status": true, "type": "plugin", "reason": "", "host": "darkstar", "key": "*", "data": {"interval": 5, "configured": true, ....}, "name": "diskfree"}']
 
 
 config.set
@@ -83,7 +83,7 @@ To set values the configuration elements, the UI may send a MQ request *config.s
 
     request : config.set
     data : type = plugin
-           id = <plugin id>
+           name = <plugin name>
            host = <hostname>
            data = <dictionnary : { 'key1' : 'value1', 'key2' : 'value2', ....} >
 
@@ -93,7 +93,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "id": "diskfree"}']
+    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "name": "diskfree"}']
 
 
 config.delete
@@ -102,18 +102,18 @@ config.delete
 Request : UIs
 Reply : dbmgr
 
-To delete all the values for a type/id/host configuration elements, the UI may send a MQ request *config.delete* to the dbmgr: ::
+To delete all the values for a type/name/host configuration elements, the UI may send a MQ request *config.delete* to the dbmgr: ::
 
     request : config.delete
     data : type = plugin
-           id = <plugin id>
+           name = <plugin name>
            host = <hostname>
 
 An example to send the request is available as *src/domogik/examples/mq-python/req_config_delete.py*.
 
 You will get a reply like this: ::
 
-    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "id": "diskfree"}']
+    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "name": "diskfree"}']
 
 
 device_types.get
@@ -162,7 +162,7 @@ Reply : manager
 To request a plugin to start, the UI may send a MQ request *plugin.start.do* to the manager: ::
 
     request : plugin.start.do
-    data : id = <plugin id : ipx800, 1wire, ...>
+    data : name = <plugin name : ipx800, 1wire, ...>
 
 To get updates on the plugin status after the request, the UI should subscribe to the appropriate MQ publisher : *plugin.status*.
 
@@ -170,7 +170,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['plugin.start.result', '{"status": true, "reason": "", "host": "darkstar", "key": "startup", "type": "plugin", "id": "diskfree"}']
+    ['plugin.start.result', '{"status": true, "reason": "", "host": "darkstar", "key": "startup", "type": "plugin", "name": "diskfree"}']
 
 
 
@@ -183,7 +183,7 @@ Reply : the plugin to stop
 To request a plugin to stop, the UI may send a MQ request *plugin.start.do* to the plugin: ::
 
     request : plugin.stop.do
-    data : id = <plugin id : ipx800, 1wire, ...>
+    data : name = <plugin name : ipx800, 1wire, ...>
 
 To get updates on the plugin status after the request, the UI should subscribe to the appropriate MQ publisher : *plugin.status*.
 
@@ -191,7 +191,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['plugin.stop.result', '{"status": true, "reason": "", "host": "darkstar", "key": "configured", "type": "plugin", "id": "diskfree"}']
+    ['plugin.stop.result', '{"status": true, "reason": "", "host": "darkstar", "key": "configured", "type": "plugin", "name": "diskfree"}']
 
 
 
