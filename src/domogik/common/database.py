@@ -142,7 +142,8 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', 
                                                              pool_recycle=7200, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
-            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True, autocommit=True)
+            #DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True, autocommit=True)
+            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
         self.__session = DbHelper.__session_object()
 
     def get_engine(self):
@@ -243,6 +244,7 @@ class DbHelper():
         @return : the added / updated PluginConfig item
 
         """
+        print "@@@@@@  %s  /   %s   /   %s  /    %s" % ( pl_id, pl_hostname, pl_key, pl_value)
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         plugin_config = self.__session.query(
@@ -258,7 +260,7 @@ class DbHelper():
         try:
             self.__session.commit()
         except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return plugin_config
 
     def del_plugin_config(self, pl_id, pl_hostname):
