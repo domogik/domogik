@@ -9,6 +9,6 @@ cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('devices.get')
 msg.add_data('type', 'plugin')
-msg.add_data('id', 'diskfree')
+msg.add_data('name', 'velbus')
 print cli.request('dbmgr', msg.get(), timeout=10).get()
 

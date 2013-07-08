@@ -237,7 +237,7 @@ class DBConnector(XplPlugin, MQRep):
                     self._db.set_plugin_config(name, host, key, data[key])
                 self.publish_config_updated(type, name, host)
             except:
-                reason = "Error while setting configuration for '{0} {1} on {2}, key {3}' : {4}".format(type, name, host, key, traceback.format_exc())
+                reason = "Error while setting configuration for '{0} {1} on {2}' : {3}".format(type, name, host, traceback.format_exc())
                 status = False
                 self.log.error(reason)
 
@@ -336,9 +336,6 @@ class DBConnector(XplPlugin, MQRep):
         """ Reply to devices.get MQ req
             @param data : MQ req message
         """
-
-        # TODO : NOT FINISHED
-
         msg = MQMessage()
         msg.set_action('devices.result')
         status = True

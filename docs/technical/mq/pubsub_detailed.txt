@@ -19,11 +19,11 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    {"host": "darkstar", "type": "plugin", "id": "diskfree", "event": "updated"}
+    {"host": "darkstar", "type": "plugin", "name": "diskfree", "event": "updated"}
 
 The only *event* value is *updated*.
 
-In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.configuration* category and when a message is catched, if *type == 'plugin' and id == <plugin id> and host = <hostname>* then the plugin configuration in database is reloaded (in order the *clients.detail* message to be updated)
+In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.configuration* category and when a message is catched, if *type == 'plugin' and name == <plugin name> and host = <hostname>* then the plugin configuration in database is reloaded (in order the *clients.detail* message to be updated)
 
 
 plugin.status
@@ -42,7 +42,7 @@ For example, on plugin startup (see XplPlugin.__init__()), a plugin sends the *S
 
     self._pub.send_event('plugin.status',
                          {"type" : "plugin",
-                          "id" : self._name,
+                          "name" : self._name,
                           "host" : self.get_sanitized_hostname(),
                           "event" : STATUS_STARTING})
 
@@ -50,11 +50,11 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    {"host": "darkstar", "type": "plugin", "id": "diskfree", "event": "alive"}
+    {"host": "darkstar", "type": "plugin", "name": "diskfree", "event": "alive"}
 
 Find here `:doc:the full list of available status.</technical/plugins/index>`
 
-In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.status* category and when a message is catched, if *type == 'plugin' and id == <plugin id>* then the plugin status is set to the catched value.
+In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.status* category and when a message is catched, if *type == 'plugin' and name == <plugin name>* then the plugin status is set to the catched value.
 
 
 clients.list
@@ -72,7 +72,7 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "id": "diskfree"}}
+    {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "name": "diskfree"}}
 
 clients.detail
 ==============
