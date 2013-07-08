@@ -32,7 +32,6 @@
 #@organization: Domogik
 
 # Manage options
-
 function display_usage {
     echo "Usage : "
     echo "  Full installation : ./install.sh"
@@ -42,7 +41,6 @@ function display_usage {
     echo "         ./install.sh --help"
 }
 
-MAIN_INSTALL=y
 DOMOGIK_XPL_HUB=python
 while [ "$1" ] ; do 
     arg=$1
@@ -67,14 +65,6 @@ while [ "$1" ] ; do
     shift
 done
 
-
-DMG_HOME=
-
-DMG_ETC=/etc/domogik
-DMG_CACHE=/var/cache/domogik
-DMG_LIB=/var/lib/domogik
-DMG_LOCK=/var/lock/domogik
-
 function stop_domogik {
     if [ -f "/etc/init.d/domogik" -o -f "/etc/rc.d/domogik" ];then
         if [ -d "/var/run/domogik" ];then
@@ -86,28 +76,6 @@ function stop_domogik {
             fi
         fi
     fi
-}
-
-function run_setup_py {
-    MODE=$1
-    case $MODE in
-        develop|install)
-            if [ -f "setup.py" ];then
-                python ./ez_setup.py
-                python ./setup.py $MODE
-                if [ "x$?" != "x0" ];then
-                    echo "setup.py script exists with a non 0 return value : $?"
-                    exit 13
-                fi
-            else
-                echo "Can't find setup.py, did you download the sources correctly? "
-                exit 1
-            fi
-        ;;
-        *)
-            echo "Only develop and install modes are available"
-        ;;
-    esac
 }
 
 function create_domogik_user {
@@ -125,15 +93,6 @@ function create_domogik_user {
     fi
 }
 
-function call_app_installer {
-    echo "** Calling Application Installer"
-    /bin/su -c "python ./src/domogik/install/installer.py" $d_user
-    if [ $? -ne 0 ];then
-        echo "ERROR : An error occured during app_installer execution, read the previous lines for detail."
-        exit 1
-    fi
-}
-
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
@@ -148,24 +107,19 @@ if [ "$(pwd | cut -d"/" -f2)" == "root" ];then
     exit 20
 fi
 
-MODE=develop
 stop_domogik
-run_setup_py $MODE
+python ez_setup.py
+python setup.py develop
+if [ "x$?" != "x0" ];then
+    echo "setup.py script exists with a non 0 return value : $?"
+    exit 13
+fi
 
 read -p "If you want to use a proxy, please set it now. It will only be used during installation. (ex: http://1.2.3.4:8080)" http_proxy
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
-#this is needed now only because of old bug (#792) and should be useless for new install
-if [ "$SUDO_USER" ];then
-    trap "[ -d \"$HOME/.python-eggs\" ] && chown -R $SUDO_USER: $HOME/.python-eggs" EXIT
-    [ -d "$HOME/.python-eggs" ] && chown -R $SUDO_USER: $HOME/.python-eggs/ 
-else
-    trap "[ -d \"$HOME/.python-eggs\" ] && chown -R $USER: $HOME/.python-eggs" EXIT
-    [ -d "$HOME/.python-eggs" ] && chown -R $USER: $HOME/.python-eggs/ 
-fi
-
 create_domogik_user
 python src/domogik/install/config.py -notest
-call_app_installer
+python src/domogik/install/installer.py
 python src/domogik/install/test_config.py
