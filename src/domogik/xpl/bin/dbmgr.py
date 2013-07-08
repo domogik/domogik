@@ -336,9 +336,6 @@ class DBConnector(XplPlugin, MQRep):
         """ Reply to devices.get MQ req
             @param data : MQ req message
         """
-
-        # TODO : NOT FINISHED
-
         msg = MQMessage()
         msg.set_action('devices.result')
         status = True
