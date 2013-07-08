@@ -199,6 +199,7 @@ class deviceAPI(MethodView):
         b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             type_id=request.form.get('type_id'),
+            plugin_id=request.form.get('plugin_id'),
             description=request.form.get('description'),
             reference=request.form.get('reference'),
             pjson=pjson
@@ -209,7 +210,6 @@ class deviceAPI(MethodView):
         b = urlHandler.db.update_device(
             did,
             request.form.get('name'),
-            request.form.get('type_id'),
             request.form.get('description'),
             request.form.get('reference'),
         )

@@ -319,6 +319,9 @@ class DbHelper():
         """
         return self.__session.query(Device).filter(Device.address==None).all()
 
+    def list_devices_by_plugin(self, p_id):
+        return self.__session.query(Device).filter_by(plugin_id=p_id).all()
+
     def list_old_devices(self):
         """Return a list of devices
         @return a list of Device objects (only the devices that are inot known by this realease)
@@ -334,11 +337,11 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def add_device_and_commands(self, name, type_id, description, reference, pjson):
+    def add_device_and_commands(self, name, type_id, plugin_id, description, reference, pjson):
         # first add the device itself
         self.__session.expire_all()
         self.__session.begin(subtransactions=True)
-        dev = Device(name=name, device_type_id=type_id, description=description, reference=reference)
+        dev = Device(name=name, device_type_id=type_id, plugin_id=plugin_id, description=description, reference=reference)
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
@@ -450,11 +453,12 @@ class DbHelper():
         d = self.get_device(dev.id)
         return d
 
-    def add_device(self, d_name, d_type_id, d_description=None, d_reference=None):
+    def add_device(self, d_name, d_type_id, d_plugin_id, d_description=None, d_reference=None):
         """Add a device item
 
         @param d_name : name of the device
         @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param d_plugin_id : the plugin that controls this device
         @param d_description : extended device description, optional
         @param d_reference : device reference (ex. AM12 for x10), optional
         @return the new Device object
@@ -464,7 +468,7 @@ class DbHelper():
         self.__session.expire_all()
         self.__session.begin(subtransactions=True)
         device = Device(name=d_name, description=d_description, reference=d_reference, \
-                        device_type_id=d_type_id)
+                        device_type_id=d_type_id, plugin_id=d_plugin_id)
         self.__session.add(device)
         try:
             self.__session.commit()
