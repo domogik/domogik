@@ -190,7 +190,7 @@ class deviceAPI(MethodView):
         cli = MQSyncReq(urlHandler.zmq_context)
         msg = MQMessage()
         msg.set_action('device_types.get')
-        msg.add_data('device_type', dev_type_id)
+        msg.add_data('device_type', request.form.get('type_id') )
         res = cli.request('manager', msg.get(), timeout=10)
         if res is None:
             return "Bad device type"
