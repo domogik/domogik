@@ -101,6 +101,14 @@ def write_configfile(advanced_mode):
         with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
             ok("Writing the config file")
             config.write(configfile)     
+
+def needupdate():
+    print("Do you want to keep your current config file? [Y/n]: "),
+    newValue = sys.stdin.readline().rstrip('\n')
+    if newValue == "y" or newValue == "Y" or newValue == '':
+        return False
+    else:
+        return True
     
 def config():
     parser = ArgumentParser()
@@ -118,7 +126,8 @@ def config():
     options = parser.parse_args()
     try:
         am_i_root()
-        write_configfile(options.adv)
+        if needupdate():
+            write_configfile(options.adv)
         if not options.notest:
             test_config()
     except:
