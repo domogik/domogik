@@ -37,6 +37,13 @@ def upgrade(migrate_engine):
     if database_utils.column_exists(migrate_engine, Device.__tablename__, 'address'):
         dev = Table(Device.__tablename__, meta, autoload=True)
         dev.c.address.alter(nullable=True)
+    # add plugin_id field
+    if not database_utils.column_exists(migrate_engine, Device.__tablename__, 'plugin_id'):
+        dev = Table(Device.__tablename__, meta, autoload=True)
+        p = Column('plugin_id', Unicode(80), nullable=False) 
+        p.create(dev, populate_default=True)
+        p = None
+        dev = None
     # delete some foreign keys
     dev = Table(Device.__tablename__, meta, autoload=True)
     devu = Table('core_device_usage', meta, autoload=True)
@@ -46,7 +53,7 @@ def upgrade(migrate_engine):
     cons = ForeignKeyConstraint([dev.c.device_type_id], [devt.c.id], name='core_device_ibfk_2').drop()
     cons = ForeignKeyConstraint([devt.c.device_technology_id], [devtt.c.id], name='core_device_type_ibfk_1').drop()
     dev.c.device_usage_id.drop()
-    dev.c.device_type_id.drop()
+    #dev.c.device_type_id.drop()
     # drop device_usage in device table and the table itself
     #if database_utils.table_exists(migrate_engine, "core_device_feature_association"):
     #    devt = Table('core_device_feature_association', meta, autoload=True)

@@ -190,7 +190,7 @@ class deviceAPI(MethodView):
         cli = MQSyncReq(urlHandler.zmq_context)
         msg = MQMessage()
         msg.set_action('device_types.get')
-        msg.add_data('device_type', dev_type_id)
+        msg.add_data('device_type', request.form.get('type_id') )
         res = cli.request('manager', msg.get(), timeout=10)
         if res is None:
             return "Bad device type"
@@ -199,6 +199,7 @@ class deviceAPI(MethodView):
         b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             type_id=request.form.get('type_id'),
+            plugin_id=request.form.get('plugin_id'),
             description=request.form.get('description'),
             reference=request.form.get('reference'),
             pjson=pjson
@@ -209,7 +210,6 @@ class deviceAPI(MethodView):
         b = urlHandler.db.update_device(
             did,
             request.form.get('name'),
-            request.form.get('type_id'),
             request.form.get('description'),
             request.form.get('reference'),
         )
