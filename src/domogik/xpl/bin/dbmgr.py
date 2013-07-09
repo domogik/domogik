@@ -355,7 +355,7 @@ class DBConnector(XplPlugin, MQRep):
             reason = ""
             type = msg_data['type']
             name = msg_data['name']
-            dev_list = self._db.list_devices()
+            dev_list = self._db.list_devices_by_plugin("{0}-{1}".format(type, name))
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('type', type)
