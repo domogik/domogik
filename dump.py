@@ -26,6 +26,7 @@ class MQSniffer(MQAsyncSub):
     def on_message(self, msgid, content):
         print("New pub message {0}".format(msgid))
         print("{0}".format(content))
+        print("")
 
 def main():
     s = MQSniffer()

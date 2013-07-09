@@ -260,6 +260,7 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.info("Worker replied {0}".format(mwg))
         ret_id = rp[0]
         wrep = self._workers[ret_id]
         service = wrep.service
@@ -373,6 +374,7 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.debug("Client message received: {0}".format(msg))
         service = msg.pop(0)
         if service.startswith(b'mmi.'):
             self.on_mmi(rp, service, msg)
@@ -441,7 +443,6 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        self.log.debug("Message received: {0}".format(msg))
         rp, msg = split_address(msg)
         # dispatch on first frame after path
         t = msg.pop(0)
