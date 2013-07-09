@@ -82,15 +82,15 @@ else:
 
 # install c-hub files
 hub = {
-    'x86_64' : 'src/domogik/xpl/tools/64bit/',
-    'i686' : 'src/domogik/xpl/tools/32bit/',
-    'arm' : 'src/domogik/xpl/tools/arm/',
-    'armv5tel' : 'src/domogik/xpl/tools/arm/',
-    'armv6l' : 'src/domogik/xpl/tools/arm/'
+    'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
+    'i686' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
+    'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub',
+    'armv5tel' : 'src/domogik/xpl/tools/arm/xPL_Hub',
+    'armv6l' : 'src/domogik/xpl/tools/arm/xPL_Hub'
 }
 arch = platform.machine()
 if arch in hub.keys():
-    d_files.append(('/usr/sbin/', hub[arch]))
+    d_files.append(('/usr/sbin/', [hub[arch]]))
 else:
     print("*************** WARNING ***************")
     print("* Can't find an xPL Hub for your arch *")
@@ -112,6 +112,7 @@ setup(
     install_requires=['setuptools', 
                       'sqlalchemy == 0.7.9',
                       'sqlalchemy-migrate >= 0.7.2',
+                      'alembic',
                       'simplejson >= 1.9.2',
                       'pyOpenSSL >= 0.10', 
                       'httplib2 >= 0.6.0', 
@@ -130,14 +131,12 @@ setup(
     zip_safe = False,
     license = 'GPL v3',
     include_package_data = True,
-    packages = find_packages('src'),
-    package_dir = { 
-        '': 'src'
-    },
+    packages = ['domogik'],
+    package_dir = { 'domogik': 'src/domogik' },
     test_suite = 'domogik.tests',
     package_data = {
         'domogik': [
-            #'examples/config/domogik.cfg',
+            'examples/config/domogik.cfg',
             'examples/init/domogik',
             'examples/default/domogik',
             'examples/logrotate/domogik',
@@ -153,7 +152,7 @@ setup(
             'xplhub/examples/config/xplhub.cfg',
             'xpl/tools/32bit/xPL_Hub',
             'xpl/tools/64bit/xPL_Hub',
-            'xpl/tools/arm/xPL_Hub',
+            'xpl/tools/arm/xPL_Hub'
         ]
     },
     data_files = d_files,
@@ -175,7 +174,7 @@ setup(
             dmg_config = domogik.install.config:config
             dmg_test_config = domogik.install.test_config:test_config
             """
-        ],
+        ]
     },
     classifiers=[
         "Topic :: Home Automation",
@@ -184,6 +183,6 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: End Users/Desktop",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-        "Natural Language :: English",
+        "Natural Language :: English"
     ]
 )
