@@ -195,7 +195,7 @@ class deviceAPI(MethodView):
         if res is None:
             return "Bad device type"
         pjson = res.get_data()
-        pjson = pjson[dev_type_id]
+        pjson = pjson[request.form.get('type_id')]
         b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             type_id=request.form.get('type_id'),
