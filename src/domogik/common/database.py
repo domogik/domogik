@@ -59,6 +59,8 @@ from domogik.common.sql_schema import (
         XplCommand, XplStat, XplStatParam, XplCommandParam
 )
 
+DEFAULT_RECYCLE_POOL = 3600
+
 
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
@@ -124,7 +126,14 @@ class DbHelper():
         cfg = Loader('database')
         config = cfg.load()
         self.__db_config = dict(config[1])
-        
+
+        if self.__db_config.has_key("recycle_pool"):
+            self.log.info("User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
+            pool_recycle = int(self.__db_config['recycle_pool'])
+        else:
+            self.log.info("No user value for recycle pool. Using default value : {0}".format(DEFAULT_RECYCLE_POOL))
+            pool_recycle = DEFAULT_RECYCLE_POOL
+
         if config[0]['log_level'] == 'debug':
             logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
             logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
@@ -139,7 +148,7 @@ class DbHelper():
                 DbHelper.__engine = engine
             else:
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', 
-                                                             pool_recycle=7200, pool_size=20, max_overflow=10)
+                                                             pool_recycle=pool_recycle, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
             #DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True, autocommit=True)
             DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
