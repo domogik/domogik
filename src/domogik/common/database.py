@@ -354,9 +354,6 @@ class DbHelper():
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
-        if pjson['json_version'] < 2:
-            self.__raise_dbhelper_exception("This plugin does not support this command, json_version should at least be 2", True)
-            return None
         sensors = {}
         addedxplstats = {}
         tmp = pack.find_xplstats_for_device_type(dt.id)
