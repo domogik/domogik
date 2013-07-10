@@ -52,7 +52,7 @@ ENDC = '\033[0m'
 def is_advanced(advanced_mode, sect, key):
     advanced_keys = {
         'domogik': ['libraries_path', 'src_prefix', 'log_dir_path', 'pid_dir_path', 'broadcast'],
-        'database': ['db_prefix'],
+        'database': ['db_prefix', 'pool_recycle'],
         'rest': ['rest_server_port', 'rest_use_ssl', 'rest_ssl_certificate'],
         'mq': ['req_rep_port', 'pub_port', 'sub_port'],
     }
