@@ -48,7 +48,7 @@ from sqlalchemy.orm import sessionmaker
 
 from domogik.common.utils import ucode
 from domogik.common import logger
-from domogik.common.packagejson import PackageJson
+#from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         Device, DeviceStats,
@@ -359,7 +359,25 @@ class DbHelper():
             return None
         sensors = {}
         addedxplstats = {}
-        tmp = pack.find_xplstats_for_device_type(dt.id)
+        #tmp = pack.find_xplstats_for_device_type(dt.id)
+
+        # create a list of all xpl_stats that have a parameter that point to a sensor that is devined in a  certain device type
+        # first, get the sensors associated to the device_type
+        device_type_sensors = pjson['device_types'][type_id]['sensors']
+       
+        # then, parse xpl_stats
+        tmp = {}
+        for the_sensor_id in pjson['xpl_stats']:
+            xpl_stat = pjson['xpl_stats'][the_sensor_id]
+            for param_id in xpl_stat['parameters']:
+                the_param = xpl_stat['parameters'][param_id]
+                    if the_param.has_key("sensor"):
+                        the_sensor = param['sensor']
+                        # check if it is linked to the given device_type
+                        if the_sensor in device_type_sensors:
+                            tmp[the_sensor_id] = xpl_stat
+
+
         for sensor_id in tmp:
             sensor = pjson['sensors'][sensor_id]
             sen = Sensor(name=sensor['name'], \
