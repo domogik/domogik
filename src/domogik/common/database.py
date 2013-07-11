@@ -364,6 +364,8 @@ class DbHelper():
        
         # then, parse xpl_stats
         tmp = {}
+        print "@@@pjson="
+        print pjson
         for the_sensor_id in pjson['xpl_stats']:
             xpl_stat = pjson['xpl_stats'][the_sensor_id]
             for param_id in xpl_stat['parameters']:
