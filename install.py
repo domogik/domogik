@@ -38,59 +38,67 @@ def get_c_hub():
     else:
         return None
 
-def build_file_list():
+def build_file_list(user):
     d_files = [
-        ('/etc/domogik', ['domogik:domogik', ''], ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
-        ('/var/cache/domogik', ['domogik:domogik', ''], []),
-        ('/var/cache/domogik/pkg-cache', ['domogik:domogik', ''], []),
-        ('/var/cache/domogik/cache', ['domogik:domogik', ''], []),
-        ('/var/lib/domogik', ['domogik:domogik', ''], []),
-        ('/var/lib/domogik/packages', ['domogik:domogik', ''], ['src/domogik/common/__init__.py']),
-        ('/var/lib/domogik/resources', ['domogik:domogik', ''], []),
-        ('/var/lib/domogik/resources', ['domogik:domogik', ''], ['src/domogik/common/datatypes.json']),
-        ('/var/lock/domogik', ['domogik:domogik', ''], []),
-        ('/var/log/domogik', ['domogik:domogik', ''], []),
+        ('/etc/domogik', [user, '755'], ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
+        ('/var/cache/domogik', [user, None], []),
+        ('/var/cache/domogik/pkg-cache', [user, None], []),
+        ('/var/cache/domogik/cache', [user, None], []),
+        ('/var/lib/domogik', [user, None], []),
+        ('/var/lib/domogik/packages', [user, None], ['src/domogik/common/__init__.py']),
+        ('/var/lib/domogik/resources', [user, None], []),
+        ('/var/lib/domogik/resources', [user, None], ['src/domogik/common/datatypes.json']),
+        ('/var/lock/domogik', [user, None], []),
+        ('/var/log/domogik', [user, None], []),
     ]
 
     if os.path.exists('/etc/default'):
-        d_files.append(('/etc/default/', ['root:root', ''], ['src/domogik/examples/default/domogik']))
+        d_files.append(('/etc/default/', [user, None], ['src/domogik/examples/default/domogik']))
     else:
         print "Can't find directory where i can copy system wide config"
         exit(0)
 
     if os.path.exists('/etc/logrotate.d'):
-        d_files.append(('/etc/logrotate.d', ['root:root', ''], ['src/domogik/examples/logrotate/domogik', 'src/domogik/xplhub/examples/logrotate/xplhub']))
+        d_files.append(('/etc/logrotate.d', [user, None], ['src/domogik/examples/logrotate/domogik', 'src/domogik/xplhub/examples/logrotate/xplhub']))
 
     if os.path.exists('/etc/init.d'):
-        d_files.append(('/etc/init.d/', ['root:root', ''], ['src/domogik/examples/init/domogik']))
+        d_files.append(('/etc/init.d/', [user, '755'], ['src/domogik/examples/init/domogik']))
     elif os.path.exists('/etc/rc.d'):
-        d_files.append(('/etc/rc.d/', ['root:root', ''], ['src/domogik/examples/init/domogik']))
+        d_files.append(('/etc/rc.d/', [user, '755'], ['src/domogik/examples/init/domogik']))
     else:
         print("Can't find firectory for init script")
         exit(0)
 
     hub = get_c_hub()
     if hub is not None:
-        d_files.append(('/usr/sbin/', ['root:root', ''], [hub]))
+        d_files.append(('/usr/sbin/', [user, None], [hub]))
 
     return d_files
 
-def copy_files():
+def copy_files(user):
     info("Copy files")
-    for directory, perm, files in build_file_list():
-        if not os.path.exists(directory):
-            if os.makedirs(directory):
-                ok("Creating dir {0}".format(directory))
+    try:
+        for directory, perm, files in build_file_list(user):
+            if not os.path.exists(directory):
+                if os.makedirs(directory, perm[1]):
+                    ok("Creating dir {0}".format(directory))
+                else:
+                    fail("Failed creating dir {0}".format(directory))
             else:
-                fail("Creating dir {0}".format(directory))
-        else:
-            ok("Directory {0} already exists".format(directory))
-        # TODO set correct permissions
-        for fname in files:
-            # copy the file
-            shutil.copy(os.path.join(os.path.dirname(os.path.realpath(__file__)), fname), directory)
-            ok("Copyed file {0}".format(fname))
-        # TODO file permisions
+                ok("Directory {0} already exists".format(directory))
+            if perm[0] != '': 
+                os.system('chown {0} {1}'.format(perm[0], directory))
+            for fname in files:
+                # copy the file
+                shutil.copy(os.path.join(os.path.dirname(os.path.realpath(__file__)), fname), directory)
+                ok("Copyed file {0}".format(fname))
+                dfname = os.path.join(directory, os.path.basename(fname))
+                if perm[0] != '': 
+                    os.system('chown {0} {1}'.format(perm[0], dfname))
+                if perm[1] != None: 
+                    os.system('chmod {0} {1}'.format(perm[1], dfname))
+    except:
+        raise
 
 def create_user():
     info("Create domogik user")
@@ -107,6 +115,7 @@ def create_user():
         fail("Failed to create domogik user")
     else:
         ok("Correctly created domogik user")
+    return d_user
 
 def is_advanced(advanced_mode, sect, key):
     advanced_keys = {
@@ -179,38 +188,44 @@ def install():
     parser.add_argument('--no-db-upgrade', dest='db', action="store_true",
                    default=False, help='Don\'t do a db upgrade')
     args = parser.parse_args()
-    # CHECK python version
-    if sys.version_info < (2,6):
-        print "Python version is to low, at least python 2.6 is needed"
-        exit(0)
-    # CHECK run as root
-    info("Check this script is started as root")
-    assert os.getuid() == 0, "This script must be started as root"
-    ok("Correctly started with root privileges.")
-    # RUN setup.py
-    if not args.setup:
-        info("Run setup.py")
-        os.system('python setup.py develop')
-    # Copy files
-    copy_files()
-    # create user
-    if not args.user:
-        create_user()
-    # write config file
-    if not args.config and needupdate():
-        write_configfile(False)
-    # upgrade db
-    if not args.db:
-        os.system('python src/domogik/install/installer.py')
-    if not args.test:
-        os.system('python test_config.py')
-    print("\n\n")
-    ok("================================================== <==")
-    ok(" Everything seems ok, you should be able to start  <==")
-    ok("      Domogik with /etc/init.d/domogik start       <==")
-    ok("            or /etc/rc.d/domogik start             <==")
-    ok(" You can now install Domoweb User Interface        <==")
-    ok("================================================== <==")
+    try:
+        # CHECK python version
+        if sys.version_info < (2,6):
+            print "Python version is to low, at least python 2.6 is needed"
+            exit(0)
+        # CHECK run as root
+        info("Check this script is started as root")
+        assert os.getuid() == 0, "This script must be started as root"
+        ok("Correctly started with root privileges.")
+        # RUN setup.py
+        if not args.setup:
+            info("Run setup.py")
+            os.system('python setup.py develop')
+        # create user
+        if not args.user:
+            user = create_user()
+        else:
+            user = 'domogik'
+        # Copy files
+        copy_files( user )
+        # write config file
+        if not args.config and needupdate():
+            write_configfile(False)
+        # upgrade db
+        if not args.db:
+            os.system('python src/domogik/install/installer.py')
+        if not args.test:
+            os.system('python test_config.py')
+        print("\n\n")
+        ok("================================================== <==")
+        ok(" Everything seems ok, you should be able to start  <==")
+        ok("      Domogik with /etc/init.d/domogik start       <==")
+        ok("            or /etc/rc.d/domogik start             <==")
+        ok(" You can now install Domoweb User Interface        <==")
+        ok("================================================== <==")
+    except:
+        fail(sys.exc_info()[1])
+
 
 if __name__ == "__main__":
     install()
