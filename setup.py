@@ -42,66 +42,6 @@ from setuptools import setup, find_packages
 import platform
 import sys
 
-# check python version
-print "== check python version =="
-if sys.version_info < (2,6):
-    print "Python version is to low, at least python 2.6 is needed"
-    exit(0)
-
-# build file list
-print "== build file list =="
-d_files = [
-        ('/etc/default/', ['src/domogik/examples/default/domogik']),
-        ('/etc/domogik', ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
-        ('/var/cache/domogik', []),
-        ('/var/cache/domogik/pkg-cache', []),
-        ('/var/cache/domogik/cache', []),
-        ('/var/lib/domogik', []),
-        ('/var/lib/domogik/packages', ['src/domogik/common/__init__.py']),
-        ('/var/lib/domogik/resources', []),
-        ('/var/lib/domogik/resources', ['src/domogik/common/datatypes.json']),
-        ('/var/lock/domogik', []),
-]
-
-if os.path.exists('/etc/default'):
-    d_files.append(('/etc/default/', ['src/domogik/examples/default/domogik']))
-else:
-    print "Can't find directory where i can copy system wide config"
-    exit(0)
-
-if os.path.exists('/etc/logrotate.d'):
-    d_files.append(('/etc/logrotate.d', ['src/domogik/examples/logrotate/domogik', 'src/domogik/xplhub/examples/logrotate/xplhub']))
-
-if os.path.exists('/etc/init.d'):
-    d_files.append(('/etc/init.d/', ['src/domogik/examples/init/domogik']))
-elif os.path.exists('/etc/rc.d'):
-    d_files.append(('/etc/rc.d/', ['src/domogik/examples/init/domogik']))
-else:
-    print("Can't find firectory for init script")
-    exit(0)
-
-# install c-hub files
-hub = {
-    'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
-    'i686' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
-    'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub',
-    'armv5tel' : 'src/domogik/xpl/tools/arm/xPL_Hub',
-    'armv6l' : 'src/domogik/xpl/tools/arm/xPL_Hub'
-}
-arch = platform.machine()
-if arch in hub.keys():
-    d_files.append(('/usr/sbin/', [hub[arch]]))
-else:
-    print("*************** WARNING ***************")
-    print("* Can't find an xPL Hub for your arch *")
-    print("* C hub will not be possible on this  *")
-    print("*            system                   *")
-    print("***************************************")
-hub = None
-arch = None
-
-# runsetup
-print "== run python setup =="
 setup(
     name = 'Domogik',
     version = '0.4.0',
@@ -110,56 +50,55 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 
-                      'sqlalchemy == 0.7.9',
-                      'sqlalchemy-migrate >= 0.7.2',
-                      'alembic',
-                      'simplejson >= 1.9.2',
-                      'pyOpenSSL >= 0.10', 
-                      'httplib2 >= 0.6.0', 
-                      'psutil >= 0.1.3', 
-                      'MySQL-python >= 1.2.3c', 
-                      'pyinotify >= 0.8.9', 
-                      'pip >= 1.0', 
-                      'Distutils2',
-                      'pyserial >= 2.5',
-                      'netifaces >= 0.8',
-                      'Twisted >= 12.1.0',
-                      'Flask >= 0.9',
-                      'tornado >= 3.1',
-                      'pyzmq >= 13.1.0',
-                      'python-daemon >= 1.5.5'],
+	      'sqlalchemy == 0.7.9',
+	      'sqlalchemy-migrate >= 0.7.2',
+	      'alembic',
+	      'simplejson >= 1.9.2',
+	      'pyOpenSSL >= 0.10', 
+	      'httplib2 >= 0.6.0', 
+	      'psutil >= 0.1.3', 
+	      'MySQL-python >= 1.2.3c', 
+	      'pyinotify >= 0.8.9', 
+	      'pip >= 1.0', 
+	      'Distutils2',
+	      'pyserial >= 2.5',
+	      'netifaces >= 0.8',
+	      'Twisted >= 12.1.0',
+	      'Flask >= 0.9',
+	      'tornado >= 3.1',
+	      'pyzmq >= 13.1.0',
+	      'python-daemon >= 1.5.5'],
     zip_safe = False,
     license = 'GPL v3',
     include_package_data = True,
     packages = ['domogik'],
-    package_dir = { 'domogik': 'src/domogik' },
+    package_dir = { '': 'src' },
     test_suite = 'domogik.tests',
     package_data = {
         'domogik': [
-            'examples/config/domogik.cfg',
-            'examples/init/domogik',
-            'examples/default/domogik',
-            'examples/logrotate/domogik',
-            'examples/snmp/snmp.cfg',
-            'examples/snmp/dmg_snmp',
-            'examples/snmp/dmg_snmp.pl',
-            'install/uninstall.sh',
-            'install/version',
-            'common/datatypes.json',
-            'install/upgrade_repository/migrate.cfg',
-            'install/upgrade_repository/versions/*',
-            'xplhub/examples/logrotate/xplhub',
-            'xplhub/examples/config/xplhub.cfg',
-            'xpl/tools/32bit/xPL_Hub',
-            'xpl/tools/64bit/xPL_Hub',
-            'xpl/tools/arm/xPL_Hub'
+	    'examples/config/domogik.cfg',
+    	    'examples/init/domogik',
+	    'examples/default/domogik',
+	    'examples/logrotate/domogik',
+	    'examples/snmp/snmp.cfg',
+	    'examples/snmp/dmg_snmp',
+	    'examples/snmp/dmg_snmp.pl',
+	    'install/uninstall.sh',
+	    'install/version',
+	    'common/datatypes.json',
+	    'install/upgrade_repository/migrate.cfg',
+	    'install/upgrade_repository/versions/*',
+	    'xplhub/examples/logrotate/xplhub',
+	    'xplhub/examples/config/xplhub.cfg',
+	    'xpl/tools/32bit/xPL_Hub',
+	    'xpl/tools/64bit/xPL_Hub',
+	    'xpl/tools/arm/xPL_Hub'
         ]
     },
-    data_files = d_files,
     scripts=[],
     entry_points = {
         'console_scripts': [
-            """
+	    """
             dmg_pkgmgr = domogik.xpl.bin.pkgmgr:main
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
@@ -171,12 +110,10 @@ setup(
             dmg_forwarder = domogik.mq.pubsub.forwarder:main
             dmg_insert_data = domogik.tools.packages.insert_data:main
             dmg_review = domogik.tools.packages.review.review:main
-            dmg_config = domogik.install.config:config
-            dmg_test_config = domogik.install.test_config:test_config
-            """
+	    """
         ]
     },
-    classifiers=[
+    classtifiers=[
         "Topic :: Home Automation",
         "Environment :: No Input/Output (Daemon)",
         "Programming Language :: Python",
