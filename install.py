@@ -201,8 +201,8 @@ def install():
     # upgrade db
     if not args.db:
         os.system('python src/domogik/install/installer.py')
-    #if not args.test:
-    # run test config
+    if not args.test:
+        os.system('python test_config.py')
     print("\n\n")
     ok("================================================== <==")
     ok(" Everything seems ok, you should be able to start  <==")
