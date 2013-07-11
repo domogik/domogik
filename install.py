@@ -80,7 +80,11 @@ def copy_files(user):
     try:
         for directory, perm, files in build_file_list(user):
             if not os.path.exists(directory):
-                if os.makedirs(directory, perm[1]):
+                if perm[1] != None:
+                    res = os.makedirs(directory, int(perm[1]))
+                else:
+                    res = os.makedirs(directory)
+                if not res:
                     ok("Creating dir {0}".format(directory))
                 else:
                     fail("Failed creating dir {0}".format(directory))
@@ -209,6 +213,7 @@ def install():
         # Copy files
         copy_files( user )
         # write config file
+        info("Update the config file")
         if not args.config and needupdate():
             write_configfile(False)
         # upgrade db
@@ -224,7 +229,7 @@ def install():
         ok(" You can now install Domoweb User Interface        <==")
         ok("================================================== <==")
     except:
-        fail(sys.exc_info()[1])
+        fail(sys.exc_info())
 
 
 if __name__ == "__main__":
