@@ -49,6 +49,7 @@ def build_file_list():
         ('/var/lib/domogik/resources', ['domogik:domogik', ''], []),
         ('/var/lib/domogik/resources', ['domogik:domogik', ''], ['src/domogik/common/datatypes.json']),
         ('/var/lock/domogik', ['domogik:domogik', ''], []),
+        ('/var/log/domogik', ['domogik:domogik', ''], []),
     ]
 
     if os.path.exists('/etc/default'):
