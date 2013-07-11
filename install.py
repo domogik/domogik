@@ -26,7 +26,7 @@ def fail(msg):
 
 def get_c_hub():
     hub = {
-        'x86_64' : 'src/domogik/pl/tools/64bit/xPL_Hub',
+        'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
         'i686' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
         'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub',
         'armv5tel' : 'src/domogik/xpl/tools/arm/xPL_Hub',
@@ -76,23 +76,20 @@ def build_file_list():
 
 def copy_files():
     info("Copy files")
-    print build_file_list()
     for directory, perm, files in build_file_list():
-        print directory
         if not os.path.exists(directory):
             if os.makedirs(directory):
                 ok("Creating dir {0}".format(directory))
             else:
                 fail("Creating dir {0}".format(directory))
-            # TODO set correct permissions
+        else:
+            ok("Directory {0} already exists".format(directory))
+        # TODO set correct permissions
         for fname in files:
             # copy the file
-            dst_fname = os.path.join(directory, fname)
-            if os.path.exists(dst_fname):
-                os.removed(dst_fname)
-            if shutil.copy(os.path.join(os.path.dirname(os.path.realpath(__file__)), fname), directory):
-                ok("Copyed file {0}".format(fname))
-                # TODO file permisions
+            shutil.copy(os.path.join(os.path.dirname(os.path.realpath(__file__)), fname), directory)
+            ok("Copyed file {0}".format(fname))
+        # TODO file permisions
 
 def create_user():
     info("Create domogik user")
