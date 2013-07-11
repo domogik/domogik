@@ -87,9 +87,12 @@ def copy_files():
             # TODO set correct permissions
         for fname in files:
             # copy the file
-            print os.path.join(os.path.dirname(os.path.realpath(__file__)), fname)
+            dst_fname = os.path.join(directory, fname)
+            if os.path.exists(dst_fname):
+                os.removed(dst_fname)
             if shutil.copy(os.path.join(os.path.dirname(os.path.realpath(__file__)), fname), directory):
-                print fname 
+                ok("Copyed file {0}".format(fname))
+                # TODO file permisions
 
 def create_user():
     info("Create domogik user")
@@ -196,7 +199,7 @@ def install():
     if not args.user:
         create_user()
     # write config file
-    if args.config and needupdate():
+    if not args.config and needupdate():
         write_configfile(False)
     # upgrade db
     if not args.db:
