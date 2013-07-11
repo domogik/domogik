@@ -368,11 +368,11 @@ class DbHelper():
             xpl_stat = pjson['xpl_stats'][the_sensor_id]
             for param_id in xpl_stat['parameters']:
                 the_param = xpl_stat['parameters'][param_id]
-                    if the_param.has_key("sensor"):
-                        the_sensor = param['sensor']
-                        # check if it is linked to the given device_type
-                        if the_sensor in device_type_sensors:
-                            tmp[the_sensor_id] = xpl_stat
+                if the_param.has_key("sensor"):
+                    the_sensor = param['sensor']
+                    # check if it is linked to the given device_type
+                    if the_sensor in device_type_sensors:
+                        tmp[the_sensor_id] = xpl_stat
 
 
         for sensor_id in tmp:
