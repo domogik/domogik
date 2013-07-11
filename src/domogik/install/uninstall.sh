@@ -120,12 +120,15 @@ $RM /var/log/xplhub
 for fic in dmgenplug dmgdisplug dmg_manager dmg_send dmg_pkgmgr dmg_version dmg_dump dmg_hub 
   do
     TO_DEL=$(which $fic)
-    echo "Delete $TO_DEL"
-    $RM $TO_DEL
+    if [ "X"$TO_DEL != "X" ] ; then
+        echo "$(which $fic) / $TO_DEL"
+        echo "Delete $TO_DEL"
+        $RM $TO_DEL
+    fi
 done
 
 PY_FOLDER=$(dirname $(python -c "print __import__('domogik').__path__[0]"))
-if [ ${PY_FOLDER:0:5} == "/usr/" ] ; then
+if [[ ${PY_FOLDER:0:5} == "/usr/" ]] ; then
     echo "Remove python part : $PY_FOLDER"
     $RM $PY_FOLDER
 else
