@@ -4,12 +4,35 @@ RINOR Overview
 
 Use REST for test
 =================
+wget method
+-----------
 You can execute a REST request from a console using the *wget* command. 
 For example you can run: ::
 
     $ wget -qO- http://127.0.0.1:40405/account/user/list
 
 This will run the request and show you the results (thanks to the *-qO-* parameter).
+
+FireFox RESTClient
+------------------
+
+Install FF plugin from here: https://addons.mozilla.org/en-us/firefox/addon/restclient/
+ 
+Lauch with Tools > RestClient
+ 
+In this example we will use RESTClient for testing POST url 
+ 
+In the RESTClient interface  > menu 'Headers' > 'Custom Header'
+
+* Create a header with **name**: 'Content-Type', **value**: 'application/x-www-form-urlencoded'
+* You may tick 'Save to favorites' for next time
+
+Next, back on the RESTClient main interface:
+
+* **method**: 'POST', **url**: 'http://xxxxx:40405/device/'
+* **body** : plugin_id=plugin-diskfree&description=&name=A&reference=B&type_id=diskfree.disk_usage
+ 
+And Click 'Send'
 
 Configuration section in /etc/domogik/domogik.cfg 
 =================================================

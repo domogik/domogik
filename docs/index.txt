@@ -57,7 +57,6 @@ Technical Documentation
 * :doc:`Network ports used by Domogik </technical/network_ports>`
 * :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
-* :doc:`Device types and usages  </technical/device_feature_usage>`
 * **Database:**
   :doc:`Model </technical/database>` OSSOLETE
 * **RINOR:**
