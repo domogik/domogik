@@ -50,6 +50,7 @@ def build_file_list(user):
         ('/var/lib/domogik/resources', [user, None], ['src/domogik/common/datatypes.json']),
         ('/var/lock/domogik', [user, None], []),
         ('/var/log/domogik', [user, None], []),
+        ('/var/log/xplhub', [user, None], []),
     ]
 
     if os.path.exists('/etc/default'):
@@ -180,6 +181,7 @@ def config(advanced, notest):
         fail(sys.exc_info())
 
 def update_default(user):
+    info("Update /etc/default/domogik")
     os.system('sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER={0};" /etc/default/domogik'.format(user))
 
 def install():
@@ -213,6 +215,10 @@ def install():
             user = create_user()
         else:
             user = 'domogik'
+        # set the uid this process runs with
+        user_entry = pwd.getpwnam(user)
+        os.setgid(user_entry.pw_gid)
+        os.setuid(user_entry.pw_uid)
         # Copy files
         copy_files( user )
         update_default( user )
