@@ -70,31 +70,11 @@ setup(
 	      'python-daemon >= 1.5.5'],
     zip_safe = False,
     license = 'GPL v3',
-    include_package_data = True,
-    packages = ['domogik'],
+    #include_package_data = True,
+    packages = find_packages('src', exclude=["mpris"]),
     package_dir = { '': 'src' },
     test_suite = 'domogik.tests',
-    package_data = {
-        'domogik': [
-	    'examples/config/domogik.cfg',
-    	    'examples/init/domogik',
-	    'examples/default/domogik',
-	    'examples/logrotate/domogik',
-	    'examples/snmp/snmp.cfg',
-	    'examples/snmp/dmg_snmp',
-	    'examples/snmp/dmg_snmp.pl',
-	    'install/uninstall.sh',
-	    'install/version',
-	    'common/datatypes.json',
-	    'install/upgrade_repository/migrate.cfg',
-	    'install/upgrade_repository/versions/*',
-	    'xplhub/examples/logrotate/xplhub',
-	    'xplhub/examples/config/xplhub.cfg',
-	    'xpl/tools/32bit/xPL_Hub',
-	    'xpl/tools/64bit/xPL_Hub',
-	    'xpl/tools/arm/xPL_Hub'
-        ]
-    },
+    package_data = {},
     scripts=[],
     entry_points = {
         'console_scripts': [
