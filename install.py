@@ -119,6 +119,7 @@ def create_user():
         fail("Failed to create domogik user")
     else:
         ok("Correctly created domogik user")
+    # return the user to use
     return d_user
 
 def is_advanced(advanced_mode, sect, key):
@@ -178,6 +179,8 @@ def config(advanced, notest):
     except:
         fail(sys.exc_info())
 
+def update_default(user):
+    os.system('sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER={0};" /etc/default/domogik'.format(user))
 
 def install():
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -212,6 +215,7 @@ def install():
             user = 'domogik'
         # Copy files
         copy_files( user )
+        update_default( user )
         # write config file
         info("Update the config file")
         if not args.config and needupdate():
@@ -222,12 +226,6 @@ def install():
         if not args.test:
             os.system('python test_config.py')
         print("\n\n")
-        ok("================================================== <==")
-        ok(" Everything seems ok, you should be able to start  <==")
-        ok("      Domogik with /etc/init.d/domogik start       <==")
-        ok("            or /etc/rc.d/domogik start             <==")
-        ok(" You can now install Domoweb User Interface        <==")
-        ok("================================================== <==")
     except:
         fail(sys.exc_info())
 
