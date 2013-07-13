@@ -215,10 +215,6 @@ def install():
             user = create_user()
         else:
             user = 'domogik'
-        # set the uid this process runs with
-        user_entry = pwd.getpwnam(user)
-        os.setgid(user_entry.pw_gid)
-        os.setuid(user_entry.pw_uid)
         # Copy files
         copy_files( user )
         update_default( user )
@@ -226,6 +222,10 @@ def install():
         info("Update the config file")
         if not args.config and needupdate():
             write_configfile(False)
+        # set the uid this process runs with
+        user_entry = pwd.getpwnam(user)
+        os.setgid(user_entry.pw_gid)
+        os.setuid(user_entry.pw_uid)
         # upgrade db
         if not args.db:
             os.system('python src/domogik/install/installer.py')
