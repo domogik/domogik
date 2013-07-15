@@ -42,7 +42,7 @@ def get_c_hub():
 
 def build_file_list(user):
     d_files = [
-        ('/etc/domogik', [user, '755'], ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
+        ('/etc/domogik', [user, 0755], ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
         ('/var/cache/domogik/cache', [user, None], []),
@@ -65,9 +65,9 @@ def build_file_list(user):
         d_files.append(('/etc/logrotate.d', [user, None], ['src/domogik/examples/logrotate/domogik', 'src/domogik/xplhub/examples/logrotate/xplhub']))
 
     if os.path.exists('/etc/init.d'):
-        d_files.append(('/etc/init.d/', [user, '755'], ['src/domogik/examples/init/domogik']))
+        d_files.append(('/etc/init.d/', [user, 0755], ['src/domogik/examples/init/domogik']))
     elif os.path.exists('/etc/rc.d'):
-        d_files.append(('/etc/rc.d/', [user, '755'], ['src/domogik/examples/init/domogik']))
+        d_files.append(('/etc/rc.d/', [user, 0755], ['src/domogik/examples/init/domogik']))
     else:
         print("Can't find firectory for init script")
         exit(0)
@@ -102,8 +102,8 @@ def copy_files(user):
                 dfname = os.path.join(directory, os.path.basename(fname))
                 if perm[0] != '': 
                     os.system('chown {0} {1}'.format(perm[0], dfname))
-                if perm[1] != None: 
-                    os.system('chmod {0} {1}'.format(perm[1], dfname))
+                #if perm[1] != None: 
+                #    os.system('chmod {0} {1}'.format(perm[1], dfname))
     except:
         raise
 
