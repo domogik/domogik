@@ -8,6 +8,8 @@ import platform
 import ConfigParser
 import argparse
 import shutil
+import errno
+import traceback
 
 BLUE = '\033[94m'
 OK = '\033[92m'
@@ -170,15 +172,16 @@ def needupdate():
     else:
         return True
 
-def config(advanced, notest):
-    try:
-        am_i_root()
-        if needupdate():
-            write_configfile(advanced)
-        if not notest:
-            test_config()
-    except:
-        fail(sys.exc_info())
+# not used
+#def config(advanced, notest):
+#    try:
+#        am_i_root()
+#        if needupdate():
+#            write_configfile(advanced)
+#        if not notest:
+#            test_config()
+#    except:
+#        fail(sys.exc_info())
 
 def update_default(user):
     info("Update /etc/default/domogik")
@@ -222,14 +225,46 @@ def install():
         info("Update the config file")
         if not args.config and needupdate():
             write_configfile(False)
-        # set the uid this process runs with
-        user_entry = pwd.getpwnam(user)
-        os.setgid(user_entry.pw_gid)
-        os.setuid(user_entry.pw_uid)
         # upgrade db
         if not args.db:
-            os.system('python src/domogik/install/installer.py')
+            # set the uid this process runs with
+            user_entry = pwd.getpwnam(user)
+            os.setregid(0, user_entry.pw_gid)
+            os.setreuid(0, user_entry.pw_uid)
+            tmp_egg_path = '/tmp/domogik-egg/'
+            try:
+                os.makedirs(tmp_egg_path)
+            except OSError as exc: # Python >2.5
+                if exc.errno == errno.EEXIST and os.path.isdir(tmp_egg_path):
+                    pass
+                else: 
+                    raise
+            ok("###")
+            try:
+                os.system("export PYTHON_EGG_CACHE={0} && python src/domogik/install/installer.py".format(tmp_egg_path))
+            except:
+               fail(traceback.format_exc())
+               try:
+                   shutil.rmtree(tmp_egg_path)
+               except:
+                   fail("oh li li : %d" % traceback.format_exc())
+                   #raise
+
+            ok("@@@")
+            try:
+                shutil.rmtree(tmp_egg_path)
+            except:
+                fail("zut!")
+                fail("oh la la : %d" % traceback.format_exc())
+                #raise
+            ok("$$$")
+            # restore root uid
+            os.setregid(0, 0)
+            ok("---")
+            os.setreuid(0, 0)
+        ok("foo")
         if not args.test:
+            # TODO : replace python call by the dynamic python command
             os.system('python test_config.py')
         print("\n\n")
     except:
