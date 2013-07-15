@@ -239,7 +239,6 @@ def install():
                     pass
                 else: 
                     raise
-            ok("###")
             try:
                 os.system("export PYTHON_EGG_CACHE={0} && python src/domogik/install/installer.py".format(tmp_egg_path))
             except:
@@ -247,20 +246,14 @@ def install():
                try:
                    shutil.rmtree(tmp_egg_path)
                except:
-                   fail("oh li li : %d" % traceback.format_exc())
-                   #raise
+                   raise
 
-            ok("@@@")
             try:
                 shutil.rmtree(tmp_egg_path)
             except:
-                fail("zut!")
-                fail("oh la la : %d" % traceback.format_exc())
-                #raise
-            ok("$$$")
+                raise
             # restore root uid
             os.setregid(0, 0)
-            ok("---")
             os.setreuid(0, 0)
         ok("foo")
         if not args.test:
