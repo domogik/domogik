@@ -55,6 +55,8 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 
 .. |cmd_node| image:: ozwave_cmd_node.png
 
+.. |refr-node-inf| image:: ozwave_refresh-node-info.png
+
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 | Representation   | Message                            | Description                                                                                        |
 +==================+====================================+====================================================================================================+
@@ -119,6 +121,16 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 |                  |                                    | Saving modification in config file with "Save config" button                                       |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | Edit association                   | Manage groups association.                                                                         |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Force Refresh Node                 | Causes the nodes data to be obtained from the Z-Wave network in the same way as if it had just been|
+|                  |                                    | added. This method would normally be called automatically by OpenZWave, but if you know that a node|
+|                  | |refr-node-inf|                    | has been changed, calling this method will force a refresh of the data held by the library.        |
+|                  |                                    | This can be especially useful for devices that were asleep when the application was first run.     |
+|                  |                                    |                                                                                                    |
+|                  |                                    | Three options possible :                                                                           |
+|                  |                                    |  - Node informations : Fetch the data for a node from the Z-Wave network                           |
+|                  |                                    |  - State Node : Fetch the command class data for a node from the Z-Wave network                    |
+|                  |                                    |  - Dynamics data : Fetch only the dynamic command class data for a node from the Z-Wave network.   |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 
 Manage association devices (groups)
