@@ -42,7 +42,7 @@ def get_c_hub():
 
 def build_file_list(user):
     d_files = [
-        ('/etc/domogik', [user, 0755], ['src/domogik/examples/config/domogik.cfg',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg']),
+        ('/etc/domogik', [user, 0755], ['src/domogik/examples/config/domogik.cfg.sample',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg.sample']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
         ('/var/cache/domogik/cache', [user, None], []),
@@ -125,7 +125,7 @@ def create_user():
     # return the user to use
     return d_user
 
-def is_advanced(advanced_mode, sect, key):
+def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
         'domogik': ['libraries_path', 'src_prefix', 'log_dir_path', 'pid_dir_path', 'broadcast'],
         'database': ['db_prefix', 'pool_recycle'],
@@ -143,34 +143,72 @@ def is_advanced(advanced_mode, sect, key):
             else:
                 return False
 
-def write_configfile(advanced_mode):
+def is_xplhub_advanced(advanced_mode, sect, key):
+    advanced_keys = {
+        'hub': ['log_dir_path', 'log_bandwidth', 'log_invalid_data'],
+    }
+    if advanced_mode:
+        return True
+    else:
+        if sect not in advanced_keys:
+            return True
+        else:
+            if key not in advanced_keys[sect]:
+                return True
+            else:
+                return False
+
+def write_domogik_configfile(advanced_mode):
     # read the config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
-    config.read( ['/etc/domogik/domogik.cfg'] )
+    config.read( ['/etc/domogik/domogik.cfg.sample'] )
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            if is_advanced(advanced_mode, sect, item[0]):
+            if is_domogik_advanced(advanced_mode, sect, item[0]):
                 print("Key {0} [{1}]: ".format(item[0], item[1])),
                 newValue = sys.stdin.readline().rstrip('\n')
                 if newValue != item[1] and newValue != '':
                     # need to write it to config file
                     config.set(sect, item[0], newValue)
                     newvalues = True
-    if newvalues:
-        # write the config file
-        with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
-            ok("Writing the config file")
-            config.write(configfile)
+    # write the config file
+    with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
+
+def write_xplhub_configfile(advanced_mode):
+    # read the config file
+    newvalues = False
+    config = ConfigParser.RawConfigParser()
+    config.read( ['/etc/domogik/xplhub.cfg.sample'] )
+    for sect in config.sections():
+        info("Starting on section {0}".format(sect))
+        for item in config.items(sect):
+            if is_xplhub_advanced(advanced_mode, sect, item[0]):
+                print("Key {0} [{1}]: ".format(item[0], item[1])),
+                newValue = sys.stdin.readline().rstrip('\n')
+                if newValue != item[1] and newValue != '':
+                    # need to write it to config file
+                    config.set(sect, item[0], newValue)
+                    newvalues = True
+    # write the config file
+    with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
 
 def needupdate():
-    print("Do you want to keep your current config file? [Y/n]: "),
-    newValue = sys.stdin.readline().rstrip('\n')
-    if newValue == "y" or newValue == "Y" or newValue == '':
-        return False
-    else:
-        return True
+    # first check if there are already some config files
+    if os.path.isfile("/etc/domogik/domogik.cfg") or \
+       os.path.isfile("/etc/domogik/xplhub.cfg"):
+        print("Do you want to keep your current config files ? [Y/n]: "),
+        newValue = sys.stdin.readline().rstrip('\n')
+        if newValue == "y" or newValue == "Y" or newValue == '':
+            return False
+        else:
+            return True
+    return True
 
 # not used
 #def config(advanced, notest):
@@ -219,12 +257,14 @@ def install():
         else:
             user = 'domogik'
         # Copy files
-        copy_files( user )
-        update_default( user )
+        copy_files(user)
+        update_default(user)
         # write config file
-        info("Update the config file")
         if not args.config and needupdate():
-            write_configfile(False)
+            info("Update the config file : /etc/domogik/domogik.cfg")
+            write_domogik_configfile(False)
+            info("Update the config file : /etc/domogik/xplhub.cfg")
+            write_xplhub_configfile(False)
         # upgrade db
         if not args.db:
             # set the uid this process runs with
@@ -255,7 +295,6 @@ def install():
             # restore root uid
             os.setregid(0, 0)
             os.setreuid(0, 0)
-        ok("foo")
         if not args.test:
             # TODO : replace python call by the dynamic python command
             os.system('python test_config.py')
