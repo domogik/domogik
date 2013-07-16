@@ -20,7 +20,7 @@ log_dir_path = /var/log/domogik/
 pid_dir_path = /var/run/domogik/
 
 # Debug levels are debug, info, warning, error, critical
-log_level = debug
+log_level = info
 
 # This parameter defines which interface the Domogik plugins should listen.
 # If you have only one computer to run the Domogik installation (of course, 
