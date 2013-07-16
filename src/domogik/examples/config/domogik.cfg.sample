@@ -40,15 +40,15 @@ broadcast = 255.255.255.255
 # This parameter defines the database type. Can be one of : mysql, postgresql
 # You should first create the database when using mysql or postgresql
 # computing statistics.
-db_type = mysql
-db_user = domogik
-db_password = domopass
-db_port = 3306
-db_name = domogik
-db_host = 127.0.0.1
+type = mysql
+user = domogik
+password = domopass
+port = 3306
+name = domogik
+host = 127.0.0.1
 # This is the prefix used in database. All tables will start by it. Do *not* 
 # modify it unless you really know what you are doing
-db_prefix = core
+prefix = core
 
 # In case you get some "OperationalError: MySQL server has gone away" errors, 
 # you may need to adapt this value to your mysql configuration.
@@ -62,12 +62,12 @@ db_prefix = core
 # with xpl network.
 # REST is a HTTP server. Following parameters will indicate REST on which 
 # ip:port it will run
-rest_server_ip = 127.0.0.1
-rest_server_port = 40405
+server_ip = 127.0.0.1
+server_port = 40405
 # set to True if you want to use rest with ssl (https://....)
-rest_use_ssl = False
+use_ssl = False
 # if rest_use_ssl = True, set here path for ssl certificate of rest server
-rest_ssl_certificate=
+ssl_certificate=
 
 ###
 # Messaging section

@@ -106,8 +106,8 @@ class Rest(XplPlugin):
                 cfg_rest = Loader('rest')
                 config_rest = cfg_rest.load()
                 conf_rest = dict(config_rest[1])
-                self.server_ip = conf_rest['rest_server_ip']
-                self.server_port = conf_rest['rest_server_port']
+                self.server_ip = conf_rest['server_ip']
+                self.server_port = conf_rest['server_port']
             except KeyError:
                 # default parameters
                 self.server_ip = server_ip
@@ -119,12 +119,12 @@ class Rest(XplPlugin):
                 cfg_rest = Loader('rest')
                 config_rest = cfg_rest.load()
                 conf_rest = dict(config_rest[1])
-                self.use_ssl = conf_rest['rest_use_ssl']
+                self.use_ssl = conf_rest['use_ssl']
                 if self.use_ssl == "True":
                     self.use_ssl = True
                 else:
                     self.use_ssl = False
-                self.ssl_certificate = conf_rest['rest_ssl_certificate']
+                self.ssl_certificate = conf_rest['ssl_certificate']
             except KeyError:
                 # default parameters
                 self.use_ssl = USE_SSL
@@ -139,7 +139,7 @@ class Rest(XplPlugin):
                 cfg_rest = Loader('rest')
                 config_rest = cfg_rest.load()
                 conf_rest = dict(config_rest[1])
-                self.repo_dir = conf_rest['rest_repository']
+                self.repo_dir = conf_rest['repository']
             except KeyError:
                 # default parameters
                 self.repo_dir = DEFAULT_REPO_DIR

@@ -172,30 +172,30 @@ class DbHelper():
 
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
-        url = "%s://" % self.__db_config['db_type']
+        url = "%s://" % self.__db_config['type']
         if self.__db_config['db_port'] != '':
-            url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
-                                        self.__db_config['db_host'], self.__db_config['db_port'], self.__db_config['db_name'])
+            url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['user'], self.__db_config['password'],
+                                        self.__db_config['host'], self.__db_config['port'], self.__db_config['name'])
         else:
-            url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
-                                     self.__db_config['db_host'], self.__db_config['db_name'])
+            url = "%s%s:%s@%s/%s" % (url, self.__db_config['user'], self.__db_config['password'],
+                                     self.__db_config['host'], self.__db_config['name'])
         return url
     
     def get_db_user(self):
-        return self.__db_config['db_user']
+        return self.__db_config['user']
 
     def get_db_password(self):
-        return self.__db_config['db_password']
+        return self.__db_config['password']
     
     def get_db_name(self):
-        return self.__db_config['db_name']
+        return self.__db_config['name']
 
     def is_db_type_mysql(self):
-        return self.__db_config['db_type'].lower() == 'mysql'
+        return self.__db_config['type'].lower() == 'mysql'
 
     def get_db_type(self):
         """Return DB type which is currently used (mysql, postgresql)"""
-        return self.__db_config['db_type'].lower()
+        return self.__db_config['type'].lower()
 
 ####
 # Plugin config
