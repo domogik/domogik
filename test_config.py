@@ -237,7 +237,7 @@ def test_user_config_file(user_home, user_entry):
 
     # check [database] section
     info("Parse [database] section")
-    assert database['db_type'] == 'mysql', "Only mysql database type is supported at the moment"
+    assert database['type'] == 'mysql', "Only mysql database type is supported at the moment"
 
     uid = user_entry.pw_uid
     os.setreuid(0,uid)
@@ -253,7 +253,7 @@ def test_user_config_file(user_home, user_entry):
     
     # Check [rest] section
     info("Parse [rest] section")
-    _check_port_availability(rest['rest_server_ip'], rest['rest_server_port'])
+    _check_port_availability(rest['server_ip'], rest['server_port'])
     ok("Rest server IP/port is not bound by anything else")
 
 def test_init():
