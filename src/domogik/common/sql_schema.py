@@ -68,7 +68,7 @@ _config = None
 #    _config = _cfg.load(sys.argv[1])
 #else:
 _config = _cfg.load()
-_db_prefix = dict(_config[1])['db_prefix']
+_db_prefix = dict(_config[1])['prefix']
 
 # Define objects
 class PluginConfig(Base):
