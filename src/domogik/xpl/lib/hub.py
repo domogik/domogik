@@ -27,7 +27,7 @@ Implements
 ==========
 
 class Hub()
-class MulticastPingPong(DatagramProtocol)
+class UdpHub(DatagramProtocol)
     class __InternalTimer(Thread)
 
 @author: Fritz SMH <fritz.smh@gmail.com>
@@ -62,6 +62,7 @@ import sys
 #import copy
 #import os
 #import socket
+import IN, socket, struct
 
 # config file
 CONFIG_FILE = "/etc/domogik/xplhub.cfg"
@@ -154,22 +155,24 @@ class Hub():
         else:
             do_log_invalid_data = False
         file_invalid_data = "%s/invalid_data.csv" % config['log_dir_path']
+        interfaces_list = config['interfaces']
+        allowed_interfaces = interfaces_list.replace(" ", "").split(",") 
 
         ### Start listening to udp
-        # We use listenMultiple=True so that we can run MulticastServer.py and
-        # MulticastClient.py on same machine:
         print("- Initiating the multicast UDP client...")
         self.log.info("Initiating the multicast UDP client...")
         self.log.info("- creation...")
-        self.MPP = MulticastPingPong(log = self.log,
+        self.MPP = UdpHub(log = self.log,
+                                     allowed_interfaces = allowed_interfaces,
                                      file_clients = file_clients,
                                      do_log_bandwidth = do_log_bandwidth,
                                      file_bandwidth = file_bandwidth,
                                      do_log_invalid_data = do_log_invalid_data,
                                      file_invalid_data = file_invalid_data)
         self.log.info("- start reactor...")
-        reactor.listenMulticast(3865, self.MPP,
-                                listenMultiple=True)
+        xpl_port = reactor.listenMulticast(3865, self.MPP)   #,
+                                           #listenMultiple=True)
+
         self.log.info("- add triggers...")
         reactor.addSystemEventTrigger('during', 'shutdown', self.stop_hub)
         print("xPL hub started!")
@@ -192,7 +195,7 @@ class Hub():
 
 
 
-class MulticastPingPong(DatagramProtocol):
+class UdpHub(DatagramProtocol):
     """
        _client_list : the list of all seen clients
        _dead_client_list : the list of all dead clients
@@ -227,11 +230,14 @@ class MulticastPingPong(DatagramProtocol):
 
     """
 
-    def __init__(self, log, file_clients, do_log_bandwidth, file_bandwidth, do_log_invalid_data, file_invalid_data):
-        """ Init MulticastPingPong object
+    def __init__(self, allowed_interfaces, log, file_clients, do_log_bandwidth, file_bandwidth, do_log_invalid_data, file_invalid_data):
+        """ Init UdpHub object
         """
         ### Main log
         self.log = log
+
+        ### Allowed interfaces
+        self.allowed_interfaces = allowed_interfaces
 
         ### Host's IP
         self._ips = self._ip4_addresses()
@@ -281,13 +287,18 @@ class MulticastPingPong(DatagramProtocol):
         """
         ip_list = []
         for interface in interfaces():
-            try:
-                for link in ifaddresses(interface)[AF_INET]:
-                    ip_list.append(link['addr'])
-            except:
-                # Probably a non configured interface (wifi for example)
-                # Do nothing
-                pass
+            if interface in self.allowed_interfaces:
+                try:
+                    self.log.info("Interface {0} (selected!)".format(interface))
+                    for link in ifaddresses(interface)[AF_INET]:
+                        ip_list.append(link['addr'])
+                        self.log.info("- ip : {0}".format(link['addr']))
+                except:
+                    # Probably a non configured interface (wifi for example)
+                    # Do nothing
+                    pass
+            else:
+                self.log.info("Interface {0} (not used)".format(interface))
         return ip_list
 
 
@@ -611,14 +622,14 @@ class MulticastPingPong(DatagramProtocol):
         self._invalid_data = []
         self._append_file(self._file_invalid_data, msg)
 
-    def startProtocol(self):
-        """
-        Called after protocol has started listening.
-        """
-        # Set the TTL>1 so multicast will cross router hops:
-        self.transport.setTTL(5)
-        # Join a specific multicast group:
-        self.transport.joinGroup("228.0.0.5")
+    #def startProtocol(self):
+    #    """
+    #    Called after protocol has started listening.
+    #    """
+    #    # Set the TTL>1 so multicast will cross router hops:
+    #    self.transport.setTTL(5)
+    #    # Join a specific multicast group:
+    #    self.transport.joinGroup("224.0.0.0")
 
     def datagramReceived(self, datagram, address):
         """ Process received datagrams
