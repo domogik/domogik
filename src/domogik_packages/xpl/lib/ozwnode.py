@@ -558,6 +558,7 @@ class ZWaveNode:
         retval["InitState"] = self.GetNodeStateNW()
         retval["Polled"] = self.isPolled
         retval["ComQuality"] = self.getComQuality()
+        retval["BatteryLevel"] = self._getBatteryLevel()
         return retval
         
     def getValuesInfos(self):

@@ -29,6 +29,7 @@ New instructions to apply changes from immediatly previous version.
         - Add list of recognized manufacturers and products by openzwave in "support tools" tab.
         - Add force refresh node.
         - Add openzwave log report in "support tools" tab.
+        - Add Battery status in tab nodes.
         - Update doc.
 
 - `Previous change <changelog.html>`_

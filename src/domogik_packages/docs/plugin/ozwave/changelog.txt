@@ -22,6 +22,7 @@ New instructions to apply changes from immediatly previous version.
         - Add list of recognized manufacturers and products by openzwave in "support tools" tab.
         - Add force refresh node.
         - Add openzwave log report in "support tools" tab.
+        - Add Battery status in tab nodes.
         - Update doc.
 
 - 0.2b4 : (05-28-2013) Compatibily library : the same. 
