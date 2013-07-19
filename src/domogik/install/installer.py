@@ -48,6 +48,8 @@ from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
 
+import time
+
 DB_BACKUP_FILE = tempfile.gettempdir() + "/domogik.sql"
 # Get full path for 'upgrade_repository'
 UPGRADE_REPOSITORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "upgrade_repository")
@@ -119,15 +121,23 @@ def add_initial_data():
     """Add required data when running a brand new install"""
     print("Adding initial data...")
 
-    # Create a default user account
-    _db.add_default_user_account()
-
     # Set sqlalchemy migrate version to the latest one
     rep_v = get_repository_version()
     meta = MetaData(bind=_engine)
     migrate_table = Table(MIGRATE_VERSION_TABLE, meta, autoload=True)
     update = migrate_table.update(migrate_table.c.repository_path == UPGRADE_REPOSITORY)
     update.execute(version=int(rep_v))
+
+    # Create a default user account
+    _db.add_default_user_account()
+
+    print "LIST = %s" % _db.list_user_accounts()
+
+    _db.add_default_user_account()
+
+    print "LIST = %s" % _db.list_user_accounts()
+
+    time.sleep(60)
 
 def user_want_database_upgrade():
     answer = raw_input("Do you want to upgrade your database? [Y/n] ")

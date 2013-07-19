@@ -1004,15 +1004,27 @@ class DbHelper():
         @return a UserAccount object
 
         """
+        self.__session.expire_all()
+        self.__session.begin(subtransactions=True)
+
+        print "@@@@@ add_default_user_account"
         default_person_fname = "Admin"
         default_person_lname = "Admin"
         default_user_account_login = "admin"
         if self.__session.query(UserAccount).count() > 0:
             return None
+        print "@@@@@ add_default_user_account AAA"
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
                                  p_birthdate=datetime.date(1900, 01, 01))
-        return self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
+        print "@@@@@ person=%s" % person
+        user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
                                      a_is_admin=True)
+        print "@@@@@ user_account=%s" % user_account
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return user_account
 
     def del_user_account(self, a_id):
         """Delete a user account
