@@ -27,7 +27,7 @@ def write_access_log_after(response):
 
 @urlHandler.before_request
 def write_acces_log_before():
-    urlHandler.logger.info('http request for {0} received'.format(request.path))
+    urlHandler.logger.info('http request for {0} received. Data : {1}'.format(request.path, request.values))
 
 # json reponse handler decorator
 # the url handlers funictions can return
