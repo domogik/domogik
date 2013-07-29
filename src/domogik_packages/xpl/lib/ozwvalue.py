@@ -155,7 +155,7 @@ class ZWaveValueNode:
                     ret = self._node._manager.releaseButton(self.valueData['id'])
                     print "type button , releasecommand :",  val
                 if not ret :
-                    retval ['error']   = 'value is not a Value Type_Button'
+                    retval ['error']   = 'Value is not a Value Type_Button.'
             else : value = val        
             print ("setValue de ", self.valueData['commandClass'], " instance :", self.valueData['instance'], " value : ",  value,
                        " on valueId :" , self.valueData['id'], " type : ",  self.valueData['type'])       
@@ -164,7 +164,7 @@ class ZWaveValueNode:
                     self._node._ozwmanager._log.error ("setValue return bad type : %s, instance :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['instance'],  val, self.valueData['id']))
                     print("return bad type value")
                     retval ['value'] = False
-                    retval['error'] = "return bad type value"
+                    retval['error'] = "Return bad type value."
                 else : 
                     self._valueData['value'] = val
                     self._lastUpdate = time.time()
@@ -174,7 +174,7 @@ class ZWaveValueNode:
                 self._node._ozwmanager._log.error ("setConfigParam no send message : %s, index :%d, value : %s, on valueId : %d" %(self.valueData['commandClass'], self.valueData['index'],  val, self.valueData['id']))
                 print("setConfigParam : no send message")
                 retval ['value'] = False
-                retval['error'] = "setConfigParam : no send message"
+                retval['error'] = "setConfigParam : no send message."
             else : 
                 self._valueData['value'] = val
                 self._lastUpdate = time.time()
@@ -197,7 +197,7 @@ class ZWaveValueNode:
         self._lastUpdate = time.time()
         valueData['homeId'] = int(valueData['homeId']) # Pour etre compatible avec javascript
         valueData['id'] = str(valueData['id']) # Pour etre compatible avec javascript
-        self._node.reportToUI({'notifytype': 'value-changed', 'usermsg' :'value has changed', 'data': valueData})
+        self._node.reportToUI({'notifytype': 'value-changed', 'usermsg' :'Value has changed.', 'data': valueData})
 
     def convertInType(self,  val):
         """Convertion de val dans le type de la value."""
@@ -282,9 +282,9 @@ class ZWaveValueNode:
             :rtype: bool"""
         try :
             intensity = int(intensity)
-        except OZwaveValueException as e:
-            self._log.error('value.enablePoll(intensity) :' + e.value)
-            return {"error" : "Enable poll, error : %s" %e.value}
+        except Exception as e:
+            self._log.error('value.enablePoll(intensity) :' + e.message)
+            return {"error" : "Enable poll, error : %s" %e.message}
         return self._node._manager.enablePoll(self.valueData['id'], intensity)
         
     def disablePoll(self):

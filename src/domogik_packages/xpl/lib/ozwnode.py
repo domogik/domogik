@@ -558,6 +558,7 @@ class ZWaveNode:
         retval["InitState"] = self.GetNodeStateNW()
         retval["Polled"] = self.isPolled
         retval["ComQuality"] = self.getComQuality()
+        retval["BatteryLevel"] = self._getBatteryLevel()
         return retval
         
     def getValuesInfos(self):
@@ -686,9 +687,9 @@ class ZWaveNode:
             self._manager.setNodeName(self.homeId, self.id, name)
             self._ozwmanager._log.debug('Requesting setNodeName for node {0} with new name {1}'.format(self.id, name))
             return True
-        except OZwaveNodeException as e :
-            self._ozwmanager._log.error('Node {0} naming error with name : {1}. '.format(self.id, name) + e.value)
-            print('Node {0} naming error with name : {1}. '.format(self.id, name) + e.value)
+        except Exception as e :
+            self._ozwmanager._log.error('Node {0} naming error with name : {1}. '.format(self.id, name) + e.message)
+            print('Node {0} naming error with name : {1}. '.format(self.id, name) + e.message)
             return False
             
     def setLocation(self, loc):
@@ -698,9 +699,9 @@ class ZWaveNode:
             self._manager.setNodeLocation(self.homeId, self.id, loc)   
             self._ozwmanager._log.debug('Requesting setNodeLocation for node {0} with new location {1}'.format(self.id, loc))
             return True
-        except OZwaveNodeException as e :
-            self._ozwmanager._log.error('Node {0} naming error with location : {1}. '.format(self.id, loc) + e.value)
-            print('Node {0} naming error with location : {1}. '.format(self.id, loc) + e.value)
+        except Exception as e :
+            self._ozwmanager._log.error('Node {0} naming error with location : {1}. '.format(self.id, loc) + e.message)
+            print('Node {0} naming error with location : {1}. '.format(self.id, loc) + e.message)
             return False
 
     def refresh(self):

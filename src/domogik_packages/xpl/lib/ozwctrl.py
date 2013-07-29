@@ -237,8 +237,8 @@ controller to learn new data.
         """Gestion des actions du controlleur et des messages de retour"""    
         retval = action
         retval['error'] = ''
-        errorCom = {'cmdstate': 'not running' , 'error': 'not started', 'error_msg': 'check your controller.'}
-        errorNode ={'cmdstate': 'not running',  'error': 'Unknown node : ' + str(action['nodeid']), 'error_msg': 'check input options.'}
+        errorCom = {'cmdstate': 'not running' , 'error': 'Not started', 'error_msg': 'Check your controller.'}
+        errorNode ={'cmdstate': 'not running',  'error': 'Unknown node : ' + str(action['nodeid']), 'error_msg': 'Check input options.'}
         if action['highpower'] =='True' : highpower = True
         else : highpower = False
         if action['cmd'] == 'Stop action' :
@@ -247,7 +247,7 @@ controller to learn new data.
                 retval['error'] = ''
                 retval['message'] = 'User have stop command.'
             else :
-                retval['error'] = 'Fail to stop controller commande'
+                retval['error'] = 'Fail to stop controller commande.'
                 if self._lastCtrlState['state'] == self.SIGNAL_CTRL_NORMAL : 
                     retval['cmdstate'] ='not running'
                     retval['error_msg'] = 'User have try stop command. But no action processing.'
@@ -270,13 +270,13 @@ controller to learn new data.
             elif action['action'] == 'CreateNewPrimary' :
                 if self.begin_command_create_new_primary() :
                     retval['cmdstate'] ='running'
-                    retval['message'] ='Wait for refresh, be patient....'
+                    retval['message'] ='Wait for refresh, be patient...'
                 else : retval.update(errorCom)   
     
             elif action['action'] == 'ReceiveConfiguration' :
                 if self.begin_command_receive_configuration() :
                     retval['cmdstate'] ='running'
-                    retval['message'] ='Wait for refresh, be patient....'
+                    retval['message'] ='Wait for refresh, be patient...'
                 else : retval.update(errorCom)    
     
             elif action['action'] == 'RemoveDevice' :
@@ -295,7 +295,7 @@ controller to learn new data.
                 if node :
                     if self.begin_command_remove_failed_node(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='wait for removing node , be patient....'
+                        retval['message'] ='Wait for removing node, be patient...'
                     else : retval.update(errorCom)
                 else : retval.update(errorNode)            
                 
@@ -309,7 +309,7 @@ controller to learn new data.
                 if node :
                     if self.begin_command_has_node_failed(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='wait for research , be patient....'
+                        retval['message'] ='Wait for research, be patient...'
                     else : retval.update(errorCom)
                 else : retval.update(errorNode)
                     
@@ -323,7 +323,7 @@ controller to learn new data.
                 if node :
                     if self.begin_command_replace_failed_node(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='wait for replace node failed, be patient....'
+                        retval['message'] ='Wait for replace node failed, be patient...'
                     else : retval.update(errorCom)
                 else : retval.update(errorNode)                    
                     
@@ -336,7 +336,7 @@ controller to learn new data.
             elif action['action'] == 'RequestNetworkUpdate' :
                 if self.begin_command_request_network_update() :
                     retval['cmdstate'] ='running'
-                    retval['message'] ='Wait for refresh, be patient....'
+                    retval['message'] ='Wait for refresh, be patient...'
                 else : retval.update(errorCom)
                     
             elif action['action'] =='RequestNodeNeighborUpdate':
@@ -349,7 +349,7 @@ controller to learn new data.
                 if node :
                     if self.begin_command_request_node_neigbhor_update(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='Wait for refresh, be patient....'
+                        retval['message'] ='Wait for refresh, be patient...'
                     else : retval.update(errorCom)
                 else : retval.update(errorNode)
  
@@ -369,11 +369,12 @@ controller to learn new data.
                 if node and nodeDest :
                     if self.begin_command_assign_return_route(action['nodeid'],  action['arg']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='Wait for route assign, be patient....'
+                        retval['message'] ='Wait for route assign, be patient...'
                     else : retval.update(errorCom)
                 else : 
                     retval.update(errorNode)
-                    retval['error'] = retval['error'] + ' and (or) node to : ' + str(action['arg'])
+                    if not node : retval['error'] = 'Unknown node : ' + str(action['nodeid']) +' '
+                    if not nodeDest : retval['error'] +=  'Unknown node : '  + str(action['arg'])
 
             elif action['action'] =='DeleteAllReturnRoutes':
                 if action['nodeid'] == 0 :
@@ -385,7 +386,7 @@ controller to learn new data.
                 if node :
                     if self.begin_command_delete_all_return_routes(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='Wait for deleting return route, be patient....'
+                        retval['message'] ='Wait for deleting return route, be patient...'
                     else : retval.update(errorCom)
                 else : retval.update(errorNode)
  
@@ -399,14 +400,14 @@ controller to learn new data.
                 if node :
                     if self.begin_command_send_node_information(action['nodeid']) :
                         retval['cmdstate'] ='running'
-                        retval['message'] ='Wait get node information, be patient....'
+                        retval['message'] ='Wait get node information, be patient...'
                     else : retval.update(errorCom)
                 else : retval.update(errorNode)
                 
             elif action['action'] == 'ReplicationSend' :
                 if self.begin_command_replication_send(highpower) :
                     retval['cmdstate'] ='running'
-                    retval['message'] ='Wait for sending information from primary to secondary.'
+                    retval['message'] ='Wait for sending information from primary to secondary, be patient...'
                 else : retval.update(errorCom)
             if retval['error'] == '' :
                 self._lastCtrlState = {'update' : time.time(),  'state': self.SIGNAL_CTRL_STARTING, 'error_msg' : 'None.',
@@ -427,7 +428,7 @@ controller to learn new data.
             else :
                 retval['cmdstate']  = 'waiting'
                 retval['state']  = 'Waiting'
-                retval['message'] ='Wait for controller response, be patient....'
+                retval['message'] ='Wait for controller response, be patient...'
         else :
             retval['error'] = 'Unknown cmd : ' + action['cmd']
             retval['cmdstate'] ='Unknown'
@@ -788,8 +789,8 @@ controller to learn new data.
             retval = value.enablePoll(intensity)
             if retval == True :
                 return {'error': ""}
-            else: {"error" : "Fail enable poll %d" % valueId + retval["error"]}
-        else : return {"error" : "Unknown value %d" % valueId}
+            else: {'error' : "Fail enable poll %d" % valueId + retval['error']}
+        else : return {'error' : "Unknown value %d" % valueId}
     
     def disablePoll(self, nodeId,  valueId):
         node = self._ozwmanager._getNode(self.homeId,  nodeId)
@@ -797,5 +798,5 @@ controller to learn new data.
         if value :
             if value.disablePoll() :
                 return {'error': ""}
-            else: {"error" : "Fail disable poll %d" % valueId}
-        else : return {"error" : "Unknown value %d" % valueId}
+            else: {'error' : "Fail disable poll %d" % valueId}
+        else : return {'error' : "Unknown value %d" % valueId}

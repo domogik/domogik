@@ -76,9 +76,9 @@ class OZwave(XplPlugin):
         try:
             self.myzwave = OZWavemanager(self, self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf)
             print 'manager demarré'
-        except OZwaveException as e:
-            self.log.error(e.value)
-            print e.value
+        except Exception as e:
+            self.log.error(e.message)
+            print e.message
             self.force_leave()
             return
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
@@ -122,7 +122,7 @@ class OZwave(XplPlugin):
         retval = UIdata.replace('&quot;', '"').replace('&squot;', "'").replace("&ouvr;", '{').replace("&ferm;", '}') ;
         try :
             return eval(retval)
-        except OZwaveException as e:
+        except Exception as e:
             print retval
             self.log.debug ("Format data to UI : eval in getdict2UIdata error : " +   retval)
             return {'error': 'invalid format'}
