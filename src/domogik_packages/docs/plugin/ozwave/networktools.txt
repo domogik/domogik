@@ -87,3 +87,15 @@ Enter node number and click button refresh.
     :width: 750px
 
 |node-stats|
+
+Device test messages
+====================
+
+.. |msg-test| image:: ozwave_test-result.png
+    :width: 750px
+
+You can send test message to all active nodes, or just one.
+Enter node number, number of message and click button "Send test messages".
+Results are display in "Node statistic" section for both case.
+
+|msg-test|

@@ -23,7 +23,9 @@ Show log file informations
 .. |logfile| image:: ozwave_display-log.png
     :width: 750px
 
-- You can display n lines from beginning or until end of ozwave plugin log file. 
+- You can display n lines from beginning or until end of ozwave plugin log file or openzwave lib C++ log when is activate in plugin parameter. 
+- Select type log, number of line(s) and click button.
+- Negative value on number of lines shows full log.
     
 |logfile|
 

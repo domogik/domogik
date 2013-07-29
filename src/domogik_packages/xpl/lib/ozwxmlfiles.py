@@ -230,13 +230,21 @@ class Manufacturers():
             products=[]
             try:
                 for p in m['products']:
-                    if p['name'] not in products :
-                        prod = {'name': p['name']}
-                        if p.has_key('config') :
-                            prod .update({'config': p['config']})
+                    newP = True
+                    if p.has_key('config') : conf = p['config']
+                    else : conf =""
+                    for rP in products :
+                        if p['name'] == rP['name'] and conf == rP['config'] :
+                   #     i = products.index(p['name']).index(p['id'])
+                            rP['ids'].append(p['id'])
+                            newP = False
+                    if newP :
+                  # if i = p['name'] not in products :
+                        prod = {'name': p['name'], 'type': p['type'], 'ids': [p['id']]}
+                        prod .update({'config': conf})
                         products.append(prod)
             except: pass
-            manufacturers.append({'manufacturer': m['name'],  'products': products})
+            manufacturers.append({'manufacturer': m['name'], 'id': m['id'],  'products': products})
         return manufacturers
     
     def getAllProductsTranslateText(self):
@@ -312,9 +320,9 @@ if __name__ == "__main__":
     toTranslate = listManufacturers.getAllProductsTranslateText()
     fich = open("/var/tmp/exporttrad.txt", "w")
 #    fich = open("D:/Python_prog/test/exporttrad.txt", "w")
-    for prod in  toTranslate['products']:
-        print prod
-        fich.write(prod['name'].encode('utf8').replace('\n','\r') + '\n\n')
+#    for prod in  toTranslate['products']:
+#        print prod
+#        fich.write(prod['name'].encode('utf8').replace('\n','\r') + '\n\n')
     for ligne in toTranslate['tabtext']:
         fich.write(ligne.encode('utf8').replace('\n','\r') + '\n\n')
     fich.close()
