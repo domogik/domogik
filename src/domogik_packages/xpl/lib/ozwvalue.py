@@ -282,9 +282,9 @@ class ZWaveValueNode:
             :rtype: bool"""
         try :
             intensity = int(intensity)
-        except OZwaveValueException as e:
-            self._log.error('value.enablePoll(intensity) :' + e.value)
-            return {"error" : "Enable poll, error : %s" %e.value}
+        except Exception as e:
+            self._log.error('value.enablePoll(intensity) :' + e.message)
+            return {"error" : "Enable poll, error : %s" %e.message}
         return self._node._manager.enablePoll(self.valueData['id'], intensity)
         
     def disablePoll(self):

@@ -4,7 +4,7 @@ Change log
 
 New instructions to apply changes from immediatly previous version.
 
-- 0.2b5 : (16-07-2013) Compatibily library : OpenZwave >= 1.0.663, python_openzwave >= 0.2.5 (rev >= 18832df1dd95).
+- 0.2b5 : (29-07-2013) Compatibily library : OpenZwave >= 1.0.663, python_openzwave >= 0.2.5 (rev >= 18832df1dd95).
     - Target : python_openzwave, domogik and domoweb.
     - Update, compile and install python_openzwave.
     - An insert_data or a reinstall is necessary.
@@ -13,6 +13,7 @@ New instructions to apply changes from immediatly previous version.
         - Fix accent on node name and location.
         - Fix display update name and location name just after sended.
         - Fix some actions bug.
+        - Fix some Exception error.
         - Forced unit conversion F -> °C for temperature device in F.
         - Double xPL message for switch multi-level. (for testing-not sure it's a good idea !)
         - UI dialog node associations improvement.

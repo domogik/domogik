@@ -114,9 +114,9 @@ class OZWavemanager(threading.Thread):
                 if HIdName != None : 
                     try :
                         self._nameAssoc[HIdName] = long(HIdAssoc,  16)
-                    except OZwaveManagerException as e:
-                        self._log.error(e.value)
-                        print e.value
+                    except Exception as e:
+                        self._log.error("Convertion HIdAssoc parameter error : " + e.message  + ". Forced to '0'")
+                        print "Convertion HIdAssoc parameter error : " + e.message + ". Forced to '0'"
                         self._nameAssoc[HIdName]  = 0
                 else:
                     loop = False
@@ -138,9 +138,9 @@ class OZWavemanager(threading.Thread):
             try : 
                 os.mkdir(self._userPath)
                 print ("User openzwave directory created : %s"  %self._userPath)
-            except OZwaveManagerException as e:
-                self._log.error(e.value)
-                print e.value
+            except Exception as e:
+                self._log.error(e.message)
+                print e.message
                 raise OZwaveManagerException ("Directory openzwave config not exist : %s"  % self._configPath)
         if not os.access(self._userPath,  os.W_OK) :
             self._log.error("User %s haven't write access on user openzwave directory : %s"  %(user,  self._configPath))
@@ -321,7 +321,7 @@ class OZWavemanager(threading.Thread):
             elif message['from'] == 'end':
                 retval['data'] = tailer.tail(open(filename), lines)
             else: return {'error': "No from direction define."}
-        except:
+        except :
                 retval['error'] = "Exception : %s" % (traceback.format_exc())
                 self._log.error("Get log openzwave lines : " + retval['error'])
         return retval
@@ -988,15 +988,15 @@ class OZWavemanager(threading.Thread):
             if newname != 'Undefined' and node.name != newname :
                 try :
                     node.setName(newname)
-                except OZwaveManagerException as e:
-                    self._log.error('node.setName() :' + e.value)
-                    return {"error" : "Node %d, can't update name, error : %s" %(nodeId, e.value) }
+                except Exception as e:
+                    self._log.error('node.setName() :' + e.message)
+                    return {"error" : "Node %d, can't update name, error : %s" %(nodeId, e.message) }
             if newloc != 'Undefined' and node.location != newloc :
                 try :
                     node.setLocation(newloc)
-                except OZwaveManagerException as e:
-                    self._log.error('node.setLocation() :' + e.value)
-                    return {"error" : "Node %d, can't update location, error : %s" %(nodeId, e.value) }
+                except Exception as e:
+                    self._log.error('node.setLocation() :' + e.message)
+                    return {"error" : "Node %d, can't update location, error : %s" %(nodeId, e.message) }
             return node.getInfos()                                
         else : return {"error" : "Zwave network not ready, can't find node %d" %nodeId}
 

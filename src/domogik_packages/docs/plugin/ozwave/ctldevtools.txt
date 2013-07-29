@@ -45,6 +45,8 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 
 .. |progess-state2| image:: ozwave_progess-state2.png
 
+.. |battery-level| image:: ozwave_battery-level.png
+
 .. |awake1| image:: ozwave_awake1.png
 
 .. |awake2| image:: ozwave_update-sleep.png
@@ -76,6 +78,10 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 |                  | In progress - Can receive messages | Node can now receive messages, but initialization not finish.                                      |
 |                  +------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | Out of operation                   | Node is mark as failed, controller don't find him.                                                 |
++------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | **Pointing the mouse over battery icon in column "NodeId" give status of battery level.**                                               |
+| |battery-level|  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Value in %                         | Fill icon picture level of battery.                                                                |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 |                  | **Pointing the mouse over icon in column "Awake" give status of listening mode.**                                                       |
 | |awake1|         +------------------------------------+----------------------------------------------------------------------------------------------------+
