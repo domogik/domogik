@@ -59,7 +59,7 @@ List of MQ messages used for pub/sub pattern
 * destination : used by : the ones which subscribe to the published data
 
 ======================= =================== ====================== =====================
-Source                  Used by             Header              Python example
+Source                  Used by             Header                 Python example
 ======================= =================== ====================== =====================
 xplevent                rest                statmgr.received
 ----------------------- ------------------- ---------------------- ---------------------
