@@ -9,7 +9,7 @@ from domogik.mq.message import MQMessage
 class Test(MQAsyncSub):
 
     def __init__(self):
-        MQAsyncSub.__init__(self, zmq.Context(), 'test', ['packages.detail'])
+        MQAsyncSub.__init__(self, zmq.Context(), 'test', ['client.list'])
         IOLoop.instance().start()
 
     def on_message(self, msgid, content):

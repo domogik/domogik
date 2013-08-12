@@ -273,7 +273,7 @@ class Manager(XplPlugin):
         msg_data = {}
         for pkg in self._packages:
             msg_data[pkg] = self._packages[pkg].get_json()
-        self._pub.send_event('packages.detail', 
+        self._pub.send_event('package.detail', 
                              msg_data)
 
 
@@ -380,7 +380,7 @@ class Manager(XplPlugin):
 
         ### packages details
         # retrieve the packages details
-        if msg.get_action() == "packages.detail.get":
+        if msg.get_action() == "package.detail.get":
             self.log.info("Packages details request : {0}".format(msg))
             self._mdp_reply_packages_detail()
 
@@ -392,12 +392,12 @@ class Manager(XplPlugin):
 
         ### clients list and details
         # retrieve the clients list
-        elif msg.get_action() == "clients.list.get":
+        elif msg.get_action() == "client.list.get":
             self.log.info("Clients list request : {0}".format(msg))
             self._mdp_reply_clients_list()
 
         # retrieve the clients details
-        elif msg.get_action() == "clients.detail.get":
+        elif msg.get_action() == "client.detail.get":
             self.log.info("Clients details request : {0}".format(msg))
             self._mdp_reply_clients_detail()
 
@@ -417,7 +417,7 @@ class Manager(XplPlugin):
         """ Reply on the MQ
         """
         msg = MQMessage()
-        msg.set_action('packages.detail.result')
+        msg.set_action('package.detail.result')
         for pkg in self._packages:
             msg.add_data(pkg, self._packages[pkg].get_json())
         self.reply(msg.get())
@@ -445,7 +445,7 @@ class Manager(XplPlugin):
         """ Reply on the MQ
         """
         msg = MQMessage()
-        msg.set_action('clients.list.result')
+        msg.set_action('client.list.result')
         clients = self._clients.get_list() 
         for key in clients:
             msg.add_data(key, clients[key])
@@ -456,7 +456,7 @@ class Manager(XplPlugin):
         """ Reply on the MQ
         """
         msg = MQMessage()
-        msg.set_action('clients.detail.result')
+        msg.set_action('client.detail.result')
         clients = self._clients.get_detail() 
         for key in clients:
             msg.add_data(key, clients[key])
@@ -497,7 +497,7 @@ class Manager(XplPlugin):
 
 class Package():
     """ This class is used to create a package object which contains the packages information (parts of the json).
-        This is needed for the packages.detais MQ dialog
+        This is needed for the package.detais MQ dialog
     """
 
     def __init__(self, type, name):
@@ -1027,9 +1027,9 @@ class Clients():
         """ Publish the clients list update over the MQ
         """
         # MQ publisher
-        self._pub.send_event('clients.list', 
+        self._pub.send_event('client.list', 
                              self._clients)
-        self._pub.send_event('clients.detail', 
+        self._pub.send_event('client.detail', 
                              self._clients_with_details)
 
 

@@ -3,39 +3,39 @@ Req/rep detailed informations
 =============================
 
 
-clients.list.get
+client.list.get
 ================
 
 Request : UIs
 Reply : manager
 
-To get the clients list, the UI may send a MQ request *clients.list.get* to the manager.
+To get the clients list, the UI may send a MQ request *client.list.get* to the manager.
 
-The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *clients.list*.
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *client.list*.
 
-An example to send the request is available as *src/domogik/examples/mq-python/req_clients_list.py*.
+An example to send the request is available as *src/domogik/examples/mq-python/req_client_list.py*.
 
 You will get a reply like this: ::
 
-    ['clients.list.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "configured": true, "pid": 0, "host": "darkstar", "package_id": "plugin-diskfree", "type": "plugin"}}']
+    ['client.list.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "configured": true, "pid": 0, "host": "darkstar", "package_id": "plugin-diskfree", "type": "plugin"}}']
 
 
 
-clients.detail.get
+client.detail.get
 ==================
 
 Request : UIs
 Reply : manager
 
-To get the clients detail, the UI may send a MQ request *clients.detail.get* to the manager.
+To get the clients detail, the UI may send a MQ request *client.detail.get* to the manager.
 
-The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *clients.detail*.
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *client.detail*.
 
-An example to send the request is available as *src/domogik/examples/mq-python/req_clients_detail.py*.
+An example to send the request is available as *src/domogik/examples/mq-python/req_client_detail.py*.
 
 You will get a reply like this: ::
 
-    ['clients.detail.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "data": {"configuration": [{"description": "Automatically start plugin at Domogik startup", "default": false, "required": false, "options": [], "key": "startup-plugin", "type": "boolean", "id": "0"}, {"description": "Interval between each poll (minute)", "default": 5, "required": false, "value": "7", "options": [], "key": "interval", "type": "integer", "id": "1"}]}, "configured": true, "pid": 0, "package_id": "plugin-diskfree", "host": "darkstar", "type": "plugin"}}']
+    ['client.detail.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "data": {"configuration": [{"description": "Automatically start plugin at Domogik startup", "default": false, "required": false, "options": [], "key": "startup-plugin", "type": "boolean", "id": "0"}, {"description": "Interval between each poll (minute)", "default": 5, "required": false, "value": "7", "options": [], "key": "interval", "type": "integer", "id": "1"}]}, "configured": true, "pid": 0, "package_id": "plugin-diskfree", "host": "darkstar", "type": "plugin"}}']
 
 
 config.get
@@ -136,23 +136,23 @@ You will get a reply like this: ::
     ['device_types.result', '{"diskfree.disk_usage": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": [], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "package_id": "plugin-diskfree", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "type": "plugin", "name": "diskfree"}}}']
 
 
-packages.detail.get
+package.detail.get
 ===================
 
 Request : UIs
 Reply : manager
 
-To get the packages detail, the UI may send a MQ request *packages.detail.get* to the manager.
+To get the packages detail, the UI may send a MQ request *package.detail.get* to the manager.
 
-The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *packages.detail*.
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *package.detail*.
 
-Be caution, this is different from *clients.detail* as only the packages are listed, not the instances of the packages (as does clients.detail). This message should be used only for packages management!!
+Be caution, this is different from *client.detail* as only the packages are listed, not the instances of the packages (as does client.detail). This message should be used only for packages management!!
 
-An example to send the request is available as *src/domogik/examples/mq-python/req_packages_detail.py*.
+An example to send the request is available as *src/domogik/examples/mq-python/req_package_detail.py*.
 
 You will get a reply like this: ::
 
-    ['packages.detail.result', '{"plugin-diskfree": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
+    ['package.detail.result', '{"plugin-diskfree": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "xpl_params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
 
 
 plugin.start.do
