@@ -104,6 +104,8 @@ Publisher:
 Subscriber: any member who wants to be aware of the packages details
 * UIs
 
+Be caution, this is different from *clients.detail* as only the packages are listed, not the instances of the packages (as does clients.detail). This message should be used only for packages management!!
+
 The manager publishes over the MQ the packages detail when there is something new.
 
 An example to catch these messages is available as *src/domogik/examples/mq-python/sub_packages_detail.py*.

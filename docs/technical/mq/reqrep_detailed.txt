@@ -146,6 +146,8 @@ To get the packages detail, the UI may send a MQ request *packages.detail.get* t
 
 The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *packages.detail*.
 
+Be caution, this is different from *clients.detail* as only the packages are listed, not the instances of the packages (as does clients.detail). This message should be used only for packages management!!
+
 An example to send the request is available as *src/domogik/examples/mq-python/req_packages_detail.py*.
 
 You will get a reply like this: ::

@@ -379,7 +379,7 @@ class Manager(XplPlugin):
         XplPlugin.on_mdp_request(self, msg)
 
         ### packages details
-        # retrieve the clients details
+        # retrieve the packages details
         if msg.get_action() == "packages.detail.get":
             self.log.info("Packages details request : {0}".format(msg))
             self._mdp_reply_packages_detail()
@@ -524,12 +524,13 @@ class Package():
                 self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
             else:
                 self.json = pkg_json.get_json()
-                del(self.json['configuration'])
-                del(self.json['xpl_stats'])
-                del(self.json['commands'])
-                del(self.json['xpl_commands'])
-                del(self.json['sensors'])
-                del(self.json['json_version'])
+                # TODO : clean useless informations
+                #del(self.json['configuration'])
+                #del(self.json['xpl_stats'])
+                #del(self.json['commands'])
+                #del(self.json['xpl_commands'])
+                #del(self.json['sensors'])
+                #del(self.json['json_version'])
         except:
             self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.name, traceback.format_exc()))
 
@@ -831,14 +832,6 @@ class Plugin(GenericComponent, MQAsyncSub):
                 self.log.error("Plugin {0} : invalid json file".format(self.name))
             else:
                 self.data = pkg_json.get_json()
-                del(self.data['xpl_stats'])
-                del(self.data['udev_rules'])
-                del(self.data['device_types'])
-                del(self.data['commands'])
-                del(self.data['xpl_commands'])
-                del(self.data['sensors'])
-                del(self.data['identity'])
-                del(self.data['json_version'])
                 # and finally, add the configuration values in the data
                 self.add_configuration_values_to_data()
         except:
