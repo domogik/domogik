@@ -1,3 +1,4 @@
+from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
 from flask import request
@@ -187,22 +188,43 @@ class deviceAPI(MethodView):
         return 204, b
 
     def post(self):
+        """ Create a new device
+            Get all the clients details
+            Finally, call the database function to create the device and give it the device types list and clients details : they will be used to fill the database as the json structure is recreated in the database
+        """
         cli = MQSyncReq(urlHandler.zmq_context)
+
+        #self.log.info("Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
+        #urlHandler.log.info("Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
+
+        # get the client details
         msg = MQMessage()
-        msg.set_action('device_types.get')
-        msg.add_data('device_type', request.form.get('type_id') )
+        msg.set_action('client.detail.get')
         res = cli.request('manager', msg.get(), timeout=10)
         if res is None:
-            return "Bad device type"
-        pjson = res.get_data()
-        pjson = pjson[request.form.get('type_id')]
+            return 500, "Error while getting the clients details"
+
+        # create the full client id : 
+        if request.form.get('type') == "plugin":
+            client_id = "{0}-{1}.{2}".format(DMG_VENDOR_ID, request.form.get('id'), request.form.get('host'))
+        else:
+            client_id = "{0}-{1}.{2}".format(request.form.get('type'), request.form.get('id'), request.form.get('host'))
+
+        # get the corresponding json
+        all_clients_data = res.get_data()
+
+        # extract the inresting part of the json (just the client part)
+        client_data = all_clients_data[client_id]['data']
+
+        # create the device in database
+        # notice that we don't give any address for the device as this will be done with another url later
         b = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
-            type_id=request.form.get('type_id'),
-            plugin_id=request.form.get('plugin_id'),
+            device_type=request.form.get('device_type'),
+            client_id=client_id,
             description=request.form.get('description'),
             reference=request.form.get('reference'),
-            pjson=pjson
+            client_data=client_data
         )
         return 201, b
 
