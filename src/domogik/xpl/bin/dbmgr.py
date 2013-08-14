@@ -39,6 +39,8 @@ Implements
 
 import traceback
 
+from domogik.xpl.lib.rest.jsondata import domogik_encoder
+from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
 from domogik.mq.reqrep.worker import MQRep
@@ -46,6 +48,7 @@ from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 import time
 import zmq
+import json
 
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
@@ -119,7 +122,7 @@ class DBConnector(XplPlugin, MQRep):
             self._mdp_reply_config_delete(msg)
 
         # devices list
-        elif msg.get_action() == "devices.get":
+        elif msg.get_action() == "device.get":
             self._mdp_reply_devices_result(msg)
 
 
@@ -333,11 +336,11 @@ class DBConnector(XplPlugin, MQRep):
 
 
     def _mdp_reply_devices_result(self, data):
-        """ Reply to devices.get MQ req
+        """ Reply to device.get MQ req
             @param data : MQ req message
         """
         msg = MQMessage()
-        msg.set_action('devices.result')
+        msg.set_action('device.result')
         status = True
 
         msg_data = data.get_data()
@@ -349,18 +352,27 @@ class DBConnector(XplPlugin, MQRep):
             status = False
             reason = "Devices request : missing 'name' field : {0}".format(data)
 
+        if 'host' not in msg_data:
+            status = False
+            reason = "Devices request : missing 'host' field : {0}".format(data)
+
         if status == False:
             self.log.error(reason)
         else:
             reason = ""
             type = msg_data['type']
+            if type == "plugin":
+                type = DMG_VENDOR_ID
             name = msg_data['name']
-            dev_list = self._db.list_devices_by_plugin("{0}-{1}".format(type, name))
+            host = msg_data['host']
+            dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+            dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('type', type)
             msg.add_data('name', name)
-            msg.add_data('devices', dev_list)
+            msg.add_data('host', host)
+            msg.add_data('devices', dev_json)
 
         self.log.debug(msg.get())
         self.reply(msg.get())
