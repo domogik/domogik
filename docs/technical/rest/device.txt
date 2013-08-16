@@ -1,0 +1,159 @@
+============================
+/device - devices management
+============================
+
+Available actions : 
+
+* GET : get one or several devices informations
+* POST : create a new device
+* PUT : update an existing device
+* DELETE : delete a existing device
+
+
+GET
+===
+
+This method is used to get informations about existing devices. There are several way to call the **/device** url with the GET method.
+
+/device
+-------
+
+All the devices will be returned in a json table. 
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/device
+    Response (application/json) : 
+    [
+        {
+            "commands": {...},
+            "description": "a description",
+            "reference": "a reference",
+            "sensors": {...},
+            "device_type_id": "a.device.type",
+            "plugin_id": "domogik-aplugin.ahostname",
+            "id": 666,
+            "name": "a name for the device"
+        },
+        { ...}
+    ]
+    
+/device/<device id>
+-------------------
+
+The device corresponding to the given id will be returned in a json.
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/device
+    Response (application/json) :
+        {
+            "commands": {...},
+            "description": "a description",
+            "reference": "a reference",
+            "sensors": {...},
+            "device_type_id": "a.device.type",
+            "plugin_id": "domogik-aplugin.ahostname",
+            "id": 666,
+            "name": "a name for the device"
+        }
+
+POST
+====
+
+This method is used to create a new device.
+
+The created device will be returned as a json structure which is similar to a part of the packages json file.
+
+Example: ::
+
+    Method : POST
+    Url : http://127.0.0.1:40405/device
+    Headers:
+        Content-Type: application/x-www-form-urlencoded
+    Body: 
+        name=the device name
+        type=the client type (plugin, ...)
+        id=the client id (diskfree, ozwave, ...)
+        host=the client host
+        description=some description about the device
+        reference=some reference about the device
+        device_type=the type of the device we want to create (diskfree.disk_usage, ...)
+    Response (application/json):
+        {
+            "commands": {...},
+            "description": "a description",
+            "reference": "a reference",
+            "sensors": {...},
+            "device_type_id": "a.device.type",
+            "plugin_id": "domogik-aplugin.ahostname",
+            "id": 666,
+            "name": "a name for the device"
+        }
+
+
+PUT
+===
+
+This method is used to update the basic informations about a device:
+
+* name
+* description
+* refeence
+
+Any other device information can be updated by other urls.
+
+The updated device will be returned as a json structure which is similar to a part of the packages json file.
+
+Example: ::
+
+    Method : PUT
+    Url : http://127.0.0.1:40405/device/<device id>
+    Headers:
+        Content-Type: application/x-www-form-urlencoded
+    Body: 
+        name=the device name
+        description=some description about the device
+        reference=some reference about the device
+    Response (application/json):
+        {
+            "commands": {...},
+            "description": "a description",
+            "reference": "a reference",
+            "sensors": {...},
+            "device_type_id": "a.device.type",
+            "plugin_id": "domogik-aplugin.ahostname",
+            "id": 666,
+            "name": "a name for the device"
+        }
+
+
+DELETE
+======
+
+This method is used to delete a device.
+
+/device/<device id>
+-------------------
+
+The device corresponding to the given id will be returned in a json.
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/device/<device id>
+    Response (application/json) :
+        {
+            "commands": {...},
+            "description": "a description",
+            "reference": "a reference",
+            "sensors": {...},
+            "device_type_id": "a.device.type",
+            "plugin_id": "domogik-aplugin.ahostname",
+            "id": 666,
+            "name": "a name for the device"
+        }
+
+

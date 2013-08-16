@@ -1,0 +1,106 @@
+=============
+REST Overview
+=============
+
+.. todo::
+
+    * description
+    * pictures/charts about startup, url processing, MQ dialogs
+    * ...
+   
+Overview
+========
+
+REST is ....
+
+
+Use REST for test
+=================
+wget method
+-----------
+You can execute a REST GET request from a console using the *wget* command. 
+For example you can run: ::
+
+    $ wget -qO- http://127.0.0.1:40405/device
+
+This will run the request and show you the results (thanks to the *-qO-* parameter).
+
+FireFox RESTClient
+------------------
+
+This Firefox plugin will allow you to send easily POST, DELETE and other requests.
+
+Install FF plugin from here: https://addons.mozilla.org/en-us/firefox/addon/restclient/.
+ 
+Lauch with **Tools > RestClient**
+ 
+In this example we will use RESTClient for testing POST url 
+ 
+In the RESTClient interface menu go in **Headers > Custom Header** and : 
+
+* Create a header with **name**: 'Content-Type', **value**: 'application/x-www-form-urlencoded'
+* You may tick **Save to favorites** for the next time
+
+Next, go back on the RESTClient main interface:
+
+* **method**: 'POST', **url**: 'http://xxxxx:40405/device/'
+* **body** : name=device%20name&type=plugin&id=diskfree&host=darkstar&description=desc&reference=ref&device_type=diskfree.disk_usage
+ 
+And Click on **Send**
+
+Configuration section in /etc/domogik/domogik.cfg 
+=================================================
+
+In Domogik configuration file, there are several options about REST in **[rest]** section:
+
+* server_ip (default : 127.0.0.1) : ip of REST HTTP server 
+* server_port (default : 40405) : port of REST HTTP server
+* use_ssl (default : False) : use (True) or not (False) HTTPS instead of HTTP
+* ssl_certificate (default : empty) : path of certificate file (.pem)
+
+How to use REST with SSL?
+=========================
+
+Generate certificate 
+--------------------
+First, generate a self-signed certificate compounded of a certificate and a private key for your REST server with the following command (both certificate and key are put in a single file : domogik.pem): ::
+
+    $ openssl req -new -x509 -keyout domogik.pem -out domogik.pem -days 365 -nodes
+
+This certificate is valid for one year. Adapt the *days* parameter (-days 365) to change this.
+
+Configure REST
+--------------
+Then, set **rest_use_ssl** parameter to True and **rest_ssl_certificate** with the path to your certificate file.
+
+Restart REST server.
+
+Status 
+======
+
+Rest uses http status codes to identify the error:
+
+get:
+    code = 200
+    data = the returned data from the get request (json)
+
+delete:
+    code = 204
+    data = empty
+ 
+put (update):
+    code = 200
+    data = the updated object (json)
+ 
+post (create):
+    code = 201
+    data = the new object (json)
+ 
+error:
+    code = 400
+    data = {msg: "string describing the error"}
+ 
+action ok, no content returnd:
+    code = 204
+    data = Empty
+
