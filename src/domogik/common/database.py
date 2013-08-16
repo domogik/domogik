@@ -326,10 +326,18 @@ class DbHelper():
         """Return a list of devices
         @return a list of Device objects (only the devices that are known by this realease)
         """
-        return self.__session.query(Device).filter(Device.address==None).all()
+        #return self.__session.query(Device).filter(Device.address==None).all()
+        device_list = []
+        for device in self.__session.query(Device).filter(Device.address==None).all():
+            device_list.append(self.get_device(device.id))
+        return device_list
 
     def list_devices_by_plugin(self, p_id):
-        return self.__session.query(Device).filter_by(plugin_id=p_id).all()
+        #return self.__session.query(Device).filter_by(plugin_id=p_id).all()
+        device_list = []
+        for device in self.__session.query(Device).filter_by(plugin_id=p_id).all():
+            device_list.append(self.get_device(device.id))
+        return device_list
 
     def list_old_devices(self):
         """Return a list of devices
@@ -344,7 +352,36 @@ class DbHelper():
         @return a Device object
 
         """
-        return self.__session.query(Device).filter_by(id=d_id).first()
+        device = self.__session.query(Device).filter_by(id=d_id).first()
+
+        # fill basic informations about the device
+        json_device = { 'id' : device.id, 
+                        'name' : device.name, 
+                        'reference' : device.reference, 
+                        'description' : device.description, 
+                        'device_type_id' : device.device_type_id, 
+                        'plugin_id' : device.plugin_id
+                      }
+
+        # complete with sensors informations
+        sensors = self.get_sensor_by_device_id(device.id)
+        json_device['sensors'] = {}
+        for a_sensor in sensors:
+            json_sensor = { 'id' : a_sensor.id,
+                            'name' : a_sensor.name,
+                            'data_type' : a_sensor.data_type,
+                            'conversion' : a_sensor.conversion, 
+                            'last_value' : a_sensor.last_value, 
+                            'last_received' : a_sensor.last_received
+                          }
+            json_device['sensors'][a_sensor.reference] = json_sensor
+
+        # complete with commands informations
+        # TODO :)
+        json_device['commands'] = {}
+
+        return json_device
+
 
     def add_device_and_commands(self, name, device_type, client_id, description, reference, client_data):
         """ Create a device : fill the following tables with data from the related client json file

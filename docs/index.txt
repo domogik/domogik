@@ -59,7 +59,7 @@ Technical Documentation
 * :doc:`Sensors </technical/sensor>`
 * **Database:**
   :doc:`Model </technical/database>` OSSOLETE
-* **RINOR:**
+* **RINOR:** -- obsolete : see the REST chapter for 0.4 developments --
 	* :doc:`Overview </technical/rinor/index>`
 	* :doc:`XPL Events </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
 	* :doc:`REST /device </technical/rinor/rest_device>`: Get device data from the database
@@ -71,6 +71,9 @@ Technical Documentation
 	* :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
 	* :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
 	* :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
+* **REST:**
+	* :doc:`Overview </technical/rest/index>`
+	* :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
 * **Message Queue:**

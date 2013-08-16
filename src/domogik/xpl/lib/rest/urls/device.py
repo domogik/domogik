@@ -177,8 +177,7 @@ class deviceAPI(MethodView):
 
     def get(self, did):
         if did != None:
-            b = urlHandler.db.list_devices(did)
-            print b
+            b = urlHandler.db.get_device(did)
         else:
             b = urlHandler.db.list_devices()
         return 200, b
@@ -218,7 +217,7 @@ class deviceAPI(MethodView):
 
         # create the device in database
         # notice that we don't give any address for the device as this will be done with another url later
-        b = urlHandler.db.add_device_and_commands(
+        created_device = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             device_type=request.form.get('device_type'),
             client_id=client_id,
@@ -226,7 +225,8 @@ class deviceAPI(MethodView):
             reference=request.form.get('reference'),
             client_data=client_data
         )
-        return 201, b
+        
+        return 201, created_device
 
     def put(self, did):
         b = urlHandler.db.update_device(
@@ -235,6 +235,6 @@ class deviceAPI(MethodView):
             request.form.get('description'),
             request.form.get('reference'),
         )
-        return 200, b
+        return 200, urlHandler.db.get_device(did)
 
 register_api(deviceAPI, 'device', '/device/', pk='did', pk_type='int')
