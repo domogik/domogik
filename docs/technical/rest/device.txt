@@ -133,12 +133,7 @@ Example: ::
 DELETE
 ======
 
-This method is used to delete a device.
-
-/device/<device id>
--------------------
-
-The device corresponding to the given id will be returned in a json.
+This method is used to delete a device. The device corresponding to the given id will be returned in a json.
 
 Example: ::
 
