@@ -49,16 +49,16 @@ Example: ::
     Method : GET
     Url : http://127.0.0.1:40405/device
     Response (application/json) :
-        {
-            "commands": {...},
-            "description": "a description",
-            "reference": "a reference",
-            "sensors": {...},
-            "device_type_id": "a.device.type",
-            "plugin_id": "domogik-aplugin.ahostname",
-            "id": 666,
-            "name": "a name for the device"
-        }
+    {
+        "commands": {...},
+        "description": "a description",
+        "reference": "a reference",
+        "sensors": {...},
+        "device_type_id": "a.device.type",
+        "plugin_id": "domogik-aplugin.ahostname",
+        "id": 666,
+        "name": "a name for the device"
+    }
 
 POST
 ====
@@ -82,16 +82,16 @@ Example: ::
         reference=some reference about the device
         device_type=the type of the device we want to create (diskfree.disk_usage, ...)
     Response (application/json):
-        {
-            "commands": {...},
-            "description": "a description",
-            "reference": "a reference",
-            "sensors": {...},
-            "device_type_id": "a.device.type",
-            "plugin_id": "domogik-aplugin.ahostname",
-            "id": 666,
-            "name": "a name for the device"
-        }
+    {
+        "commands": {...},
+        "description": "a description",
+        "reference": "a reference",
+        "sensors": {...},
+        "device_type_id": "a.device.type",
+        "plugin_id": "domogik-aplugin.ahostname",
+        "id": 666,
+        "name": "a name for the device"
+    }
 
 
 PUT
@@ -118,16 +118,16 @@ Example: ::
         description=some description about the device
         reference=some reference about the device
     Response (application/json):
-        {
-            "commands": {...},
-            "description": "a description",
-            "reference": "a reference",
-            "sensors": {...},
-            "device_type_id": "a.device.type",
-            "plugin_id": "domogik-aplugin.ahostname",
-            "id": 666,
-            "name": "a name for the device"
-        }
+    {
+        "commands": {...},
+        "description": "a description",
+        "reference": "a reference",
+        "sensors": {...},
+        "device_type_id": "a.device.type",
+        "plugin_id": "domogik-aplugin.ahostname",
+        "id": 666,
+        "name": "a name for the device"
+    }
 
 
 DELETE
@@ -137,18 +137,18 @@ This method is used to delete a device. The device corresponding to the given id
 
 Example: ::
 
-    Method : GET
+    Method : DELETE
     Url : http://127.0.0.1:40405/device/<device id>
     Response (application/json) :
-        {
-            "commands": {...},
-            "description": "a description",
-            "reference": "a reference",
-            "sensors": {...},
-            "device_type_id": "a.device.type",
-            "plugin_id": "domogik-aplugin.ahostname",
-            "id": 666,
-            "name": "a name for the device"
-        }
+    {
+        "commands": {...},
+        "description": "a description",
+        "reference": "a reference",
+        "sensors": {...},
+        "device_type_id": "a.device.type",
+        "plugin_id": "domogik-aplugin.ahostname",
+        "id": 666,
+        "name": "a name for the device"
+    }
 
 

@@ -1,0 +1,25 @@
+======================================================
+/device/addglobal - add a global parameter to a device
+======================================================
+
+Available actions : 
+
+* PUT : set the global parameter for all xpl commands and xpl stats
+
+..todo ::
+
+    Finish
+
+PUT
+===
+
+This method is used to .............................
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/device/.............................
+    Response (application/json) : 
+    .............................
+
+    
