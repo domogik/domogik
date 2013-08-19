@@ -376,6 +376,47 @@ class DbHelper():
                           }
             json_device['sensors'][a_sensor.reference] = json_sensor
 
+        # complete for each xpl_stat information
+        json_device['xpl_stats'] = {}
+        for a_xplstat in self.get_xpl_stat_by_device_id(device.id):
+            json_xplstat = { 'id' : a_xplstat.id,
+                             'name' : a_xplstat.name,
+                             'schema' : a_xplstat.schema,
+                             'parameters' : {
+                                'static' : [],
+                                'dynamic' : [],
+                                'device' : []
+                             }
+                           }
+            # and for each xpl_stat, add the parameters informations
+            # the loop is done twice : 
+            # - for the dynamic parameters
+            # - for the static parameters
+            # Notice : 
+            #- if static field == 1 => this is a static param
+            #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
+            #- if statis == 0 and it has a sensor id => its a dynamic param
+            for a_xplstat_param in a_xplstat.params:
+                if a_xplstat_param.static == False:
+                    if a_xplstat_param.sensor_id == None:
+                        json_xplstat['parameters']['device'].append({ 'xplstat_id' :  a_xplstat_param.xplstat_id,
+                                                                      'key' :  a_xplstat_param.key,
+                                                                      'value' :  a_xplstat_param.value
+                                                                    })
+                    else:
+                        json_xplstat['parameters']['dynamic'].append({'xplstat_id' :  a_xplstat_param.xplstat_id,
+                                                                      'key' :  a_xplstat_param.key,
+                                                                      'value' :  a_xplstat_param.value,
+                                                                      'ignore_values' :  a_xplstat_param.ignore_values
+                                                                    })
+                if a_xplstat_param.static == True:
+                    json_xplstat['parameters']['static'].append({ 'xplstat_id' :  a_xplstat_param.xplstat_id,
+                                                                  'key' :  a_xplstat_param.key,
+                                                                  'value' :  a_xplstat_param.value
+                                                                })
+                 
+            json_device['xpl_stats'][a_xplstat.name] = json_xplstat
+
         # complete with commands informations
         # TODO :)
         json_device['commands'] = {}
@@ -427,12 +468,15 @@ class DbHelper():
             self.__session.flush()
 
             ### Table core_xplstat_param
+            #- if static field == 1 => this is a static param
+            #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
+            #- if statis == 0 and it has a sensor id => its a dynamic param
 
             # static parameters
             for a_parameter in xplstat_in_client_data['parameters']['static']:
                 self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_sensor, a_parameter))
                 parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                          sensor_id = None, \
+                                          sensor_id = sensor.id, \
                                           key = a_parameter['key'], \
                                           value = a_parameter['value'], \
                                           static = True, \
@@ -496,8 +540,6 @@ class DbHelper():
        
         # then, parse xpl_stats
         tmp = {}
-        print "@@@pjson="
-        print pjson
         for the_sensor_id in pjson['xpl_stats']:
             xpl_stat = pjson['xpl_stats'][the_sensor_id]
             for param_id in xpl_stat['parameters']:
@@ -1139,23 +1181,18 @@ class DbHelper():
         #self.__session.expire_all()
         ##self.__session.begin(subtransactions=True)
 
-        print "@@@@@ add_default_user_account"
         default_person_fname = "Admin"
         default_person_lname = "Admin"
         default_user_account_login = "admin"
         if self.__session.query(UserAccount).count() > 0:
             return None
-        print "@@@@@ add_default_user_account AAA"
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
                                  p_birthdate=datetime.date(1900, 01, 01))
-        print "@@@@@ person=%s" % person
         user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
                                      a_is_admin=True)
-        print "@@@@@ user_account=%s" % user_account
         #try:
         #    self.__session.commit()
         #except Exception as sql_exception:
-        #    print "FIIIIIIII"
         #    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return user_account
 

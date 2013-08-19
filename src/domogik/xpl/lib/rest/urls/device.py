@@ -16,77 +16,86 @@ def device_list_old():
 @json_response
 def device_params(dev_type_id):
     try:
-        cli = MQSyncReq(urlHandler.zmq_context)
-        msg = MQMessage()
-        msg.set_action('device_types.get')
-        msg.add_data('device_type', dev_type_id)
-        res = cli.request('manager', msg.get(), timeout=10)
-        if res is None:
-            return "Bad device type"
-        pjson = res.get_data()
-        pjson = pjson[dev_type_id]
-        # parse the data
-        ret = {}
-        ret['commands'] = []
-        ret['global'] = []
-        if 'xpl_params' in pjson['device_types'][dev_type_id]:
-            ret['global']  = pjson['device_types'][dev_type_id]['xpl_params']
-        ret['xpl_stat'] = []
-        ret['xpl_cmd'] = []
-        # find all features for this device
-        for c in pjson['device_types'][dev_type_id]['commands']:
-            if not c in pjson['commands']:
-                break
-            cm = pjson['commands'][c]
-            ret['commands'].append(c)
-            # we must have an xpl command
-            if not 'xpl_command' in cm:
-                break
-            # we have an xpl_command => find it
-            if not cm['xpl_command'] in pjson['xpl_commands']:
-                return "Command references an unexisting xpl_command"
-            # find the xpl commands that are neede for this feature
-            cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
-            cmd['id'] = c
-            # finc the xpl_stat message
-            cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
-            cmd['id'] = c
-            # finc the xpl_stat message
-            if not 'xplstat_name' in cmd:
-                break
-            if not cmd['xplstat_name'] in pjson['xpl_stats']:
-                return "XPL command references an unexisting xpl_stat"
-            stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
-            stat['id'] = cmd['xplstat_name']
-            # remove all parameters
-            cmd['params'] = cmd['parameters']['device']
-            del cmd['parameters']
-            ret['xpl_cmd'].append(cmd)
-            if stat is not None:
-                # remove all parameters
-                stat['params'] = stat['parameters']['device']
-                del stat['parameters']
-                ret['xpl_stat'].append(stat)
-            del stat
-            del cmd
-        ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
+        result = get_device_params(dev_type_id)
     except:
-        return "Error in getting xplparams"
+        # TODO : catch the error message raised
+        return 500, "Error while getting device params"
     # return the info
-    return 200, ret
+    return 200, result
+
+def get_device_params(dev_type_id):
+    cli = MQSyncReq(urlHandler.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev_type_id)
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is None:
+        raise "Bad device type"
+    pjson = res.get_data()
+    pjson = pjson[dev_type_id]
+    # parse the data
+    ret = {}
+    ret['commands'] = []
+    ret['global'] = []
+    if 'xpl_params' in pjson['device_types'][dev_type_id]:
+        ret['global']  = pjson['device_types'][dev_type_id]['xpl_params']
+    ret['xpl_stat'] = []
+    ret['xpl_cmd'] = []
+    # find all features for this device
+    for c in pjson['device_types'][dev_type_id]['commands']:
+        if not c in pjson['commands']:
+            break
+        cm = pjson['commands'][c]
+        ret['commands'].append(c)
+        # we must have an xpl command
+        if not 'xpl_command' in cm:
+            break
+        # we have an xpl_command => find it
+        if not cm['xpl_command'] in pjson['xpl_commands']:
+            raise "Command references an unexisting xpl_command"
+        # find the xpl commands that are neede for this feature
+        cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
+        cmd['id'] = c
+        # finc the xpl_stat message
+        cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
+        cmd['id'] = c
+        # finc the xpl_stat message
+        if not 'xplstat_name' in cmd:
+            break
+        if not cmd['xplstat_name'] in pjson['xpl_stats']:
+            raise "XPL command references an unexisting xpl_stat"
+        stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
+        stat['id'] = cmd['xplstat_name']
+        # remove all parameters
+        cmd['params'] = cmd['parameters']['device']
+        del cmd['parameters']
+        ret['xpl_cmd'].append(cmd)
+        if stat is not None:
+            # remove all parameters
+            stat['params'] = stat['parameters']['device']
+            del stat['parameters']
+            ret['xpl_stat'].append(stat)
+        del stat
+        del cmd
+    ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
+    return ret
 
 @urlHandler.route('/device/addglobal/<int:did>', methods=['PUT'])
 @json_response
 def device_globals(did):
-    dev = urlHandler.db.get_device(id)
-    js = device_params_get(dev.device_type_id, json=False)
-    for x in urlHandler.db.get_xpl_command_by_device_id(id):
+    #- if static field == 1 => this is a static param
+    #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
+    #- if statis == 0 and it has a sensor id => its a dynamic param
+    device = urlHandler.db.get_device(did)
+    js = get_device_params(device['device_type_id'])
+    for x in urlHandler.db.get_xpl_command_by_device_id(did):
         for p in js['global']:
             urlHandler.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
-    for x in self._db.get_xpl_stat_by_device_id(id):
+    for x in urlHandler.db.get_xpl_stat_by_device_id(did):
         for p in js['global']:
-            urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
-    return 204, ""
+            #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
+            urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=False)
+    return 200, "{}"
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])
 @json_response
