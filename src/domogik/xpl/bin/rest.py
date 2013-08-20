@@ -174,7 +174,7 @@ class Rest(XplPlugin):
         urlHandler.xpl = self.myxpl 
         # reload statsmanager helper
         urlHandler.reload_stats = self.reload_stats
-        urlHandler.zmq_context = self._zmq
+        urlHandler.zmq_context = self.zmq
         # handler for getting the paths
         urlHandler.resources_directory = self.get_resources_directory()
         
@@ -209,7 +209,7 @@ class Rest(XplPlugin):
 
     def reload_stats(self):
         self.log.debug("=============== reload stats")
-        req = MQSyncReq(self._zmq)
+        req = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.setaction( 'reload' )
         req.request('statmgr', msg.get())

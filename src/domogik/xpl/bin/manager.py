@@ -178,9 +178,9 @@ class Manager(XplPlugin):
         self.log.info("Packages path : {0}".format(self.get_packages_directory()))
 
         ### MQ
-        # self._zmq = zmq.Context() is aleady define in XplPlugin
+        # self.zmq = zmq.Context() is aleady define in XplPlugin
         # notice that Xplugin plugins already inherits of MQRep
-        # notice that MQRep.__init__(self, self._zmq, self.name) is already done in XplPlugin
+        # notice that MQRep.__init__(self, self.zmq, self.name) is already done in XplPlugin
 
         ### Create the clients list
         self._clients = Clients()
@@ -257,7 +257,7 @@ class Manager(XplPlugin):
                                                self._clients, 
                                                self.get_libraries_directory(),
                                                self.get_packages_directory(),
-                                               self._zmq,
+                                               self.zmq,
                                                self.get_stop,
                                                self.get_sanitized_hostname())
                     # The automatic startup is handled in the Plugin class in __init__
@@ -294,7 +294,7 @@ class Manager(XplPlugin):
             @param name : component name : dbmgr, rest
         """
         self._inc_startup_lock()
-        component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self._zmq)
+        component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
         self._write_fifo("INFO", "Start {0}...".format(name))
         pid = component.start()
         if pid != 0:
@@ -627,10 +627,10 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         self.register_component()
 
         ### zmq context
-        self._zmq = zmq_context
+        self.zmq = zmq_context
 
         ### subscribe the the MQ for category = plugin and name = self.name
-        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status'])
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status'])
 
 
     def start(self):
@@ -753,13 +753,13 @@ class Plugin(GenericComponent, MQAsyncSub):
         self._libraries_directory = libraries_directory
 
         ### zmq context
-        self._zmq = zmq_context
+        self.zmq = zmq_context
 
         ### XplPlugin
         self._stop = stop
 
         ### config
-        self._config = Query(self._zmq, self.log)
+        self._config = Query(self.zmq, self.log)
 
         ### get the plugin data (from the json file)
         status = None
@@ -779,7 +779,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.register_component()
 
         ### subscribe the the MQ for category = plugin and name = self.name
-        MQAsyncSub.__init__(self, self._zmq, 'manager', ['plugin.status', 'plugin.configuration'])
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.name, 'auto_startup')

@@ -47,6 +47,7 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 from domogik.mq.pubsub.publisher import MQPub
 from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.packagejson import PackageJson, PackageException
@@ -109,12 +110,12 @@ class XplPlugin(BasePlugin, MQRep):
         self._name = name
 
         # MQ publisher and REP
-        self._zmq = zmq.Context()
-        self._pub = MQPub(self._zmq, self._name)
+        self.zmq = zmq.Context()
+        self._pub = MQPub(self.zmq, self._name)
         self._send_status(STATUS_STARTING)
         ### MQ
         # for stop requests
-        MQRep.__init__(self, self._zmq, self._name)
+        MQRep.__init__(self, self.zmq, self._name)
 
 
         self._is_manager = is_manager
@@ -173,7 +174,7 @@ class XplPlugin(BasePlugin, MQRep):
             Check in database (over queryconfig) if the key 'configured' is set to True for the plugin
             if not, stop the plugin and log this
         """
-        self._config = Query(self._zmq, self.log)
+        self._config = Query(self.zmq, self.log)
         configured = self._config.query(self._name, 'configured')
         if configured == '1':
             configured = True
@@ -266,6 +267,43 @@ class XplPlugin(BasePlugin, MQRep):
 
         # no cast operation : return the value
         return value
+
+    def get_device_list(self):
+        """ Request the dbmgr component over MQ to get the devices list for this client
+        """
+        self.log.info("Retrieve the devices list for this client...")
+        mq_client = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('device.get')
+        msg.add_data('type', 'plugin')
+        msg.add_data('name', 'diskfree')
+        msg.add_data('host', 'darkstar')
+        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        if not result:
+            self.log.error("Unable to retrieve the device list")
+            self.force_leave()
+            return
+        else:
+            device_list = result.get_data()['devices']
+            for a_device in device_list:
+                self.log.info("- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
+                                                                                    a_device['name'], \
+                                                                                    a_device['device_type_id']))
+                # log some informations about the device
+                # first : the stats
+                self.log.info("  Features :")
+                for a_xpl_stat in a_device['xpl_stats']:
+                    self.log.info("  - {0}".format(a_xpl_stat))
+                    self.log.info("    Parameters :")
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['device']:
+                        self.log.info("    - {0} = {1}".format(a_feature['key'], a_feature['value']))
+
+                # then, the commands
+                # TODO !!!!!!
+
+            return device_list
+         
+
 
     def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin

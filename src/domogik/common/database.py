@@ -135,9 +135,10 @@ class DbHelper():
             pool_recycle = DEFAULT_RECYCLE_POOL
 
         if config[0]['log_level'] == 'debug':
-            logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
-            logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
-            logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
+            #logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
+            #logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
+            #logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
+            pass
 
         url = self.get_url_connection_string()
         if use_test_db:
@@ -335,8 +336,10 @@ class DbHelper():
     def list_devices_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(plugin_id=p_id).all()
         device_list = []
+        print "=> %s" % p_id
         for device in self.__session.query(Device).filter_by(plugin_id=p_id).all():
             device_list.append(self.get_device(device.id))
+            print "->%s" % device.id
         return device_list
 
     def list_old_devices(self):
