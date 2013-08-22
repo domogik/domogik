@@ -159,6 +159,7 @@ class XplPlugin(BasePlugin, MQRep):
         #self._process_info.start()
 
         self.enable_hbeat_called = False
+        self.dont_run_ready = False
 
         # for all no core elements, load the json
         # TODO find a way to do it nicer ??
@@ -235,41 +236,50 @@ class XplPlugin(BasePlugin, MQRep):
             if self.json_data['configuration'][idx]['key'] == key:
                 type = self.json_data['configuration'][idx]['default']
                 self.log.info("Casting value for key '{0}' in type '{1}'...".format(key, type)) 
-                try:
-                    if type == "boolean":
-                        # just in case, the "True"/"False" are not already converted in True/False
-                        # this is (currently) done on queryconfig side
-                        if value == "True":
-                            return True
-                        elif value ==  "False":
-                            return False
-                    # type == choice : nothing to do
-                    if type == "date": 
-                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
-                    if type == "datetime": 
-                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
-                    # type == email : nothing to do
-                    if type == "float":
-                        return float(value)
-                    if type == "integer":
-                        return float(value)
-                    # type == ipv4 : nothing to do
-                    # type == multiple choice : nothing to do
-                    # type == string : nothing to do
-                    if type == "time": 
-                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
-                    # type == url : nothing to do
-
-                except:
-                    # if an error occurs : return the default value and log a warning
-                    self.log.warning("Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
-                    return value
+                return self.cast(value, type)
 
         # no cast operation : return the value
         return value
 
-    def get_device_list(self):
+    def cast(self, value, type):
+        """ Cast a value for a type
+            @param value : value to cast
+            @param type : type in which you want to cast the value
+        """
+        try:
+            if type == "boolean":
+                # just in case, the "True"/"False" are not already converted in True/False
+                # this is (currently) done on queryconfig side
+                if value == "True":
+                    return True
+                elif value ==  "False":
+                    return False
+            # type == choice : nothing to do
+            if type == "date": 
+                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+            if type == "datetime": 
+                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+            # type == email : nothing to do
+            if type == "float":
+                return float(value)
+            if type == "integer":
+                return float(value)
+            # type == ipv4 : nothing to do
+            # type == multiple choice : nothing to do
+            # type == string : nothing to do
+            if type == "time": 
+                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+            # type == url : nothing to do
+
+        except:
+            # if an error occurs : return the default value and log a warning
+            self.log.warning("Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
+            return value
+        return value
+
+    def get_device_list(self, quit_if_no_device = False):
         """ Request the dbmgr component over MQ to get the devices list for this client
+            @param quit_if_no_device: if True, exit the plugin if there is no devices
         """
         self.log.info("Retrieve the devices list for this client...")
         mq_client = MQSyncReq(self.zmq)
@@ -282,9 +292,15 @@ class XplPlugin(BasePlugin, MQRep):
         if not result:
             self.log.error("Unable to retrieve the device list")
             self.force_leave()
-            return
+            return []
         else:
             device_list = result.get_data()['devices']
+            if device_list == []:
+                self.log.warn("There is no device created for this client")
+                if quit_if_no_device:
+                    self.log.warn("The developper requested to stop the client if there is no device created")
+                    self.force_leave()
+                    return []
             for a_device in device_list:
                 self.log.info("- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
                                                                                     a_device['name'], \
@@ -302,12 +318,28 @@ class XplPlugin(BasePlugin, MQRep):
                 # TODO !!!!!!
 
             return device_list
+
+    def get_parameter_for_feature(self, a_device, type, feature, key):
+        """ For a device feature, return the required parameter value
+            Example with : a_device = {u'xpl_stats': {u'get_total_space': {u'name': u'get_total_space', u'id': 49, u'parameters': {u'device': [{u'xplstat_id': 49, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 49, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 49, u'key': u'type', u'value': u'total_space'}], u'dynamic': [{u'xplstat_id': 49, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_free_space': {u'name': u'get_free_space', u'id':51, u'parameters': {u'device': [{u'xplstat_id': 51, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 51, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 51, u'key': u'type', u'value': u'free_space'}], u'dynamic': [ {u'xplstat_id': 51, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_used_space': {u'name': u'get_used_space', u'id': 52, u'parameters': {u'device': [{u'xplstat_id': 52, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 52, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 52, u'key': u'type', u'value': u'used_space'}], u'dynamic': [{u'xplstat_id': 52, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_percent_used': {u'name': u'get_percent_used', u'id': 50, u'parameters': {u'device': [{u'xplstat_id': 50, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 50, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 50, u'key': u'type', u'value': u'percent_used'}], u'dynamic': [{u'xplstat_id': 50, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}}, u'commands': {}, u'description': u'/home sur darkstar', u'reference': u'ref', u'id': 49, u'device_type_id': u'diskfree.disk_usage', u'sensors': {u'get_total_space': {u'conversion': u'', u'name': u'Total Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 80}, u'get_free_space': {u'conversion': u'', u'name': u'Free Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 82}, u'get_used_space': {u'conversion': u'', u'name': u'Used Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 83}, u'get_percent_used': {u'conversion': u'', u'name': u'Percent used', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 81}}, u'plugin_id': u'domogik-diskfree.darkstar', u'name': u'darkstar:/home'}
+                         type = xpl_stats
+                         feature = get_percent_used
+                         key = device
+            Return : /home
+        """
+        for a_param in a_device[type][feature]['parameters']['device']:
+            if a_param['key'] == key:
+                return self.cast(a_param['value'], a_param['type'])
+        return None
          
 
 
     def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin
         """
+        if self.dont_run_ready == True:
+            return
+
         ### activate xpl hbeat
         if self.enable_hbeat_called == True:
             self.log.error("in ready() : enable_hbeat() function already called : the plugin may not be fully converted to the 0.4+ Domogik format")
@@ -566,6 +598,13 @@ class XplPlugin(BasePlugin, MQRep):
         '''
         Leave threads & timers
         '''
+        # avoid ready() to be launched
+        self.dont_run_ready = True
+        # stop IOLoop
+        #try:
+        #    IOLoop.instance().start()
+        #except:
+        #    pass
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
         # send stopped status over the MQ

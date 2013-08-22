@@ -404,7 +404,8 @@ class DbHelper():
                     if a_xplstat_param.sensor_id == None:
                         json_xplstat['parameters']['device'].append({ 'xplstat_id' :  a_xplstat_param.xplstat_id,
                                                                       'key' :  a_xplstat_param.key,
-                                                                      'value' :  a_xplstat_param.value
+                                                                      'value' :  a_xplstat_param.value,
+                                                                      'type' :  a_xplstat_param.type
                                                                     })
                     else:
                         json_xplstat['parameters']['dynamic'].append({'xplstat_id' :  a_xplstat_param.xplstat_id,
@@ -483,7 +484,8 @@ class DbHelper():
                                           key = a_parameter['key'], \
                                           value = a_parameter['value'], \
                                           static = True, \
-                                          ignore_values = None)
+                                          ignore_values = None,
+                                          type = None)
                 self.__session.add(parameter)
                 self.__session.flush()
 
@@ -498,7 +500,8 @@ class DbHelper():
                                           key = a_parameter['key'], \
                                           value = None, \
                                           static = False, \
-                                          ignore_values = a_parameter['ignore_values'])
+                                          ignore_values = a_parameter['ignore_values'],
+                                          type = None)
                 self.__session.add(parameter)
                 self.__session.flush()
 
@@ -1538,10 +1541,10 @@ class DbHelper():
     def get_xpl_stat_param_by_sensor(self, sensor_id):
         return self.__session.query(XplStatParam).filter_by(sensor_id=sensor_id).first()
 
-    def add_xpl_stat_param(self, statid, key, value, static, ignore_values=None):
+    def add_xpl_stat_param(self, statid, key, value, static, ignore_values=None, type=None):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
-        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None, ignore_values=ignore_values)
+        param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None, ignore_values=ignore_values, type=type)
         self.__session.add(param)
         try:
             self.__session.commit()
@@ -1549,7 +1552,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
-    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, ignore_values=None):
+    def update_xpl_stat_param(self, stat_id, key, value=None, static=None, ignore_values=None, type=None):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
@@ -1561,6 +1564,8 @@ class DbHelper():
             param.static = static
         if ignore_values is not None:
             param.ignore_values = ignore_values
+        if type is not None:
+            param.type = type
         self.__session.add(param)
         try:
             self.__session.commit()

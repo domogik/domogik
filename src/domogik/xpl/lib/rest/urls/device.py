@@ -94,7 +94,7 @@ def device_globals(did):
     for x in urlHandler.db.get_xpl_stat_by_device_id(did):
         for p in js['global']:
             #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
-            urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=False)
+            urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=False, type=p['type'])
     return 200, "{}"
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])

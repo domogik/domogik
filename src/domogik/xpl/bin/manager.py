@@ -239,7 +239,7 @@ class Manager(XplPlugin):
             try:
                 [type, name] = pkg.split("_")
             except:
-                self.log.warning("Invalid package : {0}".format(pkg))
+                self.log.warning("Invalid package : {0} (should be named like this : <type>_<name> (plugin_ipx800, ...)".format(pkg))
                 continue
             self.log.debug("Type : {0}     / Id : {1}".format(type, name))
           
