@@ -105,9 +105,7 @@ class QueryMQ():
 
         ### response from dbmgr
         else:
-            res = MQMessage()
-            res.set(ret)
-            dat = res.get_data()
+            dat = ret.get_data()
             if dat['status']:
                 self._log.debug("Query config : successfull response : {0}".format(ret))
                 if key == "*":

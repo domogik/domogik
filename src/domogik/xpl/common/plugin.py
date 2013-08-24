@@ -294,9 +294,7 @@ class XplPlugin(BasePlugin, MQRep):
             self.force_leave()
             return []
         else:
-            res = MQMessage()
-            res.set(result)
-            device_list = res.get_data()['devices']
+            device_list = result.get_data()['devices']
             if device_list == []:
                 self.log.warn("There is no device created for this client")
                 if quit_if_no_device:
