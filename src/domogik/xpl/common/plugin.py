@@ -287,14 +287,16 @@ class XplPlugin(BasePlugin, MQRep):
         msg.set_action('device.get')
         msg.add_data('type', 'plugin')
         msg.add_data('name', 'diskfree')
-        msg.add_data('host', 'darkstar')
+        msg.add_data('host', self.get_sanitized_hostname())
         result = mq_client.request('dbmgr', msg.get(), timeout=10)
         if not result:
             self.log.error("Unable to retrieve the device list")
             self.force_leave()
             return []
         else:
-            device_list = result.get_data()['devices']
+            res = MQMessage()
+            res.set(result)
+            device_list = res.get_data()['devices']
             if device_list == []:
                 self.log.warn("There is no device created for this client")
                 if quit_if_no_device:
@@ -327,10 +329,13 @@ class XplPlugin(BasePlugin, MQRep):
                          key = device
             Return : /home
         """
-        for a_param in a_device[type][feature]['parameters']['device']:
-            if a_param['key'] == key:
-                return self.cast(a_param['value'], a_param['type'])
-        return None
+        try:
+            for a_param in a_device[type][feature]['parameters']['device']:
+                if a_param['key'] == key:
+                    return self.cast(a_param['value'], a_param['type'])
+            return None
+        except:
+            return None
          
 
 

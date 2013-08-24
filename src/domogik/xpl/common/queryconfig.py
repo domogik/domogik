@@ -105,14 +105,17 @@ class QueryMQ():
 
         ### response from dbmgr
         else:
-            if ret._data['status']:
+            res = MQMessage()
+            res.set(ret)
+            dat = res.get_data()
+            if dat['status']:
                 self._log.debug("Query config : successfull response : {0}".format(ret))
                 if key == "*":
-                    return ret._data['data']
+                    return dat['data']
                 else:
-                    return ret._data['value']
+                    return dat['value']
             else:
-                self._log.error("Query config : error returned. Reason : {0}".format(ret._data['reason']))
+                self._log.error("Query config : error returned. Reason : {0}".format(dat['reason']))
                 return None
 
 

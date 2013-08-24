@@ -17,9 +17,8 @@ def device_list_old():
 def device_params(dev_type_id):
     try:
         result = get_device_params(dev_type_id)
-    except:
-        # TODO : catch the error message raised
-        return 500, "Error while getting device params"
+    except Exception as e:
+        return 500, "Error while getting device params: {0}".format(e)
     # return the info
     return 200, result
 
@@ -30,7 +29,7 @@ def get_device_params(dev_type_id):
     msg.add_data('device_type', dev_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
-        raise "Bad device type"
+        raise Exception("Bad device type")
     pjson = res.get_data()
     pjson = pjson[dev_type_id]
     # parse the data
@@ -63,7 +62,7 @@ def get_device_params(dev_type_id):
         if not 'xplstat_name' in cmd:
             break
         if not cmd['xplstat_name'] in pjson['xpl_stats']:
-            raise "XPL command references an unexisting xpl_stat"
+            raise Exception("XPL command references an unexisting xpl_stat")
         stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
         stat['id'] = cmd['xplstat_name']
         # remove all parameters
