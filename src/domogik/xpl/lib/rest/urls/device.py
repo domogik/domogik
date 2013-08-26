@@ -29,9 +29,13 @@ def get_device_params(dev_type_id):
     msg.add_data('device_type', dev_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
-        raise Exception("Bad device type")
+        raise Exception("Bad device type (MQ)")
     pjson = res.get_data()
+    if pjson is None:
+        raise Exception("Bad device type (json)")
     pjson = pjson[dev_type_id]
+    if pjson is None:
+        raise Exception("Device type not found")
     # parse the data
     ret = {}
     ret['commands'] = []
