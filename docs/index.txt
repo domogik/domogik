@@ -58,7 +58,7 @@ Technical Documentation
 * :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
 * **Database:**
-  :doc:`Model </technical/database>` OSSOLETE
+  :doc:`Model </technical/database>`
 * **RINOR:** -- obsolete : see the REST chapter for 0.4 developments --
   * :doc:`Overview </technical/rinor/index>`
   * :doc:`XPL Events </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
