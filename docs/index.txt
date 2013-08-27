@@ -72,13 +72,15 @@ Technical Documentation
   * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
   * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
 * **REST:**
-  * :doc:`Overview </technical/rest/index>`
-  * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
-  * Devices parameters management
-    * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
-    * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
-  * Old Domogik 0.2/0.3 devices migration
-    * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
+    * :doc:`Overview </technical/rest/index>`
+    * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
+    * Devices parameters management
+        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
+        * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
+    * Old Domogik 0.2/0.3 devices migration
+        * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
+* **Db manager:**
+* **XPL Event manager:**
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
 * **Message Queue:**
