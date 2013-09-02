@@ -58,6 +58,7 @@ from domogik.common.sql_schema import (
         Sensor, SensorHistory,
         XplCommand, XplStat, XplStatParam, XplCommandParam
 )
+from contextlib import contextmanager
 
 DEFAULT_RECYCLE_POOL = 3600
 
@@ -135,9 +136,9 @@ class DbHelper():
             pool_recycle = DEFAULT_RECYCLE_POOL
 
         if config[0]['log_level'] == 'debug':
-            #logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
-            #logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
-            #logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
+            logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
+            logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
+            logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
             pass
 
         url = self.get_url_connection_string()
@@ -151,9 +152,28 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8', 
                                                              pool_recycle=pool_recycle, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
-            #DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True, autocommit=True)
             DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
+        #self.__session = DbHelper.__session_object()
+
+    @contextmanager
+    def session_scope(self):
         self.__session = DbHelper.__session_object()
+        try:
+            yield self.__session
+            self.__session.commit()
+        except:
+            self.__session.rollback()
+            raise
+        finally:
+            self.__session.close()
+            self.__session = None
+
+    def open_session(self):
+        self.__session = DbHelper.__session_object()
+
+    def close_session(self):
+        self.__session.close()
+        self.__session = None
 
     def get_engine(self):
         """Return the existing engine or None if not set
@@ -788,14 +808,17 @@ class DbHelper():
         self.__session.execute(
             t_stats.delete().where(and_(t_stats.c.device_id == oid, t_stats.c.skey == okey))
         )
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return num
             
 ####
 # Sensor history
 ####
     def add_sensor_history(self, sid, value, date):
-	self.__session.expire_all()
+        self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
 	sensor = self.__session.query(Sensor).filter_by(id=sid).first()
 	if sensor is not None:
@@ -1080,6 +1103,7 @@ class DbHelper():
         @return the new UserAccount object or raise a DbHelperException if it already exists
 
         """
+        self.__session.expire_all()
         person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
         return self.add_user_account(a_login, a_password, person.id, a_is_admin, a_skin_used)
 
@@ -1132,6 +1156,7 @@ class DbHelper():
         @return a UserAccount object
 
         """
+        self.__session.expire_all()
         user_acc = self.update_user_account(a_id, a_login, None, a_is_admin, a_skin_used)
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1184,6 +1209,7 @@ class DbHelper():
         @return a UserAccount object
 
         """
+        self.__session.expire_all()
         #self.__session.expire_all()
         ##self.__session.begin(subtransactions=True)
 
@@ -1254,7 +1280,6 @@ class DbHelper():
 
         """
         # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
         person = Person(first_name=p_first_name, last_name=p_last_name, birthdate=p_birthdate)
         self.__session.add(person)
@@ -1275,7 +1300,6 @@ class DbHelper():
 
         """
         # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
         person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is None:
@@ -1320,22 +1344,18 @@ class DbHelper():
 # sensor
 ###################
     def get_all_sensor(self):
-        self.__session.expire_all()
         return self.__session.query(Sensor).all()
 
     def get_sensor_by_device_id(self, did):
-        self.__session.expire_all()
         return self.__session.query(Sensor).filter_by(device_id=did).all()
 
 ###################
 # command
 ###################
     def get_all_command(self):
-        self.__session.expire_all()
         return self.__session.query(Command).all()
     
     def get_command(self, id):
-        self.__session.expire_all()
         return self.__session.query(Command).filter_by(id=id).first()
     
     def add_command(self, device_id, name, reference, return_confirmation):
@@ -1367,15 +1387,12 @@ class DbHelper():
 # xplcommand
 ###################
     def get_all_xpl_command(self):
-        self.__session.expire_all()
         return self.__session.query(XplCommand).all()
     
     def get_xpl_command(self, p_id):
-        self.__session.expire_all()
         return self.__session.query(XplCommand).filter_by(id=p_id).first()
 
     def get_xpl_command_by_device_id(self, d_id):
-        self.__session.expire_all()
         return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
 
     def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id, json_id):
@@ -1434,15 +1451,12 @@ class DbHelper():
 # xplstat
 ###################
     def get_all_xpl_stat(self):
-        self.__session.expire_all()
         return self.__session.query(XplStat).all()
 
     def get_xpl_stat(self, p_id):
-        self.__session.expire_all()
         return self.__session.query(XplStat).filter_by(id=p_id).first()
     
     def get_xpl_stat_by_device_id(self, d_id):
-        self.__session.expire_all()
         return self.__session.query(XplStat).filter_by(device_id=d_id).all()
 
     def add_xpl_stat(self, name, schema, device_id, json_id):
@@ -1488,15 +1502,6 @@ class DbHelper():
         self.__session.add(stat)
         try:
             self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return stat
-
-###################
-# XplCommandParam
-###################
-    def add_xpl_command_param(self, cmd_id, key, value):
-        self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
         param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
         self.__session.add(param)

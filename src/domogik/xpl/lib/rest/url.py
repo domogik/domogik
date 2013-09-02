@@ -20,6 +20,7 @@ def db_helper(action_func):
 # create acces_log
 @urlHandler.after_request
 def write_access_log_after(response):
+    urlHandler.db.close_session()
     urlHandler.logger.debug(' => response status code: {0}'.format(response.status_code))
     urlHandler.logger.debug(' => response content_type: {0}'.format(response.content_type))
     urlHandler.logger.debug(' => response data: {0}'.format(response.response))
@@ -27,6 +28,7 @@ def write_access_log_after(response):
 
 @urlHandler.before_request
 def write_acces_log_before():
+    urlHandler.db.open_session()
     urlHandler.logger.info('http request for {0} received. Data : {1}'.format(request.path, request.values))
 
 # json reponse handler decorator

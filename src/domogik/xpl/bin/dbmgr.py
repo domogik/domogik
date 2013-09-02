@@ -70,61 +70,57 @@ class DBConnector(XplPlugin, MQRep):
 
         # Check for database connexion
         self._db = DbHelper()
-        nb_test = 0
-        db_ok = False
-        while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
-            nb_test += 1
-            try:
-                self._db.list_user_accounts()
-                db_ok = True
-            except:
-                msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}".format(nb_test, DATABASE_CONNECTION_NUM_TRY)
+        with self._db.session_scope():
+            nb_test = 0
+            db_ok = False
+            while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
+                nb_test += 1
+                try:
+                    self._db.list_user_accounts()
+                    db_ok = True
+                except:
+                    msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}".format(nb_test, DATABASE_CONNECTION_NUM_TRY)
+                    self.log.error(msg)
+                    msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
+                    self.log.info(msg)
+                    time.sleep(DATABASE_CONNECTION_WAIT)
+
+            if nb_test >= DATABASE_CONNECTION_NUM_TRY:
+                msg = "Exiting dbmgr!"
                 self.log.error(msg)
-                msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
-                self.log.info(msg)
-                time.sleep(DATABASE_CONNECTION_WAIT)
+                self.force_leave()
+                return
 
-        if nb_test >= DATABASE_CONNECTION_NUM_TRY:
-            msg = "Exiting dbmgr!"
-            self.log.error(msg)
-            self.force_leave()
-            return
-
-        msg = "Connected to the database"
-        self.log.info(msg)
-        try:
-            self._engine = self._db.get_engine()
-        except:
-            self.log.error("Error while starting database engine : {0}".format(traceback.format_exc()))
-            self.force_leave()
-            return
-
+            msg = "Connected to the database"
+            self.log.info(msg)
+            try:
+                self._engine = self._db.get_engine()
+            except:
+                self.log.error("Error while starting database engine : {0}".format(traceback.format_exc()))
+                self.force_leave()
+                return
         self.ready()
         # Already done in ready()
         #IOLoop.instance().start() 
-
 
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
             @param msg : MQ req message
         """
-        # XplPlugin handles MQ Req/rep also
-        XplPlugin.on_mdp_request(self, msg)
+        with self._db.session_scope():
+            # XplPlugin handles MQ Req/rep also
+            XplPlugin.on_mdp_request(self, msg)
 
-        # configuration
-        if msg.get_action() == "config.get":
-            self._mdp_reply_config_get(msg)
-
-        elif msg.get_action() == "config.set":
-            self._mdp_reply_config_set(msg)
-
-        elif msg.get_action() == "config.delete":
-            self._mdp_reply_config_delete(msg)
-
-        # devices list
-        elif msg.get_action() == "device.get":
-            self._mdp_reply_devices_result(msg)
-
+            # configuration
+            if msg.get_action() == "config.get":
+                self._mdp_reply_config_get(msg)
+            elif msg.get_action() == "config.set":
+                self._mdp_reply_config_set(msg)
+            elif msg.get_action() == "config.delete":
+                self._mdp_reply_config_delete(msg)
+            # devices list
+            elif msg.get_action() == "device.get":
+                self._mdp_reply_devices_result(msg)
 
     def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req

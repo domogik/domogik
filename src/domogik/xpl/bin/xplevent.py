@@ -76,6 +76,7 @@ class XplEvent(XplPlugin, MQRep):
         """ (re)load all xml files to (re)create _Stats objects
         """
         self.log.info("Rest Stat Manager loading.... ")
+        self._db.open_session()
         try:
             # not the first load : clean
             if self.stats != None:
@@ -108,6 +109,7 @@ class XplEvent(XplPlugin, MQRep):
                                   "xpl-stat", self.log, self._db, self.pub))
         except:
             self.log.error("%s" % traceback.format_exc())
+        self._db.close_session()
         self.log.info("Loading finished")
   
     class _Stat:
@@ -150,15 +152,14 @@ class XplEvent(XplPlugin, MQRep):
             """ Callback for the xpl message
             @param message : the Xpl message received 
             """
-            my_db = DbHelper()
             self._log_stats.debug("Stat received for device %s." \
-                    % (self._dev.name))
+                    % (self._dev['name']))
             current_date = calendar.timegm(time.gmtime())
             device_data = []
             try:
                 # find what parameter to store
                 for p in self._stat.params:
-                    if p.sensor_id is not None:
+                    if p.sensor_id is not None and p.static is 0:
                         if p.key in message.data:
                             value = message.data[p.key]
                             self._log_stats.debug("Key found %s with value %s." \
@@ -179,7 +180,10 @@ class XplEvent(XplPlugin, MQRep):
                                         % (p.key, value))
                                 # do the store
                                 device_data.append({"value" : value, "sensor": p.sensor_id})
-                                my_db.add_sensor_history(p.sensor_id, value, current_date)
+                                my_db = DbHelper()
+                                with my_db.scoped_session():
+                                    my_db.add_sensor_history(p.sensor_id, value, current_date)
+                                del(my_db)
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
                 print("==== Error in Stats ====")
@@ -188,11 +192,10 @@ class XplEvent(XplPlugin, MQRep):
                 self._log_stats.error(error)
             # publish the result
             self._pub.send_event('device-stats', \
-                          {"timestamp" : current_date, "device_id" : self._dev.id, "data" : device_data})
+                          {"timestamp" : current_date, "device_id" : self._dev['id'], "data" : device_data})
             # put data in the event queue
             #self._event_requests.add_in_queues(self._dev.id, 
             #        {"timestamp" : current_date, "device_id" : self._dev.id, "data" : device_data})
-            del(my_db)
 
 if __name__ == '__main__':
     EVTN = XplEvent()
