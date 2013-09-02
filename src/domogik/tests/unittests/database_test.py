@@ -784,7 +784,8 @@ class DeviceStatsTestCase(GenericTestCase):
 
         # Months
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
-        end_p = make_ts(2013, 6, 21, 15, 48, 0)
+        now = datetime.datetime.now()
+        end_p = make_ts(now.year, now.month, now.day, 15, 48, 0)
         insert_step = 3600 * 24 * 15
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
@@ -820,7 +821,6 @@ class DeviceStatsTestCase(GenericTestCase):
                                                     start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                     end_date_ts=None, step_used='month', function_used='avg')
         ym_list = [(r[0], r[1]) for r in results['values']]
-        now = datetime.datetime.now()
         assert (2010, 6) in ym_list
         # We use the previous month because it may happen that no data have been inserted for the current month
         # Especially when we are at the beginning of the month
