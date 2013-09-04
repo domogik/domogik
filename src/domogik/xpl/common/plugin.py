@@ -286,7 +286,7 @@ class XplPlugin(BasePlugin, MQRep):
         msg = MQMessage()
         msg.set_action('device.get')
         msg.add_data('type', 'plugin')
-        msg.add_data('name', 'diskfree')
+        msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
         result = mq_client.request('dbmgr', msg.get(), timeout=10)
         if not result:
