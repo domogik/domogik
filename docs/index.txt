@@ -93,6 +93,5 @@ Technical Documentation
 
 Developers Documentation
 ========================
-* :doc:`Developing a package </package_development/index>`
-* :doc:`Upgrading a package to 0.4 </package_development/json_file_upgrade>`
+* :doc:`Developing a package </package_development/plugins/index>`
 * :doc:`Tools </tools/index>`
