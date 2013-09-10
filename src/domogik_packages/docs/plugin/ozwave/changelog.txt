@@ -4,6 +4,12 @@ Change log
 
 New instructions to apply changes from immediatly previous version.
 
+- 0.2c1 : (29-07-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
+    - Target : domogik.
+    - Change log :
+        - Retrieve domogik device zwave ctrl address from rest.
+        - update doc
+		
 - 0.2b5 : (29-07-2013) Compatibily library : OpenZwave >= 1.0.663, python_openzwave >= 0.2.5 (rev >= 18832df1dd95).
     - Target : python_openzwave, domogik and domoweb.
     - Update, compile and install python_openzwave.

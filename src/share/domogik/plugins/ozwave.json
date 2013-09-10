@@ -429,7 +429,7 @@
 		"category" : "Z-wave",
 		"documentation" : "http://wiki.domogik.org/tiki-index.php?page=plugin_ozwave",
 		"description" : "Z-Wave is a wireless ecosystem that lets all your home electronics talk to each other, and to you, via remote control",
-		"changelog" : "0.2b5\n - Add poll service, Force conversion degre F to C ++ see changelog in doc\n0.2b4\n - Add support-tools, Change WebSocket server to generic\n0.2b3\n - Add test network function\n0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
+		"changelog" : "0.2c1\n - release candidate 1, \n0.2b5\n - Add poll service, Force conversion degre F to C ++ see changelog in doc\n0.2b4\n - Add support-tools, Change WebSocket server to generic\n0.2b3\n - Add test network function\n0.2b2\n - Add Start-Stop driver function\n0.2b1\n - Direct Websocket to Domogik dialog\n0.1b8\n - Report ctrl and node state to xPL\n0.1b7\n - stat_key format change + add keys ++\n0.1b6\n - add ctrl action + sensor 4in1 with motion\n0.1b5\n - add sensors power/motion...\n0.1b4\n - add groups associations\n0.1b2\n - add neighbors page.\n0.1\n - plugin creation.",
 		"author_email" : "nico84dev at gmail.com",
 		"author" : "Nicolas VIGNAL",
 		"domogik_min_version" : "0.3.0",
@@ -442,7 +442,7 @@
                 "type": "python"
             }
 		],
-		"version" : "0.2b5",
+		"version" : "0.2c1",
 		"type" : "plugin",
 		"id" : "ozwave"
 	}, "json_version" : 1
