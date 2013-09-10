@@ -14,9 +14,11 @@ Install WebSocket library for Python
 ====================================
 - `WebSocket library for Python (ws4py). 0.3.0-beta <https://github.com/Lawouach/WebSocket-for-Python>`_
 
-.. warning ::     
+.. warning ::
+	
+    Probably an installation with  "pip install ws4py" or "easy_install ws4py" install version 0.2.4 , this version **don't work** !
 
-	Probably install with  "pip install ws4py" or "easy_install ws4py" install the ws4py 0.2.4 , this version **don't work** !
+	Lastests beta revisions **don't work** so following install method below.
 
 Normal install
 --------------
@@ -26,6 +28,13 @@ get source code
 .. code-block:: bash
 
 	$ git clone git@github.com:Lawouach/WebSocket-for-Python.git
+
+change to working revision
+
+.. code-block:: bash
+
+	$ cd WebSocket-for-Python
+	$ git reset --hard eec3a7dcb33b322eac598f5125425e62c0050969
 
 Installing the ws4py package is performed as usual:
 
