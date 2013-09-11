@@ -562,12 +562,23 @@ class DbHelper():
                 self.__session.flush()
 
             ### Table core_xplcommand
-            if 'xpl_command' in a_command:
+            if 'xpl_command' in command_in_client_data:
                 self.log.debug("Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
-
-        ### Table core_xplcommand_param
-
-
+                # TODO finc the correct matching xplstat
+                xplstatid = None
+                x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
+                xplcommand = XplCommand(cmd_id=command.id, \
+                                        name=x_command['name'], \
+                                        schema=x_command['schema'], \
+                                        device_id=device.id, stat_id=xplstatid, \
+                                        json_id=command_in_client_data['xpl_command'])
+                self.__session.add(xplcommand)
+                self.__session.flush()
+                ### Table core_xplcommand_param
+                for p in x_command['parameters']['static']:
+                    par = XplCommandParam(cmd_id=xplcommand.id, \
+                                         key=p['key'], value=p['value'])
+                    self.__session.add(par)
 
         ### Finally, commit all !
         try:
