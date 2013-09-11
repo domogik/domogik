@@ -483,55 +483,88 @@ class DbHelper():
             ### Table core_xplstat
             # for each sensor, insert its xplstats (if any) in database
             self.log.debug("Device creation : inserting data in core_xplstat for '{0}'...".format(a_sensor))
-            xplstat_in_client_data = client_data['xpl_stats'][a_sensor]
-            xplstat = XplStat(name = xplstat_in_client_data['name'], \
+            # find all xpl_stats that link to this sensor and insert them
+            for a_xplstat in client_data['xpl_stats']:
+                xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
+                for param in xplstat_in_client_data['parameters']['dynamic']:
+                    if 'sensor' in param and param['sensor'] == a_sensor:
+                        self.log.debug("Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
+                        xplstat = XplStat(name = xplstat_in_client_data['name'], \
                               schema = xplstat_in_client_data['schema'], \
                               device_id = device.id, \
                               json_id = a_sensor)
-            self.__session.add(xplstat)
-            self.__session.flush()
+                        self.__session.add(xplstat)
+                        self.__session.flush()
 
-            ### Table core_xplstat_param
-            #- if static field == 1 => this is a static param
-            #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
-            #- if statis == 0 and it has a sensor id => its a dynamic param
+                        ### Table core_xplstat_param
+                        #- if static field == 1 => this is a static param
+                        #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
+                        #- if statis == 0 and it has a sensor id => its a dynamic param
 
-            # static parameters
-            for a_parameter in xplstat_in_client_data['parameters']['static']:
-                self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_sensor, a_parameter))
-                parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                          sensor_id = sensor.id, \
-                                          key = a_parameter['key'], \
-                                          value = a_parameter['value'], \
-                                          static = True, \
-                                          ignore_values = None,
-                                          type = None)
-                self.__session.add(parameter)
-                self.__session.flush()
+                        # static parameters
+                        for a_parameter in xplstat_in_client_data['parameters']['static']:
+                            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_sensor, a_parameter))
+                            parameter =  XplStatParam(xplstat_id = xplstat.id , \
+                                                      sensor_id = sensor.id, \
+                                                      key = a_parameter['key'], \
+                                                      value = a_parameter['value'], \
+                                                      static = True, \
+                                                      ignore_values = None,
+                                                      type = None)
+                            self.__session.add(parameter)
+                            self.__session.flush()
 
-            # dynamic parameters
-            for a_parameter in xplstat_in_client_data['parameters']['dynamic']: 
-                self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_sensor, a_parameter))
-                # set some values before inserting data
-                if 'ignore_values' not in a_parameter:
-                    a_parameter['ignore_values'] = None
-                parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                          sensor_id = sensor.id, \
-                                          key = a_parameter['key'], \
-                                          value = None, \
-                                          static = False, \
-                                          ignore_values = a_parameter['ignore_values'],
-                                          type = None)
-                self.__session.add(parameter)
-                self.__session.flush()
+                        # dynamic parameters
+                        for a_parameter in xplstat_in_client_data['parameters']['dynamic']: 
+                            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_sensor, a_parameter))
+                            # set some values before inserting data
+                            if 'ignore_values' not in a_parameter:
+                                a_parameter['ignore_values'] = None
+                            parameter =  XplStatParam(xplstat_id = xplstat.id , \
+                                                      sensor_id = sensor.id, \
+                                                      key = a_parameter['key'], \
+                                                      value = None, \
+                                                      static = False, \
+                                                      ignore_values = a_parameter['ignore_values'],
+                                                      type = None)
+                            self.__session.add(parameter)
+                            self.__session.flush()
 
-            # device parameters
-            # => nothing to do
-                                          
-    
+                        # device parameters
+                        # => nothing to do
+                                                      
+        
 
         ### Table core_command
-        ### Table core_xplcommand
+
+        # first, get the commands associated to the device_type
+        self.log.debug("Device creation : start to process the commands")
+        device_type_commands = client_data['device_types'][device_type]['commands']
+        self.log.debug("Device creation : list of commands availabel for the device : {0}".format(device_type_commands))
+
+        for a_command in device_type_commands:
+            self.log.debug("Device creation : inserting data in core_command for '{0}'...".format(a_command))
+            command_in_client_data = client_data['commands'][a_command]
+            command = Command(name = command_in_client_data['name'], \
+                              device_id = device.id, \
+                              reference = a_command, \
+                              return_confirmation = command_in_client_data['return_confirmation'])
+            self.__session.add(command)
+            self.__session.flush()
+
+            self.log.debug("Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
+            for command_param in client_data['commands'][a_command]['params']:
+                pa = CommandParam(command.id, \
+                                  command_param['key'], \
+                                  command_param['data_type'], \
+                                  command_param['conversion'])
+                self.__session.add(pa)
+                self.__session.flush()
+
+            ### Table core_xplcommand
+            if 'xpl_command' in a_command:
+                self.log.debug("Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
+
         ### Table core_xplcommand_param
 
 
@@ -1485,11 +1518,8 @@ class DbHelper():
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
     
     def update_xpl_stat(self, id, name=None, schema=None, device_id=None):
-        """Update a xpl_stat
-        """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         stat = self.__session.query(XplStat).filter_by(id=id).first()
         if stat is None:
             self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % id)
@@ -1502,10 +1532,8 @@ class DbHelper():
         self.__session.add(stat)
         try:
             self.__session.commit()
-        #self.__session.begin(subtransactions=True)
-        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
-        self.__session.add(param)
-        try:
+            param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
+            self.__session.add(param)
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
