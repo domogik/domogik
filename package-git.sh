@@ -17,7 +17,7 @@ FINAL_ARCHIVE=/tmp/domogik-$RELEASE.tgz
 
 function generate_pkg() {
     echo "Generate package..."
-    git archive 0.3 \
+    git archive $BRANCH \
     --prefix domogik-$RELEASE/ \
     --worktree-attributes \
     --format tgz \
