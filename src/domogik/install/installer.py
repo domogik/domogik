@@ -232,6 +232,6 @@ if __name__ == "__main__":
             elif opt in ('-d', '--dump'):
                 backup_existing_database(confirm=False)
                 sys.exit()
-
-    install_or_upgrade()
-    check_install_is_ok()
+    with self._db.session_scope():
+        install_or_upgrade()
+        check_install_is_ok()
