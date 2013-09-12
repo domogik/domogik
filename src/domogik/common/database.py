@@ -448,11 +448,60 @@ class DbHelper():
         return json_device
 
 
+    def add_device_and_commands_xplstat(self, devid, sensorid, a_xplstat, xplstat_in_client_data):
+        self.log.debug("Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
+        xplstat = XplStat(name = xplstat_in_client_data['name'], \
+              schema = xplstat_in_client_data['schema'], \
+              device_id = devid, \
+              json_id = a_xplstat)
+        self.__session.add(xplstat)
+        self.__session.flush()
+
+        ### Table core_xplstat_param
+        #- if static field == 1 => this is a static param
+        #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
+        #- if statis == 0 and it has a sensor id => its a dynamic param
+
+        # static parameters
+        for a_parameter in xplstat_in_client_data['parameters']['static']:
+            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
+            parameter =  XplStatParam(xplstat_id = xplstat.id , \
+                                      sensor_id = sensor.id, \
+                                      key = a_parameter['key'], \
+                                      value = a_parameter['value'], \
+                                      static = True, \
+                                      ignore_values = None,
+                                      type = None)
+            self.__session.add(parameter)
+            self.__session.flush()
+
+        # dynamic parameters
+        for a_parameter in xplstat_in_client_data['parameters']['dynamic']: 
+            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_xplstat, a_parameter))
+            # set some values before inserting data
+            if 'ignore_values' not in a_parameter:
+                a_parameter['ignore_values'] = None
+            parameter =  XplStatParam(xplstat_id = xplstat.id , \
+                                      sensor_id = sensorid, \
+                                      key = a_parameter['key'], \
+                                      value = None, \
+                                      static = False, \
+                                      ignore_values = a_parameter['ignore_values'],
+                                      type = None)
+            self.__session.add(parameter)
+            self.__session.flush()
+
+        # device parameters
+        # => nothing to do
+        return xplstat 
+
+
     def add_device_and_commands(self, name, device_type, client_id, description, reference, client_data):
         """ Create a device : fill the following tables with data from the related client json file
             - core_device
             - ...
         """
+        created_xpl_stats = {}
         self.__session.expire_all()
 
         ### Add the device itself
@@ -462,8 +511,8 @@ class DbHelper():
         self.__session.flush()
 
         ### Table core_sensor
-
         # first, get the sensors associated to the device_type
+        print client_data
         self.log.debug("Device creation : start to process the sensors")
         device_type_sensors = client_data['device_types'][device_type]['sensors']
         self.log.debug("Device creation : list of sensors availabel for the device : {0}".format(device_type_sensors))
@@ -488,52 +537,8 @@ class DbHelper():
                 xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
                 for param in xplstat_in_client_data['parameters']['dynamic']:
                     if 'sensor' in param and param['sensor'] == a_sensor:
-                        self.log.debug("Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
-                        xplstat = XplStat(name = xplstat_in_client_data['name'], \
-                              schema = xplstat_in_client_data['schema'], \
-                              device_id = device.id, \
-                              json_id = a_sensor)
-                        self.__session.add(xplstat)
-                        self.__session.flush()
-
-                        ### Table core_xplstat_param
-                        #- if static field == 1 => this is a static param
-                        #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
-                        #- if statis == 0 and it has a sensor id => its a dynamic param
-
-                        # static parameters
-                        for a_parameter in xplstat_in_client_data['parameters']['static']:
-                            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_sensor, a_parameter))
-                            parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                                      sensor_id = sensor.id, \
-                                                      key = a_parameter['key'], \
-                                                      value = a_parameter['value'], \
-                                                      static = True, \
-                                                      ignore_values = None,
-                                                      type = None)
-                            self.__session.add(parameter)
-                            self.__session.flush()
-
-                        # dynamic parameters
-                        for a_parameter in xplstat_in_client_data['parameters']['dynamic']: 
-                            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_sensor, a_parameter))
-                            # set some values before inserting data
-                            if 'ignore_values' not in a_parameter:
-                                a_parameter['ignore_values'] = None
-                            parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                                      sensor_id = sensor.id, \
-                                                      key = a_parameter['key'], \
-                                                      value = None, \
-                                                      static = False, \
-                                                      ignore_values = a_parameter['ignore_values'],
-                                                      type = None)
-                            self.__session.add(parameter)
-                            self.__session.flush()
-
-                        # device parameters
-                        # => nothing to do
-                                                      
-        
+                        xplstat = self.add_device_and_commands_xplstat(device.id, sensor.id, a_xplstat, xplstat_in_client_data)
+                        created_xpl_stats[a_xplstat] = xplstat.id
 
         ### Table core_command
 
@@ -564,9 +569,13 @@ class DbHelper():
             ### Table core_xplcommand
             if 'xpl_command' in command_in_client_data:
                 self.log.debug("Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
-                # TODO finc the correct matching xplstat
-                xplstatid = None
                 x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
+                if x_command['xplstat_name'] in created_xpl_stats.keys():
+                    xplstatid = created_xpl_stats[x_command['xplstat_name']]
+                else:
+                    xplstat_in_client_data = client_data['xpl_stats'][x_command['xplstat_name']]
+                    xplstat = self.add_device_and_commands_xplstat(device.id, None, x_command['xplstat_name'], xplstat_in_client_data)
+                    xplstatid = xplstat.id
                 xplcommand = XplCommand(cmd_id=command.id, \
                                         name=x_command['name'], \
                                         schema=x_command['schema'], \
