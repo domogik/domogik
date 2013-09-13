@@ -1559,6 +1559,20 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return param
 
+###################
+# XplCommandParam
+###################
+    def add_xpl_command_param(self, cmd_id, key, value):
+        self.__session.expire_all()
+        #self.__session.begin(subtransactions=True)
+        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
+        self.__session.add(param)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return param
+
     def update_xpl_command_param(self, cmd_id, key, value=None):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
