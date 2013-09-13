@@ -51,3 +51,21 @@ To check these sensors the plugin need 2 information for the device type:
         }
 
 
+Description
+-----------
+
+* *id* : this is the device type id
+* *name* : the device type name
+* *description* : a short description of the device type
+* *commands* : the list of commands supported by this device type
+* *sensors* : the list of sensors supported by this device type
+* *xpl_params* : list of parameters that are common to ALL xpl messages for this device type
+
+  * *key* : the xpl key for the message
+  * *description* :  short description of this field
+  * *type* : the value type for this field
+  * depending on the type the are other posibilitys (like min_value, max_value, ....)
+
+..todo ::
+
+    Explain where to find the other values

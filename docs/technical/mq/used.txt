@@ -51,6 +51,8 @@ UIs                     manager             plugin.start.do     plugin.start.res
 UIs                     plugin (by id)      plugin.stop.do      plugin.stop.result     req_plugin_stop.py
 ======================= =================== =================== ====================== ========================
 
+*clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.
+
 
 List of MQ messages used for pub/sub pattern
 ============================================
@@ -75,3 +77,4 @@ manager                 UIs                 client.detail          sub_client_de
 ----------------------- ------------------- ---------------------- ---------------------
 manager                 UIs                 package.detail         sub_package_detail.py
 ======================= =================== ====================== =====================
+

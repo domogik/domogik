@@ -5,45 +5,70 @@ info.json for plugins - xpl_stats section
 Purpose
 =======
 
-The sensors section will quickly describe each sensor with:
-
-* a name
-* a data type. See :doc:`the data types documentation <../data_types/index>` for more informations
-* if needed, some conversion options
+The xpl_stats section will describe all xPL messages that may be received by some sensors. No difference is made between *xpl-stat* and *xpl-trig* messages : as some xpl client implement these messages not as required in the xPL specification, we process them in the same (this is not an issue as basically xpl-trig and xpl-stat contains the same data : xpl-trig is just used for events and data changes and xpl-stat for all other usages).
 
 Example 1
 =========
 
 This example is the *diskfree* plugin. See the :doc:`device types documentation <device_types>` for more informations.
 
-For each sensor, we define a name and no conversion option. Then, depending of the sensor we use 2 data types:
-
-* DT_Byte : this one is used for values in byte, which are the values returned by the sensors *get_free_space*, *get_used_space* and *get_total_space*.
-* DT_Scaling is used for values in percent from 0 to 100, which corresponds to the value returned by the sensor *get_percent_used*.
-
 ::
 
-        "sensors": {
-            "get_free_space": {
-                    "name": "Free Space",
-                    "data_type": "DT_Byte",
-                    "conversion": ""
-            },
-            "get_used_space": {
-                    "name": "Used Space",
-                    "data_type": "DT_Byte",
-                    "conversion": ""
-            },
-            "get_total_space": {
-                    "name": "Total Space",
-                    "data_type": "DT_Byte",
-                    "conversion": ""
-            },
-            "get_percent_used": {
-                    "name": "Percent used",
-                    "data_type": "DT_Scaling",
-                    "conversion": ""
-            }
+        "xpl_stats": {
+           "get_percent_used": {                       
+                "name": "Percent used",
+                "schema": "sensor.basic",
+                "parameters": {
+                        "static": [
+                            {
+                                    "key": "type",
+                                    "value": "percent_used"
+                            }
+                        ],
+                        "device": [],
+                        "dynamic": [
+                            {   
+                                 "key": "current",
+                                 "ignore_values": "",
+                                 "sensor": "get_percent_used"
+                            }
+                        ]
+                }
+           },
+           "get_used_space": {
+                   ...
+           },
+           "get_total_space": {
+                   ...
+           },
+           "get_free_space": {
+                   ...
+           }
         },
+    
+Description
+-----------
 
+Here there is 4 sorts of xpl messages that may be received. Each one has its proper subsection here: 
+
+* "get_percent_used": {...}
+* "get_used_space": {...}
+* "get_total_space": {...}
+* "get_free_space": {...}
+
+The key used is free and you can put anything you want. In this plugin, each sensor has its own xpl message, so we choose to use for this key the name of the related sensor. This key will be inserted in database only for reference (it is not used, it is just in the database to help for debugging to find the related data in the json file).
+
+For each message you need to set:
+
+* *name*: it will be displayed in the user interface when you will configure a widget.
+* *schema*: the xPL schema used by the plugin.
+* *parameters*: all the parameters of the xPL message.
+
+  * *static*: all the static keys of the xPL message. Static keys will always be the same, whatever the device is.
+  * *device* : an empty table (always). This part is here only to be compliant with the json of a device which is given to the user interfaces.
+  * *dynamic* : all the dynamic parts of the xPL message. It is all the keys which are not related to the device address : values for the sensors.
+
+..todo :: 
+
+    explain ignore_values
 
