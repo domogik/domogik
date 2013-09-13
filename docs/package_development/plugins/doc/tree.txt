@@ -1,0 +1,53 @@
+==================
+Documentation tree
+==================
+
+Depending on the plugin, the documentation may be very big *ozwave* for example) or very small (*diskfree* for example). So you won't create your documentation in the same way for all the plugins. In this chapter, we will give you only some rules and recommendations.
+
+The mandatatory part
+====================
+
+Only 2 files are mandatory:
+
+* doc/index.txt
+* doc/changelog.txt
+
+The *index.txt* will be the main entry of your documentation. The *changelog.txt* will contain the history of your package.
+
+Example tree for a simple plugin
+================================
+
+::
+
+    doc/index.txt
+    doc/changelog.txt
+    doc/*.png
+
+For these plugins all the content of the user documentation will be directly written in *index.txt*.
+
+Example tree for a big plugin
+=============================
+
+::
+
+    doc/index.txt
+    doc/changelog.txt
+    doc/contents.txt
+    doc/ctldevtools.txt
+    doc/dependencies.txt
+    doc/networktools.txt
+    doc/ozwave.txt
+    doc/*.png
+
+As the documentation is in this example (*ozwave*) splitted in several files, the *index.txt* will contain a link on each part. Example: ::
+
+    ================
+    Table of content
+    ================
+    
+    * :doc:`Plugin documentation </ozwave>`
+    * :doc:`Dependencies installation </dependencies>`
+    * :doc:`Controller & devices tools</ctldevtools>`
+    * :doc:`Zwave network tools</networktools>`
+
+Of course you can use sub directories if you want.

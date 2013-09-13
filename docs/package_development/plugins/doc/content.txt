@@ -1,0 +1,24 @@
+=======================================
+What should contain the documentation ?
+=======================================
+
+The documentation is very important! If there is no documentation for your plugin or if the documentation is not clear, the users won't want to use your plugin.
+
+A structured documentation
+==========================
+
+Your documentation must be logic and structured. It should follow some logical steps: ::
+
+* first, describe the plugin, what is its goal, what are its features
+* then, don't forget to list the compliant hardware devices or services 
+* add some photos of the hardware in order the user can be sure he has the same thing
+* if there are some complex dependancies (like OWFS for *onewire*), explain how to install them or at least give url to the appropriate documentations
+* explain how to configure the plugin (the global configuration, not the domogik devices configuration)
+* explain how to create a device (not where the user should click on the user interface as there is already a documentation for this) : 
+
+  * which feature it used for which hardware device or service ?
+  * what does a device address will look like
+  * give sample values and explain them
+
+* if your plugin has some helpers, explain their features and how to use them
+* fianlly you may add any informations that seem important for the user

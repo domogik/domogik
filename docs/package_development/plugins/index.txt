@@ -17,9 +17,17 @@ Packages development
   * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
   * :doc:`Identity part <json/identity>`
   * :doc:`Configuration part <json/configuration>`
-  * ...
+  * :doc:`Device types part <json/device_types>`
+  * :doc:`Sensors part <json/sensors>` 
+  * :doc:`Xpl stats part <json/xpl_stats>` ....................................TODO
+  * :doc:`Commands part <json/commands>` ....................................TODO 
+  * :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
   * :doc:`Udev rules part <json/udev_rules>`
-  * ...
+  * :doc:`Json version part <json/version>` ....................................TODO
+
+* :doc:`Data types <data_types/index>` ....................................TODO
+
+* :doc:`Tests scripts <tests/scripts>` ....................................TODO
 
 * Python part
   
@@ -45,5 +53,10 @@ Packages development
 
 * Data files
 * Documentation
+
+  * :doc:`Doc tree <doc/tree>`
+  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
+  * :doc:`What should contain the documentation ? <doc/content>`
+
 * Tests
 * Nightly builds

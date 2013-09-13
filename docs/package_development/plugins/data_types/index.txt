@@ -1,0 +1,19 @@
+==================
+Domogik data types
+==================
+
+Purpose
+=======
+
+Domogik data type are used to....
+
+
+Where can I find the list of the data types ?
+=============================================
+
+The data types allowed by Domogik are listed in this files (installed with a Domogik release): */var/lib/domogik/resources/datatypes.json*.
+
+
+..todo ::
+
+    Explain more

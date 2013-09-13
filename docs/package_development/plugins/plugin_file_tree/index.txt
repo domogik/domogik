@@ -27,7 +27,9 @@ Some other items may be added:
 
 * **data** : if needed this folder can contain data needed by the plugin or the plugin may write data in it
 * **conversions** : TODO
-* **tests** : if the plugin have some tests scripts, they must be here
+* **tests** : the test scripts
+
+
 
 
 
