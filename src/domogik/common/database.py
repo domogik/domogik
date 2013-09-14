@@ -183,7 +183,8 @@ class DbHelper():
         return DbHelper.__engine
 
     def __del__(self):
-        self.__session.close()
+        if self.__session:
+            self.__session.close()
 
     def __rollback(self):
         """Issue a rollback to a SQL transaction (for dev purposes only)
