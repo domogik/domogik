@@ -69,7 +69,7 @@ class XplEvent(XplPlugin, MQRep):
         if msg._action == "reload":
             self.load()
             msg = MQMessage()
-            msg.setaction( 'reload.result' )
+            msg.set_action( 'reload.result' )
             self.reply(msg.get())
 
     def load(self):

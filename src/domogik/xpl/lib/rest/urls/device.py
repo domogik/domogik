@@ -98,6 +98,7 @@ def device_globals(did):
         for p in js['global']:
             #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
             urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=False, type=p['type'])
+    urlHandler.reload_stats()        
     return 200, "{}"
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])
@@ -140,6 +141,7 @@ def device_xplcmd_params(did):
             return
         # go and add the param
         urlHandler.db.add_xpl_command_param(cmd_id=cmd.id, key=p['key'], value=request.form.get(p['key']))
+    urlHandler.reload_stats()        
     return 204, ""
 
 @urlHandler.route('/device/xplstatparams/<int:did>', methods=['PUT'])
@@ -182,6 +184,7 @@ def device_xplstat_params(did):
             return
         # go and add the param
         urlHandler.db.add_xpl_stat_param(cmd_id=cmd.id, key=p['key'], value=request.form.get(['key']))
+    urlHandler.reload_stats()        
     return 204, ""
 
 class deviceAPI(MethodView):
@@ -237,7 +240,7 @@ class deviceAPI(MethodView):
             reference=request.form.get('reference'),
             client_data=client_data
         )
-        
+        urlHandler.reload_stats()        
         return 201, created_device
 
     def put(self, did):
@@ -247,6 +250,7 @@ class deviceAPI(MethodView):
             request.form.get('description'),
             request.form.get('reference'),
         )
+        urlHandler.reload_stats()        
         return 200, urlHandler.db.get_device(did)
 
 register_api(deviceAPI, 'device', '/device/', pk='did', pk_type='int')
