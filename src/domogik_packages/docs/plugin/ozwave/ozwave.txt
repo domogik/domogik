@@ -11,7 +11,7 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
-- 0.2c1 : (29-07-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
+- 0.2c1 : (15-09-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
     - Target : domogik.
     - Change log :
         - Retrieve domogik device zwave ctrl address from rest.
