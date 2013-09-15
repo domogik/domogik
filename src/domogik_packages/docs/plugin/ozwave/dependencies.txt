@@ -2,13 +2,13 @@
 Dependencies installation
 =========================
 
-Install python-openzwave, the official way
-==========================================
+Install tailer library for Python
+=================================
+- `tailer 0.3 library for Python <https://pypi.python.org/pypi/tailer>`_
 
-- `Python-openzwave <http://wiki.domogik.org/plugin_pyozw>`_ (>=0.2.5) 
+Installation with  "pip install tailer" or "easy_install tailer"
 
-.. todo:: 
-    Screen shoot and explanations.......
+That all.
 
 Install WebSocket library for Python
 ====================================
@@ -25,22 +25,298 @@ Normal install
 
 get source code
 
+With your user github account :
+
 .. code-block:: bash
 
-	$ git clone git@github.com:Lawouach/WebSocket-for-Python.git
+    $ git clone git@github.com:Lawouach/WebSocket-for-Python.git
+
+Or if you don't have user github account use :
+
+.. code-block:: bash
+
+    git clone --recurcive https://github.com/Lawouach/WebSocket-for-Python.git
 
 change to working revision
 
 .. code-block:: bash
 
-	$ cd WebSocket-for-Python
-	$ git reset --hard eec3a7dcb33b322eac598f5125425e62c0050969
+    $ cd WebSocket-for-Python
+    $ git reset --hard eec3a7dcb33b322eac598f5125425e62c0050969
 
 Installing the ws4py package is performed as usual:
 
 .. code-block:: bash
 
-	$ python setup.py install
+    $ python setup.py install
+
+
+Install python-openzwave
+========================
+
+Purpose
+-------
+
+This not a plugin, but an external library for zwave plugin, is based on `python-openzwave <https://code.google.com/p/python-openzwave/>`_ software.
+
+python-openzawe and `openzawe <http://code.google.com/p/open-zwave/>`_ are in hight development, by two different teams, so installing it can be sometimes not so easy. So we propose you different methods to install it.
+
+History
+^^^^^^^
+
+The original script `py-openzwave <https://github.com/maartendamen/py-openzwave>`_ was from maarten damen and **is no longer compatible with ozwave plugin.**
+
+Prerequisite
+------------
+
+if not installed, install the following packages:
+
+- g++
+- libudev-dev
+- python-dev
+- python-setuptools
+- cython(at least 0.14.1)
+- python-louie
+- python-sphinx to make the documentation 
+
+
+You must install mercurial and subversion to get sources of python-openzwave and openzwave. Look at the documentation of your Linux distribution to do them.
+
+Install python-openzwave, the official way
+------------------------------------------
+
+Get the sources
+^^^^^^^^^^^^^^^
+
+- Ubuntu users can use bibi21000 `packages <http://bibi21000.gallet.info/index.php/en/repository/125-ubuntu-repository.html>`_ to install python-openzwave in a simplest way.
+
+- Or clone the hg repo: 
+
+.. code-block:: bash
+
+    $hg clone https://code.google.com/p/python-openzwave/
+
+Automatic installation
+^^^^^^^^^^^^^^^^^^^^^^
+
+- You can build python-openzwave with the install.sh script. 
+
+Enter the python-openzwave directory
+
+.. code-block:: bash
+
+    $cd python-openzwave
+
+then use the provided scipt to compile
+
+.. code-block:: bash
+
+    $./update.sh
+
+.. code-block:: bash
+
+    $./compile.sh
+
+    If the build process succeed, run the following command to install 
+
+.. code-block:: bash
+
+    $sudo python setup.py install
+
+.. note ::
+
+    That's all for ozwave plugin functionnality.
+    If you want others stuff you can do instructions below
+
+Install python-openzwave, others ways and stuff
+-----------------------------------------------
+
+Manual installation
+^^^^^^^^^^^^^^^^^^^
+
+- Retrieve the sources of openzwave : 
+
+.. code-block:: bash
+
+    $svn checkout http://open-zwave.googlecode.com/svn/trunk/ openzwave
+
+- Build openzwave 
+
+.. code-block:: bash
+
+    $cd openzwave/cpp/build/linux
+    $make
+    $cd ../../../..
+
+- Build python-openzwave 
+
+.. code-block:: bash
+
+    $python setup.py build
+
+- And install it if compilation succeed 
+
+.. code-block:: bash
+
+    $sudo python setup.py install
+
+Installation on debian/ubuntu
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You need to compile and install openzwave as a package to generate python-openzwave.
+
+- After that, make the python-openzwave package 
+
+.. code-block:: bash
+
+    $dpkg-buildpackage -rfakeroot
+
+- You can now install the package with
+
+.. code-block:: bash
+
+    $sudo dpkg -i python-openzwave*.deb
+
+API documentation is in /usr/share/doc/python-openzwave
+
+Static vs dynamic (or shared)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The openzwave (c++) lib needs to run as a singleton : it means that it
+MUST have only one instance of the manager running on your computer.
+
+There is 2 ways of linking libraries with a program :
+
+    static : includes a copy of the library in your binary program. This means 
+
+that your program has its own instance of the library. This the way the
+install.sh runs. So you CAN'T have another program (like the control-panel)
+running when using the python-openzwave library
+
+    dynamic or shared : includes a link to the library in your binary program. 
+
+This means that your program share the library with other programs. In this
+case, the instance is owned directly by the library. This the way the
+debian package works. So you CAN have another program running when
+using the python-openzwave library. Of course, this program MUST use
+the shared library.
+
+
+Generate some documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+using the command :
+
+.. code-block:: bash
+
+    $./make_doc.shcompil openzwave
 
 
 
+There is a copy of the openzwave's directory in **/usr/local/share/python-openzwave**
+API documentation is in **/usr/local/share/doc/python-openzwave**
+
+How to check python-openzwave
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    $./examples/api_demo.py
+
+
+
+Creating the zwave device controller
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We need to create an udev rule in order to create the device **/dev/zwave**
+- check your device
+It's suppose your zwave controller is at **/dev/ttyUSB0**
+
+.. code-block:: bash
+
+    $ udevadm info --name=/dev/ttyUSB0 --attribute-walk
+
+
+- locate your idVendor and idProdroduct
+
+In **/etc/udev/rules.d**, create a file zwave.rules, and write the following rule
+
+Example, for aeon stick
+
+.. code-block:: bash
+
+    | SUBSYSTEMS=="usb", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60",
+                   SYMLINK+="zwave", MODE="0666"
+
+Install openzwave control-panel
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In order to identify your network and collect the NodeID of your devices, we recommend to use the openzwave-control-panel
+
+.. code-block:: bash
+
+    $ln -s open-zwave-read-only open-zwave
+
+Compile libmicrohttpd
+~~~~~~~~~~~~~~~~~~~~~
+libmicrohttpd is needed by openzwave-control-panel. Don’t use the libmicrohttpd provided by your distribution. The compilation of the openzwave-control-panel will fail otherwise !
+Respect carefully the folder location; ie openzwave, libmicrohttpd, and openzwave-control-panel must have the same parent directory.
+
+.. code-block:: bash
+
+    $wget ftp://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.19.tar.gz
+    $tar zxvf libmicrohttpd-0.9.19.tar.gz
+    $mv libmicrohttpd-0.9.19 libmicrohttpd
+    $cd libmicrohttpd
+    $./configure
+    $make
+    $sudo make install
+    $cd ~
+
+Compile openzwave-control-panel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
+
+    | $svn checkout http://openzwave-control-panel.googlecode.com/svn/trunk/ 
+                    openzwave-control-panel
+    | $cd openzwave-control-panel
+    | $nano Makefile
+
+Change the following lines
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For Linux uncomment out next two lines
+
+.. code-block:: bash
+
+    LIBZWAVE := $(wildcard $(OPENZWAVE)/cpp/lib/linux/*.a)
+    LIBUSB := -ludev
+
+Compile
+~~~~~~~
+.. code-block:: bash
+
+    $make
+
+- ozwcp require acces to the config dir of ozw
+
+.. code-block:: bash
+
+    $ln -s ../open-zwave/config config
+    $chmod -R 777 config
+
+To start the openzwave-control-panel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
+
+    $./ozwcp -d -p 1234
+
+- Point your browser to http://openzwave-machinename:1234/
+
+From source page `Piethein Strengholt's Blog <http://www.strengholt-online.nl/howto-compile-open-zwave-and-openzwave-control-panel-on-ubuntu/>`_ 
+
+Developer resources
+^^^^^^^^^^^^^^^^^^^
+For developing you can access to python-openzwave dev, instructions here :
+
+`<http://bibi21000.gallet.info/index.php/en/home-automation-uk/124-openzwave-vs-python-reloaded.html>`_ 
