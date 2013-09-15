@@ -198,7 +198,8 @@ class deviceAPI(MethodView):
         return 200, b
 
     def delete(self, did):
-        b = urlHandler.db.del_devic(did)
+        b = urlHandler.db.del_device(did)
+        urlHandler.reload_stats()        
         return 204, b
 
     def post(self):
