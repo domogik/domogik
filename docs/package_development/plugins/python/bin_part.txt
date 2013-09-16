@@ -223,6 +223,16 @@ Then, you can make a look on the device list and for each device get its paramet
 
 Here is an example from the *diskfree* plugin: ::
 
+            # get the devices list
+            self.devices = self.get_device_list(quit_if_no_device = True)
+            
+            # instantiate the class of the library
+            # notice that we sent as parameters some callbacks :
+            # * the logger object (self.log)
+            # * the function to send a xPL messages
+            # * a function to help to stop the plugin
+            disk_manager = Disk(self.log, self.send_xpl, self.get_stop())
+            
             # loop on all found devices
             for a_device in self.devices:
                 try:
@@ -262,6 +272,61 @@ At the end of your *__init__* function, just add these 2 lines: ::
             self.log.info("Plugin ready :)")
 
 
+Focus on the logs
+=================
+
+There are 4 methods that enable you to log informations in the log files. The default logfiles are located in the directory configured in */etc/domogik/domogik.cfg* as *log_dir_path* (default is */var/log/domogik/*). The filename is *myplugin.log*.
+
+Here are the 4 methods:
+
+* ``self.log.error("a message")``: log an error message
+* ``self.log.warning("a message")``: log a warning message
+* ``self.log.info("a message")``: log an information message
+* ``self.log.debug("a message")``: log a debug message
+
+Error
+-----
+
+The error messages are to be used to log all critical or blocking points.
+
+Warning
+-------
+
+The warning messages are to be used to log the small errors (with no real impact : for example an incorrect value is read from a sensor but it may happen as the technology is not 100% reliable) or some strange behavious that are not blocking points
+
+Info
+----
+
+The info messages must be used for important informations:
+
+* some informations about the plugin startup
+* any information that may help someone who reads the log to check the plugin started successfully
+* a new device has been detected by the plugin
+* ...
+
+You must not use this log level for debug messages, for example:
+
+* avoid to use this level in eternal loops (to avoir big log files). Use the debug level in this case
+
+Debug
+-----
+
+The debug log level is not activated with Domogik official packages, so these messages won't be written in the log files. The development version of Domogik has this log level activated.
+The debug messages are to be used for:
+* logging any step in the plugin processing
+* log actions in the eternal loops
+* log important variable status
+* log any connection to a service or a hardware
+* ...
+
+You can and you must use the debug messages! They are evry important when a bug is discovered as they allow anybody to check what is the issue.
+
+Using the logs in the library part
+----------------------------------
+
+:doc:`See the library part documentation <lib_part>`
+
+
 Focus on xPL : send xPL messages and listen for xPL messages
 ============================================================
 
@@ -272,5 +337,11 @@ TODO
 
 Listen for xPL messages
 -----------------------
+
+TODO
+
+
+Focus on launching threads 
+==========================
 
 TODO
