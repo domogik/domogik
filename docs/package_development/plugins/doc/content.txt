@@ -7,7 +7,7 @@ The documentation is very important! If there is no documentation for your plugi
 A structured documentation
 ==========================
 
-Your documentation must be logic and structured. It should follow some logical steps: ::
+Your documentation must be logic and structured. It should follow some logical steps: 
 
 * first, describe the plugin, what is its goal, what are its features
 * then, don't forget to list the compliant hardware devices or services 

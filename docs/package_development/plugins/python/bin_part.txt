@@ -45,9 +45,232 @@ TODO : logging, force_leave,
 
 TODO : MQ usage
 
-Create the binary part
-======================
+Template of the binary part
+===========================
 
-TODO : example template for a dummy plugin
+Header
+------
+
+First, you need to put a header in the file. Here is a template: ::
+
+    #!/usr/bin/python
+    # -*- coding: utf-8 -*-
+    
+    """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
+    
+    License
+    =======
+    
+    B{Domogik} is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    B{Domogik} is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+    
+    Plugin purpose
+    ==============
+    
+    A quick description of the plugin
+    
+    Implements
+    ==========
+    
+    MyClassName()
+    -  __init__()
+    -  a_function()
+    
+    @author: The developper name <the.developper@email.com>
+    @copyright: (C) 2007-2013 Domogik project
+    @license: GPL(v3)
+    @organization: Domogik
+    """
+
+The first line is called the `shebang <http://en.wikipedia.org/wiki/Shebang_%28Unix%29>`_. The second line specify to python that we will use the *utf-8* coding.
+Then, there is a big comment part : *"""..."""* It contains 4 sections:
+
+* *License*: this should be the same for all Domogik plugins. It says that the file/plugin is uses the GPL license.
+* *Plugin purpose*: a quick description of the plugin.
+* *Implements*: this should list of the implement classes and methods
+* the 4 lines which starts with a *@*: fill the first line with your name or surname and your email.
+
+Import the needed libraries
+---------------------------
+
+Then, you need to import some libraries needed by the plugin. Example: ::
+
+    from domogik.xpl.common.plugin import XplPlugin
+    from domogik.xpl.common.xplmessage import XplMessage
+    
+    from packages.plugin_diskfree.lib.diskfree import Disk
+    import threading
+    import traceback
+
+Some import lines are mandatory: ::
+
+    from domogik.xpl.common.plugin import XplPlugin # this one is needed as all the xPL plugins extends from the class XplPlugin. This class will provide you some usefull functions to get the configuration parameters values, ...
+    from domogik.xpl.common.xplmessage import XplMessage # this one is needed to create a xPL message.
+
+Then, you have to import your plugin library objects (here for the plugin diskfree we import a class): ::
+
+    from packages.plugin_diskfree.lib.diskfree import Disk
+
+To finish, depending on the plugin needs, you may need to import some various librairies. Example: ::
+
+    import threading
+    import traceback
+
+Create the main class
+---------------------
+
+Now, you can create your main class. Here is an empty class template and the final part of the plugin bin file which will allow to instantiate this class when you execute the bin file: ::
+
+    class MypluginManager(XplPlugin):
+        """ A description about the class
+        """
+    
+        def __init__(self):
+            """ The constructor of your class. This function  will be called when the class is instantiated.
+            """
+            XplPlugin.__init__(self, name='myplugin')
+            # do some other actions
+    
+    if __name__ == "__main__":
+        MypluginManager()
+
+Of course, rename *MypluginManager* and *myplugin* with your plugin name!
 
 
+What should be done in the main class ?
+---------------------------------------
+
+Well, it depends on your plugin! 
+
+First, you should handle the configuration part:
+
+* get the global configuration elements for your plugin (see the *configuration* part of the json file)
+* eventually, get the created devices list and for each device get its configuration values
+* if needed, do some checks about the configuration elements and the devices
+
+Then, start the features:
+
+* if the plugin manage some sensors, launch some threads to listen for the sensors (the threads should launch functions from the plugin library)
+* if the plugin manage some actuators, create some listeners for xPL commands messages. These listeners will call some callback functions (which should be defined in the library part)
+
+Finally, tell Domogik that the plugin is ready: 
+
+* when all is ready, call the *ready()* function
+
+
+
+Focus on the configuration
+==========================
+
+The plugin global configuration
+-------------------------------
+
+If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multimple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices : we will see this later). But for plugins with some configuration elements, the plugin developper may want to check that the plugin has been configured before the plugin can start!
+This can be done by calling the function *self.check_configured()* and check its return value: ::
+
+            # check if the plugin is configured. If not, this will stop the plugin and log an error
+            if not self.check_configured():
+                return
+
+How this functions works ? It is quite simple: when the user save the plugin configuration on a user interface, a *configured* key is inserted in database for the plugin and the host on which it is installed. If this key is not set to true in database, when you call this function, it will return False.
+
+
+To retrieve a configuration parameter value, you just need to do this: ::
+
+    self.interval = self.get_config("interval") 
+
+This function will check in database if a value is set for the key *interval* and the host where the plugin is installed. If there is such a value, it will be cast returned and casted to the data type configured in the json file. If there is no value, the default value configured in the json file will be returned.
+So, you don't need to cast the value and you don't need to handle some default value as it is already done in the json file. 
+
+Notice that the *auto_startup* configuration key which is mandatory in the json file is not to handle in the plugin. This is a configuration key used only by the *manager*.
+
+Get the created devices list for a plugin
+-----------------------------------------
+
+Some plugins may need to know the devices on which they need to interact. To get the devices list, just do: ::
+
+            # get the devices list
+            self.devices = self.get_device_list(quit_if_no_device = True)
+
+If your plugin needs some devices to be created to be run, set the parameter *quit_if_no_device* to *True*. If you do so and if no device exists when the plugin starts, the plugin will stop itself and log an error about this.
+
+Then, you can make a look on the device list and for each device get its parameters and do something (launch a thread, create a listener, ...). Example for the loop: ::
+
+            # loop on all found devices
+            for a_device in self.devices:
+                try:
+                    # get the configuration values for the key 'the_key' for the sensor 'the_sensor' of the device
+                    the_value = self.get_parameter_for_feature(a_device, "xpl_stats", "the_sensor", "the_key")
+
+                    # do something
+                except:
+                    # if there is an error, log it
+                    self.log.error(traceback.format_exc())
+                    # if the error is something blocking (a hardware gateway unavailable for exemple), you may want the plugin to stop. 
+                    # if so, uncomment the following lines
+                    #self.force_leave()
+                    #return
+
+Here is an example from the *diskfree* plugin: ::
+
+            # loop on all found devices
+            for a_device in self.devices:
+                try:
+                    ### feature get_total_space
+                    # get the path to check for the sensor 'get_total_space' of the device. The configuration key is 'device'
+                    path = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "device")
+                    # get the interval between each check for the sensor 'get_total_space' of the device. The configuration key is 'interval'
+                    interval = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "interval")
+
+                    self.log.info("Start monitoring totel space for '%s'" % path)
+                    # start a thread
+                    # the thread must be named to be explicit in the logs 
+                    thr_name = "{0}-{1}".format(a_device['name'], "get_total_space")
+                    # create the thread
+                    threads[thr_name] = threading.Thread(None,
+                                                   disk_manager.get_total_space,
+                                                  thr_name,
+                                                  (path, interval,),
+                                                  {})
+                    # start the thread
+                    threads[thr_name].start()
+    
+                except:
+                    # if there is an error, log it
+                    self.log.error(traceback.format_exc())
+                    # we don't quit plugin if an error occured
+                    # a disk can have been unmounted for a while
+                    #self.force_leave()
+                    #return
+
+Focus on the end : plugin ready
+===============================
+
+At the end of your *__init__* function, just add these 2 lines: ::
+
+            self.ready()
+            self.log.info("Plugin ready :)")
+
+
+Focus on xPL : send xPL messages and listen for xPL messages
+============================================================
+
+Send xPL messages
+-----------------
+
+TODO
+
+Listen for xPL messages
+-----------------------
+
+TODO
