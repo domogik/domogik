@@ -92,14 +92,11 @@ class OZWavemanager(threading.Thread):
         self._cb_sendxPL_trig = cb_sendxPL_trig
         self._stop = stop
         
-        # Init de la partie rest domogik
-        self.rest_server_ip = "127.0.0.1"
-        self.rest_server_port = "40405"
+        # Get config rest domogik
+        self.conf_rest = {'rest_ssl_certificate': '', 'rest_server_ip': '127.0.0.1', 'rest_server_port': '40405', 'rest_use_ssl': 'False'}
         cfg_rest = Loader('rest')
         config_rest = cfg_rest.load()
-        conf_rest = dict(config_rest[1])
-        self.rest_server_ip = conf_rest['rest_server_ip']
-        self.rest_server_port = conf_rest['rest_server_port']
+        self.conf_rest = dict(config_rest[1])
         
         self._homeId = 0
         self._activeNodeId = None # node actif courant, pour utilisation dans les fonctions du manager
@@ -388,7 +385,9 @@ class OZWavemanager(threading.Thread):
         if self._controller :
             return self._controller.ctrlDeviceName
         else : 
-            rest = "http://%s:%s" % (self.rest_server_ip, self.rest_server_port)
+            if self.conf_rest['rest_use_ssl'] == 'False' : protocol = 'http'
+            else : protocol = 'https'
+            rest = "%s://%s:%s" % (protocol, self.conf_rest['rest_server_ip'], self.conf_rest['rest_server_port'])
             the_url = "%s/base/device/list" % (rest)
             req = urllib2.Request(the_url)
             handle = urllib2.urlopen(req)
