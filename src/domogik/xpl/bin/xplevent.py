@@ -69,7 +69,7 @@ class XplEvent(XplPlugin, MQRep):
         if msg._action == "reload":
             self.load()
             msg = MQMessage()
-            msg.setaction( 'reload.result' )
+            msg.set_action( 'reload.result' )
             self.reply(msg.get())
 
     def load(self):
@@ -159,7 +159,8 @@ class XplEvent(XplPlugin, MQRep):
             try:
                 # find what parameter to store
                 for p in self._stat.params:
-                    if p.sensor_id is not None and p.static is 0:
+                    self._log_stats.debug("Checking param {0}".format(p))
+                    if p.sensor_id is not None and p.static is False:
                         if p.key in message.data:
                             value = message.data[p.key]
                             self._log_stats.debug("Key found %s with value %s." \
@@ -174,16 +175,22 @@ class XplEvent(XplPlugin, MQRep):
                                 # check if we need a conversion
                                 if self._sen.conversion is not None and self._sen.conversion != '':
                                     value = call_package_conversion(\
-                                                self._log_stats, self._dev.device_type.plugin_id, \
+                                                self._log_stats, self._dev['plugin_id'], \
                                                 self._sen.conversion, value)
                                     self._log_stats.debug("Key found %s with value %s after conversion." \
                                         % (p.key, value))
                                 # do the store
                                 device_data.append({"value" : value, "sensor": p.sensor_id})
                                 my_db = DbHelper()
-                                with my_db.scoped_session():
+                                with my_db.session_scope():
                                     my_db.add_sensor_history(p.sensor_id, value, current_date)
                                 del(my_db)
+                            else:
+                                self._log_stats.debug("Don't need to store this value")
+                        else:
+                            self._log_stats.debug("Key not found in message data")
+                    else:
+                        self._log_stats.debug("No sensor attached")
             except:
                 error = "Error when processing stat : %s" % traceback.format_exc()
                 print("==== Error in Stats ====")

@@ -196,5 +196,21 @@ You will get a reply like this: ::
     ['plugin.stop.result', '{"status": true, "reason": "", "host": "darkstar", "key": "configured", "type": "plugin", "name": "diskfree"}']
 
 
+reload
+=======
+
+Request : rest
+Reply : xplevent
+
+To request xplevent to load all new data from the DB: ::
+
+    request : reload
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_reload.py*.
+
+You will get a reply like this: ::
+
+    ['reload.result', '{}']
+
 
 

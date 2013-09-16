@@ -183,7 +183,8 @@ class DbHelper():
         return DbHelper.__engine
 
     def __del__(self):
-        self.__session.close()
+        if self.__session:
+            self.__session.close()
 
     def __rollback(self):
         """Issue a rollback to a SQL transaction (for dev purposes only)
@@ -466,7 +467,7 @@ class DbHelper():
         for a_parameter in xplstat_in_client_data['parameters']['static']:
             self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
             parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                      sensor_id = sensor.id, \
+                                      sensor_id = sensorid, \
                                       key = a_parameter['key'], \
                                       value = a_parameter['value'], \
                                       static = True, \

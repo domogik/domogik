@@ -73,7 +73,7 @@ def call_package_conversion(log, plugin, method, value):
     @return the converted value or None on error
  
     """
-    modulename = 'domogik_packages.conversions.{0}'.format(plugin)
+    modulename = 'packages.plugin_{0}.conversions.{0}'.format(plugin)
     classname = '{0}Conversions'.format(plugin)
     try:
         module = __import__(modulename, fromlist=[classname])

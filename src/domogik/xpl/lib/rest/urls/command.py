@@ -1,10 +1,12 @@
 from domogik.xpl.lib.rest.url import urlHandler, json_response, timeit
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 import sys
 import os
 import domogik
 from subprocess import Popen, PIPE
-from flask import Response
+from flask import Response, request
+from domogik.common.utils import call_package_conversion
 
 @urlHandler.route('/cmd/id/<int:cid>', methods=['GET'])
 @json_response
@@ -37,19 +39,18 @@ def api_command(cid):
         msg.add_data({p.key : p.value})
     # dynamic params
     for p in cmd.params:
-        if self.get_parameters(p.key):
-            value = self.get_parameters(p.key)
+        if request.args.get(p.key):
+            value = request.args.get(p.key)
             # chieck if we need a conversion
             if p.conversion is not None and p.conversion != '':
                 value = call_package_conversion(\
-                            urlHandler.log, dev.device_type.plugin_id, \
+                            urlHandler.logger, dev['plugin_id'], \
                             p.conversion, value)
-            # pluginName.conversion.<proc name>
             msg.add_data({p.key : value})
         else:
             return 400, {msg: "Parameter ({0}) for device command msg is not provided in the url".format(p.key)}
     # send out the msg
-    self.myxpl.send(msg)
+    urlHandler.xpl.send(msg)
     ### Wait for answer
     stat_msg = None
     if xplstat != None:
@@ -57,20 +58,20 @@ def api_command(cid):
         for p in xplstat.params:
             filters[p.key] = p.value
         for p in cmd.params:
-            if self.get_parameters(p.key):
+            if request.args.get(p.key):
                 filters[p.key] = str(value)
             else:
                 return 400, {msg: "Parameter ({0}) for device command msg is not provided in the url".format(p.key)}
         # get xpl message from queue
-        try:
-            urlHandler.log.debug("Command : wait for answer...")
-            stat_msg = self._get_from_queue(self._queue_command, 'xpl-trig', xplstat.schema, filters)
-        except Empty:
+        urlHandler.logger.debug("Command : wait for answer...")
+        #stat_msg = self._get_from_queue(self._queue_command, 'xpl-trig', xplstat.schema, filters)
+        if stat_msg == None:
             return 400, {msg: "No data or timeout on getting command response"}
-        urlHandler.log.debug("Command : message received : {0}".format(stat_msg))
+        else:
+            urlHandler.logger.debug("Command : stat message received : {0}".format(stat_msg))
     else:
         # no listener defined in xml : don't wait for an answer
-        urlHandler.log.debug("Command : no listener defined : not waiting for an answer")
+        urlHandler.logger.debug("Command : no listener defined : not waiting for an answer")
 
     ### REST processing finished and OK
     if stat_msg != None:
