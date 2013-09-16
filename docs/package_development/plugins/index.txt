@@ -19,7 +19,7 @@ Packages development
   * :doc:`Configuration part <json/configuration>`
   * :doc:`Device types part <json/device_types>`
   * :doc:`Sensors part <json/sensors>` 
-  * :doc:`Xpl stats part <json/xpl_stats>` ....................................TODO
+  * :doc:`Xpl stats part <json/xpl_stats>`
   * :doc:`Commands part <json/commands>` ....................................TODO 
   * :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
   * :doc:`Udev rules part <json/udev_rules>`
@@ -33,11 +33,9 @@ Packages development
   
   * :doc:`__init__.py files <python/init_files>`
   * :doc:`Bin part <python/bin_part>`
-  * Library
+  * :doc:`Library part <python/lib_part>`
   * How to ...
 
-    * get a configuration value
-    * get the devices lists (if needed)
     * log in a file
     * manage infinite loop without *while True*
     * create a timer
@@ -60,3 +58,6 @@ Packages development
 
 * Tests
 * Nightly builds
+* Errors
+
+  * Errors handled by baseplugin/plugin ................ TODO

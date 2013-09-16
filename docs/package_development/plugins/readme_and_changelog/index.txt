@@ -30,4 +30,4 @@ CHANGELOG
 
 The real changelog file must be located in **docs/changelog.txt**. To allow the user to find it quickly, please create a CHANGELOG in the root directory like this: ::
 
-    echo "The changelog informations are available in docs/changelog.txt" > CHANGELOG
+    echo "The changelog informations are available in doc/changelog.txt" > CHANGELOG

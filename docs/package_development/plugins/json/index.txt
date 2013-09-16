@@ -26,7 +26,8 @@ The **json_version** must be set to **2** for Domogik 0.4 compliant plugins.
 You will find detailed instructions about each part in this chapters:
 
 * :doc:`identity <identity>`
-* :doc:`configuration <configuration>`
 * ...
-* :doc:`udev_rules <udev_rules>`
 
+..todo ::
+
+    finish to set all the links. Notice that they are available in the global index for plugin development.
