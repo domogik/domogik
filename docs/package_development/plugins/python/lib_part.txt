@@ -18,7 +18,6 @@ Template
 
 TODO
 
-TODO : callback
 TODO : inifinite loop
 TODO : timer
 
@@ -38,7 +37,37 @@ Focus on xPL : send xPL messages and listen for xPL messages
 Send xPL messages
 -----------------
 
-TODO : callback
+As seen in :doc:`the bibrary part documentation <bin_part>`, the function to send xPL messages are sent to the library class constructor as a parameter: ::
+
+    my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+
+In the class, set the parameter name to *callback* (so it will be clear for everybody) and store it in an instance variables named *self._callback*.
+::
+
+    class MyLibraryClass:
+        """ My class
+        """
+    
+        def __init__(self, log, callback, stop):
+            """ Init MyLibraryClass
+                @param log : log instance
+                @param callback : callback
+                @param stop : stop flag
+            """
+            self._log = log
+            self._callback = callback
+            self._stop = stop
+
+Then, you can use this callback in any function when needed. Example: ::
+
+        def a_function(self):
+            """ My function
+            """
+            # do some things
+            arg1 = "abc"
+            arg2 = 234
+            self._callback(arg1, arg2)
+
 
 Listen for xPL messages
 -----------------------

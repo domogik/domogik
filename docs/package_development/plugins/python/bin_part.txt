@@ -176,7 +176,7 @@ The plugin global configuration
 -------------------------------
 
 If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multimple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices : we will see this later). But for plugins with some configuration elements, the plugin developper may want to check that the plugin has been configured before the plugin can start!
-This can be done by calling the function *self.check_configured()* and check its return value: ::
+This can be done by calling the function ``self.check_configured()``* and check its return value: ::
 
             # check if the plugin is configured. If not, this will stop the plugin and log an error
             if not self.check_configured():
@@ -234,6 +234,7 @@ Here is an example from the *diskfree* plugin: ::
             disk_manager = Disk(self.log, self.send_xpl, self.get_stop())
             
             # loop on all found devices
+            threads = {}
             for a_device in self.devices:
                 try:
                     ### feature get_total_space
@@ -254,6 +255,8 @@ Here is an example from the *diskfree* plugin: ::
                                                   {})
                     # start the thread
                     threads[thr_name].start()
+
+                    # [...] 3 other features are managed like this in the plugin
     
                 except:
                     # if there is an error, log it
@@ -262,6 +265,8 @@ Here is an example from the *diskfree* plugin: ::
                     # a disk can have been unmounted for a while
                     #self.force_leave()
                     #return
+
+Notice in this example that we get the devices list, then instantiate the class of the library and finally, for each device, call a method (or more if needed) from the library class in a thread.
 
 Focus on the end : plugin ready
 ===============================
@@ -333,7 +338,46 @@ Focus on xPL : send xPL messages and listen for xPL messages
 Send xPL messages
 -----------------
 
-TODO
+To allow the plugin to send some xPL messages, you must create such a function in the binary part. The function will not be the same for all the plugins and depends on the plugin features and on the xPL schema used. 
+
+Here is a template: ::
+
+        def send_xpl(self, arg1, arg2, ...):
+            """ Send xPL message on network
+            """
+            self.log.debug("Sending xPL message for arg1={0}, arg2={1}...".format(arg1, arg2))
+            msg = XplMessage()
+            msg.set_type("xpl-stat")
+            msg.set_schema("aschema.basic")
+            msg.add_data({"key1" : arg1})
+            msg.add_data({"key2" : arg2})
+            # ...
+            self.myxpl.send(msg)
+
+This function should be called from the library part. To allow the library part to call this function, you must sends this function as a callback parameter to the library.
+
+Here is an example of the function for the *sensor.basic* xPL message: ::
+
+        def send_xpl(self, address, type, value):
+            """ Send xPL message on network
+            """
+            self.log.debug("Values for {0} on {1} : {2}".format(type, address, value))
+            msg = XplMessage()
+            msg.set_type("xpl-stat")
+            msg.set_schema("sensor.basic")
+            msg.add_data({"device" : address})
+            msg.add_data({"type" : type})
+            msg.add_data({"current" : value})
+            self.myxpl.send(msg)
+
+Let's see how to use it with the library...
+
+First, when you instantiate the class of the library, set the function as a parameter (this is call a callback): ::
+
+    my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+
+As you can see here, the ``self.send_xpl`` function is set as a parameter. We will see in the :doc:`library documentation <lib_part>` how to use it.
+
 
 Listen for xPL messages
 -----------------------
@@ -344,4 +388,37 @@ TODO
 Focus on launching threads 
 ==========================
 
-TODO
+When you want to launch an infinite task, you can use a thread. In this thread you can have an infinite loop with a timer in it or an infinite reading on something. 
+
+To be sure that the thread could be stopped when the plugin is requested to stop, you will need to use a *stop flag* in the library. So you need to give this *stop flag* to the library, for example when instantiating the library class. Example: ::
+
+
+    my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+
+The function ``self.get_stop()`` will get the stop flag of the plugin and so give it to *my_object*. Then, in the methods of the library class, you will be able to handle this flag in the loops. You can read the :doc:`library documentation <lib_part>` to see how to handle it.
+
+Then, you can create your thread. Example: ::
+
+    import threading
+    # [...]
+    
+    class MypluginManager(XplPlugin):
+        # [...]
+ 
+        def a_function(self):
+            # [...]
+
+            # instantiate the class of the library
+            my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+        
+            # set the thread name
+            thr_name = "a_name_for_my_thread"
+            # create the thread
+            my_thread = threading.Thread(None,
+                                          my_object.the_fonction,
+                                          thr_name,
+                                          (arg1, arg2,),
+                                          {})
+            # start the thread
+            my_thread.start()
+
