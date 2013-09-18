@@ -64,9 +64,13 @@ For each message you need to set:
 * *schema*: the xPL schema used by the plugin.
 * *parameters*: all the parameters of the xPL message.
 
-  * *static*: all the static keys of the xPL message. Static keys will always be the same, whatever the device is.
-  * *device* : an empty table (always). This part is here only to be compliant with the json of a device which is given to the user interfaces.
-  * *dynamic* : all the dynamic parts of the xPL message. It is all the keys which are not related to the device address : values for the sensors.
+  * *static*: all the static keys of the xPL message. Static keys will always be the same, whatever the device is. They will never be displayed in the user interface.
+  * *device* : the static parameters. Their value is defined on a per device basis (input is requested) in the user interface. The values can be different for the *xpl_commands* and xpl_stats* parts (if both exists).
+  * *dynamic* : all the dynamic parts of the xPL message. It is all the keys which are not related to the device address : values for the sensors. They are stored in the sensor history table.
+
+15:01 < cereal_> dynamic (for commands) => the key will be filled in on command sending (usually the return from a 
+                 widget)
+
 
 ..todo :: 
 
