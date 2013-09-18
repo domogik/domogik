@@ -9,6 +9,8 @@ The device_types section describes all the device types that are handled by the 
 A device type is linked to some *commands* and some *sensors*. For example, a temperature sensor will have only a temperature  sensor. A temperature and humidity sensor will have 2 sensors : a temperature sensor and a humidity sensor. In some technologies, an on/off lighting device type will have 1 command : on/off (which may be named switch) and a dimmer device type will have 2 commands: on/off (switch) and dimmer (which could be simply named dimmer).
 Finally a device type has some parameters. For simple device type, there will be only one parameter : the device address. For some complex device type (some KNX or Chacon devices for example), you will have several parameters : the address which is split in 2 parts (chacon devices), the actuator address which is not the same as the sensor one (KNX devices), ...
 
+The known datatypes can be found in /var/lib/domogik/resources/datatypes.json.
+
 Example 1
 =========
 
@@ -65,7 +67,3 @@ Description
   * *description* :  short description of this field
   * *type* : the value type for this field
   * depending on the type the are other posibilitys (like min_value, max_value, ....)
-
-..todo ::
-
-    Explain where to find the other values
