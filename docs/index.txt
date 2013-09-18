@@ -79,6 +79,9 @@ Technical Documentation
         * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
     * Old Domogik 0.2/0.3 devices migration
         * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
+    * Command sending
+        * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
+
 * **Db manager:**
 * **XPL Event manager:**
 * **Packages:**

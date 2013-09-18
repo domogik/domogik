@@ -117,7 +117,7 @@
             "DT_Month",
             "DT_Day",
             "DT_Hour",
-            "DT_minute",
+            "DT_Minute",
             "DT_Second",
             "DT_mSecond",
             "DT_Timestamp",
@@ -385,6 +385,13 @@
         "min": null,
         "max": null,
         "unit": "Mb",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_GByte": {
+        "min": null,
+        "max": null,
+        "unit": "Gb",
         "parent": "DT_Number",
         "childs": []
     },
