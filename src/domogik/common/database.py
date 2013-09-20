@@ -136,9 +136,9 @@ class DbHelper():
             pool_recycle = DEFAULT_RECYCLE_POOL
 
         if config[0]['log_level'] == 'debug':
-            logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
-            logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
-            logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
+            #logger.Logger('sqlalchemy.engine', domogik_prefix=False, use_filename='sqlalchemy')
+            #logger.Logger('sqlalchemy.pool', domogik_prefix=False, use_filename='sqlalchemy')
+            #logger.Logger('sqlalchemy.orm', domogik_prefix=False, use_filename='sqlalchemy')
             pass
 
         url = self.get_url_connection_string()
@@ -1399,6 +1399,9 @@ class DbHelper():
 ###################
     def get_all_sensor(self):
         return self.__session.query(Sensor).all()
+
+    def get_sensor(self, id):
+        return self.__session.query(Sensor).filter_by(id=id).first()
 
     def get_sensor_by_device_id(self, did):
         return self.__session.query(Sensor).filter_by(device_id=did).all()
