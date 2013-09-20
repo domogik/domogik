@@ -14,6 +14,7 @@ Packages development
 * :doc:`start.sh file <start_file/index>`
 * :doc:`Json file <json/index>`
 
+  * :doc:`Sample json file <json/sample>`
   * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
   * :doc:`Identity part <json/identity>`
   * :doc:`Configuration part <json/configuration>`
