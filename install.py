@@ -122,6 +122,7 @@ def create_user(d_user):
     if d_user not in [x[0] for x in pwd.getpwall()]:
         print("Creating the {0} user".format(d_user))
         os.system('/usr/sbin/useradd --system {0}'.format(d_user))
+        os.system('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
     if d_user not in [x[0] for x in pwd.getpwall()]:
         fail("Failed to create domogik user")
     else:
