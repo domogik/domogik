@@ -14,6 +14,7 @@ Packages development
 * :doc:`start.sh file <start_file/index>`
 * :doc:`Json file <json/index>`
 
+  * :doc:`Sample json file <json/sample>`
   * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
   * :doc:`Identity part <json/identity>`
   * :doc:`Configuration part <json/configuration>`
@@ -25,7 +26,7 @@ Packages development
   * :doc:`Udev rules part <json/udev_rules>`
   * :doc:`Json version part <json/version>` ....................................TODO
 
-* :doc:`Data types <data_types/index>` ....................................TODO
+* :doc:`Data types <data_types/index>`
 
 * :doc:`Tests scripts <tests/scripts>` ....................................TODO
 
@@ -55,6 +56,7 @@ Packages development
   * :doc:`Doc tree <doc/tree>`
   * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
   * :doc:`What should contain the documentation ? <doc/content>`
+  * :doc:`The developpers part <doc/dev>`
 
 * Tests
 * Nightly builds

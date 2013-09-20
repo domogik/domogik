@@ -1,0 +1,7 @@
+===================
+Doc for developpers
+===================
+
+You must create a documentation part about the plugin development. In this part, you must at least:
+
+* list and describe the xPL schema used, with some examples.
