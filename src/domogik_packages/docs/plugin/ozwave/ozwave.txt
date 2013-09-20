@@ -11,27 +11,11 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
-- 0.2b5 : (29-07-2013) Compatibily library : OpenZwave >= 1.0.663, python_openzwave >= 0.2.5 (rev >= 18832df1dd95).
-    - Target : python_openzwave, domogik and domoweb.
-    - Update, compile and install python_openzwave.
-    - An insert_data or a reinstall is necessary.
+- 0.2c1 : (15-09-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
+    - Target : domogik.
     - Change log :
-        - Fix some report controller action.
-        - Fix accent on node name and location.
-        - Fix display update name and location name just after sended.
-        - Fix some actions bug.
-        - Fix some Exception error.
-        - Forced unit conversion F -> °C for temperature device in F.
-        - Double xPL message for switch multi-level. (for testing-not sure it's a good idea !)
-        - UI dialog node associations improvement.
-        - Add device motion binary multi sensor 4-in-1.
-        - Add polling command_class. Some limitations : there is an issue with getPollIntensity openzwave lib so for moment function is deactivated and value 1 is always received. Some command class like COMMAND_CLASS_POWERLEVEL seem to enable but the polling is not in effect.
-        - Add timer reporting controller status on widget (every 60s) and report status "started plugin, started, init, lock, no-ctrl, ok, stop".
-        - Add list of recognized manufacturers and products by openzwave in "support tools" tab.
-        - Add force refresh node.
-        - Add openzwave log report in "support tools" tab.
-        - Add Battery status in tab nodes.
-        - Update doc.
+        - Retrieve domogik device zwave ctrl address from rest.
+        - update doc
 
 - `Previous change <changelog.html>`_
 

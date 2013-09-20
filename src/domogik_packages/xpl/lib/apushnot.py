@@ -37,7 +37,7 @@ import urllib2
 import json
 
 # Configuration.
-BACKEND = 'https://notifrier.appspot.com/notifry';
+BACKEND = 'https://newtifry.appspot.com/newtifry';
 
 
 class APushNotification:

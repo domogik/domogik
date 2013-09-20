@@ -93,9 +93,11 @@ class BroadcastServer(object):
         self.port = port
         self.cb_recept = cb_recept
         self.log = log
+        self.server = None
         self.server = make_server('', port, server_class=WSGIServer,
                      handler_class=WebSocketWSGIRequestHandler,
                      app=WebSocketWSGIApplication(handler_cls=WebSocketsHandler))
+        if not self.server : raise WsUIServerException('Error websocket server creation, check if there is any other running plugin instance.')
         self.server.initialize_websockets_manager()
         __ctrlServer__.append(self)
         servUI = threading.Thread(None, self.run, "th_WSserv_msg_to_ui", (), {} )
@@ -121,10 +123,10 @@ class BroadcastServer(object):
         """Close server and Destroy class."""
         print ('server stopped')
         self.running = False
-        self.server.server_close()
-        __ctrlServer__.remove(self)
+        if  self.server : self.server.server_close()
+        if __ctrlServer__ : __ctrlServer__.remove(self)
         if self.log : self.log.info('WebSocket server forever on port : %d Destroyed' %self.port)
-        
+
     def broadcastMessage(self, message):
         """broadcast Message to all clients"""
         header = {'type':'pub',  'idws' : 'for each' , 'ip' : '0.0.0.0',  'timestamp' : long(time.time()*100)}
@@ -142,7 +144,7 @@ class BroadcastServer(object):
                 self.server.manager.remove(ws)
                 print "Failed sockets"
                 continue
-                
+
     def sendAck(self, ackMsg):
         """Send a confirmation message  'Ack'  to client"""
         if ackMsg['header'] :

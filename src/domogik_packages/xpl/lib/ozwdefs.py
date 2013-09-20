@@ -44,7 +44,7 @@ import sys
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.2b5"
+OZWPLuginVers = "0.2c1"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])

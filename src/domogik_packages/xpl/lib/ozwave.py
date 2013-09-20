@@ -33,6 +33,9 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
+import urllib2
+import urllib
+from domogik.common.configloader import Loader
 
 from collections import namedtuple
 import binascii
@@ -51,6 +54,7 @@ import sys
 import resource
 import traceback
 import tailer
+
 # import time
 # from time import sleep
 # import os.path
@@ -87,6 +91,13 @@ class OZWavemanager(threading.Thread):
         self._cb_send_xPL = cb_send_xPL
         self._cb_sendxPL_trig = cb_sendxPL_trig
         self._stop = stop
+        
+        # Get config rest domogik
+        self.conf_rest = {'rest_ssl_certificate': '', 'rest_server_ip': '127.0.0.1', 'rest_server_port': '40405', 'rest_use_ssl': 'False'}
+        cfg_rest = Loader('rest')
+        config_rest = cfg_rest.load()
+        self.conf_rest = dict(config_rest[1])
+        
         self._homeId = 0
         self._activeNodeId = None # node actif courant, pour utilisation dans les fonctions du manager
         self._ctrlnodeId = None
@@ -373,12 +384,25 @@ class OZWavemanager(threading.Thread):
     def _getCtrlDeviceName(self):
         if self._controller :
             return self._controller.ctrlDeviceName
-        else : # TODO: Pour retour du ctrlname, si ctrl pas initialisé hypothèse qu'il en 1.1, voir si possible a récupérer de domogik....
-            n = str(self._nameAssoc.keys() [0])
-            if n : 
-                return "%s.1.1" % (n)
+        else : 
+            if self.conf_rest['rest_use_ssl'] == 'False' : protocol = 'http'
+            else : protocol = 'https'
+            rest = "%s://%s:%s" % (protocol, self.conf_rest['rest_server_ip'], self.conf_rest['rest_server_port'])
+            the_url = "%s/base/device/list" % (rest)
+            req = urllib2.Request(the_url)
+            handle = urllib2.urlopen(req)
+            devices = handle.read()
+            ret = json.loads(devices)
+            if ret["status"] == "OK" :
+                for dev in ret["device"]:
+                    if  dev['device_type_id'] == 'ozwave.ctrl' : 
+                        return dev['address']
             else :
-                return None
+                n = str(self._nameAssoc.keys() [0])
+                if n : 
+                    return "%s.1.1" % (n)
+                else :
+                    return None
 
     def cb_openzwave(self,  args):
         """Callback depuis la librairie py-openzwave 
