@@ -47,7 +47,7 @@ except ImportError:
 MSG_VERSION = "0_1"
 
 class MQSyncSub():
-    def __init__(self, context, caller_id, *category_filters):
+    def __init__(self, context, caller_id, category_filters):
         if ("domogik.common.configloader" in sys.modules):
             cfg = Loader('mq').load()
             self.cfg_mq = dict(cfg[1])
