@@ -92,7 +92,6 @@ class VelbusManager(XplPlugin):
             self.log.error(ex.value)
             self.force_leave()
             return
-        self.manager.scan()
             
         # Start reading RFXCOM
         listenthread = threading.Thread(None,
@@ -102,6 +101,9 @@ class VelbusManager(XplPlugin):
                                    {})
         self.register_thread(listenthread)
         listenthread.start()
+        
+        self.manager.scan()
+        
         self.enable_hbeat()
 
     def send_xpl(self, schema, data):

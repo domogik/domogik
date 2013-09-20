@@ -41,6 +41,7 @@ MODULE_TYPES = {
  31 : {"id": "VMBGP2", "subtype": "INPUT"},
  32 : {"id": "VMBGP4", "subtype": "INPUT"},
  33 : {"id": "VMBGP0", "subtype": "INPUT"},
+ 34 : {"id": "VMB7IN", "subtype": "INPUT"},
 }
 
 MSG_TYPES = {
