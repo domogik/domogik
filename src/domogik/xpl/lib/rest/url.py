@@ -118,3 +118,4 @@ from domogik.xpl.lib.rest.urls.helper import *
 # Pure REST API
 from domogik.xpl.lib.rest.urls.person import personAPI
 from domogik.xpl.lib.rest.urls.account import AccountAPI
+from domogik.xpl.lib.rest.urls.sensor import sensorAPI
