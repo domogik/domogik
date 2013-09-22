@@ -23,9 +23,9 @@ Packages development
   * :doc:`Xpl stats part <json/xpl_stats>`
   * :doc:`Commands part <json/commands>` ....................................TODO 
   * :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
-  * :doc:`Udev rules part <json/udev_rules>`
   * :doc:`Json version part <json/version>` ....................................TODO
 
+* :doc:`Udev files <udev_rules/index>`
 * :doc:`Data types <data_types/index>`
 
 * :doc:`Tests scripts <tests/scripts>` ....................................TODO
