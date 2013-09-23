@@ -53,7 +53,7 @@ from zmq.eventloop.ioloop import IOLoop
 from domogik.common.packagejson import PackageJson, PackageException
 import zmq
 import traceback
-
+import json
 
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
@@ -117,7 +117,7 @@ class XplPlugin(BasePlugin, MQRep):
         # for stop requests
         MQRep.__init__(self, self.zmq, self._name)
 
-
+        self.helpers = {}
         self._is_manager = is_manager
         cfg = Loader('domogik')
         my_conf = cfg.load()
@@ -363,6 +363,7 @@ class XplPlugin(BasePlugin, MQRep):
             IOLoop.instance().start()
 
 
+
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
             @param msg : MQ req message
@@ -373,6 +374,24 @@ class XplPlugin(BasePlugin, MQRep):
         if msg.get_action() == "plugin.stop.do":
             self.log.info("Plugin stop request : {0}".format(msg))
             self._mdp_reply_plugin_stop(msg)
+        elif msg.get_action() == "helper.list.get":
+            self.log.info("Plugin helper list request : {0}".format(msg))
+            self._mdp_reply_helper_list(msg)
+        elif msg.get_action() == "helper.help.get":
+            self.log.info("Plugin helper help request : {0}".format(msg))
+            self._mdp_reply_helper_help(msg)
+        elif msg.get_action() == "helper.do":
+            self.log.info("Plugin helper action request : {0}".format(msg))
+            self._mdp_reply_helper_do(msg)
+
+    def _mdp_reply_helper_help(self, data):
+        contens = data.get_data()
+	if 'command' in contens.keys():
+            if contens['command'] in self.helpers.keys():
+                msg = MQMessage()
+                msg.set_action('helper.help.result')
+                msg.add_data('help', self.helpers[contens['command']]['help'])
+                self.reply(msg.get())
 
     def _mdp_reply_plugin_stop(self, data):
         """ Stop the plugin
@@ -400,6 +419,15 @@ class XplPlugin(BasePlugin, MQRep):
         # if it fails, the manager should try to kill the plugin
         self.force_leave()
 
+    def _mdp_reply_helper_list(self, data):
+        """ Return a list of supported helpers
+            @param data : MQ req message
+        """
+        ### Send the ack over MQ Rep
+        msg = MQMessage()
+        msg.set_action('helper.list.result')
+        msg.add_data('actions', self.helpers.keys())
+        self.reply(msg.get())
 
     def _send_status(self, status):
         """ Send the plugin status over the MQ
@@ -468,6 +496,21 @@ class XplPlugin(BasePlugin, MQRep):
        except :
            raise IOError("Can't create a file in directory %s." % path)
        return path
+
+    def register_helper(self, action, help_string, callback):
+        if action not in self.helpers:
+            self.helpers[action] = {'call': callback, 'help': help_string}
+
+    def publish_helper(self, key, data):
+        if hasattr(self, "_pub"):
+            if self._name in CORE_COMPONENTS:
+                type = "core"
+            else:
+                type = "plugin"
+            self._pub.send_event('helper.publish',
+                                 {"origin" : "{0}-{1}-{2}".format(type, self._name, self.get_sanitized_hostname()),
+                                  "key": key,
+                                  "data": data})
 
     # TODO :remove
     #def get_stats_files_directory(self):
