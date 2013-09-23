@@ -383,6 +383,30 @@ class XplPlugin(BasePlugin, MQRep):
         elif msg.get_action() == "helper.do":
             self.log.info("Plugin helper action request : {0}".format(msg))
             self._mdp_reply_helper_do(msg)
+    
+    def _mdp_reply_helper_do(self, msg):
+        contens = msg.get_data()
+        if 'command' in contens.keys():
+            if contens['command'] in self.helpers.keys():
+                if 'params' not in contens.keys():
+                    contens['params'] = {}
+                    params = []
+                else:
+                    params = []
+                    for key, value in contens['params'].items():
+                        params.append( "{0}='{1}'".format(key, value) )
+                command = "self.{0}(".format(self.helpers[contens['command']]['call'])
+                command += ", ".join(params)
+                command += ")"
+                print command
+                result = eval(command)
+                # run the command with all params
+                msg = MQMessage()
+                msg.set_action('helper.do.result')
+                msg.add_data('command', contens['command'])
+                msg.add_data('params', contens['params'])
+                msg.add_data('result', result)
+                self.reply(msg.get())
 
     def _mdp_reply_helper_help(self, data):
         contens = data.get_data()
