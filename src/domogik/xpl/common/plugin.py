@@ -85,7 +85,7 @@ class XplPlugin(BasePlugin, MQRep):
     This class is a Singleton
     '''
     def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                 daemonize = True, nohub = False):
+                 daemonize = True, nohub = False, test = False):
         '''
         Create XplPlugin instance, which defines system handlers
         @param name : The name of the current plugin
@@ -108,6 +108,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.log.info("----------------------------------")
         self.log.info("Starting plugin '%s' (new manager instance)" % name)
         self._name = name
+        self._test = test   # flag used to avoid loading json in test mode
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
@@ -163,7 +164,7 @@ class XplPlugin(BasePlugin, MQRep):
 
         # for all no core elements, load the json
         # TODO find a way to do it nicer ??
-        if self._name not in CORE_COMPONENTS:
+        if self._name not in CORE_COMPONENTS and self._test == False:
             self._load_json()
 
         self.log.debug("end single xpl plugin")
