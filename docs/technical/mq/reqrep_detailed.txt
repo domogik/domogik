@@ -213,4 +213,54 @@ You will get a reply like this: ::
     ['reload.result', '{}']
 
 
+helper.list.get
+===============
 
+Request : UIs
+Reply : plugin
+
+To request all possible helpers for a plugin: ::
+
+    request : helper.list.get
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_helper_list.py*.
+
+You will get a reply like this: ::
+
+    ['helper.list.result', '{"actions": ["scan", "test"]}'] 
+
+
+helper.help.get
+===============
+
+Request : UIs
+Reply : plugin
+
+Get help info for a specifick helper command: ::
+
+    request : helper.help.get
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_helper_help.py*.
+
+You will get a reply like this: ::
+
+    ['helper.help.result', '{"help": "A help string"}']
+
+
+helper.do
+=========
+
+Request : UIs
+Reply : plugin
+
+Run a specifick helper command with optional parameters: ::
+
+    request : helper.do
+    data : command = command to run
+           params = a python dict, the keys are the param names, the values are the param values
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_helper_do.py*.
+
+You will get a reply like this: ::
+
+    ['helper.do.result', '{"command": "<the requested command", "params": "the requested params", "result": "the ouput of the called method in the plugin"}']
