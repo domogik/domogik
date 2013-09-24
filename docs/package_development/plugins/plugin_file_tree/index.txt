@@ -7,6 +7,7 @@ The plugin file tree will at least contains (assuming the plugin name is *myplug
 * **start.sh** : a script to start the plugin manually
 * **__init__.py** : an empty file needed by python
 * **info.json** : the json file which describe the plugin and its features. This file must always be named like this!
+* **info.json** : the json file which describe the plugin and its features. This file must always be named like this!
 * **bin/** : the main python program will be in this folder
 
   * **bin/__init__.py** : an empty file needed by python
@@ -27,6 +28,7 @@ The plugin file tree will at least contains (assuming the plugin name is *myplug
 
   * **design/icon.png** : the plugin icon (png, 96px * 96px). This file must always be named like this!
 
+* **udev/** : this folder will containt the udev rules needed for this pluign
 
 Some other items may be added: 
 
