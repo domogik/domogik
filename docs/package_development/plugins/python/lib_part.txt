@@ -26,7 +26,7 @@ TODO : timer
 Focus on the logs
 =================
 
-You already learned how to use the log functions in the :doc:`the bibrary part documentation <bin_part>`. Let's see how to do this in the library part.
+You already learned how to use the log functions in the :doc:`the library part documentation <bin_part>`. Let's see how to do this in the library part.
 
 TODO
 

@@ -34,6 +34,12 @@ XplPlugin and its usefull functions
 
 TODO : overview
 
+Helper function
+---------------
+
+* register_helper(action, help_string, callback)
+* publish_helper(key, data)
+
 Hidden but usefull features
 ---------------------------
 
