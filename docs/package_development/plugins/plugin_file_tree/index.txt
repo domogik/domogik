@@ -30,7 +30,7 @@ The plugin file tree will at least contains (assuming the plugin name is *myplug
 
   * **design/icon.png** : the plugin icon (png, 96px * 96px). This file must always be named like this!
 
-* **udev/** : this folder will containt the udev rules needed for this pluign
+* **udev/** : this folder will contain the udev rules needed for this plugin
 
 Some other items may be added: 
 
