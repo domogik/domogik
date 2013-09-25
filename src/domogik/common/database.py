@@ -516,7 +516,7 @@ class DbHelper():
         print client_data
         self.log.debug("Device creation : start to process the sensors")
         device_type_sensors = client_data['device_types'][device_type]['sensors']
-        self.log.debug("Device creation : list of sensors availabel for the device : {0}".format(device_type_sensors))
+        self.log.debug("Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
 
         # then, for each sensor, create it in databse for the device
         for a_sensor in device_type_sensors:
@@ -546,7 +546,7 @@ class DbHelper():
         # first, get the commands associated to the device_type
         self.log.debug("Device creation : start to process the commands")
         device_type_commands = client_data['device_types'][device_type]['commands']
-        self.log.debug("Device creation : list of commands availabel for the device : {0}".format(device_type_commands))
+        self.log.debug("Device creation : list of commands available for the device : {0}".format(device_type_commands))
 
         for a_command in device_type_commands:
             self.log.debug("Device creation : inserting data in core_command for '{0}'...".format(a_command))

@@ -2,6 +2,8 @@
 The plugin file tree
 ====================
 
+First, as already said in :doc:`the cahpter about creating the plugin repository on GitHub <create_repository/index>`, there are some rules about a plugin name : don't forget to respect them.
+
 The plugin file tree will at least contains (assuming the plugin name is *myplugin*):
 
 * **start.sh** : a script to start the plugin manually

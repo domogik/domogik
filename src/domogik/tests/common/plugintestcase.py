@@ -39,16 +39,29 @@ from threading import Event
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
+from domogik.tests.common.helpers import *
 import unittest
 import time
 
-class PluginTestCase(unittest.TestCase, XplPlugin):
+class PluginTestCase(unittest.TestCase):  #, XplPlugin):
 
     def setUp(self):
         """ sort of a Constructor
         """
-        print("------------------------------------------------------------------")
+        print("\n------------------------------------------------------------------")
+        #self.config = {}
 
+
+    ### plugin configuration tools
+
+    #def add_configuration(self, key, value):
+    #    """ Set a configuration key/value for the plugin
+    #        @param key : key
+    #        @param value : value
+    #    """
+    #    self.config[key] = value
+
+    ### xpl tools
 
     def wait_for_xpl(self, xpltype = None, xplschema = None, xplsource = None, data = {}, timeout = 10):
         """ Wait for a xpl message for a given time (in seconds)
@@ -84,6 +97,11 @@ class PluginTestCase(unittest.TestCase, XplPlugin):
     
 
 
+
+
+
+
+    ### to clean
 
     def now_to_xpl(self):
         """
