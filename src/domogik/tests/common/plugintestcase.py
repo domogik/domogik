@@ -34,200 +34,53 @@ Usage
 @organization: Domogik
 """
 
-import datetime
-from threading import Event
-from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin
-from domogik.tests.common.helpers import *
-import unittest
-import time
+from domogik.tests.common.templatetestcase import TemplateTestCase
+from domogik.tests.common.helpers import check_domogik_is_running
+from domogik.tests.common.helpers import delete_configuration
+from domogik.tests.common.helpers import configure
 
-class PluginTestCase(unittest.TestCase):  #, XplPlugin):
+class PluginTestCase(TemplateTestCase):
+#class DiskfreeTestCase(PluginTestCase):
+    """ This is the class containing all the tests for the plugin
+    """
 
-    def setUp(self):
-        """ sort of a Constructor
+    # this function is the same for all plugins
+    def __init__(self, testname, xpl_plugin, name, configuration):
+        """ Constructor
+            @param testname : used by unittest to choose the test to launch
+            @param xpl_plugin : an instance of XplPlugin to allow to use xPL features 
+            @param name : name of the plugin we are testing
+            @param configuration : dict containing the plugin configuration
         """
-        print("\n------------------------------------------------------------------")
-        #self.config = {}
+        #super(self.__class__, self).__init__(testname)
+        super(PluginTestCase, self).__init__(testname)
+        self.myxpl = xpl_plugin.myxpl
+        self.name = name
+        self.configuration = configuration
+        self.get_sanitized_hostname = xpl_plugin.get_sanitized_hostname
 
+    # this function is the same for all plugins
+    def test_0001_domogik_is_running(self):
+        self.assertTrue(check_domogik_is_running())
 
-    ### plugin configuration tools
+    # this function is the same for all plugins
+    def test_0010_configure_the_plugin(self):
+        # first, clean the plugin configuration
+        print("Delete the current plugin configuration")
+        self.assertTrue(delete_configuration("plugin", self.name, self.get_sanitized_hostname()))
+        for key in self.configuration:
+            print("Set up configuration : {0} = {1}".format(key, self.configuration[key]))
+            self.assertTrue(configure("plugin", self.name, self.get_sanitized_hostname(), key, self.configuration[key]))
 
-    #def add_configuration(self, key, value):
-    #    """ Set a configuration key/value for the plugin
-    #        @param key : key
-    #        @param value : value
-    #    """
-    #    self.config[key] = value
+    # this function is the same for all plugins
+    def test_0020_create_the_devices(self):
+        pass
 
-    ### xpl tools
-
-    def wait_for_xpl(self, xpltype = None, xplschema = None, xplsource = None, data = {}, timeout = 10):
-        """ Wait for a xpl message for a given time (in seconds)
-            @param xpltype: the xpl message type. Possible values are None (all), xpl-cmnd, xpl-stat, xpl-trig
-            @param xplschema : the xpl schema (sensor.basic for example)
-            @param xplsource : the xpl source of the message
-            @param data : the list of keys/values we should find in the message. { 'key1' : 'val1', ... }
-            @param timeout : time (in seconds) given to get the message. Once timeout has expired, we return False
-        """
-
-        # create the listener to catch the message
-        self._xpl_received = Event()
-        listener = Listener(self._wait_for_xpl_cb, 
-                            self.myxpl, 
-                            {'schema': xplschema,
-                             'xpltype': xpltype,
-                             'xplsource': xplsource})
-
-        self._xpl_received.wait(timeout)
-        if not self._xpl_received.is_set():
-            raise RuntimeError("No xPL message received")
-        print("xPL message received : {0}".format(self._xpl_data))
-        return True
-       
-
-
-    def _wait_for_xpl_cb(self, message):
-        """ Callback for the listener created in wait_for_xpl
-            @param message : xpl message received
-        """
-        self._xpl_received.set()
-        self._xpl_data = message
+    # this function is the same for all plugins
+    def test_9999_hbeat(self):
+        print("Check that a heartbeat is sent. This could take up to 5 minutes.")
+        self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat", 
+                                          xplschema = "hbeat.app", 
+                                          xplsource = "domogik-{0}.{1}".format(self.name, self.get_sanitized_hostname()),
+                                          timeout = 600))
     
-
-
-
-
-
-
-    ### to clean
-
-    def now_to_xpl(self):
-        """
-        Tranform an datetime date to an xpl one "yyyymmddhhmmss"
-        form.
-
-        @parameter sdate: The datetime to transform
-        @return: A string representing the xpl date if everything \
-            went fine. None otherwise.
-
-        """
-        try:
-            sdate = datetime.datetime.today() + datetime.timedelta(seconds=120)
-            h = "%.2i" % sdate.hour
-            m = "%.2i" % sdate.minute
-            s = "%.2i" % sdate.second
-            y = sdate.year
-            mo = "%.2i" % sdate.month
-            d = "%.2i" % sdate.day
-            xpldate = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
-            return xpldate
-        except:
-            return None
-
-    def _query_cb(self, message):
-        '''
-        Callback to receive message after a query() call
-
-        :param  message: the message received
-        :type  message: XplMessage
-
-        '''
-        result = message.data
-        #print("result=%s"%result)
-        for resp in self._keys:
-            if resp in result:
-                res = self._keys.pop(resp)
-                self._listens[resp].unregister()
-                del self._listens[resp]
-                self._result = result
-                res.set()
-                break
-
-    def query(self, key, testmsg, dictkeys=[], dictkeyvals={}, timeout=10):
-        '''
-        Send a command and wait for response from the plugin.
-
-        :param key: a key to look for
-        :type key: str
-        :param testmsg: The message to send
-        :param testmsg: XPLMessage
-        :param dictkeys: The keys that must exist in the returning message
-        :type dictkeys: set()
-        :param dictkeyvals: The key:val pairs that mus exist ine the returning message
-        :param dictkeyvals: disct()
-
-        '''
-        liste = Listener(self._query_cb, self.myxpl, {'schema': self.schema,
-                                                    'xpltype': self.xpltype})
-        self._keys[key] = Event()
-        self._listens[key] = liste
-        self.myxpl.send(testmsg)
-        if key in self._keys:
-            try:
-                self._keys[key].wait(timeout)
-                if not self._keys[key].is_set():
-                    #print("No answer received for key %s" % (key))
-                    raise RuntimeError("No answer received for key %s, check your cron xpl setup" % (key))
-            except KeyError:
-                pass
-        res = True
-        if 'error' not in self._result:
-            if dictkeys != None:
-                for mykey in dictkeys :
-                    if mykey not in self._result :
-                        res = False
-            if dictkeyvals != None:
-                for mykey in dictkeyvals :
-                    if mykey not in self._result :
-                        res = False
-                    elif self._result[mykey] != dictkeyvals[mykey]:
-                        res = False
-            return res
-        else:
-            #print("Error %s when communicating key %s" % (self._result['errorcode'], key))
-            #print("%s : %s" % (self._result['errorcode'], self._result['error']))
-            return False
-
-    def query_many(self, key, testmsg, dictkeys=[], dictkeyvals={}, retry=20):
-        '''
-        Send a command and wait for response from the plugin.
-
-        :param key: a key to look for
-        :type key: str
-        :param testmsg: The message to send
-        :param testmsg: XPLMessage
-        :param dictkeys: The keys that must exist in the returning message
-        :type dictkeys: set()
-        :param dictkeyvals: The key:val pairs that mus exist ine the returning message
-        :param dictkeyvals: disct()
-
-        '''
-        self._keys = {}
-        self._listens = {}
-        self._result = None
-        left = retry
-        res = False
-        while ((left >= 0) and (res != True)):
-            res = self.query(key, testmsg, dictkeys, dictkeyvals, timeout=60)
-            left = left -1
-        return res
-
-    def OLD____setUp(self):
-        global sendplugin
-        self.myxpl = sendplugin.myxpl
-        #self._keys = {}
-        #self._listens = {}
-        #self._result = None
-        #self.schema = "bluez.basic"
-        #self.xpltype = "xpl-trig"
-        #self.time_start = datetime.datetime.now()
-
-#    def tearDown(self):
-#        self.plugin.force_leave()
-
-
-
-
-
