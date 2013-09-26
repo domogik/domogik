@@ -79,7 +79,7 @@ import random
 #from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 #from domogik.common import logger
-#from domogik.xpl.common.baseplugin import BasePlugin
+#from domogik.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 import time

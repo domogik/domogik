@@ -41,7 +41,7 @@ import threading
 import os
 import sys
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
-from domogik.xpl.common.baseplugin import BasePlugin
+from domogik.common.baseplugin import BasePlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
