@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, timeit
+from domogik.rest.url import urlHandler, json_response, timeit
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 import sys

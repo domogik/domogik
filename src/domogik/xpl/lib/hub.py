@@ -45,7 +45,7 @@ from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 from twisted.python import log
 from optparse import OptionParser
-#from domogik.xpl.bin.hub import VERSION
+#from domogik.bin.hub import VERSION
 
 
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError

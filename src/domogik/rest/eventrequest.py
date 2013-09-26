@@ -39,7 +39,7 @@ import time
 from Queue import Queue, Empty, Full
 from threading import Thread, Event
 from domogik.xpl.common.xplconnector import XplTimer
-from domogik.xpl.lib.rest.event import DmgEvents
+from domogik.rest.event import DmgEvents
 
 
 class RequestEvents(DmgEvents):

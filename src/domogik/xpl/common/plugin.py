@@ -41,8 +41,8 @@ import threading
 import os
 import sys
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
-from domogik.xpl.common.baseplugin import BasePlugin
-from domogik.xpl.common.queryconfig import Query
+from domogik.common.baseplugin import BasePlugin
+from domogik.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 from domogik.mq.pubsub.publisher import MQPub
@@ -109,14 +109,30 @@ class XplPlugin(BasePlugin, MQRep):
         self.log.info("Starting plugin '%s' (new manager instance)" % name)
         self._name = name
         self._test = test   # flag used to avoid loading json in test mode
+        
+        '''
+        Calculate the MQ name
+        - For a core component this is just its component name (self._name)
+        - For a plugin this is plugin-<self._name>-self.hostname
+
+        The reason is that the core components need a fixed name on the mq network,
+        if a plugin starts up it needs to request the config on the network, and it needs to know the worker (core component)
+        to ask the config from.
+
+        Because of the above reason, every item in the core_component list can only run once
+        '''
+        if self._name in CORE_COMPONENTS:
+            self._mq_name = self._name
+        else:
+            self._mq_name = "plugin-{0}-{1}".format(self._name, self.get_sanitized_hostname())
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
-        self._pub = MQPub(self.zmq, self._name)
+        self._pub = MQPub(self.zmq, self._mq_name)
         self._send_status(STATUS_STARTING)
         ### MQ
         # for stop requests
-        MQRep.__init__(self, self.zmq, self._name)
+        MQRep.__init__(self, self.zmq, self._mq_name)
 
         self.helpers = {}
         self._is_manager = is_manager
@@ -533,7 +549,7 @@ class XplPlugin(BasePlugin, MQRep):
             else:
                 type = "plugin"
             self._pub.send_event('helper.publish',
-                                 {"origin" : "{0}-{1}-{2}".format(type, self._name, self.get_sanitized_hostname()),
+                                 {"origin" : self._mq_name,
                                   "key": key,
                                   "data": data})
 

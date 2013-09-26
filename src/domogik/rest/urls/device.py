@@ -1,5 +1,5 @@
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
-from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
+from domogik.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
 from flask import request
 import zmq
@@ -40,8 +40,8 @@ def get_device_params(dev_type_id):
     ret = {}
     ret['commands'] = []
     ret['global'] = []
-    if 'xpl_params' in pjson['device_types'][dev_type_id]:
-        ret['global']  = pjson['device_types'][dev_type_id]['xpl_params']
+    if 'params' in pjson['device_types'][dev_type_id]:
+        ret['global']  = pjson['device_types'][dev_type_id]['params']
     ret['xpl_stat'] = []
     ret['xpl_cmd'] = []
     # find all features for this device

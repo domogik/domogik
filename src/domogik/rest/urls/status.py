@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, db_helper, timeit
+from domogik.rest.url import urlHandler, json_response, db_helper, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -14,7 +14,7 @@ def api_root():
     # domogik global version
     global_version = sys.modules["domogik"].__version__
     # domogik src version
-    domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
+    domogik_path = os.path.dirname(domogik.rest.__file__)
     subp = Popen("cd %s ; hg branch | xargs hg log -l1 --template '{branch}.{rev} - {date|isodate}' -b" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
     (stdout, stderr) = subp.communicate()
     # if hg id has no error, we are using source  repository

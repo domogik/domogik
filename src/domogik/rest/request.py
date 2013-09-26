@@ -39,9 +39,9 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.rest.jsondata import JSonHelper
-from domogik.xpl.lib.rest.csvdata import CsvHelper
-from domogik.xpl.lib.rest.tail import Tail
+from domogik.rest.jsondata import JSonHelper
+from domogik.rest.csvdata import CsvHelper
+from domogik.rest.tail import Tail
 from domogik.common.packagemanager import PackageManager, PKG_PART_XPL, PKG_PART_RINOR, PKG_CACHE_DIR, ICON_CACHE_DIR 
 from domogik.common.packagejson import PackageException
 from domogik.common.packagejson import PackageJson
@@ -677,7 +677,7 @@ class ProcessRequest():
     def rest_status_src_version(self):
         """ Return sources version
         """
-        domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
+        domogik_path = os.path.dirname(domogik.rest.__file__)
         #subp = Popen("cd %s ; hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
         subp = Popen("cd %s ; hg branch | xargs hg log -l1 --template '{branch}.{rev} - {date|isodate}' -b" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
         (stdout, stderr) = subp.communicate()

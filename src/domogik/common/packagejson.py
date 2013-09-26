@@ -173,7 +173,7 @@ class PackageJson():
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
-                expected = ['id', 'name', 'description', 'commands', 'sensors', 'xpl_params']
+                expected = ['id', 'name', 'description', 'commands', 'sensors', 'params']
                 self._validate_keys(expected, "device_type {0}".format(devtype), devt.keys())
                 #check that all commands exists inisde each device_type
                 for cmd in devt["commands"]:
@@ -186,7 +186,7 @@ class PackageJson():
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description"]
                 optional = ["max_value", "min_value"]
-                for par in devt["xpl_params"]:
+                for par in devt["params"]:
                     self._validate_keys(expected, "a xpl_param for device_type {0}".format(devtype), par.keys(), optional)
             #validate the commands
             for cmdid in self.json["commands"]:

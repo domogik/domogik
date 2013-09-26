@@ -74,7 +74,7 @@ from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
-from domogik.xpl.common.queryconfig import Query
+from domogik.common.queryconfig import Query
 from domogik.xpl.common.xplconnector import XplTimer 
 from ConfigParser import NoSectionError
 
@@ -648,7 +648,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
         ### Start the component
         self.log.info("Request to start core component : {0}".format(self.name))
-        pid = self.exec_component("domogik.xpl.bin")
+        pid = self.exec_component("domogik.bin")
         self.set_pid(pid)
         if pid != 0:
             # Notice : we whould not need to do this as this information should be provided by the MQ plugin.status.
@@ -663,7 +663,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
     def exec_component(self, python_component_basepackage):
         """ to call to start a component
-            @param python_component_basepackage : domogik.xpl.bin, packages
+            @param python_component_basepackage : domogik.bin, packages
         """
         ### get python package path for the component
         pkg = "{0}.{1}".format(python_component_basepackage, self.name)
