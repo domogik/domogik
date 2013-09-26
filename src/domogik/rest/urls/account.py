@@ -28,7 +28,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.lib.rest.url import json_response, register_api, urlHandler
+from domogik.rest.url import json_response, register_api, urlHandler
 from flask import request
 from flask.views import MethodView
 

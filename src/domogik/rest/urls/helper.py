@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api
+from domogik.rest.url import urlHandler, json_response, register_api
 from flask.views import MethodView
 
 @urlHandler.route('/helper', methods=['GET'])

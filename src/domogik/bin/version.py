@@ -36,7 +36,7 @@ Implements
 @organization: Domogik
 """
 from domogik.bin.rest import REST_API_VERSION
-import domogik.xpl.lib.rest
+import domogik.rest
 import sys
 import os
 from subprocess import Popen, PIPE
@@ -45,7 +45,7 @@ from subprocess import Popen, PIPE
 def rest_status_src_release():
     """ Return sources release
     """
-    domogik_path = os.path.dirname(domogik.xpl.lib.rest.__file__)
+    domogik_path = os.path.dirname(domogik.rest.__file__)
     #subp = Popen("cd %s ; hg log -r tip --template '{branch}.{rev} ({latesttag}) - {date|isodate}'" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
     subp = Popen("cd %s ; hg branch | xargs hg log -l1 --template '{branch}.{rev} ({latesttag}) - {date|isodate}' -b" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
     (stdout, stderr) = subp.communicate()

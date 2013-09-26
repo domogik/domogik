@@ -1,5 +1,5 @@
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
-from domogik.xpl.lib.rest.url import urlHandler, json_response, register_api, timeit
+from domogik.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
 from flask import request
 import zmq

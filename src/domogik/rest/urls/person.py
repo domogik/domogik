@@ -1,4 +1,4 @@
-from domogik.xpl.lib.rest.url import *
+from domogik.rest.url import *
 from flask import request
 from flask.views import MethodView
 
