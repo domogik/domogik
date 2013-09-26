@@ -37,7 +37,7 @@ To check these sensors the plugin need 2 information for the device type:
                 "name": "Disk usage",
                 "commands": [],
                 "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"],
-                "xpl_params": [
+                "params": [
                     {  
                         "key": "device",
                         "description": "The path to look at.",
@@ -61,7 +61,7 @@ Description
 * *description* : a short description of the device type
 * *commands* : the list of commands supported by this device type
 * *sensors* : the list of sensors supported by this device type
-* *xpl_params* : list of parameters that are common to ALL xpl messages for this device type
+* *params* : list of parameters that are common to ALL xpl messages for this device type
 
   * *key* : the xpl key for the message
   * *description* :  short description of this field

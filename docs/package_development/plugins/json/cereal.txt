@@ -145,7 +145,7 @@ Example
                 "name": "Thermometer",
 		"commands": ["set_level_bin"],
 		"sensors": ["level"],
-		"xpl_params": [
+		"params": [
 			{
 				"key": "channel",
 				"description": "The channel number",
@@ -168,7 +168,7 @@ These data will be inserted in database during the package installation.
   * description :  short description of the device type
   * commands : list of commands supported by this device type
   * sensors : list of sensors supported by this device type
-  * xpl_params : list of parameters that are common to ALL xpl messages for this device type
+  * params : list of parameters that are common to ALL xpl messages for this device type
 	* key : the xpl key for the message
         * description :  short description of this field
         * type : the value type for this field 

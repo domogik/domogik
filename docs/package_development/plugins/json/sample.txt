@@ -18,7 +18,7 @@ Sample
                 "name": "The device name",
                 "commands": ["cmd_one", "cmd_two"],                     # link to list of commands
                 "sensors": ["sensor_one", "sensor_two"],                # link to list of sensors
-                "xpl_params": [                                         # parameters that are common to ALL xpl messages for this device type
+                "params": [                                             # parameters that are common to ALL xpl messages for this device type
                     {
                         "key": "key1_devicetype",                       # key copied to the xpl messages, this a static key like device address
                         "description": "A short description",
