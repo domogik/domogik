@@ -35,7 +35,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.bin.rest import REST_API_VERSION
+from domogik.bin.rest import REST_API_VERSION
 import domogik.xpl.lib.rest
 import sys
 import os
