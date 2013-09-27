@@ -43,3 +43,15 @@ def api_root():
     data = {"info" : info, 
            "mq": mqcfg}
     return 200, data
+
+@urlHandler.route('/map')
+@json_response
+def api_map():
+    rules = []
+    for rule in urlHandler.url_map.iter_rules():
+        rules.append({\
+            'url': rule.rule, \
+            'method': list(rule.methods), \
+            'arguments': list(rule.arguments), \
+        })
+    return 200, {'rules': rules}
