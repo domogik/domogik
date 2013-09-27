@@ -166,10 +166,23 @@ class PackageJson():
                 raise PackageException("unknown key '{0}' found in {1}".format(item, name))
 
     def _validate_02(self):
+        print self.json
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
             self._validate_keys(expected, "file", self.json.keys(), ["products", "external"])
+            # validate identity
+            expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
+            optional = ["tags", "dependencies", "package_id", "icon_file"]
+            self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)
+            # validate configuration
+            expected = ["default", "description", "key", "name", "required", "type"]
+            optional = ["sort", "max_value", "min_value", "choices", "mask", "multiline"]
+            for conf in self.json["configuration"]:
+                self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
+            # validate procuts
+            #if products in self.json.keys():
+
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
