@@ -34,6 +34,7 @@ Usage
 @organization: Domogik
 """
 
+from domogik.common.utils import get_sanitized_hostname
 from domogik.tests.common.templatetestcase import TemplateTestCase
 from domogik.tests.common.helpers import check_domogik_is_running
 from domogik.tests.common.helpers import delete_configuration
@@ -57,7 +58,6 @@ class PluginTestCase(TemplateTestCase):
         self.myxpl = xpl_plugin.myxpl
         self.name = name
         self.configuration = configuration
-        self.get_sanitized_hostname = xpl_plugin.get_sanitized_hostname
 
     # this function is the same for all plugins
     def test_0001_domogik_is_running(self):
@@ -67,10 +67,10 @@ class PluginTestCase(TemplateTestCase):
     def test_0010_configure_the_plugin(self):
         # first, clean the plugin configuration
         print("Delete the current plugin configuration")
-        self.assertTrue(delete_configuration("plugin", self.name, self.get_sanitized_hostname()))
+        self.assertTrue(delete_configuration("plugin", self.name, get_sanitized_hostname()))
         for key in self.configuration:
             print("Set up configuration : {0} = {1}".format(key, self.configuration[key]))
-            self.assertTrue(configure("plugin", self.name, self.get_sanitized_hostname(), key, self.configuration[key]))
+            self.assertTrue(configure("plugin", self.name, get_sanitized_hostname(), key, self.configuration[key]))
 
     # this function is the same for all plugins
     def test_0020_create_the_devices(self):
@@ -81,6 +81,6 @@ class PluginTestCase(TemplateTestCase):
         print("Check that a heartbeat is sent. This could take up to 5 minutes.")
         self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat", 
                                           xplschema = "hbeat.app", 
-                                          xplsource = "domogik-{0}.{1}".format(self.name, self.get_sanitized_hostname()),
+                                          xplsource = "domogik-{0}.{1}".format(self.name, get_sanitized_hostname()),
                                           timeout = 600))
     
