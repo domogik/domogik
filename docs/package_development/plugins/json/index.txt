@@ -13,7 +13,6 @@ The **info.json** file is maybe the most important part of a plugin : it will de
         "sensors": {...},
         "xpl_stats": {...},
         "device_types": {...},
-        "udev_rules": [...]
         "products": [...],
     }
 
