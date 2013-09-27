@@ -36,6 +36,7 @@ Implements
 
 import threading
 from socket import gethostname 
+from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
@@ -217,7 +218,8 @@ class BasePlugin():
         This will lower it and keep only the part before the first dot
 
         """
-        return gethostname().lower().split('.')[0].replace('-','')[0:16]
+        #return gethostname().lower().split('.')[0].replace('-','')[0:16]
+        return get_sanitized_hostname()
 
     def __del__(self):
         if hasattr(self, log):
