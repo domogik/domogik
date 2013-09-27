@@ -73,6 +73,7 @@ Technical Documentation
   * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
 * **REST:**
     * :doc:`Overview </technical/rest/index>`
+    * :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
     * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
     * Devices parameters management
         * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
