@@ -81,7 +81,7 @@ def main():
 
 
     ### Launch the hub
-    from domogik.xpl.lib.hub import Hub
+    from domogik.xpl.hub.lib import Hub
     Hub(daemon)
 
 

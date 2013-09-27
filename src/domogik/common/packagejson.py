@@ -185,9 +185,9 @@ class PackageJson():
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description"]
-                optional = ["max_value", "min_value"]
+                optional = ["max_value", "min_value", "choices", "mask", "multiline"]
                 for par in devt["params"]:
-                    self._validate_keys(expected, "a xpl_param for device_type {0}".format(devtype), par.keys(), optional)
+                    self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
             #validate the commands
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
