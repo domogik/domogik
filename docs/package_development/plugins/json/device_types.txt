@@ -65,5 +65,5 @@ Description
 
   * *key* : the xpl key for the message
   * *description* :  short description of this field
-  * *type* : the value type for this field
+  * *type* : the value type for this field. The available values are the same as the oens used in the :doc:`configuration part of the json <configuration>`
   * depending on the type the are other posibilitys (like min_value, max_value, ....)
