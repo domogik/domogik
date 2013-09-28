@@ -75,7 +75,7 @@ Technical Documentation
     * :doc:`Overview </technical/rest/index>`
     * :doc:`/ </technical/rest/status>`: Status ouput for rest
     * :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
-    * :doc:`/datatype </technical/rest/datatypes>`: The output of all known datatypes by domogik
+    * :doc:`/datatype </technical/rest/datatype>`: The output of all known datatypes by domogik
     * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
     * :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
     * :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
