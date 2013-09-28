@@ -54,4 +54,4 @@ def api_map():
             'method': list(rule.methods), \
             'arguments': list(rule.arguments), \
         })
-    return 200, {'rules': rules}
+    return 200, rules

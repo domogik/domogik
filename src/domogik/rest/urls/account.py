@@ -32,7 +32,7 @@ from domogik.rest.url import json_response, register_api, urlHandler
 from flask import request
 from flask.views import MethodView
 
-@urlHandler.route('/account/user/password/', methods=['GET'])
+@urlHandler.route('/account/password/', methods=['PUT'])
 @json_response
 def user_password():
     change_ok = urlHandler.db.change_password(request.args.get("id"), \
@@ -78,7 +78,7 @@ class AccountAPI(MethodView):
                 request.form.get('login'),
                 request.form.get('password'),
                 request.form.get('person_id'),
-                bool(request.form.get('id_admin')),
+                bool(request.form.get('is_admin')),
                 request.form.get('skin_used'),
             )
         else:
@@ -88,7 +88,7 @@ class AccountAPI(MethodView):
                 request.form.get('first_name'),
                 request.form.get('last_name'),
                 request.form.get('birthday'),
-                bool(request.form.get('id_admin')),
+                bool(request.form.get('is_admin')),
                 request.form.get('skin_used'),
             )
         return 201, dbr
@@ -100,7 +100,7 @@ class AccountAPI(MethodView):
                 aid,
                 request.form.get('login'),
                 request.form.get('person_id'),
-                bool(request.form.get('id_admin')),
+                bool(request.form.get('is_admin')),
                 request.form.get('skin_used'),
             )
         else:
@@ -110,7 +110,7 @@ class AccountAPI(MethodView):
                 request.form.get('first_name'),
                 request.form.get('last_name'),
                 request.form.get('birthday'),
-                bool(request.form.get('id_admin')),
+                bool(request.form.get('is_admin')),
                 request.form.get('skin_used'),
             )
         return 200, dbr
