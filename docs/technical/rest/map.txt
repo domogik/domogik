@@ -22,19 +22,17 @@ Example: ::
     Method : GET
     Url : http://127.0.0.1:40405/map
     Response (application/json) : 
-    {
-        "rules": [
-            {
-                "url": "/device/params/<dev_type_id>",
-                "method": [
-                    "HEAD",
-                    "OPTIONS",
-                    "GET"
-                ],
-                "arguments": [
-                    "dev_type_id"
-                ]
-            },
-            { ...}
-        ]
-    }
+    [
+        {
+            "url": "/device/params/<dev_type_id>",
+            "method": [
+                "HEAD",
+                "OPTIONS",
+                "GET"
+            ],
+            "arguments": [
+                "dev_type_id"
+            ]
+        },
+        { ...}
+    ]

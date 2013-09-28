@@ -496,5 +496,38 @@
         "format": "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)",
         "parent": "DT_List",
         "childs": []
+    },
+    "DT_HVACHeat": {
+        "values": {
+            "0": "Auto",
+            "1": "Comfort",
+            "2": "Standby",
+            "3": "Economy",
+            "4": "Building Protection",
+        },
+        "childs": []
+    },
+    "DT_HVACVent": {
+        "values": {
+            "0": "Auto",
+            "1": "Heat",
+            "2": "Cool",
+            "3": "Fan only",
+            "4": "Dry",
+        },
+        "childs": []
+    }
+    "DT_ColorCII": {
+        "values": {
+            "W": "White",
+            "O": "Orange",
+            "R": "Red",
+            "Y": "Yellow",
+            "B": "Blue",
+            "G": "Green",
+            "Bk": "Black",
+            "Br": "Brown",
+        },
+        "childs": []
     }
 }

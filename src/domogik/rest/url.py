@@ -1,6 +1,6 @@
 from flask import Flask, g, Response, request
 from domogik.common.logger import Logger
-from domogik.rest.jsondata import domogik_encoder
+from domogik.common.jsondata import domogik_encoder
 from functools import wraps
 import time
 import json
@@ -113,7 +113,6 @@ import domogik.rest.urls.datatype
 
 # more complex URLS
 from domogik.rest.urls.device import *
-from domogik.rest.urls.helper import *
 
 # Pure REST API
 from domogik.rest.urls.person import personAPI
