@@ -4,10 +4,10 @@
 
 Available actions : 
 
-* GET : get one or several devices informations
-* POST : create a new device
-* PUT : update an existing device
-* DELETE : delete a existing device
+* GET : get one or several account information
+* POST : create a new account
+* PUT : update an existing account
+* DELETE : delete a existing account
 
 
 GET
