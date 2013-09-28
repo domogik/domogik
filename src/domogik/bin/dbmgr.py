@@ -39,7 +39,7 @@ Implements
 
 import traceback
 
-from domogik.rest.jsondata import domogik_encoder
+from domogik.common.jsondata import domogik_encoder
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
