@@ -1,0 +1,38 @@
+===============
+/ - Rest status
+===============
+
+Available actions : 
+
+* GET : request the rest status
+
+GET /
+=====
+
+Returns the status of rest.
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/
+    Response (application/json) :
+    {
+       "info":
+       {
+           "REST_API_version": "0.7",
+           "SSL": false,
+           "Host": "igor",
+           "Domogik_release": "0.4.0",
+           "Domogik_version": "0.4.0",
+           "REST_API_release": "0.7",
+           "Sources_release": "0.4.0",
+           "Sources_version": "0.4.0"
+       },
+       "mq":
+       {
+           "sub_port": "40412",
+           "ip": "127.0.0.1",
+           "req_rep_port": "40410",
+           "pub_port": "40411"
+       }
+    }
