@@ -53,11 +53,6 @@ from sqlalchemy.orm import relation, backref, relationship
 from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
 
-
-DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-ACTUATOR_VALUE_TYPE_LIST = ['binary', 'range', 'list', 'trigger', 'number', 'string', 'complex',]
-SENSOR_VALUE_TYPE_LIST = ['boolean', 'number', 'string']
-
 Base = declarative_base()
 metadata = Base.metadata
 
