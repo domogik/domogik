@@ -40,7 +40,7 @@ from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
-#importdaemon
+import daemon
 
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
