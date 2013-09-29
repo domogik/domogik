@@ -364,7 +364,7 @@ class DBConnector(XplPlugin, MQRep):
             dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
-            print dev_json
+            print(dev_json)
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('type', type)

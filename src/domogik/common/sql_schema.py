@@ -39,7 +39,7 @@ Implements
 """
 
 import time, sys
-from exceptions import AssertionError
+#from exceptions import AssertionError
 
 from sqlalchemy import (
         types, create_engine, Table, Column, Index, Integer, Float, String, Enum,

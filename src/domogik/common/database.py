@@ -357,10 +357,8 @@ class DbHelper():
     def list_devices_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(plugin_id=p_id).all()
         device_list = []
-        print "=> %s" % p_id
         for device in self.__session.query(Device).filter_by(plugin_id=p_id).all():
             device_list.append(self.get_device(device.id))
-            print "->%s" % device.id
         return device_list
 
     def list_old_devices(self):
@@ -513,7 +511,6 @@ class DbHelper():
 
         ### Table core_sensor
         # first, get the sensors associated to the device_type
-        print client_data
         self.log.debug("Device creation : start to process the sensors")
         device_type_sensors = client_data['device_types'][device_type]['sensors']
         self.log.debug("Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
@@ -683,7 +680,7 @@ class DbHelper():
                 xpl_command = pjson['xpl_commands'][command['xpl_command']]
                 # add the xpl_stat
                 if 'xplstat_name' in xpl_command:
-		    xpl_stat_id = xpl_command['xplstat_name']
+                    xpl_stat_id = xpl_command['xplstat_name']
                     if xpl_stat_id not in addedxplstats:
                         xpl_stat = pjson['xpl_stats'][xpl_stat_id]
                         xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
@@ -874,14 +871,14 @@ class DbHelper():
     def add_sensor_history(self, sid, value, date):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
-	sensor = self.__session.query(Sensor).filter_by(id=sid).first()
-	if sensor is not None:
+        sensor = self.__session.query(Sensor).filter_by(id=sid).first()
+        if sensor is not None:
             # only store stats if the value is different
             if sensor.last_value is not str(value):
                 # insert new recored in core_sensor_history
                 h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
                 self.__session.add(h)
-	        sensor.last_received = date
+                sensor.last_received = date
                 sensor.last_value = str(value)
                 self.__session.add(sensor)
                 try:
@@ -1273,7 +1270,7 @@ class DbHelper():
         if self.__session.query(UserAccount).count() > 0:
             return None
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
-                                 p_birthdate=datetime.date(1900, 01, 01))
+                                 p_birthdate=datetime.date('1900', '01', '01'))
         user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
                                      a_is_admin=True)
         #try:
