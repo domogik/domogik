@@ -40,7 +40,12 @@ Implements
 ####################################################
 import os
 import pwd 
-import ConfigParser
+try:
+    # from python3 onwards
+    import configparser
+except ImportError:
+    # python 2
+    import ConfigParser as configparser
 import threading
 import time
 import fcntl
@@ -77,19 +82,19 @@ class Loader():
                 # note : default creation mode : 0777
                 os.mkdir(os.path.dirname(LOCK_FILE)) 
             except:
-                raise Exception, "ConfigLoader : unable to create the directory '%s'" % os.path.dirname(LOCK_FILE)
+                raise Exception("ConfigLoader : unable to create the directory '{0}'".format(os.path.dirname(LOCK_FILE)))
         if not os.path.exists(LOCK_FILE):
             try:
                 file = open(LOCK_FILE, "w")
                 file.write("")
                 file.close()
             except:
-                raise Exception, "ConfigLoader : unable to create the lock file '%s'" % LOCK_FILE
+                raise Exception("ConfigLoader : unable to create the lock file '{0}'".format(LOCK_FILE))
         file = open(LOCK_FILE, "r+")
         fcntl.lockf(file, fcntl.LOCK_EX)
 
         # read config file
-        self.config = ConfigParser.ConfigParser()
+        self.config = configparser.ConfigParser()
         cfg_file = open(CONFIG_FILE)
         self.config.readfp(cfg_file)
         cfg_file.close()
@@ -125,7 +130,7 @@ class Loader():
         """
         # Check load is called before this function
         if self.config == None:
-            raise Exception, "ConfigLoader : you must use load() before set() function"
+            raise Exception("ConfigLoader : you must use load() before set() function")
         self.config.set(section, key, value)
         with open(CONFIG_FILE, "wb") as configfile:
             self.config.write(configfile)

@@ -40,7 +40,7 @@ from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
-import daemon
+#importdaemon
 
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
@@ -113,7 +113,7 @@ class BasePlugin():
         if self.options.display_version:
             __import__("domogik")
             global_release = sys.modules["domogik"].__version__
-            print global_release
+            print(global_release)
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
             self.log.info("Starting the plugin in background...")
