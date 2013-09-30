@@ -185,7 +185,7 @@ class Rest(XplPlugin):
              #"keyfile": os.path.join(data_dir, "mydomain.key"),
         #}) 
         self.http_server.listen(int(self.server_port), address=self.server_ip)
-	return
+        return
 
     def stop_http(self):
         """ Stop HTTP Server

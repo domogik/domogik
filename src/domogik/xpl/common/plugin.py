@@ -415,7 +415,7 @@ class XplPlugin(BasePlugin, MQRep):
                 command = "self.{0}(".format(self.helpers[contens['command']]['call'])
                 command += ", ".join(params)
                 command += ")"
-                print command
+                print(command)
                 result = eval(command)
                 # run the command with all params
                 msg = MQMessage()
@@ -427,7 +427,7 @@ class XplPlugin(BasePlugin, MQRep):
 
     def _mdp_reply_helper_help(self, data):
         contens = data.get_data()
-	if 'command' in contens.keys():
+        if 'command' in contens.keys():
             if contens['command'] in self.helpers.keys():
                 msg = MQMessage()
                 msg.set_action('helper.help.result')
@@ -520,7 +520,7 @@ class XplPlugin(BasePlugin, MQRep):
                raise OSError("Can't write in directory %s" % path)
        else:
            try:
-               os.mkdir(path, 0770)
+               os.mkdir(path, '0770')
                self.log.info("Create directory %s." % path)
            except:
                raise OSError("Can't create directory %s." % path)

@@ -120,13 +120,22 @@ REGEXP_DATA = r"""(?P<data>(?:.*=.*\n)+)
 #                         )
 #                     """
 
-REGEXP_SINGLE_DATA = r"""(?P<data>
+try:
+    # python 2
+    REGEXP_SINGLE_DATA = r"""(?P<data>
                              (?P<data_name>[a-z0-9 ,-]{1,16})
                              =
                              (?P<data_value>[%s].*)$
                          )
                      """ % re.escape(''.join(chr(x) for x in xrange(32, 256)))
-
+except NameError:
+    # python 3
+    REGEXP_SINGLE_DATA = r"""(?P<data>
+                             (?P<data_name>[a-z0-9 ,-]{1,16})
+                             =
+                             (?P<data_value>[%s].*)$
+                         )
+                     """ % re.escape(''.join(chr(x) for x in range(32, 256)))
 
 REGEXP_GLOBAL = r"""(?P<type_>.*)\n
                     \{\n
@@ -500,7 +509,7 @@ class FragmentedXplMessage(object):
                 f_total = parts[0].split('/')[1]
                 m_id = parts[1]
             except:
-                raise ValueError, "Can't parse partid"
+                raise ValueError("Can't parse partid")
             else:
                 return (int(f_id), int(f_total), m_id)
 

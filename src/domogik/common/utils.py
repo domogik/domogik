@@ -34,7 +34,7 @@ Implements
 """
 
 from socket import gethostname
-from exceptions import ImportError, AttributeError
+#from exceptions import ImportError, AttributeError
 from subprocess import Popen, PIPE
 import os
 import sys

@@ -109,7 +109,7 @@ class Logger():
         elif len(self.__class__.logger.keys()) == 1:
             return self.__class__.logger[self.__class__.logger.keys()[0]]
         else:
-            raise AttributeError, "You must specify a loggger name"
+            raise AttributeError("You must specify a loggger name")
 
     def get_fds(self, logger_names):
         openFiles = []

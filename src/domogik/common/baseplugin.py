@@ -113,7 +113,7 @@ class BasePlugin():
         if self.options.display_version:
             __import__("domogik")
             global_release = sys.modules["domogik"].__version__
-            print global_release
+            print(global_release)
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
             self.log.info("Starting the plugin in background...")
