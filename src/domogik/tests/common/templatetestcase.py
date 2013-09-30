@@ -65,11 +65,14 @@ class TemplateTestCase(unittest.TestCase):
 
         # create the listener to catch the message
         self._xpl_received = Event()
+        criteria = {'schema': xplschema,
+                    'xpltype': xpltype,
+                    'xplsource': xplsource}
+        for key in data:
+            criteria[key] = data[key]
         listener = Listener(self._wait_for_xpl_cb, 
                             self.myxpl, 
-                            {'schema': xplschema,
-                             'xpltype': xpltype,
-                             'xplsource': xplsource})
+                            criteria)
 
         self._xpl_received.wait(timeout)
         if not self._xpl_received.is_set():

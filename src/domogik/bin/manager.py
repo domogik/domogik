@@ -71,12 +71,8 @@ from subprocess import Popen, PIPE
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
-from domogik.xpl.common.xplconnector import Listener 
-from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
 from domogik.common.queryconfig import Query
-from domogik.xpl.common.xplconnector import XplTimer 
-from ConfigParser import NoSectionError
 
 import zmq
 from domogik.mq.pubsub.subscriber import MQAsyncSub
