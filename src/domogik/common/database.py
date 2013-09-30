@@ -438,7 +438,7 @@ class DbHelper():
                                                                   'value' :  a_xplstat_param.value
                                                                 })
                  
-            json_device['xpl_stats'][a_xplstat.name] = json_xplstat
+            json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
 
         # complete with commands informations
         # TODO :)

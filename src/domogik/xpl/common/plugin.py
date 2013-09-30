@@ -345,11 +345,16 @@ class XplPlugin(BasePlugin, MQRep):
             Return : /home
         """
         try:
+            self.log.debug("Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
             for a_param in a_device[type][feature]['parameters']['device']:
                 if a_param['key'] == key:
-                    return self.cast(a_param['value'], a_param['type'])
+                    value = self.cast(a_param['value'], a_param['type'])
+                    self.log.debug("Parameter value found: {0}".format(value))
+                    return value
+            self.log.warning("Parameter not found : return None")
             return None
         except:
+            self.log.error("Error while looking for a device feature parameter. Return None. Error: {0}".format(traceback.format_exc()))
             return None
          
 

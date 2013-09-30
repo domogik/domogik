@@ -475,7 +475,7 @@ class Manager(XplPlugin):
             reason = "Plugin startup request : missing 'name' field"
             self.log.error(reason)
         else:
-            name = data.get_data('name')
+            name = data.get_data()['name']
             msg.add_data('name', name)
 
             # try to start the plugin
@@ -874,7 +874,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### Try to start the plugin
         self.log.info("Request to start plugin : {0}".format(self.name))
         pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._packages_directory, self.name, self.name), \
-                                  env_pythonpath = self._librairies_directory)
+                                  env_pythonpath = self._libraries_directory)
         pid = pid
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way

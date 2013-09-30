@@ -90,7 +90,7 @@ def delete_configuration(type, name, host):
     msg.add_data('name', name)
     result = cli.request('dbmgr', msg.get(), timeout=10)
     if result:
-        print result.get()
+        print(result.get())
         return True
     else:
         raise RuntimeError("Error while deleting configuration for {0}-{1}.{2}".format(type, name, host, key, value))
@@ -105,7 +105,7 @@ def configure(type, name, host, key, value):
     msg.add_data('data', {key : value})
     result = cli.request('dbmgr', msg.get(), timeout=10)
     if result:
-        print result.get()
+        print(result.get())
         return True
     else:
         raise RuntimeError("Error while setting configuration for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
