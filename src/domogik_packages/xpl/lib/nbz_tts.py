@@ -56,6 +56,7 @@ class NBZNotification:
                 @param voice : notification voice
             """
 	    # Parameters
+            self._server = urllib2.quote(server)
             self._serial = urllib2.quote(serial)
             self._token = urllib2.quote(token)
             self._message = urllib2.quote(message)
@@ -63,16 +64,17 @@ class NBZNotification:
 
 
             self._log.debug("NBZNotification:run")
+            self._log.debug("NOTIF : server " + self._server)
             self._log.debug("NOTIF : serial " + self._serial)
             self._log.debug("NOTIF : token  " + self._token)
             self._log.debug("NOTIF : message " + self._message)
             self._log.debug("NOTIF : voice  " + self._voice)
 
-            ttsurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&" + self._voice
-            staturl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=7&silent&strip"
-            wakupurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=13&silent&strip"
-            sleepurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&action=14&silent&strip"
-            chorurl="http://api.wizz.cc/?sn=" + self._serial + "&token=" + self._token + "&chor=10,0,motor,1,20,0,0,0,motor,0,20,0,0,1,led,0,0,238,0"
+            ttsurl="http://" + self._server + "&/?sn=" + self._serial + "&token=" + self._token + "&tts=" + self._message + "&" + self._voice
+            staturl="http://" + self._server + "&/?sn=" + self._serial + "&token=" + self._token + "&action=7&silent&strip"
+            wakupurl="http://" + self._server + "&/?sn=" + self._serial + "&token=" + self._token + "&action=13&silent&strip"
+            sleepurl="http://" + self._server + "&/?sn=" + self._serial + "&token=" + self._token + "&action=14&silent&strip"
+            chorurl="http://" + self._server + "&/?sn=" + self._serial + "&token=" + self._token + "&chor=10,0,motor,1,20,0,0,0,motor,0,20,0,0,1,led,0,0,238,0"
 
             self._log.debug("call state on nabaztag : " + staturl)
             statreq = urllib2.Request(staturl)
