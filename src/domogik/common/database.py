@@ -112,6 +112,7 @@ class DbHelper():
 
     """
     __engine = None
+    __session = None
     __session_object = None
 
     def __init__(self, echo_output=False, use_test_db=False, engine=None):
