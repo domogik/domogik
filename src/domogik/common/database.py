@@ -581,7 +581,7 @@ class DbHelper():
             self.__session.flush()
 
             self.log.debug("Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
-            for command_param in client_data['commands'][a_command]['parameterss']:
+            for command_param in client_data['commands'][a_command]['parameters']:
                 pa = CommandParam(command.id, \
                                   command_param['key'], \
                                   command_param['data_type'], \
