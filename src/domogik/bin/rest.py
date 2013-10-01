@@ -37,7 +37,6 @@ class Rest(XplPlugin):
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
-from domogik.rest.event import DmgEvents
 from domogik.rest.url import urlHandler
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
