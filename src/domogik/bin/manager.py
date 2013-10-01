@@ -71,12 +71,8 @@ from subprocess import Popen, PIPE
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
-from domogik.xpl.common.xplconnector import Listener 
-from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
 from domogik.common.queryconfig import Query
-from domogik.xpl.common.xplconnector import XplTimer 
-from ConfigParser import NoSectionError
 
 import zmq
 from domogik.mq.pubsub.subscriber import MQAsyncSub
@@ -475,7 +471,7 @@ class Manager(XplPlugin):
             reason = "Plugin startup request : missing 'name' field"
             self.log.error(reason)
         else:
-            name = data.get_data('name')
+            name = data.get_data()['name']
             msg.add_data('name', name)
 
             # try to start the plugin
@@ -874,7 +870,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### Try to start the plugin
         self.log.info("Request to start plugin : {0}".format(self.name))
         pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._packages_directory, self.name, self.name), \
-                                  env_pythonpath = self._librairies_directory)
+                                  env_pythonpath = self._libraries_directory)
         pid = pid
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way

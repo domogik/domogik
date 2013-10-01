@@ -438,7 +438,7 @@ class DbHelper():
                                                                   'value' :  a_xplstat_param.value
                                                                 })
                  
-            json_device['xpl_stats'][a_xplstat.name] = json_xplstat
+            json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
 
         # xpl_commands
         json_device['xpl_commands'] = {}
@@ -581,7 +581,7 @@ class DbHelper():
             self.__session.flush()
 
             self.log.debug("Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
-            for command_param in client_data['commands'][a_command]['params']:
+            for command_param in client_data['commands'][a_command]['parameterss']:
                 pa = CommandParam(command.id, \
                                   command_param['key'], \
                                   command_param['data_type'], \
@@ -695,7 +695,7 @@ class DbHelper():
             self.__session.add(cmd)
             self.__session.flush()
             # add the command params
-            for p in pjson['commands'][command_id]['params']:
+            for p in pjson['commands'][command_id]['parameters']:
                 pa = CommandParam(cmd.id, p['key'], p['data_type'], p['conversion'])
                 self.__session.add(pa)
                 self.__session.flush()

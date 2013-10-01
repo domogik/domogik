@@ -40,8 +40,8 @@ def get_device_params(dev_type_id):
     ret = {}
     ret['commands'] = []
     ret['global'] = []
-    if 'params' in pjson['device_types'][dev_type_id]:
-        ret['global']  = pjson['device_types'][dev_type_id]['params']
+    if 'parameters' in pjson['device_types'][dev_type_id]:
+        ret['global']  = pjson['device_types'][dev_type_id]['parameters']
     ret['xpl_stat'] = []
     ret['xpl_cmd'] = []
     # find all features for this device
@@ -70,12 +70,12 @@ def get_device_params(dev_type_id):
         stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
         stat['id'] = cmd['xplstat_name']
         # remove all parameters
-        cmd['params'] = cmd['parameters']['device']
+        cmd['parameters'] = cmd['parameters']['device']
         del cmd['parameters']
         ret['xpl_cmd'].append(cmd)
         if stat is not None:
             # remove all parameters
-            stat['params'] = stat['parameters']['device']
+            stat['parameters'] = stat['parameters']['device']
             del stat['parameters']
             ret['xpl_stat'].append(stat)
         del stat
