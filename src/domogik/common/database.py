@@ -440,9 +440,34 @@ class DbHelper():
                  
             json_device['xpl_stats'][a_xplstat.name] = json_xplstat
 
+        # xpl_commands
+        json_device['xpl_commands'] = {}
+        for a_xplcmd in self.get_xpl_command_by_device_id(device.id):
+            json_xplcmd = { 'id': a_xplcmd.id,
+                            'name' : a_xplcmd.name,
+                            'schema' : a_xplstat.schema,
+                             'parameters' : []
+                            }
+            for a_xplcmd_param in a_xplcmd.params:
+                json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
+                                                   'value' :  a_xplcmd_param.value
+                                                })
+            json_device['xpl_commands'][a_xplcmd.name] = json_xplcmd
         # complete with commands informations
-        # TODO :)
         json_device['commands'] = {}
+        for a_cmd in self.get_command_by_device_id(device.id):
+            json_command = {
+                    'id': a_cmd.id,
+                    'reference': a_cmd.reference,
+                    'name': a_cmd.name,
+                    'parameters': []
+                    }
+            for a_cmd_param in a_cmd.params:
+                json_command['parameters'].append({ 'key': a_cmd_param.key,
+                                                    'data_type': a_cmd_param.data_type,
+                                                    'conversion': a_cmd_param.conversion
+                                                })
+            json_device['commands'][a_cmd.reference] = json_command
 
         return json_device
 
@@ -1412,6 +1437,9 @@ class DbHelper():
     def get_command(self, id):
         return self.__session.query(Command).filter_by(id=id).first()
     
+    def get_command_by_device_id(self, d_id):
+        return self.__session.query(Command).filter_by(device_id=d_id).all()
+
     def add_command(self, device_id, name, reference, return_confirmation):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
