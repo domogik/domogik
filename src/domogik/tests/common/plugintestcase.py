@@ -39,9 +39,12 @@ from domogik.tests.common.templatetestcase import TemplateTestCase
 from domogik.tests.common.helpers import check_domogik_is_running
 from domogik.tests.common.helpers import delete_configuration
 from domogik.tests.common.helpers import configure
+from domogik.tests.common.testplugin import TestPlugin
+from domogik.xpl.common.plugin import STATUS_ALIVE, STATUS_STOPPED
+import time
+
 
 class PluginTestCase(TemplateTestCase):
-#class DiskfreeTestCase(PluginTestCase):
     """ This is the class containing all the tests for the plugin
     """
 
@@ -77,10 +80,24 @@ class PluginTestCase(TemplateTestCase):
         pass
 
     # this function is the same for all plugins
-    def test_9999_hbeat(self):
+    def test_0050_start_the_plugin(self):
+        tp = TestPlugin(self.name, get_sanitized_hostname())
+        self.assertTrue(tp.request_startup())
+        self.assertTrue(tp.wait_for_event(STATUS_ALIVE))
+        # just wait 1 second to get clearer logs
+        time.sleep(10)
+
+    # this function is the same for all plugins
+    def test_9900_hbeat(self):
         print("Check that a heartbeat is sent. This could take up to 5 minutes.")
         self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat", 
                                           xplschema = "hbeat.app", 
                                           xplsource = "domogik-{0}.{1}".format(self.name, get_sanitized_hostname()),
                                           timeout = 600))
     
+    # this function is the same for all plugins
+    def test_9990_stop_the_plugin(self):
+        tp = TestPlugin(self.name, get_sanitized_hostname())
+        tp.request_stop()
+        self.assertTrue(tp.wait_for_event(STATUS_STOPPED))
+
