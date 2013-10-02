@@ -109,10 +109,10 @@ class Device(Base):
     address = Column(Unicode(255), nullable=True)
     device_type_id = Column(Unicode(80), nullable=False)
     plugin_id = Column(Unicode(80), nullable=False)
-    commands = relationship("Command", backref=__tablename__, cascade="all, delete")
-    sensors = relationship("Sensor", backref=__tablename__, cascade="all, delete")
-    xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all, delete")
-    xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all, delete")
+    commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
+    sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
+    xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
+    xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
     def __init__(self, name, reference, device_type_id, plugin_id, description=None):
         """Class constructor
@@ -203,7 +203,7 @@ class Person(Base):
     first_name = Column(Unicode(20), nullable=False)
     last_name = Column(Unicode(20), nullable=False)
     birthdate = Column(Date)
-    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all, delete")
+    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all")
 
     def __init__(self, first_name, last_name, birthdate):
         """Class constructor
@@ -235,7 +235,7 @@ class UserAccount(Base):
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
     __password = Column("password", Unicode(255), nullable=False)
-    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
+    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename(), ondelete="cascade"))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False)
@@ -273,12 +273,12 @@ class UserAccount(Base):
 class Command(Base):
     __tablename__ = '%s_command' % _db_prefix
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), primary_key=True)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean)
-    xpl_command = relation("XplCommand", backref=__tablename__, cascade="all, delete", uselist=False)
-    params = relationship("CommandParam", backref=__tablename__, cascade="all, delete")
+    xpl_command = relation("XplCommand", backref=__tablename__, cascade="all", uselist=False)
+    params = relationship("CommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
     def __init__(self, device_id, name, reference, return_confirmation):
         self.device_id = device_id
@@ -298,7 +298,7 @@ class Command(Base):
 
 class CommandParam(Base):
     __tablename__ = '%s_command_param' % _db_prefix
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement='ignore_fk') 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
@@ -323,14 +323,14 @@ class CommandParam(Base):
 class Sensor(Base):
     __tablename__ = '%s_sensor' % _db_prefix
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), index=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), index=True)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
-    params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete") 
+    params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True) 
 
     def __init__(self, device_id, name, reference, data_type, conversion):
         self.device_id = device_id
@@ -352,7 +352,7 @@ class Sensor(Base):
 class SensorHistory(Base):
     __tablename__ = '%s_sensor_history' % _db_prefix
     id = Column(Integer, primary_key=True) 
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename()), nullable=False, index=True)
+    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float, nullable=True)
     value_str = Column(Unicode(32), nullable=False)
@@ -381,11 +381,11 @@ class SensorHistory(Base):
 class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"))
     json_id = Column(Unicode(64))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
-    params = relationship("XplStatParam", backref=__tablename__, cascade="all, delete")
+    params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True)
     
     def __init__(self, device_id, name, schema, json_id):
         self.device_id = device_id
@@ -406,11 +406,11 @@ class XplStat(Base):
 
 class XplStatParam(Base):
     __tablename__ = '%s_xplstat_param' % _db_prefix
-    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement='ignore_fk') 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     static = Column(Boolean)
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename()), nullable=True) 
+    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=True) 
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
@@ -438,14 +438,14 @@ class XplStatParam(Base):
 class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"))
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"))
     json_id = Column(Unicode(64))
     name = Column(Unicode(64))
     schema = Column(Unicode(32))
-    stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename()), nullable=True)
-    stat = relation("XplStat", backref=__tablename__, cascade="all, delete")
-    params = relationship("XplCommandParam", backref=__tablename__, cascade="all, delete")
+    stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), nullable=True)
+    stat = relation("XplStat", backref=__tablename__, cascade="all")
+    params = relationship("XplCommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
     def __init__(self, name, device_id, cmd_id, json_id, schema, stat_id):
         self.name = ucode(name)
@@ -468,7 +468,7 @@ class XplCommand(Base):
 
 class XplCommandParam(Base):
     __tablename__ = '%s_xplcommand_param' % _db_prefix
-    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename()), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement='ignore_fk') 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')

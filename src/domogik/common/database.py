@@ -1296,7 +1296,7 @@ class DbHelper():
         if self.__session.query(UserAccount).count() > 0:
             return None
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
-                                 p_birthdate=datetime.date('1900', '01', '01'))
+                                 p_birthdate=datetime.date(1900, 1, 1))
         user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
                                      a_is_admin=True)
         #try:
