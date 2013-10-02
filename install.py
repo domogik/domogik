@@ -42,7 +42,7 @@ def get_c_hub():
 
 def build_file_list(user):
     d_files = [
-        ('/etc/domogik', [user, 0755], ['src/domogik/examples/config/domogik.cfg.sample',  'src/domogik/examples/packages/sources.list', 'src/domogik/xplhub/examples/config/xplhub.cfg.sample']),
+        ('/etc/domogik', [user, 0755], ['src/domogik/examples/config/domogik.cfg.sample',  'src/domogik/examples/packages/sources.list', 'src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
         ('/var/cache/domogik/cache', [user, None], []),
@@ -62,7 +62,7 @@ def build_file_list(user):
         exit(0)
 
     if os.path.exists('/etc/logrotate.d'):
-        d_files.append(('/etc/logrotate.d', [user, None], ['src/domogik/examples/logrotate/domogik', 'src/domogik/xplhub/examples/logrotate/xplhub']))
+        d_files.append(('/etc/logrotate.d', [user, None], ['src/domogik/examples/logrotate/domogik', 'src/domogik/xpl/hub/examples/logrotate/xplhub']))
 
     if os.path.exists('/etc/init.d'):
         d_files.append(('/etc/init.d/', [user, 0755], ['src/domogik/examples/init/domogik']))
@@ -122,6 +122,7 @@ def create_user(d_user):
     if d_user not in [x[0] for x in pwd.getpwall()]:
         print("Creating the {0} user".format(d_user))
         os.system('/usr/sbin/useradd --system {0}'.format(d_user))
+        os.system('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
     if d_user not in [x[0] for x in pwd.getpwall()]:
         fail("Failed to create domogik user")
     else:
@@ -285,7 +286,7 @@ def install():
     parser.add_argument('--command-line', dest='command_line', action="store_true",
                    default=False, help='Configure the configuration files from the command line only')
     add_arguments_for_config_file(parser, "src/domogik/examples/config/domogik.cfg.sample")
-    add_arguments_for_config_file(parser, "src/domogik/xplhub/examples/config/xplhub.cfg.sample")
+    add_arguments_for_config_file(parser, "src/domogik/xpl/hub/examples/config/xplhub.cfg.sample")
 
 
     args = parser.parse_args()

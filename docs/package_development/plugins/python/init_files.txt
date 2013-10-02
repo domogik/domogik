@@ -7,3 +7,4 @@ Several __init__.py file must be created. They are needed in each folder which c
     $ touch __init__.py
     $ touch bin/__init__.py
     $ touch lib/__init__.py
+    $ touch conversions/__init__.py

@@ -26,9 +26,13 @@ The manager core component has been fully rewritten. The code is more clear and 
 
 New rest
 ********
+A new rest has been added, its now based on flask for url routing.
+The new rest is also using HTTP methods (GET, POST, PUT, DELETE) and HTTP status codes.
 
 New xplevent core component
 ***************************
+The old stats manager has been renamed to xplevent and is now a standalone component not linked to rest anymore
+
 
 Zero MQ
 *******
@@ -37,3 +41,17 @@ The 0MQ message queue system is now used in Domogik. All the internal communicat
 New plugins format
 ******************
 
+
+Files moved
+***********
+Some files have been moved in the source tree
+
+=============== =====================
+                    Location
+--------------- ---------------------
+What            Old           New
+=============== ============= =======
+Main binarys    xpl/bin       bin
+--------------- ------------- -------
+Rest libs       xpl/lib/rest  rest
+=============== ============= =======

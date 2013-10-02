@@ -23,7 +23,7 @@ You will get messages like this: ::
 
 The only *event* value is *updated*.
 
-In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.configuration* category and when a message is catched, if *type == 'plugin' and name == <plugin name> and host = <hostname>* then the plugin configuration in database is reloaded (in order the *clients.detail* message to be updated)
+In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.configuration* category and when a message is catched, if *type == 'plugin' and name == <plugin name> and host = <hostname>* then the plugin configuration in database is reloaded (in order the *client.detail* message to be updated)
 
 
 plugin.status
@@ -57,8 +57,8 @@ Find here `:doc:the full list of available status.</technical/plugins/index>`
 In the *manager*, a *Plugin* object is created for each plugin detected (on the file system). In each of these objects, a subscription is made to the *plugin.status* category and when a message is catched, if *type == 'plugin' and name == <plugin name>* then the plugin status is set to the catched value.
 
 
-clients.list
-============
+client.list
+===========
 
 Publisher: 
 * manager
@@ -68,14 +68,14 @@ Subscriber: any member who wants to be aware of the clients (plugins, ...) list
 
 The manager publishes over the MQ the clients list when there is something new.
 
-An example to catch these messages is available as *src/domogik/examples/mq-python/sub_clients_list.py*.
+An example to catch these messages is available as *src/domogik/examples/mq-python/sub_client_list.py*.
 
 You will get messages like this: ::
 
     {"domogik-diskfree.darkstar": {"status": "alive", "configured": true, "pid": 0, "host": "darkstar", "type": "plugin", "name": "diskfree"}}
 
-clients.detail
-==============
+client.detail
+=============
 
 Publisher: 
 * manager
@@ -87,7 +87,7 @@ The manager publishes over the MQ the clients detail when there is something new
 
 Notice that the cliens detail include the clients list.
 
-An example to catch these messages is available as *src/domogik/examples/mq-python/sub_clients_detail.py*.
+An example to catch these messages is available as *src/domogik/examples/mq-python/sub_client_detail.py*.
 
 You will get messages like this: ::
 
@@ -95,7 +95,7 @@ You will get messages like this: ::
 
 
 
-packages.detail
+packagesdetail
 ===============
 
 Publisher: 
@@ -104,12 +104,14 @@ Publisher:
 Subscriber: any member who wants to be aware of the packages details
 * UIs
 
+Be caution, this is different from *client.detail* as only the packages are listed, not the instances of the packages (as does client.detail). This message should be used only for packages management!!
+
 The manager publishes over the MQ the packages detail when there is something new.
 
-An example to catch these messages is available as *src/domogik/examples/mq-python/sub_packages_detail.py*.
+An example to catch these messages is available as *src/domogik/examples/mq-python/sub_package_detail.py*.
 
 You will get messages like this: ::
 
-    {u'plugin-diskfree': {u'device_types': {u'diskfree.disk_usage': {u'commands': [], u'description': u'Disk usage', u'xpl_params': [{u'type': u'string', u'description': u'The path to look at', u'key': u'device'}], u'sensors': [u'get_total_space', u'get_percent_used', u'get_free_space', u'get_used_space'], u'id': u'diskfree.disk_usage', u'name': u'Disk usage'}}, u'udev_rules': []}}
+    {u'plugin-diskfree': {u'device_types': {u'diskfree.disk_usage': {u'commands': [], u'description': u'Disk usage', u'params': [{u'type': u'string', u'description': u'The path to look at', u'key': u'device'}], u'sensors': [u'get_total_space', u'get_percent_used', u'get_free_space', u'get_used_space'], u'id': u'diskfree.disk_usage', u'name': u'Disk usage'}}, u'udev_rules': []}}
 
 

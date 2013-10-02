@@ -41,18 +41,19 @@ import threading
 import os
 import sys
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
-from domogik.xpl.common.baseplugin import BasePlugin
-from domogik.xpl.common.queryconfig import Query
+from domogik.common.baseplugin import BasePlugin
+from domogik.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 from domogik.mq.pubsub.publisher import MQPub
 from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.packagejson import PackageJson, PackageException
 import zmq
 import traceback
-
+import json
 
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
@@ -84,7 +85,7 @@ class XplPlugin(BasePlugin, MQRep):
     This class is a Singleton
     '''
     def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                 daemonize = True, nohub = False):
+                 daemonize = True, nohub = False, test = False):
         '''
         Create XplPlugin instance, which defines system handlers
         @param name : The name of the current plugin
@@ -107,16 +108,33 @@ class XplPlugin(BasePlugin, MQRep):
         self.log.info("----------------------------------")
         self.log.info("Starting plugin '%s' (new manager instance)" % name)
         self._name = name
+        self._test = test   # flag used to avoid loading json in test mode
+        
+        '''
+        Calculate the MQ name
+        - For a core component this is just its component name (self._name)
+        - For a plugin this is plugin-<self._name>-self.hostname
+
+        The reason is that the core components need a fixed name on the mq network,
+        if a plugin starts up it needs to request the config on the network, and it needs to know the worker (core component)
+        to ask the config from.
+
+        Because of the above reason, every item in the core_component list can only run once
+        '''
+        if self._name in CORE_COMPONENTS:
+            self._mq_name = self._name
+        else:
+            self._mq_name = "plugin-{0}-{1}".format(self._name, self.get_sanitized_hostname())
 
         # MQ publisher and REP
-        self._zmq = zmq.Context()
-        self._pub = MQPub(self._zmq, self._name)
+        self.zmq = zmq.Context()
+        self._pub = MQPub(self.zmq, self._mq_name)
         self._send_status(STATUS_STARTING)
         ### MQ
         # for stop requests
-        MQRep.__init__(self, self._zmq, self._name)
+        MQRep.__init__(self, self.zmq, self._mq_name)
 
-
+        self.helpers = {}
         self._is_manager = is_manager
         cfg = Loader('domogik')
         my_conf = cfg.load()
@@ -158,10 +176,11 @@ class XplPlugin(BasePlugin, MQRep):
         #self._process_info.start()
 
         self.enable_hbeat_called = False
+        self.dont_run_ready = False
 
         # for all no core elements, load the json
         # TODO find a way to do it nicer ??
-        if self._name not in CORE_COMPONENTS:
+        if self._name not in CORE_COMPONENTS and self._test == False:
             self._load_json()
 
         self.log.debug("end single xpl plugin")
@@ -173,7 +192,7 @@ class XplPlugin(BasePlugin, MQRep):
             Check in database (over queryconfig) if the key 'configured' is set to True for the plugin
             if not, stop the plugin and log this
         """
-        self._config = Query(self._zmq, self.log)
+        self._config = Query(self.zmq, self.log)
         configured = self._config.query(self._name, 'configured')
         if configured == '1':
             configured = True
@@ -234,42 +253,118 @@ class XplPlugin(BasePlugin, MQRep):
             if self.json_data['configuration'][idx]['key'] == key:
                 type = self.json_data['configuration'][idx]['default']
                 self.log.info("Casting value for key '{0}' in type '{1}'...".format(key, type)) 
-                try:
-                    if type == "boolean":
-                        # just in case, the "True"/"False" are not already converted in True/False
-                        # this is (currently) done on queryconfig side
-                        if value == "True":
-                            return True
-                        elif value ==  "False":
-                            return False
-                    # type == choice : nothing to do
-                    if type == "date": 
-                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
-                    if type == "datetime": 
-                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
-                    # type == email : nothing to do
-                    if type == "float":
-                        return float(value)
-                    if type == "integer":
-                        return float(value)
-                    # type == ipv4 : nothing to do
-                    # type == multiple choice : nothing to do
-                    # type == string : nothing to do
-                    if type == "time": 
-                        self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
-                    # type == url : nothing to do
-
-                except:
-                    # if an error occurs : return the default value and log a warning
-                    self.log.warning("Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
-                    return value
+                return self.cast(value, type)
 
         # no cast operation : return the value
         return value
 
+    def cast(self, value, type):
+        """ Cast a value for a type
+            @param value : value to cast
+            @param type : type in which you want to cast the value
+        """
+        try:
+            if type == "boolean":
+                # just in case, the "True"/"False" are not already converted in True/False
+                # this is (currently) done on queryconfig side
+                if value == "True":
+                    return True
+                elif value ==  "False":
+                    return False
+            # type == choice : nothing to do
+            if type == "date": 
+                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+            if type == "datetime": 
+                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+            # type == email : nothing to do
+            if type == "float":
+                return float(value)
+            if type == "integer":
+                return float(value)
+            # type == ipv4 : nothing to do
+            # type == multiple choice : nothing to do
+            # type == string : nothing to do
+            if type == "time": 
+                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+            # type == url : nothing to do
+
+        except:
+            # if an error occurs : return the default value and log a warning
+            self.log.warning("Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
+            return value
+        return value
+
+    def get_device_list(self, quit_if_no_device = False):
+        """ Request the dbmgr component over MQ to get the devices list for this client
+            @param quit_if_no_device: if True, exit the plugin if there is no devices
+        """
+        self.log.info("Retrieve the devices list for this client...")
+        mq_client = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('device.get')
+        msg.add_data('type', 'plugin')
+        msg.add_data('name', self._name)
+        msg.add_data('host', self.get_sanitized_hostname())
+        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        if not result:
+            self.log.error("Unable to retrieve the device list")
+            self.force_leave()
+            return []
+        else:
+            device_list = result.get_data()['devices']
+            if device_list == []:
+                self.log.warn("There is no device created for this client")
+                if quit_if_no_device:
+                    self.log.warn("The developper requested to stop the client if there is no device created")
+                    self.force_leave()
+                    return []
+            for a_device in device_list:
+                self.log.info("- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
+                                                                                    a_device['name'], \
+                                                                                    a_device['device_type_id']))
+                # log some informations about the device
+                # first : the stats
+                self.log.info("  Features :")
+                for a_xpl_stat in a_device['xpl_stats']:
+                    self.log.info("  - {0}".format(a_xpl_stat))
+                    self.log.info("    Parameters :")
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['device']:
+                        self.log.info("    - {0} = {1}".format(a_feature['key'], a_feature['value']))
+
+                # then, the commands
+                # TODO !!!!!!
+
+            return device_list
+
+    def get_parameter_for_feature(self, a_device, type, feature, key):
+        """ For a device feature, return the required parameter value
+            Example with : a_device = {u'xpl_stats': {u'get_total_space': {u'name': u'get_total_space', u'id': 49, u'parameters': {u'device': [{u'xplstat_id': 49, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 49, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 49, u'key': u'type', u'value': u'total_space'}], u'dynamic': [{u'xplstat_id': 49, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_free_space': {u'name': u'get_free_space', u'id':51, u'parameters': {u'device': [{u'xplstat_id': 51, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 51, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 51, u'key': u'type', u'value': u'free_space'}], u'dynamic': [ {u'xplstat_id': 51, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_used_space': {u'name': u'get_used_space', u'id': 52, u'parameters': {u'device': [{u'xplstat_id': 52, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 52, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 52, u'key': u'type', u'value': u'used_space'}], u'dynamic': [{u'xplstat_id': 52, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_percent_used': {u'name': u'get_percent_used', u'id': 50, u'parameters': {u'device': [{u'xplstat_id': 50, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 50, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 50, u'key': u'type', u'value': u'percent_used'}], u'dynamic': [{u'xplstat_id': 50, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}}, u'commands': {}, u'description': u'/home sur darkstar', u'reference': u'ref', u'id': 49, u'device_type_id': u'diskfree.disk_usage', u'sensors': {u'get_total_space': {u'conversion': u'', u'name': u'Total Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 80}, u'get_free_space': {u'conversion': u'', u'name': u'Free Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 82}, u'get_used_space': {u'conversion': u'', u'name': u'Used Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 83}, u'get_percent_used': {u'conversion': u'', u'name': u'Percent used', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 81}}, u'plugin_id': u'domogik-diskfree.darkstar', u'name': u'darkstar:/home'}
+                         type = xpl_stats
+                         feature = get_percent_used
+                         key = device
+            Return : /home
+        """
+        try:
+            self.log.debug("Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
+            for a_param in a_device[type][feature]['parameters']['device']:
+                if a_param['key'] == key:
+                    value = self.cast(a_param['value'], a_param['type'])
+                    self.log.debug("Parameter value found: {0}".format(value))
+                    return value
+            self.log.warning("Parameter not found : return None")
+            return None
+        except:
+            self.log.error("Error while looking for a device feature parameter. Return None. Error: {0}".format(traceback.format_exc()))
+            return None
+         
+
+
     def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin
         """
+        if self.dont_run_ready == True:
+            return
+
         ### activate xpl hbeat
         if self.enable_hbeat_called == True:
             self.log.error("in ready() : enable_hbeat() function already called : the plugin may not be fully converted to the 0.4+ Domogik format")
@@ -290,6 +385,7 @@ class XplPlugin(BasePlugin, MQRep):
             IOLoop.instance().start()
 
 
+
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
             @param msg : MQ req message
@@ -300,6 +396,48 @@ class XplPlugin(BasePlugin, MQRep):
         if msg.get_action() == "plugin.stop.do":
             self.log.info("Plugin stop request : {0}".format(msg))
             self._mdp_reply_plugin_stop(msg)
+        elif msg.get_action() == "helper.list.get":
+            self.log.info("Plugin helper list request : {0}".format(msg))
+            self._mdp_reply_helper_list(msg)
+        elif msg.get_action() == "helper.help.get":
+            self.log.info("Plugin helper help request : {0}".format(msg))
+            self._mdp_reply_helper_help(msg)
+        elif msg.get_action() == "helper.do":
+            self.log.info("Plugin helper action request : {0}".format(msg))
+            self._mdp_reply_helper_do(msg)
+    
+    def _mdp_reply_helper_do(self, msg):
+        contens = msg.get_data()
+        if 'command' in contens.keys():
+            if contens['command'] in self.helpers.keys():
+                if 'params' not in contens.keys():
+                    contens['params'] = {}
+                    params = []
+                else:
+                    params = []
+                    for key, value in contens['params'].items():
+                        params.append( "{0}='{1}'".format(key, value) )
+                command = "self.{0}(".format(self.helpers[contens['command']]['call'])
+                command += ", ".join(params)
+                command += ")"
+                print(command)
+                result = eval(command)
+                # run the command with all params
+                msg = MQMessage()
+                msg.set_action('helper.do.result')
+                msg.add_data('command', contens['command'])
+                msg.add_data('params', contens['params'])
+                msg.add_data('result', result)
+                self.reply(msg.get())
+
+    def _mdp_reply_helper_help(self, data):
+        contens = data.get_data()
+        if 'command' in contens.keys():
+            if contens['command'] in self.helpers.keys():
+                msg = MQMessage()
+                msg.set_action('helper.help.result')
+                msg.add_data('help', self.helpers[contens['command']]['help'])
+                self.reply(msg.get())
 
     def _mdp_reply_plugin_stop(self, data):
         """ Stop the plugin
@@ -327,6 +465,15 @@ class XplPlugin(BasePlugin, MQRep):
         # if it fails, the manager should try to kill the plugin
         self.force_leave()
 
+    def _mdp_reply_helper_list(self, data):
+        """ Return a list of supported helpers
+            @param data : MQ req message
+        """
+        ### Send the ack over MQ Rep
+        msg = MQMessage()
+        msg.set_action('helper.list.result')
+        msg.add_data('actions', self.helpers.keys())
+        self.reply(msg.get())
 
     def _send_status(self, status):
         """ Send the plugin status over the MQ
@@ -378,7 +525,7 @@ class XplPlugin(BasePlugin, MQRep):
                raise OSError("Can't write in directory %s" % path)
        else:
            try:
-               os.mkdir(path, 0770)
+               os.mkdir(path, '0770')
                self.log.info("Create directory %s." % path)
            except:
                raise OSError("Can't create directory %s." % path)
@@ -395,6 +542,21 @@ class XplPlugin(BasePlugin, MQRep):
        except :
            raise IOError("Can't create a file in directory %s." % path)
        return path
+
+    def register_helper(self, action, help_string, callback):
+        if action not in self.helpers:
+            self.helpers[action] = {'call': callback, 'help': help_string}
+
+    def publish_helper(self, key, data):
+        if hasattr(self, "_pub"):
+            if self._name in CORE_COMPONENTS:
+                type = "core"
+            else:
+                type = "plugin"
+            self._pub.send_event('helper.publish',
+                                 {"origin" : self._mq_name,
+                                  "key": key,
+                                  "data": data})
 
     # TODO :remove
     #def get_stats_files_directory(self):
@@ -528,6 +690,13 @@ class XplPlugin(BasePlugin, MQRep):
         '''
         Leave threads & timers
         '''
+        # avoid ready() to be launched
+        self.dont_run_ready = True
+        # stop IOLoop
+        #try:
+        #    IOLoop.instance().start()
+        #except:
+        #    pass
         if hasattr(self, "log"):
             self.log.debug("force_leave called")
         # send stopped status over the MQ

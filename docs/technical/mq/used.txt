@@ -30,7 +30,7 @@ Rules to apply
 ======================= =================== =================== ====================== ========================
 Source                  Destination         action req          action rep             Python example
 ======================= =================== =================== ====================== ========================
-rest                    xplevent            reload              reload.result
+rest                    xplevent            reload              reload.result          req_reload.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 plugin (any)            dbmgr               config.get          config.result          req_config_get.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
@@ -38,18 +38,26 @@ UIs                     dbmgr               config.set          config.result   
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     dbmgr               config.delete       config.result          req_config_delete.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             clients.list.get    clients.list.result    req_clients_list.py
+UIs                     manager             client.list.get     client.list.result     req_client_list.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             clients.detail.get  clients.detail.result  req_clients_detail.py
+UIs                     manager             client.detail.get   client.detail.result   req_client_detail.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 Rest                    manager             device_types.get    device_types.result    req_device_types.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             packages.detail.get packages.detail.result req_packages_detail.py
+UIs                     manager             package.detail.get  package.detail.result  req_package_detail.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     manager             plugin.start.do     plugin.start.result    req_plugin_start.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     plugin (by id)      plugin.stop.do      plugin.stop.result     req_plugin_stop.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      helper.list.get     helper.list.result     req_helper_list.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      helper.help.get     helper.help.result     req_helper_help.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      helper.do           helper.do.result       req_helper_do.py
 ======================= =================== =================== ====================== ========================
+
+*clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.
 
 
 List of MQ messages used for pub/sub pattern
@@ -59,9 +67,9 @@ List of MQ messages used for pub/sub pattern
 * destination : used by : the ones which subscribe to the published data
 
 ======================= =================== ====================== =====================
-Source                  Used by             Header              Python example
+Source                  Used by             Header                 Python example
 ======================= =================== ====================== =====================
-xplevent                rest                statmgr.received
+xplevent                rest                device-stats
 ----------------------- ------------------- ---------------------- ---------------------
 plugin (any)            manager             plugin.status          sub_plugin_status.py
                         UIs
@@ -69,9 +77,12 @@ plugin (any)            manager             plugin.status          sub_plugin_st
 plugin (any)            manager             plugin.configuration   sub_plugin_configuration.py
                         UIs
 ----------------------- ------------------- ---------------------- ---------------------
-manager                 UIs                 clients.list           sub_clients_list.py
+manager                 UIs                 client.list            sub_client_list.py
 ----------------------- ------------------- ---------------------- ---------------------
-manager                 UIs                 clients.detail         sub_clients_detail.py
+manager                 UIs                 client.detail          sub_client_detail.py
 ----------------------- ------------------- ---------------------- ---------------------
-manager                 UIs                 packages.detail        sub_packages_detail.py
+manager                 UIs                 package.detail         sub_package_detail.py
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            UIs                 helper.publish         
 ======================= =================== ====================== =====================
+

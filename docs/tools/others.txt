@@ -9,7 +9,7 @@ This is a script which check all *.py* files from a directory to get a note abou
 
 Example (we assert $DOMOGIK_HOME is the root of your Domogik repository): ::
 
-    $ cd $DOMOGIK_HOME/domogik/src/domogik/xpl/bin # for example
+    $ cd $DOMOGIK_HOME/domogik/src/domogik/bin # for example
     $ $DOMOGIK_HOME/domogik/src/tools/pylint-check.sh
     [...]
     Good files :                                                                    

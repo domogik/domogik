@@ -79,13 +79,13 @@ setup(
     entry_points = {
         'console_scripts': [
 	    """
-            dmg_pkgmgr = domogik.xpl.bin.pkgmgr:main
-            dmg_manager = domogik.xpl.bin.manager:main
-            dmg_send = domogik.xpl.bin.send:main
-            dmg_dump = domogik.xpl.bin.dump_xpl:main
+            dmg_pkgmgr = domogik.bin.pkgmgr:main
+            dmg_manager = domogik.bin.manager:main
+            dmg_send = domogik.bin.send:main
+            dmg_dump = domogik.bin.dump_xpl:main
             dmg_mq_dump = domogik.mq.dump:main
-            dmg_version = domogik.xpl.bin.version:main
-            dmg_hub = domogik.xpl.bin.hub:main
+            dmg_version = domogik.bin.version:main
+            dmg_hub = domogik.bin.hub:main
             dmg_broker = domogik.mq.reqrep.broker:main
             dmg_forwarder = domogik.mq.pubsub.forwarder:main
             dmg_insert_data = domogik.tools.packages.insert_data:main

@@ -131,14 +131,6 @@ def add_initial_data():
     # Create a default user account
     _db.add_default_user_account()
 
-    print "LIST = %s" % _db.list_user_accounts()
-
-    _db.add_default_user_account()
-
-    print "LIST = %s" % _db.list_user_accounts()
-
-    time.sleep(60)
-
 def user_want_database_upgrade():
     answer = raw_input("Do you want to upgrade your database? [Y/n] ")
     if answer == 'n':
@@ -232,6 +224,6 @@ if __name__ == "__main__":
             elif opt in ('-d', '--dump'):
                 backup_existing_database(confirm=False)
                 sys.exit()
-
-    install_or_upgrade()
-    check_install_is_ok()
+    with _db.session_scope():
+        install_or_upgrade()
+        check_install_is_ok()

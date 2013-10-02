@@ -1,0 +1,29 @@
+================================================================
+/device/old - list the old devices (created with Domogik <= 0.3)
+================================================================
+
+Available actions : 
+
+* GET : get the old devices list
+
+GET
+===
+
+This method is used to get the old devices list. This is used to migrate them to the new Domogik 0.4 database model.
+
+/device/old
+-----------
+
+All the devices will be returned in a json table. 
+
+..todo ::
+
+    Response example
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/device
+    Response (application/json) : 
+    [...]
+    

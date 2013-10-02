@@ -76,6 +76,8 @@ An hidden configuration item exists : **configured**. It is set to true in datab
 Data types
 ----------
 
+Notice that when retrieving the plugins values for the configuration elements, they are automatically casted in the appropriate format which is the one describe in this part of the json file!
+
 boolean
 *******
 

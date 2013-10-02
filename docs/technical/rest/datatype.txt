@@ -1,0 +1,33 @@
+===========================
+/datatype - Known datatypes
+===========================
+
+Available actions : 
+
+* GET : a list of known datatypes and there options
+
+GET
+===
+
+/map
+----
+
+Returns a list of all known datatypes
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/datatype
+    Response (application/json) :
+    {
+         "DT_DateTime":
+         {
+             "childs":
+             [
+                 "DT_Date",
+                 "DT_Time"
+             ],
+             "format": "YYYY-MM-DDThh:mm:ss.s"
+         },
+         { ... }
+    }
