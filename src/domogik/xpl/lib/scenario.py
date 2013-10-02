@@ -35,31 +35,28 @@ Implements
 """
 
 import traceback
-import zmq
 
-from zmq.eventloop.ioloop import IOLoop
 from domogik.xpl.lib.scenario.manager import ScenarioManager
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
 
 
-class ScenarioFrontend(XplPlugin, MQRep):
+class ScenarioFrontend(XplPlugin):
     """ This class provides an interface to MQ system to allow Scenarii management.
     """
 
     def __init__(self):
         XplPlugin.__init__(self, name='scenario')
-        MQRep.__init__(self, zmq.Context(), 'scenario')
+        self._req = MQRep(self._zmq, 'scenario')
         self._backend = ScenarioManager(self.log)
         self.add_stop_cb(self.end)
         self.add_stop_cb(self.shutdown)
         self.log.info("Scenario Frontend and Manager initialized, let's wait for some work.")
-        IOLoop.instance().start()
 
     def on_mdp_request(self, msg):
         """ Do real work with message
-        msg.getaction() shoult contain XXXX.YYYYYY
+        msg.get_action() shoult contain XXXX.YYYYYY
         with XXXX in [test, condition, parameter]
         YYYYY in [list, new, etc ...]
         """
@@ -84,26 +81,26 @@ class ScenarioFrontend(XplPlugin, MQRep):
                    'list': self._backend.list_actions,
                    'new': self._backend.ask_action_instance
                    }
-                  }
+                }
         try:
-            if msg.getdata() == {}:
-                payload = mapping[msg.getaction().split('.')[0]][msg.getaction().split('.')[1]]()
+            if msg.get_data() == {}:
+                payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
             else:
-                payload = mapping[msg.getaction().split('.')[0]][msg.getaction().split('.')[1]](**msg.getdata())
-            self._mdp_reply(msg.getaction(), "ok", payload)
+                payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
+            self._mdp_reply(msg.get_action(), "ok", payload)
 
         except:
             self.log.error("Exception occured during message processing.")
             trace = str(traceback.format_exc())
             self.log.debug(trace)
-            self._mdp_reply(msg.getaction(), "error", {"details": trace})
+            self._mdp_reply(msg.get_action(), "error", {"details": trace})
 
     def _mdp_reply(self, action, status, payload):
         msg = MQMessage()
-        msg.setaction(action)
-        msg.adddata('status', status)
-        msg.adddata('payload', payload)
-        self.reply(msg.get())
+        msg.set_action(action)
+        msg.add_data('status', status)
+        msg.add_data('payload', payload)
+        self._req.reply(msg.get())
 
     def end(self):
         """ Shutdown Scenario
