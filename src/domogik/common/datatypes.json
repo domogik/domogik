@@ -503,7 +503,7 @@
             "1": "Comfort",
             "2": "Standby",
             "3": "Economy",
-            "4": "Building Protection",
+            "4": "Building Protection"
         },
         "childs": []
     },
@@ -513,10 +513,10 @@
             "1": "Heat",
             "2": "Cool",
             "3": "Fan only",
-            "4": "Dry",
+            "4": "Dry"
         },
         "childs": []
-    }
+    },
     "DT_ColorCII": {
         "values": {
             "W": "White",
@@ -526,7 +526,7 @@
             "B": "Blue",
             "G": "Green",
             "Bk": "Black",
-            "Br": "Brown",
+            "Br": "Brown"
         },
         "childs": []
     }
