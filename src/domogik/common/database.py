@@ -53,7 +53,7 @@ from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         Device, DeviceStats,
         PluginConfig, Person,
-        UserAccount,
+        UserAccount, Scenario,
         Command, CommandParam,
         Sensor, SensorHistory,
         XplCommand, XplStat, XplStatParam, XplCommandParam
@@ -1684,6 +1684,57 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id %s : it doesn't exist" % id)
          
+###################
+# Scenario
+###################
+    def list_scenario(self):
+        return self.__session.query(Scenario).all()
+
+    def get_scenario(self, s_id):
+        return self.__session.query(Scenario).filter_by(id=s_id).first()
+
+    def add_scenario(self, name, json):
+        self.__session.expire_all()
+        #self.__session.begin(subtransactions=True)
+        scenario = Scenario(name=name, json=json)
+        self.__session.add(scenario)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return scenario
+
+    def update_scenario(self, s_id, name=None, json=None):
+        self.__session.expire_all()
+        #self.__session.begin(subtransactions=True)
+        scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
+        if scenario is None:
+            self.__raise_dbhelper_exception("Scenario with id %s couldn't be found" % s_id)
+        if name is not None:
+            scenario.name = ucode(name)
+        if json is not None:
+            scenario.json = ucode(json)
+        self.__session.add(scenario)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return scenario
+
+    def del_scenario(self, s_id):
+        self.__session.expire_all()
+        #self.__session.begin(subtransactions=True)
+        scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
+        if scenario is not None:
+            self.__session.delete(scenario)
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            return scenario
+        else:
+            self.__raise_dbhelper_exception("Couldn't delete scenario with id %s : it doesn't exist" % s_id)
+
 ###################
 # helper functions
 ###################

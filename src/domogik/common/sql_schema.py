@@ -487,3 +487,23 @@ class XplCommandParam(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return XplCommandParam.__tablename__
+
+class Scenario(Base):
+    __tablename__ = '%s_scenario' % _db_prefix
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(Unicode(32), nullable=False, autoincrement=False)
+    json = Column(UnicodeText(), nullable=False)
+
+    def __init__(self, name, json):
+        self.name = ucode(name)
+        self.json = ucode(json)
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<Scenario(id=%s name='%s' json='%s')>"\
+               % (self.id, self.name, self.json)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return Scenario.__tablename__
