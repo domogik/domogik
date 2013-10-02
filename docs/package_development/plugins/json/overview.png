@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <title>Pasteboard &mdash; Uploaded Image</title>
+    <meta name="description" content="Super simple and lightning fast image sharing. Upload clipboard images with Copy &amp; Paste and image files with Drag &amp; Drop">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="photo">
+    <meta name="twitter:url" content="http://pasteboard.co/cnejpTu.png">
+    <meta name="twitter:title" content="Pasteboard &mdash; Uploaded Image">
+    <meta name="twitter:description" content="Super simple and lightning fast image sharing. Upload clipboard images with Copy &amp; Paste and image files with Drag &amp; Drop">
+    <meta name="twitter:image" content="http://pasteboard.s3.amazonaws.com/images/cnejpTu.png">
+
+    <link rel='stylesheet' href='/css/image-53d52a3f406e0d1d9c2e8c2c487c2f22.css'>
+    <script src='/js/head-bb8db58b957fd8c00865c22dd2a2234f.js'></script>
+    
+      <!-- Google Analytics -->
+      <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-34180422-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      </script>
+    
+  </head>
+  <body data-page="Image Page">
+    <canvas class="shadow"></canvas>
+    <div class="image-container">
+      <img data-src="http://pasteboard.s3.amazonaws.com/images/cnejpTu.png" alt="uploaded image" class="image js">
+      <noscript> <img src="http://pasteboard.s3.amazonaws.com/images/cnejpTu.png" alt="uploaded image" class="image"> </noscript>
+    </div>
+    <div class="spinner"></div>
+    <div class="progress">
+      <div class="track">
+        <div class="bar"></div>
+      </div>
+    </div>
+    <div class="broken-link">Image not found</div>
+    <aside>
+      <div class="short-url">
+        <span>Short URL:</span>
+        <input type="text" readonly onClick="this.select();">
+      </div>
+      <a href="https://twitter.com/intent/tweet?text=I%20uploaded%20an%20image&url=http%3A%2F%2Fpasteboard.co/cnejpTu.png" class="twitter button social" target="__blank" data-track="Twitter Image"  title="Share on Twitter"><span class="icon"></span></a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fpasteboard.co/cnejpTu.png" class="facebook button social" target="__blank" data-track="Facebook Image" title="Share on Facebook"><span class="icon"></span></a>
+      <a href="/images/cnejpTu.png/download" class="button" data-track="Download">Download image</a>
+      
+      <a href="/" class="button confirm" data-track="Home">Upload an image</a>
+      <div class="views">
+        <span class="text">Views</span><span class="num"></span>
+      </div>
+
+    </aside>
+    <footer>
+      <h1 class="title"><a href="/">Pasteboard</a></h1>
+      <span class="author">By <a href="https://twitter.com/JoelBesada" target="__blank" data-track="Twitter">@JoelBesada</a></span>
+    </footer>
+    <script src='/js/image-5b36d2b6b3dcd725a7f070dd32d68114.js'></script>
+  </body>
+</html>
