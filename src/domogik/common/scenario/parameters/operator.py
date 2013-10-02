@@ -25,7 +25,8 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.xpl.lib.scenario.parameters.abstract import AbstractParameter
+from domogik.common.scenario.parameters.abstract import AbstractParameter
+
 class ComparisonOperatorParameter(AbstractParameter):
     """ This parameter  simply provides different operators
     List of operators can be restricted/extendded when instanciated using add_filter and set_list_of_values

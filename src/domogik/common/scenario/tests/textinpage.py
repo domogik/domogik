@@ -25,7 +25,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.xpl.lib.scenario.tests.abstract import AbstractTest
+from domogik.common.scenario.tests.abstract import AbstractTest
 from time import sleep
 
 class TextInPageTest(AbstractTest):

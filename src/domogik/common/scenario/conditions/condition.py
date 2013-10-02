@@ -25,7 +25,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.xpl.lib.scenario.conditions.abstract import AbstractCondition
+from domogik.common.scenario.conditions.abstract import AbstractCondition
 
 class Condition(AbstractCondition):
     """ We have nothing to extend right now

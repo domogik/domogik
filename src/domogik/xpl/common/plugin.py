@@ -66,7 +66,7 @@ STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
 # core components
-CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplevent', 'send', 'dump_xpl']
+CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplevent', 'send', 'dump_xpl', 'scenario']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"

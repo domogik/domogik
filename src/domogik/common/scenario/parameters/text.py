@@ -25,7 +25,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.xpl.lib.scenario.parameters.abstract import AbstractParameter
+from domogik.common.scenario.parameters.abstract import AbstractParameter
 
 class TextParameter(AbstractParameter):
     """ This parameter  simply provides a text entry

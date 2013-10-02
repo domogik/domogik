@@ -38,11 +38,11 @@ import importlib
 import inspect
 import uuid
 import json
-import domogik.xpl.lib.scenario.tests as s_t
-import domogik.xpl.lib.scenario.parameters as s_p
-import domogik.xpl.lib.scenario.conditions as s_c
-import domogik.xpl.lib.scenario.actions as s_a
-from domogik.xpl.lib.scenario.conditions.condition import Condition
+import domogik.common.scenario.tests as s_t
+import domogik.common.scenario.parameters as s_p
+import domogik.common.scenario.conditions as s_c
+import domogik.common.scenario.actions as s_a
+from domogik.common.scenario.conditions.condition import Condition
 from exceptions import KeyError
 
 
@@ -107,7 +107,7 @@ class ScenarioManager:
                 # so we have to load the module/class etc ... only once
                 if inst not in self._test_cache:
                     mod, clas = inst.split('.')
-                    module_name = "domogik.xpl.lib.scenario.tests.%s" % mod
+                    module_name = "domogik.common.scenario.tests.%s" % mod
                     cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
                     self._test_cache[inst] = cobj
                     self.log.debug("Add class %s to test cache" % inst)
@@ -120,7 +120,7 @@ class ScenarioManager:
                 # so we have to load the module/class etc ... only once
                 if inst not in self._action_cache:
                     mod, clas = inst.split('.')
-                    module_name = "domogik.xpl.lib.scenario.actions.%s" % mod
+                    module_name = "domogik.common.scenario.actions.%s" % mod
                     cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
                     self._action_cache[inst] = cobj
                     self.log.debug("Add class %s to action cache" % inst)

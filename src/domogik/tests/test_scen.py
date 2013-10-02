@@ -48,12 +48,12 @@ for k in test_v["parameters"]:
         print "          - description : %s" % vtok["description"]
         print "          - filters : %s" % vtok["filters"]
 print "  * Generating JSON with values :"
-print "    - url.urlpath = http://localhost:40404/config/welcome"
+print "    - url.urlpath = http://localhost"
 print "    - url.interval = 5"
 print "    - text.text = Domogik"
 src = """{ "NOT" : { "%s" : {
         "url": {
-        "urlpath": "http://localhost:40404/config/welcome",
+        "urlpath": "http://localhost",
             "interval" : "5"
         },
         "text": {
