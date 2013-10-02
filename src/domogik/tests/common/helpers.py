@@ -93,7 +93,7 @@ def delete_configuration(type, name, host):
         print(result.get())
         return True
     else:
-        raise RuntimeError("Error while deleting configuration for {0}-{1}.{2}".format(type, name, host, key, value))
+        raise RuntimeError("Timeout while deleting configuration for {0}-{1}.{2}".format(type, name, host))
 
 def configure(type, name, host, key, value):
     cli = MQSyncReq(zmq.Context())
