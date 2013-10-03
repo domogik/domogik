@@ -72,6 +72,11 @@ class ScenarioManager:
         # Keep list of actions uuid linked to a condition  as name : [uuid1, uuid2, ... ]
         self._conditions_actions = {}
         self.log = log
+        # As we lazy-load all the tests/actions in __instanciate
+        # we need to keep the module in a list so that we don't need to reload them
+        # every time.
+        self._test_cache = {}
+        self._action_cache = {}
 
     def __ask_instance(self, obj, mapping):
         """ Generate an uuid corresponding to the object passed as parameter
@@ -179,8 +184,6 @@ class ScenarioManager:
             self.log.error("Invalid json : %s" % json_input)
             return None
         try:
-            self._test_cache = {}
-            self._action_cache = {}
             self.__instanciate()
             c = Condition(self.log, json_input, self._tests_mapping)
             self._conditions[name] = c
