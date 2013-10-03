@@ -22,6 +22,14 @@ The **json_version** must be set to **2** for Domogik 0.4 compliant plugins.
 .. warning ::
    In json, you must write *\\n* each time you want to create a newline in the data.
 
+Overview
+========
+
+.. image:: DeviveJsonStruct.png
+
+Detailed informations
+=====================
+
 You will find detailed instructions about each part in this chapters:
 
 * :doc:`identity <identity>`

@@ -154,7 +154,7 @@ class Manager(XplPlugin):
         self.log.info("Start xplevent : {0}".format(self.options.start_xplevent))
 
         ### create a Fifo to communicate with the init script
-        self.log.info("Create the figo to communicate with the init script")
+        self.log.info("Create the fifo to communicate with the init script")
         self._state_fifo = None
         self._create_fifo()
 

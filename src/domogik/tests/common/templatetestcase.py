@@ -69,7 +69,7 @@ class TemplateTestCase(unittest.TestCase):
                     'xpltype': xpltype,
                     'xplsource': xplsource}
         for key in data:
-            criteria[key] = data[key]
+            criteria[key] = str(data[key])
         listener = Listener(self._wait_for_xpl_cb, 
                             self.myxpl, 
                             criteria)
@@ -77,7 +77,7 @@ class TemplateTestCase(unittest.TestCase):
         self._xpl_received.wait(timeout)
         if not self._xpl_received.is_set():
             raise RuntimeError("No xPL message received")
-        print("xPL message received : {0}".format(self._xpl_data))
+        print("xPL message received : {0}".format(self.xpl_data))
         return True
        
 
@@ -87,7 +87,7 @@ class TemplateTestCase(unittest.TestCase):
             @param message : xpl message received
         """
         self._xpl_received.set()
-        self._xpl_data = message
+        self.xpl_data = message
     
 
 
@@ -129,7 +129,6 @@ class TemplateTestCase(unittest.TestCase):
 
         '''
         result = message.data
-        #print("result=%s"%result)
         for resp in self._keys:
             if resp in result:
                 res = self._keys.pop(resp)
@@ -162,7 +161,6 @@ class TemplateTestCase(unittest.TestCase):
             try:
                 self._keys[key].wait(timeout)
                 if not self._keys[key].is_set():
-                    #print("No answer received for key %s" % (key))
                     raise RuntimeError("No answer received for key %s, check your cron xpl setup" % (key))
             except KeyError:
                 pass
@@ -180,8 +178,6 @@ class TemplateTestCase(unittest.TestCase):
                         res = False
             return res
         else:
-            #print("Error %s when communicating key %s" % (self._result['errorcode'], key))
-            #print("%s : %s" % (self._result['errorcode'], self._result['error']))
             return False
 
     def query_many(self, key, testmsg, dictkeys=[], dictkeyvals={}, retry=20):

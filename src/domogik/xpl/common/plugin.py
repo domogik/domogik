@@ -431,12 +431,12 @@ class XplPlugin(BasePlugin, MQRep):
                 self.reply(msg.get())
 
     def _mdp_reply_helper_help(self, data):
-        contens = data.get_data()
+        content = data.get_data()
         if 'command' in contens.keys():
-            if contens['command'] in self.helpers.keys():
+            if content['command'] in self.helpers.keys():
                 msg = MQMessage()
                 msg.set_action('helper.help.result')
-                msg.add_data('help', self.helpers[contens['command']]['help'])
+                msg.add_data('help', self.helpers[content['command']]['help'])
                 self.reply(msg.get())
 
     def _mdp_reply_plugin_stop(self, data):
@@ -449,6 +449,11 @@ class XplPlugin(BasePlugin, MQRep):
 
             Notice that no check is done on the MQ req content : we need nothing in it as it is directly addressed to a plugin
         """
+        # check if the message is for us
+        content = data.get_data()
+        if content['name'] != self._name or content['host'] != self.get_sanitized_hostname():
+            return
+
         ### Send the ack over MQ Rep
         msg = MQMessage()
         msg.set_action('plugin.stop.result')
