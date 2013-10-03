@@ -103,12 +103,16 @@ class AbstractCondition:
     def __parse_boolean(self, json):
         """ Recursive method which returns a string which represent the boolean expression defined by a json
         @param json : a json expression which represents some boolean expression
+            if json is a dict => just proceed
+            if json is a tuple => it will be a key, dict => create a new dict from this
         """
+        if type(json) == tuple:
+            json = {json[0]: json[1]}
         if type(json) == dict:
             for k in json.keys():
                 v = json[k]
                 if k in ["AND", "OR"]:
-                    return "( %s %s %s )" % (self.__parse_boolean(v[0]), k.lower(), self.__parse_boolean(v[1]))
+                    return "( %s %s %s )" % (self.__parse_boolean(v.items()[0]), k.lower(), self.__parse_boolean(v.items()[1]))
                 elif k == "NOT":
                     return "not %s" % self.__parse_boolean(v)
                 elif type(v) == dict:
