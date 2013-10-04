@@ -24,7 +24,6 @@ Implements
 @organization: Domogik
 """
 from sqlalchemy import MetaData, Table
-from domogik.common.sql_schema import DeviceUsage
 def upgrade(migrate_engine):
     # core_device_config
     migrate_engine.execute("DROP table core_device_config")
