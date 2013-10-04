@@ -60,26 +60,26 @@ class ScenarioFrontend(XplPlugin):
         YYYYY in [list, new, etc ...]
         """
         mapping = {'test':
-                   {
-                   'list': self._backend.list_tests,
-                   'new': self._backend.ask_test_instance,
-                   },
-                   'condition':
-                   {
-                   'list': self._backend.list_conditions,
-                   'new': self._backend.create_condition,
-                   'get': self._backend.get_parsed_condition,
-                   'evaluate': self._backend.eval_condition
-                   },
-                   'parameter':
-                   {
-                   'list': self._backend.list_parameters,
-                   },
-                   'action':
-                   {
-                   'list': self._backend.list_actions,
-                   'new': self._backend.ask_action_instance
-                   }
+                    {
+                        'list': self._backend.list_tests,
+                        'new': self._backend.ask_test_instance,
+                    },
+                    'scenario':
+                    {
+                        'list': self._backend.list_conditions,
+                        'new': self._backend.create_scenario,
+                        'get': self._backend.get_parsed_condition,
+                        'evaluate': self._backend.eval_condition
+                    },
+                    'parameter':
+                    {
+                        'list': self._backend.list_parameters,
+                    },
+                    'action':
+                    {
+                        'list': self._backend.list_actions,
+                        'new': self._backend.ask_action_instance
+                    }
                 }
         try:
             if msg.get_data() == {}:
@@ -87,7 +87,6 @@ class ScenarioFrontend(XplPlugin):
             else:
                 payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
             self._mdp_reply(msg.get_action(), "ok", payload)
-
         except:
             self.log.error("Exception occured during message processing.")
             trace = str(traceback.format_exc())

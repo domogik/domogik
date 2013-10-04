@@ -11,7 +11,8 @@ from domogik.mq.reqrep.client import MQSyncReq
 z = zmq.Context()
 m = MQMessage('test.list', {})
 m2 = MQMessage('parameter.list', {})
-m3 = MQMessage('condition.list', {})
+m3 = MQMessage('scenario.list', {})
+m4 = MQMessage('action.list', {})
 c = MQSyncReq(z)
 
 print "==== List of tests ===="
@@ -21,6 +22,8 @@ print "==== List of parameters ===="
 print c.request('scenario', m2.get())
 print "==== List of conditions ===="
 print c.request('scenario', m3.get())
+print "==== List actions ===="
+print c.request('scenario', m4.get())
 print "==== Get one test"
 tests_data = json.loads(tests._data['payload'])
 test_k = tests_data.keys()[0]
@@ -32,7 +35,16 @@ print "Test name : %s" % test_k
 print "Create an instance of %s" % test_k
 m4 = MQMessage('test.new', {'obj': test_k})
 uid = c.request('scenario', m4.get())
-print "Got UUID : %s" % uid._data['payload']
+print "Create an instance of %s" % test_k
+m5 = MQMessage('action.new', {'obj': 'log.LogAction'})
+uid5 = c.request('scenario', m5.get())
+m6 = MQMessage('action.new', {'obj': 'log.LogAction'})
+uid6 = c.request('scenario', m5.get())
+print "Got UUID for test: %s" % uid._data['payload']
+print "Got UUID for action: %s" % uid5._data['payload']
+print "Got UUID for action: %s" % uid6._data['payload']
+
+
 print "Needed parameters : "
 for k in test_v["parameters"]:
     v = test_v["parameters"][k]
@@ -51,26 +63,35 @@ print "  * Generating JSON with values :"
 print "    - url.urlpath = http://localhost"
 print "    - url.interval = 5"
 print "    - text.text = Domogik"
-src = """{ "NOT" : { "%s" : {
-        "url": {
-        "urlpath": "http://localhost",
-            "interval" : "5"
-        },
-        "text": {
-            "text": "Domogik2"
-        }
-    }
-}}""" % uid._data['payload']
+src = """{
+	"condition" : { 
+		"NOT" : { 
+			"%s" : {
+        			"url": {
+			            "urlpath": "http://localhost",
+			            "interval" : "5"
+			        },
+        			"text": {
+			            "text": "Domogik2"
+        			}
+    			}
+		}
+	},
+   	"actions" : {
+		"%s" : {},
+		"%s" : {}
+	}
+}""" % (uid._data['payload'], uid5._data['payload'], uid6._data['payload'])
 print "  * JSON is : %s" % src
 print "==== Create condition with this JSON"
-m5 = MQMessage('condition.new', {'name': 'foo', 'json_input': src})
+m5 = MQMessage('scenario.new', {'name': 'foo', 'json_input': src})
 cond = c.request('scenario', m5.get())
 cond = cond._data['payload']['name']
 print "Condition created with name : %s" % cond
-m6 = MQMessage('condition.get', {'name': cond})
+m6 = MQMessage('scenario.get', {'name': cond})
 parsed = c.request('scenario', m6.get())
 print "Condition expression is : %s " % parsed
-m7 = MQMessage('condition.evaluate', {'name': cond})
+m7 = MQMessage('scenario.evaluate', {'name': cond})
 print "Waiting for condition to be false (text exists in page)"
 result = True
 while result:

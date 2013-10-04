@@ -55,6 +55,24 @@ UIs                     plugin (by id)      helper.list.get     helper.list.resu
 UIs                     plugin (by id)      helper.help.get     helper.help.result     req_helper_help.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     plugin (by id)      helper.do           helper.do.result       req_helper_do.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            test.list           scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            test.create         scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            action.list         scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            action.create       scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            parameter.list      scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.list       scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.get        scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.create     scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.eval       scenario.result
 ======================= =================== =================== ====================== ========================
 
 *clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.

@@ -103,6 +103,12 @@ class AbstractCondition:
         """
         self._mapping = mapping
 
+    def get_mapping(self):
+        """ Get the mapping for this condition
+        @return : A dictionnary of uuid: pointer to a test instance
+        """
+        return self._mapping
+
     def __parse_boolean(self, json):
         """ Recursive method which returns a string which represent the boolean expression defined by a json
         @param json : a json expression which represents some boolean expression

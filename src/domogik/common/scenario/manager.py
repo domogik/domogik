@@ -59,6 +59,43 @@ class ScenarioManager:
         The test on devices are managed directly by xpl Listeners
         The test on time will be managed by a TimeManager
         The actions will be managed by an ActionManager
+        { 
+         "condition" :
+            { "AND" : {
+                    "OR" : {
+                        "one-uuid" : {
+                            "param_name_1" : {
+                                "token1" : "value",
+                                "token2" : "othervalue"
+                            },
+                            "param_name_2" : {
+                                "token3" : "foo"
+                            }
+                        },
+                        "another-uuid" : {
+                            "param_name_1" : {
+                                "token4" : "bar"
+                            }
+                        }
+                    },
+                    "yet-another-uuid" : {
+                        "param_name_1" : {
+                            "url" : "http://google.fr",
+                            "interval" : "5"
+                        }
+                    }
+                }
+            },
+         "actions" : [
+            "uid-for-action" : {
+                "param1" : "value1",
+                "param2" : "value2"
+            },
+            "uid-for-action2" : {
+                "param3" : "value3"
+            }
+         ]
+        }
     """
 
     def __init__(self, log):
@@ -72,8 +109,6 @@ class ScenarioManager:
         self._conditions = {}
         # Keep list of actions uuid linked to a condition  as name : [uuid1, uuid2, ... ]
         self._conditions_actions = {}
-        # Keep list of tests uuid linked to a condition  as name : [uuid1, uuid2, ... ]
-        self._conditions_tests = {}
         # an instance of the logger
         self.log = log
         # As we lazy-load all the tests/actions in __instanciate
@@ -162,7 +197,7 @@ class ScenarioManager:
                     self._action_cache[inst] = cobj
                     self.log.debug("Add class %s to action cache" % inst)
                 self.log.debug("Create action instance for uuid %s" % _uuid)
-                self._actions_mapping[_uuid] = self._action_cache[inst](self.log, trigger=self.generic_trigger)
+                self._actions_mapping[_uuid] = self._action_cache[inst](self.log)
 
     def shutdown(self):
         """ Callback to shut down all parameters
@@ -209,11 +244,14 @@ class ScenarioManager:
             _uuid = str(uuid.uuid4())
         return _uuid
 
-    def create_condition(self, name, json_input):
-        """ Create a Condition instance from the provided json.
+    def create_scenario(self, name, json_input):
+        """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
         The JSON will be parsed to get all the uuids, and test instances will be created.
+        The json needs to have 2 keys:
+            - condition => the json that will be used to create the condition instance
+            - actions => the json that will be used for creating the actions instances
         @Return {'name': name} or raise exception
         """
         try:
@@ -221,15 +259,31 @@ class ScenarioManager:
         except:
             self.log.error("Invalid json : %s" % json_input)
             return None
-        try:
-            self.__instanciate()
-            c = Condition(self.log, name, json_input, self._tests_mapping, self.trigger_actions)
-            self._conditions[name] = c
-            self.log.debug("Create condition %s with payload %s" % (name, payload))
-            return {'name': name}
-        except Exception, e:
-            self.log.error("Error during condition create")
-            raise e
+        if 'condition' not in payload.keys() \
+                or 'actions' not in payload.keys():
+            raise KeyError('the json for the scenario does not contain condition or actions for scenario %s' % name)
+        #try:
+        # instantiate all objects
+        self.__instanciate()
+        # create the condition itself
+        c = Condition(self.log, name, json.dumps(payload['condition']), self._tests_mapping, self.trigger_actions)
+        self._conditions[name] = c
+        self._conditions_actions[name] = []
+        self.log.debug("Create condition %s with payload %s" % (name, payload['condition']))
+        # build a list of actions
+        for action in payload['actions'].keys():
+            print "============="
+            print action
+            # action is now a tuple
+            #   (uid, params)
+            self._conditions_actions[name].append(action) 
+            self._actions_mapping[action].do_init(payload['actions'][action]) 
+        # return
+        return {'name': name}
+        #except Exception, e:
+        #    self.log.error("Error during condition create")
+        #    print e
+        #    raise e
 
     def eval_condition(self, name):
         """ Evaluate a condition calling eval_condition from Condition instance
@@ -245,17 +299,21 @@ class ScenarioManager:
     def trigger_actions(self, name):
         """ Trigger that will be called when a condition evaluates to True
         """
-        self.log.debug("================")
+        print "+++++++++++++++++++++++++++"
+        print "running actions for condition %s" % name
         if name not in self._conditions_actions \
-                or name not in self._conditions \
-                or name not in self._conditions_tests:
+                or name not in self._conditions:
             raise KeyError('no key %s in one of the _conditions tables table' % name)
         else:
             for action in self._conditions_actions[name]:
-                action.do_action( \
+                print "============="
+                print action
+                print "============="
+                self._actions_mapping[action].do_action( \
                         self._conditions[name], \
-                        self.conditions_tests[name] \
+                        self._conditions[name].get_mapping() \
                         )
+        print "+++++++++++++++++++++++++++"
 
     def list_actions(self):
         """ Return the list of actions

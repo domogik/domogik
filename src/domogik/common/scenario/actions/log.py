@@ -37,7 +37,10 @@ class LogAction(AbstractAction):
         self.set_description("Simply put some string in log file.")
 
     def do_action(self, condition, tests):
+        print "-------------------------"
+        print self._params
         self._log.info("A LogAction occured as condition %s was 'True'. Parameters are  : %s " % (condition, self._params))
+        print "-------------------------"
 
     def get_expected_entries(self):
         return {'message': {'type': 'string',
