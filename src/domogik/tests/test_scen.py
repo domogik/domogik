@@ -78,10 +78,11 @@ src = """{
 		}
 	},
    	"actions" : {
-		"%s" : {},
-		"%s" : {}
+		"%s" : {
+			"test": "ikke"
+		}
 	}
-}""" % (uid._data['payload'], uid5._data['payload'], uid6._data['payload'])
+}""" % (uid._data['payload'], uid5._data['payload'])
 print "  * JSON is : %s" % src
 print "==== Create condition with this JSON"
 m5 = MQMessage('scenario.new', {'name': 'foo', 'json_input': src})
