@@ -10,6 +10,6 @@ msg = MQMessage()
 msg.set_action('plugin.stop.do')
 msg.add_data('name', 'diskfree')
 msg.add_data('host', 'darkstar')
-print cli.request('diskfree', msg.get(), timeout=10).get()
+print cli.request('plugin-diskfree.darkstar', msg.get(), timeout=10).get()
 
 

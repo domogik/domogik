@@ -42,7 +42,6 @@ import logging
 import sys
 from domogik.common.configloader import Loader
 
-
 class Logger():
     '''
     Logger for Domogik
@@ -84,16 +83,19 @@ class Logger():
                 my_logger = logging.getLogger('domogik-%s' % component_name)
             else:
                 my_logger = logging.getLogger(component_name)
-            hdlr = logging.FileHandler(filename)
-            formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-            hdlr.setFormatter(formatter)
-            my_logger.addHandler(hdlr)
+            # log to file
+            my_logger.propagate = 0
+            if not my_logger.handlers:
+                hdlr = logging.FileHandler(filename)
+                formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+                hdlr.setFormatter(formatter)
+                my_logger.addHandler(hdlr)
 
-	    # if loglevvel is set to debug (all log entries also go to stdout)
-            if level == 'debug' and component_name.find('sqlalchemy') == -1:
-               dhdlr = logging.StreamHandler(sys.stdout)
-               dhdlr.setFormatter(formatter)
-               my_logger.addHandler(dhdlr)
+	        # if loglevvel is set to debug (all log entries also go to stdout)
+                if level == 'debug' and component_name.find('sqlalchemy') == -1:
+                    dhdlr = logging.StreamHandler(sys.stdout)
+                    dhdlr.setFormatter(formatter)
+                    my_logger.addHandler(dhdlr)
 
             my_logger.setLevel(LEVELS[level])
             self.logger[component_name] = my_logger

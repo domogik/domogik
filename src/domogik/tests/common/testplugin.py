@@ -88,13 +88,13 @@ class TestPlugin(MQAsyncSub):
         msg.set_action('plugin.stop.do')
         msg.add_data('name', self.name)
         msg.add_data('host', self.host)
-        result = cli.request('manager', msg.get(), timeout=10) 
+        result = cli.request("plugin-{0}.{1}".format(self.name, self.host), msg.get(), timeout=10) 
         if result:
             msgid, content = result.get()
             content = json.loads(content)
             print("Response : {0}".format(content))
             if content['status']:
-                print("Plugin started")
+                print("Plugin stopped")
                 return True
             else:
                 print("Error : plugin not stopped")
@@ -124,24 +124,22 @@ class TestPlugin(MQAsyncSub):
             @param msgid : message id
             @content : message content
         """
-        if msgid != "plugin.status":
-            return
-
-        print("Message received : msgid={0}, content={1}".format(msgid, content))
-        self.plugin_status = content['event']
-        if content['name'] == self.name and \
-           content['type'] == self.type and \
-           content['host'] == self.host:
-            # plugin started
-            if content['event'] == STATUS_ALIVE:
-                print("Plugin is started")
-                print("Stop listening to MQ as we get our result")
-                IOLoop.instance().stop() 
-
-            # plugin stopped
-            elif content['event'] == STATUS_STOPPED:
-                print("Plugin is stopped")
-                print("Stop listening to MQ as we get our result")
-                IOLoop.instance().stop() 
+        if msgid == "plugin.status":
+            print("Message received : msgid={0}, content={1}".format(msgid, content))
+            self.plugin_status = content['event']
+            if content['name'] == self.name and \
+               content['type'] == self.type and \
+               content['host'] == self.host:
+                # plugin started
+                if content['event'] == STATUS_ALIVE:
+                    print("Plugin is started")
+                    print("Stop listening to MQ as we get our result")
+                    IOLoop.instance().stop() 
+    
+                # plugin stopped
+                elif content['event'] == STATUS_STOPPED:
+                    print("Plugin is stopped")
+                    print("Stop listening to MQ as we get our result")
+                    IOLoop.instance().stop() 
          
 
