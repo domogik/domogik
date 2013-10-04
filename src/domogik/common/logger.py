@@ -41,7 +41,7 @@ Implements
 import logging
 import sys
 from domogik.common.configloader import Loader
-
+import sys, traceback
 
 class Logger():
     '''
@@ -59,6 +59,10 @@ class Logger():
         @param domogik_prefix : if logger name should be prefixed by 'domogik-'
         @param use_filename : if set tells the logger to use this file name (otherwise takes 'component_name')
         '''
+        print '-'*60
+        traceback.print_exc(file=sys.stdout)
+        traceback.print_stack()
+        print '-'*60
         if component_name not in self.logger:
             LEVELS = {
                         'debug': logging.DEBUG,
@@ -84,16 +88,19 @@ class Logger():
                 my_logger = logging.getLogger('domogik-%s' % component_name)
             else:
                 my_logger = logging.getLogger(component_name)
-            hdlr = logging.FileHandler(filename)
-            formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-            hdlr.setFormatter(formatter)
-            my_logger.addHandler(hdlr)
+            # log to file
+            my_logger.propagate = 0
+            if not my_logger.handlers:
+                hdlr = logging.FileHandler(filename)
+                formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+                hdlr.setFormatter(formatter)
+                my_logger.addHandler(hdlr)
 
-	    # if loglevvel is set to debug (all log entries also go to stdout)
-            if level == 'debug' and component_name.find('sqlalchemy') == -1:
-               dhdlr = logging.StreamHandler(sys.stdout)
-               dhdlr.setFormatter(formatter)
-               my_logger.addHandler(dhdlr)
+	        # if loglevvel is set to debug (all log entries also go to stdout)
+                if level == 'debug' and component_name.find('sqlalchemy') == -1:
+                    dhdlr = logging.StreamHandler(sys.stdout)
+                    dhdlr.setFormatter(formatter)
+                    my_logger.addHandler(dhdlr)
 
             my_logger.setLevel(LEVELS[level])
             self.logger[component_name] = my_logger
