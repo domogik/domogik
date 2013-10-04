@@ -195,7 +195,10 @@ class deviceAPI(MethodView):
             b = urlHandler.db.get_device(did)
         else:
             b = urlHandler.db.list_devices()
-        return 200, b
+        if b == None:
+            return 404, b
+        else:
+            return 200, b
 
     def delete(self, did):
         b = urlHandler.db.del_device(did)

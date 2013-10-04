@@ -376,6 +376,8 @@ class DbHelper():
 
         """
         device = self.__session.query(Device).filter_by(id=d_id).first()
+        if device == None:
+            return None
 
         # fill basic informations about the device
         json_device = { 'id' : device.id, 
