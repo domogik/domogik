@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 from migrate import *
-from domogik.common.sql_schema import Scenario
+from domogik.common.sql_schema import Scenario, ScenarioUUID
 from domogik.common import database_utils
 
 def upgrade(migrate_engine):
@@ -12,6 +12,9 @@ def upgrade(migrate_engine):
     if not database_utils.table_exists(migrate_engine, Scenario.__tablename__):
         table = Scenario.__table__
         table.create(bind=migrate_engine)
+    if not database_utils.table_exists(migrate_engine, ScenarioUUID.__tablename__):
+        table = ScenarioUUID.__table__
+        table.create(bind=migrate_engine)
  
 def downgrade(migrate_engine):
     # bind the engine
@@ -19,4 +22,6 @@ def downgrade(migrate_engine):
 
     # drop the page table
     table = Scenario.__table__
+    table.drop()
+    table = ScenarioUUID.__table__
     table.drop()
