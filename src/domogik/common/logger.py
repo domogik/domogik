@@ -41,7 +41,6 @@ Implements
 import logging
 import sys
 from domogik.common.configloader import Loader
-import sys, traceback
 
 class Logger():
     '''
@@ -59,10 +58,6 @@ class Logger():
         @param domogik_prefix : if logger name should be prefixed by 'domogik-'
         @param use_filename : if set tells the logger to use this file name (otherwise takes 'component_name')
         '''
-        print '-'*60
-        traceback.print_exc(file=sys.stdout)
-        traceback.print_stack()
-        print '-'*60
         if component_name not in self.logger:
             LEVELS = {
                         'debug': logging.DEBUG,
