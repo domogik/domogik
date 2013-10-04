@@ -82,6 +82,7 @@ class AbstractCondition:
         @param log : A logger instance
         @param condition : A JSON expression
         @param mapping : a dictionnary of uuid => test instances
+        @param on_true : what trigger to call if the condition evaluates to true
         """
         self._log = log
         self._name = name
