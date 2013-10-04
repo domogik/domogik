@@ -69,7 +69,7 @@ class AccountAPI(MethodView):
     def delete(self, aid):
         """ DELETE /account/<aid> """
         dbr = urlHandler.db.del_user_account(aid)
-        return 204, dbr
+        return 200, dbr
 
     def post(self):
         """ POST /account/ """
