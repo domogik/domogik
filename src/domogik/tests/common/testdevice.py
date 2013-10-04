@@ -119,10 +119,22 @@ class TestDevice():
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
 
+    def del_device(self, id):
+        """ Call DELETE /device/... to delete a device
+            @param id : device id
+        """
+        print("Delete the device : id = {0}".format(id))
+        response = requests.delete("{0}/device/{1}".format(self.rest_url, id), \
+                                 headers={'content-type':'application/x-www-form-urlencoded'})
+        print("Response : [{0}] {1}".format(response.status_code, response.text))
+        if response.status_code != 200:
+            raise RuntimeError("Error when configuring the device global parameters")
 
-#if __name__ == "__main__":
-#
-#    td = TestDevice()
-#    td.create_device("plugin", "diskfree", get_sanitized_hostname(), "test_device_diskfree", "diskfree.disk_usage")
-#    td.configure_global_parameters({"device" : "/home", "interval" : 1})
+
+if __name__ == "__main__":
+
+    td = TestDevice()
+    td.create_device("plugin", "diskfree", get_sanitized_hostname(), "test_device_diskfree", "diskfree.disk_usage")
+    td.configure_global_parameters({"device" : "/home", "interval" : 1})
+    td.del_device(td.device_id)
 
