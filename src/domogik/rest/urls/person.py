@@ -14,7 +14,7 @@ class personAPI(MethodView):
 
     def delete(self, id):
         b = urlHandler.db.del_person(id)
-        return 204, b
+        return 200, b
 
     def post(self):
         b = urlHandler.db.add_person(

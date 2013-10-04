@@ -200,7 +200,7 @@ class deviceAPI(MethodView):
     def delete(self, did):
         b = urlHandler.db.del_device(did)
         urlHandler.reload_stats()        
-        return 204, b
+        return 200, b
 
     def post(self):
         """ Create a new device
