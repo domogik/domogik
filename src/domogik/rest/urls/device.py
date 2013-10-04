@@ -228,8 +228,11 @@ class deviceAPI(MethodView):
         # get the corresponding json
         all_clients_data = res.get_data()
 
-        # extract the inresting part of the json (just the client part)
-        client_data = all_clients_data[client_id]['data']
+        # extract the interesting part of the json (just the client part)
+        if all_clients_data.has_key(client_id):
+            client_data = all_clients_data[client_id]['data']
+        else:
+            return 500, "Error : there is no client id named '{0}'".format(client_id)
 
         # create the device in database
         # notice that we don't give any address for the device as this will be done with another url later

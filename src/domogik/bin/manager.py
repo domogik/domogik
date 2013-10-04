@@ -254,7 +254,7 @@ class Manager(XplPlugin):
                                                self.get_libraries_directory(),
                                                self.get_packages_directory(),
                                                self.zmq,
-                                               self.get_stop,
+                                               self.get_stop(),
                                                self.get_sanitized_hostname())
                     # The automatic startup is handled in the Plugin class in __init__
             

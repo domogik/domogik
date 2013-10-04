@@ -124,7 +124,7 @@ class XplPlugin(BasePlugin, MQRep):
         if self._name in CORE_COMPONENTS:
             self._mq_name = self._name
         else:
-            self._mq_name = "plugin-{0}-{1}".format(self._name, self.get_sanitized_hostname())
+            self._mq_name = "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname())
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
