@@ -279,7 +279,7 @@ class Command(Base):
     __tablename__ = '%s_command' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"))
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean)
