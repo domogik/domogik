@@ -57,7 +57,7 @@ src = """{ "NOT" : { "%s" : {
             "interval" : "5"
         },
         "text": {
-            "text": "Domogik"
+            "text": "Domogik2"
         }
     }
 }}""" % uid._data['payload']

@@ -77,16 +77,18 @@ class AbstractCondition:
         * RINOR create a new Condition with the JSON and the list of uuids/tests, which are parsed by the condition itself
     """
 
-    def __init__(self, log, condition=None, mapping=None):
+    def __init__(self, log, name=None, condition=None, mapping=None, on_true=None):
         """ Create the instance
         @param log : A logger instance
         @param condition : A JSON expression
         @param mapping : a dictionnary of uuid => test instances
         """
         self._log = log
+        self._name = name
         self._condition = condition
         self._mapping = mapping
         self._parsed_condition = None
+        self._on_true = on_true
 
     def set_condition(self, condition):
         """ Set the condition to  some JSON expression
@@ -151,4 +153,9 @@ class AbstractCondition:
         if self._parsed_condition is None:
             raise ValueError("No parsed condition")
         self._log.debug("_parsed condition is : %s, eval is %s" % (self._parsed_condition, eval(self._parsed_condition)))
-        return eval(self._parsed_condition)
+        if eval(self._parsed_condition):
+            # call the callback
+            self._on_true(self._name)
+            return True
+        else:
+            return False

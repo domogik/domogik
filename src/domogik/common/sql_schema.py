@@ -530,17 +530,19 @@ class ScenarioUUID(Base):
     scenario_id = Column(Integer, ForeignKey('%s.id' % Scenario.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False)
     uuid = Column(Unicode(128), nullable=False, autoincrement=False)
     key = Column(UnicodeText(), nullable=False)
+    is_test = Column(Boolean, nullable=False, default=False)
     UniqueConstraint('uuid', name='uuid')
 
-    def __init__(self, s_id, uuid, key):
+    def __init__(self, s_id, uuid, key, is_test):
         self.scenario_id = s_id
         self.uuid = ucode(uuid)
         self.key = ucode(key)
+        self.is_test = is_test
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<ScenarioUUID(id=%s scenario_id=%s name='%s' json='%s')>"\
-               % (self.id, self.scenario_id, self.uuid, self.key)
+        return "<ScenarioUUID(id=%s scenario_id=%s name='%s' json='%s' is_test=%s)>"\
+               % (self.id, self.scenario_id, self.uuid, self.key, self.is_test)
 
     @staticmethod
     def get_tablename():

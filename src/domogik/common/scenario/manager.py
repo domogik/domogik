@@ -42,6 +42,7 @@ import domogik.common.scenario.tests as s_t
 import domogik.common.scenario.parameters as s_p
 import domogik.common.scenario.conditions as s_c
 import domogik.common.scenario.actions as s_a
+from domogik.common.database import DbHelper
 from domogik.common.scenario.conditions.condition import Condition
 from exceptions import KeyError
 
@@ -71,19 +72,49 @@ class ScenarioManager:
         self._conditions = {}
         # Keep list of actions uuid linked to a condition  as name : [uuid1, uuid2, ... ]
         self._conditions_actions = {}
+        # Keep list of tests uuid linked to a condition  as name : [uuid1, uuid2, ... ]
+        self._conditions_tests = {}
+        # an instance of the logger
         self.log = log
         # As we lazy-load all the tests/actions in __instanciate
         # we need to keep the module in a list so that we don't need to reload them
         # every time.
         self._test_cache = {}
         self._action_cache = {}
+        # load all scenarios from the DB
+        self._db = DbHelper()
+        self.load_scenarios()
 
-    def __ask_instance(self, obj, mapping):
+    def load_scenarios(self):
+        """ Loads all scenarios from the db
+        for each scenario call the create_scenario method
+        """
+        with self._db.session_scope():
+            for scenario in self._db.list_scenario():
+                # parse the json
+                sjson = json.loads(scenario.json)
+                # add all uuids to the mappings
+                for uuid in scenario.uuids:
+                    if uuid.is_test:
+                        self.__ask_instance(uuid.key, self._tests_mapping, uuid.uuid)
+                    else:
+                        self.__ask_instance(uuid.key, self._actions_mapping, uuid.uuid)
+                # now all uuids are created go and install the condition
+                self.create_condition(scenario.name, sjson['condition'])
+                # create the actions
+                self.create_action(scenario.name, sjson['action'])
+
+    def __ask_instance(self, obj, mapping, set_uuid=None):
         """ Generate an uuid corresponding to the object passed as parameter
         @param obj : a string as "objectmodule.objectClass" to instanciate
+        @param mapping : in what map to store the new uuid
+        @param uuid : if the uuid is provided, don't generate it
         @return an uuid referencing a new instance of the object
         """
-        _uuid = self.get_uuid()
+        if set_uuid is None:
+            _uuid = self.get_uuid()
+        else:
+            _uuid = uuid
         mapping[_uuid] = obj
         return _uuid
 
@@ -104,6 +135,7 @@ class ScenarioManager:
     def __instanciate(self):
         """ This method will read the list of uuids, and create coresponding
         instances if they don't exist yet.
+        If they don't exist yet the type of the instans is str or unicode
         """
         for _uuid in self._tests_mapping:
             inst = self._tests_mapping[_uuid]
@@ -168,8 +200,14 @@ class ScenarioManager:
 
     def get_uuid(self):
         """ Return some random uuid
+        Needs to verify that the uuid is not already used
+        Does this in the mappings (for actions and tests)
         """
-        return str(uuid.uuid4())
+        _uuid = str(uuid.uuid4())
+        while _uuid in self._tests_mapping.keys() \
+                or uuid in self._actions_mapping.keys():
+            _uuid = str(uuid.uuid4())
+        return _uuid
 
     def create_condition(self, name, json_input):
         """ Create a Condition instance from the provided json.
@@ -185,7 +223,7 @@ class ScenarioManager:
             return None
         try:
             self.__instanciate()
-            c = Condition(self.log, json_input, self._tests_mapping)
+            c = Condition(self.log, name, json_input, self._tests_mapping, self.trigger_actions)
             self._conditions[name] = c
             self.log.debug("Create condition %s with payload %s" % (name, payload))
             return {'name': name}
@@ -203,6 +241,21 @@ class ScenarioManager:
         else:
             res = self._conditions[name].eval_condition()
             return {'name': name, 'result': res}
+
+    def trigger_actions(self, name):
+        """ Trigger that will be called when a condition evaluates to True
+        """
+        self.log.debug("================")
+        if name not in self._conditions_actions \
+                or name not in self._conditions \
+                or name not in self._conditions_tests:
+            raise KeyError('no key %s in one of the _conditions tables table' % name)
+        else:
+            for action in self._conditions_actions[name]:
+                action.do_action( \
+                        self._conditions[name], \
+                        self.conditions_tests[name] \
+                        )
 
     def list_actions(self):
         """ Return the list of actions

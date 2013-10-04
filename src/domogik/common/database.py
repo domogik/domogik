@@ -1745,10 +1745,10 @@ class DbHelper():
     def get_scenario_uuid(self, u_id):
         return self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
 
-    def add_scenario_uuid(self, s_id, uuid, key):
+    def add_scenario_uuid(self, s_id, uuid, key, is_test):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
-        scenariouuid = ScenarioUUID(s_id=s_id, uuid=uuid, key=key)
+        scenariouuid = ScenarioUUID(s_id=s_id, uuid=uuid, key=key, is_test=is_test)
         self.__session.add(scenariouuid)
         try:
             self.__session.commit()
@@ -1756,7 +1756,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return scenariouuid
 
-    def update_scenario_uuid(self, u_id, uuid=None, key=None):
+    def update_scenario_uuid(self, u_id, uuid=None, key=None, is_test=None):
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
         scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
@@ -1766,6 +1766,8 @@ class DbHelper():
             scenariouuid.uuid = ucode(uuid)
         if key is not None:
             scenariouuid.key = ucode(key)
+        if is_test is not None:
+            scenariouuid.is_test = is_test
         self.__session.add(scenariouuid)
         try:
             self.__session.commit()
