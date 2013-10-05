@@ -385,7 +385,7 @@ class DbHelper():
                         'reference' : device.reference, 
                         'description' : device.description, 
                         'device_type_id' : device.device_type_id, 
-                        'plugin_id' : device.plugin_id
+                        'client_id' : device.plugin_id
                       }
 
         # complete with sensors informations
