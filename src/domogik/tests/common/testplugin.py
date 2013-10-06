@@ -54,6 +54,7 @@ class TestPlugin(MQAsyncSub):
         self.name = name
         self.host = host
         self.type = "plugin"
+        self.plugin_status = None
         MQAsyncSub.__init__(self, zmq.Context(), 'test', ['plugin.status'])
 
     def request_startup(self):

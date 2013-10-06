@@ -159,5 +159,5 @@ if __name__ == "__main__":
     td.configure_global_parameters({"device" : "/home", "interval" : 1})
     #td.del_device(td.device_id)
     #td.del_devices_by_client("foo")
-    td.del_devices_by_client("domogik-diskfree.darkstar")
+    td.del_devices_by_client("plugin-diskfree.darkstar")
 
