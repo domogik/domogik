@@ -224,8 +224,8 @@ class deviceAPI(MethodView):
 
         # create the full client id : 
         if request.form.get('type') == "plugin":
-            client_id = "{0}-{1}.{2}".format(DMG_VENDOR_ID, request.form.get('id'), request.form.get('host'))
-        else:
+        #    client_id = "{0}-{1}.{2}".format(DMG_VENDOR_ID, request.form.get('id'), request.form.get('host'))
+        #else:
             client_id = "{0}-{1}.{2}".format(request.form.get('type'), request.form.get('id'), request.form.get('host'))
 
         # get the corresponding json

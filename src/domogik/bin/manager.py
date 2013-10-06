@@ -565,6 +565,7 @@ class GenericComponent():
         self.name = name
         self.host = host
         self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.name, self.host)
+        self.client_id = "{0}-{1}.{2}".format("plugin", self.name, self.host)
         self.type = "unknown - not setted yet"
         self.configured = None
         self._clients = clients
@@ -577,21 +578,21 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.host, self.type, self.name, self.xpl_source, self.data, self.configured)
+        self._clients.add(self.host, self.type, self.name, self.client_id, self.data, self.configured)
 
 
     def set_status(self, new_status):
         """ set the status of the component
             @param status : new status
         """
-        self._clients.set_status(self.xpl_source, new_status)
+        self._clients.set_status(self.client_id, new_status)
 
 
     def set_pid(self, pid):
         """ set the pid of the component (for those with a pid)
             @param status : new status
         """
-        self._clients.set_pid(self.xpl_source, pid)
+        self._clients.set_pid(self.client_id, pid)
 
 
 
@@ -919,9 +920,9 @@ class Plugin(GenericComponent, MQAsyncSub):
 
 class Clients():
     """ The clients list
-          xpl_source : for a domogik plugin : domogik-<name>.<hostname>
-                       for an external member : <vendor id>-<device id>.<instance>
-        { xplsource = { 
+          client_id : for a domogik plugin : plugin-<name>.<hostname>
+                      for an external member : <vendor id>-<device id>.<instance>
+        { client_id = { 
                         host : hostname or ip
                         type : plugin, ...
                         name : package name (onewire, ipx800, ...)
@@ -937,8 +938,8 @@ class Clients():
 
         The data part is related to the type
 
-        WARNING : the 'primary key' is the xpl_source as you may have several clients with the same {type,name}
-        So, all updates will be done on a xpl_source
+        WARNING : the 'primary key' is the client_id as you may have several clients with the same {type,name}
+        So, all updates will be done on a client_id
     """
 
     def __init__(self):
@@ -954,17 +955,17 @@ class Clients():
         self.log.info("Clients initialisation")
         self._pub = MQPub(zmq.Context(), 'manager')
 
-    def add(self, host, type, name, xpl_source, data, configured = None):
+    def add(self, host, type, name, client_id, data, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
             @param type : client type
             @param name : client name
-            @param xpl_source : client xpl source
+            @param client_id : client id
             @param data : client data : only for clients details
             @param configured : True/False : for a plugin : True if the plugin is configured, else False
                                 None : for type != 'plugin'
         """
-        self.log.info("Add new client : host={0}, type={1}, name={2}, xpl_source={3}, data={4}".format(host, type, name, xpl_source, str(data)))
+        self.log.info("Add new client : host={0}, type={1}, name={2}, client_id={3}, data={4}".format(host, type, name, client_id, str(data)))
         client = { "host" : host,
                    "type" : type,
                    "name" : name,
@@ -980,33 +981,33 @@ class Clients():
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured,
                    "data" : data}
-        self._clients[xpl_source] = client
-        self._clients_with_details[xpl_source] = client_with_details
+        self._clients[client_id] = client
+        self._clients_with_details[client_id] = client_with_details
         self.publish_update()
 
-    def set_status(self, xpl_source, new_status):
+    def set_status(self, client_id, new_status):
         """ Set a new status to a client
         """
-        self.log.debug("Try to set a new status : {0} => {1}".format(xpl_source, new_status))
+        self.log.debug("Try to set a new status : {0} => {1}".format(client_id, new_status))
         if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED):
             self.log.error("Invalid status : {0}".format(new_status))
             return
-        old_status = self._clients[xpl_source]['status']
+        old_status = self._clients[client_id]['status']
         if old_status == new_status:
             self.log.debug("The status was already {0} : nothing to do".format(old_status))
             return
-        self._clients[xpl_source]['status'] = new_status
-        self._clients_with_details[xpl_source]['status'] = new_status
-        self.log.info("Status set : {0} => {1}".format(xpl_source, new_status))
+        self._clients[client_id]['status'] = new_status
+        self._clients_with_details[client_id]['status'] = new_status
+        self.log.info("Status set : {0} => {1}".format(client_id, new_status))
         self.publish_update()
 
-    def set_pid(self, xpl_source, pid):
+    def set_pid(self, client_id, pid):
         """ Set a pid to a client
         """
-        self.log.debug("Try to set the pid : {0} => {1}".format(xpl_source, pid))
-        self._clients[xpl_source]['pid'] = pid
-        self._clients_with_details[xpl_source]['pid'] = pid
-        self.log.info("Pid set : {0} => {1}".format(xpl_source, pid))
+        self.log.debug("Try to set the pid : {0} => {1}".format(client_id, pid))
+        self._clients[client_id]['pid'] = pid
+        self._clients_with_details[client_id]['pid'] = pid
+        self.log.info("Pid set : {0} => {1}".format(client_id, pid))
         self.publish_update()
 
     def get_list(self):
