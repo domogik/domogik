@@ -338,34 +338,8 @@ def install():
 
         # upgrade db
         if not args.db:
-            # set the uid this process runs with
-            user_entry = pwd.getpwnam(user)
-            os.setregid(0, user_entry.pw_gid)
-            os.setreuid(0, user_entry.pw_uid)
-            tmp_egg_path = '/tmp/domogik-egg/'
-            try:
-                os.makedirs(tmp_egg_path)
-            except OSError as exc: # Python >2.5
-                if exc.errno == errno.EEXIST and os.path.isdir(tmp_egg_path):
-                    pass
-                else: 
-                    raise
-            try:
-                os.system("export PYTHON_EGG_CACHE={0} && python src/domogik/install/installer.py".format(tmp_egg_path))
-            except:
-               fail(traceback.format_exc())
-               try:
-                   shutil.rmtree(tmp_egg_path)
-               except:
-                   raise
+            os.system('python src/domogik/install/db_install.py')
 
-            try:
-                shutil.rmtree(tmp_egg_path)
-            except:
-                raise
-            # restore root uid
-            os.setregid(0, 0)
-            os.setreuid(0, 0)
         if not args.test:
             # TODO : replace python call by the dynamic python command
             os.system('python test_config.py')

@@ -110,19 +110,19 @@ class Device(Base):
     reference = Column(Unicode(30))
     address = Column(Unicode(255), nullable=True)
     device_type_id = Column(Unicode(80), nullable=False, index=True)
-    plugin_id = Column(Unicode(80), nullable=False)
+    client_id = Column(Unicode(80), nullable=False)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
-    def __init__(self, name, reference, device_type_id, plugin_id, description=None):
+    def __init__(self, name, reference, device_type_id, client_id, description=None):
         """Class constructor
 
         @param name : short name of the device
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
-        @param plugin_id : what plugin controls this device
+        @param client_id : what plugin controls this device
         @param device_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param description : extended description, optional
 
@@ -130,14 +130,14 @@ class Device(Base):
         self.name = ucode(name)
         self.reference = ucode(reference)
         self.device_type_id = ucode(device_type_id)
-        self.plugin_id = ucode(plugin_id)
+        self.client_id = ucode(client_id)
         self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', plugin='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type_id, self.plugin_id, self.commands, \
+                  self.device_type_id, self.client_id, self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod
