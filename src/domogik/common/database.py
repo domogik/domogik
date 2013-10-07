@@ -356,9 +356,9 @@ class DbHelper():
         return device_list
 
     def list_devices_by_plugin(self, p_id):
-        #return self.__session.query(Device).filter_by(plugin_id=p_id).all()
+        #return self.__session.query(Device).filter_by(client_id=p_id).all()
         device_list = []
-        for device in self.__session.query(Device).filter_by(plugin_id=p_id).all():
+        for device in self.__session.query(Device).filter_by(client_id=p_id).all():
             device_list.append(self.get_device(device.id))
         return device_list
 
@@ -385,7 +385,7 @@ class DbHelper():
                         'reference' : device.reference, 
                         'description' : device.description, 
                         'device_type_id' : device.device_type_id, 
-                        'client_id' : device.plugin_id
+                        'client_id' : device.client_id
                       }
 
         # complete with sensors informations
@@ -533,7 +533,7 @@ class DbHelper():
 
         ### Add the device itself
         self.log.debug("Device creation : inserting data in core_device...")
-        device = Device(name=name, device_type_id=device_type, plugin_id=client_id, description=description, reference=reference)
+        device = Device(name=name, device_type_id=device_type, client_id=client_id, description=description, reference=reference)
         self.__session.add(device)
         self.__session.flush()
 
@@ -627,11 +627,11 @@ class DbHelper():
 
 
 
-    def OLD_add_device_and_commands(self, name, type_id, plugin_id, description, reference, pjson):
+    def OLD_add_device_and_commands(self, name, type_id, client_id, description, reference, pjson):
         # first add the device itself
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
-        dev = Device(name=name, device_type_id=type_id, plugin_id=plugin_id, description=description, reference=reference)
+        dev = Device(name=name, device_type_id=type_id, client_id=client_id, description=description, reference=reference)
         self.__session.add(dev)
         self.__session.flush()
         # hanle all the commands for this device_type
@@ -758,12 +758,12 @@ class DbHelper():
         d = self.get_device(dev.id)
         return d
 
-    def add_device(self, d_name, d_type_id, d_plugin_id, d_description=None, d_reference=None):
+    def add_device(self, d_name, d_type_id, d_client_id, d_description=None, d_reference=None):
         """Add a device item
 
         @param d_name : name of the device
         @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
-        @param d_plugin_id : the plugin that controls this device
+        @param d_client_id : the plugin that controls this device
         @param d_description : extended device description, optional
         @param d_reference : device reference (ex. AM12 for x10), optional
         @return the new Device object
@@ -773,7 +773,7 @@ class DbHelper():
         self.__session.expire_all()
         #self.__session.begin(subtransactions=True)
         device = Device(name=d_name, description=d_description, reference=d_reference, \
-                        device_type_id=d_type_id, plugin_id=d_plugin_id)
+                        device_type_id=d_type_id, client_id=d_client_id)
         self.__session.add(device)
         try:
             self.__session.commit()

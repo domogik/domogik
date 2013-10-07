@@ -46,7 +46,7 @@ def api_command(cid):
             # chieck if we need a conversion
             if p.conversion is not None and p.conversion != '':
                 value = call_package_conversion(\
-                            urlHandler.logger, dev['plugin_id'], \
+                            urlHandler.logger, dev['client_id'], \
                             p.conversion, value)
             msg.add_data({p.key : value})
         else:

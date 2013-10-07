@@ -30,7 +30,7 @@ In the RESTClient interface  > menu 'Headers' > 'Custom Header'
 Next, back on the RESTClient main interface:
 
 * **method**: 'POST', **url**: 'http://xxxxx:40405/device/'
-* **body** : plugin_id=plugin-diskfree&description=&name=A&reference=B&type_id=diskfree.disk_usage
+* **body** : client_id=plugin-diskfree&description=&name=A&reference=B&type_id=diskfree.disk_usage
  
 And Click 'Send'
 
