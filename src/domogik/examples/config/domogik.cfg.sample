@@ -62,12 +62,15 @@ prefix = core
 # with xpl network.
 # REST is a HTTP server. Following parameters will indicate REST on which 
 # ip:port it will run
-server_ip = 127.0.0.1
-server_port = 40405
+#interfaces = eth0, lo
+#interfaces = eth0
+interfaces = lo
+port = 40405
 # set to True if you want to use rest with ssl (https://....)
 use_ssl = False
-# if rest_use_ssl = True, set here path for ssl certificate of rest server
-ssl_certificate=
+# if rest_use_ssl = True, set here path for ssl certificate/key
+ssl_certificate =
+ssl_key =
 
 ###
 # Messaging section

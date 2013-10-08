@@ -41,6 +41,7 @@ from domogik.rest.url import urlHandler
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_ip_for_interfaces
 import locale
 from Queue import Queue, Empty, Full
 import tempfile
@@ -70,10 +71,10 @@ class Rest(XplPlugin):
     """
         
 
-    def __init__(self, server_ip, server_port):
+    def __init__(self, server_interfaces, server_port):
         """ Initiate DbHelper, Logs and config
             Then, start HTTP server and give it initialized data
-            @param server_ip :  ip of HTTP server
+            @param server_interfaces :  interfaces of HTTP server
             @param server_port :  port of HTTP server
         """
 
@@ -105,13 +106,21 @@ class Rest(XplPlugin):
                 cfg_rest = Loader('rest')
                 config_rest = cfg_rest.load()
                 conf_rest = dict(config_rest[1])
-                self.server_ip = conf_rest['server_ip']
-                self.server_port = conf_rest['server_port']
+                self.interfaces = conf_rest['interfaces']
+                self.port = conf_rest['port']
+                use_ssl = False
+                # if rest_use_ssl = True, set here path for ssl certificate/key
+                self.use_ssl = conf_rest['use_ssl']
+                self.key_file = conf_rest['ssl_certificate']
+                self.cert_file = conf_rest['ssl_key']
             except KeyError:
                 # default parameters
-                self.server_ip = server_ip
-                self.server_port = server_port
-            self.log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
+                self.interfaces = server_interfaces
+                self.port = server_port
+		self.use_ssl = False
+		self.key_file = ""
+		self.cert_file = ""
+            self.log.info("Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
     
             # SSL configuration
             try:
@@ -159,7 +168,7 @@ class Rest(XplPlugin):
     def start_http(self):
         """ Start HTTP Server
         """
-        self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
+        self.log.info("Start HTTP Server on %s:%s..." % (self.interfaces, self.port))
         # logger
         for log in self.log.handlers:
             urlHandler.logger.addHandler(log)
@@ -177,13 +186,24 @@ class Rest(XplPlugin):
         # handler for getting the paths
         urlHandler.resources_directory = self.get_resources_directory()
         
-        self.http_server = HTTPServer(WSGIContainer(urlHandler))
+	# create the server
         # for ssl, extra parameter to HTTPServier init
-        #ssl_options={
-             #"certfile": os.path.join(data_dir, "mydomain.crt"),
-             #"keyfile": os.path.join(data_dir, "mydomain.key"),
-        #}) 
-        self.http_server.listen(int(self.server_port), address=self.server_ip)
+        if self.use_ssl:
+            ssl_options = {
+                 "certfile": self.cert_file,
+                 "keyfile": self.key_file,
+            }
+	    self.http_server = HTTPServer(WSGIContainer(urlHandler), ssl_options=ssl_options)
+        else:
+            self.http_server = HTTPServer(WSGIContainer(urlHandler))
+	# listen on the interfaces
+	if self.interfaces != "":
+	    intf = self.interfaces.split(',')
+	    for ip in get_ip_for_interfaces(intf):
+	        self.http_server.listen(int(self.port), address=ip)
+        else:
+            self.http_server.bind(int(self.port))
+            self.http_server.start(1)
         return
 
     def stop_http(self):
@@ -227,5 +247,5 @@ class Rest(XplPlugin):
 
 if __name__ == '__main__':
     # Create REST server with default values (overriden by ~/.domogik/domogik.cfg)
-    REST = Rest("127.0.0.1", "8080")
+    REST = Rest('lo', '4045')
 
