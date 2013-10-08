@@ -38,9 +38,35 @@ from socket import gethostname
 from subprocess import Popen, PIPE
 import os
 import sys
+from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
+
+def get_interfaces():
+    return interfaces()
+
+def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
+    """ Returns all ips that are available for the interfaces in the list
+    @param interface_list: a list of interfaces to ge the ips for,
+        if the list is empty it will retrun all ips for this system
+    @param ip_type: what ip type to get, can be
+        AF_INET: for ipv4
+        AF_INET6: for ipv6
+    @return: a list of ips
+    """
+    if type(interface_list) is not list:
+        assert "The interface_list should be a list"
+    if len(interface_list) == 0:
+        interface_list = interfaces()
+    ips = []
+    for intf in interface_list:
+        if intf in interfaces():
+            for addr in ifaddresses(intf)[ip_type]:
+                ips.append(addr['addr'])
+        else:
+            assert "Interface {0} does not exist".format(intf)
+    return ips
 
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
