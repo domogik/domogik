@@ -109,20 +109,20 @@ class Device(Base):
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
     address = Column(Unicode(255), nullable=True)
-    device_type_id = Column(Unicode(80), nullable=False)
-    plugin_id = Column(Unicode(80), nullable=False)
+    device_type_id = Column(Unicode(80), nullable=False, index=True)
+    client_id = Column(Unicode(80), nullable=False)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
-    def __init__(self, name, reference, device_type_id, plugin_id, description=None):
+    def __init__(self, name, reference, device_type_id, client_id, description=None):
         """Class constructor
 
         @param name : short name of the device
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
-        @param plugin_id : what plugin controls this device
+        @param client_id : what plugin controls this device
         @param device_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param description : extended description, optional
 
@@ -130,14 +130,14 @@ class Device(Base):
         self.name = ucode(name)
         self.reference = ucode(reference)
         self.device_type_id = ucode(device_type_id)
-        self.plugin_id = ucode(plugin_id)
+        self.client_id = ucode(client_id)
         self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', plugin='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type_id, self.plugin_id, self.commands, \
+                  self.device_type_id, self.client_id, self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod
@@ -240,7 +240,7 @@ class UserAccount(Base):
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
     __password = Column("password", Unicode(255), nullable=False)
-    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename(), ondelete="cascade"))
+    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False)
@@ -279,10 +279,10 @@ class Command(Base):
     __tablename__ = '%s_command' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"))
-    name = Column(Unicode(255))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
-    return_confirmation = Column(Boolean)
+    return_confirmation = Column(Boolean, nullable=False)
     xpl_command = relation("XplCommand", backref=__tablename__, cascade="all", uselist=False)
     params = relationship("CommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
@@ -305,7 +305,7 @@ class Command(Base):
 class CommandParam(Base):
     __tablename__ = '%s_command_param' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
@@ -331,7 +331,7 @@ class Sensor(Base):
     __tablename__ = '%s_sensor' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), index=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     data_type = Column(Unicode(32), nullable=False)
@@ -391,10 +391,10 @@ class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"))
-    json_id = Column(Unicode(64))
-    name = Column(Unicode(64))
-    schema = Column(Unicode(32))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    json_id = Column(Unicode(64), nullable=False)
+    name = Column(Unicode(64), nullable=False)
+    schema = Column(Unicode(32), nullable=False)
     params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True)
     
     def __init__(self, device_id, name, schema, json_id):
@@ -417,10 +417,10 @@ class XplStat(Base):
 class XplStatParam(Base):
     __tablename__ = '%s_xplstat_param' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
-    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
-    value = Column(Unicode(255))
-    static = Column(Boolean)
+    value = Column(Unicode(255), nullable=True)
+    static = Column(Boolean, nullable=True)
     sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=True) 
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
@@ -450,11 +450,11 @@ class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"))
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"))
-    json_id = Column(Unicode(64))
-    name = Column(Unicode(64))
-    schema = Column(Unicode(32))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), nullable=False)
+    json_id = Column(Unicode(64), nullable=False)
+    name = Column(Unicode(64), nullable=False)
+    schema = Column(Unicode(32), nullable=False)
     stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), nullable=True)
     stat = relation("XplStat", backref=__tablename__, cascade="all")
     params = relationship("XplCommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
@@ -468,8 +468,8 @@ class XplCommand(Base):
         self.json_id = json_id
     
     def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat_id=%s params=%s)>"\
+       """Return an internal representation of the class"""
+       return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat_id=%s params=%s)>"\
                % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat_id, self.params)
 
     @staticmethod
@@ -481,7 +481,7 @@ class XplCommand(Base):
 class XplCommandParam(Base):
     __tablename__ = '%s_xplcommand_param' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
-    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement='ignore_fk') 
+    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')

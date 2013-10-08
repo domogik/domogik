@@ -357,8 +357,8 @@ class DBConnector(XplPlugin, MQRep):
         else:
             reason = ""
             type = msg_data['type']
-            if type == "plugin":
-                type = DMG_VENDOR_ID
+            #if type == "plugin":
+            #    type = DMG_VENDOR_ID
             name = msg_data['name']
             host = msg_data['host']
             dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))

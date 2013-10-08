@@ -54,6 +54,7 @@ class TestPlugin(MQAsyncSub):
         self.name = name
         self.host = host
         self.type = "plugin"
+        self.plugin_status = None
         MQAsyncSub.__init__(self, zmq.Context(), 'test', ['plugin.status'])
 
     def request_startup(self):
@@ -116,7 +117,7 @@ class TestPlugin(MQAsyncSub):
         if self.plugin_status == event:
             return True
         else:
-            print("Plugin not in status '{0}' : status = {1}".format(self.plugin_status))
+            print("Plugin not in status '{0}' : status = {1}".format(event, self.plugin_status))
             return False
 
     def on_message(self, msgid, content):

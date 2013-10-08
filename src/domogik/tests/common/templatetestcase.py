@@ -74,6 +74,8 @@ class TemplateTestCase(unittest.TestCase):
                             self.myxpl, 
                             criteria)
 
+        # we add 5% to the timeout as some operations may be done in the plugin and so the interval is not totally exact
+        timeout = timeout*1.05 
         self._xpl_received.wait(timeout)
         if not self._xpl_received.is_set():
             raise RuntimeError("No xPL message received")
@@ -90,7 +92,22 @@ class TemplateTestCase(unittest.TestCase):
         self.xpl_data = message
     
 
+    ### time tools
 
+    def is_interval_of(self, interval, delta_to_check):
+        """ Check if the delta_to_check corresponds to the interval (5% margin)
+            @param interval : in seconds
+            @param delta_to_check : interval required (difference of 2 datatime.now()
+        """
+        delta_seconds = delta_to_check.total_seconds()
+        print("Compare the delta of {0} seconds to the required interval of {1} seconds".format(delta_seconds, interval))
+        diff = abs(delta_seconds - interval)
+        five_percent_of_interval = 0.05 * interval
+        if diff > five_percent_of_interval:
+            raise RuntimeError("There is a difference of {0} seconds between the required interval and the measured time. This is more than 5% of the required interval (5% = {1} seconds)".format(diff, five_percent_of_interval))
+        else:
+            print("There is a difference of {0} seconds between the required interval and the measured time. This is less than 5% of the required interval (5% = {1} seconds)".format(diff, five_percent_of_interval))
+            return True
 
 
 

@@ -195,7 +195,10 @@ class deviceAPI(MethodView):
             b = urlHandler.db.get_device(did)
         else:
             b = urlHandler.db.list_devices()
-        return 200, b
+        if b == None:
+            return 404, b
+        else:
+            return 200, b
 
     def delete(self, did):
         b = urlHandler.db.del_device(did)
@@ -221,8 +224,8 @@ class deviceAPI(MethodView):
 
         # create the full client id : 
         if request.form.get('type') == "plugin":
-            client_id = "{0}-{1}.{2}".format(DMG_VENDOR_ID, request.form.get('id'), request.form.get('host'))
-        else:
+        #    client_id = "{0}-{1}.{2}".format(DMG_VENDOR_ID, request.form.get('id'), request.form.get('host'))
+        #else:
             client_id = "{0}-{1}.{2}".format(request.form.get('type'), request.form.get('id'), request.form.get('host'))
 
         # get the corresponding json

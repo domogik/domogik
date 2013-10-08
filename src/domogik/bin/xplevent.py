@@ -175,7 +175,7 @@ class XplEvent(XplPlugin, MQRep):
                                 # check if we need a conversion
                                 if self._sen.conversion is not None and self._sen.conversion != '':
                                     value = call_package_conversion(\
-                                                self._log_stats, self._dev['plugin_id'], \
+                                                self._log_stats, self._dev['client_id'], \
                                                 self._sen.conversion, value)
                                     self._log_stats.debug("Key found %s with value %s after conversion." \
                                         % (p.key, value))

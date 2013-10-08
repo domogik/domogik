@@ -32,7 +32,7 @@ Example: ::
             "reference": "a reference",
             "sensors": {...},
             "device_type_id": "a.device.type",
-            "plugin_id": "domogik-aplugin.ahostname",
+            "client_id": "domogik-aplugin.ahostname",
             "id": 666,
             "name": "a name for the device"
         },
@@ -55,7 +55,7 @@ Example: ::
         "reference": "a reference",
         "sensors": {...},
         "device_type_id": "a.device.type",
-        "plugin_id": "domogik-aplugin.ahostname",
+        "client_id": "domogik-aplugin.ahostname",
         "id": 666,
         "name": "a name for the device"
     }
@@ -88,7 +88,7 @@ Example: ::
         "reference": "a reference",
         "sensors": {...},
         "device_type_id": "a.device.type",
-        "plugin_id": "domogik-aplugin.ahostname",
+        "client_id": "domogik-aplugin.ahostname",
         "id": 666,
         "name": "a name for the device"
     }
@@ -124,7 +124,7 @@ Example: ::
         "reference": "a reference",
         "sensors": {...},
         "device_type_id": "a.device.type",
-        "plugin_id": "domogik-aplugin.ahostname",
+        "client_id": "domogik-aplugin.ahostname",
         "id": 666,
         "name": "a name for the device"
     }
@@ -146,7 +146,7 @@ Example: ::
         "reference": "a reference",
         "sensors": {...},
         "device_type_id": "a.device.type",
-        "plugin_id": "domogik-aplugin.ahostname",
+        "client_id": "domogik-aplugin.ahostname",
         "id": 666,
         "name": "a name for the device"
     }

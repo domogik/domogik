@@ -130,11 +130,34 @@ class TestDevice():
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
 
+    def del_devices_by_client(self, client_id):
+        """ Call GET /device to get all devices
+            Then, call del_device for each device of the given client_id
+            @param client_id: the client id for which we want to delete all the devices
+        """
+        print("Delete all the devices for the client id '{0}'".format(client_id))
+        # first, retrieve all the devices
+        response = requests.get("{0}/device/".format(self.rest_url), \
+                                 headers={'content-type':'application/x-www-form-urlencoded'})
+        print("Response : [{0}] {1}... (truncated)".format(response.status_code, response.text[:50]))
+        if response.status_code != 200:
+            raise RuntimeError("Error when configuring the device global parameters")
+        devices = device = json.loads(response.text)
+        for device in devices:
+            print("Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
+            if device['client_id'] == client_id:
+                self.del_device(device['id'])
+        
+        
+
 
 if __name__ == "__main__":
 
     td = TestDevice()
-    td.create_device("plugin", "diskfree", get_sanitized_hostname(), "test_device_diskfree", "diskfree.disk_usage")
+    td.create_device("plugin", "diskfree", get_sanitized_hostname(), "avec un accent é comme ça", "diskfree.disk_usage")
+    #td.create_device("plugin", "diskfree", get_sanitized_hostname(), "test_device_diskfree", "diskfree.disk_usage")
     td.configure_global_parameters({"device" : "/home", "interval" : 1})
-    td.del_device(td.device_id)
+    #td.del_device(td.device_id)
+    #td.del_devices_by_client("foo")
+    td.del_devices_by_client("plugin-diskfree.darkstar")
 
