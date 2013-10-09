@@ -338,19 +338,28 @@ class Sensor(Base):
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
+    history_store = Column(Boolean, nullable=False)
+    history_max = Column(Integer, nullable=True)
+    history_expire = Column(Integer, nullable=True)
+    history_round = Column(Float, nullable=True)
     params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True) 
 
-    def __init__(self, device_id, name, reference, data_type, conversion):
+    def __init__(self, device_id, name, reference, data_type, conversion, h_store, h_max, h_expire, h_round):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
         self.data_type = ucode(data_type)
         self.conversion = ucode(conversion)
+        self.history_store = h_store
+        self.history_max = h_max
+        self.history_expire = h_expire
+        self.history_round = h_round
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' data_type='%s' conversion='%s')>"\
-               % (self.id, self.device_id, self.reference, self.name, self.data_type, self.conversion)
+        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s)>"\
+               % (self.id, self.device_id, self.reference, self.name, self.data_type, self.conversion, \
+                   self.history_store, self.history_max, self.history_expire, self.history_round)
 
     @staticmethod
     def get_tablename():

@@ -552,7 +552,12 @@ class DbHelper():
                             device_id  = device.id, \
                             reference = a_sensor, \
                             data_type = sensor_in_client_data['data_type'], \
-                            conversion = sensor_in_client_data['conversion'])
+                            conversion = sensor_in_client_data['conversion'], \
+                            h_store = sensor_in_client_data['history']['store'], \
+                            h_max = sensor_in_client_data['history']['max'], \
+                            h_expire = sensor_in_client_data['history']['expire'], \
+                            h_round = sensor_in_client_data['history']['round_value'], \
+                            )
             self.__session.add(sensor)
             self.__session.flush()
 
@@ -624,139 +629,6 @@ class DbHelper():
 
         ### Return the created device as json
         d = self.get_device(device.id)
-        return d
-
-
-
-    def OLD_add_device_and_commands(self, name, type_id, client_id, description, reference, pjson):
-        # first add the device itself
-        self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
-        dev = Device(name=name, device_type_id=type_id, client_id=client_id, description=description, reference=reference)
-        self.__session.add(dev)
-        self.__session.flush()
-        # hanle all the commands for this device_type
-        sensors = {}
-        addedxplstats = {}
-        #tmp = pack.find_xplstats_for_device_type(dt.id)
-
-        # create a list of all xpl_stats that have a parameter that point to a sensor that is devined in a  certain device type
-        # first, get the sensors associated to the device_type
-        device_type_sensors = client_data['device_types'][device_type]['sensors']
-       
-        # then, parse xpl_stats
-        tmp = {}
-        for the_sensor_id in pjson['xpl_stats']:
-            xpl_stat = pjson['xpl_stats'][the_sensor_id]
-            for param_id in xpl_stat['parameters']:
-                the_param = xpl_stat['parameters'][param_id]
-                if the_param.has_key("sensor"):
-                    the_sensor = param['sensor']
-                    # check if it is linked to the given device_type
-                    if the_sensor in device_type_sensors:
-                        tmp[the_sensor_id] = xpl_stat
-
-
-        for sensor_id in tmp:
-            sensor = pjson['sensors'][sensor_id]
-            sen = Sensor(name=sensor['name'], \
-                    device_id=dev.id, reference=sensor_id, \
-                    data_type=sensor['data_type'], conversion=sensor['conversion'])
-            self.__session.add(sen)
-            self.__session.flush()
-            sensors[sensor_id] = sen.id
-            for stat in tmp[sensor_id]:
-                xpl_stat_id = stat
-                xpl_stat = pjson['xpl_stats'][xpl_stat_id]
-                xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
-                self.__session.add(xplstat)
-                self.__session.flush()
-                addedxplstats[xpl_stat_id] = xplstat.id
-                # add static params
-                for p in xpl_stat['parameters']['static']:
-                    par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
-                                   key=p['key'], value=p['value'], static=True, ignore_values=None)           
-                    self.__session.add(par)
-                # add dynamic params
-                for p in xpl_stat['parameters']['dynamic']:
-                    if 'ignore_values' not in p:
-                        p['ignore_values'] = None
-                    sensorid = None
-                    if p['sensor'] is not None: 
-                        if p['sensor'] in sensors:
-                            sensorid = sensors[p['sensor']]
-                        else:
-                            self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
-                            return None
-                    par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
-                                    key=p['key'], value=None, static=False, ignore_values=p['ignore_values'])           
-                    self.__session.add(par)
-        for command_id in pjson['device_types'][dt.id]['commands']:
-            # add the command
-            command = pjson['commands'][command_id]
-            cmd = Command(name=command['name'], \
-                    device_id=dev.id, reference=command_id, return_confirmation=command['return_confirmation'])
-            self.__session.add(cmd)
-            self.__session.flush()
-            # add the command params
-            for p in pjson['commands'][command_id]['parameters']:
-                pa = CommandParam(cmd.id, p['key'], p['data_type'], p['conversion'])
-                self.__session.add(pa)
-                self.__session.flush()
-            # if needed add the xpl* stuff
-            if 'xpl_command' in command:
-                xpl_command_id = command['xpl_command']
-                xpl_command = pjson['xpl_commands'][command['xpl_command']]
-                # add the xpl_stat
-                if 'xplstat_name' in xpl_command:
-                    xpl_stat_id = xpl_command['xplstat_name']
-                    if xpl_stat_id not in addedxplstats:
-                        xpl_stat = pjson['xpl_stats'][xpl_stat_id]
-                        xplstat = XplStat(name=xpl_stat['name'], schema=xpl_stat['schema'], device_id=dev.id, json_id=xpl_stat_id)
-                        self.__session.add(xplstat)
-                        self.__session.flush()
-                        xplstatid = xplstat.id
-                        # add static params
-                        for p in xpl_stat['parameters']['static']:
-                            par = XplStatParam(xplstat_id=xplstat.id, sensor_id=None, \
-                                         key=p['key'], value=p['value'], static=True)           
-                            self.__session.add(par)
-                        # add dynamic params
-                        for p in xpl_stat['parameters']['dynamic']:
-                            if 'ignore_values' not in p:
-                                p['ignore_values'] = None
-                            sensorid = None
-                            if p['sensor'] is not None: 
-                                if p['sensor'] in sensors:
-                                    sensorid = sensors[p['sensor']]
-                                else:
-                                    self.__raise_dbhelper_exception("Can not find sensor %s" % (p['sensor']), True)
-                                    return None
-                            par = XplStatParam(xplstat_id=xplstat.id, sensor_id=sensorid, \
-                                         key=p['key'], value=None, static=False, ignore_values=p['ignore_values'])           
-                            self.__session.add(par)
-                    else:
-                        xplstatid = addedxplstats[xpl_stat_id]
-                else:
-                    xplstatid = None
-                # add the xpl command
-                xplcommand = XplCommand(cmd_id=cmd.id, \
-                                        name=xpl_command['name'], \
-                                        schema=xpl_command['schema'], \
-                                        device_id=dev.id, stat_id=xplstatid, \
-                                        json_id=xpl_command_id) 
-                self.__session.add(xplcommand)
-                self.__session.flush()
-                # add static params
-                for p in xpl_command['parameters']['static']:
-                    par = XplCommandParam(cmd_id=xplcommand.id, \
-                                         key=p['key'], value=p['value'])           
-                    self.__session.add(par)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
-        d = self.get_device(dev.id)
         return d
 
     def add_device(self, d_name, d_type_id, d_client_id, d_description=None, d_reference=None):
