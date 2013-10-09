@@ -166,7 +166,6 @@ class PackageJson():
                 raise PackageException("unknown key '{0}' found in {1}".format(item, name))
 
     def _validate_02(self):
-        print self.json
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
@@ -216,8 +215,10 @@ class PackageJson():
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'data_type', 'conversion']
+                expected = ['name', 'data_type', 'conversion', 'history']
+                hexpected = ['store', 'max', 'expire', 'round_value']
                 self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
+                self._validate_keys(hexpected, "sensor {0} history".format(senid), sens['history'].keys())
             #validate the xpl command
             for xcmdid in self.json["xpl_commands"]:
                 xcmd = self.json["xpl_commands"][xcmdid]
