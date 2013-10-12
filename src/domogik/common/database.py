@@ -770,11 +770,11 @@ class DbHelper():
         if sensor is not None:
             #print "=============="
             #print sensor
-            store = True
             # store the value if requested
             if sensor.history_store:
+                store = True
                 # only store stats if the value is different
-                if sensor.last_value is not str(value):
+                if sensor.last_value is str(value):
                     store = False
                 # handle round_value
                 #if store and sensor.round_value > 0:
@@ -791,24 +791,27 @@ class DbHelper():
                     except Exception as sql_exception:
                         self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
                 # handle the max value
-                #if sensor.history_max > 0:
-                #    count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
-                #    if count > sensor.history_max:
-                #        # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
-                #        self.__session.query(SensorHistory) \
-                #               
-                #        meta = MetaData(bind=DbHelper.__engine)
-                #        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
-                #         self.__session.execute(
-                #             t_hist.delete.where(t_hist.c.sensor_id == sensor.id).where(~column("id").in_(\
-                #                    select([column("bar")]).select_from(table("bat")).where(column("bar")==5))\
-                #                }
-                #        }
-                #        # delete them
-                #        try:
-                #            self.__session.commit()
-                #        except Exception as sql_exception:
-                #            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                if sensor.history_max > 0:
+                    count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
+                    if count > sensor.history_max:
+                        # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
+                        tokeep1 = self.__session.query(SensorHistory.id) \
+                                .filter(SensorHistory.sensor_id==sensor.id) \
+                                .order_by(SensorHistory.date.desc()) \
+                                .limit(sensor.history_max) \
+                                .subquery()
+                        # ugly fix because mysql is not supporting limit in a subquery
+                        tokeep2 = self.__session.query(tokeep1).subquery()
+                        self.__session.query(SensorHistory) \
+                            .filter( \
+                                        SensorHistory.sensor_id==sensor.id, \
+                                        ~SensorHistory.id.in_(tokeep2) \
+                                    ) \
+                            .delete(synchronize_session=False)
+                        try:
+                            self.__session.commit()
+                        except Exception as sql_exception:
+                            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
                 # handle the expire value (days)
                 if sensor.history_expire > 0:
                     stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
