@@ -768,19 +768,30 @@ class DbHelper():
         self.__session.expire_all()
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is not None:
-            #print "=============="
-            #print sensor
             # store the value if requested
             if sensor.history_store:
-                store = True
                 # only store stats if the value is different
-                if sensor.last_value is str(value):
-                    store = False
-                # handle round_value
-                #if store and sensor.round_value > 0:
-                #
-                # insert new recored in core_sensor_history
-                if store:
+                if sensor.last_value is not str(value):
+                    # handle history_round
+                    # reduce device stats
+                    if sensor.history_round > 0:
+                        last = self.__session.query(SensorHistory) \
+                            .filter(SensorHistory.sensor_id == sid) \
+                            .order_by(SensorHistory.date.desc()) \
+                            .limit(2) \
+                            .all()
+                        last.reverse()
+                        if last and len(last) == 2:
+                            delta = abs(float(last[0].value_num) - float(last[1].value_num))
+                            if delta < sensor.history_round:
+                                delta0 = abs(float(value) - float(last[0].value_num))
+                                delta1 = abs(float(value) - float(last[1].value_num))
+                                if delta0 < sensor.history_round \
+                                        and delta1 < sensor.history_round:
+                                    self.__session.query(SensorHistory) \
+                                        .filter(SensorHistory.id == last[1].id) \
+                                        .delete()
+                    # insert new recored in core_sensor_history
                     h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
                     self.__session.add(h)
                     sensor.last_received = date
