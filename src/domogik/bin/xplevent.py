@@ -35,25 +35,20 @@ class StatsManager(XplPlugin):
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
-from domogik.common import logger
-from domogik.common.configloader import Loader
-from domogik.mq.pubsub.publisher import MQPub 
+from domogik.mq.pubsub.publisher import MQPub
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
 import time
-from Queue import Queue, Empty, Full
 import traceback
-import datetime
 import calendar
 import zmq
-from zmq.eventloop.ioloop import IOLoop
 from domogik.common.utils import call_package_conversion
 
 ################################################################################
-class XplEvent(XplPlugin, MQRep):
+class XplEvent(XplPlugin):
     """ Statistics manager
     """
-    
+
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
@@ -66,7 +61,7 @@ class XplEvent(XplPlugin, MQRep):
         self.ready()
 
     def on_mdp_request(self, msg):
-        if msg._action == "reload":
+        if msg.get_action() == "reload":
             self.load()
             msg = MQMessage()
             msg.set_action( 'reload.result' )
@@ -81,8 +76,8 @@ class XplEvent(XplPlugin, MQRep):
             # not the first load : clean
             if self.stats != None:
                 self.log.info("reloading")
-                for x in self.stats:
-                    self.myxpl.del_listener(x.get_listener())
+                for stat in self.stats:
+                    self.myxpl.del_listener(stat.get_listener())
 
             ### Load stats
             # key1, key2 = device_type_id, schema
@@ -91,15 +86,21 @@ class XplEvent(XplPlugin, MQRep):
                 self.log.debug(sen)
                 statparam = self._db.get_xpl_stat_param_by_sensor(sen.id)
                 if statparam is None:
-                    self.log.error('Corresponding xpl-stat param can not be found for sensor %s' % (sen))
+                    self.log.error( \
+                            'Corresponding xpl-stat param can not be found for sensor {0}' \
+                            .format(sen))
                     continue
                 stat = self._db.get_xpl_stat(statparam.xplstat_id)
                 if stat is None:
-                    self.log.error('Corresponding xpl-stat can not be found for xplstatparam %s' % (statparam))
+                    self.log.error( \
+                            'Corresponding xpl-stat can not be found for xplstatparam {0}' \
+                            .format(statparam))
                     continue
                 dev = self._db.get_device(stat.device_id)
                 if dev is None:
-                    self.log.error('Corresponding device can not be found for xpl-stat %s' % (stat))
+                    self.log.error(\
+                            'Corresponding device can not be found for xpl-stat {0}' \
+                            .format(stat))
                     continue
                 # xpl-trig
                 self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
@@ -111,14 +112,14 @@ class XplEvent(XplPlugin, MQRep):
             self.log.error("%s" % traceback.format_exc())
         self._db.close_session()
         self.log.info("Loading finished")
-  
+
     class _Stat:
         """ This class define a statistic parser and logger instance
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, db, pub):
-            """ Initialize a stat instance 
+        def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, dbh, pub):
+            """ Initialize a stat instance
             @param xpl : A xpl manager instance
             @param dev : A Device reference
             @param stat : A XplStat reference
@@ -126,19 +127,19 @@ class XplEvent(XplPlugin, MQRep):
             @param xpl-type: what xpl-type to listen for
             """
             ### Rest data
-            self._db = db
+            self._db = dbh
             self._log_stats = log_stats
             self._dev = dev
             self._stat = stat
             self._sen = sensor
             self._pub = pub
-            
+
             ### build the filter
             params = {'schema': stat.schema, 'xpltype': xpl_type}
-            for p in stat.params:
-                if p.static:
-                    params[p.key] = p.value
-           
+            for param in stat.params:
+                if param.static:
+                    params[param.key] = param.value
+
             ### start the listener
             self._log_stats.debug("creating listener for %s" % (params))
             self._listener = Listener(self._callback, xpl, params)
@@ -150,40 +151,48 @@ class XplEvent(XplPlugin, MQRep):
 
         def _callback(self, message):
             """ Callback for the xpl message
-            @param message : the Xpl message received 
+            @param message : the Xpl message received
             """
-            self._log_stats.debug("Stat received for device %s." \
-                    % (self._dev['name']))
+            self._log_stats.debug("Stat received for device {0}." \
+                    .format(self._dev['name']))
             current_date = calendar.timegm(time.gmtime())
             device_data = []
             try:
                 # find what parameter to store
-                for p in self._stat.params:
-                    self._log_stats.debug("Checking param {0}".format(p))
-                    if p.sensor_id is not None and p.static is False:
-                        if p.key in message.data:
-                            value = message.data[p.key]
-                            self._log_stats.debug("Key found %s with value %s." \
-                                % (p.key, value))
+                for param in self._stat.params:
+                    self._log_stats.debug("Checking param {0}".format(param))
+                    if param.sensor_id is not None and param.static is False:
+                        if param.key in message.data:
+                            value = message.data[param.key]
+                            self._log_stats.debug( \
+                                    "Key found {0} with value {1}." \
+                                    .format(param.key, value))
                             store = True
-                            if p.ignore_values:
-                                if value in eval(p.ignore_values):
-                                    self._log_stats.debug("Value %s is in the ignore list %s, so not storing." \
-                                         % (value, p.ignore_values))
+                            if param.ignore_values:
+                                if value in eval(param.ignore_values):
+                                    self._log_stats.debug( \
+                                            "Value {0} is in the ignore list {0}, so not storing." \
+                                            .format(value, param.ignore_values))
                                     store = False
                             if store:
                                 # check if we need a conversion
                                 if self._sen.conversion is not None and self._sen.conversion != '':
                                     value = call_package_conversion(\
-                                                self._log_stats, self._dev['client_id'], \
-                                                self._sen.conversion, value)
-                                    self._log_stats.debug("Key found %s with value %s after conversion." \
-                                        % (p.key, value))
+                                                self._log_stats, \
+                                                self._dev['client_id'], \
+                                                self._sen.conversion, \
+                                                value)
+                                    self._log_stats.debug( \
+                                            "Key found {0} with value {0} after conversion." \
+                                            .format(param.key, value))
                                 # do the store
-                                device_data.append({"value" : value, "sensor": p.sensor_id})
+                                device_data.append({"value" : value, "sensor": param.sensor_id})
                                 my_db = DbHelper()
                                 with my_db.session_scope():
-                                    my_db.add_sensor_history(p.sensor_id, value, current_date)
+                                    my_db.add_sensor_history(\
+                                            param.sensor_id, \
+                                            value, \
+                                            current_date)
                                 del(my_db)
                             else:
                                 self._log_stats.debug("Don't need to store this value")
@@ -192,17 +201,12 @@ class XplEvent(XplPlugin, MQRep):
                     else:
                         self._log_stats.debug("No sensor attached")
             except:
-                error = "Error when processing stat : %s" % traceback.format_exc()
-                print("==== Error in Stats ====")
-                print(error)
-                print("========================")
-                self._log_stats.error(error)
+                self._log_stats.error(traceback.format_exc())
             # publish the result
             self._pub.send_event('device-stats', \
-                          {"timestamp" : current_date, "device_id" : self._dev['id'], "data" : device_data})
-            # put data in the event queue
-            #self._event_requests.add_in_queues(self._dev.id, 
-            #        {"timestamp" : current_date, "device_id" : self._dev.id, "data" : device_data})
+                          {"timestamp" : current_date, \
+                          "device_id" : self._dev['id'], \
+                          "data" : device_data})
 
 if __name__ == '__main__':
     EVTN = XplEvent()
