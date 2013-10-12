@@ -111,12 +111,13 @@ class Device(Base):
     address = Column(Unicode(255), nullable=True)
     device_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
+    client_version = Column(Unicode(32), nullable=False)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
-    def __init__(self, name, reference, device_type_id, client_id, description=None):
+    def __init__(self, name, reference, device_type_id, client_id, client_version, description=None):
         """Class constructor
 
         @param name : short name of the device
@@ -131,13 +132,15 @@ class Device(Base):
         self.reference = ucode(reference)
         self.device_type_id = ucode(device_type_id)
         self.client_id = ucode(client_id)
+        self.client_version = ucode(client_version)
         self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type_id, self.client_id, self.commands, \
+                  self.device_type_id, self.client_id, self.client_version, \
+                  self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod

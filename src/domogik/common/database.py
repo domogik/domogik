@@ -42,7 +42,7 @@ import datetime, hashlib, time
 
 import json
 import sqlalchemy
-from sqlalchemy import Table, MetaData, and_
+from sqlalchemy import Table, MetaData, and_, or_, not_
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker
 
@@ -278,7 +278,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         plugin_config = self.__session.query(
                                 PluginConfig
                             ).filter_by(id=ucode(pl_id)
@@ -305,7 +304,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         plugin_config_list = self.__session.query(
                                     PluginConfig
                                 ).filter_by(id=ucode(pl_id)
@@ -329,7 +327,6 @@ class DbHelper():
         """        
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         plugin_config = self.__session.query(
                                PluginConfig
                            ).filter_by(id=ucode(pl_id)
@@ -534,7 +531,9 @@ class DbHelper():
 
         ### Add the device itself
         self.log.debug("Device creation : inserting data in core_device...")
-        device = Device(name=name, device_type_id=device_type, client_id=client_id, description=description, reference=reference)
+        device = Device(name=name, device_type_id=device_type, \
+                client_id=client_id, client_version=client_data['identity']['version'], \
+                description=description, reference=reference)
         self.__session.add(device)
         self.__session.flush()
 
@@ -644,7 +643,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         device = Device(name=d_name, description=d_description, reference=d_reference, \
                         device_type_id=d_type_id, client_id=d_client_id)
         self.__session.add(device)
@@ -667,7 +665,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
@@ -697,7 +694,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
@@ -744,7 +740,6 @@ class DbHelper():
 
     def upgrade_do(self, oid, okey, nid, nsid):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
                      filter(DeviceStats.skey==okey).\
                      filter(DeviceStats.device_id ==oid)
@@ -771,21 +766,62 @@ class DbHelper():
 ####
     def add_sensor_history(self, sid, value, date):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is not None:
-            # only store stats if the value is different
-            if sensor.last_value is not str(value):
+            #print "=============="
+            #print sensor
+            store = True
+            # store the value if requested
+            if sensor.history_store:
+                # only store stats if the value is different
+                if sensor.last_value is not str(value):
+                    store = False
+                # handle round_value
+                #if store and sensor.round_value > 0:
+                #
                 # insert new recored in core_sensor_history
-                h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
-                self.__session.add(h)
-                sensor.last_received = date
-                sensor.last_value = str(value)
-                self.__session.add(sensor)
-                try:
-                    self.__session.commit()
-                except Exception as sql_exception:
-                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                if store:
+                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
+                    self.__session.add(h)
+                    sensor.last_received = date
+                    sensor.last_value = ucode(value)
+                    self.__session.add(sensor)
+                    try:
+                        self.__session.commit()
+                    except Exception as sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                # handle the max value
+                #if sensor.history_max > 0:
+                #    count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
+                #    if count > sensor.history_max:
+                #        # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
+                #        self.__session.query(SensorHistory) \
+                #               
+                #        meta = MetaData(bind=DbHelper.__engine)
+                #        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
+                #         self.__session.execute(
+                #             t_hist.delete.where(t_hist.c.sensor_id == sensor.id).where(~column("id").in_(\
+                #                    select([column("bar")]).select_from(table("bat")).where(column("bar")==5))\
+                #                }
+                #        }
+                #        # delete them
+                #        try:
+                #            self.__session.commit()
+                #        except Exception as sql_exception:
+                #            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                # handle the expire value (days)
+                if sensor.history_expire > 0:
+                    stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
+                    self.__session.query(SensorHistory) \
+                        .filter( \
+                                    SensorHistory.date<=stamp, \
+                                    SensorHistory.sensor_id==sensor.id \
+                                ) \
+                        .delete(synchronize_session=False)
+                    try:
+                        self.__session.commit()
+                    except Exception as sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         else:
             self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
 
@@ -1022,7 +1058,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         user_account = self.__session.query(
                                 UserAccount
                             ).filter_by(login=ucode(a_login)
@@ -1072,7 +1107,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is None:
             self.__raise_dbhelper_exception("UserAccount with id %s couldn't be found" % a_id)
@@ -1112,7 +1146,6 @@ class DbHelper():
         user_acc = self.update_user_account(a_id, a_login, None, a_is_admin, a_skin_used)
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         person = user_acc.person
         if p_first_name is not None:
             person.first_name = ucode(p_first_name)
@@ -1138,7 +1171,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is not None:
             old_pass = ucode(_make_crypted_password(a_old_password))
@@ -1163,7 +1195,6 @@ class DbHelper():
         """
         self.__session.expire_all()
         #self.__session.expire_all()
-        ##self.__session.begin(subtransactions=True)
 
         default_person_fname = "Admin"
         default_person_lname = "Admin"
@@ -1189,7 +1220,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         user_account = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_account:
             self.__session.delete(user_account)
@@ -1232,7 +1262,6 @@ class DbHelper():
 
         """
         # Make sure previously modified objects outer of this method won't be commited
-        #self.__session.begin(subtransactions=True)
         person = Person(first_name=p_first_name, last_name=p_last_name, birthdate=p_birthdate)
         self.__session.add(person)
         try:
@@ -1252,7 +1281,6 @@ class DbHelper():
 
         """
         # Make sure previously modified objects outer of this method won't be commited
-        #self.__session.begin(subtransactions=True)
         person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is None:
             self.__raise_dbhelper_exception("Person with id %s couldn't be found" % p_id)
@@ -1280,7 +1308,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is not None:
             self.__session.delete(person)
@@ -1318,7 +1345,6 @@ class DbHelper():
 
     def add_command(self, device_id, name, reference, return_confirmation):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         cmd = Command(name=name, device_id=device_id, reference=reference, return_confirmation=return_confirmation)
         self.__session.add(cmd)
         try:
@@ -1332,7 +1358,6 @@ class DbHelper():
 ###################
     def add_commandparam(self, cmd_id, key, dtype, conversion): 
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         p = CommandParam(cmd_id=cmd_id, key=key, data_type=dtype, conversion=conversion)
         self.__session.add(p)
         try:
@@ -1355,7 +1380,6 @@ class DbHelper():
 
     def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id, json_id):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id, json_id=json_id)
         self.__session.add(cmd)
         try:
@@ -1366,7 +1390,6 @@ class DbHelper():
 
     def del_xpl_command(self, id):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
         if cmd is not None:
             self.__session.delete(cmd)
@@ -1383,7 +1406,6 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
         if cmd is None:
             self.__raise_dbhelper_exception("XplCommand with id %s couldn't be found" % id)
@@ -1419,7 +1441,6 @@ class DbHelper():
 
     def add_xpl_stat(self, name, schema, device_id, json_id):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         stat = XplStat(name=name, schema=schema, device_id=device_id, json_id=json_id)
         self.__session.add(stat)
         try:
@@ -1430,7 +1451,6 @@ class DbHelper():
 
     def del_xpl_stat(self, id):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         stat = self.__session.query(XplStat).filter_by(id=id).first()
         if stat is not None:
             self.__session.delete(stat)
@@ -1469,7 +1489,6 @@ class DbHelper():
 ###################
     def add_xpl_command_param(self, cmd_id, key, value):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
         self.__session.add(param)
         try:
@@ -1480,7 +1499,6 @@ class DbHelper():
 
     def update_xpl_command_param(self, cmd_id, key, value=None):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=cmd_id).filter_by(key=key).first()
         if param is None:
             self.__raise_dbhelper_exception("XplCommandParam with id %s and key %s couldn't be found" % (cmd_id, key))
@@ -1495,7 +1513,6 @@ class DbHelper():
 
     def del_xpl_command_param(self, id, key):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).filter_by(key=key).first()
         if param is not None:
             self.__session.delete(param)
@@ -1515,7 +1532,6 @@ class DbHelper():
 
     def add_xpl_stat_param(self, statid, key, value, static, ignore_values=None, type=None):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None, ignore_values=ignore_values, type=type)
         self.__session.add(param)
         try:
@@ -1526,7 +1542,6 @@ class DbHelper():
 
     def update_xpl_stat_param(self, stat_id, key, value=None, static=None, ignore_values=None, type=None):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is None:
             self.__raise_dbhelper_exception("XplStatParam with id %s couldn't be found" % id)
@@ -1547,7 +1562,6 @@ class DbHelper():
 
     def del_xpl_stat_param(self, stat_id, key):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is not None:
             self.__session.delete(param)
@@ -1570,7 +1584,6 @@ class DbHelper():
 
     def add_scenario(self, name, json):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         scenario = Scenario(name=name, json=json)
         self.__session.add(scenario)
         try:
@@ -1581,7 +1594,6 @@ class DbHelper():
 
     def update_scenario(self, s_id, name=None, json=None):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
             self.__raise_dbhelper_exception("Scenario with id %s couldn't be found" % s_id)
@@ -1598,7 +1610,6 @@ class DbHelper():
 
     def del_scenario(self, s_id):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is not None:
             self.__session.delete(scenario)
@@ -1621,7 +1632,6 @@ class DbHelper():
 
     def add_scenario_uuid(self, s_id, uuid, key, is_test):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         scenariouuid = ScenarioUUID(s_id=s_id, uuid=uuid, key=key, is_test=is_test)
         self.__session.add(scenariouuid)
         try:
@@ -1632,7 +1642,6 @@ class DbHelper():
 
     def update_scenario_uuid(self, u_id, uuid=None, key=None, is_test=None):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
         if scenariouuid is None:
             self.__raise_dbhelper_exception("ScenarioUUID with id %s couldn't be found" % u_id)
@@ -1651,7 +1660,6 @@ class DbHelper():
 
     def del_scenario_uuid(self, u_id):
         self.__session.expire_all()
-        #self.__session.begin(subtransactions=True)
         scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
         if scenariouuid is not None:
             self.__session.delete(scenariouuid)
