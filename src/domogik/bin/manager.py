@@ -152,7 +152,7 @@ class Manager(XplPlugin):
         self.log.info("Start dbmgr : {0}".format(self.options.start_dbmgr))
         self.log.info("Start rest : {0}".format(self.options.start_rest))
         self.log.info("Start xpl gateway : {0}".format(self.options.start_xpl))
-        self.log.info("Start scenario manager : {0}".format(self.options.start_xplscenario))
+        self.log.info("Start scenario manager : {0}".format(self.options.start_scenario))
 
         ### create a Fifo to communicate with the init script
         self.log.info("Create the fifo to communicate with the init script")
