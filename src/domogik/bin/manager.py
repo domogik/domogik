@@ -136,6 +136,11 @@ class Manager(XplPlugin):
                           dest="start_xplevent", 
                           default=False, \
                           help="Start xpl events manager if not already running.")
+        parser.add_argument("-s",
+                          action="store_true",
+                          dest="start_scenario",
+                          default=False, \
+                          help="Start scenario manager if not already running.")
         # TODO : add -E option for externals ?
 
         ### Call the XplPlugin init  
@@ -206,6 +211,11 @@ class Manager(XplPlugin):
         if self.options.start_xplevent:
             if not self._start_core_component("xplevent"):
                 self.log.error("Unable to start xplevent")
+
+        ### Start xplevent
+        if self.options.start_scenario:
+            if not self._start_core_component("scenario"):
+                self.log.error("Unable to start scenario manager")
 
         ### Check for the available packages
         # TODO : call it with a timer !

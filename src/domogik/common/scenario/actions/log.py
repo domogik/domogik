@@ -1,4 +1,4 @@
-thon
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -19,32 +19,28 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Plugin purpose
-==============
-
-Base class for all scenarios
-
-Implements
-==========
-
-- BasePlugin
-
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2012 Domogik project
+@copyright: (C) 2007-2013 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
-from domogik.scenario.scenario import Scenario
+from domogik.common.scenario.actions.abstract import AbstractAction
 
 
-CLASSNAME="MySample"
- 
-class MySample(Scenario):
- 
-    def condition(self, p, init):
-         return self.state_cond(init, p["techno"], p["device"], p["oper"], p["value"])
- 
-    def result(self):
-         some_function_to_send_email("me@me.com","Hey, it's %s %s !" % (p["oper"], p["value"]))
+class LogAction(AbstractAction):
+    """ Simple action that log something in scenario logfile
+    """
 
+    def __init__(self, log=None):
+        AbstractAction.__init__(self, log)
+        self.set_description("Simply put some string in log file.")
+
+    def do_action(self, condition, tests):
+        self._log.info("A LogAction occured as condition %s was 'True'. Parameters are  : %s " % (condition, self._params))
+
+    def get_expected_entries(self):
+        return {'message': {'type': 'string',
+                            'description': 'some extra message to put in log',
+                            'default': ''}
+               }

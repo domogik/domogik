@@ -28,7 +28,11 @@ def upgrade():
     	sa.Column('conversion', sa.Unicode(length=255), nullable=True),
     	sa.Column('last_value', sa.Unicode(length=32), nullable=True),
     	sa.Column('last_received', sa.Integer(), nullable=True),
-    	sa.ForeignKeyConstraint(['device_id'], [u'{0}.id'.format(Device.__tablename__)], ondelete='cascade'),
+        sa.Column('history_store', sa.Boolean(), nullable=False),
+        sa.Column('history_max', sa.Integer(), nullable=True),
+        sa.Column('history_expire', sa.Integer(), nullable=True),
+        sa.Column('history_round', sa.Float(), nullable=True),
+        sa.ForeignKeyConstraint(['device_id'], [u'{0}.id'.format(Device.__tablename__)], ondelete='cascade'),
     	sa.PrimaryKeyConstraint('id'),
     	mysql_engine='InnoDB'
     )

@@ -111,12 +111,13 @@ class Device(Base):
     address = Column(Unicode(255), nullable=True)
     device_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
+    client_version = Column(Unicode(32), nullable=False)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
-    def __init__(self, name, reference, device_type_id, client_id, description=None):
+    def __init__(self, name, reference, device_type_id, client_id, client_version, description=None):
         """Class constructor
 
         @param name : short name of the device
@@ -131,13 +132,15 @@ class Device(Base):
         self.reference = ucode(reference)
         self.device_type_id = ucode(device_type_id)
         self.client_id = ucode(client_id)
+        self.client_version = ucode(client_version)
         self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.device_type_id, self.client_id, self.commands, \
+                  self.device_type_id, self.client_id, self.client_version, \
+                  self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 
     @staticmethod
@@ -338,19 +341,28 @@ class Sensor(Base):
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
+    history_store = Column(Boolean, nullable=False)
+    history_max = Column(Integer, nullable=True)
+    history_expire = Column(Integer, nullable=True)
+    history_round = Column(Float, nullable=True)
     params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True) 
 
-    def __init__(self, device_id, name, reference, data_type, conversion):
+    def __init__(self, device_id, name, reference, data_type, conversion, h_store, h_max, h_expire, h_round):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
         self.data_type = ucode(data_type)
         self.conversion = ucode(conversion)
+        self.history_store = h_store
+        self.history_max = h_max
+        self.history_expire = h_expire
+        self.history_round = h_round
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' data_type='%s' conversion='%s')>"\
-               % (self.id, self.device_id, self.reference, self.name, self.data_type, self.conversion)
+        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s)>"\
+               % (self.id, self.device_id, self.reference, self.name, self.data_type, self.conversion, \
+                   self.history_store, self.history_max, self.history_expire, self.history_round)
 
     @staticmethod
     def get_tablename():
@@ -500,3 +512,52 @@ class XplCommandParam(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return XplCommandParam.__tablename__
+
+class Scenario(Base):
+    __tablename__ = '%s_scenario' % _db_prefix
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(Unicode(32), nullable=False, autoincrement=False)
+    json = Column(UnicodeText(), nullable=False)
+    uuids = relationship("ScenarioUUID", backref=__tablename__, cascade="all", passive_deletes=True)
+
+    def __init__(self, name, json):
+        self.name = ucode(name)
+        self.json = ucode(json)
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<Scenario(id=%s name='%s' json='%s' uuids=%s)>"\
+               % (self.id, self.name, self.json, self.uuids)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return Scenario.__tablename__
+
+class ScenarioUUID(Base):
+    __tablename__ = '%s_scenario_uuid' % _db_prefix
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    scenario_id = Column(Integer, ForeignKey('%s.id' % Scenario.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False)
+    uuid = Column(Unicode(128), nullable=False, autoincrement=False)
+    key = Column(UnicodeText(), nullable=False)
+    is_test = Column(Boolean, nullable=False, default=False)
+    UniqueConstraint('uuid', name='uuid')
+
+    def __init__(self, s_id, uuid, key, is_test):
+        self.scenario_id = s_id
+        self.uuid = ucode(uuid)
+        self.key = ucode(key)
+        self.is_test = is_test
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<ScenarioUUID(id=%s scenario_id=%s name='%s' json='%s' is_test=%s)>"\
+               % (self.id, self.scenario_id, self.uuid, self.key, self.is_test)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return ScenarioUUID.__tablename__
+
