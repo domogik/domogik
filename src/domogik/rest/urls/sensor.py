@@ -12,4 +12,15 @@ class sensorAPI(MethodView):
             b = urlHandler.db.get_all_sensor()
         return 200, b
 
+    def put(self, id):
+        """ PUT /sensor """
+        dbr = urlHandler.db.update_sensor(\
+                id, \
+                history_round=request.form.get('round'), \
+                history_store=request.form.get('store'), \
+                history_max=request.form.get('max'), \
+                history_expire=request.form.get('expire') \
+                )
+        return 200, dbr
+
 register_api(sensorAPI, 'sensor_api', '/sensor/', pk='id')

@@ -44,7 +44,7 @@ import json
 import sqlalchemy
 from sqlalchemy import Table, MetaData, and_, or_, not_
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, defer
 
 from domogik.common.utils import ucode
 from domogik.common import logger
@@ -1344,6 +1344,29 @@ class DbHelper():
 
     def get_sensor_by_device_id(self, did):
         return self.__session.query(Sensor).filter_by(device_id=did).all()
+
+    def update_sensor(self, sid, history_round=None, \
+            history_store=None, history_max=None, \
+            history_expire=None):
+        sensor = self.__session.query(Sensor).filter_by(id=sid).first()
+        if sensor is None:
+            self.__raise_dbhelper_exception("Sensor with id %s couldn't be found" % sid)
+        if history_round is not None:
+            sensor.history_round = history_round
+        if history_max is not None:
+            sensor.history_max = history_max
+        if history_store is not None:
+            sensor.history_store = history_store
+        if history_expire is not None:
+            sensor.history_expire = history_expire
+        self.__session.add(sensor)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return sensor
+
+
 
 ###################
 # command
