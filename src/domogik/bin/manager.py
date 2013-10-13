@@ -578,7 +578,7 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.host, self.type, self.name, self.client_id, self.data, self.configured)
+        self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.configured)
 
 
     def set_status(self, new_status):
@@ -923,6 +923,7 @@ class Clients():
           client_id : for a domogik plugin : plugin-<name>.<hostname>
                       for an external member : <vendor id>-<device id>.<instance>
         { client_id = { 
+                        xpl_source : vendorid-deviceid.instance
                         host : hostname or ip
                         type : plugin, ...
                         name : package name (onewire, ipx800, ...)
@@ -955,7 +956,7 @@ class Clients():
         self.log.info("Clients initialisation")
         self._pub = MQPub(zmq.Context(), 'manager')
 
-    def add(self, host, type, name, client_id, data, configured = None):
+    def add(self, host, type, name, client_id, xpl_source, data, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
             @param type : client type
@@ -969,6 +970,7 @@ class Clients():
         client = { "host" : host,
                    "type" : type,
                    "name" : name,
+                   "xpl_source" : xpl_source,
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "status" : STATUS_UNKNOWN,
@@ -976,6 +978,7 @@ class Clients():
         client_with_details = { "host" : host,
                    "type" : type,
                    "name" : name,
+                   "xpl_source" : xpl_source,
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "status" : STATUS_UNKNOWN,
