@@ -45,17 +45,17 @@ import zmq
 from domogik.common.utils import call_package_conversion
 
 ################################################################################
-class XplEvent(XplPlugin):
+class XplManager(XplPlugin):
     """ Statistics manager
     """
 
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
-        XplPlugin.__init__(self, 'xplevent')
-        self.log.info("XPL Events manager initialisation...")
+        XplPlugin.__init__(self, 'xplgw')
+        self.log.info("XPL manager initialisation...")
         self._db = DbHelper()
-        self.pub = MQPub(zmq.Context(), 'xplevent')
+        self.pub = MQPub(zmq.Context(), 'xplgw')
         self.stats = None
         self.load()
         self.ready()
@@ -66,6 +66,29 @@ class XplEvent(XplPlugin):
             msg = MQMessage()
             msg.set_action( 'reload.result' )
             self.reply(msg.get())
+	elif ms.get_action() == "cmd.send":
+            self._send_xpl_command(msg)
+
+    def _send_xpl_command(self, data):
+        """ Reply to config.get MQ req
+            @param data : MQ req message
+                Needed info in data:
+                - cmdid         => command id to send
+                - cmdparams     => key/value pair of all params needed for this command
+        """
+        self.log.info("Received new xplcmd request: {0}".format(data))
+        msg = MQMessage()
+        msg.set_action('xplcmd.send.result')
+
+        request = data.get_data()
+        if 'cmdid' not in request:
+            self.log.error("cmdid not in message data")
+        if 'cmdparams' not in request:
+            self.log.error("cmdparams not in message data")
+
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
 
     def load(self):
         """ (re)load all xml files to (re)create _Stats objects
@@ -209,4 +232,4 @@ class XplEvent(XplPlugin):
                           "data" : device_data})
 
 if __name__ == '__main__':
-    EVTN = XplEvent()
+    EVTN = XplManager()

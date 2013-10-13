@@ -6,7 +6,7 @@ DOMOGIK_USER=domogik
 # This variable can take 6 parameters :
 # -d to start the database manager (launch only on master host)
 # -r to start the rest component (launch only on master host)
-# -x to start the xpl events component (launch only on master host)
+# -x to start the xpl gw component (launch only on master host)
 # -s to start the start scenario manager component (launch only on master host)
 
 # TODO : OBSOLETE -E to manage external members (launch only on master host)

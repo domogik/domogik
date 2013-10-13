@@ -133,9 +133,9 @@ class Manager(XplPlugin):
                           help="Start rest if not already running.")
         parser.add_argument("-x", 
                           action="store_true", 
-                          dest="start_xplevent", 
+                          dest="start_xpl", 
                           default=False, \
-                          help="Start xpl events manager if not already running.")
+                          help="Start xpl gateway if not already running.")
         parser.add_argument("-s",
                           action="store_true",
                           dest="start_scenario",
@@ -151,7 +151,8 @@ class Manager(XplPlugin):
         self.log.info("Host : {0}".format(self.get_sanitized_hostname()))
         self.log.info("Start dbmgr : {0}".format(self.options.start_dbmgr))
         self.log.info("Start rest : {0}".format(self.options.start_rest))
-        self.log.info("Start xplevent : {0}".format(self.options.start_xplevent))
+        self.log.info("Start xpl gateway : {0}".format(self.options.start_xpl))
+        self.log.info("Start scenario manager : {0}".format(self.options.start_xplscenario))
 
         ### create a Fifo to communicate with the init script
         self.log.info("Create the fifo to communicate with the init script")
@@ -207,12 +208,12 @@ class Manager(XplPlugin):
             if not self._start_core_component("rest"):
                 self.log.error("Unable to start rest")
 
-        ### Start xplevent
-        if self.options.start_xplevent:
-            if not self._start_core_component("xplevent"):
-                self.log.error("Unable to start xplevent")
+        ### Start xpl GW
+        if self.options.start_xpl:
+            if not self._start_core_component("xplgw"):
+                self.log.error("Unable to start xpl gateway")
 
-        ### Start xplevent
+        ### Start scenario
         if self.options.start_scenario:
             if not self._start_core_component("scenario"):
                 self.log.error("Unable to start scenario manager")
