@@ -31,6 +31,6 @@ def api_ncommand(cid):
         if response['status']:
             return 200, ""
         else:
-            return 400, response['reason']
+            return 400, {'msg': response['reason']}
     else:
-        return 400, "XPL gateway does not respond"
+        return 400, {'msg': "XPL gateway does not respond"}

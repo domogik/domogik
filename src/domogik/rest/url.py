@@ -58,8 +58,12 @@ def json_response(action_func):
             rcode = 204
             rdata = None
         # do the actual return
+        if not urlHandler.clean_json:
+            resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False)
+        else:
+            resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False, indent=4)
         return Response(
-            response=json.dumps(rdata, cls=domogik_encoder(), check_circular=False),
+            response=resp,
             status=rcode,
             content_type='application/json'
         )
