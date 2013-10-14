@@ -38,6 +38,7 @@ from domogik.common.database import DbHelper
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.mq.pubsub.publisher import MQPub
 from domogik.mq.pubsub.subscriber import MQSyncSub
+from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 import time
 import traceback
@@ -59,6 +60,8 @@ class XplManager(XplPlugin):
         self._db = DbHelper()
         self.pub = MQPub(zmq.Context(), 'xplgw')
         self.stats = None
+        self.client_xpl_map = {}
+        self._load_client_to_xpl_target()
         self.load()
         self.ready()
 
@@ -73,6 +76,19 @@ class XplManager(XplPlugin):
             self.reply(msg.get())
 	elif msg.get_action() == "cmd.send":
             self._send_xpl_command(msg)
+
+    def _load_client_to_xpl_target(self):
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('client.list.get')
+        response = cli.request('manager', msg.get(), timeout=10)
+        if response:
+            data = response.get_data()
+            for cli in data:
+                self.client_xpl_map[cli] = data[cli]['xpl_source']
+        else:
+            self.log.error("Updating client list was not successfull, no response from manager")
+
 
     def _send_xpl_command(self, data):
         """ Reply to config.get MQ req
@@ -100,8 +116,15 @@ class XplManager(XplPlugin):
 			if xplstat is not None:
 			    # get the device from the db
 			    dev = self._db.get_device(int(cmd.device_id))
-			    # cmd will have all needed info now
 			    msg = XplMessage()
+                            # update the client list
+                            if not dev['client_id'] in self.client_xpl_map.keys():
+                                self._load_client_to_xpl_target()
+                            if not dev['client_id'] in self.client_xpl_map.keys():
+                                failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
+                            else:
+                                msg.set_target(self.client_xpl_map[dev['client_id']])
+                            msg.set_source(self.myxpl.get_source())
 			    msg.set_type("xpl-cmnd")
 			    msg.set_schema( xplcmd.schema)
 			    # static params
