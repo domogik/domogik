@@ -74,7 +74,7 @@ UIs                     scenario            scenario.create     scenario.result
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     scenario            scenario.eval       scenario.result
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
-rest, scenario          xplcmd              xplcmd.send         xplcmd.send.result
+rest, scenario          xplgw               cmd.send            cmd.send.result        req_xplcmd_send.py
 ======================= =================== =================== ====================== ========================
 
 *clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.
