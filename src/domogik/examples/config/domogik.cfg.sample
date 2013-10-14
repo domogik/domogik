@@ -71,6 +71,8 @@ use_ssl = False
 # if rest_use_ssl = True, set here path for ssl certificate/key
 ssl_certificate =
 ssl_key =
+# if set to True, this will result in a nicely formatted json
+clean_json = False
 
 ###
 # Messaging section
