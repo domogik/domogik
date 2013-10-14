@@ -80,7 +80,6 @@ def get_rest_url():
     config = cfg.load()
     conf = dict(config[1])
     # we return the url related to the first declared interface in domogik.cfg
-    print conf
     intf = conf['interfaces'].split(",")[0]
     ip = get_ip_for_interfaces([intf])[0]
     return "http://{0}:{1}/".format(ip, conf['port'])
