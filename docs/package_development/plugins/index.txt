@@ -28,7 +28,7 @@ Packages development
 * :doc:`Udev files <udev_rules/index>`
 * :doc:`Data types <data_types/index>`
 
-* :doc:`Tests scripts <tests/scripts>` ....................................TODO
+* :doc:`Tests <tests/index>` ....................................TODO
 
 * Python part
   
