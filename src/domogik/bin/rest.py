@@ -113,6 +113,10 @@ class Rest(XplPlugin):
                 self.use_ssl = conf_rest['use_ssl']
                 self.key_file = conf_rest['ssl_certificate']
                 self.cert_file = conf_rest['ssl_key']
+                if 'clean_json' in conf_rest:
+                    self.clean_json = conf_rest['clean_json']
+                else:
+                    self.clean_json = False
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -120,6 +124,7 @@ class Rest(XplPlugin):
 		self.use_ssl = False
 		self.key_file = ""
 		self.cert_file = ""
+                self.clean_json = False
             self.log.info("Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
     
             # SSL configuration
@@ -178,8 +183,7 @@ class Rest(XplPlugin):
         urlHandler.apiversion = self._rest_api_version
         urlHandler.use_ssl = self.use_ssl
         urlHandler.hostname = self.get_sanitized_hostname()
-        # xpl handler
-        urlHandler.xpl = self.myxpl 
+        urlHandler.clean_json = self.clean_json
         # reload statsmanager helper
         urlHandler.reload_stats = self.reload_stats
         urlHandler.zmq_context = self.zmq
