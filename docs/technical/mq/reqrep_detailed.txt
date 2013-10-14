@@ -200,9 +200,9 @@ reload
 =======
 
 Request : rest
-Reply : xplevent
+Reply : xplgw
 
-To request xplevent to load all new data from the DB: ::
+To request xplgw to load all new data from the DB: ::
 
     request : reload
 

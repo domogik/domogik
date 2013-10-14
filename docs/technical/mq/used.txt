@@ -30,7 +30,7 @@ Rules to apply
 ======================= =================== =================== ====================== ========================
 Source                  Destination         action req          action rep             Python example
 ======================= =================== =================== ====================== ========================
-rest                    xplevent            reload              reload.result          req_reload.py
+rest                    xplgw               reload              reload.result          req_reload.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 plugin (any)            dbmgr               config.get          config.result          req_config_get.py
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
@@ -73,6 +73,8 @@ UIs                     scenario            scenario.get        scenario.result
 UIs                     scenario            scenario.create     scenario.result
 ----------------------- ------------------- ------------------- ---------------------- ------------------------
 UIs                     scenario            scenario.eval       scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+rest, scenario          xplgw               cmd.send            cmd.send.result        req_xplcmd_send.py
 ======================= =================== =================== ====================== ========================
 
 *clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.
@@ -87,7 +89,7 @@ List of MQ messages used for pub/sub pattern
 ======================= =================== ====================== =====================
 Source                  Used by             Header                 Python example
 ======================= =================== ====================== =====================
-xplevent                rest                device-stats
+xplgw                   rest                device-stats
 ----------------------- ------------------- ---------------------- ---------------------
 plugin (any)            manager             plugin.status          sub_plugin_status.py
                         UIs

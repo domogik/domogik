@@ -25,7 +25,7 @@ Plugin purpose
 Implements
 ==========
 
-class StatsManager(XplPlugin):
+class XplManager(XplPlugin):
 
 @author: Maikel Punie <maikel.punie@gmail.com>
 @copyright: (C) 2007-2013 Domogik project
@@ -35,37 +35,125 @@ class StatsManager(XplPlugin):
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.mq.pubsub.publisher import MQPub
-from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.pubsub.subscriber import MQSyncSub
 from domogik.mq.message import MQMessage
 import time
 import traceback
 import calendar
 import zmq
+import json
 from domogik.common.utils import call_package_conversion
 
 ################################################################################
-class XplEvent(XplPlugin):
+class XplManager(XplPlugin):
     """ Statistics manager
     """
 
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
-        XplPlugin.__init__(self, 'xplevent')
-        self.log.info("XPL Events manager initialisation...")
+        XplPlugin.__init__(self, 'xplgw')
+        self.log.info("XPL manager initialisation...")
         self._db = DbHelper()
-        self.pub = MQPub(zmq.Context(), 'xplevent')
+        self.pub = MQPub(zmq.Context(), 'xplgw')
         self.stats = None
         self.load()
         self.ready()
 
     def on_mdp_request(self, msg):
+	# XplPlugin handles MQ Req/rep also
+        XplPlugin.on_mdp_request(self, msg)
+
         if msg.get_action() == "reload":
             self.load()
             msg = MQMessage()
             msg.set_action( 'reload.result' )
             self.reply(msg.get())
+	elif msg.get_action() == "cmd.send":
+            self._send_xpl_command(msg)
+
+    def _send_xpl_command(self, data):
+        """ Reply to config.get MQ req
+            @param data : MQ req message
+                Needed info in data:
+                - cmdid         => command id to send
+                - cmdparams     => key/value pair of all params needed for this command
+        """
+	with self._db.session_scope():
+	    self.log.info("Received new cmd request: {0}".format(data))
+            failed = False
+
+            request = data.get_data()
+            if 'cmdid' not in request:
+                failed = "cmdid not in message data"
+            if 'cmdparams' not in request:
+                failed = "cmdparams not in message data"
+            if not failed:
+                # get the command
+		cmd = self._db.get_command(request['cmdid'])
+		if cmd is not None:
+		    if cmd.xpl_command is not None:
+		        xplcmd = cmd.xpl_command
+			xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
+			if xplstat is not None:
+			    # get the device from the db
+			    dev = self._db.get_device(int(cmd.device_id))
+			    # cmd will have all needed info now
+			    msg = XplMessage()
+			    msg.set_type("xpl-cmnd")
+			    msg.set_schema( xplcmd.schema)
+			    # static params
+			    for p in xplcmd.params:
+			        msg.add_data({p.key : p.value})
+			    # dynamic params
+			    for p in cmd.params:
+				if p.key in request['cmdparams']:
+				    value = request['cmdparams'][p.key]
+				    # chieck if we need a conversion
+				    if p.conversion is not None and p.conversion != '':
+				        value = call_package_conversion(\
+						self.log, dev['client_id'], \
+						p.conversion, value)
+				    msg.add_data({p.key : value})
+				else:
+				    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
+                            if not failed:
+			        # send out the msg
+			        self.log.debug("sending xplmessage: {0}".format(msg))
+			        self.myxpl.send(msg)
+			        ### Wait for answer
+			        stat_received = 0
+			        if xplstat != None:
+				    # get xpl message from queue
+				    self.log.debug("Command : wait for answer...")
+				    sub = MQSyncSub( self.zmq, 'rest-command', ['device-stats'] )
+				    stat = sub.wait_for_event()
+				    if stat is not None:
+				        reply = json.loads(stat['content'])
+				        reply_msg = MQMessage()
+				        reply_msg.set_action('cmd.send.result')
+				        reply_msg.add_data('stat', reply)
+				        reply_msg.add_data('status', True)
+				        reply_msg.add_data('reason', None)
+				        self.log.debug("mq reply".format(reply_msg.get()))
+				        self.reply(reply_msg.get())
+			else:
+			    failed = "xplStat {0} does not exists".format(xplcmd.stat_id)
+		    else:
+                        failed = "Command {0} has no associated xplcommand".format(cmd.id)
+		else:
+		    failed = "Command {0} does not exists".format(request['cmdid'])
+
+            if failed:
+		self.log.error(failed)
+     		reply_msg = MQMessage()
+                reply_msg.set_action('cmd.send.result')
+                reply_msg.add_data('status', False)
+                reply_msg.add_data('reason', failed)
+                self.log.debug("mq reply".format(reply_msg.get()))
+                self.reply(reply_msg.get())
 
     def load(self):
         """ (re)load all xml files to (re)create _Stats objects
@@ -209,4 +297,4 @@ class XplEvent(XplPlugin):
                           "data" : device_data})
 
 if __name__ == '__main__':
-    EVTN = XplEvent()
+    EVTN = XplManager()

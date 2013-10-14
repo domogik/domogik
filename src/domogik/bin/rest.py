@@ -231,8 +231,8 @@ class Rest(XplPlugin):
         req = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action( 'reload' )
-        resp = req.request('xplevent', msg.get(), 100)
-        self.log.debug("Reply from xplevent: {0}".format(resp))
+        resp = req.request('xplgw', msg.get(), 100)
+        self.log.debug("Reply from xplgw: {0}".format(resp))
         self.log.debug("=============== reload stats END")
 
     def get_exception(self):

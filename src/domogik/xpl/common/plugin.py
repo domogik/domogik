@@ -42,6 +42,7 @@ import os
 import sys
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.common.baseplugin import BasePlugin
+from domogik.common.utils import ucode
 from domogik.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
@@ -66,7 +67,7 @@ STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
 # core components
-CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplevent', 'send', 'dump_xpl', 'scenario']
+CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"
