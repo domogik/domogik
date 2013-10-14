@@ -30,13 +30,17 @@ Even if you have python2.7 or higher installed, check that the development packa
 
     $ apt-get install python2.7-dev gcc
 
-Install SSL librairies: ::
+Install SSL libraries: ::
 
     $ apt-get install libssl-dev 
 
-Install librairies for mysql access and command line client: ::
+Install libraries for mysql access and command line client: ::
 
     $ apt-get install libmysqlclient-dev mysql-client
+
+Install libraries for postgresql: ::
+
+    $ apt-get install python-psycopg2
 
 Mysql server
 ------------
@@ -93,7 +97,7 @@ You will be asked for the following questions: ::
 
     If you want to use a proxy, please set it now. It will only be used during the installation. (ex: http://1.2.3.4:8080)
 
-During the installation, some python librairies could be downloaded. If you use a proxy, you must set it here.
+During the installation, some python libraries could be downloaded. If you use a proxy, you must set it here.
 
 .. code-block:: bash
 
