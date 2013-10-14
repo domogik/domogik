@@ -61,7 +61,7 @@ def json_response(action_func):
         if not urlHandler.clean_json:
             resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False)
         else:
-            resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False, indent=4)
+            resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False, indent=4, sort_keys=True)
         return Response(
             response=resp,
             status=rcode,
