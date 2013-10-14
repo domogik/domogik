@@ -182,6 +182,9 @@ class Manager:
         self.hub_discovery()
         self._foundhub.wait()
 
+    def get_source(self):
+        return self._source
+
     def hub_discovery(self):
         """ Start HUB discovery
         random hbeat timeout between 3 and 10 seconds, and sends HBEAT
