@@ -29,7 +29,7 @@ def write_access_log_after(response):
 @urlHandler.before_request
 def write_acces_log_before():
     urlHandler.db.open_session()
-    urlHandler.logger.info('http request for {0} received. Data : {1}'.format(request.path, request.values))
+    urlHandler.logger.info('http request for {0} received'.format(request.path))
 
 # json reponse handler decorator
 # the url handlers funictions can return
@@ -58,10 +58,13 @@ def json_response(action_func):
             rcode = 204
             rdata = None
         # do the actual return
-        if not urlHandler.clean_json:
-            resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False)
+        if rdata:
+            if not urlHandler.clean_json:
+                resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False)
+            else:
+                resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False, indent=4, sort_keys=True)
         else:
-            resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False, indent=4, sort_keys=True)
+            resp = None
         return Response(
             response=resp,
             status=rcode,
