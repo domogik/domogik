@@ -29,7 +29,7 @@ def api_ncommand(cid):
     if resp:
         response = resp.get_data()
         if response['status']:
-            return 200, ""
+            return 204, None
         else:
             return 400, {'msg': response['reason']}
     else:
