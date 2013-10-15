@@ -401,7 +401,7 @@ class ScenarioManager:
             classes = [m for m in inspect.getmembers(imported_mod) if inspect.isclass(m[1])]
             # Filter in order to keep only the classes that belong to domogik package and are not abstract
             res.extend([(module[1] + "." + c[0], c[1]) for c in filter(
-                lambda x: x[1].__module__.startswith("domogik.") and not x[0].startswith("Abstract"), classes)])
+                lambda x: x[1].__module__.startswith("domogik.common.scenario.") and not x[0].startswith("Abstract"), classes)])
         return res
 
 
