@@ -272,8 +272,6 @@ class ScenarioManager:
         self.log.debug("Create condition %s with payload %s" % (name, payload['condition']))
         # build a list of actions
         for action in payload['actions'].keys():
-            print "============="
-            print action
             # action is now a tuple
             #   (uid, params)
             self._conditions_actions[name].append(action) 
@@ -299,8 +297,6 @@ class ScenarioManager:
     def trigger_actions(self, name):
         """ Trigger that will be called when a condition evaluates to True
         """
-        print "+++++++++++++++++++++++++++"
-        print "running actions for condition %s" % name
         if name not in self._conditions_actions \
                 or name not in self._conditions:
             raise KeyError('no key %s in one of the _conditions tables table' % name)
