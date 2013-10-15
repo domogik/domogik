@@ -13,7 +13,7 @@ Create the start.sh
 Assuming your plugin name is *myplugin*, create the **start.sh** file like this (you just need to update the first line): ::
 
     $ PLUGIN_ID=myplugin
-    $ echo "export PYTHONPATH=/var/lib/domogik && /usr/bin/python bin/$PLUGIN_ID.py" > start.sh
+    $ echo "export PYTHONPATH=/var/lib/domogik && /usr/bin/python bin/$PLUGIN_ID.py -f" > start.sh
     $ chmod u+x start.sh
 
 Use it
