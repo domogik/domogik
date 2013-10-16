@@ -9,14 +9,6 @@ import json
 urlHandler = Flask(__name__)
 urlHandler.debug = True
 
-# DB handler decorator
-def db_helper(action_func):
-    @wraps(action_func)
-    def create_db_helper(*args, **kwargs):
-#        g.db = DbHelper()
-        return action_func(*args, **kwargs)
-    return create_db_helper   
-
 # create acces_log
 @urlHandler.after_request
 def write_access_log_after(response):
@@ -28,6 +20,7 @@ def write_access_log_after(response):
 
 @urlHandler.before_request
 def write_acces_log_before():
+    urlHandler.json_stop_at = []
     urlHandler.db.open_session()
     urlHandler.logger.info('http request for {0} received'.format(request.path))
 
@@ -37,6 +30,8 @@ def json_response(action_func):
     @wraps(action_func)
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
+        print args
+        print kwargs
         # if list is 2 entries long
         if (type(ret) is list or type(ret) is tuple):
             if len(ret) == 2:
@@ -58,11 +53,13 @@ def json_response(action_func):
             rcode = 204
             rdata = None
         # do the actual return
+        if type(urlHandler.json_stop_at) is not list:
+            urlHandler.json_stop_at = []
         if rdata:
-            if not urlHandler.clean_json:
-                resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False)
+            if urlHandler.clean_json == "False":
+                resp = json.dumps(rdata, cls=domogik_encoder(stop_at=urlHandler.json_stop_at), check_circular=False)
             else:
-                resp = json.dumps(rdata, cls=domogik_encoder(), check_circular=False, indent=4, sort_keys=True)
+                resp = json.dumps(rdata, cls=domogik_encoder(stop_at=urlHandler.json_stop_at), check_circular=False, indent=4, sort_keys=True)
         else:
             resp = None
         return Response(
