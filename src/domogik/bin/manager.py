@@ -272,6 +272,7 @@ class Manager(XplPlugin):
         ### Create a DeviceType collection in order to send them over MQ
         for pkg in self._packages:
             for device_type in self._packages[pkg].get_device_types():
+                self.log.info("Register new device type : {0}".format(device_type))
                 if self._device_types.has_key(device_type):
                     self.log.error("Duplicate device type detected : {0} for package {1}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {2}".format(device_type, pkg, self._device_types[device_type]))
                 self._device_types[device_type] = self._packages[pkg].get_json()
