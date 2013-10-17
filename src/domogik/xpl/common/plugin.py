@@ -184,6 +184,11 @@ class XplPlugin(BasePlugin, MQRep):
         if self._name not in CORE_COMPONENTS and self._test == False:
             self._load_json()
 
+        # init an empty devices list
+        self.devices = []
+        # init an empty 'new' devices list
+        self.new_devices = []
+
         self.log.debug("end single xpl plugin")
 
 
@@ -335,7 +340,72 @@ class XplPlugin(BasePlugin, MQRep):
                 # then, the commands
                 # TODO !!!!!!
 
+            self.devices = device_list
             return device_list
+
+
+    def device_detected(self, device_type, type, feature, data):
+        """ The plugin developpers can call this function when a device is detected
+            This function will check if a corresponding device exists and : 
+            - if so, do nothing
+            - if not, add the device in a 'new devices' list
+                 - if the device is already in the 'new devices list', does nothing
+                 - if not : add it into the list and send a MQ message : an event for the UI to say a new device is detected
+
+            ### TODO : implement a req/rep MQ message to allow UI to get the new devices list
+
+            @param device_type : device_type of the detected device
+            @param data : data about the device (address or any other configuration element of a device for this plugin)
+            @param type : xpl_stats, xpl_commands
+            @param feature : a xpl_stat or xpl_command feature
+        """
+        self.log.debug("Device detected : device_type = {0}, data = {1}".format(device_type, data))
+        #self.log.debug("Already existing devices : {0}".format(self.devices))
+        # browse all devices to find if the device exists
+        for a_device in self.devices:
+            # first, search for device type
+            if a_device['device_type_id'] == device_type:
+                params = a_device[type][feature]['parameters']['device']
+                found = True
+                for key in data:
+                    for a_param in params:
+                        if key == a_param['key'] and data[key] != a_param['value']:
+                            found = False
+                            break
+                if found:
+                    break
+        if found:
+            self.log.debug("The device already exists : id={0}.".format(a_device['id']))
+        else:
+            self.log.debug("The device doesn't exists in database")
+         
+            # add the device feature in the new devices list : self.new_devices[device_type][type][feature] = data
+            self.log.debug("Check if the device has already be marked as new...")
+            found = False
+            for a_device in self.new_devices:
+                if a_device['device_type_id'] == device_type and \
+                   a_device['type'] == type and \
+                   a_device['feature'] == feature:
+
+                   if data == a_device['data']:
+                        found = True
+                    
+            if found == False:
+                new_device ={'device_type_id' : device_type,
+                             'type' : type,
+                             'feature' : feature,
+                             'data' : data}
+                self.log.info("New device feature detected and added in the new devices list : {0}".format(new_device))
+                self.new_devices.append(new_device)
+            else:
+                self.log.debug("The device has already been detected since the plugin startup")
+            print self.new_devices
+
+
+
+
+
+
 
     def get_parameter_for_feature(self, a_device, type, feature, key):
         """ For a device feature, return the required parameter value
