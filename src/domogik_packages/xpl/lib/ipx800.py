@@ -58,6 +58,7 @@ IPX_LED_HIGH = "1"
 IPX_LED_LOW = "0"
 IPX_BTN_HIGH = "up"
 IPX_BTN_LOW = "down"
+IPX_BTN_LOW2 = "dn"
 
 # response
 IPX_SUCCESS = "Success!"
@@ -314,7 +315,7 @@ class IPX:
         # translate values
         if data['elt'] == "led" and data['value'] == IPX_LED_HIGH:
             current = "high"
-        elif data['elt'] == "led" and data['value'] == IPX_LED_LOW:
+        elif data['elt'] == "led" and (data['value'] == IPX_BTN_LOW or data['value'] == IPX_BTN_LOW2):
             current = "low"
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_HIGH:
             current = "high"
