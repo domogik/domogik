@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, db_helper, timeit
+from domogik.rest.url import urlHandler, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os

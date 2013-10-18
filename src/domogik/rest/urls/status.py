@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, db_helper, timeit
+from domogik.rest.url import urlHandler, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -10,7 +10,6 @@ from flask import Response
 @json_response
 @timeit
 def api_root():
-    print "@@@@@ /"
     # domogik global version
     global_version = sys.modules["domogik"].__version__
     # domogik src version

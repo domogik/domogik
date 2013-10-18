@@ -37,7 +37,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 import json
 import datetime
 
-def domogik_encoder():
+def domogik_encoder(stop_at=[]):
     """ wrapper function """
     _visited_objs = []
     class DomogikEncoder(json.JSONEncoder):
@@ -53,7 +53,7 @@ def domogik_encoder():
                 fields = {}
                 for field in [x for x in dir(obj) if not x.startswith('_') \
                     and x != 'metadata' and x != 'get_tablename' \
-                    and x != 'set_password']:
+                    and x != 'set_password' and x not in stop_at]:
                     fields[field] = obj.__getattribute__(field)
                 # a json-encodable dict
                 return fields

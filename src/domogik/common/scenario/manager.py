@@ -272,8 +272,6 @@ class ScenarioManager:
         self.log.debug("Create condition %s with payload %s" % (name, payload['condition']))
         # build a list of actions
         for action in payload['actions'].keys():
-            print "============="
-            print action
             # action is now a tuple
             #   (uid, params)
             self._conditions_actions[name].append(action) 
@@ -299,8 +297,6 @@ class ScenarioManager:
     def trigger_actions(self, name):
         """ Trigger that will be called when a condition evaluates to True
         """
-        print "+++++++++++++++++++++++++++"
-        print "running actions for condition %s" % name
         if name not in self._conditions_actions \
                 or name not in self._conditions:
             raise KeyError('no key %s in one of the _conditions tables table' % name)
@@ -401,7 +397,7 @@ class ScenarioManager:
             classes = [m for m in inspect.getmembers(imported_mod) if inspect.isclass(m[1])]
             # Filter in order to keep only the classes that belong to domogik package and are not abstract
             res.extend([(module[1] + "." + c[0], c[1]) for c in filter(
-                lambda x: x[1].__module__.startswith("domogik.") and not x[0].startswith("Abstract"), classes)])
+                lambda x: x[1].__module__.startswith("domogik.common.scenario.") and not x[0].startswith("Abstract"), classes)])
         return res
 
 

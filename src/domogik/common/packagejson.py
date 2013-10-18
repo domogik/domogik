@@ -180,8 +180,10 @@ class PackageJson():
             for conf in self.json["configuration"]:
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
             # validate procuts
-            #if products in self.json.keys():
-
+            if 'products' in self.json.keys():
+                expected = ["name", "id", "documentation", "type"]
+                for prod in self.json['products']:
+                    self._validate_keys(expected, "a product", prod.keys())
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]

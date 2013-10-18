@@ -395,7 +395,8 @@ class DbHelper():
                             'data_type' : a_sensor.data_type,
                             'conversion' : a_sensor.conversion, 
                             'last_value' : a_sensor.last_value, 
-                            'last_received' : a_sensor.last_received
+                            'last_received' : a_sensor.last_received,
+                            'reference' : a_sensor.reference
                           }
             json_device['sensors'][a_sensor.reference] = json_sensor
 
@@ -403,6 +404,7 @@ class DbHelper():
         json_device['xpl_stats'] = {}
         for a_xplstat in self.get_xpl_stat_by_device_id(device.id):
             json_xplstat = { 'id' : a_xplstat.id,
+                             'json_id' : a_xplstat.json_id,
                              'name' : a_xplstat.name,
                              'schema' : a_xplstat.schema,
                              'parameters' : {
@@ -445,6 +447,7 @@ class DbHelper():
         json_device['xpl_commands'] = {}
         for a_xplcmd in self.get_xpl_command_by_device_id(device.id):
             json_xplcmd = { 'id': a_xplcmd.id,
+                            'json_id' : a_xplcmd.json_id,
                             'name' : a_xplcmd.name,
                             'schema' : a_xplstat.schema,
                              'parameters' : []
@@ -461,6 +464,7 @@ class DbHelper():
                     'id': a_cmd.id,
                     'reference': a_cmd.reference,
                     'name': a_cmd.name,
+                    'return_confirmation': a_cmd.return_confirmation,
                     'parameters': []
                     }
             for a_cmd_param in a_cmd.params:
