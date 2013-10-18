@@ -524,22 +524,12 @@ class Package():
         self.log.info("Package {0} : read the json file and validate it".format(self.name))
         try:
             pkg_json = PackageJson(pkg_type = self.type, name = self.name)
-            # check if json is valid
-            if pkg_json.validate() == False:
-                # TODO : how to get the reason ?
-                self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
-            else:
-                self.json = pkg_json.get_json()
-                # TODO : clean useless informations
-                #del(self.json['configuration'])
-                #del(self.json['xpl_stats'])
-                #del(self.json['commands'])
-                #del(self.json['xpl_commands'])
-                #del(self.json['sensors'])
-                #del(self.json['json_version'])
-        except:
-            self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.name, traceback.format_exc()))
-
+            pkg_json.validate()
+            self.json = pkg_json.get_json()
+        except PackageException as e:
+            self.log.error("Package {0}-{1} : error while trying to read the json file".format(self.type, self.name))
+            self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
+            self.log.error("Package {0}-{1} : {2}".format(self.type, self.name, e.value))
 
     def get_json(self):
         """ Return the json data (after some cleanup)
@@ -832,18 +822,15 @@ class Plugin(GenericComponent, MQAsyncSub):
         try:
             self.log.info("Plugin {0} : read the json file and validate it".format(self.name))
             pkg_json = PackageJson(pkg_type = "plugin", name = self.name)
-            # check if json is valid
-            if pkg_json.validate() == False:
-                self.set_status(STATUS_INVALID)
-                # TODO : how to get the reason ?
-                self.log.error("Plugin {0} : invalid json file".format(self.name))
-            else:
-                self.data = pkg_json.get_json()
-                # and finally, add the configuration values in the data
-                self.add_configuration_values_to_data()
-        except:
-            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.name, traceback.format_exc()))
+            pkg_json.validate()
+            self.data = pkg_json.get_json()
+            self.add_configuration_values_to_data()
+        except PackageException as e:
+            self.log.error("Plugin {0} : error while trying to read the json file".format(self.name))
+            self.log.error("Plugin {0} : invalid json file".format(self.name))
+            self.log.error("Plugin {0} : {1}".format(self.name, e.value))
             self.set_status(STATUS_INVALID)
+            pass
 
     def add_configuration_values_to_data(self):
         """
