@@ -251,23 +251,25 @@ class Manager(XplPlugin):
             self.log.debug("Type : {0}     / Id : {1}".format(type, name))
           
             ### Create a package object in order to get packages details over MQ
-            self._packages["{0}-{1}".format(type, name)] = Package(type, name)
+            pkg = Package(type, name)
+            if pkg.is_valid():
+                self._packages["{0}-{1}".format(type, name)] = pkg
 
-            ### type = plugin
-            if type == "plugin":
-                if self._plugins.has_key(name):
-                    self.log.debug("The plugin '{0}' is already registered.".format(name))
-                else:
-                    self.log.info("New plugin available : {0}".format(name))
-                    self._plugins[name] = Plugin(name, 
-                                               self.get_sanitized_hostname(), 
-                                               self._clients, 
-                                               self.get_libraries_directory(),
-                                               self.get_packages_directory(),
-                                               self.zmq,
-                                               self.get_stop(),
-                                               self.get_sanitized_hostname())
-                    # The automatic startup is handled in the Plugin class in __init__
+                ### type = plugin
+                if type == "plugin":
+                    if self._plugins.has_key(name):
+                        self.log.debug("The plugin '{0}' is already registered.".format(name))
+                    else:
+                        self.log.info("New plugin available : {0}".format(name))
+                        self._plugins[name] = Plugin(name, 
+                                                   self.get_sanitized_hostname(), 
+                                                   self._clients, 
+                                                   self.get_libraries_directory(),
+                                                   self.get_packages_directory(),
+                                                   self.zmq,
+                                                   self.get_stop(),
+                                                   self.get_sanitized_hostname())
+                        # The automatic startup is handled in the Plugin class in __init__
             
         ### Create a DeviceType collection in order to send them over MQ
         for pkg in self._packages:
@@ -523,6 +525,7 @@ class Package():
 
         self.log.info("Registering a new package (warning, not a package instance but the package model) : {0}-{1}".format(self.type, self.name))
 
+        self.valid = False
         self.log.info("Package {0} : read the json file and validate it".format(self.name))
         try:
             pkg_json = PackageJson(pkg_type = self.type, name = self.name)
@@ -539,9 +542,15 @@ class Package():
                 #del(self.json['xpl_commands'])
                 #del(self.json['sensors'])
                 #del(self.json['json_version'])
+                self.valid = True
         except:
             self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.name, traceback.format_exc()))
 
+
+    def is_valid(self):
+        """ Return the json data (after some cleanup)
+        """
+        return self.valid
 
     def get_json(self):
         """ Return the json data (after some cleanup)
