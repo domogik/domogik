@@ -81,7 +81,7 @@ from zmq.eventloop.ioloop import IOLoop
 from domogik.mq.message import MQMessage
 from domogik.mq.pubsub.publisher import MQPub
 
-
+from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
 
 ##### packages management #####
@@ -102,7 +102,7 @@ from domogik.common.packagejson import PackageJson, PackageException
 FIFO_DIR = "/var/run/domogik/"
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15
-
+CHECK_FOR_NEW_PACKAGES = 30
 
 
 class Manager(XplPlugin):
@@ -219,15 +219,13 @@ class Manager(XplPlugin):
                 self.log.error("Unable to start scenario manager")
 
         ### Check for the available packages
-        # TODO : call it with a timer !
-        # each <a new parameter to define> seconds
-        # wait for 1 minute or more between each check
-        # in 'install' mode, when a new package will be installed, a signal will be sent over MQ, so we will be able to call this function when needed
         self._check_available_packages()
-
-        ### Start the MQ 
-        # Already done in XplPlugin
-        #IOLoop.instance().start() 
+        self.p = self
+        self.packageTimer = XplTimer(\
+                CHECK_FOR_NEW_PACKAGES, \
+                self._check_available_packages, \
+                self)
+        self.packageTimer.start()
 
         ### Component is ready
         self.ready()
@@ -237,6 +235,7 @@ class Manager(XplPlugin):
     def _check_available_packages(self):
         """ Check the available packages and get informations on them
         """
+        print "==============================="
         is_ok, pkg_list = self._list_packages()
         if not is_ok:
             self.log.error("Error while checking available packages. Exiting!")
