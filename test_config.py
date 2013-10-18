@@ -39,6 +39,7 @@ import pwd
 import sys
 from multiprocessing import Process, Pipe
 from socket import gethostbyname, gethostname
+from domogik.common.utils import get_ip_for_interfaces
 
 BLUE = '\033[94m'
 OK = '\033[92m'
@@ -253,7 +254,8 @@ def test_user_config_file(user_home, user_entry):
     
     # Check [rest] section
     info("Parse [rest] section")
-    _check_port_availability(rest['server_ip'], rest['server_port'])
+    for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):
+        _check_port_availability(ipadd, rest['port'])
     ok("Rest server IP/port is not bound by anything else")
 
 def test_init():
