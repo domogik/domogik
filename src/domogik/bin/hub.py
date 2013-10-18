@@ -33,7 +33,7 @@ Implements
 """
 
 
-from optparse import OptionParser
+from argparse import ArgumentParser
 from domogik.common import daemonize
 from sys import stdout
 
@@ -49,22 +49,13 @@ VERSION=1.0
 
 def main():
     ### Options management
-    parser = OptionParser()
-    parser.add_option("-V", 
-                      "--version", 
-                      action="store_true", 
-                      dest="display_version", 
-                      default=False, 
-                      help="Display the xPL hub version.")
-    parser.add_option("-f", 
-                      action="store_true", 
-                      dest="run_in_foreground", 
-                      default=False, 
-                      help="Run the xPL hub in foreground, default to background.")
-    (options, args) = parser.parse_args()
+    parser = ArgumentParser()
+    parser.add_argument("-V", action="store_true", dest="display_version", default=False, help="Display the xPL hub version.")
+    parser.add_argument("-f", action="store_true", dest="run_in_foreground", default=False, help="Run the xPL hub in foreground, default to background.")
+    options = parser.parse_args()
     if options.display_version:
         print(VERSION)
-        sys.exit(0)
+        return
     if not options.run_in_foreground:
         daemon = True
         daemonize.createDaemon()

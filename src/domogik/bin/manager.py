@@ -81,7 +81,7 @@ from zmq.eventloop.ioloop import IOLoop
 from domogik.mq.message import MQMessage
 from domogik.mq.pubsub.publisher import MQPub
 
-
+from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
 
 ##### packages management #####
@@ -102,7 +102,7 @@ from domogik.common.packagejson import PackageJson, PackageException
 FIFO_DIR = "/var/run/domogik/"
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15
-
+CHECK_FOR_NEW_PACKAGES = 30
 
 
 class Manager(XplPlugin):
@@ -219,15 +219,13 @@ class Manager(XplPlugin):
                 self.log.error("Unable to start scenario manager")
 
         ### Check for the available packages
-        # TODO : call it with a timer !
-        # each <a new parameter to define> seconds
-        # wait for 1 minute or more between each check
-        # in 'install' mode, when a new package will be installed, a signal will be sent over MQ, so we will be able to call this function when needed
         self._check_available_packages()
-
-        ### Start the MQ 
-        # Already done in XplPlugin
-        #IOLoop.instance().start() 
+        self.p = self
+        self.packageTimer = XplTimer(\
+                CHECK_FOR_NEW_PACKAGES, \
+                self._check_available_packages, \
+                self)
+        self.packageTimer.start()
 
         ### Component is ready
         self.ready()
@@ -237,6 +235,7 @@ class Manager(XplPlugin):
     def _check_available_packages(self):
         """ Check the available packages and get informations on them
         """
+        print "==============================="
         is_ok, pkg_list = self._list_packages()
         if not is_ok:
             self.log.error("Error while checking available packages. Exiting!")
@@ -529,23 +528,12 @@ class Package():
         self.log.info("Package {0} : read the json file and validate it".format(self.name))
         try:
             pkg_json = PackageJson(pkg_type = self.type, name = self.name)
-            # check if json is valid
-            if pkg_json.validate() == False:
-                # TODO : how to get the reason ?
-                self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
-            else:
-                self.json = pkg_json.get_json()
-                # TODO : clean useless informations
-                #del(self.json['configuration'])
-                #del(self.json['xpl_stats'])
-                #del(self.json['commands'])
-                #del(self.json['xpl_commands'])
-                #del(self.json['sensors'])
-                #del(self.json['json_version'])
-                self.valid = True
-        except:
-            self.log.error("Package {0}-{1} : error while trying to read the json file : {2}".format(self.type, self.name, traceback.format_exc()))
-
+            pkg_json.validate()
+            self.json = pkg_json.get_json()
+        except PackageException as e:
+            self.log.error("Package {0}-{1} : error while trying to read the json file".format(self.type, self.name))
+            self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
+            self.log.error("Package {0}-{1} : {2}".format(self.type, self.name, e.value))
 
     def is_valid(self):
         """ Return the json data (after some cleanup)
@@ -843,18 +831,15 @@ class Plugin(GenericComponent, MQAsyncSub):
         try:
             self.log.info("Plugin {0} : read the json file and validate it".format(self.name))
             pkg_json = PackageJson(pkg_type = "plugin", name = self.name)
-            # check if json is valid
-            if pkg_json.validate() == False:
-                self.set_status(STATUS_INVALID)
-                # TODO : how to get the reason ?
-                self.log.error("Plugin {0} : invalid json file".format(self.name))
-            else:
-                self.data = pkg_json.get_json()
-                # and finally, add the configuration values in the data
-                self.add_configuration_values_to_data()
-        except:
-            self.log.error("Plugin {0} : error while trying to read the json file : {1}".format(self.name, traceback.format_exc()))
+            pkg_json.validate()
+            self.data = pkg_json.get_json()
+            self.add_configuration_values_to_data()
+        except PackageException as e:
+            self.log.error("Plugin {0} : error while trying to read the json file".format(self.name))
+            self.log.error("Plugin {0} : invalid json file".format(self.name))
+            self.log.error("Plugin {0} : {1}".format(self.name, e.value))
             self.set_status(STATUS_INVALID)
+            pass
 
     def add_configuration_values_to_data(self):
         """
