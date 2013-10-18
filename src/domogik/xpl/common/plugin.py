@@ -441,20 +441,25 @@ class XplPlugin(BasePlugin, MQRep):
         """
         self.log.info("Check if there are pictures for the defined products")
         ok = True
-        for product in self.json_data['products']:
-            ok_product = False
-            for ext in PRODUCTS_PICTURES_EXTENSIONS:
-                file = "{0}.{1}".format(product['id'], ext)
-                if os.path.isfile("{0}/{1}".format(self.get_products_directory(), file)):
-                    ok_product = True
-                    break
-            if ok_product:
-                self.log.debug("- OK : {0} ({1})".format(product['name'], file))
-            else:
-                ok = False
-                self.log.warning("- Missing : {0} ({1}.{2})".format(product['name'], product['id'], PRODUCTS_PICTURES_EXTENSIONS))
+        ok_product = None
+        if self.json_data.has_key('products'):
+            for product in self.json_data['products']:
+                ok_product = False
+                for ext in PRODUCTS_PICTURES_EXTENSIONS:
+                    file = "{0}.{1}".format(product['id'], ext)
+                    if os.path.isfile("{0}/{1}".format(self.get_products_directory(), file)):
+                        ok_product = True
+                        break
+                if ok_product:
+                    self.log.debug("- OK : {0} ({1})".format(product['name'], file))
+                else:
+                    ok = False
+                    self.log.warning("- Missing : {0} ({1}.{2})".format(product['name'], product['id'], PRODUCTS_PICTURES_EXTENSIONS))
         if ok == False:
             self.log.warning("Some pictures are missing!")
+        else:
+            if ok_product == None:
+                self.log.info("There is no products defined for this plugin")
 
 
     def ready(self, ioloopstart=1):
