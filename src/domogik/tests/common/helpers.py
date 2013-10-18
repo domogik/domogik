@@ -36,8 +36,10 @@ Usage
 import zmq
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_ip_for_interfaces
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
+
 
 
 ### Common features
@@ -77,7 +79,10 @@ def get_rest_url():
     cfg = Loader('rest')
     config = cfg.load()
     conf = dict(config[1])
-    return "http://{0}:{1}/".format(conf['server_ip'], conf['server_port'])
+    # we return the url related to the first declared interface in domogik.cfg
+    intf = conf['interfaces'].split(",")[0]
+    ip = get_ip_for_interfaces([intf])[0]
+    return "http://{0}:{1}/".format(ip, conf['port'])
 
 ### Plugin configuration features
 
