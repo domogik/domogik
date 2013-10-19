@@ -530,6 +530,7 @@ class Package():
             pkg_json = PackageJson(pkg_type = self.type, name = self.name)
             pkg_json.validate()
             self.json = pkg_json.get_json()
+            self.valid = True
         except PackageException as e:
             self.log.error("Package {0}-{1} : error while trying to read the json file".format(self.type, self.name))
             self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
