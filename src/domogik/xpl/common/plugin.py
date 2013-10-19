@@ -72,6 +72,8 @@ CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'sce
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "packages"
 RESOURCES_DIR = "resources"
+PRODUCTS_DIR = "products"
+PRODUCTS_PICTURES_EXTENSIONS = ['jpg', 'png']
 
 # domogik vendor id (for xpl)
 DMG_VENDOR_ID = "domogik"
@@ -145,6 +147,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.libraries_directory = config['libraries_path']
         self.packages_directory = "{0}/{1}".format(config['libraries_path'], PACKAGES_DIR)
         self.resources_directory = "{0}/{1}".format(config['libraries_path'], RESOURCES_DIR)
+        self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, "plugin", self._name, PRODUCTS_DIR)
 
         # Get pid and write it in a file
         self._pid_dir_path = config['pid_dir_path']
@@ -189,6 +192,10 @@ class XplPlugin(BasePlugin, MQRep):
         # init an empty 'new' devices list
         self.new_devices = []
 
+        # check for products pictures
+        self.check_for_pictures()
+
+        # init finished
         self.log.debug("end single xpl plugin")
 
 
@@ -429,6 +436,31 @@ class XplPlugin(BasePlugin, MQRep):
             return None
          
 
+    def check_for_pictures(self):
+        """ if some products are defined, check if the corresponding pictures are present in the products/ folder
+        """
+        self.log.info("Check if there are pictures for the defined products")
+        ok = True
+        ok_product = None
+        if self.json_data.has_key('products'):
+            for product in self.json_data['products']:
+                ok_product = False
+                for ext in PRODUCTS_PICTURES_EXTENSIONS:
+                    file = "{0}.{1}".format(product['id'], ext)
+                    if os.path.isfile("{0}/{1}".format(self.get_products_directory(), file)):
+                        ok_product = True
+                        break
+                if ok_product:
+                    self.log.debug("- OK : {0} ({1})".format(product['name'], file))
+                else:
+                    ok = False
+                    self.log.warning("- Missing : {0} ({1}.{2})".format(product['name'], product['id'], PRODUCTS_PICTURES_EXTENSIONS))
+        if ok == False:
+            self.log.warning("Some pictures are missing!")
+        else:
+            if ok_product == None:
+                self.log.info("There is no products defined for this plugin")
+
 
     def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of XplPlugin
@@ -569,6 +601,11 @@ class XplPlugin(BasePlugin, MQRep):
        """ Return list of config files
        """
        return self._config_files
+
+    def get_products_directory(self):
+       """ getter 
+       """
+       return self.products_directory
 
     def get_libraries_directory(self):
        """ getter 
