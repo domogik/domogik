@@ -62,12 +62,18 @@ class TestDevice():
         self.device_name = None
         self.device_type = None
 
-    def create_device(self, type, id, host, device_name, device_type):
+    def create_device(self, type, name, host, device_name, device_type):
         """ Call POST /device/... to create the device
+            @param type : package type
+            @param name : package name
+            @param host : client host for the package
+            @param device_name : the device name
+            @param device_type : the device type
+            @return : the device id for the device created
         """
         # package informations
         self.type = type
-        self.id = id
+        self.name = name
         self.host = host
         # device informations
         self.device_name = device_name
@@ -75,7 +81,7 @@ class TestDevice():
         description = "a test device"
         reference = "for test only"
         print("Create a test device for the {0} {1} on {2}. Device type is '{3}', name is '{4}'".format(self.type,
-                                                                                                          self.id,
+                                                                                                          self.name,
                                                                                                           self.host,
                                                                                                           self.device_type,
                                                                                                           self.device_name))
@@ -84,7 +90,7 @@ class TestDevice():
             headers={'content-type':'application/x-www-form-urlencoded'},
             data="name={0}&type={1}&id={2}&host={3}&description={4}&reference={5}&device_type={6}".format(self.device_name,
                                                                                                           self.type,
-                                                                                                          self.id,
+                                                                                                          self.name,
                                                                                                           self.host,
                                                                                                           description,
                                                                                                           reference,
@@ -97,6 +103,7 @@ class TestDevice():
         device = json.loads(response.text)
         self.device_id = device['id']
         print("The device id is '{0}'".format(self.device_id))
+        return self.device_id
 
     def configure_global_parameters(self, params):
         """ Call PUT /device/addglobal/... to set the global parameters for a device
@@ -126,7 +133,7 @@ class TestDevice():
         print("Delete the device : id = {0}".format(id))
         response = requests.delete("{0}/device/{1}".format(self.rest_url, id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print("Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
 
@@ -139,14 +146,14 @@ class TestDevice():
         # first, retrieve all the devices
         response = requests.get("{0}/device/".format(self.rest_url), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print("Response : [{0}] {1}... (truncated)".format(response.status_code, response.text[:50]))
+        print("Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
-        devices = device = json.loads(response.text)
-        for device in devices:
-            print("Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
-            if device['client_id'] == client_id:
-                self.del_device(device['id'])
+        #devices = device = json.loads(response.text)
+        #for device in devices:
+        #    print("Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
+        #    if device['client_id'] == client_id:
+        #        self.del_device(device['id'])
         
         
 
