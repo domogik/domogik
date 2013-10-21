@@ -221,6 +221,8 @@ class Manager(XplPlugin):
         ### Check for the available packages
         self._check_available_packages()
         self.p = self
+        # TODO : use a thread instead of XplTimer to be independent of xpl libraries
+        # or rename XplTimer :)
         self.packageTimer = XplTimer(\
                 CHECK_FOR_NEW_PACKAGES, \
                 self._check_available_packages, \
