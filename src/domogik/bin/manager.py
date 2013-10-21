@@ -235,7 +235,6 @@ class Manager(XplPlugin):
     def _check_available_packages(self):
         """ Check the available packages and get informations on them
         """
-        print "==============================="
         is_ok, pkg_list = self._list_packages()
         if not is_ok:
             self.log.error("Error while checking available packages. Exiting!")
@@ -269,15 +268,14 @@ class Manager(XplPlugin):
                                                    self.get_stop(),
                                                    self.get_sanitized_hostname())
                         # The automatic startup is handled in the Plugin class in __init__
-            
-        ### Create a DeviceType collection in order to send them over MQ
-        for pkg in self._packages:
-            for device_type in self._packages[pkg].get_device_types():
-                self.log.info("Register new device type : {0}".format(device_type))
-                if self._device_types.has_key(device_type):
-                    self.log.error("Duplicate device type detected : {0} for package {1}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {2}".format(device_type, pkg, self._device_types[device_type]))
-                self._device_types[device_type] = self._packages[pkg].get_json()
- 
+                        ### Create a DeviceType collection in order to send them over MQ
+                        # this is only done when a new package is found
+                        for device_type in self._packages["{0}-{1}".format(type, name)].get_device_types():
+                            self.log.info("Register new device type : {0}".format(device_type))
+                            if self._device_types.has_key(device_type):
+                                self.log.error("Duplicate device type detected : {0} for package {1}-{2}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {3}".format(device_type, type, name, self._device_types[device_type]))
+                            self._device_types[device_type] = self._packages["{0}-{1}".format(type, name)].get_json()
+
         # publish packages list
         msg_data = {}
         for pkg in self._packages:
@@ -530,6 +528,7 @@ class Package():
             pkg_json = PackageJson(pkg_type = self.type, name = self.name)
             pkg_json.validate()
             self.json = pkg_json.get_json()
+            self.valid = True
         except PackageException as e:
             self.log.error("Package {0}-{1} : error while trying to read the json file".format(self.type, self.name))
             self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))

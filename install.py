@@ -212,10 +212,9 @@ def write_domogik_configfile(advanced_mode):
                     config.set(sect, item[0], new_value)
                     newvalues = True
     # write the config file
-    if newvalues:
-        with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
-            ok("Writing the config file")
-            config.write(configfile)
+    with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
 
 def write_xplhub_configfile(advanced_mode):
     # read the sample config file
@@ -234,12 +233,11 @@ def write_xplhub_configfile(advanced_mode):
                     newvalues = True
                 debug("Value {0} in xplhub.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    if newvalues:
-        with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
-            ok("Writing the config file")
-            config.write(configfile)
+    with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
 
-def write_domogik_configfile_from_command_line():
+def write_domogik_configfile_from_command_line(args):
     # read the sample config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
@@ -255,12 +253,11 @@ def write_domogik_configfile_from_command_line():
                 newvalues = True
             debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    if newvalues:
-        with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
-            ok("Writing the config file")
-            config.write(configfile)
+    with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
 
-def write_xplhub_configfile_from_command_line():
+def write_xplhub_configfile_from_command_line(args):
     # read the sample config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
@@ -280,7 +277,6 @@ def write_xplhub_configfile_from_command_line():
         with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
             ok("Writing the config file")
             config.write(configfile)
-
 
 def needupdate():
     # first check if there are already some config files
