@@ -193,7 +193,8 @@ class XplPlugin(BasePlugin, MQRep):
         self.new_devices = []
 
         # check for products pictures
-        self.check_for_pictures()
+        if self._name not in CORE_COMPONENTS and self._test == False:
+            self.check_for_pictures()
 
         # init finished
         self.log.debug("end single xpl plugin")
