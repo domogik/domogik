@@ -475,6 +475,9 @@ class XplPlugin(BasePlugin, MQRep):
         else:
             self.enable_hbeat()
 
+        # send the status for the xpl hbeat
+        self.myxpl.update_status(2)
+
         ### send plugin status : STATUS_ALIVE
         # TODO : why the dbmgr has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs

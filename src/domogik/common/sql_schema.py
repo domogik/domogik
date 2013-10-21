@@ -345,7 +345,6 @@ class Sensor(Base):
     history_max = Column(Integer, nullable=True)
     history_expire = Column(Integer, nullable=True)
     history_round = Column(Float, nullable=True)
-    params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True) 
 
     def __init__(self, device_id, name, reference, data_type, conversion, h_store, h_max, h_expire, h_round):
         self.device_id = device_id
