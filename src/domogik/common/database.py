@@ -131,10 +131,10 @@ class DbHelper():
         self.__db_config = dict(config[1])
 
         if self.__db_config.has_key("recycle_pool"):
-            self.log.info("User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
+            #self.log.info("User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
             pool_recycle = int(self.__db_config['recycle_pool'])
         else:
-            self.log.info("No user value for recycle pool. Using default value : {0}".format(DEFAULT_RECYCLE_POOL))
+            #self.log.info("No user value for recycle pool. Using default value : {0}".format(DEFAULT_RECYCLE_POOL))
             pool_recycle = DEFAULT_RECYCLE_POOL
 
         if config[0]['log_level'] == 'debug':

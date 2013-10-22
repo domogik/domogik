@@ -252,7 +252,7 @@ class XplManager(XplPlugin):
                     params[param.key] = param.value
 
             ### start the listener
-            self._log_stats.debug("creating listener for %s" % (params))
+            self._log_stats.info("creating listener for %s" % (params))
             self._listener = Listener(self._callback, xpl, params)
 
         def get_listener(self):
@@ -271,13 +271,13 @@ class XplManager(XplPlugin):
             try:
                 # find what parameter to store
                 for param in self._stat.params:
-                    self._log_stats.debug("Checking param {0}".format(param))
+                    # self._log_stats.debug("Checking param {0}".format(param))
                     if param.sensor_id is not None and param.static is False:
                         if param.key in message.data:
                             value = message.data[param.key]
-                            self._log_stats.debug( \
-                                    "Key found {0} with value {1}." \
-                                    .format(param.key, value))
+                            # self._log_stats.debug( \
+                            #        "Key found {0} with value {1}." \
+                            #        .format(param.key, value))
                             store = True
                             if param.ignore_values:
                                 if value in eval(param.ignore_values):
@@ -293,9 +293,9 @@ class XplManager(XplPlugin):
                                                 self._dev['client_id'], \
                                                 self._sen.conversion, \
                                                 value)
-                                    self._log_stats.debug( \
-                                            "Key found {0} with value {0} after conversion." \
-                                            .format(param.key, value))
+                                self._log_stats.info( \
+                                        "Storing stat for device '{0}': key '{1}' with value '{2}' after conversion." \
+                                        .format(self._dev['name'], param.key, value))
                                 # do the store
                                 device_data.append({"value" : value, "sensor": param.sensor_id})
                                 my_db = DbHelper()
@@ -307,10 +307,10 @@ class XplManager(XplPlugin):
                                 del(my_db)
                             else:
                                 self._log_stats.debug("Don't need to store this value")
-                        else:
-                            self._log_stats.debug("Key not found in message data")
-                    else:
-                        self._log_stats.debug("No sensor attached")
+                        #else:
+                        #    self._log_stats.debug("Key not found in message data")
+                    #else:
+                    #    self._log_stats.debug("No sensor attached")
             except:
                 self._log_stats.error(traceback.format_exc())
             # publish the result
