@@ -95,7 +95,7 @@ class QueryMQ():
             msg.add_data('key', key)
         else:
             key = "*"
-        self._log.info("Request query config for key {0}".format(key))
+        self._log.info("Request query config for plugin {0} : key {1}".format(name, key))
         ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
 
         ### no response from dbmgr

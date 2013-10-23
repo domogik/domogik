@@ -102,7 +102,7 @@ from domogik.common.packagejson import PackageJson, PackageException
 FIFO_DIR = "/var/run/domogik/"
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15
-CHECK_FOR_NEW_PACKAGES = 30
+CHECK_FOR_NEW_PACKAGES_INTERVAL = 10
 
 
 class Manager(XplPlugin):
@@ -219,15 +219,21 @@ class Manager(XplPlugin):
                 self.log.error("Unable to start scenario manager")
 
         ### Check for the available packages
-        self._check_available_packages()
-        self.p = self
+        #self._check_available_packages()
+        #self.p = self
         # TODO : use a thread instead of XplTimer to be independent of xpl libraries
         # or rename XplTimer :)
-        self.packageTimer = XplTimer(\
-                CHECK_FOR_NEW_PACKAGES, \
-                self._check_available_packages, \
-                self)
-        self.packageTimer.start()
+        #self.packageTimer = XplTimer(\
+        #        CHECK_FOR_NEW_PACKAGES, \
+        #        self._check_available_packages, \
+        #        self)
+        #self.packageTimer.start()
+        thr_check_available_packages = Thread(None,
+                                              self._check_available_packages,
+                                              "check_check_available_packages",
+                                              (),
+                                              {})
+        thr_check_available_packages.start()
 
         ### Component is ready
         self.ready()
@@ -237,53 +243,85 @@ class Manager(XplPlugin):
     def _check_available_packages(self):
         """ Check the available packages and get informations on them
         """
-        is_ok, pkg_list = self._list_packages()
-        if not is_ok:
-            self.log.error("Error while checking available packages. Exiting!")
-            sys.exit(1)
-        for pkg in pkg_list:
-            self.log.debug("Package available : {0}".format(pkg))
-            try:
-                [type, name] = pkg.split("_")
-            except:
-                self.log.warning("Invalid package : {0} (should be named like this : <type>_<name> (plugin_ipx800, ...)".format(pkg))
-                continue
-            self.log.debug("Type : {0}     / Id : {1}".format(type, name))
-          
-            ### Create a package object in order to get packages details over MQ
-            pkg = Package(type, name)
-            if pkg.is_valid():
-                self._packages["{0}-{1}".format(type, name)] = pkg
+        while not self._stop.isSet():
+            packages_updates = False
+            is_ok, pkg_list = self._list_packages()
+            if not is_ok:
+                self.log.error("Error while checking available packages. Exiting!")
+                sys.exit(1)
+            for pkg in pkg_list:
+                self.log.debug("Package available : {0}".format(pkg))
+                try:
+                    [type, name] = pkg.split("_")
+                except:
+                    self.log.warning("Invalid package : {0} (should be named like this : <type>_<name> (plugin_ipx800, ...)".format(pkg))
+                    continue
+              
+                ### is the package already registered ?
+                pkg_id = "{0}-{1}".format(type, name)
+                if pkg_id not in self._packages:
+                    self.log.info("New package detected : type = {0} / id = {1}".format(type, name))
+                    packages_updates = True
+                    pkg_registered = False
+                else:
+                    pkg_registered = True
 
-                ### type = plugin
-                if type == "plugin":
-                    if self._plugins.has_key(name):
-                        self.log.debug("The plugin '{0}' is already registered.".format(name))
+                ### Create a package object in order to get packages details over MQ
+                pkg = Package(type, name)
+                if pkg.is_valid():
+                    if pkg_registered:
+                        json_has_changed = (self._packages[pkg_id].get_json() != pkg.get_json())
                     else:
-                        self.log.info("New plugin available : {0}".format(name))
-                        self._plugins[name] = Plugin(name, 
-                                                   self.get_sanitized_hostname(), 
-                                                   self._clients, 
-                                                   self.get_libraries_directory(),
-                                                   self.get_packages_directory(),
-                                                   self.zmq,
-                                                   self.get_stop(),
-                                                   self.get_sanitized_hostname())
-                        # The automatic startup is handled in the Plugin class in __init__
-                        ### Create a DeviceType collection in order to send them over MQ
-                        # this is only done when a new package is found
-                        for device_type in self._packages["{0}-{1}".format(type, name)].get_device_types():
-                            self.log.info("Register new device type : {0}".format(device_type))
-                            if self._device_types.has_key(device_type):
-                                self.log.error("Duplicate device type detected : {0} for package {1}-{2}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {3}".format(device_type, type, name, self._device_types[device_type]))
-                            self._device_types[device_type] = self._packages["{0}-{1}".format(type, name)].get_json()
+                        json_has_changed = False
+                    if json_has_changed:
+                        self.log.info("Package {0} : the json file has been updated".format(pkg_id))
 
-        # publish packages list
-        msg_data = {}
-        for pkg in self._packages:
-            msg_data[pkg] = self._packages[pkg].get_json()
-        self._pub.send_event('package.detail', 
-                             msg_data)
+                    # if the package is already registered...
+                    # ...we check if the json has been updated. If so we need to reload data
+                    # else...
+                    # ...we load data
+                    if not pkg_registered or json_has_changed:
+                        packages_updates = True
+                        self._packages[pkg_id] = pkg
+
+                        ### type = plugin
+                        if type == "plugin":
+                            if self._plugins.has_key(name):
+                                self.log.debug("The plugin '{0}' is already registered. Reloading its data".format(name))
+                                self._plugins[name].reload_data()
+                            else:
+                                self.log.info("New plugin available : {0}".format(name))
+                                self._plugins[name] = Plugin(name, 
+                                                           self.get_sanitized_hostname(), 
+                                                           self._clients, 
+                                                           self.get_libraries_directory(),
+                                                           self.get_packages_directory(),
+                                                           self.zmq,
+                                                           self.get_stop(),
+                                                           self.get_sanitized_hostname())
+                                # The automatic startup is handled in the Plugin class in __init__
+
+                                ### Create a DeviceType collection in order to send them over MQ
+                                # this is only done when a new package is found
+
+                            ### Register all the device types
+                            for device_type in self._packages[pkg_id].get_device_types():
+                                self.log.info("Register device type : {0}".format(device_type))
+                                # TODO : delete
+                                #if self._device_types.has_key(device_type):
+                                #    self.log.error("Duplicate device type detected : {0} for package {1}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {3}".format(device_type, pkg_id, self._device_types[device_type]))
+                                self._device_types[device_type] = self._packages[pkg_id].get_json()
+    
+            # publish packages list if there are some updates or new packages
+            if packages_updates:
+                msg_data = {}
+                for pkg in self._packages:
+                    msg_data[pkg] = self._packages[pkg].get_json()
+                self._pub.send_event('package.detail', 
+                                     msg_data)
+
+            # wait before next check
+            self._stop.wait(CHECK_FOR_NEW_PACKAGES_INTERVAL)
 
 
     def _create_fifo(self):
@@ -522,15 +560,14 @@ class Package():
         log = logger.Logger('manager')
         self.log = log.get_logger('manager')
 
-        self.log.info("Registering a new package (warning, not a package instance but the package model) : {0}-{1}".format(self.type, self.name))
-
         self.valid = False
-        self.log.info("Package {0} : read the json file and validate it".format(self.name))
+        self.log.debug("Package {0}-{1} : read the json file and validate it".format(self.type, self.name))
         try:
             pkg_json = PackageJson(pkg_type = self.type, name = self.name)
             pkg_json.validate()
             self.json = pkg_json.get_json()
             self.valid = True
+            self.log.debug("Package {0}-{1} : the json file is valid".format(self.type, self.name))
         except PackageException as e:
             self.log.error("Package {0}-{1} : error while trying to read the json file".format(self.type, self.name))
             self.log.error("Package {0}-{1} : invalid json file".format(self.type, self.name))
@@ -579,6 +616,7 @@ class GenericComponent():
         self.type = "unknown - not setted yet"
         self.configured = None
         self._clients = clients
+        self.data = {}
 
         ### init logger
         log = logger.Logger('manager')
@@ -826,13 +864,19 @@ class Plugin(GenericComponent, MQAsyncSub):
             self._clients.publish_update()
 
 
+    def reload_data(self):
+        """ Just reload the client data
+        """
+        self.data = {}
+        self.fill_data()
+
     def fill_data(self):
         """ Fill the client data by reading the json file
         """
         try:
-            self.log.info("Plugin {0} : read the json file and validate it".format(self.name))
+            self.log.info("Plugin {0} : read the json file".format(self.name))
             pkg_json = PackageJson(pkg_type = "plugin", name = self.name)
-            pkg_json.validate()
+            #we don't need to validate the json file as it has already be done in the check_avaiable_packages function
             self.data = pkg_json.get_json()
             self.add_configuration_values_to_data()
         except PackageException as e:
