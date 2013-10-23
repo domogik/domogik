@@ -845,9 +845,9 @@ class DbHelper():
 
     def list_sensor_history(self, sid, num=None):
         if num is None:
-            return self.__session.query(SensorHistory).filter_by(sensor_id=sid).all()
+            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).all()
         else:
-            return self.__session.query(SensorHistory).filter_by(sensor_id=sid).limit(num)
+            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).limit(num).all()
             
     def list_sensor_history_between(self, sid, frm, to=None):
         if to:
@@ -856,9 +856,9 @@ class DbHelper():
         else:
             to = int(time.time())
         return self.__session.query(SensorHistory
-                  ).filter_by(sensor_id=sid
-                  ).filter("date >= " + _datetime_string_from_tstamp(frm)
-                  ).filter("date <= " + _datetime_string_from_tstamp(to)
+                  ).filter(SensorHistory.sensor_id==sid
+                  ).filter(SensorHistory.date>=_datetime_string_from_tstamp(frm)
+                  ).filter(SensorHistory.date<=_datetime_string_from_tstamp(to)
                   ).order_by(sqlalchemy.asc(SensorHistory.date)
                   ).all()
        

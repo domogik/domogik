@@ -79,6 +79,8 @@ Technical Documentation
     * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
     * :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
     * :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
+    * :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
+    * :doc:`/sensorhistory </technical/rest/sensorhistory>`: list sensorhistory values
     * Devices parameters management
         * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
         * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
