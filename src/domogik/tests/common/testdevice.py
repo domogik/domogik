@@ -95,7 +95,8 @@ class TestDevice():
                                                                                                           description,
                                                                                                           reference,
                                                                                                           self.device_type))
-        print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print("Response : [{0}]".format(response.status_code))
+        #print("Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
             raise RuntimeError("Error when creating the device")
 
@@ -122,7 +123,8 @@ class TestDevice():
         response = requests.put("{0}/device/addglobal/{1}".format(self.rest_url, self.device_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'},
                                  data="{0}".format(data))
-        print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print("Response : [{0}]".format(response.status_code))
+        #print("Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
 

@@ -68,7 +68,8 @@ class TestSensor():
         print("Get the sensor id for device_id={0}, sensor_name={1}".format(self.device_id, self.sensor_name))
         response = requests.get("{0}/device/{1}".format(self.rest_url, self.device_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print("Response : [{0}]".format(response.status_code))
+        #print("Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 200:
             raise RuntimeError("Error when looking for the sensor id")
 
@@ -88,7 +89,8 @@ class TestSensor():
         print("Get the last value for sensor id={0}".format(self.sensor_id))
         response = requests.get("{0}/sensor/{1}".format(self.rest_url, self.sensor_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print("Response : [{0}]".format(response.status_code))
+        #print("Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 200:
             raise RuntimeError("Error when looking for the sensor")
 
@@ -96,7 +98,7 @@ class TestSensor():
         sensor = json.loads(response.text)
         value = sensor['last_value']
         timestamp = sensor['last_received']
-        print("Timestamp = {0} ({1}) / value = {1}".format(timestamp, value))
+        print("Last value : timestamp = {0} ({1}) / value = {1}".format(timestamp, value))
         return (timestamp, value)
 
 
