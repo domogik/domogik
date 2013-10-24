@@ -124,7 +124,7 @@ def main():
     if options.action_create == True:
         # check package type
         if options.package_type not in PACKAGE_TYPES:
-            print("Error : : type must be in this list : %s" % PACKAGE_TYPES)
+            print(u"Error : : type must be in this list : %s" % PACKAGE_TYPES)
             exit()
     
         # plugin
@@ -158,7 +158,7 @@ def main():
 
     if options.action_json == True:
         if options.package_type not in PACKAGE_TYPES:
-            print("Error : : type must be in this list : %s" % PACKAGE_TYPES)
+            print(u"Error : : type must be in this list : %s" % PACKAGE_TYPES)
             exit()
         pkg_xml = PackageXml(args[0], pkg_type = options.package_type)
         print (pkg_xml.get_json())

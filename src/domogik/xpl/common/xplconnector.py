@@ -525,7 +525,7 @@ class XplTimer():
         self.log = manager.p.log
         manager.p.register_timer(self)
         manager.p.register_thread(self._timer)
-        self.log.debug("New timer created : %s " % self)
+        self.log.debug(u"New timer created : %s " % self)
 
 #    def __repr__(self):
 #        """ Representation of the Timer
@@ -550,17 +550,17 @@ class XplTimer():
         return self._timer
 
     def __del__(self):
-        self.log.debug("__del__ Manager")
+        self.log.debug(u"__del__ Manager")
         self.stop()
 
     def stop(self):
         """
         Stop the timer
         """
-        self.log.debug("Timer : stop, try to join() internal thread")
+        self.log.debug(u"Timer : stop, try to join() internal thread")
         self._stop.set()
         self._timer.join()
-        self.log.debug("Timer : stop, internal thread joined, unregister it")
+        self.log.debug(u"Timer : stop, internal thread joined, unregister it")
         self._manager.p.unregister_timer(self._timer)
 
     class __InternalTimer(threading.Thread):

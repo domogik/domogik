@@ -80,7 +80,7 @@ class TestDevice():
         self.device_type = device_type
         description = "a test device"
         reference = "for test only"
-        print("Create a test device for the {0} {1} on {2}. Device type is '{3}', name is '{4}'".format(self.type,
+        print(u"Create a test device for the {0} {1} on {2}. Device type is '{3}', name is '{4}'".format(self.type,
                                                                                                           self.name,
                                                                                                           self.host,
                                                                                                           self.device_type,
@@ -95,22 +95,22 @@ class TestDevice():
                                                                                                           description,
                                                                                                           reference,
                                                                                                           self.device_type))
-        print("Response : [{0}]".format(response.status_code))
-        #print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print(u"Response : [{0}]".format(response.status_code))
+        #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
             raise RuntimeError("Error when creating the device")
 
         # get the device id for later calls to REST
         device = json.loads(response.text)
         self.device_id = device['id']
-        print("The device id is '{0}'".format(self.device_id))
+        print(u"The device id is '{0}'".format(self.device_id))
         return self.device_id
 
     def configure_global_parameters(self, params):
         """ Call PUT /device/addglobal/... to set the global parameters for a device
             @param params : dict of params
         """
-        print("Configure the global parameters...")
+        print(u"Configure the global parameters...")
         # build the data part
         first = True
         data = ""
@@ -123,8 +123,8 @@ class TestDevice():
         response = requests.put("{0}/device/addglobal/{1}".format(self.rest_url, self.device_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'},
                                  data="{0}".format(data))
-        print("Response : [{0}]".format(response.status_code))
-        #print("Response : [{0}] {1}".format(response.status_code, response.text))
+        print(u"Response : [{0}]".format(response.status_code))
+        #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
 
@@ -132,10 +132,10 @@ class TestDevice():
         """ Call DELETE /device/... to delete a device
             @param id : device id
         """
-        print("Delete the device : id = {0}".format(id))
+        print(u"Delete the device : id = {0}".format(id))
         response = requests.delete("{0}/device/{1}".format(self.rest_url, id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print("Response : [{0}]".format(response.status_code))
+        print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
 
@@ -144,19 +144,19 @@ class TestDevice():
             Then, call del_device for each device of the given client_id
             @param client_id: the client id for which we want to delete all the devices
         """
-        print("Delete all the devices for the client id '{0}'".format(client_id))
+        print(u"Delete all the devices for the client id '{0}'".format(client_id))
         # first, retrieve all the devices
         response = requests.get("{0}/device/".format(self.rest_url), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print("Response : [{0}]".format(response.status_code))
+        print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
         if response.text == "":
-            print("There is no device to delete")
+            print(u"There is no device to delete")
             return
         devices = device = json.loads(response.text)
         for device in devices:
-            #print("Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
+            #print(u"Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
             if device['client_id'] == client_id:
                 self.del_device(device['id'])
         

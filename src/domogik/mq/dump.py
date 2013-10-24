@@ -24,9 +24,9 @@ class MQSniffer(MQAsyncSub):
         IOLoop.instance().start()
         
     def on_message(self, msgid, content):
-        print("New pub message {0}".format(msgid))
-        print("{0}".format(content))
-        print("")
+        print(u"New pub message {0}".format(msgid))
+        print(u"{0}".format(content))
+        print(u"")
 
 def main():
     s = MQSniffer()

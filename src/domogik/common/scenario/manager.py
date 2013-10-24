@@ -182,8 +182,8 @@ class ScenarioManager:
                     module_name = "domogik.common.scenario.tests.%s" % mod
                     cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
                     self._test_cache[inst] = cobj
-                    self.log.debug("Add class %s to test cache" % inst)
-                self.log.debug("Create instance for uuid %s" % _uuid)
+                    self.log.debug(u"Add class %s to test cache" % inst)
+                self.log.debug(u"Create instance for uuid %s" % _uuid)
                 self._tests_mapping[_uuid] = self._test_cache[inst](self.log, trigger=self.generic_trigger)
         for _uuid in self._actions_mapping:
             inst = self._actions_mapping[_uuid]
@@ -195,8 +195,8 @@ class ScenarioManager:
                     module_name = "domogik.common.scenario.actions.%s" % mod
                     cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
                     self._action_cache[inst] = cobj
-                    self.log.debug("Add class %s to action cache" % inst)
-                self.log.debug("Create action instance for uuid %s" % _uuid)
+                    self.log.debug(u"Add class %s to action cache" % inst)
+                self.log.debug(u"Create action instance for uuid %s" % _uuid)
                 self._actions_mapping[_uuid] = self._action_cache[inst](self.log)
 
     def shutdown(self):
@@ -205,7 +205,7 @@ class ScenarioManager:
         for _uuid in self._tests_mapping:
             inst = self._mapping[uuid]
             if type(inst) not in [str, unicode]:
-                self.log.info("Destroy test %s with uuid %s" % (inst.__class__, _uuid))
+                self.log.info(u"Destroy test %s with uuid %s" % (inst.__class__, _uuid))
                 inst.destroy()
 
     def generic_trigger(self, test_i):
@@ -257,7 +257,7 @@ class ScenarioManager:
         try:
             payload = json.loads(json_input)  # quick test to check if json is valid
         except:
-            self.log.error("Invalid json : %s" % json_input)
+            self.log.error(u"Invalid json : %s" % json_input)
             return None
         if 'condition' not in payload.keys() \
                 or 'actions' not in payload.keys():
@@ -269,7 +269,7 @@ class ScenarioManager:
         c = Condition(self.log, name, json.dumps(payload['condition']), self._tests_mapping, self.trigger_actions)
         self._conditions[name] = c
         self._conditions_actions[name] = []
-        self.log.debug("Create condition %s with payload %s" % (name, payload['condition']))
+        self.log.debug(u"Create condition %s with payload %s" % (name, payload['condition']))
         # build a list of actions
         for action in payload['actions'].keys():
             # action is now a tuple
@@ -279,7 +279,7 @@ class ScenarioManager:
         # return
         return {'name': name}
         #except Exception, e:
-        #    self.log.error("Error during condition create")
+        #    self.log.error(u"Error during condition create")
         #    print e
         #    raise e
 

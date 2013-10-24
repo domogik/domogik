@@ -114,10 +114,10 @@ class Hub():
 
         self.is_daemon = daemon
 
-        #print("Domogik xPL Hub (python) v%s" % VERSION)
-        print("Domogik xPL Hub (python) v%s" % 666)
-        print("Starting...")
-        print("- Reading configuration...")
+        #print(u"Domogik xPL Hub (python) v%s" % VERSION)
+        print(u"Domogik xPL Hub (python) v%s" % 666)
+        print(u"Starting...")
+        print(u"- Reading configuration...")
 
         ### Read hub options
         # read config file
@@ -131,16 +131,16 @@ class Hub():
                     config[k] = v
 
         except:
-            print("ERROR : Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
+            print(u"ERROR : Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
             return
  
         ### Initiate the logger
-        print("- Preparing the log files...")
+        print(u"- Preparing the log files...")
         self.log = Logger(config['log_level'])
 
         file_stdout = "%s/xplhub.log" % config['log_dir_path']
         log.startLogging(open(file_stdout, "w"), setStdout=False)
-        self.log.info("------------------------")
+        self.log.info(u"------------------------")
 
         file_clients = "%s/client_list.txt" % config['log_dir_path']
         do_log_bandwidth = config['log_bandwidth']
@@ -159,9 +159,9 @@ class Hub():
         allowed_interfaces = interfaces_list.replace(" ", "").split(",") 
 
         ### Start listening to udp
-        print("- Initiating the multicast UDP client...")
-        self.log.info("Initiating the multicast UDP client...")
-        self.log.info("- creation...")
+        print(u"- Initiating the multicast UDP client...")
+        self.log.info(u"Initiating the multicast UDP client...")
+        self.log.info(u"- creation...")
         self.MPP = UdpHub(log = self.log,
                                      allowed_interfaces = allowed_interfaces,
                                      file_clients = file_clients,
@@ -169,21 +169,21 @@ class Hub():
                                      file_bandwidth = file_bandwidth,
                                      do_log_invalid_data = do_log_invalid_data,
                                      file_invalid_data = file_invalid_data)
-        self.log.info("- start reactor...")
+        self.log.info(u"- start reactor...")
         xpl_port = reactor.listenMulticast(3865, self.MPP)   #,
                                            #listenMultiple=True)
 
-        self.log.info("- add triggers...")
+        self.log.info(u"- add triggers...")
         reactor.addSystemEventTrigger('during', 'shutdown', self.stop_hub)
-        print("xPL hub started!")
+        print(u"xPL hub started!")
 
         # following printed lines are in the xplhub.log file
-        self.log.info("xPL hub started")
+        self.log.info(u"xPL hub started")
         reactor.run()
 
     def stop_hub(self):
-        print("Request to stop the xPL hub")
-        self.log.info("Request to stop the xPL hub")
+        print(u"Request to stop the xPL hub")
+        self.log.info(u"Request to stop the xPL hub")
         self.MPP.stop_threads()
 
 
@@ -241,7 +241,7 @@ class UdpHub(DatagramProtocol):
 
         ### Host's IP
         self._ips = self._ip4_addresses()
-        self.log.info("The hub will be bind to the following addresses : %s" % self._ips)
+        self.log.info(u"The hub will be bind to the following addresses : %s" % self._ips)
 
         ### Client list
         self._file_clients = file_clients
@@ -289,23 +289,23 @@ class UdpHub(DatagramProtocol):
         for interface in interfaces():
             if interface in self.allowed_interfaces:
                 try:
-                    self.log.info("Interface {0} (selected!)".format(interface))
+                    self.log.info(u"Interface {0} (selected!)".format(interface))
                     for link in ifaddresses(interface)[AF_INET]:
                         ip_list.append(link['addr'])
-                        self.log.info("- ip : {0}".format(link['addr']))
+                        self.log.info(u"- ip : {0}".format(link['addr']))
                 except:
                     # Probably a non configured interface (wifi for example)
                     # Do nothing
                     pass
             else:
-                self.log.info("Interface {0} (not used)".format(interface))
+                self.log.info(u"Interface {0} (not used)".format(interface))
         return ip_list
 
 
     def stop_threads(self):
         """ Stop all threads
         """
-        self.log.info("Stopping timers...")
+        self.log.info(u"Stopping timers...")
         self._stop.set()
         self._timer_dead_clients.join()
         self._timer_write_clients.join()
@@ -361,7 +361,7 @@ class UdpHub(DatagramProtocol):
             if client['id'] == client_id:
                 return False
                 break
-        self.log.info("New client : %s" % client_id)
+        self.log.info(u"New client : %s" % client_id)
         return True
 
     def _decode2xpl(self, data):
@@ -372,10 +372,10 @@ class UdpHub(DatagramProtocol):
         """
         try:
             mess = XplMessage(data)
-            self.log.info("Valid xPL message")
+            self.log.info(u"Valid xPL message")
             return True, mess
         except XplMessageError:
-            self.log.error("Invalid xPL message : %s" % data)
+            self.log.error(u"Invalid xPL message : %s" % data)
             return False, None
 
     def _is_hbeat(self, xpl):
@@ -383,7 +383,7 @@ class UdpHub(DatagramProtocol):
             @param xpl : xpl message
         """
         if xpl.schema in ('hbeat.app', 'hbeat.basic'):
-            self.log.info("Hbeat message")
+            self.log.info(u"Hbeat message")
             return True
         else:
             return False
@@ -393,7 +393,7 @@ class UdpHub(DatagramProtocol):
             @param xpl : xpl message
         """
         if xpl.schema == 'hbeat.end':
-            self.log.info("Hbeat.End message")
+            self.log.info(u"Hbeat.End message")
             return True
         else:
             return False
@@ -403,7 +403,7 @@ class UdpHub(DatagramProtocol):
             @param ip : ip address
         """
         if ip in self._ips:
-            self.log.info("Local xpl client")
+            self.log.info(u"Local xpl client")
             return True
         return False
 
@@ -432,14 +432,14 @@ class UdpHub(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 if client['alive'] != ALIVE:    # should not happen
-                    self.log.error("Client %s was not alive and still in alive clients list. Resurrect it.")
+                    self.log.error(u"Client %s was not alive and still in alive clients list. Resurrect it.")
                 client['interval'] = int(xpl.data['interval'])
                 client['last_seen'] = time()
                 client['alive'] = ALIVE
                 found = True
                 break
         if found == False:
-            self.log.error("No client to update : %s" % client_id)
+            self.log.error(u"No client to update : %s" % client_id)
 
     def _remove_client(self, client_id):
         """ Set the client as dead/inactive
@@ -449,7 +449,7 @@ class UdpHub(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 if client['alive'] != ALIVE:   # should not happen
-                    self.log.error("Client %s was already not alive and still in alive clients list.")
+                    self.log.error(u"Client %s was already not alive and still in alive clients list.")
                 client['last_seen'] = time()
                 client['alive'] = STOPPED
                 self._dead_client_list.append(client)
@@ -457,7 +457,7 @@ class UdpHub(DatagramProtocol):
                 found = True
                 break
         if found == False:
-            self.log.error("No client to remove : %s" % client_id)
+            self.log.error(u"No client to remove : %s" % client_id)
 
     def _get_delivery_addresses(self, xpl):
         """ return the port list of the local client to deliver the xpl message
@@ -531,7 +531,7 @@ class UdpHub(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 client['nb_valid_messages'] += 1
-                self.log.info("Increase number of valid messages for %s to %s" % (client_id, client['nb_valid_messages']))
+                self.log.info(u"Increase number of valid messages for %s to %s" % (client_id, client['nb_valid_messages']))
                 break
 
     def _inc_invalid_counter(self, client_id):
@@ -541,7 +541,7 @@ class UdpHub(DatagramProtocol):
         for client in self._client_list:
             if client['id'] == client_id:
                 client['nb_invalid_messages'] += 1
-                self.log.info("Increase number of invalid messages for %s to %s" % (client_id, client['nb_invalid_messages']))
+                self.log.info(u"Increase number of invalid messages for %s to %s" % (client_id, client['nb_invalid_messages']))
                 break
 
     def _log_bandwidth(self, client_id, xpl):
@@ -636,7 +636,7 @@ class UdpHub(DatagramProtocol):
             @param datagram : data received
             @param address : source ip/port
         """        
-        self.log.info("Data received from %s : %s" % (repr(address), repr(datagram)))
+        self.log.info(u"Data received from %s : %s" % (repr(address), repr(datagram)))
         ip = address[0]
         port = address[1]
         client_id = self._get_client_id(ip, port)
@@ -651,7 +651,7 @@ class UdpHub(DatagramProtocol):
             self._inc_invalid_counter(client_id)
             if self._do_log_invalid_data:
                 self._log_invalid_data(client_id, datagram)
-                print("Invalid message : %s" % datagram)
+                print(u"Invalid message : %s" % datagram)
             return
 
         # TODO : needed ????

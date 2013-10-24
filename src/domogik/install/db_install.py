@@ -33,13 +33,13 @@ _url = _db.get_url_connection_string()
 _engine = create_engine(_url)
 
 def info(msg):
-    print("%s [ %s ] %s" % (BLUE,msg,ENDC))
+    print(u"%s [ %s ] %s" % (BLUE,msg,ENDC))
 def ok(msg):
-    print("%s ==> %s  %s" % (OK,msg,ENDC))
+    print(u"%s ==> %s  %s" % (OK,msg,ENDC))
 def warning(msg):
-    print("%s ==> %s  %s" % (WARNING,msg,ENDC))
+    print(u"%s ==> %s  %s" % (WARNING,msg,ENDC))
 def fail(msg):
-    print("%s ==> %s  %s" % (FAIL,msg,ENDC))
+    print(u"%s ==> %s  %s" % (FAIL,msg,ENDC))
 
 def install_or_upgrade_db():
     info("Installing or upgrading the db")

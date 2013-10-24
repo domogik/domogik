@@ -50,7 +50,7 @@ class ScenarioFrontend(XplPlugin):
         self._backend = ScenarioManager(self.log)
         self.add_stop_cb(self.end)
         self.add_stop_cb(self.shutdown)
-        self.log.info("Scenario Frontend and Manager initialized, let's wait for some work.")
+        self.log.info(u"Scenario Frontend and Manager initialized, let's wait for some work.")
         self.ready()
 
     def on_mdp_request(self, msg):
@@ -88,7 +88,7 @@ class ScenarioFrontend(XplPlugin):
                 payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
             self._mdp_reply(msg.get_action(), "ok", payload)
         except:
-            self.log.error("Exception occured during message processing.")
+            self.log.error(u"Exception occured during message processing.")
             trace = str(traceback.format_exc())
             self.log.debug(trace)
             self._mdp_reply(msg.get_action(), "error", {"details": trace})

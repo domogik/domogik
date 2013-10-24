@@ -73,15 +73,15 @@ class Sniffer(XplPlugin):
         Print received message
         '''
         if self.options.compress == False:
-            #print("%s - %s" % (datetime.datetime.now(), message))
-            self.log.info("%s - %s" % (datetime.datetime.now(), message))
+            #print(u"%s - %s" % (datetime.datetime.now(), message))
+            self.log.info(u"%s - %s" % (datetime.datetime.now(), message))
         else:
             ldt = localtime()
             date = "%s/%s/%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
             time = "%s:%s:%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
             display = "%s" % time
-            #self.log.info("%s - %s" % (datetime.datetime.now(), message))
-            print("%s - %s %s hop=%s source=%s target=%s" % (display,
+            #self.log.info(u"%s - %s" % (datetime.datetime.now(), message))
+            print(u"%s - %s %s hop=%s source=%s target=%s" % (display,
                                                           message.type,
                                                           message.schema,
                                                           message.hop_count,
@@ -89,10 +89,10 @@ class Sniffer(XplPlugin):
                                                           message.target))
             idx = 0
             for elt in message.data:
-                print("  %s=%s" % (elt, message.data[elt]))
+                print(u"  %s=%s" % (elt, message.data[elt]))
                 idx += 1
                 if idx == 4:
-                    print("  ...")
+                    print(u"  ...")
                     return
 
     def _format(self, number):

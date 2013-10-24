@@ -108,8 +108,8 @@ class XplPlugin(BasePlugin, MQRep):
         '''
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
         Watcher(self)
-        self.log.info("----------------------------------")
-        self.log.info("Starting plugin '%s' (new manager instance)" % name)
+        self.log.info(u"----------------------------------")
+        self.log.info(u"Starting plugin '%s' (new manager instance)" % name)
         self._name = name
         self._test = test   # flag used to avoid loading json in test mode
         
@@ -154,7 +154,7 @@ class XplPlugin(BasePlugin, MQRep):
         self._get_pid()
 
         if len(self.get_sanitized_hostname()) > 16:
-            self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
+            self.log.error(u"You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
             self.force_leave()
             return
 
@@ -197,7 +197,7 @@ class XplPlugin(BasePlugin, MQRep):
             self.check_for_pictures()
 
         # init finished
-        self.log.debug("end single xpl plugin")
+        self.log.debug(u"end single xpl plugin")
 
 
     def check_configured(self):
@@ -211,10 +211,10 @@ class XplPlugin(BasePlugin, MQRep):
         if configured == '1':
             configured = True
         if configured != True:
-            self.log.error("The plugin is not configured (configured = '{0}'. Stopping the plugin...".format(configured))
+            self.log.error(u"The plugin is not configured (configured = '{0}'. Stopping the plugin...".format(configured))
             self.force_leave(status = STATUS_NOT_CONFIGURED)
             return False
-        self.log.info("The plugin is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
+        self.log.info(u"The plugin is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
         return True
 
 
@@ -222,19 +222,19 @@ class XplPlugin(BasePlugin, MQRep):
         """ Load the plugin json file
         """
         try:
-            self.log.info("Read the json file and validate id".format(self._name))
+            self.log.info(u"Read the json file and validate id".format(self._name))
             pkg_json = PackageJson(pkg_type = "plugin", name = self._name)
             # check if json is valid
             if pkg_json.validate() == False:
                 # TODO : how to get the reason ?
-                self.log.error("Invalid json file")
+                self.log.error(u"Invalid json file")
                 self.force_leave(status = STATUS_INVALID)
             else:
                 # if valid, store the data so that it can be used later
-                self.log.info("The json file is valid")
+                self.log.info(u"The json file is valid")
                 self.json_data = pkg_json.get_json()
         except:
-            self.log.error("Error while trying to read the json file : {1}".format(self._name, traceback.format_exc()))
+            self.log.error(u"Error while trying to read the json file : {1}".format(self._name, traceback.format_exc()))
             self.force_leave(status = STATUS_INVALID)
 
     def get_config(self, key):
@@ -242,9 +242,9 @@ class XplPlugin(BasePlugin, MQRep):
         """
         value = self._config.query(self._name, key)
         if value == None or value == 'None':
-            self.log.info("Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
+            self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
-        self.log.info("Value for '{0}' is : {1}".format(key, value))
+        self.log.info(u"Value for '{0}' is : {1}".format(key, value))
         return value
 
     def get_config_default_value(self, key):
@@ -254,7 +254,7 @@ class XplPlugin(BasePlugin, MQRep):
         for idx in range(len(self.json_data['configuration'])):
             if self.json_data['configuration'][idx]['key'] == key:
                 default = self.json_data['configuration'][idx]['default']
-                self.log.info("Default value required for key '{0}' = {1}".format(key, default))
+                self.log.info(u"Default value required for key '{0}' = {1}".format(key, default))
                 return default
 
     def cast_config_value(self, key, value):
@@ -266,7 +266,7 @@ class XplPlugin(BasePlugin, MQRep):
         for idx in range(len(self.json_data['configuration'])):
             if self.json_data['configuration'][idx]['key'] == key:
                 type = self.json_data['configuration'][idx]['default']
-                self.log.info("Casting value for key '{0}' in type '{1}'...".format(key, type)) 
+                self.log.info(u"Casting value for key '{0}' in type '{1}'...".format(key, type)) 
                 return self.cast(value, type)
 
         # no cast operation : return the value
@@ -287,9 +287,9 @@ class XplPlugin(BasePlugin, MQRep):
                     return False
             # type == choice : nothing to do
             if type == "date": 
-                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+                self.log.error(u"TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
             if type == "datetime": 
-                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+                self.log.error(u"TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
             # type == email : nothing to do
             if type == "float":
                 return float(value)
@@ -299,12 +299,12 @@ class XplPlugin(BasePlugin, MQRep):
             # type == multiple choice : nothing to do
             # type == string : nothing to do
             if type == "time": 
-                self.log.error("TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
+                self.log.error(u"TODO : the cast in date format is not yet developped. Please request fritz_smh to do it")
             # type == url : nothing to do
 
         except:
             # if an error occurs : return the default value and log a warning
-            self.log.warning("Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
+            self.log.warning(u"Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
             return value
         return value
 
@@ -312,7 +312,7 @@ class XplPlugin(BasePlugin, MQRep):
         """ Request the dbmgr component over MQ to get the devices list for this client
             @param quit_if_no_device: if True, exit the plugin if there is no devices
         """
-        self.log.info("Retrieve the devices list for this client...")
+        self.log.info(u"Retrieve the devices list for this client...")
         mq_client = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('device.get')
@@ -321,15 +321,15 @@ class XplPlugin(BasePlugin, MQRep):
         msg.add_data('host', self.get_sanitized_hostname())
         result = mq_client.request('dbmgr', msg.get(), timeout=10)
         if not result:
-            self.log.error("Unable to retrieve the device list")
+            self.log.error(u"Unable to retrieve the device list")
             self.force_leave()
             return []
         else:
             device_list = result.get_data()['devices']
             if device_list == []:
-                self.log.warn("There is no device created for this client")
+                self.log.warn(u"There is no device created for this client")
                 if quit_if_no_device:
-                    self.log.warn("The developper requested to stop the client if there is no device created")
+                    self.log.warn(u"The developper requested to stop the client if there is no device created")
                     self.force_leave()
                     return []
             for a_device in device_list:
@@ -339,12 +339,12 @@ class XplPlugin(BasePlugin, MQRep):
                                                                                     a_device['device_type_id']))
                 # log some informations about the device
                 # first : the stats
-                self.log.info("  Features :")
+                self.log.info(u"  Features :")
                 for a_xpl_stat in a_device['xpl_stats']:
-                    self.log.info("  - {0}".format(a_xpl_stat))
-                    self.log.info("    Parameters :")
+                    self.log.info(u"  - {0}".format(a_xpl_stat))
+                    self.log.info(u"    Parameters :")
                     for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['device']:
-                        self.log.info("    - {0} = {1}".format(a_feature['key'], a_feature['value']))
+                        self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
                 # then, the commands
                 # TODO !!!!!!
@@ -368,8 +368,8 @@ class XplPlugin(BasePlugin, MQRep):
             @param type : xpl_stats, xpl_commands
             @param feature : a xpl_stat or xpl_command feature
         """
-        self.log.debug("Device detected : device_type = {0}, data = {1}".format(device_type, data))
-        #self.log.debug("Already existing devices : {0}".format(self.devices))
+        self.log.debug(u"Device detected : device_type = {0}, data = {1}".format(device_type, data))
+        #self.log.debug(u"Already existing devices : {0}".format(self.devices))
         # browse all devices to find if the device exists
         for a_device in self.devices:
             # first, search for device type
@@ -384,12 +384,12 @@ class XplPlugin(BasePlugin, MQRep):
                 if found:
                     break
         if found:
-            self.log.debug("The device already exists : id={0}.".format(a_device['id']))
+            self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))
         else:
-            self.log.debug("The device doesn't exists in database")
+            self.log.debug(u"The device doesn't exists in database")
          
             # add the device feature in the new devices list : self.new_devices[device_type][type][feature] = data
-            self.log.debug("Check if the device has already be marked as new...")
+            self.log.debug(u"Check if the device has already be marked as new...")
             found = False
             for a_device in self.new_devices:
                 if a_device['device_type_id'] == device_type and \
@@ -404,10 +404,10 @@ class XplPlugin(BasePlugin, MQRep):
                              'type' : type,
                              'feature' : feature,
                              'data' : data}
-                self.log.info("New device feature detected and added in the new devices list : {0}".format(new_device))
+                self.log.info(u"New device feature detected and added in the new devices list : {0}".format(new_device))
                 self.new_devices.append(new_device)
             else:
-                self.log.debug("The device has already been detected since the plugin startup")
+                self.log.debug(u"The device has already been detected since the plugin startup")
             print self.new_devices
 
 
@@ -425,23 +425,23 @@ class XplPlugin(BasePlugin, MQRep):
             Return : /home
         """
         try:
-            self.log.debug("Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
+            self.log.debug(u"Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
             for a_param in a_device[type][feature]['parameters']['device']:
                 if a_param['key'] == key:
                     value = self.cast(a_param['value'], a_param['type'])
-                    self.log.debug("Parameter value found: {0}".format(value))
+                    self.log.debug(u"Parameter value found: {0}".format(value))
                     return value
-            self.log.warning("Parameter not found : return None")
+            self.log.warning(u"Parameter not found : return None")
             return None
         except:
-            self.log.error("Error while looking for a device feature parameter. Return None. Error: {0}".format(traceback.format_exc()))
+            self.log.error(u"Error while looking for a device feature parameter. Return None. Error: {0}".format(traceback.format_exc()))
             return None
          
 
     def check_for_pictures(self):
         """ if some products are defined, check if the corresponding pictures are present in the products/ folder
         """
-        self.log.info("Check if there are pictures for the defined products")
+        self.log.info(u"Check if there are pictures for the defined products")
         ok = True
         ok_product = None
         if self.json_data.has_key('products'):
@@ -453,15 +453,15 @@ class XplPlugin(BasePlugin, MQRep):
                         ok_product = True
                         break
                 if ok_product:
-                    self.log.debug("- OK : {0} ({1})".format(product['name'], file))
+                    self.log.debug(u"- OK : {0} ({1})".format(product['name'], file))
                 else:
                     ok = False
-                    self.log.warning("- Missing : {0} ({1}.{2})".format(product['name'], product['id'], PRODUCTS_PICTURES_EXTENSIONS))
+                    self.log.warning(u"- Missing : {0} ({1}.{2})".format(product['name'], product['id'], PRODUCTS_PICTURES_EXTENSIONS))
         if ok == False:
-            self.log.warning("Some pictures are missing!")
+            self.log.warning(u"Some pictures are missing!")
         else:
             if ok_product == None:
-                self.log.info("There is no products defined for this plugin")
+                self.log.info(u"There is no products defined for this plugin")
 
 
     def ready(self, ioloopstart=1):
@@ -472,7 +472,7 @@ class XplPlugin(BasePlugin, MQRep):
 
         ### activate xpl hbeat
         if self.enable_hbeat_called == True:
-            self.log.error("in ready() : enable_hbeat() function already called : the plugin may not be fully converted to the 0.4+ Domogik format")
+            self.log.error(u"in ready() : enable_hbeat() function already called : the plugin may not be fully converted to the 0.4+ Domogik format")
         else:
             self.enable_hbeat()
 
@@ -488,7 +488,7 @@ class XplPlugin(BasePlugin, MQRep):
 
         ### Instantiate the MQ
         # nothing can be launched after this line (blocking call!!!!)
-        self.log.info("Start IOLoop for MQ : nothing else can be executed in the __init__ after this! Make sure that the self.ready() call is the last line of your init!!!!")
+        self.log.info(u"Start IOLoop for MQ : nothing else can be executed in the __init__ after this! Make sure that the self.ready() call is the last line of your init!!!!")
         if ioloopstart == 1:
             IOLoop.instance().start()
 
@@ -498,20 +498,20 @@ class XplPlugin(BasePlugin, MQRep):
         """ Handle Requests over MQ
             @param msg : MQ req message
         """
-        self.log.debug("MQ Request received : {0}" . format(str(msg)))
+        self.log.debug(u"MQ Request received : {0}" . format(str(msg)))
 
         ### stop the plugin
         if msg.get_action() == "plugin.stop.do":
-            self.log.info("Plugin stop request : {0}".format(msg))
+            self.log.info(u"Plugin stop request : {0}".format(msg))
             self._mdp_reply_plugin_stop(msg)
         elif msg.get_action() == "helper.list.get":
-            self.log.info("Plugin helper list request : {0}".format(msg))
+            self.log.info(u"Plugin helper list request : {0}".format(msg))
             self._mdp_reply_helper_list(msg)
         elif msg.get_action() == "helper.help.get":
-            self.log.info("Plugin helper help request : {0}".format(msg))
+            self.log.info(u"Plugin helper help request : {0}".format(msg))
             self._mdp_reply_helper_help(msg)
         elif msg.get_action() == "helper.do":
-            self.log.info("Plugin helper action request : {0}".format(msg))
+            self.log.info(u"Plugin helper action request : {0}".format(msg))
             self._mdp_reply_helper_do(msg)
     
     def _mdp_reply_helper_do(self, msg):
@@ -644,7 +644,7 @@ class XplPlugin(BasePlugin, MQRep):
        else:
            try:
                os.mkdir(path, '0770')
-               self.log.info("Create directory %s." % path)
+               self.log.info(u"Create directory %s." % path)
            except:
                raise OSError("Can't create directory %s." % path)
        try:
@@ -717,7 +717,7 @@ class XplPlugin(BasePlugin, MQRep):
         pid = os.getpid()
         pid_file = os.path.join(self._pid_dir_path,
                                 self._name + ".pid")
-        self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+        self.log.debug(u"Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
         fil = open(pid_file, "w")
         fil.write(str(pid))
         fil.close()
@@ -744,30 +744,30 @@ class XplPlugin(BasePlugin, MQRep):
     #        if host != self.get_sanitized_hostname():
     #            return
     #    except KeyError as e:
-    #        self.log.error("command, plugin or host key does not exist : %s", e)
+    #        self.log.error(u"command, plugin or host key does not exist : %s", e)
     #        return
     #    if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
-    #        self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
+    #        self.log.info(u"Someone asked to stop %s, doing." % self.get_plugin_name())
     #        self._answer_stop()
     #        self.force_leave()
     #    elif cmd == "reload":
     #        if self._reload_cb is None:
-    #            self.log.info("Someone asked to reload config of %s, but the plugin \
+    #            self.log.info(u"Someone asked to reload config of %s, but the plugin \
     #            isn't able to do it." % self.get_plugin_name())
     #        else:
     #            self._reload_cb()
     #    elif cmd == "dump":
     #        if self._dump_cb is None:
-    #            self.log.info("Someone asked to dump config of %s, but the plugin \
+    #            self.log.info(u"Someone asked to dump config of %s, but the plugin \
     #            isn't able to do it." % self.get_plugin_name())
     #        else:
     #            self._dump_cb()
     #    else: #Command not known
-    #        self.log.info("domogik.system command not recognized : %s" % cmd)
+    #        self.log.info(u"domogik.system command not recognized : %s" % cmd)
 
     def __del__(self):
         if hasattr(self, "log"):
-            self.log.debug("__del__ Single xpl plugin")
+            self.log.debug(u"__del__ Single xpl plugin")
             # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
@@ -816,7 +816,7 @@ class XplPlugin(BasePlugin, MQRep):
         #except:
         #    pass
         if hasattr(self, "log"):
-            self.log.debug("force_leave called")
+            self.log.debug(u"force_leave called")
         # send stopped status over the MQ
         if status:
             self._send_status(status)
@@ -835,39 +835,39 @@ class XplPlugin(BasePlugin, MQRep):
         if hasattr(self, "_timers"):
             for t in self._timers:
                 if hasattr(self, "log"):
-                    self.log.debug("Try to stop timer %s"  % t)
+                    self.log.debug(u"Try to stop timer %s"  % t)
                 t.stop()
                 if hasattr(self, "log"):
-                    self.log.debug("Timer stopped %s" % t)
+                    self.log.debug(u"Timer stopped %s" % t)
 
         if hasattr(self, "_stop_cb"):
             for cb in self._stop_cb:
                 if hasattr(self, "log"):
-                    self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
+                    self.log.debug(u"Calling stop additionnal method : %s " % cb.__name__)
                 cb()
     
         if hasattr(self, "_threads"):
             for t in self._threads:
                 if hasattr(self, "log"):
-                    self.log.debug("Try to stop thread %s" % t)
+                    self.log.debug(u"Try to stop thread %s" % t)
                 try:
                     t.join()
                 except RuntimeError:
                     pass
                 if hasattr(self, "log"):
-                    self.log.debug("Thread stopped %s" % t)
+                    self.log.debug(u"Thread stopped %s" % t)
                 #t._Thread__stop()
         #Finally, we try to delete all remaining threads
         for t in threading.enumerate():
             if t != threading.current_thread() and t.__class__ != threading._MainThread:
                 if hasattr(self, "log"):
-                    self.log.info("The thread %s was not registered, killing it" % t.name)
+                    self.log.info(u"The thread %s was not registered, killing it" % t.name)
                 t.join()
                 if hasattr(self, "log"):
-                    self.log.info("Thread %s stopped." % t.name)
+                    self.log.info(u"Thread %s stopped." % t.name)
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
-                self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
+                self.log.warn(u"There are more than 1 thread remaining : %s" % threading.enumerate())
 
 
 class XplResult():
@@ -946,7 +946,7 @@ class Watcher:
             self._plugin.force_leave()
             self.kill()
         except OSError:
-            print("OSError")
+            print(u"OSError")
         sys.exit()
 
     def kill(self):

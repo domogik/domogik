@@ -56,7 +56,7 @@ class XplManager(XplPlugin):
         """ Initiate DbHelper, Logs and config
         """
         XplPlugin.__init__(self, 'xplgw')
-        self.log.info("XPL manager initialisation...")
+        self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
         self.pub = MQPub(zmq.Context(), 'xplgw')
         self.stats = None
@@ -87,7 +87,7 @@ class XplManager(XplPlugin):
             for cli in data:
                 self.client_xpl_map[cli] = data[cli]['xpl_source']
         else:
-            self.log.error("Updating client list was not successfull, no response from manager")
+            self.log.error(u"Updating client list was not successfull, no response from manager")
 
 
     def _send_xpl_command(self, data):
@@ -98,7 +98,7 @@ class XplManager(XplPlugin):
                 - cmdparams     => key/value pair of all params needed for this command
         """
 	with self._db.session_scope():
-	    self.log.info("Received new cmd request: {0}".format(data))
+	    self.log.info(u"Received new cmd request: {0}".format(data))
             failed = False
 
             request = data.get_data()
@@ -144,13 +144,13 @@ class XplManager(XplPlugin):
 				    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
                             if not failed:
 			        # send out the msg
-			        self.log.debug("sending xplmessage: {0}".format(msg))
+			        self.log.debug(u"sending xplmessage: {0}".format(msg))
 			        self.myxpl.send(msg)
 			        ### Wait for answer
 			        stat_received = 0
 			        if xplstat != None:
 				    # get xpl message from queue
-				    self.log.debug("Command : wait for answer...")
+				    self.log.debug(u"Command : wait for answer...")
 				    sub = MQSyncSub( self.zmq, 'rest-command', ['device-stats'] )
 				    stat = sub.wait_for_event()
 				    if stat is not None:
@@ -160,7 +160,7 @@ class XplManager(XplPlugin):
 				        reply_msg.add_data('stat', reply)
 				        reply_msg.add_data('status', True)
 				        reply_msg.add_data('reason', None)
-				        self.log.debug("mq reply".format(reply_msg.get()))
+				        self.log.debug(u"mq reply".format(reply_msg.get()))
 				        self.reply(reply_msg.get())
 			else:
 			    failed = "xplStat {0} does not exists".format(xplcmd.stat_id)
@@ -175,18 +175,18 @@ class XplManager(XplPlugin):
                 reply_msg.set_action('cmd.send.result')
                 reply_msg.add_data('status', False)
                 reply_msg.add_data('reason', failed)
-                self.log.debug("mq reply".format(reply_msg.get()))
+                self.log.debug(u"mq reply".format(reply_msg.get()))
                 self.reply(reply_msg.get())
 
     def load(self):
         """ (re)load all xml files to (re)create _Stats objects
         """
-        self.log.info("Rest Stat Manager loading.... ")
+        self.log.info(u"Rest Stat Manager loading.... ")
         self._db.open_session()
         try:
             # not the first load : clean
             if self.stats != None:
-                self.log.info("reloading")
+                self.log.info(u"reloading")
                 for stat in self.stats:
                     self.myxpl.del_listener(stat.get_listener())
 
@@ -220,9 +220,9 @@ class XplManager(XplPlugin):
                 self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
                                   "xpl-stat", self.log, self._db, self.pub))
         except:
-            self.log.error("%s" % traceback.format_exc())
+            self.log.error(u"%s" % traceback.format_exc())
         self._db.close_session()
-        self.log.info("Loading finished")
+        self.log.info(u"Loading finished")
 
     class _Stat:
         """ This class define a statistic parser and logger instance

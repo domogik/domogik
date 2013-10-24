@@ -65,9 +65,9 @@ def rest_status_dmg_release():
 
 
 def main():
-    print("REST_API_release : %s"  % REST_API_VERSION)
-    print("Domogik_release : %s" %  rest_status_dmg_release())
-    print("Sources_release : %s" %  rest_status_src_release())
+    print(u"REST_API_release : %s"  % REST_API_VERSION)
+    print(u"Domogik_release : %s" %  rest_status_dmg_release())
+    print(u"Sources_release : %s" %  rest_status_src_release())
 
 
 if __name__ == "__main__":

@@ -99,7 +99,7 @@ class MDPBroker(object):
                               }
         self.hb_check_timer = PeriodicCallback(self.on_timer, HB_INTERVAL)
         self.hb_check_timer.start()
-        self.log.info("MDP broker started")
+        self.log.info(u"MDP broker started")
         return
 
     def register_worker(self, wid, service):
@@ -115,7 +115,7 @@ class MDPBroker(object):
         :rtype: None
         """
         if wid in self._workers:
-            self.log.info("Worker %s already registered" % service)
+            self.log.info(u"Worker %s already registered" % service)
             return
         self._workers[wid] = WorkerRep(
                 self.WORKER_PROTO, wid, service, self.main_stream)
@@ -126,7 +126,7 @@ class MDPBroker(object):
             q = ServiceQueue()
             q.put(wid)
             self._services[service] = (q, [])
-        self.log.info("Register worker %s" % service)
+        self.log.info(u"Register worker %s" % service)
         return
 
     def unregister_worker(self, wid):
@@ -152,7 +152,7 @@ class MDPBroker(object):
             wq, wr = self._services[service]
             wq.remove(wid)
         del self._workers[wid]
-        self.log.info("Unregister worker %s" % service)
+        self.log.info(u"Unregister worker %s" % service)
         return
 
     def disconnect(self, wid):
@@ -441,7 +441,7 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        self.log.debug("Message received: {0}".format(msg))
+        self.log.debug(u"Message received: {0}".format(msg))
         rp, msg = split_address(msg)
         # dispatch on first frame after path
         t = msg.pop(0)

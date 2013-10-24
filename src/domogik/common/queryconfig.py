@@ -56,7 +56,7 @@ class Query():
 
     def set(self, name, key, value):
         # TODO
-        self.log.error("Config set feature not yet implemented")
+        self.log.error(u"Config set feature not yet implemented")
 
 
 

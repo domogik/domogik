@@ -285,19 +285,19 @@ class PackageJson():
     def display(self):
         """ Display xml data in a fine way
         """
-        print("---- Package informations -------------------------------")
-        print("Type                : %s" % self.json["identity"]["type"])
-        print("Name                : %s" % self.json["identity"]["name"])
-        print("Package id          : %s" % self.json["identity"]["package_id"])
-        print("Version             : %s" % self.json["identity"]["version"])
-        print("Tags                : %s" % self.json["identity"]["tags"])
-        print("Link for doc        : %s" % self.json["identity"]["documentation"])
-        print("Description         : %s" % self.json["identity"]["description"])
-        print("Changelog           : %s" % self.json["identity"]["changelog"])
-        print("Author              : %s" % self.json["identity"]["author"])
-        print("Author's email      : %s" % self.json["identity"]["author_email"])
-        print("Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
-        print("---------------------------------------------------------")
+        print(u"---- Package informations -------------------------------")
+        print(u"Type                : %s" % self.json["identity"]["type"])
+        print(u"Name                : %s" % self.json["identity"]["name"])
+        print(u"Package id          : %s" % self.json["identity"]["package_id"])
+        print(u"Version             : %s" % self.json["identity"]["version"])
+        print(u"Tags                : %s" % self.json["identity"]["tags"])
+        print(u"Link for doc        : %s" % self.json["identity"]["documentation"])
+        print(u"Description         : %s" % self.json["identity"]["description"])
+        print(u"Changelog           : %s" % self.json["identity"]["changelog"])
+        print(u"Author              : %s" % self.json["identity"]["author"])
+        print(u"Author's email      : %s" % self.json["identity"]["author_email"])
+        print(u"Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
+        print(u"---------------------------------------------------------")
 
     def find_xplstats_for_device_type(self, devtype):
         if self.json["json_version"] != 2:

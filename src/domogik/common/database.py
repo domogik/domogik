@@ -131,10 +131,10 @@ class DbHelper():
         self.__db_config = dict(config[1])
 
         if self.__db_config.has_key("recycle_pool"):
-            #self.log.info("User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
+            #self.log.info(u"User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
             pool_recycle = int(self.__db_config['recycle_pool'])
         else:
-            #self.log.info("No user value for recycle pool. Using default value : {0}".format(DEFAULT_RECYCLE_POOL))
+            #self.log.info(u"No user value for recycle pool. Using default value : {0}".format(DEFAULT_RECYCLE_POOL))
             pool_recycle = DEFAULT_RECYCLE_POOL
 
         if config[0]['log_level'] == 'debug':
@@ -263,7 +263,7 @@ class DbHelper():
                     ).filter_by(key=ucode(pl_key)
                     ).first()
         except:
-            self.log.debug("oups : {0}".format(traceback.format-exc()))
+            self.log.debug(u"oups : {0}".format(traceback.format-exc()))
         return ret
 
     def set_plugin_config(self, pl_id, pl_hostname, pl_key, pl_value):
@@ -478,7 +478,7 @@ class DbHelper():
 
 
     def add_device_and_commands_xplstat(self, devid, sensorid, a_xplstat, xplstat_in_client_data):
-        self.log.debug("Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
+        self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
         xplstat = XplStat(name = xplstat_in_client_data['name'], \
               schema = xplstat_in_client_data['schema'], \
               device_id = devid, \
@@ -493,7 +493,7 @@ class DbHelper():
 
         # static parameters
         for a_parameter in xplstat_in_client_data['parameters']['static']:
-            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
             parameter =  XplStatParam(xplstat_id = xplstat.id , \
                                       sensor_id = sensorid, \
                                       key = a_parameter['key'], \
@@ -506,7 +506,7 @@ class DbHelper():
 
         # dynamic parameters
         for a_parameter in xplstat_in_client_data['parameters']['dynamic']: 
-            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_xplstat, a_parameter))
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_xplstat, a_parameter))
             # set some values before inserting data
             if 'ignore_values' not in a_parameter:
                 a_parameter['ignore_values'] = None
@@ -534,7 +534,7 @@ class DbHelper():
         self.__session.expire_all()
 
         ### Add the device itself
-        self.log.debug("Device creation : inserting data in core_device...")
+        self.log.debug(u"Device creation : inserting data in core_device...")
         device = Device(name=name, device_type_id=device_type, \
                 client_id=client_id, client_version=client_data['identity']['version'], \
                 description=description, reference=reference)
@@ -543,13 +543,13 @@ class DbHelper():
 
         ### Table core_sensor
         # first, get the sensors associated to the device_type
-        self.log.debug("Device creation : start to process the sensors")
+        self.log.debug(u"Device creation : start to process the sensors")
         device_type_sensors = client_data['device_types'][device_type]['sensors']
-        self.log.debug("Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
+        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
 
         # then, for each sensor, create it in databse for the device
         for a_sensor in device_type_sensors:
-            self.log.debug("Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
+            self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
             sensor_in_client_data = client_data['sensors'][a_sensor]
             sensor = Sensor(name = sensor_in_client_data['name'], \
                             device_id  = device.id, \
@@ -566,7 +566,7 @@ class DbHelper():
 
             ### Table core_xplstat
             # for each sensor, insert its xplstats (if any) in database
-            self.log.debug("Device creation : inserting data in core_xplstat for '{0}'...".format(a_sensor))
+            self.log.debug(u"Device creation : inserting data in core_xplstat for '{0}'...".format(a_sensor))
             # find all xpl_stats that link to this sensor and insert them
             for a_xplstat in client_data['xpl_stats']:
                 xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
@@ -578,12 +578,12 @@ class DbHelper():
         ### Table core_command
 
         # first, get the commands associated to the device_type
-        self.log.debug("Device creation : start to process the commands")
+        self.log.debug(u"Device creation : start to process the commands")
         device_type_commands = client_data['device_types'][device_type]['commands']
-        self.log.debug("Device creation : list of commands available for the device : {0}".format(device_type_commands))
+        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
 
         for a_command in device_type_commands:
-            self.log.debug("Device creation : inserting data in core_command for '{0}'...".format(a_command))
+            self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
             command_in_client_data = client_data['commands'][a_command]
             command = Command(name = command_in_client_data['name'], \
                               device_id = device.id, \
@@ -592,7 +592,7 @@ class DbHelper():
             self.__session.add(command)
             self.__session.flush()
 
-            self.log.debug("Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
+            self.log.debug(u"Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
             for command_param in client_data['commands'][a_command]['parameters']:
                 pa = CommandParam(command.id, \
                                   command_param['key'], \
@@ -603,7 +603,7 @@ class DbHelper():
 
             ### Table core_xplcommand
             if 'xpl_command' in command_in_client_data:
-                self.log.debug("Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
+                self.log.debug(u"Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
                 x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
                 if x_command['xplstat_name'] in created_xpl_stats.keys():
                     xplstatid = created_xpl_stats[x_command['xplstat_name']]

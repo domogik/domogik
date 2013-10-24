@@ -69,10 +69,10 @@ class PluginTestCase(TemplateTestCase):
     # this function is the same for all plugins
     def test_0010_configure_the_plugin(self):
         # first, clean the plugin configuration
-        print("Delete the current plugin configuration")
+        print(u"Delete the current plugin configuration")
         self.assertTrue(delete_configuration("plugin", self.name, get_sanitized_hostname()))
         for key in self.configuration:
-            print("Set up configuration : {0} = {1}".format(key, self.configuration[key]))
+            print(u"Set up configuration : {0} = {1}".format(key, self.configuration[key]))
             self.assertTrue(configure("plugin", self.name, get_sanitized_hostname(), key, self.configuration[key]))
 
     # this function is the same for all plugins
@@ -89,7 +89,7 @@ class PluginTestCase(TemplateTestCase):
 
     # this function is the same for all plugins
     def test_9900_hbeat(self):
-        print("Check that a heartbeat is sent. This could take up to 5 minutes.")
+        print(u"Check that a heartbeat is sent. This could take up to 5 minutes.")
         self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat", 
                                           xplschema = "hbeat.app", 
                                           xplsource = "domogik-{0}.{1}".format(self.name, get_sanitized_hostname()),

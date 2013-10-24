@@ -61,7 +61,7 @@ class ProcessInfo():
         self.myxpl = myxpl
         # check pid exists
         if not psutil.pid_exists(pid):
-            self.log.warning("No process '%s' exists" % pid)
+            self.log.warning(u"No process '%s' exists" % pid)
             return
         # create psutil object
         self.p = psutil.Process(pid)
@@ -82,7 +82,7 @@ class ProcessInfo():
         """
         # check process status
         if not psutil.pid_exists(self.pid):
-            self.log.warning("Process '%s' doesn't exists anymore : stop watching for it" % self.pid)
+            self.log.warning(u"Process '%s' doesn't exists anymore : stop watching for it" % self.pid)
             self.stop.set()
             return
         # cpu info
@@ -108,10 +108,10 @@ class ProcessInfo():
         if self._callback != None:
             self._callback(self.pid, values)
         else:
-            print("%s > %s" % (self.pid, values))
+            print(u"%s > %s" % (self.pid, values))
 
 def display(pid, data):
-    print("DATA (%s) = %s" % (pid, str(data)))
+    print(u"DATA (%s) = %s" % (pid, str(data)))
 
 if __name__ == "__main__":
     my_process = ProcessInfo(3529)

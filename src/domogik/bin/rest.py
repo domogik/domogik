@@ -80,8 +80,8 @@ class Rest(XplPlugin):
 
         XplPlugin.__init__(self, name = 'rest')
         # logging initialization
-        self.log.info("Rest Server initialisation...")
-        self.log.debug("locale : %s %s" % locale.getdefaultlocale())
+        self.log.info(u"Rest Server initialisation...")
+        self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
 
         # API version
         self._rest_api_version = REST_API_VERSION
@@ -97,7 +97,7 @@ class Rest(XplPlugin):
             # plugin installation path
             #self._package_path = conf['package_path']
             #self._src_prefix = None
-            #self.log.info("Set package path to '%s' " % self._package_path)
+            #self.log.info(u"Set package path to '%s' " % self._package_path)
             #self._design_dir = "%s/domogik_packages/design/" % self._package_path
             self.package_mode = True
     
@@ -125,7 +125,7 @@ class Rest(XplPlugin):
 		self.key_file = ""
 		self.cert_file = ""
                 self.clean_json = False
-            self.log.info("Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
+            self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
     
             # SSL configuration
             try:
@@ -143,9 +143,9 @@ class Rest(XplPlugin):
                 self.use_ssl = USE_SSL
                 self.ssl_certificate = SSL_CERTIFICATE
             if self.use_ssl == True:
-                self.log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
+                self.log.info(u"Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
             else:
-                self.log.info("Configuration : SSL support not activated")
+                self.log.info(u"Configuration : SSL support not activated")
     
             # File repository
             try:
@@ -158,7 +158,7 @@ class Rest(XplPlugin):
                 self.repo_dir = DEFAULT_REPO_DIR
 
  	    # Launch server, stats
-            self.log.info("REST Initialisation OK")
+            self.log.info(u"REST Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
             # calls the tornado.ioloop.instance().start()
@@ -168,12 +168,12 @@ class Rest(XplPlugin):
             self.ready(0)
             IOLoop.instance().start()
         except :
-            self.log.error("%s" % self.get_exception())
+            self.log.error(u"%s" % self.get_exception())
 
     def start_http(self):
         """ Start HTTP Server
         """
-        self.log.info("Start HTTP Server on %s:%s..." % (self.interfaces, self.port))
+        self.log.info(u"Start HTTP Server on %s:%s..." % (self.interfaces, self.port))
         # logger
         for log in self.log.handlers:
             urlHandler.logger.addHandler(log)
@@ -231,22 +231,22 @@ class Rest(XplPlugin):
         return
 
     def reload_stats(self):
-        self.log.debug("=============== reload stats")
+        self.log.debug(u"=============== reload stats")
         req = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action( 'reload' )
         resp = req.request('xplgw', msg.get(), 100)
-        self.log.debug("Reply from xplgw: {0}".format(resp))
-        self.log.debug("=============== reload stats END")
+        self.log.debug(u"Reply from xplgw: {0}".format(resp))
+        self.log.debug(u"=============== reload stats END")
 
     def get_exception(self):
         """ Get exception and display it on stdout
         """
         my_exception =  str(traceback.format_exc()).replace('"', "'")
         # TODO : to delete : no more need to print this as log are in stdout
-        #print("==== Error in REST ====")
+        #print(u"==== Error in REST ====")
         #print(my_exception)
-        #print("=======================")
+        #print(u"=======================")
         return my_exception
 
 if __name__ == '__main__':

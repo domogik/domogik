@@ -66,7 +66,7 @@ class DBConnector(XplPlugin, MQRep):
         XplPlugin.__init__(self, 'dbmgr')
         # Already done in XplPlugin
         #MQRep.__init__(self, zmq.Context(), 'dbmgr')
-        self.log.debug("Init database_manager instance")
+        self.log.debug(u"Init database_manager instance")
 
         # Check for database connexion
         self._db = DbHelper()
@@ -96,7 +96,7 @@ class DBConnector(XplPlugin, MQRep):
             try:
                 self._engine = self._db.get_engine()
             except:
-                self.log.error("Error while starting database engine : {0}".format(traceback.format_exc()))
+                self.log.error(u"Error while starting database engine : {0}".format(traceback.format_exc()))
                 self.force_leave()
                 return
         self.ready()
@@ -167,7 +167,7 @@ class DBConnector(XplPlugin, MQRep):
             try:
                 if get_all_keys == True:
                     config = self._db.list_plugin_config(name, host)
-                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, config))
+                    self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, config))
                     json_config = {}
                     for elt in config:
                         json_config[elt.key] = self.convert(elt.value)
@@ -176,7 +176,7 @@ class DBConnector(XplPlugin, MQRep):
                     value = self._fetch_techno_config(name, host, key)
                     # temporary fix : should be done in a better way (on db side)
                     value = self.convert(value)
-                    self.log.info("Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, value))
+                    self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, value))
                     msg.add_data('value', value)
             except:
                 status = False
@@ -284,7 +284,7 @@ class DBConnector(XplPlugin, MQRep):
             msg.add_data('host', host)
             try:
                 self._db.del_plugin_config(name, host)
-                self.log.info("Delete config for {0} {1}".format(type, name))
+                self.log.info(u"Delete config for {0} {1}".format(type, name))
                 self.publish_config_updated(type, name, host)
             except:
                 status = False
@@ -315,7 +315,7 @@ class DBConnector(XplPlugin, MQRep):
                 while result.id != name or \
                    result.hostname != host or \
                    result.key != key:
-                    self.log.debug("Bad result : {0}/{1} != {2}/{3}".format(result.id, result.key, plugin, key))
+                    self.log.debug(u"Bad result : {0}/{1} != {2}/{3}".format(result.id, result.key, plugin, key))
                     result = self._db.get_plugin_config(name, host, key)
                 val = result.value
                 if val == '':
@@ -323,7 +323,7 @@ class DBConnector(XplPlugin, MQRep):
                 return val
             except AttributeError:
                 # if no result is found
-                #self.log.error("Attribute error : {0}".format(traceback.format_exc()))
+                #self.log.error(u"Attribute error : {0}".format(traceback.format_exc()))
                 return "None"
         except:
             msg = "No config found host={0}, plugin={1}, key={2}".format(host, name, key)

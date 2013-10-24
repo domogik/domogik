@@ -212,7 +212,7 @@ class deviceAPI(MethodView):
         """
         cli = MQSyncReq(urlHandler.zmq_context)
 
-        #self.log.info("Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
+        #self.log.info(u"Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
         #urlHandler.log.info("Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
 
         # get the client details

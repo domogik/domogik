@@ -50,7 +50,7 @@ def ask(question):
     """
 
     while True:
-        print("{0}\n[yes/no]".format(question))
+        print(u"{0}\n[yes/no]".format(question))
         # raw_input returns the empty string for "enter"
         yes = set(['yes','y', 'ye'])
         no = set(['no','n'])
@@ -61,7 +61,7 @@ def ask(question):
         elif choice in no:
            return False
         else:
-           print("Please respond with 'yes' or 'no'")
+           print(u"Please respond with 'yes' or 'no'")
 
 
 ### Domogik general checks

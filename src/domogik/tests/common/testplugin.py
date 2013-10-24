@@ -60,7 +60,7 @@ class TestPlugin(MQAsyncSub):
     def request_startup(self):
         """ Request the plugin to start over the manager
         """
-        print("Request plugin startup to the manager for '{0}' on '{1}'".format(self.name, self.host))
+        print(u"Request plugin startup to the manager for '{0}' on '{1}'".format(self.name, self.host))
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('plugin.start.do')
@@ -70,12 +70,12 @@ class TestPlugin(MQAsyncSub):
         if result:
             msgid, content = result.get()
             content = json.loads(content)
-            print("Response from the manager : {0}".format(content))
+            print(u"Response from the manager : {0}".format(content))
             if content['status']:
-                print("Plugin started")
+                print(u"Plugin started")
                 return True
             else:
-                print("Error : plugin not started")
+                print(u"Error : plugin not started")
                 return False
         else:
             raise RuntimeError("MQ Timeout when requesting manager to start the plugin")
@@ -83,7 +83,7 @@ class TestPlugin(MQAsyncSub):
     def request_stop(self):
         """ Request the plugin to stop
         """
-        print("Request plugin to stop : '{0}' on '{1}'".format(self.name, self.host))
+        print(u"Request plugin to stop : '{0}' on '{1}'".format(self.name, self.host))
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('plugin.stop.do')
@@ -93,12 +93,12 @@ class TestPlugin(MQAsyncSub):
         if result:
             msgid, content = result.get()
             content = json.loads(content)
-            print("Response : {0}".format(content))
+            print(u"Response : {0}".format(content))
             if content['status']:
-                print("Plugin stopped")
+                print(u"Plugin stopped")
                 return True
             else:
-                print("Error : plugin not stopped")
+                print(u"Error : plugin not stopped")
                 return False
         else:
             raise RuntimeError("MQ Timeout when requesting to stop the plugin")
@@ -109,7 +109,7 @@ class TestPlugin(MQAsyncSub):
             This is done by subscribing on the MQ plugin.status publisher
             If no status has been catched before the timeout, raise an error
         """
-        print("Start listening to MQ...")
+        print(u"Start listening to MQ...")
         IOLoop.instance().start() 
         # TODO : handle timeout
 
@@ -117,7 +117,7 @@ class TestPlugin(MQAsyncSub):
         if self.plugin_status == event:
             return True
         else:
-            print("Plugin not in status '{0}' : status = {1}".format(event, self.plugin_status))
+            print(u"Plugin not in status '{0}' : status = {1}".format(event, self.plugin_status))
             return False
 
     def on_message(self, msgid, content):
@@ -126,21 +126,21 @@ class TestPlugin(MQAsyncSub):
             @content : message content
         """
         if msgid == "plugin.status":
-            print("Message received : msgid={0}, content={1}".format(msgid, content))
+            print(u"Message received : msgid={0}, content={1}".format(msgid, content))
             self.plugin_status = content['event']
             if content['name'] == self.name and \
                content['type'] == self.type and \
                content['host'] == self.host:
                 # plugin started
                 if content['event'] == STATUS_ALIVE:
-                    print("Plugin is started")
-                    print("Stop listening to MQ as we get our result")
+                    print(u"Plugin is started")
+                    print(u"Stop listening to MQ as we get our result")
                     IOLoop.instance().stop() 
     
                 # plugin stopped
                 elif content['event'] == STATUS_STOPPED:
-                    print("Plugin is stopped")
-                    print("Stop listening to MQ as we get our result")
+                    print(u"Plugin is stopped")
+                    print(u"Stop listening to MQ as we get our result")
                     IOLoop.instance().stop() 
          
 

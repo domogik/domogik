@@ -66,7 +66,7 @@ class BasePlugin():
         dmg_user = Default.get("DOMOGIK_USER")
         logname = pwd.getpwuid(os.getuid())[0]
         if dmg_user != logname:
-            print("ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : %s" % dmg_user)
+            print(u"ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : %s" % dmg_user)
             sys.exit(1)
 
         if name is not None:
@@ -116,11 +116,11 @@ class BasePlugin():
             print(global_release)
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
-            self.log.info("Starting the plugin in background...")
+            self.log.info(u"Starting the plugin in background...")
             ctx = daemon.DaemonContext()
             ctx.files_preserve = l.get_fds([name])
             ctx.open()
-            self.log.info("Daemonize plugin %s" % name)
+            self.log.info(u"Daemonize plugin %s" % name)
             self.is_daemon = True
         else:
             #l = logger.Logger(name)
@@ -158,7 +158,7 @@ class BasePlugin():
             if not  t.isAlive():
                 self._threads.remove(t)
         if thread in self._threads:
-            self.log.info("Try to register a thread twice :" % thread)
+            self.log.info(u"Try to register a thread twice :" % thread)
         else:
             self._lock_add_thread.acquire()
             self._threads.append(thread)
@@ -185,7 +185,7 @@ class BasePlugin():
         @param timer : the timer to add
         '''
         if timer in self._timers:
-            self.log.info("Try to register a timer twice : %s" % timer)
+            self.log.info(u"Try to register a timer twice : %s" % timer)
         else:
             self.log.debug('New timer registered : %s' % timer)
             self._lock_add_timer.acquire()
@@ -223,5 +223,5 @@ class BasePlugin():
 
     def __del__(self):
         if hasattr(self, log):
-            self.log.debug("__del__ baseplugin")
+            self.log.debug(u"__del__ baseplugin")
 
