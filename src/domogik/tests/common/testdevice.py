@@ -151,11 +151,14 @@ class TestDevice():
         print("Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters")
-        #devices = device = json.loads(response.text)
-        #for device in devices:
-        #    print("Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
-        #    if device['client_id'] == client_id:
-        #        self.del_device(device['id'])
+        if response.text == "":
+            print("There is no device to delete")
+            return
+        devices = device = json.loads(response.text)
+        for device in devices:
+            #print("Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
+            if device['client_id'] == client_id:
+                self.del_device(device['id'])
         
         
 
@@ -168,5 +171,5 @@ if __name__ == "__main__":
     td.configure_global_parameters({"device" : "/home", "interval" : 1})
     #td.del_device(td.device_id)
     #td.del_devices_by_client("foo")
-    td.del_devices_by_client("plugin-diskfree.darkstar")
+    #td.del_devices_by_client("plugin-diskfree.darkstar")
 

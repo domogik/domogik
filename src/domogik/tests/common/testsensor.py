@@ -86,7 +86,7 @@ class TestSensor():
         """ Call GET /sensor/<id> to get the last value of the sensor
             Returns a tuple : (timestamp, value)
         """
-        print("Get the last value for sensor id={0}".format(self.sensor_id))
+        print("Get the last value for sensor id={0} / name={1}".format(self.sensor_id, self.sensor_name))
         response = requests.get("{0}/sensor/{1}".format(self.rest_url, self.sensor_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print("Response : [{0}]".format(response.status_code))
@@ -98,7 +98,7 @@ class TestSensor():
         sensor = json.loads(response.text)
         value = sensor['last_value']
         timestamp = sensor['last_received']
-        print("Last value : timestamp = {0} ({1}) / value = {1}".format(timestamp, value))
+        print("Last value : timestamp = {0} / value = {1}".format(timestamp, value))
         return (timestamp, value)
 
 

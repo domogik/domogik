@@ -333,7 +333,8 @@ class XplPlugin(BasePlugin, MQRep):
                     self.force_leave()
                     return []
             for a_device in device_list:
-                self.log.info("- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
+                print type(a_device['name'])
+                self.log.info(u"- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
                                                                                     a_device['name'], \
                                                                                     a_device['device_type_id']))
                 # log some informations about the device
