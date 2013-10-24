@@ -294,8 +294,8 @@ class XplManager(XplPlugin):
                                                 self._sen.conversion, \
                                                 value)
                                 self._log_stats.info( \
-                                        "Storing stat for device '{0}': key '{1}' with value '{2}' after conversion." \
-                                        .format(self._dev['name'], param.key, value))
+                                        "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
+                                        .format(self._dev['name'], self._dev['id'], self._sen.name, self._sen.id, param.key, value))
                                 # do the store
                                 device_data.append({"value" : value, "sensor": param.sensor_id})
                                 my_db = DbHelper()
