@@ -27,6 +27,7 @@ Packages development
 
 * :doc:`Udev files <udev_rules/index>`
 * :doc:`Data types <data_types/index>`
+* :doc:`Field types <field_types/index>`
 
 * :doc:`Tests <tests/index>` ....................................TODO
 
