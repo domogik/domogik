@@ -90,6 +90,7 @@ class AbstractCondition:
         self._mapping = mapping
         self._parsed_condition = None
         self._on_true = on_true
+        self._set_condition_for_tests()
 
     def set_condition(self, condition):
         """ Set the condition to  some JSON expression
@@ -102,12 +103,17 @@ class AbstractCondition:
         @param mapping : A dictionnary of uuid: pointer to a test instance
         """
         self._mapping = mapping
+        self._set_condition_for_tests()
 
     def get_mapping(self):
         """ Get the mapping for this condition
         @return : A dictionnary of uuid: pointer to a test instance
         """
         return self._mapping
+
+    def _set_condition_for_tests(self):
+        for (uid, test) in self._mapping.items():
+            test.set_condition(self)
 
     def __parse_boolean(self, json):
         """ Recursive method which returns a string which represent the boolean expression defined by a json
