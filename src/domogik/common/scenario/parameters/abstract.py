@@ -36,17 +36,16 @@ class AbstractParameter:
     child classes.
     """
 
-    def __init__(self, log = None, xpl = None, trigger = None):
+    def __init__(self, log = None, trigger = None):
         """ Create the parameter instance
-        The default init will only create the instance, and provide access to logging system and 
-        xpl on self._log and self._xpl
+        The default init will only create the instance, and provide access to logging system
+        on self._log
         This method should be extended to set type, filter, etc ...
         @param log : a Logger instance
         @param xpl : A Xpl Manager instance
         @param trigger : a method to call when the status of the parameter is updated
         """
         self._log = log
-        self._xpl = xpl
         self._type = None
         self._filters = {}
         self._list_of_values = {}
@@ -62,15 +61,17 @@ class AbstractParameter:
         """
         return self._trigger
 
-    def call_trigger(self):
+    def call_trigger(self, init=0):
         """ Call the trigger in a thread.
         Does nothing if no trigger is defined
         """
-        print "calling trigger %s" % self._trigger
         if self._trigger == None:
             return
         else:
-            self._thread = Thread(target=self._trigger,name = "call trigger %s" % self._trigger, args=[self])
+            if self._thread and not init:
+                self._thread.join()
+                self._thread = None
+            self._thread = Thread(target=self._trigger, name = "call trigger %s" % self._trigger, args=[self])
             self._thread.start()
 
     def get_type(self):
@@ -238,7 +239,7 @@ class AbstractParameter:
             if entry in self.get_list_of_values() and params[entry] not in self.get_list_of_values()[entry]:
                 raise ValueError("The submitted value for entry " + entry + " is not in list of authorized values")
         self._params = params
-        self.call_trigger()
+        self.call_trigger(1)
 
     def evaluate(self):
         """ This method is called by the Test to evaluate the parameter.
@@ -256,4 +257,7 @@ class AbstractParameter:
         """ Destroy parameter
         This method is called by Test and can be extended to add some checks to destroy / stop part of the parameter
         """
+        # cleanup the trigger thread if it exists
+        if self._thread is not None:
+            self._thread.join()
         pass

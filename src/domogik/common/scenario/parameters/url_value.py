@@ -34,8 +34,8 @@ class UrlParameter(AbstractParameter):
     """ This parameter looks periodically at some URL and return the content of the page
     """
 
-    def __init__(self, log = None, xpl = None, trigger = None):
-        AbstractParameter.__init__(self, log, xpl, trigger)
+    def __init__(self, log = None, trigger = None):
+        AbstractParameter.__init__(self, log, trigger)
         self.set_type("url")
         self.add_expected_entry("urlpath", "string", "Url the script will fetch")
         self.add_expected_entry("interval", "string", "Interval between 2 fetch in second")
@@ -75,6 +75,7 @@ class UrlParameter(AbstractParameter):
         """
         self._event.set()
         self._fetch_thread.join()
+        AbstractParameter.destroy(self)
 
 
 #Some basic tests

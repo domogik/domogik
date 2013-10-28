@@ -68,6 +68,7 @@ class ScenarioFrontend(XplPlugin):
                     {
                         'list': self._backend.list_conditions,
                         'new': self._backend.create_scenario,
+                        'delete': self._backend.delete_scenario,
                         'get': self._backend.get_parsed_condition,
                         'evaluate': self._backend.eval_condition
                     },

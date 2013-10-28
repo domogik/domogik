@@ -39,8 +39,8 @@ class CronParameter(AbstractParameter):
     This is the simplest exemple for to see how you can extend Parameter
     """
 
-    def __init__(self, log = None, xpl = None, trigger = None):
-        AbstractParameter.__init__(self, log, xpl, trigger)
+    def __init__(self, log = None, trigger = None):
+        AbstractParameter.__init__(self, log, trigger)
         self.set_type("string")
         self.add_expected_entry("cron", "string", "Cron timed trigger")
         self.expr = None
