@@ -223,26 +223,26 @@ class deviceAPI(MethodView):
             return 500, "Error while getting the clients details"
 
         # create the full client id : 
-        if request.form.get('type') == "plugin":
+        #if request.form.get('type') == "plugin":
         #    client_id = "{0}-{1}.{2}".format(DMG_VENDOR_ID, request.form.get('id'), request.form.get('host'))
         #else:
-            client_id = "{0}-{1}.{2}".format(request.form.get('type'), request.form.get('id'), request.form.get('host'))
+        #    client_id = "{0}-{1}.{2}".format(request.form.get('type'), request.form.get('id'), request.form.get('host'))
 
         # get the corresponding json
         all_clients_data = res.get_data()
 
         # extract the interesting part of the json (just the client part)
-        if all_clients_data.has_key(client_id):
-            client_data = all_clients_data[client_id]['data']
+        if all_clients_data.has_key(request.form.get('client_id')):
+            client_data = all_clients_data[request.form.get('client_id')]['data']
         else:
-            return 500, "Error : there is no client id named '{0}'".format(client_id)
+            return 500, "Error : there is no client id named '{0}'".format(request.form.get('client_id'))
 
         # create the device in database
         # notice that we don't give any address for the device as this will be done with another url later
         created_device = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
             device_type=request.form.get('device_type'),
-            client_id=client_id,
+            client_id=request.form.get('client_id'),
             description=request.form.get('description'),
             reference=request.form.get('reference'),
             client_data=client_data

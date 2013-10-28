@@ -75,9 +75,7 @@ Example: ::
         Content-Type: application/x-www-form-urlencoded
     Body: 
         name=the device name
-        type=the client type (plugin, ...)
-        id=the client id (diskfree, ozwave, ...)
-        host=the client host
+        client_id=The client id
         description=some description about the device
         reference=some reference about the device
         device_type=the type of the device we want to create (diskfree.disk_usage, ...)

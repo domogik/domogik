@@ -70,7 +70,13 @@ class AbstractTest:
         if not self._description:
             return ""
         return self._description
-        
+       
+    def set_condition(self, cond):
+        """ Set the condition where this test belongs to
+        @param cond : the condition_name
+        """
+        self._cond = cond
+
     def get_condition(self):
         """ Return condition this test belongs to
         @return None if the test is not attached  to any condition (shouldn't happen out of tests)
