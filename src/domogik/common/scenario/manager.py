@@ -201,7 +201,7 @@ class ScenarioManager:
         """ Callback to shut down all parameters
         """
         for cond in self._conditions.keys():
-            self.delete_scenario(cond)
+            self.delete_scenario(cond, db_delete=False)
 
     def generic_trigger(self, test_i):
         """ Generic trigger to refresh a condition state when some value change
@@ -239,7 +239,7 @@ class ScenarioManager:
             _uuid = str(uuid.uuid4())
         return _uuid
 
-    def delete_scenario(self, name):
+    def delete_scenario(self, name, db_delete=True):
         if name not in self._conditions:
             self.log.info(u"Scenario {0} doesn't exist".format(name))
             return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(name)}
@@ -254,6 +254,12 @@ class ScenarioManager:
             for action in self._conditions_actions[name]:
                 self._actions_mapping[action].destroy()
             del self._conditions_actions[name]
+            # delete from the db
+            with self._db.session_scope():
+                scen = self._db.get_scenario_by_name(name)
+                print scen
+                if scen:
+                    self._db.del_scenario(scen.id)
             self.log.info(u"Scenario {0} deleted".format(name))
 
     def create_scenario(self, name, json_input, store=True):
@@ -266,15 +272,23 @@ class ScenarioManager:
             - actions => the json that will be used for creating the actions instances
         @Return {'name': name} or raise exception
         """
+        if name in self._conditions.keys():
+            self.log.error(u"A scenario with name '{0}' already exists.".format(name))
+            return {'status': 'NOK', 'msg': 'a scenario with this name already exists'}
+
         try:
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
-            print e
-            self.log.error(u"Invalid json : {0}".format(json_input))
-            return None
+            self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
+            self.log.debug(e)
+            return {'status': 'NOK', 'msg': 'invallid json'}
+
         if 'condition' not in payload.keys() \
                 or 'actions' not in payload.keys():
-            raise KeyError(u"the json for the scenario does not contain condition or actions for scenario {0}".format(name))
+            msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
+            self.log.error(msg)
+            return {'status': 'NOK', 'msg': msg}
+
         # instantiate all objects
         self.__instanciate()
         # create the condition itself

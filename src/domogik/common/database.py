@@ -1623,6 +1623,9 @@ class DbHelper():
     def get_scenario(self, s_id):
         return self.__session.query(Scenario).filter_by(id=s_id).first()
 
+    def get_scenario_by_name(self, s_name):
+        return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
+
     def add_scenario(self, name, json):
         self.__session.expire_all()
         scenario = Scenario(name=name, json=json)

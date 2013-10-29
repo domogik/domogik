@@ -87,18 +87,17 @@ class ScenarioFrontend(XplPlugin):
                 payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
             else:
                 payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
-            self._mdp_reply(msg.get_action(), "ok", payload)
+            self._mdp_reply(msg.get_action(), payload)
         except:
             self.log.error(u"Exception occured during message processing.")
             trace = str(traceback.format_exc())
             self.log.debug(trace)
             self._mdp_reply(msg.get_action(), "error", {"details": trace})
 
-    def _mdp_reply(self, action, status, payload):
+    def _mdp_reply(self, action, payload):
         msg = MQMessage()
         msg.set_action(action)
-        msg.add_data('status', status)
-        msg.add_data('payload', payload)
+        msg.add_data('result', payload)
         self.reply(msg.get())
 
     def end(self):

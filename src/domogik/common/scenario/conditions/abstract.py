@@ -94,8 +94,10 @@ class AbstractCondition:
 
     def destroy(self):
         ret = []
+        print self._mapping
         for (uid, test) in self._mapping.items():
-            test.destroy()
+            if type(test) not in [str, unicode]: 
+                test.destroy()
             ret.append(uid)
         return ret
 
