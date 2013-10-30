@@ -137,6 +137,11 @@ The status information can be refreshed using button. |bt-refresh-ctrl|
 |                  |                                    |  - Node informations : Fetch the data for a node from the Z-Wave network                           |
 |                  |                                    |  - State Node : Fetch the command class data for a node from the Z-Wave network                    |
 |                  |                                    |  - Dynamics data : Fetch only the dynamic command class data for a node from the Z-Wave network.   |
+|                  +------------------------------------+----------------------------------------------------------------------------------------------------+
+|                  | Monitor Node and log it            | This commmand store all event send an receive by a node. To stop monitoring click again button.    |
+|                  |                                    | Log file saved in user path defined in config section.                                             |
+|                  |                                    | (defaut: share/domogik/data/ozwave/lognodeXXX.log)                                                 |
+|                  |                                    | Log contains also openzwave log if unable.                                                         |
 +------------------+------------------------------------+----------------------------------------------------------------------------------------------------+
 
 Manage association devices (groups)

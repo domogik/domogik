@@ -1,5 +1,5 @@
 ===================
-Zwave network tools
+Support tools
 ===================
 
 .. |menu4| image:: ozwave_menu-supporttools.png

@@ -35,7 +35,7 @@ Or if you don't have user github account use :
 
 .. code-block:: bash
 
-    git clone --recurcive https://github.com/Lawouach/WebSocket-for-Python.git
+    git clone --recursive https://github.com/Lawouach/WebSocket-for-Python.git
 
 change to working revision
 

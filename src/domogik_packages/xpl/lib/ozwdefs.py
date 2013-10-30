@@ -44,7 +44,7 @@ import sys
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.2c1"
+OZWPLuginVers = "0.2c2"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
@@ -72,7 +72,7 @@ Capabilities = ['Primary Controller', 'Secondary Controller', 'Static Update Con
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
                                'COMMAND_CLASS_SENSOR_MULTILEVEL', 'COMMAND_CLASS_BATTERY',  'COMMAND_CLASS_METER', 
-                               'COMMAND_CLASS_SWITCH_MULTILEVEL', ]
+                               'COMMAND_CLASS_SWITCH_MULTILEVEL', 'COMMAND_CLASS_THERMOSTAT_SETPOINT' ]
                                
 # Listes des types reconnues comme device domogik (label openzwave)
 DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery-level', 'sensor', 'status', # sensor
@@ -80,8 +80,8 @@ DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery
                                   'alarm-type', 'alarm-level', 'count', 'instant-energy-production', 'total-energy-production',
                                   'energy-production-today', 'total-production-time', 'indicator', 'locked', 'level',
                                   'operating-state', 
-                                  'basic', 'switch', 'step-size', 'inc', 'dec', 'bright', 'dim',  'toggle-switch',  # Actuaror
-                                  'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint']
+                                  'basic', 'switch', 'level', 'step-size', 'inc', 'dec', 'bright', 'dim',  'toggle-switch',  # Actuaror
+                                  'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint', 'heating']
 
 # Notifications reportés sur le hub xPL pour l'UI
 UICtrlReportType = ['plugin-state', 'driver-ready', 'driver-remove', 'init-process', 'ctrl-error', 'ctrl-action',
@@ -90,7 +90,8 @@ UICtrlReportType = ['plugin-state', 'driver-ready', 'driver-remove', 'init-proce
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
                                 'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
-                                'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL','COMMAND_CLASS_METER' ]
+                                'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL','COMMAND_CLASS_METER', 
+                                'COMMAND_CLASS_THERMOSTAT_SETPOINT ' ]
 
 BasicDeviceType = {1: 'TYPE_CONTROLLER', 2: 'TYPE_STATIC_CONTROLLER', 3: 'TYPE_SLAVE', 4 :'TYPE_ROUTING_SLAVE'}
 GenericDeviceType = { 0x00:'TYPE_SPECIFIC_TYPE_NOT_USED', 0x01: 'TYPE_CONTROLLER', 

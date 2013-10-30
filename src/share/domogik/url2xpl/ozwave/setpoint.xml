@@ -1,0 +1,21 @@
+<technology id="ozwave">
+  <command name="setpoint">
+    <schema>ozwave.basic</schema>
+    <command-key>command</command-key>    
+    <address-key>device</address-key>    
+    <command-xpl-value>setpoint</command-xpl-value>
+    <parameters>                                                                                            
+      <parameter key="value" location="1"/>
+      <parameter key="type" value="heating"/>
+      <parameter key="unit" value="\u00B0C"/>
+    </parameters>                                                                                           
+  </command>
+  <listener>
+    <schema>ozwave.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="setpoint" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
