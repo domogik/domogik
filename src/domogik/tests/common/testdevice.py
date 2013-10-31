@@ -54,47 +54,37 @@ class TestDevice():
         self.rest_url = get_rest_url()
 
         # package informations
-        self.type = None
-        self.id = None
-        self.host = None
+        self.client_id = None
 
         # device informations
         self.device_name = None
         self.device_type = None
 
-    def create_device(self, type, name, host, device_name, device_type):
+    def create_device(self, client_id, device_name, device_type):
         """ Call POST /device/... to create the device
-            @param type : package type
-            @param name : package name
-            @param host : client host for the package
+            @param client_id : client id
             @param device_name : the device name
             @param device_type : the device type
             @return : the device id for the device created
         """
         # package informations
-        self.type = type
-        self.name = name
-        self.host = host
+        self.client_id = client_id
         # device informations
         self.device_name = device_name
         self.device_type = device_type
         description = "a test device"
         reference = "for test only"
-        print(u"Create a test device for the {0} {1} on {2}. Device type is '{3}', name is '{4}'".format(self.type,
-                                                                                                          self.name,
-                                                                                                          self.host,
+        print(u"Create a test device for {0}. Device type is '{1}', name is '{2}'".format(self.client_id,
                                                                                                           self.device_type,
                                                                                                           self.device_name))
 
         response = requests.post("{0}/device/".format(self.rest_url), \
             headers={'content-type':'application/x-www-form-urlencoded'},
-            data="name={0}&type={1}&id={2}&host={3}&description={4}&reference={5}&device_type={6}".format(self.device_name,
-                                                                                                          self.type,
-                                                                                                          self.name,
-                                                                                                          self.host,
-                                                                                                          description,
-                                                                                                          reference,
-                                                                                                          self.device_type))
+            data="name={0}&client_id={1}&description={2}&reference={3}&device_type={4}".format(self.device_name,
+                                                                                               self.client_id,
+                                                                                               description,
+                                                                                               reference,
+                                                                                               self.device_type))
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
