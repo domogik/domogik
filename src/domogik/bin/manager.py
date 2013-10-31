@@ -919,9 +919,24 @@ class Plugin(GenericComponent, MQAsyncSub):
         if res:
             return 0
 
+        ### Actions for test mode
+        test_mode = self._config.query(self.name, 'test_mode')
+        test_options = ""
+        if test_mode == True: 
+            self.log.info("The plugin {1} is requested to be launched in TEST mode".format(self.name))
+            test_options = "-t"
+            idx = 0
+            again = True
+            while again:
+                param = self._config.query(self.name, "test_param{0}".format(idx))
+                if param != None:
+                    test_options = "{0} {1}".format(test_options, param)
+                else:
+                    again = False
+
         ### Try to start the plugin
-        self.log.info(u"Request to start plugin : {0}".format(self.name))
-        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py".format(self._packages_directory, self.name, self.name), \
+        self.log.info(u"Request to start plugin : {0} {1}".format(self.name, test_options))
+        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_options), \
                                   env_pythonpath = self._libraries_directory)
         pid = pid
 
