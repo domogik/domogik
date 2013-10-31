@@ -42,15 +42,13 @@ class AbstractTest:
        exception if the method can't be evaluated
     """
 
-    def __init__(self, log = None, xpl = None, trigger = None, cond = None):
+    def __init__(self, log = None, trigger = None, cond = None):
         """ Create the instance
         @param log : A logger instance
-        @param xpl : The Xpl Manager instance
         @param trigger : a method to call when a parameter changes
         @param cond : The condition instance test is attached to
         """
         self._log = log
-        self._xpl = xpl
         self._trigger = trigger
         self._parameters = {}
         self._description = None
@@ -88,7 +86,7 @@ class AbstractTest:
         """ Callback called by a parameter when the fill() method is called
         Basically, it only calls the underlying ttrigger if exists
         """
-        self._log.warning("Trigger %s called by parameter %s" % (self._trigger, param))
+        #self._log.warning("Trigger %s called by parameter %s" % (self._trigger, param))
         if self._trigger != None:
             self._trigger(self)
 
@@ -151,7 +149,7 @@ class AbstractTest:
         module_name = "domogik.common.scenario.parameters.%s" % modonly
         #This may raise ImportError
         cname = getattr(__import__(module_name, fromlist = [modonly]), classonly)
-        p = cname(self._log, self._xpl, self.cb_trigger)
+        p = cname(log=self._log, trigger=self.cb_trigger)
         self._parameters[name] = p
 
     def destroy(self):

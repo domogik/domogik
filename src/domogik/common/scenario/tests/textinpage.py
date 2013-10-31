@@ -32,8 +32,8 @@ class TextInPageTest(AbstractTest):
     """ Simple test to check if a word is contained in an url
     """
 
-    def __init__(self, log = None, xpl = None, trigger = None):
-        AbstractTest.__init__(self, log, xpl, trigger)
+    def __init__(self, log = None, trigger = None):
+        AbstractTest.__init__(self, log, trigger)
         self.set_description("Check if a web page contains some word")
         self.add_parameter("url", "url_value.UrlParameter")
         self.add_parameter("text", "text.TextParameter")
@@ -48,12 +48,11 @@ class TextInPageTest(AbstractTest):
             return None
         else:
             res = t.evaluate() in u.evaluate().decode('utf-8')
-            self._log.debug("Evaluate %s in %s : %s" % (t, u, res))
             return res
 
 
-TEST = None
 if __name__ == "__main__":
+    TEST = None
     import logging
 
     def mytrigger(test):

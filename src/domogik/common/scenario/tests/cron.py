@@ -32,8 +32,8 @@ class CronTest(AbstractTest):
     """ Simple test to check if a word is contained in an url
     """
 
-    def __init__(self, log = None, xpl = None, trigger = None):
-        AbstractTest.__init__(self, log, xpl, trigger)
+    def __init__(self, log = None, trigger = None):
+        AbstractTest.__init__(self, log, trigger)
         self.set_description("Trigger on a certain timed event")
         self.add_parameter("cron", "cron.CronParameter")
 

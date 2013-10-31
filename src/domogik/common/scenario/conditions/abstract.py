@@ -92,6 +92,15 @@ class AbstractCondition:
         self._on_true = on_true
         self._set_condition_for_tests()
 
+    def destroy(self):
+        ret = []
+        print self._mapping
+        for (uid, test) in self._mapping.items():
+            if type(test) not in [str, unicode]: 
+                test.destroy()
+            ret.append(uid)
+        return ret
+
     def set_condition(self, condition):
         """ Set the condition to  some JSON expression
         @param condition : A JSON expression
@@ -164,9 +173,11 @@ class AbstractCondition:
         @return a boolean representing result of evaluation
         """
         if self._parsed_condition is None:
-            raise ValueError("No parsed condition")
+            return None
+        res = eval(self._parsed_condition)
+        self._log.info("Evaluating condition {0} result = {1}".format(self._name, res))
         self._log.debug("_parsed condition is : %s, eval is %s" % (self._parsed_condition, eval(self._parsed_condition)))
-        if eval(self._parsed_condition):
+        if res:
             # call the callback
             self._on_true(self._name)
             return True

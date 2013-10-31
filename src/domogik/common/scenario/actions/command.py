@@ -39,14 +39,20 @@ class CommandAction(AbstractAction):
         self.set_description("Start a certain command")
 
     def do_action(self, condition, tests):
-        print "DOOOOOOOOOOOOOOOOOOOOOOOOOOO"
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('cmd.send')
         msg.add_data('cmdid', self._params['cmdid'])
         msg.add_data('cmdparams', self._params['cmdparams'])
         # do the request
-        print cli.request('xplgw', msg.get(), timeout=10)
+        res = cli.request('xplgw', msg.get(), timeout=10)
+        if res:
+            data = res.get_data()
+            if not data['status']:
+                self._log.error("Command sending to XPL gw failed: {0}".format(res))
+        else:
+            self._log.error("XPL gw did not respond")
+
 
     def get_expected_entries(self):
         return {

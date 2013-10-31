@@ -57,6 +57,9 @@ class AbstractAction:
         self._log = log
         self._description = ''
 
+    def destroy(self):
+        pass
+
     def set_description(self, description):
         """ Update the description of the test
         This description will be usefull to help user to understand what the test does
