@@ -48,9 +48,9 @@ Let's say you will work in you home directory. Clone your repository: ::
 
 And activate the plugin on Domogik side: ::
 
-    $ cd /var/lib/domogik/packages
+    $ cd /var/lib/domogik/domogik_packages
     $ ln -s /home/fritz/domogik-plugin-diskfree plugin_diskfree
 
 Assuming you cloned an already working plugin, Domogik will automatically detect the plugin after a few seconds and you will be able to configure it and start it.
 
-**Be carefull** : the symbolic link must be named like this : **/var/lib/domogik/packages/[package type]_[package name]**! You must use an *underscore* because python will not be able to see your plugin as a package is you use a *minus*.
+**Be carefull** : the symbolic link must be named like this : **/var/lib/domogik/domogik_packages/[package type]_[package name]**! You must use an *underscore* because python will not be able to see your plugin as a package is you use a *minus*.

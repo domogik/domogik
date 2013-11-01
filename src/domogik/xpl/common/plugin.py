@@ -70,7 +70,7 @@ STATUS_INVALID = "invalid"
 CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
-PACKAGES_DIR = "packages"
+PACKAGES_DIR = "domogik_packages"
 RESOURCES_DIR = "resources"
 PRODUCTS_DIR = "products"
 PRODUCTS_PICTURES_EXTENSIONS = ['jpg', 'png']

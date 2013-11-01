@@ -21,7 +21,7 @@ Use it
 
 To launch the plugin in foreground (it is better during the plugin development), just launch **start.sh**: ::
 
-    $ cd /var/lib/domogik/packages/plugin_myplugin
+    $ cd /var/lib/domogik/domogik_packages/plugin_myplugin
     $ ./start.sh
 
 The plugin will be launched in foreground. To stop it, you can use (ctrl)-(C).

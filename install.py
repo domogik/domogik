@@ -61,7 +61,7 @@ def build_file_list(user):
         ('/var/cache/domogik/pkg-cache', [user, None], []),
         ('/var/cache/domogik/cache', [user, None], []),
         ('/var/lib/domogik', [user, None], []),
-        ('/var/lib/domogik/packages', [user, None], \
+        ('/var/lib/domogik/domogik_packages', [user, None], \
                 ['src/domogik/common/__init__.py']),
         ('/var/lib/domogik/resources', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \

@@ -117,7 +117,7 @@ Then, you need to import some libraries needed by the plugin. Example: ::
     from domogik.xpl.common.plugin import XplPlugin
     from domogik.xpl.common.xplmessage import XplMessage
     
-    from packages.plugin_diskfree.lib.diskfree import Disk
+    from domogik_packages.plugin_diskfree.lib.diskfree import Disk
     import threading
     import traceback
 
@@ -128,7 +128,7 @@ Some import lines are mandatory: ::
 
 Then, you have to import your plugin library objects (here for the plugin diskfree we import a class): ::
 
-    from packages.plugin_diskfree.lib.diskfree import Disk
+    from domogik_packages.plugin_diskfree.lib.diskfree import Disk
 
 To finish, depending on the plugin needs, you may need to import some various librairies. Example: ::
 

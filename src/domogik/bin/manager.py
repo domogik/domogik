@@ -168,11 +168,6 @@ class Manager(XplPlugin):
             # pid dir path
             self._pid_dir_path = conf['pid_dir_path']
        
-            # packages module path : /var/lib/domogik
-            #self._package_module_path = conf['package_path']
-            # packages installation path : /var/lib/domogik/packages
-            #self._package_path = "{0}/{1}".format(self._package_module_path, PACKAGES_DIR)
-            #self.log.info(u"Package path : {0}".format(self._package_path))
         except:
             self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
