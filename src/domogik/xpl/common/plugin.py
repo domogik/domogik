@@ -245,7 +245,7 @@ class XplPlugin(BasePlugin, MQRep):
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
         self.log.info(u"Value for '{0}' is : {1}".format(key, value))
-        return value
+        return self.cast_config_value(value)
 
     def get_config_default_value(self, key):
         """ Get the default value for a config key from the json file
@@ -270,6 +270,8 @@ class XplPlugin(BasePlugin, MQRep):
                 return self.cast(value, type)
 
         # no cast operation : return the value
+        if value == "None":
+            return None
         return value
 
     def cast(self, value, type):

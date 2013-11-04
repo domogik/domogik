@@ -799,6 +799,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         self._stop = stop
 
         ### config
+        # used only in the function add_configuration_values_to_data()
+        # elsewhere, this function is used : self.get_config("xxxx")
         self._config = Query(self.zmq, self.log)
 
         ### get the plugin data (from the json file)
@@ -915,23 +917,16 @@ class Plugin(GenericComponent, MQAsyncSub):
             return 0
 
         ### Actions for test mode
-        test_mode = self._config.query(self.name, 'test_mode')
-        test_options = ""
+        test_mode = self._config.query(self.name, "test_mode")
+        test_option = self._config.query(self.name, "test_option")
+        test_args = ""
         if test_mode == True: 
-            self.log.info("The plugin {1} is requested to be launched in TEST mode".format(self.name))
-            test_options = "-t"
-            idx = 0
-            again = True
-            while again:
-                param = self._config.query(self.name, "test_param{0}".format(idx))
-                if param != None:
-                    test_options = "{0} {1}".format(test_options, param)
-                else:
-                    again = False
+            self.log.info("The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
+            test_args = "-t {0}".format(test_option)
 
         ### Try to start the plugin
-        self.log.info(u"Request to start plugin : {0} {1}".format(self.name, test_options))
-        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_options), \
+        self.log.info(u"Request to start plugin : {0} {1}".format(self.name, test_args))
+        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_args), \
                                   env_pythonpath = self._libraries_directory)
         pid = pid
 

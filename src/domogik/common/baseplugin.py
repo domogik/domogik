@@ -109,6 +109,10 @@ class BasePlugin():
                           dest="run_in_foreground", 
                           default=False, 
                           help="Run the plugin in foreground, default to background.")
+        parser.add_argument("-t", 
+                          dest="test_option", 
+                          default=None,
+                          help="Test option.")
         self.options = parser.parse_args()
         if self.options.display_version:
             __import__("domogik")
