@@ -46,9 +46,10 @@ from ozwvalue import ZWaveValueNode
 from ozwnode import ZWaveNode
 from ozwctrl import ZWaveController
 from ozwxmlfiles import *
+from ozwmonitornodes import ManageMonitorNodes
 from wsuiserver import BroadcastServer 
 from ozwdefs import *
-from datetime import timedelta
+from datetime import timedelta,  datetime
 import pwd
 import sys
 import resource
@@ -86,6 +87,7 @@ class OZWavemanager(threading.Thread):
         """
         self._main = main
         self._device = None
+        self.monitorNodes = None
         self._configPlug = config
         self._log = log
         self._cb_send_xPL = cb_send_xPL
@@ -113,6 +115,7 @@ class OZWavemanager(threading.Thread):
         self._initFully = False
         self._ctrlActProgress = None
         self.lastTest = 0
+        self._completMsg = self._configPlug.query('ozwave', 'cpltmsg')
         self._wsPort = int(self._configPlug.query('ozwave', 'wsportserver'))
         # récupération des associations nom de réseaux et homeID
         self._nameAssoc = {}
@@ -167,7 +170,8 @@ class OZWavemanager(threading.Thread):
             opts = "--logging false"
         self._log.info("Try to run openzwave manager")
         self.options = libopenzwave.PyOptions()
-        self.options.create(self._configPath, self._userPath,  opts) 
+        self.options.create(self._configPath, self._userPath,  opts)
+        if self._completMsg: self.options.addOptionBool('NotifyTransactions',  self._completMsg)
         self.options.lock() # nécessaire pour bloquer les options et autoriser le PyManager à démarrer
         self._manager = libopenzwave.PyManager()
         self._manager.create()
@@ -175,8 +179,8 @@ class OZWavemanager(threading.Thread):
         self._log.info(self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers)
         self._log.info('Config path : ' + self._configPath)
         self._log.info('User path : ' + self._userPath)
-        self._log.info('Logging openzwave : ' + opts)
-        print 'user config :',  self._userPath,  " Logging openzwave : ",  opts
+        self._log.info('Openzwave options : {0}, NotifyTransactions : {1}'.format(opts, self._completMsg))
+        print 'User config : {0}; Openzwave options : {1}, NotifyTransactions : {2}'.format(self._userPath, opts, self._completMsg)
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
         self.serverUI =  BroadcastServer(self._wsPort,  self.cb_ServerWS,  self._log) # demarre le websocket server
         self._cb_send_xPL({'type':'xpl-trig', 'schema':'ozwctrl.basic',
@@ -186,6 +190,8 @@ class OZWavemanager(threading.Thread):
                                             'node': 'controller',
                                             'usermsg': 'Plugin is in intialization process, be patient...',
                                             'data': {'state':'wsserver_started', 'wsport': self._wsPort}}})
+        self.monitorNodes = ManageMonitorNodes(self)
+        self.monitorNodes.start()  # demarrer la surveillance des nodes pour helper log
         self.getManufacturers()
         
      # On accède aux attributs uniquement depuis les property
@@ -235,11 +241,11 @@ class OZWavemanager(threading.Thread):
         """ Stop class OZWManager."""
         print("Stopping plugin, Remove driver from openzwave : %s" %self._device)
         self._log.info("Stopping plugin, Remove driver from openzwave : %s",  self._device)
-        sleep(1)
+ #       sleep(1)
         self.closeDevice(self._device)
         self._device = None
         self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-remove', 'usermsg' : 'Plugin stopped.', 'data': False})
-        sleep(2)
+   #     sleep(2)
         self.serverUI.close()
         self._main. _ctrlHBeat.stop()
     
@@ -439,6 +445,7 @@ class OZWavemanager(threading.Thread):
 #         DriverFailed = 19                 / Driver failed to load
 #         DriverReset = 20                  / All nodes and values for this driver have been removed.  This is sent instead of potentially hundreds of individual node and value notifications.
 
+        self.monitorNodes.openzwave_report(args)
         print('\n%s\n[%s]:' % ('-'*20, args['notificationType']))
         print args
         notifyType = args['notificationType']
@@ -564,39 +571,39 @@ class OZWavemanager(threading.Thread):
         node = self._getNode(self._homeId, args['nodeId'])
         nCode = libopenzwave.PyNotificationCodes[args['notificationCode']]
         print nCode,  nCode.doc
-        if nCode == 'MsgComplete':     #      Code_MsgComplete = 0,                                   /**< Completed messages */
-            print 'MsgComplete notification code :', args
-            self._log.info('MsgComplete notification code for Node {0}.'.format(node.id))
-        elif nCode == 'Timeout':         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
-            print 'Timeout notification on node :',  args['nodeId']
-            self._log.info('Timeout notification code for Node {0}.'.format(args['nodeId']))
-        elif nCode == 'NoOperation':  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
-            print 'NoOperation notification code :', args
-            self._log.info('Z-Wave Device Node {0} successful receipt testing message.'.format(node.id))
-            node.recevNoOperation(args,  self.lastTest)
-        elif nCode == 'Awake':            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
-            if node : 
+        if not node:
+            self._log.debug("Notification for node who doesn't exist : {0}".format(args))
+        else :
+            if nCode == 'MsgComplete':     #      Code_MsgComplete = 0,                                   /**< Completed messages */
+                print 'MsgComplete notification code :', args
+                self._log.debug('MsgComplete notification code for Node {0}.'.format(node.id))
+                node.receivesCompletMsg(args)
+            elif nCode == 'Timeout':         #      Code_Timeout,                                              /**< Messages that timeout will send a Notification with this code. */
+                print 'Timeout notification on node :',  args['nodeId']
+                self._log.info('Timeout notification code for Node {0}.'.format(args['nodeId']))
+            elif nCode == 'NoOperation':  #       Code_NoOperation,                                       /**< Report on NoOperation message sent completion  */
+                print 'NoOperation notification code :', args
+                self._log.info('Z-Wave Device Node {0} successful receipt testing message.'.format(node.id))
+                node.receivesNoOperation(args,  self.lastTest)
+            elif nCode == 'Awake':            #      Code_Awake,                                                /**< Report when a sleeping node wakes up */
                 node.setSleeping(False)
                 print ('Z-Wave sleeping device Node {0} wakes up.'.format(node.id))
                 self._log.info('Z-Wave sleeping device Node {0} wakes up.'.format(node.id))
-        elif nCode == 'Sleep':            #      Code_Sleep,                                                /**< Report when a node goes to sleep */
-            if node : 
+            elif nCode == 'Sleep':            #      Code_Sleep,                                                /**< Report when a node goes to sleep */
                 node.setSleeping(True)
+                node.receiveSleepState(args)
                 print ('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} goes to sleep.'.format(node.id))
-        elif nCode == 'Dead':             #       Code_Dead                                               /**< Report when a node is presumed dead */
-            if node : 
+            elif nCode == 'Dead':             #       Code_Dead                                               /**< Report when a node is presumed dead */
                 node.markAsFailed()
                 print ('Z-Wave Device Node {0} marked as dead.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} marked as dead.'.format(node.id))
-        elif nCode == 'Alive':             #       Code_Alive						/**< Report when a node is revived */
-            if node : 
+            elif nCode == 'Alive':             #       Code_Alive						/**< Report when a node is revived */
                 node.markAsOK()
                 print ('Z-Wave Device Node {0} marked as alive.'.format(node.id))
                 self._log.info('Z-Wave Device Node {0} marked as alive.'.format(node.id))
-       
-        else :
-            self._log.error('Error notification code unknown : ', args)
+            else :
+                self._log.error('Error notification code unknown : ', args)
             
     def _getNode(self, homeId, nodeId):
         """ Renvoi l'objet node correspondant"""
@@ -626,7 +633,7 @@ class OZWavemanager(threading.Thread):
                 else : 
                     retval = ZWaveNode(self,  homeId, nodeId)
                 print 'Created new node with homeId 0x%0.8x, nodeId %d' % (homeId, nodeId)
-                self._log.debug('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
+                self._log.info('Created new node with homeId 0x%0.8x, nodeId %d', homeId, nodeId)
                 self._nodes[nodeId] = retval
             else :
                 self._log.debug("Can't create a Node ID n°0")
@@ -653,7 +660,7 @@ class OZWavemanager(threading.Thread):
         node = self._fetchNode(args['homeId'], args['nodeId'])
         node._lastUpdate = time.time()
         self._log.info ('Node %d as add or changed (homeId %.8x)' , args['nodeId'],  args['homeId'])
-
+        
     def _handleNodeRemoved(self, args):
         """Un node est ajouté ou a changé"""
         node = self._getNode(args['homeId'], args['nodeId'])
@@ -694,13 +701,10 @@ class OZWavemanager(threading.Thread):
         valueNode = node.getValue(valueId['id'])
         valueNode.updateData(valueId)
         # formattage infos générales
-        msgtrig = {'typexpl':'xpl-trig',
-                          'device' : "%s.%d.%d" % (self._nameAssoc.keys()[self._nameAssoc.values().index(homeId)] , activeNodeId,valueId['instance']) ,                          
-                          'valuetype':  valueId['type'], 
-                          'type' : valueId['label'].lower()}  # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
-                                                                            # les labels sont listés dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
-#        Le traitement pour chaque command_class s'effectue danqs la ValueNode correspondante.
-        msgtrig = valueNode.valueToxPLTrig(msgtrig)
+        # ici l'idée est de passer tout les valeurs stats et trig en identifiants leur type par le label forcé en minuscule.
+        # les labels sont listés dans les tableaux des devices de la page spéciale, il faut les saisir dans sensor.basic-ozwave.xml.
+        # Le traitement pour chaque command_class s'effectue danqs la ValueNode correspondante.
+        msgtrig = valueNode.valueToxPLTrig()
         if msgtrig : self._cb_sendxPL_trig(msgtrig)
         else : print ('commande non  implémentee vers xPL : %s'  % valueId['commandClass'] )
 
@@ -974,7 +978,7 @@ class OZWavemanager(threading.Thread):
             else : retval['error'] = "Can't test primary controller, node %d." %nodeId
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
-
+        
     def getGeneralStatistics(self):
         """Retourne les statistic générales du réseaux"""
         retval={}
@@ -1064,145 +1068,158 @@ class OZWavemanager(threading.Thread):
         blockAck = False
         report = {'error':  'Message not handle.'}
         ackMsg = {}
-        print("WS - Requete UI")
-        if message['header']['type'] in ('req', 'req-ack'):
-            if message['request'] == 'ctrlAction' :
-                report = self.handle_ControllerAction(message['action'])
-         #       if message['action']['cmd'] =='getState' and report['cmdstate'] != 'stop' : blockAck = True
-            elif message['request'] == 'ctrlSoftReset' :
-                report = self.handle_ControllerSoftReset()
-            elif message['request'] == 'ctrlHardReset' :
-                report = self.handle_ControllerHardReset()
-            elif message['request'] == 'GetNetworkID' :
-                report = self.getNetworkInfo()
-            elif message['request'] == 'GetNodeInfo' :
-                if self._IsNodeId(message['node']):
-                    report = self.getNodeInfos(message['node'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-                print "Refresh node :", report
-            elif message['request'] == 'RefreshNodeDynamic' :
-                if self._IsNodeId(message['node']):
-                    report = self.refreshNodeDynamic(message['node'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-            elif message['request'] == 'RefreshNodeInfo' :
-                if self._IsNodeId(message['node']):
-                    report = self.refreshNodeInfo(message['node'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-            elif message['request'] == 'RefreshNodeState' :
-                if self._IsNodeId(message['node']):
-                    report = self.refreshNodeState(message['node'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-                print "Refresh node :", report
-            elif message['request'] == 'SaveConfig':
-                report = self.saveNetworkConfig()
-            elif message['request'] == 'GetMemoryUsage':
-                report = self.getMemoryUsage()
-            elif message['request'] == 'GetAllProducts':
-                report = self.getAllProducts()
-            elif message['request'] == 'SetNodeNameLoc':
-                report = self.setUINodeNameLoc(message['node'], message['newname'],  message['newloc'])
-                ackMsg['node'] = message['node']
-            elif message['request'] == 'GetNodeValuesInfo':
-                if self._IsNodeId(message['node']):
-                    report =self.getNodeValuesInfos(message['node'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-            elif message['request'] == 'GetValueInfos':
-                if self._IsNodeId(message['node']):
+        print "WS - Requete UI",  message
+        if message.has_key('header') :
+            if message['header']['type'] in ('req', 'req-ack'):
+                if message['request'] == 'ctrlAction' :
+                    report = self.handle_ControllerAction(message['action'])
+             #       if message['action']['cmd'] =='getState' and report['cmdstate'] != 'stop' : blockAck = True
+                elif message['request'] == 'ctrlSoftReset' :
+                    report = self.handle_ControllerSoftReset()
+                elif message['request'] == 'ctrlHardReset' :
+                    report = self.handle_ControllerHardReset()
+                elif message['request'] == 'GetNetworkID' :
+                    report = self.getNetworkInfo()
+                elif message['request'] == 'GetNodeInfo' :
+                    if self._IsNodeId(message['node']):
+                        report = self.getNodeInfos(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                    print "Refresh node :", report
+                elif message['request'] == 'RefreshNodeDynamic' :
+                    if self._IsNodeId(message['node']):
+                        report = self.refreshNodeDynamic(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'RefreshNodeInfo' :
+                    if self._IsNodeId(message['node']):
+                        report = self.refreshNodeInfo(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'RefreshNodeState' :
+                    if self._IsNodeId(message['node']):
+                        report = self.refreshNodeState(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                    print "Refresh node :", report
+                elif message['request'] == 'SaveConfig':
+                    report = self.saveNetworkConfig()
+                elif message['request'] == 'GetMemoryUsage':
+                    report = self.getMemoryUsage()
+                elif message['request'] == 'GetAllProducts':
+                    report = self.getAllProducts()
+                elif message['request'] == 'SetNodeNameLoc':
+                    report = self.setUINodeNameLoc(message['node'], message['newname'],  message['newloc'])
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'GetNodeValuesInfo':
+                    if self._IsNodeId(message['node']):
+                        report =self.getNodeValuesInfos(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'GetValueInfos':
+                    if self._IsNodeId(message['node']):
+                        valId = long(message['valueid']) # Pour javascript type string
+                        report =self.getValueInfos(message['node'], valId)
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                    ackMsg['valueid'] = message['valueid']
+                    print 'Refresh one Value infos : ', report
+                elif message['request'] == 'SetPollInterval':
+                    self._controller.setPollInterval(message['interval'],  False)
+                    ackMsg['interval'] = self._controller.getPollInterval()
+                    if  ackMsg['interval'] == message['interval']:
+                        report = {'error':''}
+                    else :
+                        report = {'error':'Setting interval error : keep value %d ms.' %ackMsg['interval']}
+                elif message['request'] == 'EnablePoll':
                     valId = long(message['valueid']) # Pour javascript type string
-                    report =self.getValueInfos(message['node'], valId)
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-                ackMsg['valueid'] = message['valueid']
-                print 'Refresh one Value infos : ', report
-            elif message['request'] == 'SetPollInterval':
-                self._controller.setPollInterval(message['interval'],  False)
-                ackMsg['interval'] = self._controller.getPollInterval()
-                if  ackMsg['interval'] == message['interval']:
-                    report = {'error':''}
-                else :
-                    report = {'error':'Setting interval error : keep value %d ms.' %ackMsg['interval']}
-            elif message['request'] == 'EnablePoll':
-                valId = long(message['valueid']) # Pour javascript type string
-                report = self._controller.enablePoll( message['node'],  valId,  message['intensity'])
-                ackMsg['node'] = message['node']
-                ackMsg['valueid'] = message['valueid']
-            elif message['request'] == 'DisablePoll':
-                valId = long(message['valueid']) # Pour javascript type string
-                report = self._controller.disablePoll( message['node'],  valId)
-                ackMsg['node'] = message['node']
-                ackMsg['valueid'] = message['valueid']
-
-            elif message['request'] == 'GetValueTypes':
-                report = sGetListCmdsCtrlelf.getValueTypes()  
-            elif message['request'] == 'GetListCmdsCtrl':
-                report = self.getListCmdsCtrl()
-            elif message['request'] == 'setValue':
-                if self._IsNodeId(message['node']):
+                    report = self._controller.enablePoll( message['node'],  valId,  message['intensity'])
+                    ackMsg['node'] = message['node']
+                    ackMsg['valueid'] = message['valueid']
+                elif message['request'] == 'DisablePoll':
                     valId = long(message['valueid']) # Pour javascript type string
-                    report = self.setValue(message['node'], valId, message['newValue'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-                ackMsg['valueid'] = message['valueid']
-                print 'Set command_class Value : ',  report
-            elif message['request'] == 'setGroups':
-                if self._IsNodeId(message['node']):
-                    report = self.setMembersGrps(message['node'], message['ngrps'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']         
-                print 'Set Groups association : ',  report
-            elif message['request'] == 'GetGeneralStats':
-                report = self.getGeneralStatistics()
-                print 'Refresh generale stats : ',  report                
-            elif message['request'] == 'GetNodeStats':
-                if self._IsNodeId(message['node']):
-                    report = self.getNodeStatistics(message['node'])
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-                print 'Refresh node stats : ',  report
-            elif message['request'] == 'StartCtrl':
-                if not self.ready : 
-                    self.openDevice(self.device)
-                    report = {'error':'',  'running': True}
-                else : report = {'error':'Driver already running.',  'running': True}
-                print 'Start Driver : ',  report
-            elif message['request'] == 'StopCtrl':
-                if self.device and self._ctrlnodeId : 
-                    self.closeDevice(self.device)
-                    report = {'error':'',  'running': False}
-                else : report = {'error':'No Driver knows.',  'running': False}
-                print 'Stop Driver : ',  report
-            elif message['request'] == 'TestNetwork':
-                report = self.testNetwork(message['count'],  10000, True)
-            elif message['request'] == 'TestNetworkNode':
-                if self._IsNodeId(message['node']):
-                    report = self.testNetworkNode(message['node'],  message['count'],  10000, True)
-                else : report = {'error':  'Invalide nodeId format.'}
-                ackMsg['node'] = message['node']
-            elif message['request'] == 'GetLog':
-                report = self.getLoglines(message)
-            elif message['request'] == 'GetLogOZW':
-                report = self.getLogOZWlines(message)
-            else :
-                report['error'] ='Unknown request.'
-                print "commande inconnue"
-        if message['header']['type'] == 'req-ack' and not blockAck :
-            ackMsg['header'] = {'type': 'ack',  'idws' : message['header']['idws'], 'idmsg' : message['header']['idmsg'],
-                                           'ip' : message['header']['ip'] , 'timestamp' : long(time.time()*100)}
-            ackMsg['request'] = message['request']
-            if report :
-                if 'error' in report :
-                    ackMsg['error'] = report['error']
+                    report = self._controller.disablePoll( message['node'],  valId)
+                    ackMsg['node'] = message['node']
+                    ackMsg['valueid'] = message['valueid']
+    
+                elif message['request'] == 'GetValueTypes':
+                    report = sGetListCmdsCtrlelf.getValueTypes()  
+                elif message['request'] == 'GetListCmdsCtrl':
+                    report = self.getListCmdsCtrl()
+                elif message['request'] == 'setValue':
+                    if self._IsNodeId(message['node']):
+                        valId = long(message['valueid']) # Pour javascript type string
+                        report = self.setValue(message['node'], valId, message['newValue'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                    ackMsg['valueid'] = message['valueid']
+                    print 'Set command_class Value : ',  report
+                elif message['request'] == 'setGroups':
+                    if self._IsNodeId(message['node']):
+                        report = self.setMembersGrps(message['node'], message['ngrps'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']         
+                    print 'Set Groups association : ',  report
+                elif message['request'] == 'GetGeneralStats':
+                    report = self.getGeneralStatistics()
+                    print 'Refresh generale stats : ',  report                
+                elif message['request'] == 'GetNodeStats':
+                    if self._IsNodeId(message['node']):
+                        report = self.getNodeStatistics(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                    print 'Refresh node stats : ',  report
+                elif message['request'] == 'StartCtrl':
+                    if not self.ready : 
+                        self.openDevice(self.device)
+                        report = {'error':'',  'running': True}
+                    else : report = {'error':'Driver already running.',  'running': True}
+                    print 'Start Driver : ',  report
+                elif message['request'] == 'StopCtrl':
+                    if self.device and self._ctrlnodeId : 
+                        self.closeDevice(self.device)
+                        report = {'error':'',  'running': False}
+                    else : report = {'error':'No Driver knows.',  'running': False}
+                    print 'Stop Driver : ',  report
+                elif message['request'] == 'TestNetwork':
+                    report = self.testNetwork(message['count'],  10000, True)
+                elif message['request'] == 'TestNetworkNode':
+                    if self._IsNodeId(message['node']):
+                        report = self.testNetworkNode(message['node'],  message['count'],  10000, True)
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'GetLog':
+                    report = self.getLoglines(message)
+                elif message['request'] == 'GetLogOZW':
+                    report = self.getLogOZWlines(message)
+                elif message['request'] == 'StartMonitorNode':
+                    if self._IsNodeId(message['node']):
+                        report = self.monitorNodes.startMonitorNode(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'StopMonitorNode':
+                    if self._IsNodeId(message['node']):
+                        report = self.monitorNodes.stopMonitorNode(message['node'])
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
                 else :
-                    ackMsg['error'] = ''
-                ackMsg['data'] = report
-            else : 
-                ackMsg['error'] = 'No data report.'
-            self.serverUI.sendAck(ackMsg)
+                    report['error'] ='Unknown request.'
+                    print "commande inconnue"
+            if message['header']['type'] == 'req-ack' and not blockAck :
+                ackMsg['header'] = {'type': 'ack',  'idws' : message['header']['idws'], 'idmsg' : message['header']['idmsg'],
+                                               'ip' : message['header']['ip'] , 'timestamp' : long(time.time()*100)}
+                ackMsg['request'] = message['request']
+                if report :
+                    if 'error' in report :
+                        ackMsg['error'] = report['error']
+                    else :
+                        ackMsg['error'] = ''
+                    ackMsg['data'] = report
+                else : 
+                    ackMsg['error'] = 'No data report.'
+                self.serverUI.sendAck(ackMsg)
+        else :
+            raise OZwaveManagerException("WS request bad format : {0}".format(message))
 
                 
     def reportCtrlMsg(self, ctrlmsg):

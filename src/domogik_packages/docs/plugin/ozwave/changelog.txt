@@ -4,11 +4,28 @@ Change log
 
 New instructions to apply changes from immediatly previous version.
 
+- 0.2c2 : (30-10-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
+    - Target : domogik (0.2c2), domoweb (0.2c1)
+    - An `insert_data <changelog.html#do-an-insert-data>`_ or a reinstall is necessary.
+    - Knows issue : At auto start plugin fail sometimes, stop it or kill process ($ps -ef | grep ozwave) and restart it.
+    - Change log :
+        - Add individual monitoring node(s) in log file for debugging and helper develop device compatibilities.
+        - Add removing ghost node from groups capability.
+        - Add Dimmer multi-controls (FGD211) and bright/dim commands.
+        - Add Thermostat setpoint (Danfos living-connect)
+        - Add NotifyTransactions option (You must probably modify openzwave lib to fix issues failling plugin start, see doc section `options <ozwave.html#configuration>`_ .)
+        - Fix wsServer fail connection some time.
+        - Fix memory change during websocket sending Broadcast and Ack Message.
+        - Fix no display "Support tools" page with some browsers versions.
+        - Fix select last controleur action in reopen dialog box.
+        - Graph neighbors code improved.
+        - Update doc
+
 - 0.2c1 : (15-09-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
     - Target : domogik.
     - Change log :
         - Retrieve domogik device zwave ctrl address from rest.
-        - update doc
+        - Update doc
 		
 - 0.2b5 : (29-07-2013) Compatibily library : OpenZwave >= 1.0.663, python_openzwave >= 0.2.5 (rev >= 18832df1dd95).
     - Target : python_openzwave, domogik and domoweb.
@@ -71,10 +88,10 @@ New instructions to apply changes from immediatly previous version.
 	
 Do an insert data
 =================
-In your domogik directory :
+In your domogik directory with user domogik :
 
 .. code-block:: bash
 
-	$sudo src/tools/packages/insert_data.py src/share/domogik/plugins/ozwave.json
+	$ src/tools/packages/insert_data.py src/share/domogik/plugins/ozwave.json
 
 

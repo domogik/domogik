@@ -54,13 +54,18 @@ All message have an header JSON with keys :
 @organization: Domogik
 """
 
+import logging
+import logging.handlers
 from wsgiref.simple_server import make_server
 from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
 from ws4py.server.wsgiutils import WebSocketWSGIApplication
 from ws4py.websocket import WebSocket
+from ws4py import configure_logger as wsServer_logger
 import threading
 import json
 import time
+import os
+
 
 __ctrlServer__ = []  # tab servers for websockets recover
 
@@ -80,6 +85,19 @@ class WsUIServerException(Exception):
 class BroadcastServer(object):
     """Class de gestion du server websocket pour dialogue plugin UI"""
     def __init__(self,  port=5570,  cb_recept = None,  log = None ):
+        fName = "//var//log/domogik//wsuiserver.log"
+        if log :
+            for h in log.__dict__['handlers']:
+                if h.__class__.__name__ in ['FileHandler', 'TimedRotatingFileHandler','RotatingFileHandler', 'WatchedFileHandler']:
+                    fName = os.path.dirname(h.baseFilename) + "/wsuiserver.log"
+                    break
+        log.debug('Log WS Server on : {0}'.format(fName))
+        self._wsLogws = wsServer_logger(level = logging.DEBUG)
+        logfmt = logging.Formatter("[%(asctime)s] %(levelname)s %(message)s")
+        handler = logging.handlers.RotatingFileHandler(fName, maxBytes=10485760, backupCount=5)
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(logfmt)
+        self._wsLogws.addHandler(handler)
         global __ctrlServer__
         # check free port
         for s in __ctrlServer__ :
@@ -127,8 +145,9 @@ class BroadcastServer(object):
         if __ctrlServer__ : __ctrlServer__.remove(self)
         if self.log : self.log.info('WebSocket server forever on port : %d Destroyed' %self.port)
 
-    def broadcastMessage(self, message):
+    def broadcastMessage(self, msg):
         """broadcast Message to all clients"""
+        message = msg.copy()  # copy dict to ensure a memory change during process
         header = {'type':'pub',  'idws' : 'for each' , 'ip' : '0.0.0.0',  'timestamp' : long(time.time()*100)}
         message['header'] = header
         info = 'Websocket server sending for %d client(s) : %s' % (len(self.server.manager.websockets),  str(message))
@@ -145,8 +164,9 @@ class BroadcastServer(object):
                 print "Failed sockets"
                 continue
 
-    def sendAck(self, ackMsg):
+    def sendAck(self, ackMessage):
         """Send a confirmation message  'Ack'  to client"""
+        ackMsg = ackMessage.copy()  # copy dict to ensure a memory change during process
         if ackMsg['header'] :
             for ws in self.server.manager.websockets.itervalues():
                 if ws.peer_address[1] == ackMsg['header']['idws'] :
@@ -166,8 +186,8 @@ class WebSocketsHandler(WebSocket):
             raise WsUIServerException ("Openning WS client error, port %d not find in server list."  % port)
         print 'New WebSocket client detected ',  self.peer_address
         if self.server.log : self.server.log.info('A new WebSocket client connected : %s : %s'  % (self.peer_address[0], self.peer_address[1]))
-#        self.send(json.dumps({'header': {'type' : 'confirm-connect', 'id' : 'ws_serverUI',  'idws': self.peer_address[1]}}))
-#        print 'Message confirmation send'
+        self.send(json.dumps({'header': {'type' : 'confirm-connect', 'id' : 'ws_serverUI',  'idws': self.peer_address[1]}}))
+        print 'WebSockect Message confirmation send from open to client',  self.peer_address[1] 
         self.confirmed = False
 
     def closed(self, code,  status):
@@ -191,7 +211,7 @@ class WebSocketsHandler(WebSocket):
             if header['type']  == 'ack-connect':
                 self.confirmed = True
                 self.send(json.dumps({'header': {'type' : 'confirm-connect', 'id' : 'ws_serverUI',  'idws': self.peer_address[1]}}))
-                print '    WebSockect client connection confirmed, send client identity : ',  self.peer_address[1] 
+                print 'WebSockect client connection confirmed by received, send client identity : ',  self.peer_address[1] 
             elif header['type']  == 'server-hbeat':
                 self.sendAck(msg)
             elif self.confirmed == True :

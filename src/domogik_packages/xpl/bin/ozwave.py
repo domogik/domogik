@@ -68,6 +68,7 @@ class OZwave(XplPlugin):
         device = self._config.query('ozwave', 'device')
         ozwlogConf = self._config.query('ozwave', 'ozwlog')
         self._config = Query(self.myxpl, self.log)
+        self.myzwave = None
         print ('Mode log openzwave :',  ozwlogConf)
         # Recupère l'emplacement des fichiers de configuration OZW
         pathUser = self.get_data_files_directory()  +'/'
@@ -75,12 +76,19 @@ class OZwave(XplPlugin):
         # Initialise le manager Open zwave
         try:
             self.myzwave = OZWavemanager(self, self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf)
-            print 'manager demarré'
+            print 'OZWmanager demarré :-)'
         except Exception as e:
-            self.log.error(e.message)
-            print e.message
-            self.force_leave()
-            return
+            raise
+            self.log.error('Error on creating OZWmanager at 1st attempt : {0} **** try second attempt.'.format(e))
+            self.get_stop().wait(2)
+            try:
+                self.log.debug('try second attempt after 2s.{0}'.format(sys.exc_info()))
+                self.myzwave = OZWavemanager(self, self._config, self.send_xPL, self.sendxPL_trig, self.get_stop(), self.log, configPath = pathConfig,  userPath = pathUser,  ozwlog = ozwlogConf)
+                print 'OZWmanager demarré :-)'
+            except Exception as e2:
+                self.log.error('Error on creating 2nd attempt OZWmanager : {0}'.format(e2))
+                self.force_leave()
+                return
         # Crée le listener pour les messages de commande xPL traités par les devices zwave
         Listener(self.ozwave_cmd_cb, self.myxpl,{'schema': 'ozwave.basic',
                                                                         'xpltype': 'xpl-cmnd'})
@@ -100,6 +108,7 @@ class OZwave(XplPlugin):
         print ("commande xpl recue")
         print message
         self.log.debug(message)
+        if self.myzwave is not None : self.myzwave.monitorNodes.xpl_report(message)
         if 'command' in message.data:
             if 'group'in message.data:
                 # en provenance de l'UI spéciale
@@ -108,12 +117,12 @@ class OZwave(XplPlugin):
                 cmd = message.data['command']
                 device = message.data['device']
                 if cmd == 'level' :
-                    print ("appel envoi zwave command %s" %cmd)
-                    lvl = message.data['level']
-                    self.myzwave.sendNetworkZW(cmd, device, lvl)
+                    value = message.data['level']
+                    self.myzwave.sendNetworkZW(cmd, device, value)
                 elif cmd == "on"  or cmd == "off" :
-                    print ("appel envoi zwave command %s" %cmd)
                     self.myzwave.sendNetworkZW(cmd, device)
+                elif cmd == 'setpoint' :
+                    self.myzwave.sendNetworkZW(cmd, device, {'type': message.data['type'], 'value': message.data['value']})
                 else:
                     self.myzwave.sendNetworkZW(cmd, device)
                     
@@ -195,6 +204,7 @@ class OZwave(XplPlugin):
             mess.add_data({'data': self.getUIdata2dict(args)})
         print mess
         self.myxpl.send(mess)
+        if self.myzwave is not None : self.myzwave.monitorNodes.xpl_report(mess)
         
     def sendxPL_trig(self, msgtrig):
         """Envoie un message trig sur le hub xPL"""
@@ -208,44 +218,20 @@ class OZwave(XplPlugin):
             print "sendxPL_trig  +++++++++++++++++++ ", msgtrig
             mess.set_type(msgtrig['typexpl'])
             mess.set_schema(msgtrig['schema'])
-            if msgtrig['genre'] == 'actuator' :
-                if msgtrig['type']  == 'level' :
-                    if msgtrig['level'] in [0, 'False', False] :
-                        cmd ="off"
-                        messDup = {'cmd': 'level'}
-                    elif msgtrig['level'] in [99, 255, 'True',  True] :
-                        cmd ="on"
-                        messDup = {'cmd': 'level'}
-                    else: 
-                        cmd ='level'
-                        if msgtrig['level'] != 0 : messDup = {'cmd': 'off'}
-                        else : messDup = {'cmd': 'on'}
-                    mess.add_data({'device' : msgtrig['device'],
-                                'command' : cmd,
-                                'level': msgtrig['level']})
-                
-                if msgtrig['type']  == 'switch' :
-                    if msgtrig['level'] in ['False', False] : cmd ="off"
-                    elif msgtrig['level'] in ['True',  True] : cmd ="on"
-                    else : raise OZwaveException("Error format in sendxPL_trig : %s" %str(msgtrig))
-                    mess.add_data({'device' : msgtrig['device'],
-                                'command' : cmd,
-                                'level': msgtrig['level']})
-                    if msgtrig.has_key('type'): mess.add_data({'type' : msgtrig['type'] })
-            elif msgtrig['genre'] == 'sensor' :  # tout sensor
-                if msgtrig['type'] =='status' :  # gestion du sensor binary pour widget binary
-                    mess.add_data({'device' : msgtrig['device'],
-                            'type' : msgtrig['type'] ,
-                            'current' : 'true' if msgtrig['value']   else 'false'})
-                else : mess.add_data({'device' : msgtrig['device'],  
-                            'type' : msgtrig['type'] ,
-                            'current' : msgtrig['value'] })
-            if msgtrig.has_key('units') and msgtrig['units'] !='' : mess.add_data({'units' : msgtrig['units'] })
+            mess.add_data({'device' : msgtrig['device']})
+            mess.add_data(msgtrig['data'])                            
+            if msgtrig.has_key('msgdump'): 
+                messDup = msgtrig['msgdump']
+                messDup['device'] = msgtrig['device']
             print mess
             self.myxpl.send(mess)
+            if self.myzwave is not None : self.myzwave.monitorNodes.xpl_report(mess)
             if messDup : # envoi d'un message dupliqué avec des keys differentes (pour un dimmer le level sur on/off)
-                mess.add_data(mesDup)
+                mess.clear_data()
+                mess.add_data(messDup)
+                print 'Dump Xpl Message : ' + str(mess)
                 self.myxpl.send(mess)
+                if self.myzwave is not None :  self.myzwave.monitorNodes.xpl_report(mess)
         elif 'command' in msgtrig and msgtrig['command'] == 'Info':
             print("Home ID is %s" % msgtrig['Home ID'])
 
