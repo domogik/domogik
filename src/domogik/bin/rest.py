@@ -251,5 +251,5 @@ class Rest(XplPlugin):
 
 if __name__ == '__main__':
     # Create REST server with default values (overriden by ~/.domogik/domogik.cfg)
-    REST = Rest('lo', '4045')
+    REST = Rest('lo', '40405')
 

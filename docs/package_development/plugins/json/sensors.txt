@@ -41,17 +41,35 @@ For each sensor, we define a name and no conversion option. Then, depending of t
             "get_used_space": {
                     "name": "Used Space",
                     "data_type": "DT_Byte",
-                    "conversion": ""
+                    "conversion": "",
+                    "history": {
+                        "store": True,
+                        "max": 0,
+                        "expire": 0,
+                        "round_value": 0
+                    }
             },
             "get_total_space": {
                     "name": "Total Space",
                     "data_type": "DT_Byte",
-                    "conversion": ""
+                    "conversion": "",
+                    "history": {
+                        "store": True,
+                        "max": 0,
+                        "expire": 0,
+                        "round_value": 0
+                    }
             },
             "get_percent_used": {
                     "name": "Percent used",
                     "data_type": "DT_Scaling",
-                    "conversion": ""
+                    "conversion": "",
+                    "history": {
+                        "store": True,
+                        "max": 0,
+                        "expire": 0,
+                        "round_value": 0
+                    }
             }
         },
 
@@ -66,5 +84,5 @@ Each item has several properties:
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table
     * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate, this will only be evaluated if tstore is True
-    * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days. This will only be evaluated if tstore is True
+    * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days. This will only be evaluated if store is True
     * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if tstore is True
