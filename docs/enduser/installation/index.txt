@@ -79,6 +79,7 @@ Use git to get the sources: ::
 
     $ sudo apt-get install git
     $ git clone https://github.com/domogik/domogik.git
+    $ git checkout 0.4-candidate
 
 Install Domogik 
 ---------------

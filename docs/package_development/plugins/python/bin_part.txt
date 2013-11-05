@@ -301,7 +301,12 @@ Here are the 4 methods:
 Error
 -----
 
-The error messages are to be used to log all critical or blocking points.
+The error messages are to be used to log all critical or blocking points. You must use this : 
+
+* each time the plugin can't open a resource (hardware, file, url)
+* each time the plugin catch some important exception, as a connexion lost to a hardware, url, ...
+* if something is wrong in the plugin configuration
+* ...
 
 Warning
 -------
@@ -315,7 +320,7 @@ The info messages must be used for important informations:
 
 * some informations about the plugin startup
 * any information that may help someone who reads the log to check the plugin started successfully
-* a new device has been detected by the plugin
+* give some informations about the hardware (if the plugin uses some hardware) : firmware version, configuration modes, ...
 * ...
 
 You must not use this log level for debug messages, for example:
@@ -330,7 +335,7 @@ The debug messages are to be used for:
 * logging any step in the plugin processing
 * log actions in the eternal loops
 * log important variable status
-* log any connection to a service or a hardware
+* log any connection to a service or a hardware. For example, with a serial device you must log all that is sent to the device or all that is received from the device. These are very important informations for debugging! These informations can also be used later to create some automated tests or fix bugs and test them thanks to the user logs.
 * ...
 
 You can and you must use the debug messages! They are evry important when a bug is discovered as they allow anybody to check what is the issue.
