@@ -96,8 +96,9 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
 .. todo::
 
-    This option is not yet available in Domogik 0.4
-    Describe all the steps
+    * This option is not yet available in Domogik 0.4
+    * Describe all the steps
+    * Describe how to use the command line
 
 
 Optional : postgresql (instead of mysql)
