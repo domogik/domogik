@@ -109,7 +109,7 @@ class BasePlugin():
                           dest="run_in_foreground", 
                           default=False, 
                           help="Run the plugin in foreground, default to background.")
-        parser.add_argument("-t", 
+        parser.add_argument("-T", 
                           dest="test_option", 
                           default=None,
                           help="Test option.")

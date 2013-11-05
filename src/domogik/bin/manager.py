@@ -922,7 +922,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         test_args = ""
         if test_mode == True: 
             self.log.info("The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
-            test_args = "-t {0}".format(test_option)
+            test_args = "-T {0}".format(test_option)
 
         ### Try to start the plugin
         self.log.info(u"Request to start plugin : {0} {1}".format(self.name, test_args))
