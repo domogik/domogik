@@ -36,6 +36,8 @@ Usage
 
 import time
 import binascii
+import json
+import traceback
 
 
 # for compatibility
@@ -59,16 +61,26 @@ class Serial():
 
     def __init__(self, device, baudrate = None, parity = None, stopbits = None):
         """ Construtor
-            @param device : useless, just for compatibility
+            @param device : the json file with the fake data
             @param baudrate : useless, just for compatibility
             @param parity : useless, just for compatibility
             @param stopbits : useless, just for compatibility
         """
         # there is nothing to do, excepting logging!
-        print(u"Fake serial device created for device '{0}'".format(device))
+        print(u"Fake serial device created. The fake data in the file '{0}' will be used".format(device))
+
+        # load the json file
+        try:
+            json_fp = open(device)
+            self.data = json.load(json_fp)
+            json_fp.close()
+        except:
+            raise SerialException(u"Error while opening fake serial device from file {0} : {1}".format(device, traceback.format_exc()))
         
         # read index
-        self.read_idx = 0
+        self.history_idx = 0
+        # loop index
+        self.loop_idx = 0
 
     def flush(self):
         pass
@@ -87,86 +99,54 @@ class Serial():
         """ Mock the read feature
             @param length : length of the data to read. For compatibility only
         """        
-        fake_data = [
-                       { 'action' : 'data', 
-                         'data' : '61'
-                       },
-                       { 'action' : 'data', 
-                         'data' : '0d'
-                       },
-                       { 'action' : 'data', 
-                         'data' : '010001025344000c2f00000000'
-                       },
-                       { 'action' : 'wait', 
-                         'delay' : 10
-                       },
-                       { 'action' : 'data', 
-                         'data' : '0a'
-                       },
-                       { 'action' : 'data', 
-                         'data' : '520100250400d4470350'
-                       },
-                       { 'action' : 'wait', 
-                         'delay' : 15
-                       },
-                       { 'action' : 'data', 
-                         'data' : '0a'
-                       },
-                       { 'action' : 'data', 
-                         'data' : '520100250400d4470350'
-                       },
-                       { 'action' : 'wait', 
-                         'delay' : 15
-                       },
-                       { 'action' : 'data', 
-                         'data' : '0a'
-                       },
-                       { 'action' : 'data', 
-                         'data' : '520100250400d4470350'
-                       },
-                       { 'action' : 'wait', 
-                         'delay' : 15
-                       },
-                       { 'action' : 'data', 
-                         'data' : '0a'
-                       },
-                       { 'action' : 'data', 
-                         'data' : '520100250400d4470350'
-                       },
-                   ]
         while True:
-            print "%s vs %s" % (self.read_idx, len(fake_data))
-            if self.read_idx < len(fake_data)-1:
-                self.read_idx += 1
-                action = fake_data[self.read_idx]['action']
-                print(u"Action = {0}".format(action))
+            # check if we are waiting for some response 
+            #TODO
+
+            # handle the history part
+            if self.history_idx < len(self.data['history'])-1:
+                action = self.data['history'][self.history_idx]['action']
+                description = self.data['history'][self.history_idx]['description']
+                print(u"Action = {0} / Description = {1}".format(action, description))
                 if action == 'data':
-                    value = binascii.unhexlify(fake_data[self.read_idx]['data'])
-                    print value
-                    #print(u" => read {0}".format(value))
+                    value = binascii.unhexlify(self.data['history'][self.history_idx]['data'])
+                    self.history_idx += 1
                     return value
                 if action == 'wait':
-                    delay = fake_data[self.read_idx]['delay']
+                    delay = self.data['history'][self.history_idx]['delay']
                     print(u" => wait for {0}s".format(delay))
+                    self.history_idx += 1
                     time.sleep(delay)
+            # and if the history is finished, handle the loop
             else:
-                raise SerialException(u"There is nothing else to read in the fake serial device")
+                if self.data['loop'] == []:
+                    raise SerialException(u"There is nothing else to read in the fake serial device")
+                else:
+                    print("The history has ended...we are in the loop")
+                    if self.loop_idx == len(self.data['loop']):
+                        self.loop_idx = 0
+                    action = self.data['loop'][self.loop_idx]['action']
+                    description = self.data['loop'][self.loop_idx]['description']
+                    print(u"Action = {0} / Description = {1}".format(action, description))
+                    if action == 'data':
+                        value = binascii.unhexlify(self.data['loop'][self.loop_idx]['data'])
+                        self.loop_idx += 1
+                        return value
+                    if action == 'wait':
+                        delay = self.data['loop'][self.loop_idx]['delay']
+                        print(u" => wait for {0}s".format(delay))
+                        self.loop_idx += 1
+                        time.sleep(delay)
                
 
 
 if __name__ == "__main__":
 
-    my_mock = Serial("/dev/rfxcom")
-    my_mock.read()
-    my_mock.read()
-    my_mock.read()
-    my_mock.read()
-    my_mock.read()
-    my_mock.read()
-    my_mock.read()
-    my_mock.read()
+    my_mock = Serial("/media/stock/domotique/git/domogik-plugin-rfxcom/tests/352_data.json")
+    while True:
+        my_mock.read()
 
 
 # TODO :
-# plugins : add an option to the MQ to send options to the plugin from the manager to load a lib and give a scenario name
 # add a way to eternally do some actions (repeat the last 2 ?)
+# add a dictionnary to respond
