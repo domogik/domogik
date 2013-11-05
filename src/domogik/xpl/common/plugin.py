@@ -110,6 +110,8 @@ class XplPlugin(BasePlugin, MQRep):
         Watcher(self)
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting plugin '%s' (new manager instance)" % name)
+        if self.options.test_option:
+            self.log.info(u"The plugin is starting in TEST mode. Test option is {0}".format(self.options.test_option))
         self._name = name
         self._test = test   # flag used to avoid loading json in test mode
         
@@ -245,7 +247,7 @@ class XplPlugin(BasePlugin, MQRep):
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
         self.log.info(u"Value for '{0}' is : {1}".format(key, value))
-        return self.cast_config_value(value)
+        return self.cast_config_value(key, value)
 
     def get_config_default_value(self, key):
         """ Get the default value for a config key from the json file
