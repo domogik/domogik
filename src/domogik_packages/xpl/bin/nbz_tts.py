@@ -60,14 +60,15 @@ class NBZNotificationListener(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         while loop == True:
             nabaztag = self._config.query('nbz_tts', 'name-%s' % str(num))
+            server = self._config.query('nbz_tts', 'server-%s' % str(num))
             serial = self._config.query('nbz_tts', 'serial-%s' % str(num))
             token = self._config.query('nbz_tts', 'token-%s' % str(num))
             voice = self._config.query('nbz_tts', 'voice-%s' % str(num))
             if nabaztag != None:
-                mess="Configuration : nabaztag=" + str(nabaztag) + " , serial=" + str(serial) + ", token=" + str(token) + ", voice=" + str(voice)
+                mess="Configuration : nabaztag=" + str(nabaztag) + " , server=" + str(server) + " , serial=" + str(serial) + ", token=" + str(token) + ", voice=" + str(voice)
                 self.log.info(mess)
                 print(mess)
-                self.alias_list[nabaztag] = {"nabaztag" : nabaztag, "serial" : serial, "token" : token, "voice" : voice}
+                self.alias_list[nabaztag] = {"nabaztag" : nabaztag, "server" : server, "serial" : serial, "token" : token, "voice" : voice}
                 num += 1
             else:
                 loop = False
@@ -79,6 +80,15 @@ class NBZNotificationListener(XplPlugin):
             print(msg)
             self.force_leave()
             return
+
+        # Check server
+        for alias in self.alias_list:
+            if str(self.alias_list[alias]['server']) != "None":
+                self.log.debug("Server for nabaztag " + str(self.alias_list[alias]['nabaztag']) + " is " + str(self.alias_list[alias]['server']))
+            else:
+                self.log.error("Can't find the server adress for the nabaztag " + str(self.alias_list[alias]['nabaztag']) + " , please check the configuration page of this plugin")
+                self.force_leave()
+                return
 
         # Check serial
         for alias in self.alias_list:
@@ -127,6 +137,7 @@ class NBZNotificationListener(XplPlugin):
             for alias in self.alias_list:
                 try:
                     if str(self.alias_list[alias]['nabaztag']) == str(to):
+                        serverkey = self.alias_list[alias]['server']
                         serialkey = self.alias_list[alias]['serial']
                         tokenkey = self.alias_list[alias]['token']
                         voicekey = self.alias_list[alias]['voice']
@@ -145,8 +156,8 @@ class NBZNotificationListener(XplPlugin):
             return
 
 
-        self.log.debug("Call send_tts with following parameters : serial=" + serialkey + ", token=" + tokenkey + ", message=" + body + ", voice=" + voicekey)
-        self.nbz_notification_manager.send_tts(serialkey, tokenkey, body, voicekey)
+        self.log.debug("Call send_tts with following parameters : server=" + serverkey + ", serial=" + serialkey + ", token=" + tokenkey + ", message=" + body + ", voice=" + voicekey)
+        self.nbz_notification_manager.send_tts(serverkey, serialkey, tokenkey, body, voicekey)
 
 
 
