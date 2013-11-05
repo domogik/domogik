@@ -206,6 +206,7 @@ def write_domogik_configfile(advanced_mode):
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
             if is_domogik_advanced(advanced_mode, sect, item[0]):
+                print("Key {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
