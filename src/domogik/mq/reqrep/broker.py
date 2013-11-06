@@ -25,6 +25,7 @@ __email__ = 'gst-py@a-nugget.de'
 import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
+import traceback
 
 from domogik.mq.common import split_address
 from domogik.common.configloader import Loader
@@ -77,6 +78,7 @@ class MDPBroker(object):
         """
         l = logger.Logger('mq_broker')
         self.log = l.get_logger()
+        self.log.info("MDP broker startup...")
 
         socket = context.socket(zmq.ROUTER)
         socket.bind(main_ep)
@@ -89,6 +91,7 @@ class MDPBroker(object):
             self.client_stream.on_recv(self.on_message)
         else:
             self.client_stream = self.main_stream
+        self.log.debug("Socket created...")
         self._workers = {}
         # services contain the worker queue and the request queue
         self._services = {}
@@ -97,9 +100,10 @@ class MDPBroker(object):
                               b'\x04': self.on_heartbeat,
                               b'\x05': self.on_disconnect,
                               }
+        self.log.debug("Launch the timer...")
         self.hb_check_timer = PeriodicCallback(self.on_timer, HB_INTERVAL)
         self.hb_check_timer.start()
-        self.log.info(u"MDP broker started")
+        self.log.info("MDP broker started")
         return
 
     def register_worker(self, wid, service):
@@ -114,19 +118,23 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        if wid in self._workers:
-            self.log.info(u"Worker %s already registered" % service)
-            return
-        self._workers[wid] = WorkerRep(
-                self.WORKER_PROTO, wid, service, self.main_stream)
-        if service in self._services:
-            wq, wr = self._services[service]
-            wq.put(wid)
-        else:
-            q = ServiceQueue()
-            q.put(wid)
-            self._services[service] = (q, [])
-        self.log.info(u"Register worker %s" % service)
+        self.log.debug("Try to register a worker : wid={0}, service={1}".format(wid, service))
+        try:
+            if wid in self._workers:
+                self.log.debug("Worker %s already registered" % service)
+                return
+            self._workers[wid] = WorkerRep(
+                    self.WORKER_PROTO, wid, service, self.main_stream)
+            if service in self._services:
+                wq, wr = self._services[service]
+                wq.put(wid)
+            else:
+                q = ServiceQueue()
+                q.put(wid)
+                self._services[service] = (q, [])
+            self.log.info("Registered worker : wid={0}, service={1}".format(wid, service))
+        except:
+            self.log.error("Error while registering a worker : wid={0}, service={1}, trace={2}".format(wid, service, traceback.format_exc()))
         return
 
     def unregister_worker(self, wid):
@@ -141,18 +149,23 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.debug("Try to unregister a worker : wid={0}".format(wid))
         try:
-            wrep = self._workers[wid]
-        except KeyError:
-            # not registered, ignore
-            return
-        wrep.shutdown()
-        service = wrep.service
-        if service in self._services:
-            wq, wr = self._services[service]
-            wq.remove(wid)
-        del self._workers[wid]
-        self.log.info(u"Unregister worker %s" % service)
+            try:
+                wrep = self._workers[wid]
+            except KeyError:
+                # not registered, ignore
+                self.log.warning("The worker wid={0} is not registered, ignoring the unregister request".format(wid))
+                return
+            wrep.shutdown()
+            service = wrep.service
+            if service in self._services:
+                wq, wr = self._services[service]
+                wq.remove(wid)
+            del self._workers[wid]
+            self.log.info("Unregistered worker : wid={0}".format(wid))
+        except:
+            self.log.error("Error while unregistering a worker : wid={0}, trace={1}".format(wid, traceback.format_exc()))
         return
 
     def disconnect(self, wid):
@@ -165,13 +178,19 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.debug("Try to disconnect a worker : wid={0}".format(wid))
         try:
-            wrep = self._workers[wid]
-        except KeyError:
-            # not registered, ignore
-            return
-        to_send = [ wid, self.WORKER_PROTO, b'\x05' ]
-        self.main_stream.send_multipart(to_send)
+            try:
+                wrep = self._workers[wid]
+            except KeyError:
+                # not registered, ignore
+                self.log.warning("The worker wid={0} is not registered, ignoring the disconnect request".format(wid))
+                return
+            to_send = [ wid, self.WORKER_PROTO, b'\x05' ]
+            self.main_stream.send_multipart(to_send)
+            self.log.info("Request to unregister a worker : wid={0}".format(wid))
+        except:
+            self.log.error("Error while disconnecting a worker : wid={0}, trace={1}".format(wid, traceback.format_exc()))
         self.unregister_worker(wid)
         return
 
@@ -203,21 +222,27 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        if self.client_stream == self.main_stream:
-            self.client_stream = None
-        self.main_stream.on_recv(None)
-        self.main_stream.socket.setsockopt(zmq.LINGER, 0)
-        self.main_stream.socket.close()
-        self.main_stream.close()
-        self.main_stream = None
-        if self.client_stream:
-            self.client_stream.on_recv(None)
-            self.client_stream.socket.setsockopt(zmq.LINGER, 0)
-            self.client_stream.socket.close()
-            self.client_stream.close()
-            self.client_stream = None
-        self._workers = {}
-        self._services = {}
+        self.log.info("Shutdown starting...")
+        try:
+            self.log.debug("Closing the socket...")
+            if self.client_stream == self.main_stream:
+                self.client_stream = None
+            self.main_stream.on_recv(None)
+            self.main_stream.socket.setsockopt(zmq.LINGER, 0)
+            self.main_stream.socket.close()
+            self.main_stream.close()
+            self.main_stream = None
+            if self.client_stream:
+                self.client_stream.on_recv(None)
+                self.client_stream.socket.setsockopt(zmq.LINGER, 0)
+                self.client_stream.socket.close()
+                self.client_stream.close()
+                self.client_stream = None
+            self.log.debug("Clean workers and services...")
+            self._workers = {}
+            self._services = {}
+        except:
+            self.log.error("Error during shutdown : trace={0}".format(traceback.format_exc()))
         return
 
     def on_timer(self):
@@ -227,8 +252,10 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.debug("Check for dead workers...")
         for wrep in self._workers.values():
             if not wrep.is_alive():
+                self.log.info("A worker seems to be dead : wid={0}".format(wrep.id))
                 self.unregister_worker(wrep.id)
         return
 
@@ -310,6 +337,7 @@ class MDPBroker(object):
         :rtype: None
         """
         wid = rp[0]
+        self.log.info("A worker disconnects itself : wid={0}".format(wid))
         self.unregister_worker(wid)
         return
 
@@ -426,6 +454,7 @@ class MDPBroker(object):
         else:
             # ignore unknown command
             # DISCONNECT worker
+            self.log.warning("Unknown command from worker (it will be disconnect) : wid={0}, cmd={1}".format(rp[0], cmd))
             self.disconnect(rp[0])
         return
 
@@ -441,7 +470,7 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        self.log.debug(u"Message received: {0}".format(msg))
+        self.log.debug("Message received: {0}".format(msg))
         rp, msg = split_address(msg)
         # dispatch on first frame after path
         t = msg.pop(0)
@@ -450,7 +479,7 @@ class MDPBroker(object):
         elif t.startswith(b'MDPC'):
             self.on_client(t, rp, msg)
         else:
-            print 'Broker unknown Protocol: "%s"' % t
+            self.log.warning("Broker unknown Protocol: {0}".format(t))
         return
 #
 
