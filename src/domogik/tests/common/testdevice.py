@@ -88,7 +88,7 @@ class TestDevice():
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
-            raise RuntimeError("Error when creating the device")
+            raise RuntimeError("Error when creating the device : {0}".format(response.text))
 
         # get the device id for later calls to REST
         device = json.loads(response.text)
@@ -116,7 +116,7 @@ class TestDevice():
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters")
+            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
 
     def del_device(self, id):
         """ Call DELETE /device/... to delete a device
@@ -127,7 +127,7 @@ class TestDevice():
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters")
+            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
 
     def del_devices_by_client(self, client_id):
         """ Call GET /device to get all devices
@@ -140,7 +140,7 @@ class TestDevice():
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters")
+            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
         if response.text == "":
             print(u"There is no device to delete")
             return
