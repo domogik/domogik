@@ -1,0 +1,17 @@
+{% block content %}
+<div class="container">
+    <h1>Client {{ clientid }}</h1>
+    <ul class="nav nav-tabs">
+        <li {% if active == "home" %} class="active" {% endif %}><a href="/client/{{ clientid }}">Home</a></li>
+        <li {% if active == "config" %} class="active" {% endif %}><a href="/client/{{ clientid }}/config">Config</a></li>
+        <li {% if active == "devices" %} class="active" {% endif %} class="dropdown">
+            <a href="/client/{{ clientid }}/devices" class="dropdown-toggle" data-toggle="dropdown">Devices <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="/client/{{ clientid }}/devices/known">Known</a></li>
+                <li><a href="/client/{{ clientid }}/devices/detected">Detected</a></li>
+                <li><a href="/client/{{ clientid }}/devices/new">New</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+{% endblock %}
