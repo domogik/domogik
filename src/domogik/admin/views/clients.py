@@ -2,7 +2,6 @@ from domogik.admin.application import app
 from flask import render_template, request, flash
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
-from domogik.admin.common.form import DomoForm
 from flask_wtf import Form
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField
@@ -81,12 +80,16 @@ def client_config(client_id):
         config = detaila[client_id]['data']['configuration']
     else:
         config = {}
+    known_items = []
 
     # dynamically generate the wtfform
     class F(Form):
         submit = SubmitField("Send")
         pass
     for item in config:
+        # keep track of the known fields
+        known_items.append(item["key"])
+        # handle required
         if item["required"] == "yes":
             arguments = [Required()]
         else:
@@ -117,9 +120,30 @@ def client_config(client_id):
     form = F()
 
     if request.method == 'POST' and form.validate():
-        print "TODO"
-        flash('Client config saved', 'info')
-        flash('Client config saved2', 'danger')
+        # build the requested config set
+        data = {}
+        for arg, value in request.form.items():
+            if arg in known_items:
+                data[arg] = value
+        # build the message
+        msg = MQMessage()
+        msg.set_action('config.set')
+        tmp = client_id.split('-')
+        msg.add_data('type', tmp[0])
+        tmp = tmp[1].split('.')
+        msg.add_data('host', tmp[1])
+        msg.add_data('name', tmp[0])
+        msg.add_data('data', data)
+        res = cli.request('dbmgr', msg.get(), timeout=10)
+        if res is not None:
+            data = res.get_data()
+            if data["status"]:
+                flash('Config save successfull', 'success')
+            else:
+                flash('Config save failed', 'warning')
+                flash(data["reason"], 'danger')
+        else:
+            flash('DbMgr did not respond on the config.set, check the logs', 'danger')
 
     return render_template('client_config.html',
             form = form,
