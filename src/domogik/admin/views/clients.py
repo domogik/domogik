@@ -7,6 +7,8 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField
 from wtforms.validators import Required
 
+from domogik.rest.urls.device import get_device_params
+
 @app.route('/clients')
 def clients():
     cli = MQSyncReq(app.zmq_context)
@@ -59,15 +61,6 @@ def client_devices_detected(client_id):
             clientid = client_id,
             active = 'devices'
             )
-
-class ConfigForm(Form):
-
-    def __new__(cls, config, **kwargs):
-        for item in config:
-            field = TextField(item["name"], description=item["description"])
-            setattr(cls, item["key"], field)
-        return super(ConfigForm, cls).__new__(cls, **kwargs)
-
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 def client_config(client_id):
@@ -151,3 +144,78 @@ def client_config(client_id):
             active = 'config'
             )
 
+@app.route('/client/<client_id>/devices/new')
+def client_devices_new(client_id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('client.detail.get')
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is not None:
+        detaila = res.get_data()
+        data = detaila[client_id]['data']
+    else:
+        data = {}
+
+    dtypes = data["device_types"].keys()
+    products = {}
+    for prod in data["products"]:
+        products[prod["name"]] = prod["type"]
+ 
+    return render_template('client_device_new.html',
+            device_types = dtypes,
+            products = products,
+            clientid = client_id,
+            active = 'devices'
+            )
+
+@app.route('/client/<client_id>/devices/new/<device_type_id>')
+def client_devices_new_wiz(client_id, device_type_id):
+    # TODO get them
+    params = get_device_params(device_type_id, app.zmq_context)
+
+    # dynamically generate the wtfform
+    class F(Form):
+        submit = SubmitField("Send")
+        pass
+
+    #for item in config:
+        # keep track of the known fields
+    #    known_items.append(item["key"])
+        # handle required
+    #    if item["required"] == "yes":
+    #        arguments = [Required()]
+    #    else:
+    #        arguments = []
+        # fill in the field
+    #    if 'value' in item:
+    #        default = item["value"]
+    #    else:
+    #        default = item["default"]
+        # build the field
+    #    if item["type"] == "boolean":
+    #        field = BooleanField(item["name"], arguments, description=item["description"], default=default)
+    #    elif item["type"] == "number":
+    #        field = IntegerField(item["name"], arguments, description=item["description"], default=default)
+    #    elif item["type"] == "enum":
+    #        choices = []
+    #        for choice in item["choices"]:
+    #            choices.append((choice, choice))
+    #        field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
+    #    else:
+    #        field = TextField(item["name"], arguments, description=item["description"], default=default)
+    #    # add the field
+    #    setattr(F, item["key"], field)
+    # add the submit button
+    field = submit = SubmitField("Send")
+    setattr(F, "submit", field)
+
+    form = F()
+
+
+    return render_template('client_device_new_wiz.html',
+            form = form,
+            params = params,
+            dtype = device_type_id,
+            clientid = client_id,
+            active = 'devices'
+            )

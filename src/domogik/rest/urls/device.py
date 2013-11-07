@@ -22,8 +22,11 @@ def device_params(dev_type_id):
     # return the info
     return 200, result
 
-def get_device_params(dev_type_id):
-    cli = MQSyncReq(urlHandler.zmq_context)
+def get_device_params(dev_type_id, zmq=None):
+    if zmq:
+        cli = MQSyncReq(zmq)
+    else:
+        cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
     msg.set_action('device_types.get')
     msg.add_data('device_type', dev_type_id)
