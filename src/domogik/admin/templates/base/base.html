@@ -13,10 +13,12 @@
     {%- block styles %}
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/static/css/bootstrap-notify.css" rel="stylesheet" media="screen">
     {%- endblock styles %}
     {%- endblock head %}
   </head>
   <body{% block body_attribs %}{% endblock body_attribs %}>
+    <div class="notifications bottom-right"></div>
     {% block body -%}
     {% block navbar %}
 	{% include "base/nav.html" %}
@@ -25,8 +27,21 @@
     {%- endblock content %}
 
     {% block scripts %}
-    <script src="/static/jquery.js"></script>
-    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-notify.js"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script type="text/javascript">
+           {% for category, message in messages: %}
+            $('.notifications').notify({
+                message: { text: '{{ message }}' },
+                type: '{{ category }}'
+            }).show();
+            {% endfor %}
+            </script>
+    {% endif %}
+    {% endwith %}
     {%- endblock scripts %}
     {%- endblock body %}
   </body>
