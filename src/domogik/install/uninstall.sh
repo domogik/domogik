@@ -105,6 +105,9 @@ $RM /var/cache/domogik
 echo "Delete /var/lib/domogik"
 $RM /var/lib/domogik
 
+echo "Delete /var/lock/domogik"
+$RM /var/lock/domogik
+
 CONFIG_FOLDER=/etc/domogik/
 echo "Delete config folder : $CONFIG_FOLDER"
 $RM $CONFIG_FOLDER

@@ -64,6 +64,7 @@ setup(
 	      'netifaces >= 0.8',
 	      'Twisted >= 12.1.0',
 	      'Flask >= 0.9',
+	      'Flask-WTF >= 0.9.3',
 	      'tornado >= 3.1',
 	      'pyzmq >= 13.1.0',
 	      'python-daemon >= 1.5.5'],
