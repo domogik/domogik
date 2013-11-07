@@ -82,3 +82,14 @@ ip = 127.0.0.1
 req_rep_port = 40410
 pub_port = 40411
 sub_port = 40412
+
+###
+# Admin interface
+###
+[admin]
+interfaces = lo,eth0
+port = 40406
+use_ssl = False
+ssl_certificate =
+ssl_key =
+
