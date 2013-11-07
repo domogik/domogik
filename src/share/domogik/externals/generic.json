@@ -340,7 +340,8 @@
         "src/share/domogik/stats/generic/sensor.basic-generic-thermometer.xml",
         "src/share/domogik/stats/generic/sensor.basic-generic-water.xml",
         "src/share/domogik/stats/generic/teleinfo.basic-teleinfo.xml",
-        "src/share/domogik/stats/generic/teleinfo.short-teleinfo.xml"
+        "src/share/domogik/stats/generic/teleinfo.short-teleinfo.xml",
+        "src/share/domogik/stats/generic/cid.basic-generic.xml"
     ], 
     "identity": {
         "author": "Fritz", 
