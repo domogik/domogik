@@ -104,7 +104,7 @@ class Serial():
             #TODO
 
             # handle the history part
-            if self.history_idx < len(self.data['history'])-1:
+            if self.history_idx < len(self.data['history']):
                 action = self.data['history'][self.history_idx]['action']
                 description = self.data['history'][self.history_idx]['description']
                 print(u"Action = {0} / Description = {1}".format(action, description))
@@ -148,5 +148,4 @@ if __name__ == "__main__":
 
 
 # TODO :
-# add a way to eternally do some actions (repeat the last 2 ?)
 # add a dictionnary to respond
