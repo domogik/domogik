@@ -42,6 +42,11 @@ New plugins format
 ******************
 
 
+New admin
+*********
+The administration interface is no more included in Domoweb. It is now included in Domogik and available on http://ip:40406/
+
+
 Files moved
 ***********
 Some files have been moved in the source tree
