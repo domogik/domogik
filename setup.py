@@ -50,6 +50,7 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 
+	      'argparse >= 1.2.1', 
 	      'sqlalchemy',
 	      'alembic',
 	      'simplejson >= 1.9.2',
