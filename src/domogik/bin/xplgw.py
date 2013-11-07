@@ -267,7 +267,7 @@ class XplManager(XplPlugin):
             self._log_stats.debug("Stat received for device {0}." \
                     .format(self._dev['name']))
             current_date = calendar.timegm(time.gmtime())
-            device_data = []
+            stored_value = None
             try:
                 # find what parameter to store
                 for param in self._stat.params:
@@ -297,7 +297,7 @@ class XplManager(XplPlugin):
                                         "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
                                         .format(self._dev['name'], self._dev['id'], self._sen.name, self._sen.id, param.key, value))
                                 # do the store
-                                device_data.append({"value" : value, "sensor": param.sensor_id})
+                                stored_value = value
                                 my_db = DbHelper()
                                 with my_db.session_scope():
                                     my_db.add_sensor_history(\
@@ -317,7 +317,8 @@ class XplManager(XplPlugin):
             self._pub.send_event('device-stats', \
                           {"timestamp" : current_date, \
                           "device_id" : self._dev['id'], \
-                          "data" : device_data})
+                          "sensor_id" : self._sen.id, \
+                          "stored_value" : stored_value})
 
 if __name__ == '__main__':
     EVTN = XplManager()
