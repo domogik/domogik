@@ -1,5 +1,5 @@
 from domogik.admin.application import app
-from flask import render_template, request, flash
+from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from flask_wtf import Form
@@ -168,49 +168,62 @@ def client_devices_new(client_id):
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/new/<device_type_id>')
+@app.route('/client/<client_id>/devices/new/<device_type_id>', methods=['GET', 'POST'])
 def client_devices_new_wiz(client_id, device_type_id):
     # TODO get them
     params = get_device_params(device_type_id, app.zmq_context)
 
     # dynamically generate the wtfform
     class F(Form):
+        name = TextField("Device", [Required()], description="the display name for this device")
+        description = TextField("Description", description="A description for this device")
+        reference = TextField("Reference", description="A reference for this device")
         submit = SubmitField("Send")
         pass
-
-    #for item in config:
-        # keep track of the known fields
-    #    known_items.append(item["key"])
-        # handle required
-    #    if item["required"] == "yes":
-    #        arguments = [Required()]
-    #    else:
-    #        arguments = []
-        # fill in the field
-    #    if 'value' in item:
-    #        default = item["value"]
-    #    else:
-    #        default = item["default"]
-        # build the field
-    #    if item["type"] == "boolean":
-    #        field = BooleanField(item["name"], arguments, description=item["description"], default=default)
-    #    elif item["type"] == "number":
-    #        field = IntegerField(item["name"], arguments, description=item["description"], default=default)
-    #    elif item["type"] == "enum":
-    #        choices = []
-    #        for choice in item["choices"]:
-    #            choices.append((choice, choice))
-    #        field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
-    #    else:
-    #        field = TextField(item["name"], arguments, description=item["description"], default=default)
-    #    # add the field
-    #    setattr(F, item["key"], field)
+    # add the global params
+    for item in params["global"]:
+        if item["type"] == "integer":
+            field = IntegerField("Global {0}".format(item["key"]), [Required()], description=item["description"])
+        else:
+            field = TextField("Global {0}".format(item["key"]), [Required()], description=item["description"])
+        setattr(F, item["key"], field)
     # add the submit button
     field = submit = SubmitField("Send")
     setattr(F, "submit", field)
 
     form = F()
 
+    if request.method == 'POST' and form.validate():
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('client.detail.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            detaila = res.get_data()
+            client_data = detaila[client_id]['data']
+        else:
+            flash("Device creation failed", "warning")
+            flash("Can not find this client id", "danger")
+            return redirect("/client/{0}/devices/known".format(client_id))
+        with app.db.session_scope():
+            # create the device
+            created_device = app.db.add_device_and_commands(
+                name=request.form.get('name'),
+                device_type=device_type_id,
+                client_id=client_id,
+                description=request.form.get('description'),
+                reference=request.form.get('reference'),
+                client_data=client_data
+            )
+            # add the global
+            for x in app.db.get_xpl_command_by_device_id(created_device["id"]):
+                for p in params['global']:
+                    app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
+            for x in app.db.get_xpl_stat_by_device_id(created_device["id"]):
+                for p in params['global']:
+                    app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=False, type=p['type'])
+            flash("device created", "success")
+            return redirect("/client/{0}/devices/known".format(client_id))
 
     return render_template('client_device_new_wiz.html',
             form = form,
