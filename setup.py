@@ -66,6 +66,7 @@ setup(
 	      'Flask >= 0.9',
 	      'Flask-WTF >= 0.9.3',
 	      'tornado >= 3.1',
+              'requests >= 1.2.3',
 	      'pyzmq >= 13.1.0',
 	      'python-daemon >= 1.5.5'],
     zip_safe = False,
