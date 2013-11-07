@@ -62,6 +62,12 @@ def client_devices_detected(client_id):
             active = 'devices'
             )
 
+@app.route('/client/<client_id>/devices/delete/<did>')
+def client_devices_delete(client_id, did):
+    with app.db.session_scope():
+        app.db.del_device(did)
+    return redirect("/client/{0}/devices/known".format(client_id))
+
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 def client_config(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -155,11 +161,14 @@ def client_devices_new(client_id):
         data = detaila[client_id]['data']
     else:
         data = {}
-
-    dtypes = data["device_types"].keys()
+    if type(data["device_types"]) is not dict:
+        dtypes = {}
+    else:
+        dtypes = data["device_types"].keys()
     products = {}
-    for prod in data["products"]:
-        products[prod["name"]] = prod["type"]
+    if "products" in data:
+        for prod in data["products"]:
+            products[prod["name"]] = prod["type"]
  
     return render_template('client_device_new.html',
             device_types = dtypes,
