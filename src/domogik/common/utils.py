@@ -130,7 +130,7 @@ def is_already_launched(log, id):
     cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2}".format(id, STARTED_BY_MANAGER, my_pid)
     # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
 
-    log.info("Looking for already launched instances of '{0}'".format(id))
+    log.info("Looking for launched instances of '{0}'".format(id))
     is_launched = False
     subp = Popen(cmd, shell=True, stdout=PIPE)
     pid_list = []

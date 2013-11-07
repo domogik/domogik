@@ -961,6 +961,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         """ Check if the plugin is stopped. If not, kill it
         """
         self._stop.wait(WAIT_AFTER_STOP_REQUEST)
+        self.log.debug("Check if the plugin {0} has stopped it self. Else there will be a bloodbath".format(self.name))
         res, pid_list = is_already_launched(self.log, self.name)
         if res:
             for the_pid in pid_list:
