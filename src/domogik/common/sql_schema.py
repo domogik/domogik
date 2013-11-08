@@ -272,6 +272,19 @@ class UserAccount(Base):
         """Return an internal representation of the class"""
         return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>"\
                % (self.id, self.login, self.is_admin, self.person)
+   # Flask-Login integration
+    def is_authenticated(self):
+        return True
+    def is_active(self):
+        return True
+    def is_anonymous(self):
+        return False
+    def get_id(self):
+        return self.id
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.login
+
 
     @staticmethod
     def get_tablename():
