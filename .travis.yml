@@ -9,15 +9,17 @@ mysql:
   username: travis
   encoding: utf8
 install:
-  - ~/domogik/src/domogik/tests/travis/travis-install-dependencies.sh
+  - echo "TBD=$TRAVIS_BUILD_DIR"
+  - ls $TRAVIS_BUILD_DIR/
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-dependencies.sh
 before_script:
-  - ~/domogik/src/domogik/tests/travis/travis-setup-database.sh
-  - ~/domogik/src/domogik/tests/travis/travis-install-domogik.sh
-  - ~/domogik/src/domogik/tests/travis/travis-start-domogik.sh
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-setup-database.sh
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik.sh
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-start-domogik.sh
 script:
   - echo "Domogik installed!"
 after_failure:
-  - ~/domogik/src/domogik/tests/travis/travis-after-failure.sh
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-after-failure.sh
 notifications:
   irc: "irc.freenode.net#domogik"
 
