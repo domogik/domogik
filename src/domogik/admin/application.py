@@ -26,3 +26,4 @@ app.config['RECAPTCHA_PUBLIC_KEY'] = \
 # import all files inside the view module
 from domogik.admin.views.index import *
 from domogik.admin.views.clients import *
+from domogik.admin.views.orphans import *
