@@ -1,0 +1,23 @@
+branches:
+  only:
+    - 0.4-candidate
+python:
+  - "2.7"
+mysql:
+  adapter: mysql2
+  database: domogik
+  username: travis
+  encoding: utf8
+install:
+  - ~/domogik/src/domogik/tests/travis/travis-install-dependencies.sh
+before_script:
+  - ~/domogik/src/domogik/tests/travis/travis-setup-database.sh
+  - ~/domogik/src/domogik/tests/travis/travis-install-domogik.sh
+  - ~/domogik/src/domogik/tests/travis/travis-start-domogik.sh
+script:
+  - echo "Domogik installed!"
+after_failure:
+  - ~/domogik/src/domogik/tests/travis/travis-after-failure.sh
+notifications:
+  irc: "irc.freenode.net#domogik"
+
