@@ -71,7 +71,7 @@ def check_domogik_is_running():
     """
     # currently, we only ask the user to check
     #return ask("Notice that the plugin configuration will be reset for the tests!\nTests should only be done on dedicated environments!!!!!!!!!! Check that Domogik is up and.... are you ready ?")
-    pass
+    return True
     
 
 def get_rest_url():
