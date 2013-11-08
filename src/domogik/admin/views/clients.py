@@ -6,10 +6,12 @@ from flask_wtf import Form
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField
 from wtforms.validators import Required
+from flask_login import login_required
 
 from domogik.rest.urls.device import get_device_params
 
 @app.route('/clients')
+@login_required
 def clients():
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -21,10 +23,12 @@ def clients():
         client_list = {}
 
     return render_template('clients.html',
+        mactve="clients",
         clients=client_list
         )
 
 @app.route('/client/<client_id>')
+@login_required
 def client_detail(client_id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -39,30 +43,36 @@ def client_detail(client_id):
     return render_template('client.html',
             clientid = client_id,
             detail = detail,
+            mactve="clients",
             active = 'home'
             )
 
 @app.route('/client/<client_id>/devices/known')
+@login_required
 def client_devices_known(client_id):
     with app.db.session_scope():
         devices = app.db.list_devices_by_plugin(client_id)
     return render_template('client_devices.html',
             devices = devices,
             clientid = client_id,
+            mactve="clients",
             active = 'devices'
             )
 
 @app.route('/client/<client_id>/devices/detected')
+@login_required
 def client_devices_detected(client_id):
     # TODO get them
     devices = {}
     return render_template('client_detected.html',
             devices = devices,
             clientid = client_id,
+            mactve="clients",
             active = 'devices'
             )
 
 @app.route('/client/<client_id>/devices/delete/<did>')
+@login_required
 def client_devices_delete(client_id, did):
     with app.db.session_scope():
         app.db.del_device(did)
@@ -74,6 +84,7 @@ def client_devices_delete(client_id, did):
     return redirect("/client/{0}/devices/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
+@login_required
 def client_config(client_id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -152,10 +163,12 @@ def client_config(client_id):
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
+            mactve="clients",
             active = 'config'
             )
 
 @app.route('/client/<client_id>/devices/new')
+@login_required
 def client_devices_new(client_id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -179,10 +192,12 @@ def client_devices_new(client_id):
             device_types = dtypes,
             products = products,
             clientid = client_id,
+            mactve="clients",
             active = 'devices'
             )
 
 @app.route('/client/<client_id>/devices/new/<device_type_id>', methods=['GET', 'POST'])
+@login_required
 def client_devices_new_wiz(client_id, device_type_id):
     # TODO get them
     params = get_device_params(device_type_id, app.zmq_context)
@@ -250,5 +265,6 @@ def client_devices_new_wiz(client_id, device_type_id):
             params = params,
             dtype = device_type_id,
             clientid = client_id,
+            mactve="clients",
             active = 'devices'
             )

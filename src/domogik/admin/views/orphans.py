@@ -2,8 +2,10 @@ from domogik.admin.application import app
 from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
+from flask_login import login_required
 
 @app.route('/orphans')
+@login_required
 def orphans():
     # get all clients
     cli = MQSyncReq(app.zmq_context)
@@ -24,10 +26,12 @@ def orphans():
             orphan_devs.append(dev)
 
     return render_template('orphans.html',
+        mactve="orphans",
         devices=orphan_devs
         )
 
 @app.route('/orphansi/delete/<did>')
+@login_required
 def orphans_delete(did):
     with app.db.session_scope():
         app.db.del_device(did)

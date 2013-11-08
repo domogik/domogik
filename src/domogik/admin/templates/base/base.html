@@ -21,7 +21,9 @@
     <div class="notifications bottom-right"></div>
     {% block body -%}
     {% block navbar %}
-	{% include "base/nav.html" %}
+        {% if not nonav %}
+        {% include "base/nav.html" %}
+        {% endif %}
     {%- endblock navbar %}
     {% block content -%}
     {%- endblock content %}
