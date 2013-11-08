@@ -273,9 +273,11 @@ def test_version():
 
 def test_hostname():
     info("Check hostname")
-    assert len(gethostname().split('.')[0]) < 16, "Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
-            Please change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again."
-    ok("Hostname length is < 16.")
+    #assert len(gethostname().split('.')[0]) < 16, "Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
+    if len(gethostname().split('.')[0]) < 16:
+        warning("Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
+            You should change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again.")
+    #ok("Hostname length is < 16.")
     if gethostname().count("-") > 0:
         warning("Your hostname is '%s'. It shouldn't contain the character '-'." % gethostname())
     else:
