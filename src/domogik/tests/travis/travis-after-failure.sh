@@ -2,9 +2,12 @@
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
 ps -ef | grep dmg
-ps -ef | grep $DMG_PLUGIN
+if [ ! -z $TUTUXX ] ; then 
+    ps -ef | grep $DMG_PLUGIN
+    cat /var/log/domogik/$DMG_PLUGIN.log
+fi
 cat /etc/default/domogik
-cat /var/log/domogik/$DMG_PLUGIN.log
+cat /etc/domogik/domogik.cfg
 cat /var/log/domogik/db_api.log
 cat /var/log/domogik/dbmgr.log
 cat /var/log/domogik/manager.log
