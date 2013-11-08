@@ -65,6 +65,7 @@ setup(
 	      'Twisted >= 12.1.0',
 	      'Flask >= 0.9',
 	      'Flask-WTF >= 0.9.3',
+              'Flask-Login',
 	      'tornado >= 3.1',
               'requests >= 1.2.3',
 	      'pyzmq >= 13.1.0',

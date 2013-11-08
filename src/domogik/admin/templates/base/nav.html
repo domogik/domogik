@@ -7,9 +7,13 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="navbar-inner">
     <ul class="nav navbar-nav visible-md visible-lg">
-      <li class="active"><a href="/clients">Clients</a></li>
-      <li><a href="/orphans">Orpahns</a></li>
-      <li><a href="/config">Configuration</a></li>
+      <li{% if mactive == "clients" %} class="active" {% endif %}><a href="/clients">Clients</a></li>
+      <li{% if mactive == "orphans" %} class="active" {% endif %}><a href="/orphans">Orpahns</a></li>
+      <li{% if mactive == "auth" %} class="active" {% endif %}><a href="/auth">Auth</a></li>
+      <li{% if mactive == "config" %} class="active" {% endif %}><a href="/config">Configuration</a></li>
+    </ul>
+    <ul class="nav navbar-nav visible-md visible-lg navbar-right">
+      <li><a href="/logout">Logout</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right hidden-md hidden-lg">
       <li class="dropdown">
@@ -18,7 +22,10 @@
           <li><a href="/">Home</a></li>
           <li><a href="/clients">Clients</a></li>
           <li><a href="/orphans">Orphans</a></li>
+          <li><a href="/auth">Auth</a></li>
           <li><a href="/config">Configuration</a></li>
+          <li class="divider"></li>
+          <li><a href="/logout">Logout</a></li>
         </ul>
       </li>
     </ul>
