@@ -22,4 +22,6 @@ after_failure:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-after-failure.sh
 notifications:
   irc: "irc.freenode.net#domogik"
+  on_success: never
+  on_failure: always
 
