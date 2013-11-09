@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -171,7 +171,7 @@ def test_config_files():
     user_home = user_entry.pw_dir
     assert os.path.isfile("/etc/domogik/domogik.cfg"), "The domogik config file /etc/domogik/domogik.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
     ok("Domogik's user exists and has a config file")
-    
+
     test_user_config_file(user_home, user_entry)
 
 def _test_user_can_write(conn, path, user_entry):
@@ -204,7 +204,7 @@ def test_user_config_file(user_home, user_entry):
     import ConfigParser
     config = ConfigParser.ConfigParser()
     config.read("/etc/domogik/domogik.cfg")
-    
+
     #check [domogik] section
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
@@ -249,9 +249,9 @@ def test_user_config_file(user_home, user_entry):
     os.setreuid(0,0)
     os.environ['HOME'] = old_home
     assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
-        
+
     ok("[database] section seems good")
-    
+
     # Check [rest] section
     info("Parse [rest] section")
     for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):

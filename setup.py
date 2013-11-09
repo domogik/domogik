@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -49,16 +49,16 @@ setup(
     description = 'OpenSource home automation software',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools', 
-	      'argparse >= 1.2.1', 
+    install_requires=['setuptools',
+	      'argparse >= 1.2.1',
 	      'sqlalchemy',
 	      'alembic',
 	      'simplejson >= 1.9.2',
-	      'pyOpenSSL >= 0.10', 
-	      'psutil >= 0.1.3', 
-	      'MySQL-python >= 1.2.3c', 
+	      'pyOpenSSL >= 0.10',
+	      'psutil >= 0.1.3',
+	      'MySQL-python >= 1.2.3c',
               'psycopg2',
-	      'pip >= 1.0', 
+	      'pip >= 1.0',
 	      'Distutils2',
 	      'pyserial >= 2.5',
 	      'netifaces >= 0.8',
