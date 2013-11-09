@@ -18,8 +18,8 @@ before_script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-start-domogik.sh
 script:
   - echo "Domogik installed!"
-after_failure:
-  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-after-failure.sh
+after_script:
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-after.sh
 notifications:
   irc: "irc.freenode.net#domogik"
   on_success: never
