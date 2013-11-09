@@ -110,6 +110,7 @@ class XplPlugin(BasePlugin, MQRep):
         Watcher(self)
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting plugin '%s' (new manager instance)" % name)
+        self.log.info(u"Python version is {0}".format(sys.version_info))
         if self.options.test_option:
             self.log.info(u"The plugin is starting in TEST mode. Test option is {0}".format(self.options.test_option))
         self._name = name
