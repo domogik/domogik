@@ -31,6 +31,8 @@ Packages development
 
 * :doc:`Tests <tests/index>` ....................................TODO
 
+  * :doc:`Travis CI templates <tests/travis_templates>` ....................................TODO
+
 * Python part
   
   * :doc:`__init__.py files <python/init_files>`

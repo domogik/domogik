@@ -1,0 +1,8 @@
+===================
+Travis CI templates
+===================
+
+
+..todo ::
+
+    Plugins templates
