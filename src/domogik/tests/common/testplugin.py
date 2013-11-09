@@ -89,7 +89,7 @@ class TestPlugin(MQAsyncSub):
         msg.set_action('plugin.stop.do')
         msg.add_data('name', self.name)
         msg.add_data('host', self.host)
-        result = cli.request("plugin-{0}.{1}".format(self.name, self.host), msg.get(), timeout=15) 
+        result = cli.request("plugin-{0}.{1}".format(self.name, self.host), msg.get(), timeout=20) 
         if result:
             msgid, content = result.get()
             content = json.loads(content)
