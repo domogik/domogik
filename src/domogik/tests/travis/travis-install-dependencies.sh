@@ -3,7 +3,7 @@
 
 sudo apt-get update
 sudo apt-get install libzmq3-dev
-sudo pip install pyzmq
+pip install pyzmq
 sudo apt-get install python-argparse
 sudo apt-get install python2.7-dev gcc
 sudo apt-get install libssl-dev
