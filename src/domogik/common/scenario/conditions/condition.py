@@ -41,11 +41,11 @@ if __name__ == "__main__":
     c = None
 
     def mytrigger(test):
-        logging.warning("Trigger called by test %s, refreshing state" % test)
+        logging.warning("Trigger called by test {0}, refreshing state".format(test))
         if c.get_parsed_condition() == None:
             return
         st = c.eval_condition()
-        logging.warning("state of condition '%s' is %s" % (c.get_parsed_condition(), st))
+        logging.warning("state of condition '{0}' is {1}".format(c.get_parsed_condition(), st))
 
     cond1 = """{ "NOT": {
         "990137de-25c9-4d47-8598-bb2eaec18e35": {
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     mapping = {}
     mapping['990137de-25c9-4d47-8598-bb2eaec18e35'] = TextInPageTest(logging, trigger = mytrigger)
     c = Condition(logging, cond1, mapping)
-    print "Condition created : %s" % c
+    print "Condition created : {0}".format(c)
     print "Trying to parse the condition ..."
     pc = c.parse_condition()
-    print "Condition parsed, result is %s, condition is %s " % (pc, c.get_parsed_condition())
+    print "Condition parsed, result is {0}, condition is {1} ".format(pc, c.get_parsed_condition())

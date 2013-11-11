@@ -42,7 +42,6 @@ class CronTest(AbstractTest):
         """
         params = self.get_raw_parameters()
         crn = params["cron"]
-        print crn
         if crn.evaluate() == None:
             return None
         else:
@@ -56,23 +55,23 @@ if __name__ == "__main__":
     TEST = None
 
     def mytrigger(test):
-        print "Trigger called by test %s, refreshing state" % test
+        print("Trigger called by test {0}, refreshing state".format(test))
         st = TEST.evaluate()
         print "state is %s" % st
 
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
     TEST = CronTest(logging, trigger = mytrigger)
-    print TEST
-    print "getting parameters"
+    print(TEST)
+    print("getting parameters")
     p = TEST.get_parameters()
-    print p
-    print "===="
-    print "Trying to evaluate : %s" % TEST.evaluate()
-    print "===="
-    print "set data for parameters"
+    print(p)
+    print("====")
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
+    print("====")
+    print("set data for parameters")
     data = { "cron": { "cron" : "*/2 * * * *"} }
     TEST.fill_parameters(data)
     sleep(5)
-    print "Trying to evaluate : %s" % TEST.evaluate()
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
     TEST.destroy()

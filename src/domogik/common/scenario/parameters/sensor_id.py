@@ -53,9 +53,9 @@ if __name__ == "__main__":
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
     t = SensorIdParameter(logging, None)
-    print "Expected entries : %s" % t.get_expected_entries()
-    print "Evaluate should be None : %s" % t.evaluate()
-    print "==> Setting some value for entry 'sensor_id'"
+    print("Expected entries : {0}".format(t.get_expected_entries()))
+    print("Evaluate should be None : {0}".format(t.evaluate()))
+    print("==> Setting some value for entry 'sensor_id'")
     data = { "sensor_id" : "1" }
     t.fill(data)
-    print "Evaluate should now return the sensor id : %s" % t.evaluate()
+    print("Evaluate should now return the sensor id : {0}".format(t.evaluate()))

@@ -54,9 +54,9 @@ if __name__ == "__main__":
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
     t = TextParameter(logging, None)
-    print "Expected entries : %s" % t.get_expected_entries()
-    print "Evaluate should be None : %s" % t.evaluate()
-    print "==> Setting some value for entry 'text'"
+    print("Expected entries : {0}".format(t.get_expected_entries()))
+    print("Evaluate should be None : {0}".format(t.evaluate()))
+    print("==> Setting some value for entry 'text'")
     data = { "text" : "This is a nice text" }
     t.fill(data)
-    print "Evaluate should now return some string : %s" % t.evaluate()
+    print("Evaluate should now return some string : {0}".format(t.evaluate()))

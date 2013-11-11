@@ -55,7 +55,7 @@ class UrlParameter(AbstractParameter):
                 try:
                     u = urlopen(p["urlpath"])
                 except:
-                    self._log.warn("urlopen : Exception occured : %s" % sys.exc_info()[0])
+                    self._log.warn("urlopen : Exception occured : {0}".format(sys.exc_info()[0]))
                     self._result = None
                 else:
                     self._result = "\n".join(u.readlines())
@@ -85,15 +85,15 @@ if __name__ == "__main__":
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
     t = UrlParameter(logging, None)
-    print "Expected entries : %s" % t.get_expected_entries()
-    print "Evaluate should be None : %s" % t.evaluate()
-    print "==> Setting some url value for entries"
+    print("Expected entries : {0}".format(t.get_expected_entries())
+    print("Evaluate should be None : {0}".format(t.evaluate())
+    print("==> Setting some url value for entries")
     data = { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
     "interval": "5"}
     t.fill(data)
-    print "I wait 12 seconds"
+    print("I wait 12 seconds")
     sleep(12)
-    print "And I check the result now that the page has (normally) been fetched : %s" % t.evaluate()
-    print "And I destroy the parameter"
+    print("And I check the result now that the page has (normally) been fetched : {0}".format(t.evaluate()))
+    print("And I destroy the parameter")
     t.destroy()
 

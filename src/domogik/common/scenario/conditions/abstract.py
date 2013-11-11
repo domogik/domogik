@@ -136,14 +136,14 @@ class AbstractCondition:
             for k in json.keys():
                 v = json[k]
                 if k in ["AND", "OR"]:
-                    return "( %s %s %s )" % (self.__parse_boolean(v.items()[0]), k.lower(), self.__parse_boolean(v.items()[1]))
+                    return "( {0} {1} {2} )".format(self.__parse_boolean(v.items()[0]), k.lower(), self.__parse_boolean(v.items()[1]))
                 elif k == "NOT":
-                    return "not %s" % self.__parse_boolean(v)
+                    return "not {0}".format(self.__parse_boolean(v))
                 elif type(v) == dict:
                     #declaration of tests
                     test = self._mapping[k]
                     test.fill_parameters(v)
-                    return "self._mapping['%s'].evaluate()" % k
+                    return "self._mapping['{0}'].evaluate()".format(k)
 
     def get_parsed_condition(self):
         """Returns the parsed condition
@@ -162,7 +162,7 @@ class AbstractCondition:
         try:
             _j = json.loads(self._condition)
         except ValueError as e:
-            self._log.warning("Can't load json : %s" % self._condition)
+            self._log.warning("Can't load json : {0}".format(self._condition))
             raise e
         self._parsed_condition = self.__parse_boolean(_j)
         return True
@@ -176,7 +176,7 @@ class AbstractCondition:
             return None
         res = eval(self._parsed_condition)
         self._log.info("Evaluating condition {0} result = {1}".format(self._name, res))
-        self._log.debug("_parsed condition is : %s, eval is %s" % (self._parsed_condition, eval(self._parsed_condition)))
+        self._log.debug("_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, eval(self._parsed_condition)))
         if res:
             # call the callback
             self._on_true(self._name)

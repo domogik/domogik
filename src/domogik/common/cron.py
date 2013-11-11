@@ -74,7 +74,6 @@ class CronExpression(object):
         The epoch should be defined down to the minute sorted by
         descending significance.
         """
-        print "========="
         self._special = False
         for key in SPECIALS:
             if line.startswith(key):
