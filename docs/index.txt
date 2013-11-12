@@ -17,7 +17,7 @@ Overview
 End User Documentation
 ======================
 
-* :doc:`Release 0.4.0 </releases/0.4.0>` OSSOLETE
+* :doc:`Release 0.4.0 </releases/0.4.0>` 
 * :doc:`Release 0.3.0 </releases/0.3.0>`
 * :doc:`Release 0.2.0 </releases/0.2.0>`
 * :doc:`Release 0.1.0 </releases/0.1.0>`
