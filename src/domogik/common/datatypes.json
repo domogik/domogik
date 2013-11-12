@@ -117,12 +117,16 @@
             "DT_Month",
             "DT_Day",
             "DT_Hour",
-            "DT_minute",
+            "DT_Minute",
             "DT_Second",
             "DT_mSecond",
             "DT_Timestamp",
             "DT_mMeter",
-            "DT_mMeterHour"     
+            "DT_mMeterHour",
+            "DT_Byte",
+            "DT_kByte",
+            "DT_MByte",
+            "DT_GByte"
         ]
     },
     "DT_Scaling": {
@@ -363,6 +367,34 @@
         "parent": "DT_Number",
         "childs": []
     },
+    "DT_Byte": {
+        "min": null,
+        "max": null,
+        "unit": "b",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kByte": {
+        "min": null,
+        "max": null,
+        "unit": "kb",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_MByte": {
+        "min": null,
+        "max": null,
+        "unit": "Mb",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_GByte": {
+        "min": null,
+        "max": null,
+        "unit": "Gb",
+        "parent": "DT_Number",
+        "childs": []
+    },
     "DT_Char": {
         "childs": []
     },
@@ -463,6 +495,39 @@
     "DT_ColorCMYK": {
         "format": "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)",
         "parent": "DT_List",
+        "childs": []
+    },
+    "DT_HVACHeat": {
+        "values": {
+            "0": "Auto",
+            "1": "Comfort",
+            "2": "Standby",
+            "3": "Economy",
+            "4": "Building Protection"
+        },
+        "childs": []
+    },
+    "DT_HVACVent": {
+        "values": {
+            "0": "Auto",
+            "1": "Heat",
+            "2": "Cool",
+            "3": "Fan only",
+            "4": "Dry"
+        },
+        "childs": []
+    },
+    "DT_ColorCII": {
+        "values": {
+            "W": "White",
+            "O": "Orange",
+            "R": "Red",
+            "Y": "Yellow",
+            "B": "Blue",
+            "G": "Green",
+            "Bk": "Black",
+            "Br": "Brown"
+        },
         "childs": []
     }
 }

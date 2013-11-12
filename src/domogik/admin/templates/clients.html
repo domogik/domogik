@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans %}Client list{% endtrans %}</h1>
+    {% if clients|length > 0 %}
+      <table class="table table-striped table-hover table-condensed">
+            <thead>
+                    <tr>
+                        <td>{% trans %}ID{% endtrans %}</td>
+                        <td>{% trans %}Status{% endtrans %}</td>
+                        <td>{% trans %}Configured{% endtrans %}</td>
+                        <td>{% trans %}Details{% endtrans %}</td>
+                    </tr>
+            </thead>
+            <tbody>
+            {% for name, data in clients.iteritems() %}
+                    <tr>
+                            <td>{{ name }}</td>
+                            <td>{{ data.status }}</td>
+                            <td>{{ data.configured }}</td>
+                            <td>
+                                {% if data.configured %}
+                                    <a href="/client/{{ name }}">
+                                {% else %}
+                                    <a href="/client/{{ name }}/config">
+                                {% endif %}
+                                    {% trans %}Details{% endtrans %}
+                                    </a>
+                            </td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    <div class="alert alert-warning">{% trans %}No clients found{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

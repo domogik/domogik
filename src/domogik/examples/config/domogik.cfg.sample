@@ -1,0 +1,95 @@
+# This config file is used by some Domogik scripts.
+# You must tune it and then put it in /etc/domogik/domogik.cfg
+
+###
+# This is the Domogik global section
+###
+
+[domogik]
+# The directory in which resources : packages (plugins, widgets, etc) will be installed.
+# It will be created during first package installation.
+libraries_path = /var/lib/domogik/
+
+# The directory in which log files will be created
+# It must exists and be writable by the Domogik user
+# Default : /var/log/domogik/
+log_dir_path = /var/log/domogik/
+
+# This directory will contains pid files of started plugins.
+# They are used to stop the process by killing it
+pid_dir_path = /var/run/domogik/
+
+# Debug levels are debug, info, warning, error, critical
+log_level = debug
+
+# This parameter defines which interface the Domogik plugins should listen.
+# If you have only one computer to run the Domogik installation (of course, 
+# the one used to browse the interface is not important), you can leave it 
+# on 127.0.0.1, so that xPL won't polute your network. If you use more than 
+# one computer, you have to set it to your public interface IP. In this case, 
+# don't forget to update /etc/default/domogik : HUB_IFACE
+bind_interface = 127.0.0.1
+
+# Don't touch it unless you really know what you are doing
+broadcast = 255.255.255.255
+
+###
+# Database section
+###
+[database]
+# This parameter defines the database type. Can be one of : mysql, postgresql
+# You should first create the database when using mysql or postgresql
+# computing statistics.
+type = mysql
+user = domogik
+password = domopass
+port = 3306
+name = domogik
+host = 127.0.0.1
+# This is the prefix used in database. All tables will start by it. Do *not* 
+# modify it unless you really know what you are doing
+prefix = core
+
+# In case you get some "OperationalError: MySQL server has gone away" errors, 
+# you may need to adapt this value to your mysql configuration.
+#pool_recycle = 3600
+
+###
+# REST section
+###
+[rest]
+# REST is a plugin that allows all UI to get info in database or to discuss 
+# with xpl network.
+# REST is a HTTP server. Following parameters will indicate REST on which 
+# ip:port it will run
+#interfaces = eth0, lo
+#interfaces = eth0
+interfaces = lo
+port = 40405
+# set to True if you want to use rest with ssl (https://....)
+use_ssl = False
+# if rest_use_ssl = True, set here path for ssl certificate/key
+ssl_certificate =
+ssl_key =
+# if set to True, this will result in a nicely formatted json
+clean_json = False
+
+###
+# Messaging section
+###
+[mq]
+ip = 127.0.0.1
+req_rep_port = 40410
+pub_port = 40411
+sub_port = 40412
+
+###
+# Admin interface
+###
+[admin]
+interfaces = lo,eth0
+port = 40406
+use_ssl = False
+ssl_certificate =
+ssl_key =
+

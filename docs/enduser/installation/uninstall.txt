@@ -12,7 +12,7 @@ Uninstall
 
 From the root of Domogik sources or the Domogik package, just do: ::
 
-    ./install/uninstall.sh
+    $ sudo ./src/domogik/install/uninstall.sh
 
  
 

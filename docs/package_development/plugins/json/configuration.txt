@@ -1,0 +1,260 @@
+=============================================
+info.json for plugins - configuration section
+=============================================
+
+Purpose
+=======
+
+The configuration section describes the plugin configuration items. The configuration section will always have at least one item : **auto_startup**.
+
+Example
+=======
+
+For this example we assume that your plugin has several configuration items: 
+
+* the mandatory **auto_startup** item
+* an optionnal **interval** item : if not configured, the default value configured in the json will be used y the plugin
+
+Here is the corresponding section: ::
+
+    "configuration": [
+        {
+            "default": false,
+            "description": "Automatically start the plugin at Domogik startup",
+            "sort": "0",
+            "key": "auto_startup",
+            "name" : "Start the plugin with Domogik",
+            "required": true,
+            "type": "boolean"
+        },
+        {
+            "default": 5,
+            "description": "Interval between each poll (minute)",
+            "sort": "1",
+            "key": "interval",
+            "name": "Interval",
+            "required": false,
+            "type": "integer",
+            ...
+        }
+
+
+Description
+===========
+
+Each item has several properties: 
+
+* **sort** : it is an integer which allows to order the items on the user interface. *sort=0* is reserved for *auto_startup*.
+* **key** : the configuration key. This is used to store the value in database. The key must be lower case, limited to 255 characters. The only separator allowed in the *underscore*. This won't be displayed on the user interface.
+* **name** : a human readable equivalent of the **key**. This wil be displayed on the user interface.
+* **description** : the configuration item description. If the item type is an interger, a float or something like this, you must specify the unity (minutes, seconds, ...) in the description.
+* **type** : the configuration item type. You will find more informations below.
+* **default** : the default value. If the configuration item is not set in database, this default value will be used by the plugin.
+* **required** : is the configuration of this item required to run the plugin ? On the user interface, you may not be able to start a plugin if all the *required = true* items are not filled. If the *required* key doesn't exist, we assume that the item is required and *required = true*.
+* **...** : some addtionnal and optionnal parameters depending on the **type**. You will find more informations below.
+
+Notice aboue special values
+---------------------------
+
+In json format, you need to use for the boolean type :
+* true
+* false
+
+For undefined (None in python, undefined in javascript, Null in Java) values :
+* null
+
+auto_startup
+------------
+
+The **auto_startup** item must be set for all the plugins. This allow the user to configure on the user interface if he wants the plugin to be started on Domogik startup. The default value must be *false*.
+
+The hidden configuration item : configured
+------------------------------------------
+
+An hidden configuration item exists : **configured**. It is set to true in database when a plugin is configured and deleted when the plugin configuration is cleaned (this is done on *dbmgr* side). This item allows to check if a plugin si configured before starting it. If the plugin is not configured, it won't start!
+
+Data types
+----------
+
+Notice that when retrieving the plugins values for the configuration elements, they are automatically casted in the appropriate format which is the one describe in this part of the json file!
+
+boolean
+*******
+
+Possible values: 
+
+* true
+* false
+
+Validation : check the value is *true* or *false*
+
+string
+******
+
+Parameters:
+
+* max_length: int (optional)
+* min_length: int (optional)
+* mask: str (optional). The following characters are allowed in the mask :
+
+  * 9: Any digit character
+  * A: Any letter character
+  * *: Any letter or digit character
+
+  Example for a x10 address : *A9*. A x10 address is build with 1 letter and 1 number
+
+* multiline: boolean (optional)
+
+Validation: 
+
+* validates max_length or min_length, if they are provided. 
+* validates mask if provided.
+
+Formatting:
+
+* if multiline, use a textarea or similar
+* if not multiline use an input text
+
+Example: ::
+
+    "configuration": [
+        ...
+        {
+            ...
+            "key": "some_string_item",
+            "type": "integer",
+            "max-length": 20,
+            "min-length": 10,
+            "mask": "(999) AAA-***",
+            "multiline": false,
+            ...
+        }
+
+choice
+******
+
+Parameters:
+
+* choices : An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this field.
+
+Validation: validates that the given value exists in the list of choices.
+
+Example: ::
+
+    "configuration": [
+        ...
+        {
+            ...
+            "key": "some_choice_item",
+            "type": "choice",
+            "choices" : {"a":"A", "b":"B", "c":"C"},
+            ...
+        }
+
+multiplechoice
+**************
+
+This will store a list of values separated with ','
+
+Parameters:
+
+* choices : An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this field.
+
+Validation: validates that the given values exists in the list of choices.
+
+Example: ::
+
+    "configuration": [
+        ...
+        {
+            ...
+            "key": "some_multiplechoice_item",
+            "type": "multiplechoice",
+            "choices" : {"a":"A", "b":"B", "c":"C"},
+            ...
+        }
+
+date
+****
+
+Format is 'DD/MM/YYYY'
+
+Validation: validates that the given value respect the particular date format.
+
+time
+****
+
+Format is 'HH:MM:SS'
+
+Validation: validates that the given value respect the particular time format.
+
+datetime
+********
+
+Format is 'YYYY-MM-DD HH:MM:SS'
+
+Validation: validates that the given value respect the particular datetime format.
+
+float
+*****
+
+Parameters:
+
+* max_value:int (optional)
+* min_value:int (optional)
+
+Validation: validates that the given value is an float and is in the range (if set).
+
+Example: ::
+
+    "configuration": [
+        ...
+        {
+            ...
+            "key": "some_float_item",
+            "type": "float",
+            "max-value": 20,
+            "min-value": 10,
+            ...
+        }
+
+integer
+*******
+
+Parameters:
+
+* max_value:int (optional)
+* min_value:int (optional)
+
+Validation: Validates that the given value is an integer and is in the range (if set).
+
+Example: ::
+
+    "configuration": [
+        ...
+        {
+            ...
+            "key": "some_integer_item",
+            "type": "integer",
+            "max-value": 20,
+            "min-value": 10,
+            ...
+        }
+
+email
+*****
+
+Validation: validates that the given value is a valid email address.
+
+ipv4
+****
+
+Validation: validates that the given value is a valid IPv4 address.
+
+url
+***
+
+Validation: validates that the given value is a valid URL.
+
+
+

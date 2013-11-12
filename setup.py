@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -39,44 +39,8 @@ ez_setup.use_setuptools()
 
 import os
 from setuptools import setup, find_packages
-from install.get_arch import *
 import platform
-
-def list_all_files(path, dst):
-    """
-    List all files and subdirectories contained in a path
-    @param path : the path from where to get files and subdirectories
-    @param dst : The based destination path
-    @return : a list of tuples for each directory in path (including path itself)
-    """
-    d = []
-    files = []
-    for i in os.listdir(path):
-        if not os.path.isdir(os.path.join(path, i)):
-            files.append(os.path.join(path, i))
-        else:
-            d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
-    d.append((dst, files))
-    return d
-
-arch = get_path()
-
-d_files = [
-        ('/usr/sbin/', ['src/tools/dmgenplug']),
-        ('/usr/sbin/', ['src/tools/dmgdisplug']),
-        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
-        ('/etc/default/', ['src/domogik/examples/default/domogik'])
-]
-
-if arch != None:
-    d_files.append(('/usr/sbin/', [arch]))
-else:
-    print("*************** WARNING ***************")
-    print("* Can't find an xPL Hub for your arch *")
-    print("* Please check documentation in :     *")
-    print("*  src/domogik/xpl/tools/COMPILE.txt  *")
-    print("* to get the sources and compile them.*")
-    print("***************************************")
+import sys
 
 setup(
     name = 'Domogik',
@@ -85,44 +49,61 @@ setup(
     description = 'OpenSource home automation software',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools', 
-                      'sqlalchemy == 0.7.9',
-                      'sqlalchemy-migrate >= 0.7.2',
-                      'simplejson >= 1.9.2',
-                      'pyOpenSSL >= 0.10', 
-                      'httplib2 >= 0.6.0', 
-                      'psutil >= 0.1.3', 
-                      'MySQL-python >= 1.2.3c', 
-                      'pyinotify >= 0.8.9', 
-                      'pip >= 1.0', 
-                      'Distutils2',
-                      'pyserial >= 2.5',
-                      'netifaces>=0.8',
-                      'Twisted>=12.1.0'],
+    install_requires=['setuptools',
+	      'argparse >= 1.2.1',
+	      'sqlalchemy',
+	      'alembic',
+	      'simplejson >= 1.9.2',
+	      'pyOpenSSL >= 0.10',
+	      'psutil >= 0.1.3',
+	      'MySQL-python >= 1.2.3c',
+              'psycopg2',
+	      'pip >= 1.0',
+	      'Distutils2',
+	      'pyserial >= 2.5',
+	      'netifaces >= 0.8',
+	      'Twisted >= 12.1.0',
+	      'Flask >= 0.9',
+	      'Flask-WTF >= 0.9.3',
+              'Flask-Login',
+              'Flask-Babel',
+	      'tornado >= 3.1',
+              'requests >= 1.2.3',
+	      'pyzmq >= 13.1.0',
+	      'python-daemon >= 1.5.5'],
     zip_safe = False,
     license = 'GPL v3',
-    # namespace_packages = ['domogik', 'mpris', 'tools'],
-    # include_package_data = True,
+    #include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
-    package_dir = {'': 'src'},
+    package_dir = { '': 'src' },
     test_suite = 'domogik.tests',
-    package_data = {
-    },
-    data_files = d_files,
-
+    package_data = {},
+    scripts=[],
     entry_points = {
         'console_scripts': [
-            """
-            dmg_pkgmgr = domogik.xpl.bin.pkgmgr:main
-            dmg_manager = domogik.xpl.bin.manager:main
-            dmg_send = domogik.xpl.bin.send:main
-            dmg_dump = domogik.xpl.bin.dump_xpl:main
+	    """
+            dmg_pkgmgr = domogik.bin.pkgmgr:main
+            dmg_manager = domogik.bin.manager:main
+            dmg_send = domogik.bin.send:main
+            dmg_dump = domogik.bin.dump_xpl:main
             dmg_mq_dump = domogik.mq.dump:main
-            dmg_version = domogik.xpl.bin.version:main
-            dmg_hub = domogik.xpl.bin.hub:main
+            dmg_admin = domogik.bin.admin:main
+            dmg_version = domogik.bin.version:main
+            dmg_hub = domogik.bin.hub:main
             dmg_broker = domogik.mq.reqrep.broker:main
             dmg_forwarder = domogik.mq.pubsub.forwarder:main
-            """
-        ],
+            dmg_insert_data = domogik.tools.packages.insert_data:main
+            dmg_review = domogik.tools.packages.review.review:main
+	    """
+        ]
     },
+    classifiers=[
+        "Topic :: Home Automation",
+        "Environment :: No Input/Output (Daemon)",
+        "Programming Language :: Python",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: End Users/Desktop",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Natural Language :: English"
+    ]
 )

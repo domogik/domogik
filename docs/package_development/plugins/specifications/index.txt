@@ -1,0 +1,18 @@
+=====================
+Plugin specifications
+=====================
+
+For any development project, the developper (ideally not the developper, but for Domogik plugins, it will be the developper for most of the plugins), must write some specifications.
+
+People often think that specifications takes too much time and it is an optionnal step. Yes, you can skip the specifications step, but there is a risk you loose a lot of time when doing this ;).
+
+For Domogik plugins we strongly suggest you to write some specifications before doing anything. Here are some things you should focus on: 
+
+* plugin features
+* xpl messages that will be used (you should read http://xplproject.org.uk/wiki/index.php?title=XPL_Message_Schema)
+* how to handle errors (access to the hardware or service, ...) 
+* does the plugin need dedicated configuration pages on Domoweb administration interface ?
+
+As GitHub already integrates a wiki component for each repository, you should use the plugin repository wiki to write the specifications.
+
+You may also want to define a roadmap in this wiki if you plan to do the plugin in several steps.

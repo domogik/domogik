@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+{% import "base/wtf.html" as wtf %}
+
+{% block content %}
+{% include "client_menu.html" %}
+<div class="container">
+    <h2>{% trans %}Configuration{% endtrans %}</h2>
+    {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+</div>
+{% endblock %}

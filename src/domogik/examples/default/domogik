@@ -6,16 +6,20 @@ DOMOGIK_USER=domogik
 # This variable can take 6 parameters :
 # -d to start the database manager (launch only on master host)
 # -r to start the rest component (launch only on master host)
-# -E to manage external members (launch only on master host)
-# -p to regulary ping plugins 
-# -t <ping duration> to customize ping duration. Default : 20
-# -w <wait time between 2 ping> to customize ping delay. Default : 60
+# -x to start the xpl gw component (launch only on master host)
+# -s to start the start scenario manager component (launch only on master host)
+
+# TODO : OBSOLETE -E to manage external members (launch only on master host)
+# TODO : OBSOLETE -p to regulary ping plugins 
+# TODO : OBSOLETE -t <ping duration> to customize ping duration. Default : 20
+# TODO : OBSOLETE -w <wait time between 2 ping> to customize ping delay. Default : 60
+
 # Remember : Your domogik installation must have *one* and *only one*
 # instance of each manager running.
 # Your domogik installation won't start on this computer if :
 #  - The database manager is not already running elsewhere on the network
 #  - You do not pass -d parameter to the manager
-MANAGER_PARAMS="-d -r -p -E"
+MANAGER_PARAMS="-d -r -x -s"
 
 # You may want to use a xPL hub which is not the one given with Domogik
 # If so, set this option to 'false'
@@ -24,19 +28,19 @@ LAUNCH_DOMOGIK_XPL_HUB=true
 # Two hubs are available in Domogik
 # - the C hub 
 # - the Domogik python hub
-# By default, the Domogik python hub is used. On very slow computers, you may want to use the C hub instead.
+# By default, the Domogik python hub is used. On very slow computers, you may 
+# want to use the C hub instead.
 # Possible values are: c, python
 DOMOGIK_XPL_HUB=python
 
-# You can define one or many extra path(s) for Domogik startup scripts.
-# This should only be useful if you use Domogik in developement mode (with setup.py develop)
-# or if you have a custom path install.
-# PATH is needed to locate 1 application :
-#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop
-CUSTOM_PATH=
 
-# Interface where the xpl hub is supposed to listen for
-HUB_IFACE="lo"
+
+
+
+
+###############################################################################
+#               Time configuration for server starting/stopping               #
+###############################################################################
 
 # Time to wait for the server to die, in seconds
 # If this value is set too low you might not
@@ -54,3 +58,23 @@ DIETIME=2
 # when it actually did)
 STARTTIME=6
 
+
+
+
+
+
+
+
+###############################################################################
+#                   Obsolete C xPL hub configuration                          #
+###############################################################################
+
+# You can define one or many extra path(s) for Domogik startup scripts.
+# This should only be useful if you use Domogik in developement mode (with 
+# setup.py develop) or if you have a custom path install.
+# PATH is needed to locate 1 application :
+#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop
+CUSTOM_PATH=
+
+# Interface where the xpl hub is supposed to listen for
+HUB_IFACE="lo"

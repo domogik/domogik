@@ -1,0 +1,104 @@
+========================================
+info.json for plugins - identity section
+========================================
+
+Purpose
+=======
+
+The identity section is the identity card of the plugin.
+
+
+Example
+=======
+
+::
+
+    "identity": {
+        "author": "John",
+        "author_email": "john@dummy.com",
+        "tags": ["computer"],
+        "dependencies": [],
+        "description": "A plugin description which may be on \n several lines",
+        "domogik_min_version": "0.4.0",
+        "name": "myplugin",
+        "type": "plugin",
+        "version": "0.1"
+    },
+
+Description
+===========
+
+* **type** : the package type. For a plugin, the value will always be **plugin**
+* **name** : the plugin name. Example : ipx800, diskfree, ... 
+* **version** : the plugin version
+* **domogik_min_version** : the minimum Domogik compliant release. It can't be lower than 0.4.0
+* **description** : the plugin description
+* **author** : nickname, full name, society or anaything to identify the author of the plugin
+* **author_email** : an email to contact the package author. If you want you can write the email like this : *john at dummy dot com*.
+* **tags** : a list of tags. You will find some examples below.
+* **dependencies** : a list of dependencies for the package. You will find more informations below.
+
+Tags
+----
+
+Here is a list of suggested tags. If needed you can use new tags (if so, please send us a mail in order we may complete this list):
+
+* appliance
+* communication
+* computer
+* electricity
+* energy
+* gas
+* hvac   (heating, ventilation and air conditionning)
+* heating
+* light
+* media
+* online_service
+* plc   (power line carrier)
+* relayboard
+* security
+* shutter
+* telephony
+* temperature
+* water
+* weather
+* wireless
+
+
+Dependencies
+------------
+
+There are 3 types of dependencies:
+
+* python packages or libraries
+* Domogik plugins
+* other dependencies
+
+Both *python* and *plugin* can be checked by Domogik when installing a plugin, so it is very important to list the dependencies to avoid users to create new bug tickets just because they forgot to install a dependency.
+
+Example for a **python** dependency: ::
+
+    "dependencies": [
+        {
+            "id": "pyserial (>=2.5)",
+            "type": "python"
+        }
+    ],
+
+Example for a **plugin** dependency: ::
+
+    "dependencies": [
+        {
+            "id": "cron",
+            "type": "plugin"
+        }
+
+Example for an **other** dependency: ::
+
+    "dependencies": [
+        {
+            "id": "owfs (>=2.8.4)",
+            "type": "other"
+        }
+
+

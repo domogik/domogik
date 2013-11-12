@@ -1,8 +1,0 @@
-.. _index:
-
-================
-Table of content
-================
-
-* :doc:`Plugin documentation </__PKG_NAME__>`
-* :doc:`Helpers documentation </helpers>`

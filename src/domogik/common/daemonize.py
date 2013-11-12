@@ -102,7 +102,7 @@ def createDaemon():
          # longer a session leader, preventing the daemon from ever acquiring
          # a controlling terminal.
          pid = os.fork()	# Fork a second child.
-      except OSError as e:
+      except OSError, e:
          raise Exception, "%s [%d]" % (e.strerror, e.errno)
 
       if (pid == 0):	# The second child.

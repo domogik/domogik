@@ -921,7 +921,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
             pass
 
 if __name__ == "__main__":
-    print("Creating test database...")
+    print(u"Creating test database...")
     db = DbHelper(use_test_db=True)
     url = db.get_url_connection_string()
     test_url = '%s_test' % url
@@ -930,5 +930,5 @@ if __name__ == "__main__":
     sql_schema.metadata.drop_all(engine_test)
     sql_schema.metadata.create_all(engine_test)
     
-    print("*** Using database %s ***\n" % db.get_db_type())
+    print(u"*** Using database %s ***\n" % db.get_db_type())
     unittest.main()

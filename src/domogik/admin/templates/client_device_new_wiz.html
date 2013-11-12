@@ -1,0 +1,11 @@
+{% extends "base/base.html" %}
+{% import "base/wtf.html" as wtf %}
+
+{% block content %}
+{% include "client_menu.html" %}
+<div class="container">
+    {{ params }}
+    <h2>{% trans %}Create a new device{% endtrans %} {{ dtype }}</h2>
+    {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+</div>
+{% endblock %}

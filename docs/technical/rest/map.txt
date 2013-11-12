@@ -1,0 +1,38 @@
+=================
+/map - Known urls
+=================
+
+Available actions : 
+
+* GET : a list of known urls and there options
+
+
+GET
+===
+
+This method is used to get informations about all urls.
+
+/map
+-------
+
+Returns a list of all known rest urls
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/map
+    Response (application/json) : 
+    [
+        {
+            "url": "/device/params/<dev_type_id>",
+            "method": [
+                "HEAD",
+                "OPTIONS",
+                "GET"
+            ],
+            "arguments": [
+                "dev_type_id"
+            ]
+        },
+        { ...}
+    ]

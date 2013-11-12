@@ -37,6 +37,7 @@ C_XPLHUB=xPL_Hub
 PYTHON_XPLHUB=dmg_hub
 MQ_BROKER=dmg_broker
 MQ_FORWARDER=dmg_forwarder
+ADMIN=dmg_admin
 DIETIME=2
 STARTTIME=5
 #PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
@@ -62,6 +63,17 @@ function start {
         echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
     fi
     start_daemon
+    start_admin
+}
+
+function start_admin {
+    echo -n " * Starting the admin interface ..."
+    /bin/su - ${DOMOGIK_USER} -c "$(which ${ADMIN}) >/dev/null"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during admin startup."
+        exit 1
+    fi
+    echo " Done."
 }
 
 function start_mq {
@@ -164,6 +176,17 @@ function status_manager {
     fi
 }
 
+function status_admin {
+    set +e
+    RUNNING=$(/usr/bin/pgrep -c ${ADMIN})
+    set -e
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+        echo " * ${ADMIN} is running"
+    else
+        echo " * ${ADMIN} is not running"
+    fi
+} 
+
 function status_mq {
     set +e
     RUNNING=$(/usr/bin/pgrep -c ${MQ_BROKER})
@@ -212,6 +235,7 @@ function status_xpl {
 }
 
 function stop {
+    stop_admin
     stop_plugins
     if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
         stop_xpl
@@ -221,6 +245,16 @@ function stop {
     stop_manager
     stop_mq
     kill_all
+}
+
+function stop_admin {
+    echo -n " * Stopping Admin interface..."
+    for pid in `ps ax | grep "${ADMIN}" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+        sleep ${DIETIME}
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    echo " Done."
 }
 
 function stop_mq {
@@ -321,14 +355,15 @@ kill_all() {
 }
 
 function update_cache {
-    echo -n " * Updating packages cache..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
-    if [ $? -gt 0 ]; then
-        echo " An error occured during packages cache update."
-        exit 1
-    else
-        echo " Done"
-    fi
+    echo -n " * Updating cache temporary disabled in 0.4"
+    #echo -n " * Updating packages cache..."
+    #/bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
+    #if [ $? -gt 0 ]; then
+    #    echo " An error occured during packages cache update."
+    #    exit 1
+    #else
+    #    echo " Done"
+    #fi
 }
 
 # Check if the directory for lock exists
@@ -356,6 +391,9 @@ case "$1" in
             update_cache
         else
             case "$2" in
+                admin)
+                    start_admin
+                ;;
 		mq)
                     start_mq
                 ;;
@@ -368,7 +406,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 start [manager|xpl|mq]"
+                    echo "usage: $0 start [manager|xpl|mq|admin]"
                 ;;
             esac
         fi
@@ -378,6 +416,9 @@ case "$1" in
             stop
         else
             case "$2" in
+                admin)
+                    stop_admin
+                ;;
 		mq)
                     stop_mq
                 ;;
@@ -391,7 +432,7 @@ case "$1" in
                     stop_manager
                 ;;
                 *)
-                    echo "usage: $0 stop [manager|xpl|mq]"
+                    echo "usage: $0 stop [manager|xpl|mq|admin]"
                 ;;
             esac
         fi
@@ -406,6 +447,11 @@ case "$1" in
             sleep ${STARTTIME}
         else
             case "$2" in
+                admin)
+                    stop_admin
+                    sleep ${DIETIME}
+                    start_admin
+                ;;
 		mq)
                     stop_mq
                     sleep ${DIETIME}
@@ -426,7 +472,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 restart [manager|xpl|mq]"
+                    echo "usage: $0 restart [manager|xpl|mq|admin]"
                 ;;
             esac
         fi
@@ -436,6 +482,9 @@ case "$1" in
             status
         else
             case "$2" in
+                admin)
+                    status_admin
+                ;;
                 manager)
                     status_manager
                 ;;
@@ -452,7 +501,7 @@ case "$1" in
         fi
         ;;
     *)
-    echo "usage: $0 {start|stop|restart|status} [(mq|xpl|manager|plugins)]"
+    echo "usage: $0 {start|stop|restart|status} [(mq|xpl|manager|plugins|admin)]"
     echo "More help : $0 command help"
 esac
 exit 0

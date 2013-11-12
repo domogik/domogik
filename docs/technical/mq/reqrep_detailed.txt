@@ -1,0 +1,266 @@
+=============================
+Req/rep detailed informations
+=============================
+
+
+client.list.get
+================
+
+Request : UIs
+Reply : manager
+
+To get the clients list, the UI may send a MQ request *client.list.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *client.list*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_client_list.py*.
+
+You will get a reply like this: ::
+
+    ['client.list.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "configured": true, "pid": 0, "host": "darkstar", "package_id": "plugin-diskfree", "type": "plugin"}}']
+
+
+
+client.detail.get
+==================
+
+Request : UIs
+Reply : manager
+
+To get the clients detail, the UI may send a MQ request *client.detail.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *client.detail*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_client_detail.py*.
+
+You will get a reply like this: ::
+
+    ['client.detail.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "data": {"configuration": [{"description": "Automatically start plugin at Domogik startup", "default": false, "required": false, "options": [], "key": "startup-plugin", "type": "boolean", "id": "0"}, {"description": "Interval between each poll (minute)", "default": 5, "required": false, "value": "7", "options": [], "key": "interval", "type": "integer", "id": "1"}]}, "configured": true, "pid": 0, "package_id": "plugin-diskfree", "host": "darkstar", "type": "plugin"}}']
+
+
+config.get
+==========
+
+Request : Plugins, UIs
+Reply : dbmgr
+
+To get *one* configuration elements, the clients may send a MQ request *config.get* to the dbmgr: ::
+
+    request : config.get
+    data : type = plugin
+           name = <plugin name>
+           host = <hostname>
+           key = <configuration key>
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_get.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "reason": "", "value": 5, "host": "darkstar", "key": "interval", "type": "plugin", "name": "diskfree"}']
+
+To get *all* configuration elements for a plugin, you can use the same MQ request without the *key* element. 
+ll the values will be returned as a json dictionnary in the *data* key :
+
+    request : config.get
+    data : type = plugin
+           name = <plugin name>
+           host = <hostname>
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_get_all.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "type": "plugin", "reason": "", "host": "darkstar", "key": "*", "data": {"interval": 5, "configured": true, ....}, "name": "diskfree"}']
+
+
+config.set
+==========
+
+Request : UIs
+Reply : dbmgr
+
+To set values the configuration elements, the UI may send a MQ request *config.set* to the dbmgr: ::
+
+    request : config.set
+    data : type = plugin
+           name = <plugin name>
+           host = <hostname>
+           data = <dictionnary : { 'key1' : 'value1', 'key2' : 'value2', ....} >
+
+Notice that a 'configured' key (value = True) will be silently added as configuration element : it indicates that the plugin has been configured and is used by the plugins and the UIs.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_set.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "name": "diskfree"}']
+
+
+config.delete
+=============
+
+Request : UIs
+Reply : dbmgr
+
+To delete all the values for a type/name/host configuration elements, the UI may send a MQ request *config.delete* to the dbmgr: ::
+
+    request : config.delete
+    data : type = plugin
+           name = <plugin name>
+           host = <hostname>
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_config_delete.py*.
+
+You will get a reply like this: ::
+
+    ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "name": "diskfree"}']
+
+
+device_types.get
+================
+
+Request : Rest
+Reply : manager
+
+To get the device_types associated data, Rest may send a MQ request *device_types.get* to the manager.
+The result is build in this way : 
+* for each package detected by the manager, all *device_types* in the json file are listed. Then, each is added in a dictionnary with the package json file content as value.
+
+    request : device_types.get
+    data : device_type = <a device type>  (optionnal : if not provided, all the device_types are returned)
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_device_types.py*.
+
+You will get a reply like this: ::
+
+    ['device_types.result', '{"diskfree.disk_usage": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": [], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "package_id": "plugin-diskfree", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "type": "plugin", "name": "diskfree"}}}']
+
+
+package.detail.get
+===================
+
+Request : UIs
+Reply : manager
+
+To get the packages detail, the UI may send a MQ request *package.detail.get* to the manager.
+
+The UI may use this MQ request only on startup or when it needs to initiate the values. To get updates, the UI should subscribe to the appropriate MQ publisher : *package.detail*.
+
+Be caution, this is different from *client.detail* as only the packages are listed, not the instances of the packages (as does client.detail). This message should be used only for packages management!!
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_package_detail.py*.
+
+You will get a reply like this: ::
+
+    ['package.detail.result', '{"plugin-diskfree": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
+
+
+plugin.start.do
+===============
+
+Request : UIs
+Reply : manager
+
+To request a plugin to start, the UI may send a MQ request *plugin.start.do* to the manager: ::
+
+    request : plugin.start.do
+    data : name = <plugin name : ipx800, 1wire, ...>
+
+To get updates on the plugin status after the request, the UI should subscribe to the appropriate MQ publisher : *plugin.status*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_plugin_start.py*.
+
+You will get a reply like this: ::
+
+    ['plugin.start.result', '{"status": true, "reason": "", "host": "darkstar", "key": "startup", "type": "plugin", "name": "diskfree"}']
+
+
+
+plugin.stop.do
+===============
+
+Request : UIs
+Reply : the plugin to stop
+
+To request a plugin to stop, the UI may send a MQ request *plugin.start.do* to the plugin: ::
+
+    request : plugin.stop.do
+    data : name = <plugin name : ipx800, 1wire, ...>
+
+To get updates on the plugin status after the request, the UI should subscribe to the appropriate MQ publisher : *plugin.status*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_plugin_stop.py*.
+
+You will get a reply like this: ::
+
+    ['plugin.stop.result', '{"status": true, "reason": "", "host": "darkstar", "key": "configured", "type": "plugin", "name": "diskfree"}']
+
+
+reload
+=======
+
+Request : rest
+Reply : xplgw
+
+To request xplgw to load all new data from the DB: ::
+
+    request : reload
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_reload.py*.
+
+You will get a reply like this: ::
+
+    ['reload.result', '{}']
+
+
+helper.list.get
+===============
+
+Request : UIs
+Reply : plugin
+
+To request all possible helpers for a plugin: ::
+
+    request : helper.list.get
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_helper_list.py*.
+
+You will get a reply like this: ::
+
+    ['helper.list.result', '{"actions": ["scan", "test"]}'] 
+
+
+helper.help.get
+===============
+
+Request : UIs
+Reply : plugin
+
+Get help info for a specifick helper command: ::
+
+    request : helper.help.get
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_helper_help.py*.
+
+You will get a reply like this: ::
+
+    ['helper.help.result', '{"help": "A help string"}']
+
+
+helper.do
+=========
+
+Request : UIs
+Reply : plugin
+
+Run a specifick helper command with optional parameters: ::
+
+    request : helper.do
+    data : command = command to run
+           params = a python dict, the keys are the param names, the values are the param values
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_helper_do.py*.
+
+You will get a reply like this: ::
+
+    ['helper.do.result', '{"command": "<the requested command", "params": "the requested params", "result": "the ouput of the called method in the plugin"}']

@@ -8,6 +8,10 @@ Release 0.4.0
 New features 
 ============
 
+Python compatibility
+********************
+Domogik is no more compliant with Python 2.6. You need at least Python 2.7 to run Domogik.
+
 New DB schema
 *************
 A new DB schema has been implemented, with this new schema we removed the features but add support for multiple adress fields (like address and channel). We also added support for devices that use a different address for receiving commands and for sending there statusses. With this implementation we increased the plugin json_version to 2, meaning that the old plugins will not work in this release.
@@ -15,3 +19,51 @@ A new DB schema has been implemented, with this new schema we removed the featur
 Domogik Datatypes
 *****************
 All data comming from and going to the domogik database is now in an unifmorm format, the domogik datatyps.
+
+New manager
+***********
+The manager core component has been fully rewritten. The code is more clear and more flexible
+
+New rest
+********
+A new rest has been added, its now based on flask for url routing.
+The new rest is also using HTTP methods (GET, POST, PUT, DELETE) and HTTP status codes.
+
+New xpl core component
+**********************
+The new xpl core component is the only gateway to the xpl network, this is the component that translates the mq messages to xpl-commands and the xpl-stats/triggers to mq published events.
+
+
+Zero MQ
+*******
+The 0MQ message queue system is now used in Domogik. All the internal communications are now done with 0MQ instead of using xPL. xPL is still used to send automation data over the network.
+
+New plugins format
+******************
+
+
+New admin
+*********
+The administration interface is no more included in Domoweb. It is now included in Domogik and available on http://ip:40406/
+
+
+Tests
+*****
+
+* test framework
+* Travis CI
+
+
+Files moved
+***********
+Some files have been moved in the source tree
+
+=============== =====================
+                    Location
+--------------- ---------------------
+What            Old           New
+=============== ============= =======
+Main binarys    xpl/bin       bin
+--------------- ------------- -------
+Rest libs       xpl/lib/rest  rest
+=============== ============= =======

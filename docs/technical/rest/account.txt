@@ -1,0 +1,276 @@
+=============================
+/account - account management
+=============================
+
+Available actions : 
+
+* GET : get one or several account information
+* POST : create a new account
+* PUT : update an existing account
+* DELETE : delete a existing account
+
+
+GET
+===
+
+This method is used to get informations about existing accounts. There are several way to call the **/account** url with the GET method.
+
+/account
+-------
+
+All the accountss will be returned in a json table. 
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/account
+    Response (application/json) : 
+    [
+        {
+            "skin_used": "",
+            "core_person":
+            {
+                "first_name": "Admin",
+                "last_name": "Admin",
+                "id": 1,
+                "birthdate": "1900-01-01",
+                "user_accounts":
+                [
+                    null
+                ]
+            },
+            "person": null,
+            "is_admin": true,
+            "person_id": 1,
+            "login": "admin",
+            "id": 1
+        },
+        { ...}
+    ]
+    
+/account/<account id>
+---------------------
+
+The account corresponding to the given id will be returned in a json.
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/account/<account id>
+    Response (application/json) :
+    {
+       "skin_used": "",
+       "core_person":
+       {
+           "first_name": "Admin",
+           "last_name": "Admin",
+           "id": 1,
+           "birthdate": "1900-01-01",
+           "user_accounts":
+           [
+               null
+           ]
+       },
+       "person": null,
+       "is_admin": true,
+       "person_id": 1,
+       "login": "admin",
+       "id": 1
+    }
+
+
+/account/auth/<username>/<password>
+-----------------------------------
+
+Validate the password for a certain user account.
+Will return the user account record (same like GET /account/<account id>) if ok, if nor ok it will return an empty string
+
+Example: ::
+
+    Method : GET
+    Url : http://127.0.0.1:40405/account/auth/<username>/<password>
+    Response (application/json) :
+    {
+       "skin_used": "",
+       "core_person":
+       {
+           "first_name": "Admin",
+           "last_name": "Admin",
+           "id": 1,
+           "birthdate": "1900-01-01",
+           "user_accounts":
+           [
+               null
+           ]
+       },
+       "person": null,
+       "is_admin": true,
+       "person_id": 1,
+       "login": "admin",
+       "id": 1
+    }
+
+POST
+====
+
+This method is used to create a new account, this can be called with or without a person id, without a person id, then the parameters last_name, first_name and birthday are required. if you provide the parameter person_id then these are not required.
+
+Example: ::
+
+    Method : POST
+    Url : http://127.0.0.1:40405/account
+    Headers:
+        Content-Type: application/x-www-form-urlencoded
+    Body without a person_id: 
+        login=The login for this account
+        first_name=The firstname for this person
+        last_name=The lastname for this person
+        birthday=The birthday for this person
+        is_admin=If the user is an admin or not
+        skin_used=The used skin for the ui
+        password=The password for this account
+    Body with a person_id:
+        login=The login for this account
+        is_admin=If the user is an admin or not
+        skin_used=The used skin for the ui
+        person_id=The person id to use
+        password=The password for this account
+    Response (application/json):
+    {
+        "skin_used": "",
+        "core_person":
+        {
+            "first_name": "foo",
+            "last_name": "bar",
+            "id": 4,
+            "birthdate": null,
+            "user_accounts":
+            [
+                null
+            ]
+        },
+        "person": null,
+        "is_admin": false,
+        "person_id": 4,
+        "login": "test2",
+        "id": 3
+    }
+
+
+PUT
+===
+
+/account/password
+-----------------
+
+With this method we can update a users password.
+Will return the account object if successfull, and empty string if failed.
+
+Example: ::
+
+    Method : PUT
+    Url : http://127.0.0.1:40405/account/password
+    Headers:
+        Content-Type: application/x-www-form-urlencoded
+    Body: 
+        account_id=The account to update the password for
+        old=The old password
+        new=The new password
+    Response (application/json):
+    {
+       "skin_used": "",
+       "core_person":
+       {
+           "first_name": "Admin",
+           "last_name": "Admin",
+           "id": 1,
+           "birthdate": "1900-01-01",
+           "user_accounts":
+           [
+               null
+           ]
+       },
+       "person": null,
+       "is_admin": true,
+       "person_id": 1,
+       "login": "admin",
+       "id": 1
+    }
+
+/account/
+-----------------
+
+This method is used to update the information about an account. All info except the password can be updated.
+The same rules as the POST method apply about the person_id
+
+The updated account will be returned in the json.
+
+Example: ::
+
+    Method : PUT
+    Url : http://127.0.0.1:40405/account
+    Headers:
+        Content-Type: application/x-www-form-urlencoded
+    Body without a person_id: 
+        login=The login for this account
+        first_name=The firstname for this person
+        last_name=The lastname for this person
+        birthday=The birthday for this person
+        is_admin=If the user is an admin or not
+        skin_used=The used skin for the ui
+    Body with a person_id:
+        login=The login for this account
+        is_admin=If the user is an admin or not
+        skin_used=The used skin for the ui
+        person_id=The person id to use
+    Response (application/json):
+    {
+        "skin_used": "",
+        "core_person":
+        {
+            "first_name": "foo",
+            "last_name": "bar",
+            "id": 4,
+            "birthdate": null,
+            "user_accounts":
+            [
+                null
+            ]
+        },
+        "person": null,
+        "is_admin": false,
+        "person_id": 4,
+        "login": "test2",
+        "id": 3
+    }
+
+DELETE
+======
+
+This method is used to delete an account. The account corresponding to the given id will be returned in a json.
+
+Example: ::
+
+    Method : DELETE
+    Url : http://127.0.0.1:40405/account/<account id>
+    Response (application/json) :
+    {
+       "skin_used": "",
+       "core_person":
+       {
+           "first_name": "Admin",
+           "last_name": "Admin",
+           "id": 1,
+           "birthdate": "1900-01-01",
+           "user_accounts":
+           [
+               null
+           ]
+       },
+       "person": null,
+       "is_admin": true,
+       "person_id": 1,
+       "login": "admin",
+       "id": 1
+    }
+

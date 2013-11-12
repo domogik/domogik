@@ -42,7 +42,6 @@ import logging
 import sys
 from domogik.common.configloader import Loader
 
-
 class Logger():
     '''
     Logger for Domogik
@@ -84,16 +83,19 @@ class Logger():
                 my_logger = logging.getLogger('domogik-%s' % component_name)
             else:
                 my_logger = logging.getLogger(component_name)
-            hdlr = logging.FileHandler(filename)
-            formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-            hdlr.setFormatter(formatter)
-            my_logger.addHandler(hdlr)
+            # log to file
+            my_logger.propagate = 0
+            if not my_logger.handlers:
+                hdlr = logging.FileHandler(filename)
+                formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+                hdlr.setFormatter(formatter)
+                my_logger.addHandler(hdlr)
 
-	    # if loglevvel is set to debug (all log entries also go to stdout)
-            if level == 'debug' and component_name.find('sqlalchemy') == -1:
-               dhdlr = logging.StreamHandler(sys.stdout)
-               dhdlr.setFormatter(formatter)
-               my_logger.addHandler(dhdlr)
+	        # if loglevvel is set to debug (all log entries also go to stdout)
+                if level == 'debug' and component_name.find('sqlalchemy') == -1:
+                    dhdlr = logging.StreamHandler(sys.stdout)
+                    dhdlr.setFormatter(formatter)
+                    my_logger.addHandler(dhdlr)
 
             my_logger.setLevel(LEVELS[level])
             self.logger[component_name] = my_logger
@@ -109,4 +111,14 @@ class Logger():
         elif len(self.__class__.logger.keys()) == 1:
             return self.__class__.logger[self.__class__.logger.keys()[0]]
         else:
-            raise AttributeError, "You must specify a loggger name"
+            raise AttributeError("You must specify a loggger name")
+
+    def get_fds(self, logger_names):
+        openFiles = []
+        for name in logger_names:
+            logger = self.logger[name]
+            for handler in logger.handlers:
+                if hasattr(handler, 'stream') and \
+                    hasattr(handler.stream, 'fileno'):
+                    openFiles.append(handler.stream) 
+        return openFiles

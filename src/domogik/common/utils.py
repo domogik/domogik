@@ -34,7 +34,39 @@ Implements
 """
 
 from socket import gethostname
-from exceptions import ImportError, AttributeError
+#from exceptions import ImportError, AttributeError
+from subprocess import Popen, PIPE
+import os
+import sys
+from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
+
+# used by is_already_launched
+STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
+
+def get_interfaces():
+    return interfaces()
+
+def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
+    """ Returns all ips that are available for the interfaces in the list
+    @param interface_list: a list of interfaces to ge the ips for,
+        if the list is empty it will retrun all ips for this system
+    @param ip_type: what ip type to get, can be
+        AF_INET: for ipv4
+        AF_INET6: for ipv6
+    @return: a list of ips
+    """
+    if type(interface_list) is not list:
+        assert "The interface_list should be a list"
+    if len(interface_list) == 0:
+        interface_list = interfaces()
+    ips = []
+    for intf in interface_list:
+        if intf in interfaces():
+            for addr in ifaddresses(intf)[ip_type]:
+                ips.append(addr['addr'])
+        else:
+            assert "Interface {0} does not exist".format(intf)
+    return ips
 
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
@@ -50,7 +82,9 @@ def ucode(my_string):
 
     """
     if my_string is not None:
-        if not type(my_string) == str:
+        if type(my_string) == unicode:
+            return my_string
+        elif not type(my_string) == str:
             return str(my_string).decode("utf-8")
         else:
             return my_string.decode("utf-8")
@@ -67,7 +101,7 @@ def call_package_conversion(log, plugin, method, value):
     @return the converted value or None on error
  
     """
-    modulename = 'domogik_packages.conversions.{0}'.format(plugin)
+    modulename = 'packages.plugin_{0}.conversions.{0}'.format(plugin)
     classname = '{0}Conversions'.format(plugin)
     try:
         module = __import__(modulename, fromlist=[classname])
@@ -82,4 +116,33 @@ def call_package_conversion(log, plugin, method, value):
         return value
     log.debug("calling {0}.{1}".format(staticclass, staticmethode))
     return staticmethode(value)
+
+def is_already_launched(log, id):
+    """ Check if there are already some process for the component launched
+        @param log : logger
+        @param id : plugin id to check with pgrep
+        @return : is_launched : True/False
+                  pid_list : list of the already launched processes pid
+    """
+    my_pid = os.getpid()
+ 
+    # the manager add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+    cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2}".format(id, STARTED_BY_MANAGER, my_pid)
+    # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
+
+    log.info("Looking for launched instances of '{0}'".format(id))
+    is_launched = False
+    subp = Popen(cmd, shell=True, stdout=PIPE)
+    pid_list = []
+    for line in subp.stdout:
+        is_launched = True
+        log.info("Process found : {0}".format(line.rstrip("\n")))
+        pid_list.append(line.rstrip("\n").split(" ")[0])
+    subp.wait()  
+    if is_launched:
+        log.info("There are already existing processes.")
+    else:
+        log.info("No existing process.")
+    return is_launched, pid_list
+
 

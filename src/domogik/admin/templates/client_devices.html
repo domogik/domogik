@@ -1,0 +1,90 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+{% include "client_menu.html" %}
+<div class="container">
+    <h2>{% trans %}Known Devices{% endtrans %}</h2>
+    {% if devices|length > 0 %}
+      <table class="table table-striped table-hover table-condensed">
+            <thead>
+                    <tr>
+                        <td>{% trans %}ID{% endtrans %}</td>
+                        <td>{% trans %}Name{% endtrans %}</td>
+                        <td>{% trans %}Device Type{% endtrans %}</td>
+                        <td>{% trans %}Description{% endtrans %}</td>
+                        <td>{% trans %}Details{% endtrans %}</td>
+                    </tr>
+            </thead>
+            <tbody>
+            {% for data in devices %}
+                    <tr>
+                            <td>{{ data.id }}</td>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.device_type_id }}</td>
+                            <td>{{ data.description }}</td>
+                            <td>
+                                <a onclick="$('#detail-{{ data.id }}').toggle()">{% trans %}Details{% endtrans %}</a>
+                                &nbsp;&nbsp;|&nbsp;&nbsp;
+                                <a href="/client/{{ clientid }}/devices/delete/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
+                            </td>
+                    </tr>
+                    <tr id="detail-{{ data.id }}" style="display: none;">
+                            <td colspan="5"> 
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">{% trans %}Sensors{% endtrans %}</div>
+                                        <table>
+                                              <thead>
+                                                <tr>
+                                                    <td>{% trans %}ID{% endtrans %}</td>
+                                                    <td>{% trans %}Name{% endtrans %}</td>
+                                                    <td>{% trans %}Data Type{% endtrans %}</td>
+                                                    <td>{% trans %}Last value{% endtrans %}</td>
+                                                    <td>{% trans %}Last received{% endtrans %}</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for name, sen in data.sensors.items() %}
+                                                        <tr>
+                                                                <td>{{ sen.id }}</td>
+                                                                <td>{{ sen.name }}</td>
+                                                                <td>{{ sen.data_type }}</td>
+                                                                <td>{{ sen.last_value }}</td>
+                                                                <td>{{ sen.last_received }} </td>
+                                                        </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                        </table>
+                                </div> 
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">{% trans %}Commands{% endtrans %}</div>
+                                        <table>
+                                              <thead>
+                                                <tr>
+                                                    <td>{% trans %}ID{% endtrans %}</td>
+                                                    <td>{% trans %}Name{% endtrans %}</td>
+                                                    <td>{% trans %}Params{% endtrans %}</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for name, cmd in data.commands.items() %}
+                                                        <tr>
+                                                                <td>{{ cmd.id }}</td>
+                                                                <td>{{ cmd.name }}</td>
+                                                                <td>{{ cmd.parameters }}</td>
+                                                        </tr>
+                                                        
+                                                {% endfor %}
+                                                </tbody>
+                                        </table>
+                                </div> 
+ 
+                            </td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    <div class="alert alert-warning">{% trans %}No devices found{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

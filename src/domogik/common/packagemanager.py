@@ -386,7 +386,7 @@ class PackageManager():
         # get package name
         if path[0:4] == "http": # special process for a http path
             id = full_name = '-'.join(path.split("/")[-3:])
-            print("id=%s" % full_name)
+            print(u"id=%s" % full_name)
         else:
             full_name = os.path.basename(path)
             # twice to remove first .gz and then .tar
@@ -426,7 +426,7 @@ class PackageManager():
         dmg = sys.modules["domogik"]
         self.log("Domogik version = %s" % dmg.__version__)
         self.log("Minimum Domogik version required for package = %s" % pkg_json["identity"]["domogik_min_version"])
-        print("%s < %s" % ( pkg_json["identity"]["domogik_min_version"] , dmg.__version__))
+        print(u"%s < %s" % ( pkg_json["identity"]["domogik_min_version"] , dmg.__version__))
         if pkg_json["identity"]["domogik_min_version"] > dmg.__version__:
             msg = "This package needs a Domogik version >= %s. Actual is %s. Installation ABORTED!" % (pkg_json["identity"]["domogik_min_version"], dmg.__version__)
             self.log(msg)
@@ -545,7 +545,7 @@ class PackageManager():
                     type_path = "plugins"
                 if pkg_type == "external":
                     type_path = "externals"
-                print("%s => %s" % ("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path)))
+                print(u"%s => %s" % ("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path)))
                 copytree("%s/src/share/domogik/%ss" % (pkg_dir, pkg_type), "%s/%s" % (plg_path, type_path), self.log)
                 copytree("%s/src/share/domogik/data/" % pkg_dir, "%s/data/" % plg_path, self.log)
 

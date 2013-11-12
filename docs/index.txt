@@ -2,6 +2,12 @@
 Domogik
 =======
 
+
+.. todo::
+    This release is actually in development.
+    Some parts of this documentation still need to be updated!
+
+
 Overview
 ========
 
@@ -11,7 +17,10 @@ Overview
 End User Documentation
 ======================
 
-* :doc:`Release 0.4.0 </releases/0.4.0>`
+* :doc:`Release 0.4.0 </releases/0.4.0>` OSSOLETE
+* :doc:`Release 0.3.0 </releases/0.3.0>`
+* :doc:`Release 0.2.0 </releases/0.2.0>`
+* :doc:`Release 0.1.0 </releases/0.1.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
 * **Installation:**
 
@@ -48,33 +57,51 @@ Technical Documentation
 * :doc:`Network ports used by Domogik </technical/network_ports>`
 * :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
-* :doc:`Device types and usages  </technical/device_feature_usage>`
 * **Database:**
   :doc:`Model </technical/database>`
-* **RINOR:**
-	* :doc:`Overview </technical/rinor/index>`
-	* :doc:`Statistics Manager </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
-	* :doc:`REST /base </technical/rinor/rest_base>`: Get data from the database (devices, events, etc)
-	* :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
-	* :doc:`REST /events </technical/rinor/rest_events>`: Get events
-	* :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
-	* :doc:`REST /account </technical/rinor/rest_account>`: List accounts, login, etc
-	* :doc:`REST /plugin </technical/rinor/rest_plugin>`: Start, stop xPL plugins
-	* :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
-	* :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
-	* :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
-	* :doc:`REST /package </technical/rinor/rest_package>`: Packages
-	* :doc:`REST /host </technical/rinor/rest_host>`: Hosts informations
+* **RINOR:** -- obsolete : see the REST chapter for 0.4 developments --
+  * :doc:`Overview </technical/rinor/index>`
+  * :doc:`XPL Events </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
+  * :doc:`REST /device </technical/rinor/rest_device>`: Get device data from the database
+  * :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
+  * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
+  * :doc:`REST /account </technical/rinor/rest_account>`: Login and password changes
+  * :doc:`REST /user </technical/rinor/rest_user>`: List users
+  * :doc:`REST /person </technical/rinor/rest_person>`: List persons
+  * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
+  * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
+  * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
+* **REST:**
+    * :doc:`Overview </technical/rest/index>`
+    * :doc:`/ </technical/rest/status>`: Status ouput for rest
+    * :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
+    * :doc:`/datatype </technical/rest/datatype>`: The output of all known datatypes by domogik
+    * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
+    * :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
+    * :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
+    * :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
+    * :doc:`/sensorhistory </technical/rest/sensorhistory>`: list sensorhistory values
+    * Devices parameters management
+        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
+        * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
+    * Old Domogik 0.2/0.3 devices migration
+        * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
+    * Command sending
+        * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
+
+* **Db manager:**
+* **XPL Event manager:**
 * **Packages:**
   :doc:`Packages overview </technical/packages>`
 * **Message Queue:**
-        * :doc:`Overview </technical/mq/overview>`
-        * :doc:`Request Reply </technical/mq/reqrep>`
-        * :doc:`Publish Subscribe </technical/mq/pubsub>`
-        * :doc:`Used messages </technical/mq/used>`
+    * :doc:`Overview </technical/mq/overview>`
+    * :doc:`Request Reply </technical/mq/reqrep>`
+    * :doc:`Publish Subscribe </technical/mq/pubsub>`
+    * :doc:`Used messages </technical/mq/used>`
+    * :doc:`Detail on Request Reply used messages </technical/mq/reqrep_detailed>`
+    * :doc:`detail on Publish Subscribe used messages</technical/mq/pubsub_detailed>`
 
 Developers Documentation
 ========================
-* :doc:`Developing a package </package_development/index>`
-* :doc: `Upgrading a package to 0.4 </package_development/json_file_upgrade>`
+* :doc:`Developing a package </package_development/plugins/index>`
 * :doc:`Tools </tools/index>`

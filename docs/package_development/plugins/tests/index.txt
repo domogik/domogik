@@ -1,0 +1,47 @@
+================
+Testing a plugin
+================
+
+Testing a plugin is really important! This allow to:
+* check if the plugin works as designed
+* check if the last update didn't break anything: this is called *non regression tests*
+
+Some libraries have been created in the Domogik project to help you to create the test scripts. These libraries can:
+* create some devices
+* configure, start, stop and do some basic checks on the plugin
+* help you to test xPL dialogs
+
+**Be carefull : executing the tests may delete your existing devices and so you can loose some data!!!!**
+
+File tree
+=========
+
+The following files are mandatory for the tests: ::
+
+    tests/
+      # the 0* files are just helpers for the developpers
+      001_configure.py     # this python file is used by the developpers to quickly configure the plugin 
+      002_create_device.py # this python file is used by the developpers to quickly create some test devices
+
+      # all the other files are related to the plugin tests
+      tests.json          # this is a file which describe all the test files. It is used for tests automation
+
+Then, depending on your plugin, you can have only one test file: ::
+
+    tests/
+      ..
+      010_tests.py
+
+Or several files. If so, there are some naming rules to follow:
+
+* *1xx_foo.py* : all these tests file *must not alter* the plugin configuration or the existing devices. Users could launch them to test some features and so help developpers to resolve the issues. These tests will require some user actions.
+* *2xx_foo.py* : all these tests *alter* the plugin configuration or existing devices. They use *real hardware devices* (if the plugin use some hardware). The difference with the *1xx* serie is that these tests can go deeper in the features as all is permitted.
+* *3xx_foo.py* : all these tests *alter* the plugin configuration or existing devices. They use only mocks (virtual devices) and can be executed without hardware. These tests are used for test automation.
+
+Example: ::
+
+    tests/
+      ..
+      TODO
+
+

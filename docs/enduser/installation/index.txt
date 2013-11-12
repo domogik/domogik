@@ -19,24 +19,28 @@ Check your Python version with: ::
     python -V
 
 .. warning::
-    Right now Domogik **requires Python 2.6/2.7**. Python 3 is not (yet) supported.
+    Right now Domogik **requires Python 2.7**. Python 3 is not (yet) fully supported.
 
-If you don't already have Python 2.6/2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
+If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
 
-    $ apt-get install python2.6
-    $ ln -sf /usr/bin/python2.6 /usr/bin/python
+    $ apt-get install python2.7
+    $ ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Even if you have python2.6 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
+Even if you have python2.7 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
 
-    $ apt-get install python2.X-dev gcc
+    $ apt-get install python2.7-dev gcc
 
-Install SSL librairies: ::
+Install SSL libraries: ::
 
     $ apt-get install libssl-dev 
 
-Install librairies for mysql access and command line client: ::
+Install libraries for mysql access and command line client: ::
 
     $ apt-get install libmysqlclient-dev mysql-client
+
+Install libraries for postgresql: ::
+
+    $ apt-get install python-psycopg2
 
 Mysql server
 ------------
@@ -69,19 +73,21 @@ Create the user "domogik" to use the new database: ::
 Download Domogik
 ----------------
 
-Go on `Download <http://wiki.domogik.org/Download>`_ to get Domogik.
-You will get a file named **domogik-<release>.tgz**. Download it and extract it: ::
+The 0.4 release is still in dev so you need to get domogik from the sources.
 
-    $ wget http://repo.domogik.org/...
-    $ tar xvzf domogik-<release>.tgz
-    $ cd domogik-<release>
+Use git to get the sources: ::
+
+    $ sudo apt-get install git
+    $ git clone https://github.com/domogik/domogik.git
+    $ git checkout 0.4-candidate
 
 Install Domogik 
 ---------------
 
-From **domogik-<release>** folder, run the install: ::
+Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
-    $ sudo ./install.sh
+    $ cd domogik/
+    $ sudo ./install.py
 
 .. note:: 
 
@@ -89,90 +95,12 @@ From **domogik-<release>** folder, run the install: ::
     
     If you want to use the C hub instead of the python hub (the default one), use the **--hub_c** option. See :doc:`here </xplhub/index>` for more informations on the xpl hubs.
 
-You will be asked for the following questions: ::
+.. todo::
 
-    If you want to use a proxy, please set it now. It will only be used during the installation. (ex: http://1.2.3.4:8080)
+    * This option is not yet available in Domogik 0.4
+    * Describe all the steps
+    * Describe how to use the command line
 
-During the installation, some python librairies could be downloaded. If you use a proxy, you must set it here.
-
-.. code-block:: bash
-
-    Which user will run domogik, it will be created if it does not exist yet? (default : domogik)
-
-System user that will launch Domogik. You should keep the default choice.
-
-If the choosen user doesn't exist, you will have to answser following questions: ::
-
-    Enter new UNIX password: 
-    ...
-    Retype new UNIX password: 
-    ...
-    Changing the user information for domogik
-    Enter the new value, or press ENTER for the default
-        Full Name []: 
-        Room Number []: 
-        Work Phone []: 
-        Home Phone []: 
-        Other []: 
-    Is the information correct? [Y/n] 
-    ...
-
-Enter twice a password for the user and eventually, fill values about the new user: ::
-
-    You already have a domogik.cfg file. Do you want to keep it ? [Y/n]
-
-If you already have a Domogik config file, you will be asked for keeping it or not: ::
-
-    Which interface do you want to bind to? (default : lo) :
-
-To use Domogik only on a local computer, choose **lo**. To access it from another computer or use multi host features, choose the appropriate network interface (e.g. : **eth0**): ::
-
-    If you need to access Domogik from outside, you can specify an IP now :
-
-Used to access to Domogik over the internet.
-You can set your public IP here (depending on your configuration, you could need to create a port redirection on your router. **Warning** : Domogik is not yet secure, use this with caution!
-
-.. code-block:: bash
-
-    You need to have a working Mysql server with a domogik user and database.       
-    You can create it using these commands (as mysql admin user) :                  
-     > CREATE DATABASE domogik;                                                     
-     > GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'randompassword';                                                                       
-    Press Enter to continue the installation when your setup is ok.
-
-If you have installed Mysql server and create the Domogik database, just press Enter.
-
-Set connection information for the database: ::
-
-    Please set your mysql parameters.                                               
-    Username : domogik                                                              
-    Password : domopass                                                             
-    Port [3306] :                                                                   
-    Host [localhost] :                                                              
-    Database name [domogik]:
-
-.. code-block:: bash
-
-    Your database already contains some tables, do you want to drop them. If you choose No, new items will *NOT* be installed ? [Y/n]
-    
-    In case the Domogik database is not empty (it is not the first installation), you will get this warning.
-    Depending on your needs choose the appropriate option. Y choice will delete all existing data.
-
-.. code-block:: bash
-
-    Everything seems to be good, Domogik should be installed correctly.             
-    I will start the test_config.py script to check it.                             
-    Please press Enter when ready.
-
-Just press enter to start the check script: ::
-
-    ==> ================================================== <==                     
-    ==>  Everything seems ok, you should be able to start  <==                     
-    ==>       Domogik with /etc/init.d/domogik start       <==                     
-    ==>             or /etc/rc.d/domogik start             <==                     
-    ==> ================================================== <==
-
-The installation is finished and seems to be OK.
 
 Optional : postgresql (instead of mysql)
 ----------------------------------------
@@ -180,7 +108,8 @@ Optional : postgresql (instead of mysql)
 If you wish to use postgresql instead of mysql
 
 * Create your database
-* Edit your */etc/domogik/domogik.cfg* file and put database information : db_type (postgresql), db_user, db_password...
+* Edit your */etc/domogik/domogik.cfg* file and edit the *[database]* section : type = postgresql
+
 
 Make Domogik start with your computer
 -------------------------------------
@@ -196,13 +125,15 @@ Start domogik
 .. code-block:: bash
 
     $ sudo /etc/init.d/domogik start
+    * Starting 0MQ broker ... Done.
+    * Starting 0MQ forwarder ... Done.
     * Starting xPL (python version)... Done.
-    * Starting Manager (with -d -r -p -E)... Done.
-    * Updating packages cache... Done
+    * Starting Manager (with -d -r -x -s)... Done.
 
 
 It will start : 
 
+* The 0MQ broker and forwarder
 * The xpl hub
 * The Domogik manager on this host
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
@@ -210,7 +141,7 @@ It will start :
 Next step : domoweb, the web user interface
 -------------------------------------------
 
-You can now `install Domoweb <http://docs.domogik.org/domoweb/0.3/>`_, the web user interface.
+Domoweb is not yet available for Domogik 0.4
 
 It doesn't work?
 ----------------

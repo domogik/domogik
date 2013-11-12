@@ -30,10 +30,17 @@ Sync
 
 ::
 
-	z = zmq.context()
-	m = MQMessage('config.get', {'ikke':'blah'})
-	c = MQSyncReq(z)
-	print c.request('dbmgr', m.get())
+    import zmq
+    from zmq.eventloop.ioloop import IOLoop
+    from domogik.mq.reqrep.client import MQSyncReq
+    from domogik.mq.message import MQMessage
+    
+    cli = MQSyncReq(zmq.Context())
+    msg = MQMessage()
+    msg.set_action('plugin.start.do')
+    msg.add_data('id', 'diskfree')
+    print cli.request('manager', msg.get(), timeout=10).get()
+
 
 Workers
 =======
@@ -62,27 +69,34 @@ How to Use
 
 ::
 
-	class DBConnector(MQRep):
-	    def __init__(self):
-		MQRep.__init__(self, zmq.Context(), 'dbmgr')
-		....
-		IOLoop.instance().start()
-
-	    def on_mdp_request(self, msg):
-		if msg._action == "config.get":
-		    plugin = msg._data['plugin']
-		    hostname = msg._data['hostname']
-		    key = msg._data['key']
-		    self._mdp_reply(plugin, hostname, key, self._fetch_elmt_config(plugin, element, key), element)
-		    
-	    def _mdp_reply(self, plugin, hostname, key, value, element=None):
-		msg = MQMessage()
-		msg.setaction( 'config.result' )
-		msg.adddata('plugin', plugin)
-		msg.adddata('hostname', hostname)
-		msg.adddata('key', key)
-		msg.adddata('value', value)
-		self.reply(msg.get())
+    from domogik.mq.reqrep.worker import MQRep
+    from domogik.mq.message import MQMessage
+    from zmq.eventloop.ioloop import IOLoop
+    import zmq
+    
+    
+    class Rep(MQRep):
+    
+        def __init__(self):
+            MQRep.__init__(self, zmq.Context(), 'test_rep')
+            IOLoop.instance().start()
+    
+        def on_mdp_request(self, msg):
+            # display the req message
+            print(msg)
+            # call a function to reply to the message depending on the header
+            if msg.get_action() == "foo.this.do":
+                self._mdp_reply_foo_this(msg)
+    
+        def _mdp_reply_foo_this(self, msg_received):
+            # get the value for a key of the received message 
+            the_value = data.get_data('a_key')
+            # send the reply
+            msg = MQMessage()
+            msg.set_action('foo.this.result')
+            msg.add_data('another_key', 'another_value')
+            print msg.get()
+            self.reply(msg.get())
 
 
 Examples

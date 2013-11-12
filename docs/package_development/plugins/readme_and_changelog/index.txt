@@ -1,0 +1,33 @@
+==========================
+Readme and changelog files
+==========================
+
+These 2 files are needed in package root directory:
+
+* README.md
+* CHANGELOG
+
+README.md
+=========
+
+The **README.md** file should contain a quick description of the plugin, and invite the user to find more informations on http://docs.domogik/org/
+
+The **.md** extension is for *Markdown* which is a text markup language. You can find `more information about Markdown on wikipedia <http://en.wikipedia.org/wiki/Markdown>`_
+
+You may create the file like this (assuming the plugin id is *myplugin*): ::
+
+    $ PLUGIN_ID=myplugin
+    $ echo "domogik-plugin-$PLUGIN_ID
+    =======================
+    
+    This is a plugin for Domogik : http://www.domogik.org
+
+    You can find the documentation source in the **doc/** folder and if this package is a candidate for the nightly builds, you may find the build documentation on http://docs.domogik.org" > README.md
+
+
+CHANGELOG
+=========
+
+The real changelog file must be located in **docs/changelog.txt**. To allow the user to find it quickly, please create a CHANGELOG in the root directory like this: ::
+
+    echo "The changelog informations are available in doc/changelog.txt" > CHANGELOG

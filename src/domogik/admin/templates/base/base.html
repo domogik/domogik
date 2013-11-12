@@ -1,0 +1,52 @@
+{% block doc -%}
+<!DOCTYPE html>
+<html{% block html_attribs %}{% endblock html_attribs %}>
+{%- block html %}
+  <head>
+    {%- block head %}
+    <title>{% block title %}{% endblock title %}</title>
+
+    {%- block metas %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {%- endblock metas %}
+
+    {%- block styles %}
+    <!-- Bootstrap -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/static/css/bootstrap-notify.css" rel="stylesheet" media="screen">
+    {%- endblock styles %}
+    {%- endblock head %}
+  </head>
+  <body{% block body_attribs %}{% endblock body_attribs %}>
+    <div class="notifications bottom-right"></div>
+    {% block body -%}
+    {% block navbar %}
+        {% if not nonav %}
+        {% include "base/nav.html" %}
+        {% endif %}
+    {%- endblock navbar %}
+    {% block content -%}
+    {%- endblock content %}
+
+    {% block scripts %}
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-notify.js"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script type="text/javascript">
+           {% for category, message in messages: %}
+            $('.notifications').notify({
+                message: { text: '{{ message }}' },
+                type: '{{ category }}'
+            }).show();
+            {% endfor %}
+            </script>
+    {% endif %}
+    {% endwith %}
+    {%- endblock scripts %}
+    {%- endblock body %}
+  </body>
+{%- endblock html %}
+</html>
+{% endblock doc -%}

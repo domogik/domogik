@@ -79,7 +79,7 @@ import random
 #from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 #from domogik.common import logger
-#from domogik.xpl.common.baseplugin import BasePlugin
+#from domogik.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 import time
@@ -182,6 +182,9 @@ class Manager:
         self.hub_discovery()
         self._foundhub.wait()
 
+    def get_source(self):
+        return self._source
+
     def hub_discovery(self):
         """ Start HUB discovery
         random hbeat timeout between 3 and 10 seconds, and sends HBEAT
@@ -267,7 +270,9 @@ class Manager:
                     raise
             else:
                 self._fragment_uid = self._fragment_uid + 1
-            self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
+            # TODO : reactivate
+            # commented by fritz in 0.4 for dev purpose
+            #self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
             self.p.log.warning("Error during send of message")
             self.p.log.debug(traceback.format_exc())
@@ -520,7 +525,7 @@ class XplTimer():
         self.log = manager.p.log
         manager.p.register_timer(self)
         manager.p.register_thread(self._timer)
-        self.log.debug("New timer created : %s " % self)
+        self.log.debug(u"New timer created : %s " % self)
 
 #    def __repr__(self):
 #        """ Representation of the Timer
@@ -545,17 +550,17 @@ class XplTimer():
         return self._timer
 
     def __del__(self):
-        self.log.debug("__del__ Manager")
+        self.log.debug(u"__del__ Manager")
         self.stop()
 
     def stop(self):
         """
         Stop the timer
         """
-        self.log.debug("Timer : stop, try to join() internal thread")
+        self.log.debug(u"Timer : stop, try to join() internal thread")
         self._stop.set()
         self._timer.join()
-        self.log.debug("Timer : stop, internal thread joined, unregister it")
+        self.log.debug(u"Timer : stop, internal thread joined, unregister it")
         self._manager.p.unregister_timer(self._timer)
 
     class __InternalTimer(threading.Thread):

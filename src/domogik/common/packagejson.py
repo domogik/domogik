@@ -39,6 +39,10 @@ import traceback
 import urllib2
 import datetime
 import json
+#TODO : why this import fails ?
+#from domogik.xpl.common.plugin import PACKAGES_DIR
+PACKAGES_DIR = "domogik_packages"
+
 
 
 
@@ -60,67 +64,55 @@ class PackageJson():
     """ PackageJson class
         load the file into a json and complete it
     """
-    def __init__(self, id = None, url = None, path = None, pkg_type = "plugin"):
+    def __init__(self, name = None, url = None, path = None, pkg_type = "plugin"):
         """ Read json file of a plugin and make an object from it
-            @param id : name of package
+            @param name : name of package
             @param url : url of file
             @param path : path of file
             @param pkg_type : package type (default : 'plugin')
-                          To use only with id != None
+                          To use only with name != None
         """
         json_file = None
         try:
             # load from sources repository
-            if id != None:
+            if name != None:
                 # get config
                 cfg = Loader('domogik')
                 config = cfg.load()
                 conf = dict(config[1])
 
                 if pkg_type == "plugin":
-                    if conf.has_key('package_path'):
-                        json_directory = "%s/domogik_packages/plugins/" % (conf['package_path'])
-                    else:
-                        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/plugins/")
-                elif pkg_type == "external":
-                    if conf.has_key('package_path'):
-                        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
-                    else:
-                        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
+                    json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
+                    icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
+                # TODO : reactivate later
+                #elif pkg_type == "external":
+                #    if conf.has_key('package_path'):
+                #        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
+                #    else:
+                #        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '%s' doesn't exists" % pkg_type)
-                json_file = "%s/%s.json" % (json_directory, id)
+                #json_file = "%s/%s.json" % (json_directory, name)
 
-                self.info_file = json_file
-                self.json = json.load(open(self.info_file))
+                self.json = json.load(open(json_file))
 
-                # icon file
-                if conf.has_key('package_path'):
-                    self.icon_file = "%s/domogik_packages/design/%s/%s/icon.png" % (conf['package_path'], pkg_type, id)
-                else:
-                    self.icon_file = "%s/%s/%s/%s/icon.png" % (conf['src_prefix'], "share/domogik/design/", pkg_type, id)
-    
             elif path != None:
                 json_file = path
-                self.info_file = json_file
-                self.json = json.load(open(self.info_file))
-                self.icon_file = None
+                icon_file = None
+                self.json = json.load(open(json_file))
 
             elif url != None:
                 json_file = url
-                self.info_file = json_file
+                icon_file = None
                 json_data = urllib2.urlopen(json_file)
                 self.json = json.load(xml_data)
-                self.icon_file = None
 
             self.validate()
 
             # complete json
-            self.json["identity"]["fullname"] = "%s-%s" % (self.json["identity"]["type"],
-                                                           self.json["identity"]["id"])
-            self.json["identity"]["info_file"] = self.info_file
-            self.json["identity"]["icon_file"] = self.icon_file
-            self.json["all_files"] = self.json["files"]
+            self.json["identity"]["package_id"] = "%s-%s" % (self.json["identity"]["type"],
+                                                           self.json["identity"]["name"])
+            self.json["identity"]["icon_file"] = icon_file
         except PackageException as exp:
             raise PackageException(exp.value)
         except:
@@ -162,7 +154,7 @@ class PackageJson():
         if self.json["json_version"] == 2:
             self._validate_02()
         else:
-            return True
+            return False
 
     def _validate_keys(self, expected, name, lst, optional=[]):
         for exp in expected:
@@ -176,12 +168,26 @@ class PackageJson():
     def _validate_02(self):
         try:
             #check that all main keys are in the file
-            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "files", "json_version"]
-            self._validate_keys(expected, "file", self.json.keys(), ["products", "udev-rules", "external"])
+            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
+            self._validate_keys(expected, "file", self.json.keys(), ["products", "external"])
+            # validate identity
+            expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
+            optional = ["tags", "dependencies", "package_id", "icon_file"]
+            self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)
+            # validate configuration
+            expected = ["default", "description", "key", "name", "required", "type"]
+            optional = ["sort", "max_value", "min_value", "choices", "mask", "multiline"]
+            for conf in self.json["configuration"]:
+                self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
+            # validate procuts
+            if 'products' in self.json.keys():
+                expected = ["name", "id", "documentation", "type"]
+                for prod in self.json['products']:
+                    self._validate_keys(expected, "a product", prod.keys())
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
-                expected = ['id', 'name', 'description', 'commands', 'sensors', 'xpl_params']
+                expected = ['id', 'name', 'description', 'commands', 'sensors', 'parameters']
                 self._validate_keys(expected, "device_type {0}".format(devtype), devt.keys())
                 #check that all commands exists inisde each device_type
                 for cmd in devt["commands"]:
@@ -193,17 +199,17 @@ class PackageJson():
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description"]
-                optional = ["max_value", "min_value"]
-                for par in devt["xpl_params"]:
-                    self._validate_keys(expected, "a xpl_param for device_type {0}".format(devtype), par.keys(), optional)
+                optional = ["max_value", "min_value", "choices", "mask", "multiline"]
+                for par in devt["parameters"]:
+                    self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
             #validate the commands
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
-                expected = ['name', 'return_confirmation', 'params', 'xpl_command']
+                expected = ['name', 'return_confirmation', 'parameters', 'xpl_command']
                 self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
                 # validate the params
                 expected = ['key', 'data_type', 'conversion']
-                for par in cmd['params']:
+                for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
                 if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
@@ -211,8 +217,10 @@ class PackageJson():
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'data_type', 'conversion']
+                expected = ['name', 'data_type', 'conversion', 'history']
+                hexpected = ['store', 'max', 'expire', 'round_value']
                 self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
+                self._validate_keys(hexpected, "sensor {0} history".format(senid), sens['history'].keys())
             #validate the xpl command
             for xcmdid in self.json["xpl_commands"]:
                 xcmd = self.json["xpl_commands"][xcmdid]
@@ -269,25 +277,27 @@ class PackageJson():
         my_file.write(json.dumps(my_json))
         my_file.close()
 
+    def get_json(self):
+        """ Return the json data
+        """
+        return self.json
+
     def display(self):
         """ Display xml data in a fine way
         """
-        print("---- Package informations -------------------------------")
-        print("Type                : %s" % self.json["identity"]["type"])
-        print("Id                  : %s" % self.json["identity"]["id"])
-        print("Full name           : %s" % self.json["identity"]["fullname"])
-        print("Version             : %s" % self.json["identity"]["version"])
-        print("Category            : %s" % self.json["identity"]["category"])
-        print("Link for doc        : %s" % self.json["identity"]["documentation"])
-        print("Description         : %s" % self.json["identity"]["description"])
-        print("Changelog           : %s" % self.json["identity"]["changelog"])
-        print("Author              : %s" % self.json["identity"]["author"])
-        print("Author's email      : %s" % self.json["identity"]["author_email"])
-        print("Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
-        print("----- Package files -------------------------------------")
-        for my_file in self.json["files"]:
-            print("- %s" % my_file)
-        print("---------------------------------------------------------")
+        print(u"---- Package informations -------------------------------")
+        print(u"Type                : %s" % self.json["identity"]["type"])
+        print(u"Name                : %s" % self.json["identity"]["name"])
+        print(u"Package id          : %s" % self.json["identity"]["package_id"])
+        print(u"Version             : %s" % self.json["identity"]["version"])
+        print(u"Tags                : %s" % self.json["identity"]["tags"])
+        print(u"Link for doc        : %s" % self.json["identity"]["documentation"])
+        print(u"Description         : %s" % self.json["identity"]["description"])
+        print(u"Changelog           : %s" % self.json["identity"]["changelog"])
+        print(u"Author              : %s" % self.json["identity"]["author"])
+        print(u"Author's email      : %s" % self.json["identity"]["author_email"])
+        print(u"Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
+        print(u"---------------------------------------------------------")
 
     def find_xplstats_for_device_type(self, devtype):
         if self.json["json_version"] != 2:

@@ -20,3 +20,4 @@ domogik.sqlite
 dist/ 
 build/
 _build/*
+install.log

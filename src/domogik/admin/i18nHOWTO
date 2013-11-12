@@ -1,0 +1,15 @@
+#To update if new strings need to be added
+
+pybabel extract -F babel.cfg -o translations/messages.pot .
+
+#To update all the translation files
+
+pybabel update -i translations/messages.pot -d translations
+
+#To compile the translations
+
+pybabel compile -d translations
+
+#To add a new translation
+
+pybabel init -i translations/messages.pot -d translations -l <locale>

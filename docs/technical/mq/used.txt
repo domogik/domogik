@@ -2,25 +2,107 @@
 Used MQ messages
 ========================
 
+You can find examples for req and sub in *src/domogik/examples/mq-python/*
+
+The detailed informations are available in:
+
+* :doc:`pub/sub detailed informations <pubsub_detailed>`
+* :doc:`req/rep detailed informations <reqrep_detailed>`
+ 
+
 List of MQ messages used for req/rep pattern
 ============================================
 
-======================= =========== =========== =============
-Source			Destination action req 	action rep
-======================= =========== ===========	=============
-Rest			statManager reload     	reload.result
------------------------ ----------- ----------- -------------
-Plugin			dbManager   config.get  config.result
------------------------ ----------- ----------- -------------
-Plugin			dbManager   config.set  config.result
-======================= =========== =========== =============
+* source : the one which makes the REQ request
+* destination : the one which replies a REP reply to the REQ request
+
+Rules to apply
+--------------
+
+* An *action request header* ends by *.get* if its purpose si to get informations/data.
+* An *action request header* ends by *.do* if its purpose is to launch an action.
+* In all cases, the *reply header* will ends by *.result*
+* For all *.do*, the reply must contains these keys : 
+
+  * status = True / False
+  * reason = "a reason if status = False, empty is status = True"
+
+======================= =================== =================== ====================== ========================
+Source                  Destination         action req          action rep             Python example
+======================= =================== =================== ====================== ========================
+rest                    xplgw               reload              reload.result          req_reload.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+plugin (any)            dbmgr               config.get          config.result          req_config_get.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     dbmgr               config.set          config.result          req_config_set.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     dbmgr               config.delete       config.result          req_config_delete.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     manager             client.list.get     client.list.result     req_client_list.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     manager             client.detail.get   client.detail.result   req_client_detail.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+Rest                    manager             device_types.get    device_types.result    req_device_types.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     manager             package.detail.get  package.detail.result  req_package_detail.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     manager             plugin.start.do     plugin.start.result    req_plugin_start.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      plugin.stop.do      plugin.stop.result     req_plugin_stop.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      helper.list.get     helper.list.result     req_helper_list.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      helper.help.get     helper.help.result     req_helper_help.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     plugin (by id)      helper.do           helper.do.result       req_helper_do.py
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            test.list           scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            test.create         scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            action.list         scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            action.create       scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            parameter.list      scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.list       scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.get        scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.create     scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+UIs                     scenario            scenario.eval       scenario.result
+----------------------- ------------------- ------------------- ---------------------- ------------------------
+rest, scenario          xplgw               cmd.send            cmd.send.result        req_xplcmd_send.py
+======================= =================== =================== ====================== ========================
+
+*clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.
 
 
 List of MQ messages used for pub/sub pattern
 ============================================
 
-======================= =========== ========================
-Source			Destination Header
-======================= =========== ========================
-statManager		Rest	    statmgr.received
-======================= =========== ========================
+* source : the one which publishes messages over the MQ
+* destination : used by : the ones which subscribe to the published data
+
+======================= =================== ====================== =====================
+Source                  Used by             Header                 Python example
+======================= =================== ====================== =====================
+xplgw                   rest                device-stats
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            manager             plugin.status          sub_plugin_status.py
+                        UIs
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            manager             plugin.configuration   sub_plugin_configuration.py
+                        UIs
+----------------------- ------------------- ---------------------- ---------------------
+manager                 UIs                 client.list            sub_client_list.py
+----------------------- ------------------- ---------------------- ---------------------
+manager                 UIs                 client.detail          sub_client_detail.py
+----------------------- ------------------- ---------------------- ---------------------
+manager                 UIs                 package.detail         sub_package_detail.py
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            UIs                 helper.publish         
+======================= =================== ====================== =====================
+

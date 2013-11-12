@@ -1,0 +1,25 @@
+================
+Udev rules files
+================
+
+Purpose
+=======
+
+Each plugin has a *udev* folder. This folder can contain (if needed) some sample udev rules. There can be only one file if the plugin handles only one hardware interface or many files if many hardware interfaces could be used.
+In the files, you must add some comments.
+
+Example : onewire-ds9490r.rules
+===============================
+
+This file is for one of the available hardware interfaces handled by the onewire plugin.
+
+::
+
+    # model : DS9490R
+    # description : Usb DS9490R adaptator
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", SYMLINK+="onewire", MODE="0666"
+
+
+* model : related device model.
+* description : short desciption of the rule. Indicate the related device model here.
+

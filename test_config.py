@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -39,6 +39,7 @@ import pwd
 import sys
 from multiprocessing import Process, Pipe
 from socket import gethostbyname, gethostname
+from domogik.common.utils import get_ip_for_interfaces
 
 BLUE = '\033[94m'
 OK = '\033[92m'
@@ -170,7 +171,7 @@ def test_config_files():
     user_home = user_entry.pw_dir
     assert os.path.isfile("/etc/domogik/domogik.cfg"), "The domogik config file /etc/domogik/domogik.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
     ok("Domogik's user exists and has a config file")
-    
+
     test_user_config_file(user_home, user_entry)
 
 def _test_user_can_write(conn, path, user_entry):
@@ -203,7 +204,7 @@ def test_user_config_file(user_home, user_entry):
     import ConfigParser
     config = ConfigParser.ConfigParser()
     config.read("/etc/domogik/domogik.cfg")
-    
+
     #check [domogik] section
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
@@ -237,7 +238,7 @@ def test_user_config_file(user_home, user_entry):
 
     # check [database] section
     info("Parse [database] section")
-    assert database['db_type'] == 'mysql', "Only mysql database type is supported at the moment"
+    assert database['type'] == 'mysql', "Only mysql database type is supported at the moment"
 
     uid = user_entry.pw_uid
     os.setreuid(0,uid)
@@ -248,12 +249,13 @@ def test_user_config_file(user_home, user_entry):
     os.setreuid(0,0)
     os.environ['HOME'] = old_home
     assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
-        
+
     ok("[database] section seems good")
-    
+
     # Check [rest] section
     info("Parse [rest] section")
-    _check_port_availability(rest['rest_server_ip'], rest['rest_server_port'])
+    for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):
+        _check_port_availability(ipadd, rest['port'])
     ok("Rest server IP/port is not bound by anything else")
 
 def test_init():
@@ -266,33 +268,38 @@ def test_init():
 def test_version():
     info("Check python version")
     v = sys.version_info
-    assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
-    ok("Python version is >= 2.6")
+    assert not (v[0] == 2 and v[1] < 7), "Python version is %s.%s, it must be >= 2.7, please upgrade" % (v[0], v[1])
+    ok("Python version is >= 2.7")
 
 def test_hostname():
     info("Check hostname")
-    assert len(gethostname().split('.')[0]) < 16, "Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
-            Please change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again."
-    ok("Hostname length is < 16.")
+    #assert len(gethostname().split('.')[0]) < 16, "Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
+    if len(gethostname().split('.')[0]) < 16:
+        warning("Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
+            You should change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again.")
+    #ok("Hostname length is < 16.")
     if gethostname().count("-") > 0:
         warning("Your hostname is '%s'. It shouldn't contain the character '-'." % gethostname())
     else:
         ok("Hostname characters are OK")
 
-try:
-    am_i_root()
-    test_imports()
-    test_hostname()
-    test_config_files()
-    test_init()
-    test_version()
-    print("\n\n")
-    ok("================================================== <==")
-    ok(" Everything seems ok, you should be able to start  <==")
-    ok("      Domogik with /etc/init.d/domogik start       <==")
-    ok("            or /etc/rc.d/domogik start             <==")
-    ok(" You can now install Domoweb User Interface        <==")
-    ok("================================================== <==")
-except:
-    fail(sys.exc_info()[1])
+def test_config():
+    try:
+        am_i_root()
+        test_imports()
+        test_hostname()
+        test_config_files()
+        test_init()
+        test_version()
+        print("\n\n")
+        ok("================================================== <==")
+        ok(" Everything seems ok, you should be able to start  <==")
+        ok("      Domogik with /etc/init.d/domogik start       <==")
+        ok("            or /etc/rc.d/domogik start             <==")
+        ok(" You can now install Domoweb User Interface        <==")
+        ok("================================================== <==")
+    except:
+        fail(sys.exc_info()[1])
 
+if __name__ == "__main__":
+    test_config()

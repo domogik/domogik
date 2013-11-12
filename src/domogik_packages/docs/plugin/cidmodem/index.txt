@@ -1,8 +1,0 @@
-.. _index:
-
-================
-Table of content
-================
-
-* :doc:`Plugin documentation </cidmodem>`
-* :doc:`Helpers documentation </helpers>`

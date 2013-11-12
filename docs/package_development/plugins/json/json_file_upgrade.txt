@@ -1,0 +1,32 @@
+==========================================================
+Plugins json file upgrade from version 1 to json version 2
+==========================================================
+
+Purpose
+=======
+This document describes the step to follow for upgrading the plugin json file from version 1 to 2.
+With json version 2 the url2xpl and the stats xml files are deprecated, the contens of these files are moved to the plugin json file.
+This document only describes how to upgrade.
+
+TODO : finish
+
+* configuration
+
+  * id => sort
+  * minus => underscore in keys
+  * yes/no => true/false
+  * empty => null
+  * no more interface
+  * optionnal => required
+  * startup-plugin => auto_startup
+  * ajout de name
+  * option optionnelles en fonction de type
+
+* no more files section
+* identity
+
+  * no more changelog
+  * category => tags
+  * id => name
+
+* ...

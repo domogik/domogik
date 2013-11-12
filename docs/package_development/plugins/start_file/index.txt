@@ -1,0 +1,28 @@
+========
+start.sh
+========
+
+Purpose
+=======
+
+The **start.sh** file is only an helper for the developpers and people who want to test the plugin from the command line. It will override the PYTHONPATH environment variable and launch the plugin.
+
+Create the start.sh
+===================
+
+Assuming your plugin name is *myplugin*, create the **start.sh** file like this (you just need to update the first line): ::
+
+    $ PLUGIN_ID=myplugin
+    $ echo "export PYTHONPATH=/var/lib/domogik && /usr/bin/python bin/$PLUGIN_ID.py -f" > start.sh
+    $ chmod u+x start.sh
+
+Use it
+======
+
+To launch the plugin in foreground (it is better during the plugin development), just launch **start.sh**: ::
+
+    $ cd /var/lib/domogik/domogik_packages/plugin_myplugin
+    $ ./start.sh
+
+The plugin will be launched in foreground. To stop it, you can use (ctrl)-(C).
+

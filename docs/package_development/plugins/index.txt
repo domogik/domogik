@@ -1,0 +1,68 @@
+====================
+Packages development
+====================
+
+* :doc:`What is new in 0.4 about Domogik plugins format ? <what_is_new_in_0.4>`
+
+
+* :doc:`Release numbers rules <releases/release_numbers_rules>`
+* :doc:`Create the plugin repository on GitHub <create_repository/index>`
+* :doc:`Write specifications <specifications/index>`
+* :doc:`Plugin file tree <plugin_file_tree/index>`
+* :doc:`Readme and changelog files <readme_and_changelog/index>`
+* :doc:`.gitignore file <git/gitignore>`
+* :doc:`start.sh file <start_file/index>`
+* :doc:`Json file <json/index>`
+
+  * :doc:`Sample json file <json/sample>`
+  * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
+  * :doc:`Identity part <json/identity>`
+  * :doc:`Configuration part <json/configuration>`
+  * :doc:`Device types part <json/device_types>`
+  * :doc:`Sensors part <json/sensors>` 
+  * :doc:`Xpl stats part <json/xpl_stats>`
+  * :doc:`Commands part <json/commands>` ....................................TODO 
+  * :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
+  * :doc:`Json version part <json/version>` ....................................TODO
+
+* :doc:`Udev files <udev_rules/index>`
+* :doc:`Data types <data_types/index>`
+* :doc:`Field types <field_types/index>`
+
+* :doc:`Tests <tests/index>` ....................................TODO
+
+  * :doc:`Travis CI templates <tests/travis_templates>` ....................................TODO
+
+* Python part
+  
+  * :doc:`__init__.py files <python/init_files>`
+  * :doc:`Bin part <python/bin_part>`
+  * :doc:`Library part <python/lib_part>`
+  * How to ...
+
+    * log in a file
+    * manage infinite loop without *while True*
+    * create a timer
+    * ...
+
+  * Helpers
+
+    * ...
+
+* Graphical resources
+
+  * :doc:`Icon <graphical/icon_file>`
+
+* Data files
+* Documentation
+
+  * :doc:`Doc tree <doc/tree>`
+  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
+  * :doc:`What should contain the documentation ? <doc/content>`
+  * :doc:`The developpers part <doc/dev>`
+
+* Tests
+* Nightly builds
+* Errors
+
+  * Errors handled by baseplugin/plugin ................ TODO

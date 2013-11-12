@@ -1,6 +1,0 @@
-=======
-Helpers
-=======
-
-This plugin has no helper.
-
