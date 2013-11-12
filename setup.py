@@ -97,7 +97,7 @@ setup(
 	    """
         ]
     },
-    classtifiers=[
+    classifiers=[
         "Topic :: Home Automation",
         "Environment :: No Input/Output (Daemon)",
         "Programming Language :: Python",
