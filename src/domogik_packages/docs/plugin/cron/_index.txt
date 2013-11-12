@@ -1,5 +1,0 @@
-* :doc:`Plugin documentation </cron>`
-* :doc:`Admin documentation </admin>`
-* :doc:`Helpers documentation </helpers>`
-* :doc:`Developpers documentation </developpers>`
-* :doc:`Cron_query API </cron_query>`
