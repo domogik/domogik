@@ -5,7 +5,7 @@
 {% include "client_menu.html" %}
 <div class="container">
     {{ params }}
-    <h2>Create a new device {{ dtype }}</h2>
+    <h2>{% trans %}Create a new device{% endtrans %} {{ dtype }}</h2>
     {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
 </div>
 {% endblock %}

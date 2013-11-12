@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-12 13:04+0100\n"
+"POT-Creation-Date: 2013-11-12 16:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,122 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: templates/clients.html:5
-msgid "Client list"
+#: templates/client_config.html:7 templates/base/nav.html:13
+#: templates/base/nav.html:26
+msgid "Configuration"
 msgstr ""
 
-#: templates/clients.html:10 templates/orphans.html:10
+#: templates/client_detected.html:6
+msgid "Detected devices"
+msgstr ""
+
+#: templates/client_device_new.html:6 templates/client_device_new_wiz.html:8
+msgid "Create a new device"
+msgstr ""
+
+#: templates/client_device_new.html:8
+msgid "Create by product"
+msgstr ""
+
+#: templates/client_device_new.html:15
+msgid "Create by device type"
+msgstr ""
+
+#: templates/client_device_new.html:20
+msgid "No device types found"
+msgstr ""
+
+#: templates/client_devices.html:6
+msgid "Known Devices"
+msgstr ""
+
+#: templates/client_devices.html:11 templates/client_devices.html:38
+#: templates/client_devices.html:63 templates/clients.html:10
+#: templates/orphans.html:10
 msgid "ID"
+msgstr ""
+
+#: templates/client_devices.html:12 templates/client_devices.html:39
+#: templates/client_devices.html:64 templates/orphans.html:12
+msgid "Name"
+msgstr ""
+
+#: templates/client_devices.html:13 templates/orphans.html:13
+msgid "Device Type"
+msgstr ""
+
+#: templates/client_devices.html:14 templates/orphans.html:14
+msgid "Description"
+msgstr ""
+
+#: templates/client_devices.html:15 templates/client_devices.html:26
+#: templates/clients.html:13 templates/clients.html:28
+#: templates/orphans.html:15
+msgid "Details"
+msgstr ""
+
+#: templates/client_devices.html:28
+msgid "Delete"
+msgstr ""
+
+#: templates/client_devices.html:34
+msgid "Sensors"
+msgstr ""
+
+#: templates/client_devices.html:40
+msgid "Data Type"
+msgstr ""
+
+#: templates/client_devices.html:41
+msgid "Last value"
+msgstr ""
+
+#: templates/client_devices.html:42
+msgid "Last received"
+msgstr ""
+
+#: templates/client_devices.html:59
+msgid "Commands"
+msgstr ""
+
+#: templates/client_devices.html:65
+msgid "Params"
+msgstr ""
+
+#: templates/client_devices.html:87
+msgid "No devices found"
+msgstr ""
+
+#: templates/client_menu.html:3 templates/orphans.html:11
+msgid "Client"
+msgstr ""
+
+#: templates/client_menu.html:5 templates/base/nav.html:22
+msgid "Home"
+msgstr ""
+
+#: templates/client_menu.html:6
+msgid "Config"
+msgstr ""
+
+#: templates/client_menu.html:8
+msgid "Devices"
+msgstr ""
+
+#: templates/client_menu.html:10
+msgid "Known"
+msgstr ""
+
+#: templates/client_menu.html:11
+msgid "Detected"
+msgstr ""
+
+#: templates/client_menu.html:12
+msgid "New"
+msgstr ""
+
+#: templates/clients.html:5
+msgid "Client list"
 msgstr ""
 
 #: templates/clients.html:11
@@ -31,11 +141,6 @@ msgstr ""
 
 #: templates/clients.html:12
 msgid "Configured"
-msgstr ""
-
-#: templates/clients.html:13 templates/clients.html:28
-#: templates/orphans.html:15
-msgid "Details"
 msgstr ""
 
 #: templates/clients.html:36
@@ -48,22 +153,6 @@ msgstr ""
 
 #: templates/orphans.html:5
 msgid "Orphan Devices"
-msgstr ""
-
-#: templates/orphans.html:11
-msgid "Client"
-msgstr ""
-
-#: templates/orphans.html:12
-msgid "Name"
-msgstr ""
-
-#: templates/orphans.html:13
-msgid "Device Type"
-msgstr ""
-
-#: templates/orphans.html:14
-msgid "Description"
 msgstr ""
 
 #: templates/orphans.html:34
@@ -82,10 +171,6 @@ msgstr ""
 msgid "Auth"
 msgstr ""
 
-#: templates/base/nav.html:13 templates/base/nav.html:26
-msgid "Configuration"
-msgstr ""
-
 #: templates/base/nav.html:16 templates/base/nav.html:28
 msgid "Logout"
 msgstr ""
@@ -94,19 +179,51 @@ msgstr ""
 msgid "Menu"
 msgstr ""
 
-#: templates/base/nav.html:22
-msgid "Home"
+#: views/clients.py:156
+msgid "Config saved successfull"
 msgstr ""
 
-#: views/login.py:37
+#: views/clients.py:158
+msgid "Config saved failed"
+msgstr ""
+
+#: views/clients.py:161
+msgid "DbMgr did not respond on the config.set, check the logs"
+msgstr ""
+
+#: views/clients.py:207
+msgid "the display name for this device"
+msgstr ""
+
+#: views/clients.py:208
+msgid "A description for this device"
+msgstr ""
+
+#: views/clients.py:209
+msgid "A reference for this device"
+msgstr ""
+
+#: views/clients.py:234
+msgid "Device creation failed"
+msgstr ""
+
+#: views/clients.py:235
+msgid "Can not find this client id"
+msgstr ""
+
+#: views/clients.py:260
+msgid "device created"
+msgstr ""
+
+#: views/login.py:51
 msgid "Login successfull"
 msgstr ""
 
-#: views/login.py:40
+#: views/login.py:54
 msgid "This user is not an admin"
 msgstr ""
 
-#: views/login.py:42
+#: views/login.py:56
 msgid "Combination of username and password wrong"
 msgstr ""
 

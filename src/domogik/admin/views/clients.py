@@ -153,12 +153,12 @@ def client_config(client_id):
         if res is not None:
             data = res.get_data()
             if data["status"]:
-                flash('Config save successfull', 'success')
+                flash(gettext("Config saved successfull"), 'success')
             else:
-                flash('Config save failed', 'warning')
+                flash(gettext("Config saved failed"), 'warning')
                 flash(data["reason"], 'danger')
         else:
-            flash('DbMgr did not respond on the config.set, check the logs', 'danger')
+            flash(gettext("DbMgr did not respond on the config.set, check the logs"), 'danger')
 
     return render_template('client_config.html',
             form = form,
@@ -204,9 +204,9 @@ def client_devices_new_wiz(client_id, device_type_id):
 
     # dynamically generate the wtfform
     class F(Form):
-        name = TextField("Device", [Required()], description="the display name for this device")
-        description = TextField("Description", description="A description for this device")
-        reference = TextField("Reference", description="A reference for this device")
+        name = TextField("Device", [Required()], description=gettext("the display name for this device"))
+        description = TextField("Description", description=gettext("A description for this device"))
+        reference = TextField("Reference", description=gettext("A reference for this device"))
         submit = SubmitField("Send")
         pass
     # add the global params
@@ -231,8 +231,8 @@ def client_devices_new_wiz(client_id, device_type_id):
             detaila = res.get_data()
             client_data = detaila[client_id]['data']
         else:
-            flash("Device creation failed", "warning")
-            flash("Can not find this client id", "danger")
+            flash(gettext("Device creation failed"), "warning")
+            flash(gettext("Can not find this client id"), "danger")
             return redirect("/client/{0}/devices/known".format(client_id))
         with app.db.session_scope():
             # create the device
@@ -257,7 +257,7 @@ def client_devices_new_wiz(client_id, device_type_id):
             msg.set_action( 'reload' )
             resp = req.request('xplgw', msg.get(), 100)
             # inform the user
-            flash("device created", "success")
+            flash(gettext("device created"), "success")
             return redirect("/client/{0}/devices/known".format(client_id))
 
     return render_template('client_device_new_wiz.html',

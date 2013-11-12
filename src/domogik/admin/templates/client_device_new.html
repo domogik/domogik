@@ -3,21 +3,21 @@
 {% block content %}
 {% include "client_menu.html" %}
 <div class="container">
-    <h2>Create a new device</h2>
+    <h2>{% trans %}Create a new device{% endtrans %}</h2>
     {% if products|length > 0 %}
-        <h3>Create by product</h3>
+    <h3>{% trans %}Create by product{% endtrans %}</h3>
         {% for name, type in products.items() %}
         <a href="/client/{{ clientid }}/devices/new/{{ type }}"><button type="button" class="btn btn-default btn-sm">{{ name }}</button></a>
         {% endfor %}
     {% endif %}
 
     {% if device_types|length > 0 %}
-        <h3>Create by device type</h3>
+    <h3>{% trans %}Create by device type{% endtrans %}</h3>
         {% for dev in device_types %}
         <a href="/client/{{ clientid }}/devices/new/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ dev }}</button></a>
         {% endfor %}
     {% else %}
-        <div class="alert alert-warning">No devices types found</div>
+    <div class="alert alert-warning">{% trans %}No device types found{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}

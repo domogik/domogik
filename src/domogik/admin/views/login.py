@@ -1,8 +1,8 @@
-from domogik.admin.application import app, login_manager
+from domogik.admin.application import app, login_manager, babel
 from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user, current_user
 from wtforms import form, fields, validators
 
 class LoginForm(form.Form):
@@ -25,8 +25,22 @@ def load_user(userid):
 def rediret_to_login():
     return redirect('/login')
 
+@babel.localeselector
+def get_locale():
+    if request.accept_languages.best_match(['en', 'fr']) is not None:
+        return request.accept_languages.best_match(['en', 'fr'])
+    else:
+        return 'en'
+
 @app.route('/login', methods=('GET', 'POST'))
 def login():
+    print request.user_agent.platform
+    print request.user_agent.language
+    print request.user_agent.browser
+    print request.user_agent.version
+    print request.headers.get('User-Agent')
+    print request.accept_languages.best_match(['en', 'fr'])
+    print "============"
     fform = LoginForm(request.form)
     if request.method == 'POST' and fform.validate():
         with app.db.session_scope():

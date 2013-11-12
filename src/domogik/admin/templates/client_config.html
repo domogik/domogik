@@ -4,7 +4,7 @@
 {% block content %}
 {% include "client_menu.html" %}
 <div class="container">
-    <h2> Configuration</h2>
+    <h2>{% trans %}Configuration{% endtrans %}</h2>
     {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
 </div>
 {% endblock %}
