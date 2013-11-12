@@ -3,6 +3,7 @@ from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from flask_login import login_required
+from flask.ext.babel import gettext, ngettext
 
 @app.route('/orphans')
 @login_required
@@ -40,5 +41,5 @@ def orphans_delete(did):
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    flash("Device deleted", "success")
+    flash(gettext("Device deleted"), "success")
     return redirect("/orphans")

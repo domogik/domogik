@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_wtf import Form, RecaptchaField
 from flask_login import LoginManager
+from flask.ext.babel import Babel
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
@@ -17,6 +18,7 @@ else:
 login_manager = LoginManager()
 app = Flask(__name__)
 login_manager.init_app(app)
+babel = Babel(app)
 
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter

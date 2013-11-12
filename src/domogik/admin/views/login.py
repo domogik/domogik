@@ -34,12 +34,12 @@ def login():
                 user = app.db.get_user_account_by_login(request.form["user"])
                 if user.is_admin:
                     login_user(user)
-                    flash("Login successfull", "success")
+                    flash(gettext("Login successfull"), "success")
                     return redirect('/')
                 else:
-                    flash("This user is not an admin", "warning")
+                    flash(gettext("This user is not an admin"), "warning")
             else:
-                flash("Combination of username and password wrong", "warning")
+                flash(gettext("Combination of username and password wrong"), "warning")
     return render_template('login.html',
         form=fform,
         nonav = True)

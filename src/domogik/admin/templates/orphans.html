@@ -2,17 +2,17 @@
 
 {% block content %}
 <div class="container">
-    <h2>Orphan Devices</h2>
+    <h2>{% trans %}Orphan Devices{% endtrans %}</h2>
     {% if devices|length > 0 %}
       <table class="table table-striped table-hover table-condensed">
             <thead>
                     <tr>
-                            <td>ID</td>
-                            <td>Client</td>
-                            <td>Name</td>
-                            <td>Device Type</td>
-                            <td>Description</td>
-                            <td>Details</td>
+                        <td>{% trans %}ID{% endtrans %}</td>
+                        <td>{% trans %}Client{% endtrans %}</td>
+                        <td>{% trans %}Name{% endtrans %}</td>
+                        <td>{% trans %}Device Type{% endtrans %}</td>
+                        <td>{% trans %}Description{% endtrans %}</td>
+                        <td>{% trans %}Details{% endtrans %}</td>
                     </tr>
             </thead>
             <tbody>
@@ -31,7 +31,7 @@
             </tbody>
         </table>
     {% else %}
-    <div class="alert alert-success">Hooray, no orphans found</div>
+    <div class="alert alert-success">{% trans %}Hooray, no orphans found{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}

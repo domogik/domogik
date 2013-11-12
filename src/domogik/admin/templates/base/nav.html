@@ -7,25 +7,25 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="navbar-inner">
     <ul class="nav navbar-nav visible-md visible-lg">
-      <li{% if mactive == "clients" %} class="active" {% endif %}><a href="/clients">Clients</a></li>
-      <li{% if mactive == "orphans" %} class="active" {% endif %}><a href="/orphans">Orpahns</a></li>
-      <li{% if mactive == "auth" %} class="active" {% endif %}><a href="/auth">Auth</a></li>
-      <li{% if mactive == "config" %} class="active" {% endif %}><a href="/config">Configuration</a></li>
+        <li{% if mactive == "clients" %} class="active" {% endif %}><a href="/clients">{% trans %}Clients{% endtrans%}</a></li>
+      <li{% if mactive == "orphans" %} class="active" {% endif %}><a href="/orphans">{% trans %}Orphans{% endtrans%}</a></li>
+      <li{% if mactive == "auth" %} class="active" {% endif %}><a href="/auth">{% trans %}Auth{% endtrans%}</a></li>
+      <li{% if mactive == "config" %} class="active" {% endif %}><a href="/config">{% trans %}Configuration{% endtrans%}</a></li>
     </ul>
     <ul class="nav navbar-nav visible-md visible-lg navbar-right">
-      <li><a href="/logout">Logout</a></li>
+        <li><a href="/logout">{% trans %}Logout{% endtrans%}</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right hidden-md hidden-lg">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu <b class="caret"></b></a>
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Menu{% endtrans%} <b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a href="/">Home</a></li>
-          <li><a href="/clients">Clients</a></li>
-          <li><a href="/orphans">Orphans</a></li>
-          <li><a href="/auth">Auth</a></li>
-          <li><a href="/config">Configuration</a></li>
+            <li><a href="/">{% trans %}Home{% endtrans%}</a></li>
+            <li><a href="/clients">{% trans %}Clients{% endtrans%}</a></li>
+            <li><a href="/orphans">{% trans %}Orphans{% endtrans%}</a></li>
+            <li><a href="/auth">{% trans %}Auth{% endtrans%}</a></li>
+            <li><a href="/config">{% trans %}Configuration{% endtrans%}</a></li>
           <li class="divider"></li>
-          <li><a href="/logout">Logout</a></li>
+          <li><a href="/logout">{% trans %}Logout{% endtrans%}</a></li>
         </ul>
       </li>
     </ul>
