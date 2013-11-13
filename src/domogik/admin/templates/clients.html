@@ -4,7 +4,7 @@
 <div class="container">
     <h1>{% trans %}Client list{% endtrans %}</h1>
     {% if clients|length > 0 %}
-      <table class="table table-striped table-hover table-condensed">
+      <table class="table table-condensed" style="border-collapse:collapse;">
             <thead>
                     <tr>
                         <td>{% trans %}ID{% endtrans %}</td>
@@ -15,19 +15,24 @@
             </thead>
             <tbody>
             {% for name, data in clients.iteritems() %}
+                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle">
+                        <td>{{ name }}</td>
+                        <td>{{ data.status }}</td>
+                        <td>{{ data.configured }}</td>
+                        <td>
+                            {% if data.configured %}
+                                <a href="/client/{{ name }}">
+                            {% else %}
+                                <a href="/client/{{ name }}/config">
+                            {% endif %}
+                            {% trans %}Details{% endtrans %}
+                            </a>
+                        </td>
+                    </tr>
                     <tr>
-                            <td>{{ name }}</td>
-                            <td>{{ data.status }}</td>
-                            <td>{{ data.configured }}</td>
-                            <td>
-                                {% if data.configured %}
-                                    <a href="/client/{{ name }}">
-                                {% else %}
-                                    <a href="/client/{{ name }}/config">
-                                {% endif %}
-                                    {% trans %}Details{% endtrans %}
-                                    </a>
-                            </td>
+                        <td colspan="4" class="hiddenRow">
+                            {% include 'client_overview.html' %}
+                        </td>
                     </tr>
             {% endfor %}
             </tbody>

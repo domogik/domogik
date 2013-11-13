@@ -2,6 +2,25 @@
 Domogik admin default theme
 */
 
+/* collapse table */
+.hiddenRow {
+    padding: 0 !important;
+}
+
+/* client list */
+.status div {
+    display: inline-block;
+    margin-right: 2em;
+}
+
+.current_status {
+    background-color: #cccccc;
+}
+
+
+
+
+/*** delete below ****/
 .dmg_client {
     border: 1px solid black;
     margin-bottom: 1em;
@@ -14,6 +33,3 @@ Domogik admin default theme
     margin-right: 1em;
 }
 
-.current_status {
-    background-color: #cccccc;
-}
