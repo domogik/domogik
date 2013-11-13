@@ -1,0 +1,19 @@
+/*
+Domogik admin default theme
+*/
+
+.dmg_client {
+    border: 1px solid black;
+    margin-bottom: 1em;
+}
+
+
+.dmg_client .status div {
+    display: inline-block;
+    border: 1px dashed black;
+    margin-right: 1em;
+}
+
+.current_status {
+    background-color: #cccccc;
+}
