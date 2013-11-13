@@ -1,6 +1,6 @@
 include ez_setup.py
 include setup.py
-include install.sh
+include install.py
 include README.txt
 include COPYING
 include test_config.py
