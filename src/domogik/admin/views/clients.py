@@ -7,6 +7,7 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField
 from wtforms.validators import Required
 from flask_login import login_required
+from flask.ext.babel import gettext, ngettext
 
 from domogik.rest.urls.device import get_device_params
 

@@ -4,6 +4,7 @@ from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from flask_login import login_required, login_user, logout_user, current_user
 from wtforms import form, fields, validators
+from flask.ext.babel import gettext, ngettext, get_locale
 
 class LoginForm(form.Form):
     user = fields.TextField('user', [validators.Required()])
@@ -27,19 +28,17 @@ def rediret_to_login():
 
 @babel.localeselector
 def get_locale():
-    if request.accept_languages.best_match(['en', 'fr']) is not None:
-        return request.accept_languages.best_match(['en', 'fr'])
-    else:
-        return 'en'
+    return 'nl_BE'
 
 @app.route('/login', methods=('GET', 'POST'))
 def login():
-    print request.user_agent.platform
-    print request.user_agent.language
-    print request.user_agent.browser
-    print request.user_agent.version
-    print request.headers.get('User-Agent')
-    print request.accept_languages.best_match(['en', 'fr'])
+    print get_locale()
+    #print request.user_agent.platform
+    #print request.user_agent.language
+    #print request.user_agent.browser
+    #print request.user_agent.version
+    #print request.headers.get('User-Agent')
+    #print request.accept_languages.best_match(['en', 'fr'])
     print "============"
     fform = LoginForm(request.form)
     if request.method == 'POST' and fform.validate():
