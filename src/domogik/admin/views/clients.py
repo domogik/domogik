@@ -25,6 +25,7 @@ def clients():
 
     return render_template('clients.html',
         mactve="clients",
+	overview_state="collapse",
         clients=client_list
         )
 
@@ -42,8 +43,9 @@ def client_detail(client_id):
         detail = {}
 
     return render_template('client.html',
+            loop = {'index': 1},
             clientid = client_id,
-            detail = detail,
+            data = detail,
             mactve="clients",
             active = 'home'
             )

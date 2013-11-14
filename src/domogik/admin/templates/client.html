@@ -3,6 +3,15 @@
 {% block content %}
 {% include "client_menu.html" %}
 <div class="container">
-    {{ detail }}
+	{% include 'client_overview.html' %}
+	<h2>{% trans %}Author{% endtrans %}</h2>
+	<ul>
+	    <li>{% trans %}Name{% endtrans %} : {{ data.data.identity.author }}</li>
+	    <li>{% trans %}Email{% endtrans %} : {{ data.data.identity.author_email }}</li>
+	</ul>
+	<div>
+		<button type="button" class="btn btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
+		<button type="button" class="btn btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
+	</div>
 </div>
 {% endblock %}

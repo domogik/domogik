@@ -33,12 +33,12 @@ def get_locale():
 @app.route('/login', methods=('GET', 'POST'))
 def login():
     print get_locale()
-    #print request.user_agent.platform
-    #print request.user_agent.language
-    #print request.user_agent.browser
-    #print request.user_agent.version
-    #print request.headers.get('User-Agent')
-    #print request.accept_languages.best_match(['en', 'fr'])
+    print request.user_agent.platform
+    print request.user_agent.language
+    print request.user_agent.browser
+    print request.user_agent.version
+    print request.headers.get('User-Agent')
+    print request.accept_languages.best_match(['en', 'fr'])
     print "============"
     fform = LoginForm(request.form)
     if request.method == 'POST' and fform.validate():

@@ -43,13 +43,33 @@ import locale
 from tornado.wsgi import WSGIContainer
 import traceback
 from tornado.httpserver import HTTPServer
+from tornado.web import FallbackHandler, Application
+from tornado.websocket import WebSocketHandler
 import zmq
 import signal
 zmq.eventloop.ioloop.install()
-from tornado.ioloop import IOLoop 
+from tornado.ioloop import IOLoop, PeriodicCallback 
 from domogik.admin.application import app as admin_app
+import time
 
 ################################################################################
+class AdminWebSocket(WebSocketHandler):
+    clients = set()
+
+    @staticmethod
+    def send_message():
+        for cli in AdminWebSocket.clients:
+            cli.write_message(time.ctime())
+
+    def open(self):
+	print"open"
+	print self
+        AdminWebSocket.clients.add(self)
+
+    def on_close(self):
+        AdminWebSocket.clients.remove(self)
+
+
 class Admin(XplPlugin):
     """ REST Server 
         - create a HTTP server 
@@ -116,6 +136,11 @@ class Admin(XplPlugin):
         # handler for getting the paths
         admin_app.resources_directory = self.get_resources_directory()
         
+	tapp = Application([
+		(r"/ws", AdminWebSocket),
+                (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
+	])
+
 	# create the server
         # for ssl, extra parameter to HTTPServier init
         if self.use_ssl is True:
@@ -123,9 +148,9 @@ class Admin(XplPlugin):
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
-	    self.http_server = HTTPServer(WSGIContainer(admin_app), ssl_options=ssl_options)
+	    self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
-            self.http_server = HTTPServer(WSGIContainer(admin_app))
+            self.http_server = HTTPServer(tapp)
 	# listen on the interfaces
 	if self.interfaces != "":
 	    intf = self.interfaces.split(',')
@@ -134,6 +159,7 @@ class Admin(XplPlugin):
         else:
             self.http_server.bind(int(self.port))
             self.http_server.start(1)
+        PeriodicCallback(AdminWebSocket.send_message,1000).start()
         return
 
     def stop_http(self):
