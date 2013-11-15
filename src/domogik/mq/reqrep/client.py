@@ -31,6 +31,7 @@ from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from zmq import select
 from domogik.mq.message import MQMessage
+from domogik.mq.socket import ZmqSocket
 try:
         from domogik.common.configloader import Loader
 except ImportError:
@@ -69,7 +70,7 @@ class MQSyncReq(object):
             ip = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-req_rep_port')
             endpoint = "tcp://{0}:{1}".format(ip.value, port.value)
-        self.socket = context.socket(zmq.REQ)
+        self.socket = ZmqSocket(context, zmq.REQ)
         self.socket.connect(endpoint)         
         return
 
@@ -89,6 +90,22 @@ class MQSyncReq(object):
         self.socket = None
         return
 
+    def rawrequest(self, service, msg, timeout=None):
+        if not timeout or timeout < 0.0:
+            timeout = None
+	if type(msg) in (bytes, unicode):
+            msg = [msg]
+	to_send = [self._proto_version, service]
+	to_send.extend(msg)
+	self.socket.send_multipart(to_send)
+	ret = None
+        rlist, _, _ = select([self.socket], [], [], timeout)
+        if rlist and rlist[0] == self.socket:
+            ret = self.socket.recv_multipart()
+            ret.pop(0) # remove service from reply
+            ret.pop(0)
+	return ret
+
     def request(self, service, msg, timeout=None):
         """Send the given message.
 
@@ -99,22 +116,10 @@ class MQSyncReq(object):
         
         :rtype : message parts
         """
-
-        if not timeout or timeout < 0.0:
-            timeout = None
-        if type(msg) in (bytes, unicode):
-            msg = [msg]
-        to_send = [self._proto_version, service]
-        to_send.extend(msg)
-        self.socket.send_multipart(to_send)
-        ret = None
-        msg = None
-        rlist, _, _ = select([self.socket], [], [], timeout)
-        if rlist and rlist[0] == self.socket:
-            ret = self.socket.recv_multipart()
-            ret.pop(0) # remove service from reply
-            ret.pop(0)
-            msg = MQMessage()
+	ret = self.rawrequest( service, msg, timeout)
+	msg = None
+	if ret:
+	    msg = MQMessage()
             msg.set(ret)
         return msg
 
@@ -164,7 +169,7 @@ class MqAsyncReq(object):
             ip = Parameter.objects.get(key='mq-ip')
             port = Parameter.objects.get(key='mq-req_rep_port')
             self.endpoint = "tcp://{0}:{1}".format(ip.value, port.value)
-        socket = context.socket(zmq.REQ)
+        socket = ZmqSocket(context, zmq.REQ)
         ioloop = IOLoop.instance()
         self.service = service
         self.stream = ZMQStream(socket, ioloop)

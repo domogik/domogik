@@ -36,6 +36,7 @@ from zmq.eventloop.ioloop import IOLoop, DelayedCallback, PeriodicCallback
 
 from domogik.mq.common import split_address
 from domogik.mq.message import MQMessage
+from domogik.mq.socket import ZmqSocket
 try:
         from domogik.common.configloader import Loader
 except ImportError:
@@ -84,7 +85,7 @@ class MQRep(object):
     def _create_stream(self):
         """Helper to create the socket and the stream.
         """
-        socket = self.context.socket(zmq.DEALER)
+        socket = ZmqSocket(self.context, zmq.DEALER)
         ioloop = IOLoop.instance()
         self.stream = ZMQStream(socket, ioloop)
         self.stream.on_recv(self._on_message)
@@ -107,11 +108,11 @@ class MQRep(object):
         """Method called every HB_INTERVAL milliseconds.
         """
         self.curr_liveness -= 1
-##         print '%.3f tick - %d' % (time.time(), self.curr_liveness)
+        print '%.3f tick - %d' % (time.time(), self.curr_liveness)
         self.send_hb()
         if self.curr_liveness >= 0:
             return
-        ## print '%.3f lost connection' % time.time()
+        print '%.3f lost connection' % time.time()
         # ouch, connection seems to be dead
         self.shutdown()
         # try to recreate it
