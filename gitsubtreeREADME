@@ -14,4 +14,4 @@ Updating it:
 Pshing back upstream (to zmq):
 1- commit normally
 2- git subtree push --prefix src/domogik/mq zmq master
-
+or git subtree push --prefix=src/domogik/mq git@github.com:domogik/zmq.git master
