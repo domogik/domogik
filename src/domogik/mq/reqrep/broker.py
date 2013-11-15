@@ -601,7 +601,7 @@ def main():
     my_conf = cfg.load()
     config = dict(my_conf[1])
 
-    #createDaemon()
+    createDaemon()
     context = zmq.Context()
     print "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
     broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
