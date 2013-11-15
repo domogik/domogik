@@ -318,7 +318,7 @@ def install():
                    default=False, help='Don\'t run a config writer')
     parser.add_argument('--no-create-user', dest='user_creation', \
                    action="store_false", \
-                   default=False, help='Don\'t create a user')
+                   default=True, help='Don\'t create a user')
     parser.add_argument('--no-db-upgrade', dest='db', action="store_true",
                    default=False, help='Don\'t do a db upgrade')
     parser.add_argument("--user",
