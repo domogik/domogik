@@ -36,7 +36,7 @@ Usage
 import zmq
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.configloader import Loader
-from domogik.common.utils import get_ip_for_interfaces
+from domogik.common.utils import get_ip_for_interfaces, is_already_launched
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 
@@ -69,10 +69,21 @@ def ask(question):
 def check_domogik_is_running():
     """ a function to check if domogik is running, and so if the tests can be done
     """
-    # currently, we only ask the user to check
-    #return ask("Notice that the plugin configuration will be reset for the tests!\nTests should only be done on dedicated environments!!!!!!!!!! Check that Domogik is up and.... are you ready ?")
-    return True
-    
+    ret = True
+    to_check = ['dmg_hub', 'dmg_broker', 'dmg_forwarder']
+    for chk in to_check:
+        status = is_already_launched(None, chk, False)
+        if not status[0]:
+            print("component {0} is not running".format(chk))
+            ret = False
+
+    to_check = ['rest', 'xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
+    for chk in to_check:
+        status = is_already_launched(None, chk)
+        if not status[0]:
+            print("component {0} is not running".format(chk))
+            ret = False
+    return ret
 
 def get_rest_url():
     """ Return the REST server url (constructed from the configuration file of the host)
