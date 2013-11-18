@@ -128,7 +128,7 @@ def is_already_launched(log, id):
  
     # the manager add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
-    cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2} | grep -v sudo".format(id, STARTED_BY_MANAGER, my_pid)
+    cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2} | grep -v sudo | grep -v su".format(id, STARTED_BY_MANAGER, my_pid)
     # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
 
     log.info("Looking for launched instances of '{0}'".format(id))
