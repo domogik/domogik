@@ -399,8 +399,8 @@ def install():
             os.setreuid(0,0)
             os.environ['HOME'] = old_home
 
-        if not args.test:
-            os.system('python test_config.py')
+        #if not args.test:
+        #    os.system('python test_config.py')
         print("\n\n")
     except:
         fail(sys.exc_info())

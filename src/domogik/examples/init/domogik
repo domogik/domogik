@@ -49,7 +49,7 @@ LOGDIR="/var/log/domogik"
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${CUSTOM_PATH}:
+PATH=${PATH}:${CUSTOM_PATH}:
 if [ ${UID} != 0 ];then
     echo "Must be run with root privileges";
     exit 1;

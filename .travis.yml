@@ -1,3 +1,4 @@
+language: python
 branches:
   only:
     - master
@@ -15,7 +16,7 @@ install:
 before_script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-setup-database.sh
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik.sh
-  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-start-domogik.sh
+  - sudo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-start-domogik.sh
 script:
   - echo "Domogik installed!"
 after_script:
