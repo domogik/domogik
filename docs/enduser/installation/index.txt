@@ -70,7 +70,7 @@ Create the user "domogik" to use the new database: ::
 Download Domogik
 ----------------
 
-Go on `Download <http://wiki.domogik.org/Download>`_ to get Domogik.
+Go on `Download <http://www.domogik.org/Download>`_ to get Domogik.
 You will get a file named **domogik-<release>.tgz**. Download it and extract it: ::
 
     $ wget http://repo.domogik.org/...
