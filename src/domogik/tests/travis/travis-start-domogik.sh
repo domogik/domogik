@@ -4,6 +4,7 @@
 which dmg_hub
 which dmg_broker
 which dmg_forwarder
+echo $PATH
 sudo /etc/init.d/domogik start
 sleep 10
 cat /var/log/domogik/manager.log
