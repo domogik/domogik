@@ -13,6 +13,6 @@ sudo python install.py --no-setup --no-test --user $LOGNAME --command-line --dom
 echo "==== SOME CLEANUP stuff"
 sudo chown $LOGNAME:root /var/lock/domogik
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
-sudo chown $LOGNAME:root /var/log/domogik/*
+#sudo chown $LOGNAME:root /var/log/domogik/*
 ls -l /var/lock/domogik/
 
