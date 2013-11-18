@@ -1,0 +1,14 @@
+language: python
+branches:
+  only:
+    - master
+python:
+  - "2.7"
+script:
+  - echo "Domogik installed!"
+notifications:
+  irc: "irc.freenode.net#domogik"
+  on_success: never
+  on_failure: never
+
+
