@@ -66,6 +66,9 @@ STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
+# time between each send of the status
+STATUS_HBEAT = 15
+
 # core components
 CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin']
 
@@ -135,7 +138,16 @@ class XplPlugin(BasePlugin, MQRep):
         # MQ publisher and REP
         self.zmq = zmq.Context()
         self._pub = MQPub(self.zmq, self._mq_name)
-        self._send_status(STATUS_STARTING)
+        self._set_status(STATUS_STARTING)
+
+        # MQ : start the thread which sends the status each N seconds
+        thr_send_status = threading.Thread(None,
+                                           self._send_status_loop,
+                                           "send_status_loop",
+                                           (),
+                                           {})
+        thr_send_status.start()
+
         ### MQ
         # for stop requests
         MQRep.__init__(self, self.zmq, self._mq_name)
@@ -489,7 +501,7 @@ class XplPlugin(BasePlugin, MQRep):
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self._name = "unknown"
-        self._send_status(STATUS_ALIVE)
+        self._set_status(STATUS_ALIVE)
 
         ### Instantiate the MQ
         # nothing can be launched after this line (blocking call!!!!)
@@ -577,7 +589,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.reply(msg.get())
 
         ### Change the plugin status
-        self._send_status(STATUS_STOP_REQUEST)
+        self._set_status(STATUS_STOP_REQUEST)
 
         ### Try to stop the plugin
         # if it fails, the manager should try to kill the plugin
@@ -593,7 +605,22 @@ class XplPlugin(BasePlugin, MQRep):
         msg.add_data('actions', self.helpers.keys())
         self.reply(msg.get())
 
-    def _send_status(self, status):
+    def _set_status(self, status):
+        """ Set the plugin status and send it
+        """
+        self._status = status
+        self._send_status()
+
+    def _send_status_loop(self):
+        """ send the status each STATUS_HBEAT seconds
+        """
+        # TODO : we could optimize by resetting the timer each time the status is sent
+        # but as this is used only to check for dead plugins by the manager, it is not very important ;)
+        while not self._stop.isSet():
+            self._send_status()
+            self._stop.wait(STATUS_HBEAT)
+
+    def _send_status(self):
         """ Send the plugin status over the MQ
         """ 
         if hasattr(self, "_pub"):
@@ -601,11 +628,12 @@ class XplPlugin(BasePlugin, MQRep):
                 type = "core"
             else:
                 type = "plugin"
+            self.log.debug("Send plugin status : {0}".format(self._status))
             self._pub.send_event('plugin.status', 
                                  {"type" : type,
                                   "name" : self._name,
                                   "host" : self.get_sanitized_hostname(),
-                                  "event" : status})
+                                  "event" : self._status})
 
     def get_config_files(self):
        """ Return list of config files
@@ -824,9 +852,9 @@ class XplPlugin(BasePlugin, MQRep):
             self.log.debug(u"force_leave called")
         # send stopped status over the MQ
         if status:
-            self._send_status(status)
+            self._set_status(status)
         else:
-            self._send_status(STATUS_STOPPED)
+            self._set_status(STATUS_STOPPED)
 
         # send hbeat.end message
         self._send_hbeat_end()
