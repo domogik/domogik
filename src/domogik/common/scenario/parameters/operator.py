@@ -58,7 +58,7 @@ if __name__ == "__main__":
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
     t = ComparisonOperatorParameter(logging, None)
-    print("Expected entries : {0}".format(t.get_expected_entries())
+    print("Expected entries : {0}".format(t.get_expected_entries()))
     print("Evaluate should be None : {0}".format(t.evaluate()))
     print("List of possible values is {0}".format(t.get_list_of_values()))
     print("==> Setting some wrong value for entry 'operator', should raise some error")

@@ -39,8 +39,45 @@ import logging
 import datetime
 
 from domogik.common.scenario.parameters.cron import CronParameter
+from domogik.common.scenario.parameters.operator import ComparisonOperatorParameter 
 from domogik.common.cron import CronExpression
 
+
+class ScenarioOperatorParamterTest(unittest.TestCase):
+    """ Test CronParameter
+    """
+
+    def setUp(self):
+        """ Create a Cron Parameter object
+        """
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+        self._obj = ComparisonOperatorParameter(log=logging)
+        self._triggered = False
+
+    def tearDown(self):
+        """ Destroy cron object
+        """
+        del self._obj
+        self._triggered = False
+
+    def triggered(self, payload=None):
+        """ Called when the trigger is called """
+        self._trigger = True
+
+    def test_fill_with_equal(self):
+        """ Test fill method with an equal
+        """
+        # Test without cron expression
+        parameters = {"operator": "=="}
+        self._obj.fill(params=parameters)
+        self.assertTrue(self._obj.evaluate())
+
+    def test_fill_with_bad(self):
+        """ Test fill method with a bad operator
+        """
+        # Test without cron expression
+        parameters = {"operator": "bad"}
+        self.assertRaises(ValueError, self._obj.fill, parameters)
 
 class ScenarioCronParameterTest(unittest.TestCase):
     """ Test CronParameter
@@ -64,7 +101,7 @@ class ScenarioCronParameterTest(unittest.TestCase):
         self._trigger = True
 
     def test_fill_with_data(self):
-        """ TEst fill method
+        """ Test fill method
         """
         parameters = {"cron": "*/5 * * * *"}
         self._obj.fill(params=parameters)
