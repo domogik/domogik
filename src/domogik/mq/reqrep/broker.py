@@ -29,7 +29,7 @@ import traceback
 
 from domogik.mq.common import split_address
 from domogik.common.configloader import Loader
-from domogik.common.daemonize import createDaemon
+from domogik.common.daemon.daemon import DaemonContext
 from domogik.common import logger
 from domogik.mq.socket import ZmqSocket
 
@@ -601,7 +601,9 @@ def main():
     my_conf = cfg.load()
     config = dict(my_conf[1])
 
-    createDaemon()
+    ctx = DaemonContext()
+    ctx.open()
+
     context = zmq.Context()
     print "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
     broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
