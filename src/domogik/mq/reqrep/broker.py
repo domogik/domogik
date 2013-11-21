@@ -254,7 +254,7 @@ class MDPBroker(object):
         :rtype: None
         """
         self.log.debug("Check for dead workers...")
-        for wrep in self._workers.values():
+        for wrep in list(self._workers.values()):
             if not wrep.is_alive():
                 self.log.info("A worker seems to be dead : wid={0} service={1}".format(wrep.id, wrep.service))
                 self.unregister_worker(wrep.id)
@@ -359,14 +359,14 @@ class MDPBroker(object):
         if service == b'mmi.service':
             s = msg[0]
             ret = b'404'
-            for wr in self._workers.values():
+            for wr in list(self._workers.values()):
                 if s == wr.service:
                     ret = b'200'
                     break
             self.client_response(rp, service, [ret])
         elif service == b'mmi.services':
 	    ret = []
-            for wr in self._workers.values():
+            for wr in list(self._workers.values()):
                 ret.append(wr.service)
 	    self.client_response(rp, service, [b', '.join(ret)])
         else:
@@ -430,7 +430,7 @@ class MDPBroker(object):
             # unknwon service
             # ignore request
             msg = "broker has no service {0}".format(service)
-            print msg
+            print(msg)
             self.log.warning(msg)
         return
 
@@ -605,7 +605,7 @@ def main():
     ctx.open()
 
     context = zmq.Context()
-    print "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
+    print(("tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])))
     broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
     IOLoop.instance().start()
     broker.shutdown()

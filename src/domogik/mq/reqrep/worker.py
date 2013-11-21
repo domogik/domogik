@@ -108,11 +108,11 @@ class MQRep(object):
         """Method called every HB_INTERVAL milliseconds.
         """
         self.curr_liveness -= 1
-        print '%.3f tick - %d' % (time.time(), self.curr_liveness)
+        print(('{0} tick - {1}'.format(time.time(), self.curr_liveness)))
         self.send_hb()
         if self.curr_liveness >= 0:
             return
-        print '%.3f lost connection' % time.time()
+        print(('{0} lost connection'.format(time.time())))
         # ouch, connection seems to be dead
         self.shutdown()
         # try to recreate it

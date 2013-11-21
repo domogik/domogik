@@ -8,7 +8,7 @@ class ZmqSocket(zmq.Socket):
         zmq.Socket.__init__(self, ctx, type)
 
     def on_timeout(self):
-	assert("The ZMQ socket received a timeout of 5.0 sec")
+        assert("The ZMQ socket received a timeout of 5.0 sec")
         return None
 
     def _timeout_wrapper(f):

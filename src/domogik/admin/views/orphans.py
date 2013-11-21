@@ -23,7 +23,7 @@ def orphans():
     # loop over the devices
     orphan_devs = []
     for dev in devs:
-        if dev["client_id"] not in client_list.keys():
+        if dev["client_id"] not in list(client_list.keys()):
             orphan_devs.append(dev)
 
     return render_template('orphans.html',

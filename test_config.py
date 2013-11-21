@@ -50,13 +50,13 @@ ENDC = '\033[0m'
 user = ''
 
 def info(msg):
-    print("%s [ %s ] %s" % (BLUE,msg,ENDC))
+    print("{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
 def ok(msg):
-    print("%s ==> %s  %s" % (OK,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(OK,msg,ENDC))
 def warning(msg):
-    print("%s ==> %s  %s" % (WARNING,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
 def fail(msg):
-    print("%s ==> %s  %s" % (FAIL,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
 
 def am_i_root():
     info("Check this script is started as root")
