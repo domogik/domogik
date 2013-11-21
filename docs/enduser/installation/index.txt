@@ -34,10 +34,6 @@ Install SSL libraries: ::
 
     $ apt-get install libssl-dev 
 
-Install libraries for mysql access and command line client: ::
-
-    $ apt-get install libmysqlclient-dev mysql-client
-
 Install libraries for postgresql: ::
 
     $ apt-get install python-psycopg2
