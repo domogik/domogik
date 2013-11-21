@@ -452,7 +452,7 @@ class DbHelper():
             json_xplcmd = { 'id': a_xplcmd.id,
                             'json_id' : a_xplcmd.json_id,
                             'name' : a_xplcmd.name,
-                            'schema' : a_xplstat.schema,
+                            'schema' : a_xplcmd.schema,
                              'parameters' : []
                             }
             for a_xplcmd_param in a_xplcmd.params:
