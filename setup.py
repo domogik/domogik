@@ -42,6 +42,11 @@ from setuptools import setup, find_packages
 import platform
 import sys
 
+if sys.version_info[0] == 3:
+    netifaces = 'netifaces-py3'
+else:
+    netifaces = 'netifaces'
+
 setup(
     name = 'Domogik',
     version = '0.4.0',
@@ -58,9 +63,8 @@ setup(
 	      'pymysql',
               'psycopg2',
 	      'pip >= 1.0',
-	      'Distutils2',
 	      'pyserial >= 2.5',
-	      'netifaces >= 0.8',
+              netifaces,
 	      'Twisted >= 12.1.0',
 	      'Flask >= 0.9',
 	      'Flask-WTF >= 0.9.3',
