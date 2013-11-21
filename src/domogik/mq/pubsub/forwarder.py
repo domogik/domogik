@@ -37,13 +37,14 @@ Implements
 import zmq
 from domogik.common.configloader import Loader
 from domogik.common import logger
-from domogik.common.daemonize import createDaemon
+from domogik.common.daemon.daemon import DaemonContext
 
 def main():
     """
        Main loop for the forwarder
     """
-    createDaemon()
+    ctx = DaemonContext()
+    ctx.open()
 
     cfg = Loader('mq').load()
     config = dict(cfg[1])

@@ -140,7 +140,7 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for arg, value in request.form.items():
+        for arg, value in list(request.form.items()):
             if arg in known_items:
                 data[arg] = value
         # build the message
@@ -185,7 +185,7 @@ def client_devices_new(client_id):
     if type(data["device_types"]) is not dict:
         dtypes = {}
     else:
-        dtypes = data["device_types"].keys()
+        dtypes = list(data["device_types"].keys())
     products = {}
     if "products" in data:
         for prod in data["products"]:

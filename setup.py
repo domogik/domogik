@@ -42,6 +42,11 @@ from setuptools import setup, find_packages
 import platform
 import sys
 
+if sys.version_info[0] == 3:
+    netifaces = 'netifaces-py3'
+else:
+    netifaces = 'netifaces'
+
 setup(
     name = 'Domogik',
     version = '0.4.0',
@@ -50,18 +55,16 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools',
-	      'argparse >= 1.2.1',
 	      'sqlalchemy',
 	      'alembic',
 	      'simplejson >= 1.9.2',
 	      'pyOpenSSL >= 0.10',
 	      'psutil >= 0.1.3',
-	      'MySQL-python >= 1.2.3c',
+	      'pymysql',
               'psycopg2',
 	      'pip >= 1.0',
-	      'Distutils2',
 	      'pyserial >= 2.5',
-	      'netifaces >= 0.8',
+              netifaces,
 	      'Twisted >= 12.1.0',
 	      'Flask >= 0.9',
 	      'Flask-WTF >= 0.9.3',
@@ -69,8 +72,7 @@ setup(
               'Flask-Babel',
 	      'tornado >= 3.1',
               'requests >= 1.2.3',
-	      'pyzmq >= 13.1.0',
-	      'python-daemon >= 1.5.5'],
+	      'pyzmq >= 13.1.0'],
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,
@@ -82,7 +84,6 @@ setup(
     entry_points = {
         'console_scripts': [
 	    """
-            dmg_pkgmgr = domogik.bin.pkgmgr:main
             dmg_manager = domogik.bin.manager:main
             dmg_send = domogik.bin.send:main
             dmg_dump = domogik.bin.dump_xpl:main

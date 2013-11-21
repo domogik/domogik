@@ -84,20 +84,6 @@ from domogik.mq.pubsub.publisher import MQPub
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
 
-##### packages management #####
-# TODO : use later : package management related
-#from distutils2.version import VersionPredicate, IrrationalVersionError
-#from domogik.common.packagemanager import PackageManager, PKG_PART_XPL
-## the try/except it to handle http://bugs.python.org/issue14317
-#try:
-#    from distutils2.index.simple import Crawler
-#except ImportError:  
-#    from distutils2.pypi.simple import Crawler
-
-#PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
-
-
-
 ### constants
 FIFO_DIR = "/var/run/domogik/"
 PYTHON = sys.executable

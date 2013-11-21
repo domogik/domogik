@@ -40,8 +40,8 @@ from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
-import daemon
 
+from domogik.common.daemon.daemon import DaemonContext
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
 from domogik.common.utils import is_already_launched
@@ -121,7 +121,7 @@ class BasePlugin():
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
             self.log.info(u"Starting the plugin in background...")
-            ctx = daemon.DaemonContext()
+            ctx = DaemonContext()
             ctx.files_preserve = l.get_fds([name])
             ctx.open()
             self.log.info(u"Daemonize plugin %s" % name)

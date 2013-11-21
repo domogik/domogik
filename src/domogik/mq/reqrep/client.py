@@ -93,7 +93,7 @@ class MQSyncReq(object):
     def rawrequest(self, service, msg, timeout=None):
         if not timeout or timeout < 0.0:
             timeout = None
-	if type(msg) in (bytes, unicode):
+	if type(msg) in (bytes, str):
             msg = [msg]
 	to_send = [self._proto_version, service]
 	to_send.extend(msg)
@@ -210,7 +210,7 @@ class MqAsyncReq(object):
         """
         if not self.can_send:
             raise InvalidStateError()
-        if type(msg) in (bytes, unicode):
+        if type(msg) in (bytes, str):
             msg = [msg]
         # prepare full message
         to_send = self._proto_prefix[:]
