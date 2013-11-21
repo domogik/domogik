@@ -82,7 +82,6 @@ setup(
     entry_points = {
         'console_scripts': [
 	    """
-            dmg_pkgmgr = domogik.bin.pkgmgr:main
             dmg_manager = domogik.bin.manager:main
             dmg_send = domogik.bin.send:main
             dmg_dump = domogik.bin.dump_xpl:main
