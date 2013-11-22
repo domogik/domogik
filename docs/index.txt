@@ -35,7 +35,7 @@ End User Documentation
   * :doc:`First Use </enduser/configuration/index>` (*)
   * :doc:`Accounts management </enduser/administration/account>`
 
-* **:doc:`Packages </enduser/packages/index>`**
+* ** :doc:`Packages </enduser/packages/index>` **
 
   * **TODO**: configuration, ...
   * **TODO**: dev
