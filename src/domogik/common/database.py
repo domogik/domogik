@@ -51,7 +51,7 @@ from domogik.common import logger
 #from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        Device, DeviceStats,
+        Device, DeviceStats, DeviceParam,
         PluginConfig, Person,
         UserAccount,
         Scenario, ScenarioUUID,
@@ -388,6 +388,14 @@ class DbHelper():
                         'device_type_id' : device.device_type_id, 
                         'client_id' : device.client_id
                       }
+        # params
+        json_device['params'] = {}
+        for a_param in device.params:
+            json_param = { 'id': a_param.id,
+                           'key': a_param.key,
+                           'value': a_param.value
+                           }
+            json_device['params'][a_param.key] = json_param
 
         # complete with sensors informations
         sensors = self.get_sensor_by_device_id(device.id)
@@ -1718,7 +1726,34 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete scenario with id %s : it doesn't exist" % s_id)
 
+###################
+# Device Config
+###################
+    def add_device_param(self, d_id, key, value): 
+        self.__session.expire_all()
+        config = DeviceParam(device_id=d_id, key=key, value=value)
+        self.__session.add(config)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return config
 
+    def udpate_device_param(self, dc_id, key=None, value=None):
+        self.__session.expire_all()
+        config = self.__session.query(DeviceParam).filter_by(id=dc_id).first()
+        if config is None:
+            self.__raise_dbhelper_exception("ScenarioUUID with id %s couldn't be found" % u_id)
+        if key is not None:
+            config.key = ucode(key)
+        if value is not None:
+            config.value = ucode(value)
+        self.__session.add(config)
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return config
 
 ###################
 # helper functions

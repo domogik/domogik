@@ -14,11 +14,20 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 from domogik.common.sql_schema import \
-	Sensor, Device, Command, XplStat, \
+	Sensor, Device, Command, XplStat, DeviceParam, \
 	SensorHistory, XplStatParam, XplCommand, \
 	XplCommandParam, CommandParam, PluginConfig
 
 def upgrade():
+    op.create_table(DeviceParam.__tablename__,
+    	sa.Column('id', sa.Integer(), nullable=False),
+    	sa.Column('device_id', sa.Integer(), nullable=False),
+    	sa.Column('key', sa.Unicode(length=32), autoincrement=False, nullable=False),
+    	sa.Column('value', sa.Unicode(length=255), nullable=True),
+        sa.ForeignKeyConstraint(['device_id'], [u'{0}.id'.format(Device.__tablename__)], ondelete='cascade'),
+    	sa.PrimaryKeyConstraint('id'),
+    	mysql_engine='InnoDB'
+    )
     op.create_table(Sensor.__tablename__,
     	sa.Column('id', sa.Integer(), nullable=False),
     	sa.Column('device_id', sa.Integer(), nullable=False),
@@ -205,4 +214,5 @@ def downgrade():
     op.drop_table(u'core_xplstat')
     op.drop_table(u'core_command')
     op.drop_table(u'core_sensor')
+    op.drop_table(u'core_device_params')
     ### end Alembic commands ###
