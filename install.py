@@ -393,14 +393,13 @@ def install():
             os.setreuid(0,uid)
             old_home = os.environ['HOME']
             os.environ['HOME'] = user_home
-
             os.system('python src/domogik/install/db_install.py')
 
             os.setreuid(0,0)
             os.environ['HOME'] = old_home
 
-        #if not args.test:
-        #    os.system('python test_config.py')
+        if not args.test:
+            os.system('python test_config.py')
         print("\n\n")
     except:
         fail(sys.exc_info())

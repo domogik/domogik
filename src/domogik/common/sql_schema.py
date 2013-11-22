@@ -112,6 +112,7 @@ class Device(Base):
     device_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
     client_version = Column(Unicode(32), nullable=False)
+    params = relationship("DeviceParam", backref=__tablename__, cascade="all", passive_deletes=True)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
@@ -142,6 +143,37 @@ class Device(Base):
                   self.device_type_id, self.client_id, self.client_version, \
                   self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return Device.__tablename__
+
+class DeviceParam(Base):
+    """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
+
+    __tablename__ = '%s_device_param' % _db_prefix
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value = Column(Unicode(255), nullable=True)
+
+    def __init__(self, device_id, key, value):
+        """Class constructor
+
+        @param device_id : The device where this parameter is linked to 
+        @param key : The param name
+        @param value : The param value
+        """
+        self.device_id = device_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<DeviceParam(id={0}, device_id={1}, key='{2}', value='{3}')>"\
+               .format(self.id, self.device_id, self.key, self.value)\
 
     @staticmethod
     def get_tablename():
