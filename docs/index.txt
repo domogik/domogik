@@ -35,12 +35,10 @@ End User Documentation
   * :doc:`First Use </enduser/configuration/index>` (*)
   * :doc:`Accounts management </enduser/administration/account>`
 
-* **Packages:**
+* **:doc:`Packages </enduser/packages/index>`**
 
-  * :doc:`Repositories </enduser/packages/repositories>`
-  * :doc:`Installing a package </enduser/packages/installation>` (*)
-  * :doc:`Plugin configuration and startup </enduser/packages/plugin_configuration_and_startup>` (*)
-  * :doc:`Plugin helpers </enduser/packages/plugin_helpers>` (*)
+  * **TODO**: configuration, ...
+  * **TODO**: dev
 
 * **Devices:**
 
@@ -59,18 +57,6 @@ Technical Documentation
 * :doc:`Sensors </technical/sensor>`
 * **Database:**
   :doc:`Model </technical/database>`
-* **RINOR:** -- obsolete : see the REST chapter for 0.4 developments --
-  * :doc:`Overview </technical/rinor/index>`
-  * :doc:`XPL Events </technical/rinor/statmgr>`: Store into the database the xPL activity on Network
-  * :doc:`REST /device </technical/rinor/rest_device>`: Get device data from the database
-  * :doc:`REST /cmd </technical/rinor/rest_command>`: Send commands to devices
-  * :doc:`REST /stats </technical/rinor/rest_stats>`: Get stats from the database
-  * :doc:`REST /account </technical/rinor/rest_account>`: Login and password changes
-  * :doc:`REST /user </technical/rinor/rest_user>`: List users
-  * :doc:`REST /person </technical/rinor/rest_person>`: List persons
-  * :doc:`REST /xpl-cmnd </technical/rinor/rest_xplcmnd>`: Directly send a xPL message
-  * :doc:`REST /repo </technical/rinor/rest_repository>`: Store files
-  * :doc:`REST /helper </technical/rinor/rest_helper>`: Helpers
 * **REST:**
     * :doc:`Overview </technical/rest/index>`
     * :doc:`/ </technical/rest/status>`: Status ouput for rest
