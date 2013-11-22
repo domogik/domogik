@@ -102,8 +102,8 @@ echo "Delete rc.d script"
 echo "Delete /var/cache/domogik"
 $RM /var/cache/domogik
 
-echo "Delete /var/lib/domogik"
-$RM /var/lib/domogik
+echo "Delete /var/lib/domogik/resources"
+$RM /var/lib/domogik/resources
 
 echo "Delete /var/lock/domogik"
 $RM /var/lock/domogik
@@ -140,6 +140,7 @@ else
 fi
 
 echo "Notice : database was not suppressed : you must do it manually"
+echo "         the folder /var/lib/domogik/domogik_packages was not suppressed"
 
 echo "Uninstall complete!"
 
