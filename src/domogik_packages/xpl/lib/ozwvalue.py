@@ -403,7 +403,7 @@ class ZWaveValueNode:
             elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_BINARY' : 
                 if self.valueData['type'] == 'Bool' :
                     msgtrig['schema'] = 'sensor.basic'
-                    msgtrig ['data'] = {'type': 'status', 'current' : 'true' if self.valueData['value']   else 'false'} # gestion du sensor binary pour widget binary
+                    msgtrig ['data'] = {'type': self.labelDomogik, 'current' : 'true' if self.valueData['value']   else 'false'} # gestion du sensor binary pour widget binary
             elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
                 msgtrig['schema'] = 'sensor.basic'
                 if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.
