@@ -106,7 +106,8 @@ class Logger():
             formatter = logging.Formatter('%(message)s')
         if formatter:
             for log in self.get_logger().handlers:
-                log.setFormatter(formatter)
+                if type(log) is logging.StreamHandler:
+                    log.setFormatter(formatter)
 
     def get_logger(self, logger_name = None):
         '''
