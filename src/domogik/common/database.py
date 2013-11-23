@@ -382,7 +382,6 @@ class DbHelper():
         
         if device == None:
             return None
-        print device
         # fill basic informations about the device
         json_device = { 'id' : device.id, 
                         'name' : device.name, 
@@ -479,7 +478,6 @@ class DbHelper():
                             'xpl_stat_ack': a_xplcmd.stat.json_id,
                             'parameters' : []
                             }
-            print a_xplcmd
             for a_xplcmd_param in a_xplcmd.params:
                 json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
                                                    'value' :  a_xplcmd_param.value
