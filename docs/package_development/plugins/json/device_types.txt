@@ -40,11 +40,13 @@ To check these sensors the plugin need 2 information for the device type:
                 "params": [
                     {  
                         "key": "device",
+                        "xpl": true,
                         "description": "The path to look at.",
                         "type": "string"
                     },
                     {
                         "key": "interval",
+                        "xpl": false,
                         "description": "The time in minutes between each check.",
                         "type": "integer"
                     }
@@ -64,6 +66,7 @@ Description
 * *params* : list of parameters that are common to ALL xpl messages for this device type
 
   * *key* : the xpl key for the message
+  * *xpl* : is this an xpl parameter or nit, if set to true this parameter will be included in the xplcommands and expected in the xplstats/triggers, if set to false it will only be availble internal in domogik or in the plugin if it requests the devices
   * *description* :  short description of this field
   * *type* : the value type for this field. The available values are the same as the oens used in the :doc:`configuration part of the json <configuration>`
   * depending on the type the are other posibilitys (like min_value, max_value, ....)

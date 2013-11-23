@@ -250,10 +250,15 @@ def client_devices_new_wiz(client_id, device_type_id):
             # add the global
             for x in app.db.get_xpl_command_by_device_id(created_device["id"]):
                 for p in params['global']:
-                    app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
+                    if p["xpl"] is True:
+                        app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
             for x in app.db.get_xpl_stat_by_device_id(created_device["id"]):
                 for p in params['global']:
-                    app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
+                    if p["xpl"] is True:
+                        app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
+            for p in params['global']:
+                if p["xpl"] is not True:
+                    app.db.add_device_param(created_device["id"], p["key"], request.form.get(p['key']))
             # reload stats
             req = MQSyncReq(app.zmq_context)
             msg = MQMessage()

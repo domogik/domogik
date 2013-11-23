@@ -525,8 +525,8 @@ class XplCommand(Base):
     
     def __repr__(self):
        """Return an internal representation of the class"""
-       return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat_id=%s params=%s)>"\
-               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat_id, self.params)
+       return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat=%s params=%s)>"\
+               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat, self.params)
 
     @staticmethod
     def get_tablename():

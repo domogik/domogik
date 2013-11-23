@@ -96,12 +96,17 @@ def device_globals(did):
     js = get_device_params(device['device_type_id'])
     for x in urlHandler.db.get_xpl_command_by_device_id(did):
         for p in js['global']:
-            urlHandler.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
+            if p["xpl"] is True:
+                urlHandler.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
     for x in urlHandler.db.get_xpl_stat_by_device_id(did):
         for p in js['global']:
-            #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
-            urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
-    urlHandler.reload_stats()        
+            if p["xpl"] is True:
+                #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
+                urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
+    for p in params['global']:
+        if p["xpl"] is not True:
+            urlHandler.db.add_device_param(did, p["key"], request.form.get(p['key']))
+    urlHandler.relad_stats()        
     return 200, "{}"
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])

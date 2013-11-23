@@ -353,14 +353,14 @@ class DbHelper():
         #return self.__session.query(Device).filter(Device.address==None).all()
         device_list = []
         for device in self.__session.query(Device).filter(Device.address==None).all():
-            device_list.append(self.get_device(device.id))
+            device_list.append(self.get_device(device=device))
         return device_list
 
     def list_devices_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
         device_list = []
         for device in self.__session.query(Device).filter_by(client_id=p_id).all():
-            device_list.append(self.get_device(device.id))
+            device_list.append(self.get_device(device=device))
         return device_list
 
     def list_old_devices(self):
@@ -369,17 +369,20 @@ class DbHelper():
         """
         return self.__session.query(Device).filter(Device.address!=None).all()
 
-    def get_device(self, d_id):
+    def get_device(self, d_id=None, device=None):
         """Return a device by its id
 
         @param d_id : The device id
+        @param device : The Device object (sqlalchemy)
         @return a Device object
 
         """
-        device = self.__session.query(Device).filter_by(id=d_id).first()
+        if device is None and d_id is not None:
+            device = self.__session.query(Device).filter_by(id=d_id).first()
+        
         if device == None:
             return None
-
+        print device
         # fill basic informations about the device
         json_device = { 'id' : device.id, 
                         'name' : device.name, 
@@ -396,11 +399,10 @@ class DbHelper():
                            'value': a_param.value
                            }
             json_device['params'][a_param.key] = json_param
-
+        
         # complete with sensors informations
-        sensors = self.get_sensor_by_device_id(device.id)
         json_device['sensors'] = {}
-        for a_sensor in sensors:
+        for a_sensor in device.sensors:
             json_sensor = { 'id' : a_sensor.id,
                             'name' : a_sensor.name,
                             'data_type' : a_sensor.data_type,
@@ -410,6 +412,23 @@ class DbHelper():
                             'reference' : a_sensor.reference
                           }
             json_device['sensors'][a_sensor.reference] = json_sensor
+
+        # complete with commands information
+        json_device['commands'] = {}
+        for a_cmd in device.commands:
+            json_command = {
+                    'id': a_cmd.id,
+                    'name': a_cmd.name,
+                    'return_confirmation': a_cmd.return_confirmation,
+                    'xpl_command' : a_cmd.xpl_command.json_id,
+                    'parameters': []
+                    }
+            for a_cmd_param in a_cmd.params:
+                json_command['parameters'].append({ 'key': a_cmd_param.key,
+                                                    'data_type': a_cmd_param.data_type,
+                                                    'conversion': a_cmd_param.conversion
+                                                })
+            json_device['commands'][a_cmd.reference] = json_command
 
         # complete for each xpl_stat information
         json_device['xpl_stats'] = {}
@@ -435,20 +454,17 @@ class DbHelper():
             for a_xplstat_param in a_xplstat.params:
                 if a_xplstat_param.static == False:
                     if a_xplstat_param.sensor_id == None:
-                        json_xplstat['parameters']['device'].append({ 'xplstat_id' :  a_xplstat_param.xplstat_id,
-                                                                      'key' :  a_xplstat_param.key,
+                        json_xplstat['parameters']['device'].append({ 'key' :  a_xplstat_param.key,
                                                                       'value' :  a_xplstat_param.value,
                                                                       'type' :  a_xplstat_param.type
                                                                     })
                     else:
-                        json_xplstat['parameters']['dynamic'].append({'xplstat_id' :  a_xplstat_param.xplstat_id,
-                                                                      'key' :  a_xplstat_param.key,
+                        json_xplstat['parameters']['dynamic'].append({'key' :  a_xplstat_param.key,
                                                                       'value' :  a_xplstat_param.value,
                                                                       'ignore_values' :  a_xplstat_param.ignore_values
                                                                     })
                 if a_xplstat_param.static == True:
-                    json_xplstat['parameters']['static'].append({ 'xplstat_id' :  a_xplstat_param.xplstat_id,
-                                                                  'key' :  a_xplstat_param.key,
+                    json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
                                                                   'value' :  a_xplstat_param.value
                                                                 })
                  
@@ -458,33 +474,17 @@ class DbHelper():
         json_device['xpl_commands'] = {}
         for a_xplcmd in self.get_xpl_command_by_device_id(device.id):
             json_xplcmd = { 'id': a_xplcmd.id,
-                            'json_id' : a_xplcmd.json_id,
                             'name' : a_xplcmd.name,
                             'schema' : a_xplcmd.schema,
-                             'parameters' : []
+                            'xpl_stat_ack': a_xplcmd.stat.json_id,
+                            'parameters' : []
                             }
+            print a_xplcmd
             for a_xplcmd_param in a_xplcmd.params:
                 json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
                                                    'value' :  a_xplcmd_param.value
                                                 })
-            json_device['xpl_commands'][a_xplcmd.name] = json_xplcmd
-        # complete with commands informations
-        json_device['commands'] = {}
-        for a_cmd in self.get_command_by_device_id(device.id):
-            json_command = {
-                    'id': a_cmd.id,
-                    'reference': a_cmd.reference,
-                    'name': a_cmd.name,
-                    'return_confirmation': a_cmd.return_confirmation,
-                    'parameters': []
-                    }
-            for a_cmd_param in a_cmd.params:
-                json_command['parameters'].append({ 'key': a_cmd_param.key,
-                                                    'data_type': a_cmd_param.data_type,
-                                                    'conversion': a_cmd_param.conversion
-                                                })
-            json_device['commands'][a_cmd.reference] = json_command
-
+            json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
         return json_device
 
 
