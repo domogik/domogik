@@ -81,6 +81,7 @@ class PackageInstaller():
         """ Init
         """
         l = logger.Logger("package")
+        l.set_format_mode("messageOnly")
         self.log = l.get_logger()
 
         parser = ArgumentParser()

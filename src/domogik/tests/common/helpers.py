@@ -74,15 +74,19 @@ def check_domogik_is_running():
     for chk in to_check:
         status = is_already_launched(None, chk, False)
         if not status[0]:
-            print("component {0} is not running".format(chk))
+            print("ERROR : component {0} is not running".format(chk))
             ret = False
+        else:
+            print("component {0} is running".format(chk))
 
     to_check = ['rest', 'xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
     for chk in to_check:
-        status = is_already_launched(None, chk)
+        status = is_already_launched(None, chk, False)
         if not status[0]:
-            print("component {0} is not running".format(chk))
+            print("ERROR : component {0} is not running".format(chk))
             ret = False
+        else:
+            print("component {0} is running".format(chk))
     return ret
 
 def get_rest_url():

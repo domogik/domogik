@@ -131,6 +131,7 @@ def is_already_launched(log, id, manager=True):
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
     if manager:
         cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2} | grep -v sudo | grep -v su".format(id, STARTED_BY_MANAGER, my_pid)
+        print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
     # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
