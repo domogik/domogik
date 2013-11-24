@@ -1,4 +1,4 @@
-#!/bin/bash -e 
+#!/bin/bash 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
 ps -ef | grep dmg
