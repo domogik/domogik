@@ -147,6 +147,7 @@ class PackageInstaller():
         """ Install the package from a folder
             If there is a correst json file, just create a symlink :)
         """
+        path = os.path.realpath(path)
         self.log.info("Install a package from a folder : {0}".format(path))
         # check if there is the json file
         json_file = os.path.join(path, JSON_FILE)
