@@ -1217,8 +1217,8 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         temp_high = gh(data, 5)
         temp_low = gh(data, 6)
         # first bit = 1 => sign = "-"
-        if (int(temp_high, 16) & 0b1000000) == 0b10000000:
-            temp = - float((int(temp_low, 16) + 256*(int(bin(temp_high, 16)) & 0b01111111)))/10
+        if (int(temp_high, 16) & 0b10000000) == 0b10000000:
+            temp   = - float((int(int(temp_high, 16)) & 0b01111111) * 256 + int(temp_low, 16))/10
         # first bit = 0 => sign = "+"
         else:
             temp = float((int(temp_high, 16) * 256 + int(temp_low, 16)))/10            
@@ -1293,8 +1293,8 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         temp_low = gh(data, 6)
         
         # first bit = 1 => sign = "-"
-        if (int(temp_high, 16) & 0b1000000) == 0b10000000:
-            temp = - float((int(temp_low, 16) + 256*(int(bin(temp_high, 16)) & 0b01111111)))/10
+        if (int(temp_high, 16) & 0b10000000) == 0b10000000:
+            temp   = - float((int(int(temp_high, 16)) & 0b01111111) * 256 + int(temp_low, 16))/10
         # first bit = 0 => sign = "+"
         else:
             temp = float((int(temp_high, 16) * 256 + int(temp_low, 16)))/10
@@ -1356,8 +1356,8 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         temp_high = gh(data, 5)
         temp_low = gh(data, 6)
         # first bit = 1 => sign = "-"
-        if (int(temp_high, 16) & 0b1000000) == 0b10000000:
-            temp = - float((int(temp_low, 16) + 256*(int(bin(temp_high, 16)) & 0b01111111)))/10
+        if (int(temp_high, 16) & 0b10000000) == 0b10000000:
+            temp   = - float((int(int(temp_high, 16)) & 0b01111111) * 256 + int(temp_low, 16))/10
         # first bit = 0 => sign = "+"
         else:
             temp = float((int(temp_high, 16) * 256 + int(temp_low, 16)))/10
