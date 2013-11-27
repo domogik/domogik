@@ -34,6 +34,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
+from domogik.xpl.common.plugin import XplPlugin
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from argparse import ArgumentParser
@@ -149,11 +150,24 @@ class TestRunner():
 
     def _run_testfile(self, path, test, config):
         # load the module
-        imp.load_source(test, "{0}/{1}".format(path, config['file']))
+        mod = imp.load_source(test, "{0}/{1}".format(path, config['file']))
+        cls = getattr(mod, config['class'])
         # start a unittest suite
         suite = unittest.TestSuite()
-        # add the suites
+        # start an xplplugin
+        xpl_plugin = XplPlugin(name = 'testrunner', 
+                           daemonize = False, 
+                           parser = None,
+                           nohub = True,
+                           test  = True)
+        # run the config module
+        cfg = cls.configure()
+        cls.create_device()
 
+        # add the suites
+        for totest in dir(cls):
+            if totest.startswith('test_'):
+                suite.addTest(cls(totest, xpl_plugin, 'name', cfg))
         # run
         res = unittest.TextTestRunner().run(suite)
         self.results['test'] = res
