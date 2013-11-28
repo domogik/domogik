@@ -103,10 +103,10 @@ def device_globals(did):
             if p["xpl"] is True:
                 #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
                 urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
-    for p in params['global']:
+    for p in js['global']:
         if p["xpl"] is not True:
             urlHandler.db.add_device_param(did, p["key"], request.form.get(p['key']))
-    urlHandler.relad_stats()        
+    urlHandler.reload_stats()
     return 200, "{}"
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])
