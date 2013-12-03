@@ -431,7 +431,7 @@ class DbHelper():
 
         # complete for each xpl_stat information
         json_device['xpl_stats'] = {}
-        for a_xplstat in self.get_xpl_stat_by_device_id(device.id):
+        for a_xplstat in device.xpl_stats:
             json_xplstat = { 'id' : a_xplstat.id,
                              'json_id' : a_xplstat.json_id,
                              'name' : a_xplstat.name,
@@ -451,27 +451,27 @@ class DbHelper():
             #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
             #- if statis == 0 and it has a sensor id => its a dynamic param
             for a_xplstat_param in a_xplstat.params:
-                if a_xplstat_param.static == False:
-                    if a_xplstat_param.sensor_id == None:
-                        json_xplstat['parameters']['device'].append({ 'key' :  a_xplstat_param.key,
-                                                                      'value' :  a_xplstat_param.value,
-                                                                      'type' :  a_xplstat_param.type
-                                                                    })
+                if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
+                    if a_xplstat_param.sensor_id:
+                        for sen in device.sensors:
+                            if sen.id == a_xplstat_param.sensor_id:
+                                sensor_name = sen.reference
                     else:
-                        json_xplstat['parameters']['dynamic'].append({'key' :  a_xplstat_param.key,
-                                                                      'value' :  a_xplstat_param.value,
-                                                                      'ignore_values' :  a_xplstat_param.ignore_values
+                        sensor_name = None
+                    json_xplstat['parameters']['dynamic'].append({'key' :  a_xplstat_param.key,
+                                                                      'ignore_values' :  a_xplstat_param.ignore_values,
+                                                                      'sensor_name': sensor_name
                                                                     })
-                if a_xplstat_param.static == True:
+                else:
                     json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
-                                                                  'value' :  a_xplstat_param.value
+                                                                  'value' :  a_xplstat_param.value,
                                                                 })
                  
             json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
 
         # xpl_commands
         json_device['xpl_commands'] = {}
-        for a_xplcmd in self.get_xpl_command_by_device_id(device.id):
+        for a_xplcmd in device.xpl_commands:
             json_xplcmd = { 'id': a_xplcmd.id,
                             'name' : a_xplcmd.name,
                             'schema' : a_xplcmd.schema,
