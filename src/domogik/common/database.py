@@ -391,7 +391,7 @@ class DbHelper():
                         'client_id' : device.client_id
                       }
         # params
-        json_device['params'] = {}
+        json_device['paramseters'] = {}
         for a_param in device.params:
             json_param = { 'id': a_param.id,
                            'key': a_param.key,
