@@ -438,18 +438,13 @@ class DbHelper():
                              'schema' : a_xplstat.schema,
                              'parameters' : {
                                 'static' : [],
-                                'dynamic' : [],
-                                'device' : []
+                                'dynamic' : []
                              }
                            }
             # and for each xpl_stat, add the parameters informations
             # the loop is done twice : 
             # - for the dynamic parameters
             # - for the static parameters
-            # Notice : 
-            #- if static field == 1 => this is a static param
-            #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
-            #- if statis == 0 and it has a sensor id => its a dynamic param
             for a_xplstat_param in a_xplstat.params:
                 if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
                     if a_xplstat_param.sensor_id:
