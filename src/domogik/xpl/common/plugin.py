@@ -356,15 +356,23 @@ class XplPlugin(BasePlugin, MQRep):
                                                                                     a_device['device_type_id']))
                 # log some informations about the device
                 # first : the stats
-                self.log.info(u"  Features :")
+                self.log.info(u"  xpl_stats features :")
                 for a_xpl_stat in a_device['xpl_stats']:
                     self.log.info(u"  - {0}".format(a_xpl_stat))
-                    self.log.info(u"    Parameters :")
+                    self.log.info(u"    Static Parameters :")
                     for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['static']:
                         self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
+                    self.log.info(u"    Dynamic Parameters :")
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['dynamic']:
+                        self.log.info(u"    - {0}".format(a_feature['key']))
 
                 # then, the commands
-                # TODO !!!!!!
+                self.log.info(u"  xpl_commands features :")
+                for a_xpl_cmd in a_device['xpl_commands']:
+                    self.log.info(u" - {0}".format(a_xpl_cmd))
+                    self.log.info(u" + Parameters :")
+                    for a_feature in a_device['xpl_commands'][a_xpl_cmd]['parameters']:
+                        self.log.info(u" - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
             self.devices = device_list
             return device_list
