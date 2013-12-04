@@ -397,7 +397,7 @@ class DbHelper():
                            'key': a_param.key,
                            'value': a_param.value
                            }
-            json_device['params'][a_param.key] = json_param
+            json_device['parameters'][a_param.key] = json_param
         
         # complete with sensors informations
         json_device['sensors'] = {}
