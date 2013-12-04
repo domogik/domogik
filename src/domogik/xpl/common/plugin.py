@@ -360,8 +360,7 @@ class XplPlugin(BasePlugin, MQRep):
                 for a_xpl_stat in a_device['xpl_stats']:
                     self.log.info(u"  - {0}".format(a_xpl_stat))
                     self.log.info(u"    Parameters :")
-                    print "@@@@ %s" % a_device['xpl_stats'][a_xpl_stat] 
-                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['device']:
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['static']:
                         self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
                 # then, the commands
@@ -392,7 +391,7 @@ class XplPlugin(BasePlugin, MQRep):
         for a_device in self.devices:
             # first, search for device type
             if a_device['device_type_id'] == device_type:
-                params = a_device[type][feature]['parameters']['device']
+                params = a_device[type][feature]['parameters']['static']
                 found = True
                 for key in data:
                     for a_param in params:
@@ -441,9 +440,9 @@ class XplPlugin(BasePlugin, MQRep):
         """
         try:
             self.log.debug(u"Get parameter '{0}'".format(key))
-            for a_param in a_device['params']:
-                if a_param['key'] == key:
-                    value = self.cast(a_param['value'], a_param['type'])
+            for a_param in a_device['parameters']:
+                if a_param == key:
+                    value = self.cast(a_device['parameters'][a_param]['value'], a_device['parameters'][a_param]['type'])
                     self.log.debug(u"Parameter value found: {0}".format(value))
                     return value
             self.log.warning(u"Parameter not found : return None")
