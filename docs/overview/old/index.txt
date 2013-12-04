@@ -1,0 +1,66 @@
+==============
+Quick overview
+==============
+
+What is Domogik in few words ?
+==============================
+
+Domogik is a free home automation solution based on xPL. It allows to use several User Interfaces (you can even create your own interface if you are want).
+Domogik is modular : you can add and remove plugins easily and create your own plugins. A plugin is based on a technology (or part of a technology).
+
+How does it work ?
+==================
+
+.. image:: domogik_overview_schema.png
+
+RINOR
+-----
+RINOR is a kind of gateway server between User Interfaces, database and xPL world. It allows to :
+
+* read and write data from / to the database
+* listen to the xPL network and send xPL commands
+* record statistics
+* start, stop and configure plugins
+* provide the REST API server for UIs
+
+User Interface
+--------------
+The user interfaces allow you to manage your Domogik system : switch on the lights, check the temperatures, ...
+
+All UIs will need to access the REST API server to communicate with the Domogik core. REST is the **UNIQUE** entry point for all UI interactions (for database access, xPL communication or everything else an UI needs and REST allows).
+
+xPL
+---
+
+.. epigraph::
+
+    xPL is an open protocol intended to allow the control and monitoring of home automation devices. The primary design goal of xPL is to provide a rich set of features and functionalities, whilst maintaining an elegant, uncomplicated message structure. The protocol includes complete discovery and auto-configuration capabilities which support a fully 'plug and play' architecture essential to ensure a good end-user experience.
+    xPL benefits from a strongly-specified message structure, required to ensure that xPL-enabled devices from different vendors are able to communicate without the risk of incompatibilities.
+
+    -- From `xPL official website <http://xplproject.org.uk/>`_
+
+Database
+--------
+The database is used in two ways : 
+
+* directly by RINOR (request of stats, devices...)
+* when plugins ask for their configuration. The configuration is stored in the database but plugins do not have a direct access to it (this is required for modularity purposes). So the database can provide the configuration to plugins by communicating over the xPL network (in fact RINOR asks the database to retrieve this information).
+
+Plugins
+-------
+Plugins (X10, 1wire, Plcbus, etc) are standalone and can only communicate over the xPL network. This is the key of modularity.
+
+Packages
+--------
+As Domogik is delivered by default without plugins you need to install them explicitely. Plugins are available as packages in online repositories and you can install them from the administration of Domoweb (the web user interface).
+
+Web user interface (Web UI)
+---------------------------
+Domoweb supports the latest HTML5 and CSS features to give users the best experience possible with a Web UI. But this choice implies that you won't be able to use Domogik Web UI with older browsers. 
+
+If your browser doesn't support all HTML5 features used by Domogik, you will get this kind of notification :
+
+.. image:: firefox_html5_warning.png
+
+We recommend you to use browsers like Firefox, Chrome (Chromium) or any other that respects the latest web standards.
+

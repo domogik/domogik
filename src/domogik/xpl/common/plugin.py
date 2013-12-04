@@ -360,6 +360,7 @@ class XplPlugin(BasePlugin, MQRep):
                 for a_xpl_stat in a_device['xpl_stats']:
                     self.log.info(u"  - {0}".format(a_xpl_stat))
                     self.log.info(u"    Parameters :")
+                    print "@@@@ %s" % a_device['xpl_stats'][a_xpl_stat] 
                     for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['device']:
                         self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
