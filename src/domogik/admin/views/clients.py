@@ -258,7 +258,7 @@ def client_devices_new_wiz(client_id, device_type_id):
                         app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
             for p in params['global']:
                 if p["xpl"] is not True:
-                    app.db.add_device_param(created_device["id"], p["key"], request.form.get(p['key']))
+                    app.db.add_device_param(created_device["id"], p["key"], request.form.get(p['key']), p['type'])
             # reload stats
             req = MQSyncReq(app.zmq_context)
             msg = MQMessage()

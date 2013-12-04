@@ -105,7 +105,7 @@ def device_globals(did):
                 urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
     for p in js['global']:
         if p["xpl"] is not True:
-            urlHandler.db.add_device_param(did, p["key"], request.form.get(p['key']))
+            urlHandler.db.add_device_param(did, p["key"], request.form.get(p['key']), p["type"])
     urlHandler.reload_stats()
     return 200, "{}"
 

@@ -158,22 +158,25 @@ class DeviceParam(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
+    type = Column(Unicode(32), nullable=True)
 
-    def __init__(self, device_id, key, value):
+    def __init__(self, device_id, key, value, type):
         """Class constructor
 
         @param device_id : The device where this parameter is linked to 
         @param key : The param name
         @param value : The param value
+        @param type : The type param
         """
         self.device_id = device_id
         self.key = ucode(key)
         self.value = ucode(value)
+        self.type = ucode(type)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceParam(id={0}, device_id={1}, key='{2}', value='{3}')>"\
-               .format(self.id, self.device_id, self.key, self.value)\
+        return "<DeviceParam(id={0}, device_id={1}, key='{2}', value='{3}', type='{4}')>"\
+               .format(self.id, self.device_id, self.key, self.value, self.type)\
 
     @staticmethod
     def get_tablename():
