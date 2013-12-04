@@ -434,17 +434,35 @@ class XplPlugin(BasePlugin, MQRep):
 
 
 
+    def get_parameter(self, a_device, key):
+        """ For a device feature, return the required parameter value
+            @param a_device: the device informations
+            @param key: the parameter key
+        """
+        try:
+            self.log.debug(u"Get parameter '{0}'".format(key))
+            for a_param in a_device['params']:
+                if a_param['key'] == key:
+                    value = self.cast(a_param['value'], a_param['type'])
+                    self.log.debug(u"Parameter value found: {0}".format(value))
+                    return value
+            self.log.warning(u"Parameter not found : return None")
+            return None
+        except:
+            self.log.error(u"Error while looking for a device parameter. Return None. Error: {0}".format(traceback.format_exc()))
+            return None
+         
+
     def get_parameter_for_feature(self, a_device, type, feature, key):
         """ For a device feature, return the required parameter value
-            Example with : a_device = {u'xpl_stats': {u'get_total_space': {u'name': u'get_total_space', u'id': 49, u'parameters': {u'device': [{u'xplstat_id': 49, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 49, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 49, u'key': u'type', u'value': u'total_space'}], u'dynamic': [{u'xplstat_id': 49, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_free_space': {u'name': u'get_free_space', u'id':51, u'parameters': {u'device': [{u'xplstat_id': 51, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 51, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 51, u'key': u'type', u'value': u'free_space'}], u'dynamic': [ {u'xplstat_id': 51, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_used_space': {u'name': u'get_used_space', u'id': 52, u'parameters': {u'device': [{u'xplstat_id': 52, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 52, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 52, u'key': u'type', u'value': u'used_space'}], u'dynamic': [{u'xplstat_id': 52, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_percent_used': {u'name': u'get_percent_used', u'id': 50, u'parameters': {u'device': [{u'xplstat_id': 50, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 50, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 50, u'key': u'type', u'value': u'percent_used'}], u'dynamic': [{u'xplstat_id': 50, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}}, u'commands': {}, u'description': u'/home sur darkstar', u'reference': u'ref', u'id': 49, u'device_type_id': u'diskfree.disk_usage', u'sensors': {u'get_total_space': {u'conversion': u'', u'name': u'Total Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 80}, u'get_free_space': {u'conversion': u'', u'name': u'Free Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 82}, u'get_used_space': {u'conversion': u'', u'name': u'Used Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 83}, u'get_percent_used': {u'conversion': u'', u'name': u'Percent used', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 81}}, u'client_id': u'domogik-diskfree.darkstar', u'name': u'darkstar:/home'}
-                         type = xpl_stats
-                         feature = get_percent_used
-                         key = device
-            Return : /home
+            @param a_device: the device informations
+            @param type: the parameter type (xpl_stats, ...)
+            @param feature: the parameter feature
+            @param key: the parameter key
         """
         try:
             self.log.debug(u"Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
-            for a_param in a_device[type][feature]['parameters']['device']:
+            for a_param in a_device[type][feature]['parameters']['static']:
                 if a_param['key'] == key:
                     value = self.cast(a_param['value'], a_param['type'])
                     self.log.debug(u"Parameter value found: {0}".format(value))
