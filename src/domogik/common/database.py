@@ -395,9 +395,10 @@ class DbHelper():
         for a_param in device.params:
             json_param = { 'id': a_param.id,
                            'key': a_param.key,
+                           'type': a_param.type,
                            'value': a_param.value
                            }
-            json_device['params'][a_param.key] = json_param
+            json_device['parameters'][a_param.key] = json_param
         
         # complete with sensors informations
         json_device['sensors'] = {}
@@ -438,18 +439,13 @@ class DbHelper():
                              'schema' : a_xplstat.schema,
                              'parameters' : {
                                 'static' : [],
-                                'dynamic' : [],
-                                'device' : []
+                                'dynamic' : []
                              }
                            }
             # and for each xpl_stat, add the parameters informations
             # the loop is done twice : 
             # - for the dynamic parameters
             # - for the static parameters
-            # Notice : 
-            #- if static field == 1 => this is a static param
-            #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
-            #- if statis == 0 and it has a sensor id => its a dynamic param
             for a_xplstat_param in a_xplstat.params:
                 if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
                     if a_xplstat_param.sensor_id:
@@ -458,12 +454,13 @@ class DbHelper():
                                 sensor_name = sen.reference
                     else:
                         sensor_name = None
-                    json_xplstat['parameters']['dynamic'].append({'key' :  a_xplstat_param.key,
-                                                                      'ignore_values' :  a_xplstat_param.ignore_values,
-                                                                      'sensor_name': sensor_name
-                                                                    })
+                    json_xplstat['parameters']['dynamic'].append({ 'key' :  a_xplstat_param.key,
+                                                                   'ignore_values' :  a_xplstat_param.ignore_values,
+                                                                   'sensor_name': sensor_name
+                                                                })
                 else:
                     json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
+                                                                  'type' : a_xplstat_param.type,
                                                                   'value' :  a_xplstat_param.value,
                                                                 })
                  
@@ -1727,9 +1724,9 @@ class DbHelper():
 ###################
 # Device Config
 ###################
-    def add_device_param(self, d_id, key, value): 
+    def add_device_param(self, d_id, key, value, type): 
         self.__session.expire_all()
-        config = DeviceParam(device_id=d_id, key=key, value=value)
+        config = DeviceParam(device_id=d_id, key=key, value=value, type=type)
         self.__session.add(config)
         try:
             self.__session.commit()
