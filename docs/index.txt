@@ -11,8 +11,7 @@ Domogik
 Overview
 ========
 
-* :doc:`Quick </overview/index>` 
-* :doc:`Detailed </overview/detailed>`
+* :doc:`Domogik overview </overview/index>` 
 
 End User Documentation
 ======================

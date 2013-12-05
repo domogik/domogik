@@ -1,8 +1,0 @@
-=====================
-Detailed architecture
-=====================
-
-Internal architecture
-=====================
-.. image:: internal_architecture.png
-
