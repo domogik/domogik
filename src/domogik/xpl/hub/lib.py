@@ -49,7 +49,7 @@ from optparse import OptionParser
 
 
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
-from domogik.common import daemonize
+#from domogik.common import daemonize
 
 from datetime import datetime
 from time import time
