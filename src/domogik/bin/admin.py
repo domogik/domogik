@@ -108,10 +108,11 @@ class Admin(XplPlugin):
 		self.cert_file = ""
                 self.clean_json = False
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
-            self.db = DbHelper()
+            # TODO : delete
+            #self.db = DbHelper()
 
  	    # Launch server, stats
-            self.log.info(u"REST Initialisation OK")
+            self.log.info(u"Admin Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
 	    self.start_http()

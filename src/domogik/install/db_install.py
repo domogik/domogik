@@ -1,9 +1,14 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import os
 import pwd
 import sys
+# debug
+# TODO : delete later
+print("SYS.PATH={0}".format(sys.path))
+import getpass
+print("USER={0}".format(getpass.getuser()))
+# end debug
 import platform
 import ConfigParser
 import argparse

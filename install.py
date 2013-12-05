@@ -388,15 +388,16 @@ def install():
             except KeyError:
                 raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
 
-            uid = user_entry.pw_uid
-            user_home = user_entry.pw_dir
-            os.setreuid(0,uid)
-            old_home = os.environ['HOME']
-            os.environ['HOME'] = user_home
+            # TODO : delete commented lines : useless
+            #uid = user_entry.pw_uid
+            #user_home = user_entry.pw_dir
+            #os.setreuid(0,uid)
+            #old_home = os.environ['HOME']
+            #os.environ['HOME'] = user_home
             os.system('python src/domogik/install/db_install.py')
 
-            os.setreuid(0,0)
-            os.environ['HOME'] = old_home
+            #os.setreuid(0,0)
+            #os.environ['HOME'] = old_home
 
         if not args.test:
             os.system('python test_config.py')

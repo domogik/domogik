@@ -1,5 +1,7 @@
 #!/bin/bash -e 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
+echo "PYTHONXXXX:"
+ls -l $(which python)
 echo "==== SOME SETUP stuff"
 sudo mkdir -p /var/lock/domogik
 sudo chown $LOGNAME:root /var/lock/domogik

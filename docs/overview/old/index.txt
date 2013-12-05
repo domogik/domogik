@@ -11,14 +11,7 @@ Domogik is modular : you can add and remove plugins easily and create your own p
 How does it work ?
 ==================
 
-.. image:: overview.png
-
-..todo ::
-
-    finish !
-
-
-
+.. image:: domogik_overview_schema.png
 
 RINOR
 -----
