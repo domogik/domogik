@@ -16,18 +16,49 @@ Overview
 End User Documentation
 ======================
 
+Releases history
+----------------
 * :doc:`Release 0.4.0 </releases/0.4.0>` 
 * :doc:`Release 0.3.0 </releases/0.3.0>`
 * :doc:`Release 0.2.0 </releases/0.2.0>`
 * :doc:`Release 0.1.0 </releases/0.1.0>`
 * :doc:`Domogik requirements </enduser/requirements>`
-* **Installation:**
 
-  * :doc:`Standard Installation </enduser/installation/index>` (*)
-  * :doc:`Repositories configuration </enduser/installation/repositories>` (*)
-  * :doc:`Configure external access to Domogik </enduser/installation/external>`
+Installation
+------------
+
+.. todo::
+    external access page still good ? To check
+    and should be only for the admin ! For domoweb, this should be in the domoweb doc
+
+    complete standard installation part
+
+    links to domoweb/domodroid doc
   
-  Now, install Domoweb (the Domogik web user interface) before starting the following parts.
+Basic installation
+******************
+
+* :doc:`Standard Installation </enduser/installation/index>`
+
+Next steps:
+
+* Configure Domogik over the administration interface
+* Install a control user interface like Domoweb or Domodroid
+
+Advanced installation tutorials
+*******************************
+
+The following tutorials are not mandatory to use Domogik. You can pick just what you need for what you want.
+
+* :doc:`Configure external access to Domogik </enduser/installation/external>`
+* Install Domogik in a python virtualenv (and what is a virtualenv ?)
+
+
+Start to use Domogik
+--------------------
+
+.. todo::
+    All this part is to rewrite. 
 
 * **First steps:**
 
@@ -50,6 +81,10 @@ End User Documentation
  
 Technical Documentation
 =======================
+
+.. todo::
+    All this part is to review. 
+
 * :doc:`The xPL hub </xplhub/index>`
 * :doc:`Network ports used by Domogik </technical/network_ports>`
 * :doc:`Commands </technical/command>`
@@ -88,5 +123,9 @@ Technical Documentation
 
 Developers Documentation
 ========================
+
+.. todo::
+    All this part is currently in progress
+
 * :doc:`Developing a package </package_development/plugins/index>`
 * :doc:`Tools </tools/index>`
