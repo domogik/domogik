@@ -5,13 +5,25 @@ Quick overview
 What is Domogik in few words ?
 ==============================
 
-Domogik is a free home automation solution based on xPL. It allows to use several User Interfaces (you can even create your own interface if you are want).
+Domogik is a free home automation solution based on xPL. It allows to use several User Interfaces (you can even create your own interface if you want).
 Domogik is modular : you can add and remove plugins easily and create your own plugins. A plugin is based on a technology (or part of a technology).
 
 How does it work ?
 ==================
 
-.. image:: overview.png
+Here is an overview of all the Domogik components
+
+.. image:: overview.svg
+
+
+
+
+
+
+
+
+
+
 
 ..todo ::
 
