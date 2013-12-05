@@ -11,17 +11,76 @@ Domogik is modular : you can add and remove plugins easily and create your own p
 How does it work ?
 ==================
 
-Here is an overview of all the Domogik components
+Domogik is made of several core components. Each core component has some dedicated tasks. All components interact between them thanks to a message queue : `Zero MQ <http://zeromq.org/>`_. As Domogik uses xPL for automation purpose, some core components are plugged to the xPL network which is used by the xPL plugins. There is also one database to store configuration and data of all the sensors.
+
+Here is an overview of all the Domogik components :
 
 .. image:: overview.svg
 
+Components overview
+===================
 
+Database
+--------
 
+The database will store all configuration parameters, all device parameters and all the sensors history.
 
+Message queue (MQ)
+------------------
 
+The message queue is very important for Domogik. All the domogik internal communications are sent and receive over the MQ. The plugins also use the MQ to interact with core components. Hopefully, the plugin developpers don't need to focus on the MQ : all is handled by some generic functions, so the developpers can focus on their plugin features.
 
+xPL hub
+-------
 
+The xPL hub is just a hub dedicated to xPL. All xPL clients (domogik plugins for example) must first connect themself to the hub and then the hub will deliver all xPL messages to the appropriate targets. 
+If an automation installation has several servers, each server will have its own xPL hub.
 
+xPL plugins
+-----------
+
+A xPL plugin is currently (0.4 release) the only kind of package on Domogik side. One day, there will be some other kind of packages, but this is another story ;).
+A xPL plugin can handle some automation hardware (x10, plcbus, zwave, knx, ...) or some online services (Yahoo Weather, ...). The plugin will send or receive some xPL messages to send sensor data (light status, temperature, ...) or receive commands to apply (switch on, switch off, ...).
+
+With Domogik, the developper won't need to focus on the xPL protocol specification (heart beat messages, hub discovery, etc) : all is handle by some generic functions and the developper will only need to focus on sending and receiving the xPL messages related to his plugins features.
+
+Manager
+-------
+
+The manager is the core component which will monitor all the other components (core or plugins). When a component start, it will send its status to the manager and this one will look on it during all its life. The manager start and stop plugins (depending on the user actions on the user interface or during the startup sequence).
+
+Dbmgr
+-----
+
+The dbmgr (database manager) is used to manage the plugin configuration. When a plugin need some configuration parameters, it will query the dbmgr over the message queue.
+
+Rest
+----
+
+Rest is a REST service which is used by the user interfaces to manage devices, send commands, get the sensors data, ...
+
+XplGW
+-----
+
+XplGW (xPL gateway) is the gateway between the xPL world and the database. This component store in memory the plugin xpl interfaces (thanks to the manager) and is able to translate all received xPL messages into informations that can be stored in database. This component is also used by Rest (over the MQ) to send xPL commands.
+
+Scenario
+--------
+
+The scenario component handle the scenarii management.
+
+Admin
+-----
+
+This component is very important, this is the only user interface delivered in Domogik. This user interface will allow you to configure and manage your Domogik installation. This is not a control interface for your automation system! This is an interface to configure your automation system. To control your automation system, you will need to install another user interface like *Domoweb* or *Domodroid*
+
+Domoweb and Domodroid
+---------------------
+
+These are not components of Domogik. These are some user interfaces to control your automation system over Domogik. You can install them if you want, but you can also develop your own user interface if you prefer to do so.
+
+Why xPL ?
+=========
 
 
 
