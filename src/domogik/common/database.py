@@ -576,7 +576,7 @@ class DbHelper():
                 stat = client_data['xpl_stats'][a_stat]
                 for param in stat['parameters']['dynamic']:
                     if param['sensor'] == a_sensor:
-                        stats_list.append(param['sensor'])
+                        stats_list.append(a_stat)
 
         ### Table core_xplstat
         for a_xplstat in stats_list:
