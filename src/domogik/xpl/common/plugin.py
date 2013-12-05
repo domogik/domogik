@@ -561,12 +561,12 @@ class XplPlugin(BasePlugin, MQRep):
         contens = msg.get_data()
         if 'command' in contens.keys():
             if contens['command'] in self.helpers.keys():
-                if 'params' not in contens.keys():
-                    contens['params'] = {}
+                if 'parameters' not in contens.keys():
+                    contens['parameters'] = {}
                     params = []
                 else:
                     params = []
-                    for key, value in contens['params'].items():
+                    for key, value in contens['parameters'].items():
                         params.append( "{0}='{1}'".format(key, value) )
                 command = "self.{0}(".format(self.helpers[contens['command']]['call'])
                 command += ", ".join(params)
@@ -577,7 +577,7 @@ class XplPlugin(BasePlugin, MQRep):
                 msg = MQMessage()
                 msg.set_action('helper.do.result')
                 msg.add_data('command', contens['command'])
-                msg.add_data('params', contens['params'])
+                msg.add_data('parameters', contens['parameters'])
                 msg.add_data('result', result)
                 self.reply(msg.get())
 
