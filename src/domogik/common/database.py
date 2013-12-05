@@ -493,11 +493,6 @@ class DbHelper():
         self.__session.flush()
 
         ### Table core_xplstat_param
-        #- if static field == 1 => this is a static param
-        #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
-        #- if statis == 0 and it has a sensor id => its a dynamic param
-
-        # static parameters
         for a_parameter in xplstat_in_client_data['parameters']['static']:
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
             parameter =  XplStatParam(xplstat_id = xplstat.id , \
@@ -527,8 +522,6 @@ class DbHelper():
                 self.__session.add(parameter)
                 self.__session.flush()
 
-        # device parameters
-        # => nothing to do
         return xplstat 
 
 
