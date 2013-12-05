@@ -483,7 +483,7 @@ class DbHelper():
         return json_device
 
 
-    def add_device_and_commands_xplstat(self, devid, sensorid, a_xplstat, xplstat_in_client_data):
+    def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data):
         self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
         xplstat = XplStat(name = xplstat_in_client_data['name'], \
               schema = xplstat_in_client_data['schema'], \
@@ -516,15 +516,16 @@ class DbHelper():
             # set some values before inserting data
             if 'ignore_values' not in a_parameter:
                 a_parameter['ignore_values'] = None
-            parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                      sensor_id = sensorid, \
+            if a_parameter["sensor"] in sensors:
+                parameter =  XplStatParam(xplstat_id = xplstat.id , \
+                                      sensor_id = sensors[a_parameter["sensor"]], \
                                       key = a_parameter['key'], \
                                       value = None, \
                                       static = False, \
                                       ignore_values = a_parameter['ignore_values'],
                                       type = None)
-            self.__session.add(parameter)
-            self.__session.flush()
+                self.__session.add(parameter)
+                self.__session.flush()
 
         # device parameters
         # => nothing to do
@@ -583,7 +584,7 @@ class DbHelper():
 	    self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
 	    xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
 	    for param in xplstat_in_client_data['parameters']['dynamic']:
-		xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors[param['sensor']], a_xplstat, xplstat_in_client_data)
+		xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data)
 		created_xpl_stats[a_xplstat] = xplstat.id
 	del stats_list
 
