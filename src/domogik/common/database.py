@@ -501,7 +501,7 @@ class DbHelper():
         for a_parameter in xplstat_in_client_data['parameters']['static']:
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
             parameter =  XplStatParam(xplstat_id = xplstat.id , \
-                                      sensor_id = sensorid, \
+                                      sensor_id = None, \
                                       key = a_parameter['key'], \
                                       value = a_parameter['value'], \
                                       static = True, \
@@ -537,6 +537,7 @@ class DbHelper():
             - ...
         """
         created_xpl_stats = {}
+	created_sensors = {}
         self.__session.expire_all()
 
         ### Add the device itself
@@ -554,6 +555,7 @@ class DbHelper():
         self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
 
         # then, for each sensor, create it in databse for the device
+        stats_list = []
         for a_sensor in device_type_sensors:
             self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
             sensor_in_client_data = client_data['sensors'][a_sensor]
@@ -569,20 +571,23 @@ class DbHelper():
                             )
             self.__session.add(sensor)
             self.__session.flush()
+            created_sensors[a_sensor] = sensor.id
+            for a_stat in client_data['xpl_stats']:
+                stat = client_data['xpl_stats'][a_stat]
+                for param in stat['parameters']['dynamic']:
+                    if param['sensor'] == a_sensor:
+                        stats_list.append(param['sensor'])
 
-            ### Table core_xplstat
-            # for each sensor, insert its xplstats (if any) in database
-            self.log.debug(u"Device creation : inserting data in core_xplstat for '{0}'...".format(a_sensor))
-            # find all xpl_stats that link to this sensor and insert them
-            for a_xplstat in client_data['xpl_stats']:
-                xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
-                for param in xplstat_in_client_data['parameters']['dynamic']:
-                    if 'sensor' in param and param['sensor'] == a_sensor:
-                        xplstat = self.add_device_and_commands_xplstat(device.id, sensor.id, a_xplstat, xplstat_in_client_data)
-                        created_xpl_stats[a_xplstat] = xplstat.id
+        ### Table core_xplstat
+        for a_xplstat in stats_list:
+	    self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
+	    xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
+	    for param in xplstat_in_client_data['parameters']['dynamic']:
+		xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors[param['sensor']], a_xplstat, xplstat_in_client_data)
+		created_xpl_stats[a_xplstat] = xplstat.id
+	del stats_list
 
         ### Table core_command
-
         # first, get the commands associated to the device_type
         self.log.debug(u"Device creation : start to process the commands")
         device_type_commands = client_data['device_types'][device_type]['commands']
