@@ -8,7 +8,7 @@ Installation
 .. note::
     * These examples assume you are using Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
-    * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to `the specific installations steps for postgresql <postgresql>`_.
+    * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
 
 Dependencies
 ------------
@@ -44,7 +44,7 @@ Mysql server
 ------------
 
 .. warning::
-    If you plan to use *postgresql*, please check the `postgresql installation steps <postgresql>`_.
+    If you plan to use *postgresql*, please check the :doc:`postgresql installation steps <postgresql>`.
 
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
