@@ -40,6 +40,8 @@ Basic installation
 
 First, you will need to do the :doc:`standard snstallation </enduser/installation/index>`
 
+If you encounter some errors, please check :doc:`the errors and solutions page </enduser/errors/index>`
+
 Then, you will need to:
 
 * Configure Domogik over the administration interface
