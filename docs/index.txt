@@ -88,8 +88,15 @@ Technical Documentation
 General informations
 -------------------
 
+General informations:
+
 * :doc:`Network ports used by Domogik </technical/network_ports>`
 * :doc:`Database model </technical/database>`
+
+Terms:
+
+* :doc:`Commands </technical/command>`
+* :doc:`Sensors </technical/sensor>`
 
 xPL Hub
 -------
@@ -158,16 +165,9 @@ Core component : REST
 Packages
 --------
 
-.. todo::
-    review
+* :doc:`Packages overview </technical/packages/index>`
+* :doc:`Package type : xPL plugin </technical/packages/xpl_plugin>`
 
-* :doc:`Packages overview </technical/packages>`
-
-???
----
-
-* :doc:`Commands </technical/command>`
-* :doc:`Sensors </technical/sensor>`
 
 
 Developers Documentation
@@ -176,5 +176,5 @@ Developers Documentation
 .. todo::
     All this part is currently in progress
 
-* :doc:`Developing a package </package_development/plugins/index>`
+* :doc:`Developing a plugin </package_development/plugins/index>`
 * :doc:`Tools </tools/index>`

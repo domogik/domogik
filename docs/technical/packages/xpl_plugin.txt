@@ -1,0 +1,13 @@
+===========
+xPL plugins
+===========
+
+Purpose
+=======
+
+xPL plugins packages, called also *plugins* are the first type of packages available on Domogik. They are used to interact with home automation devices or online services.
+
+How to develop a plugin ?
+=========================
+
+Just read the documentation on :doc:`how to develop a plugin </package_development/plugins/index>`.
