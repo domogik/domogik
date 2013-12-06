@@ -50,6 +50,7 @@ Advanced installation tutorials
 
 The following tutorials are not mandatory to use Domogik. You can pick just what you need for what you want.
 
+* :doc:`Install Domogik from a script </enduser/installation/install_from_a_script>`
 * :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
 * :doc:`Configure external access to Domogik </enduser/installation/external>`
 * Install Domogik in a python virtualenv (and what is a virtualenv ?)
