@@ -13,29 +13,34 @@ Installation
 Dependencies
 ------------
 
-Check your Python version with: ::
+Check your Python version with: 
 
+.. code-block:: bash
     python -V
 
 .. warning::
     Right now Domogik **requires Python 2.7**. Python 3 is not (yet) fully supported.
 
-If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
+If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: 
 
-    $ apt-get install python2.7
-    $ ln -sf /usr/bin/python2.7 /usr/bin/python
+.. code-block:: bash
+    $ sudo apt-get install python2.7
+    $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Even if you have python2.7 or higher installed, check that the development package is also installed, or do: ::
+Even if you have python2.7 or higher installed, check that the development package is also installed, or do: 
 
-    $ apt-get install python2.7-dev gcc
+.. code-block:: bash
+    $ sudo apt-get install python2.7-dev gcc
 
-Install SSL libraries: ::
+Install SSL libraries: 
 
-    $ apt-get install libssl-dev 
+.. code-block:: bash
+    $ sudo apt-get install libssl-dev 
 
-Install libraries for postgresql: ::
+Install libraries for postgresql: 
 
-    $ apt-get install python-psycopg2
+.. code-block:: bash
+    $ sudo apt-get install python-psycopg2
 
 .. note::
     Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
@@ -50,22 +55,26 @@ Mysql server
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
     * It is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
-Install packages for mysql server: ::
+Install packages for mysql server: 
 
-    $ apt-get install mysql-server
+.. code-block:: bash
+    $ sudo apt-get install mysql-server
 
-Log on the mysql database as root user: ::
+Log on the mysql database as root user: 
 
+.. code-block:: bash
     $ mysql -u root -p
     Enter password: 
 
-Create a database called "domogik": ::
+Create a database called "domogik": 
 
+.. code-block:: bash
     mysql> CREATE DATABASE domogik;
     Query OK, 1 row affected (0.00 sec)
 
-Create the user "domogik" to use the new database: ::
+Create the user "domogik" to use the new database: 
 
+.. code-block:: bash
     mysql> GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'domopass';
     Query OK, 0 rows affected (0.00 sec)
 
@@ -81,8 +90,9 @@ Download Domogik
 
 The 0.4 release is still in development so you need to get domogik from the sources.
 
-Use git to get the sources: ::
+Use git to get the sources: 
 
+.. code-block:: bash
     $ sudo apt-get install git
     $ git clone https://github.com/domogik/domogik.git
     $ git checkout master
@@ -90,8 +100,9 @@ Use git to get the sources: ::
 Install Domogik 
 ---------------
 
-Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
+Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: 
 
+.. code-block:: bash
     $ cd domogik/
     $ sudo ./install.py
 
@@ -108,22 +119,21 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 Make Domogik start with your computer
 -------------------------------------
 
-For Debian or Ubuntu systems: ::
+For Debian or Ubuntu systems: 
 
+.. code-block:: bash
     $ sudo update-rc.d domogik defaults
-
-For Archlinux: add *@domogik* at the very end of the line starting with *DAEMON*.
 
 Start domogik
 -------------
-.. code-block:: bash
 
+.. code-block:: bash
     $ sudo /etc/init.d/domogik start
     * Starting 0MQ broker ... Done.
     * Starting 0MQ forwarder ... Done.
     * Starting xPL (python version)... Done.
     * Starting Manager (with -d -r -x -s)... Done.
-
+    * Starting the admin interface ... Done.
 
 It will start : 
 
@@ -131,6 +141,7 @@ It will start :
 * The xpl hub
 * The Domogik manager on this host
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
+* The administration web interface
 
 Next step : domoweb, the web user interface
 -------------------------------------------
