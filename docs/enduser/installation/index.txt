@@ -74,13 +74,13 @@ Create the user "domogik" to use the new database: ::
 Download Domogik
 ----------------
 
-The 0.4 release is still in dev so you need to get domogik from the sources.
+The 0.4 release is still in development so you need to get domogik from the sources.
 
 Use git to get the sources: ::
 
     $ sudo apt-get install git
     $ git clone https://github.com/domogik/domogik.git
-    $ git checkout 0.4-candidate
+    $ git checkout master
 
 Install Domogik 
 ---------------
@@ -94,7 +94,7 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
     During installation, a new user will be created if necessary.
     
-    If you want to use the C hub instead of the python hub (the default one), use the **--hub_c** option. See :doc:`here </xplhub/index>` for more informations on the xpl hubs.
+    If you want to use the C hub instead of the python hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hubs.
 
 .. todo::
 
