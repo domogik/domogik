@@ -11,7 +11,8 @@ GET
 
 /sensorhistory/id/<sensor id>/latest
 ------------------------------------
-Get latest value
+
+Get the latest value of a sensor.
 
 Example: ::
 
@@ -30,7 +31,8 @@ Example: ::
 
 /sensorhistory/id<sensor id>/last/<number of item to get>
 ---------------------------------------------------------
-Get the N last values
+
+Get the N last values of a sensor.
 
 Example: ::
 
@@ -57,7 +59,7 @@ Example: ::
 /sensorhistory/id/<sensor id>/from/<start time>{/to/<end time>}
 ---------------------------------------------------------------
 
-Get values from <start time> to ...
+Get the values for a sensor from <start time> to ...
 <start time> and <end time> need to be timestamps
 
 Example: ::
@@ -83,7 +85,7 @@ Example: ::
     ]
 
 /sensorhistory/id/<sensor id>/from/<start time> {/to/<end time>}/interval/<year, month, week, day, hour, minute, second>/selector/<min(number only), max(number only), avg(number only), first, last, x>
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Tuples format
 *************

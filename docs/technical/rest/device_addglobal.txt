@@ -10,16 +10,24 @@ Available actions :
 
     Finish
 
-PUT
-===
+PUT /device/addglobal
+=====================
 
-This method is used to .............................
+This method is used to set the global parameters of a device.
 
 Example: ::
 
-    Method : GET
-    Url : http://127.0.0.1:40405/device/.............................
-    Response (application/json) : 
-    .............................
+    Method : PUT
+    Url : http://127.0.0.1:40405/device/addglobal
+    Headers:
+        Content-Type: application/x-www-form-urlencoded
+    Body:
+        param1=value1
+        param2=value2
+        param3=value3
+        ...
+    Response (application/json):
+        ...
+
 
     

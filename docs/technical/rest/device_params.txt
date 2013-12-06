@@ -6,10 +6,10 @@ Available actions :
 
 * GET : get the parameters associated to a device type
 
-GET
-===
+GET /device/params
+==================
 
-This method is used to get the list of the parameters associated to a device type. This list is needed bu the user itnerfaces to create the form to set the parameters of a device.
+This method is used to get the list of the parameters associated to a device type. This list is needed by the user interfaces to create the form to set the parameters of a device.
 
 Example: ::
 
