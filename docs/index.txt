@@ -57,6 +57,7 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 * :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
 * Configure external access to Domogik administration interface
 * Install Domogik in a python virtualenv (and what is a virtualenv ?)
+* :doc:`Configure SSL </enduser/installation/ssl>`
 
 
 Quick start guide
@@ -132,7 +133,24 @@ Core component : REST
 ---------------------
 
 .. todo::
-    TODO
+    Review
+
+* :doc:`Overview </technical/rest/index>`
+* :doc:`/ </technical/rest/status>`: Status ouput for rest
+* :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
+* :doc:`/datatype </technical/rest/datatype>`: The output of all known datatypes by domogik
+* :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
+* :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
+* :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
+* :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
+* :doc:`/sensorhistory </technical/rest/sensorhistory>`: list sensorhistory values
+* Devices parameters management
+    * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
+    * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
+* Old Domogik 0.2/0.3 devices migration
+    * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
+* Command sending
+    * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
 
 Packages
 --------
@@ -147,23 +165,6 @@ Packages
 
 * :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
-* **REST:**
-    * :doc:`Overview </technical/rest/index>`
-    * :doc:`/ </technical/rest/status>`: Status ouput for rest
-    * :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
-    * :doc:`/datatype </technical/rest/datatype>`: The output of all known datatypes by domogik
-    * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
-    * :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
-    * :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
-    * :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
-    * :doc:`/sensorhistory </technical/rest/sensorhistory>`: list sensorhistory values
-    * Devices parameters management
-        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
-        * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
-    * Old Domogik 0.2/0.3 devices migration
-        * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
-    * Command sending
-        * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
 
 
 Developers Documentation
