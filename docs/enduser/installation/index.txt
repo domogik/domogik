@@ -105,15 +105,6 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
     Describe all the steps
 
 
-Optional : postgresql (instead of mysql)
-----------------------------------------
-
-If you wish to use postgresql instead of mysql
-
-* Create your database
-* Edit your */etc/domogik/domogik.cfg* file and edit the *[database]* section : type = postgresql
-
-
 Make Domogik start with your computer
 -------------------------------------
 
