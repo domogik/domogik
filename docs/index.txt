@@ -82,9 +82,6 @@ Detailed guide
 Technical Documentation
 =======================
 
-.. todo::
-    All this part is to review. 
-
 General informations
 -------------------
 
@@ -167,8 +164,6 @@ Packages
 
 * :doc:`Packages overview </technical/packages/index>`
 * :doc:`Package type : xPL plugin </technical/packages/xpl_plugin>`
-
-
 
 Developers Documentation
 ========================
