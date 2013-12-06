@@ -354,18 +354,6 @@ kill_all() {
     done
 }
 
-function update_cache {
-    echo -n " * Updating cache temporary disabled in 0.4"
-    #echo -n " * Updating packages cache..."
-    #/bin/su - ${DOMOGIK_USER} -c "dmg_pkgmgr -u 2>/dev/null 1>&2"
-    #if [ $? -gt 0 ]; then
-    #    echo " An error occured during packages cache update."
-    #    exit 1
-    #else
-    #    echo " Done"
-    #fi
-}
-
 # Check if the directory for lock exists
 function check_lock_dir {
     #USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
@@ -388,7 +376,6 @@ case "$1" in
             start
             sleep ${STARTTIME}
             sleep ${STARTTIME}
-            update_cache
         else
             case "$2" in
                 admin)
