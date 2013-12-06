@@ -1,6 +1,6 @@
-================================================================
-/device/old - list the old devices (created with Domogik <= 0.3)
-================================================================
+=========================================================================
+/device/old - list the old devices (the ones created with Domogik <= 0.3)
+=========================================================================
 
 Available actions : 
 
@@ -23,7 +23,7 @@ All the devices will be returned in a json table.
 Example: ::
 
     Method : GET
-    Url : http://127.0.0.1:40405/device
+    Url : http://127.0.0.1:40405/device/old
     Response (application/json) : 
     [...]
     

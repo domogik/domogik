@@ -120,29 +120,9 @@ This example demonstrates how the url can generate any type of xpl message, the 
 
 The commands are dynamic parameters and need to be sent via the url, the xpl command params are staticly defined, these definitions are done during device creation and are not changeable afterwards.
 
-How REST gets xpl-trig for a /command 
-=====================================
-
-* REST start
-* REST do some init stuff
-* REST try to get QUEUE_COMMAND_* values from database. If not get default values 
-* REST create a queue for /command
-* REST get a /command call
-* REST create a thread for /command (like all others /foo)
-* REST create and send XPL message 
-* REST start counting for timeout (see QUEUE_COMMAND_TIMEOUT)
-* while timeout not reached, REST read queue to get xpl-trig
-* if timeout reached:
-
-  *  REST send timeout message
-
-* else :
-
-  * REST transform xpl-trig in json data
-  * REST send data
 
 How UI will get status of device ?
 ==================================
 
-REST only send a OK/KO response with the xpl-trig xPL message received when a /command is successfull. 
+REST only send http code as response. If http code = 200, then the user interface should request REST to get the last sensor value.
 To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.
