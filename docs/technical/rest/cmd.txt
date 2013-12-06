@@ -133,8 +133,11 @@ How REST gets xpl-trig for a /command
 * REST start counting for timeout (see QUEUE_COMMAND_TIMEOUT)
 * while timeout not reached, REST read queue to get xpl-trig
 * if timeout reached:
+
   *  REST send timeout message
+
 * else :
+
   * REST transform xpl-trig in json data
   * REST send data
 
@@ -142,4 +145,4 @@ How UI will get status of device ?
 ==================================
 
 REST only send a OK/KO response with the xpl-trig xPL message received when a /command is successfull. 
-To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/stats** or **/events** REST feature to get info from this device.
+To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.
