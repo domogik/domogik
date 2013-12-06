@@ -9,7 +9,7 @@ Available actions :
 GET /
 =====
 
-Returns the status of rest.
+Returns some general informations about REST and the Domogik system.
 
 Example: ::
 

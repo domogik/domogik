@@ -79,22 +79,31 @@ get:
 
 delete:
 
-* code = 204
-* data = empty
+    code = 204
+
+    data = empty
  
 put (update):
+
     code = 200
+
     data = the updated object (json)
  
 post (create):
+
     code = 201
+
     data = the new object (json)
  
 error:
+
     code = 400
+
     data = {msg: "string describing the error"}
  
 action ok, no content returnd:
+
     code = 204
+
     data = Empty
 
