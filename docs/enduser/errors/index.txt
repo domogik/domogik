@@ -39,9 +39,11 @@ Check the process status
 
 Assuming the Domogik user is *domogik*, do the following checks:
 
-* check all main components are up: ::
+* check all main components are up: 
 
-    $ ps -fu domogik | grep dmg_
+    ::
+
+        $ ps -fu domogik | grep dmg_
 
     You must have one process for the *MQ broker* and one for the *MQ forwarder*: ::
 
@@ -50,11 +52,11 @@ Assuming the Domogik user is *domogik*, do the following checks:
 
 
 
-    domogik    32605     1  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_hub
-    domogik      329     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_admin
-    domogik      336   329  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_admin
-    domogik    32635     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
-    domogik    32642 32635  0 14:12 ?        00:00:09 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
+        domogik    32605     1  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_hub
+        domogik      329     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_admin
+        domogik      336   329  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_admin
+        domogik    32635     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
+        domogik    32642 32635  0 14:12 ?        00:00:09 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
 
 
 
