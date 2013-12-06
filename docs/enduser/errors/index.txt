@@ -16,6 +16,7 @@ First don't forget to :
 * check the log files for errors
 * check the process status 
 * check if services are availables
+* check if xPL is working fine
 
 Check the log files
 -------------------
@@ -50,43 +51,111 @@ Assuming the Domogik user is *domogik*, do the following checks:
         domogik    32562     1  1 14:12 ?        00:00:23 /usr/bin/python /usr/local/bin/dmg_broker
         domogik    32583     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_forwarder
 
-
+    You must have one process for the python hub: ::
 
         domogik    32605     1  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_hub
+
+    You must have 2 processes for the administration web interface: ::
+
         domogik      329     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_admin
         domogik      336   329  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_admin
+
+    You must have 2 processes for the manager: ::
+
         domogik    32635     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
         domogik    32642 32635  0 14:12 ?        00:00:09 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
 
+    Check if rest is up: ::
+
+        $ ps -fu fritz | grep rest
+        fritz    32700     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/rest.pyc
+        fritz    32709 32700  0 14:12 ?        00:00:12 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/rest.pyc
+
+    Check if dbmgr is up: ::
+
+        $ ps -fu domogik | grep dbmgr
+        domogik    32669     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/dbmgr.py
+        domogik    32678 32669  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/dbmgr.py
+
+    Check if xplgw is up: ::
+
+        $ ps -fu domogik | grep xplgw
+        domogik    32726     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
+        domogik    32735 32726  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
+
+    If one component is not up, check its log files. If the component is *rest*, *dbmgr* or *xplgw* and you find no logs, check in the *manager* logs.
+
+Check if services are availables
+--------------------------------
+
+You can use the following command on your server to check all ports where a service is listening. Notice that Domogik uses by default ports in 404xx range. ::
+
+    # netstat -tnpl | grep 404
+
+If rest server is up, you will see: ::
+    
+    tcp        0      0 192.168.1.10:40405      0.0.0.0:*               LISTEN      32709/python
+
+If the administration web interface is up, you will see (depending on your network configuration): ::
+    
+    tcp        0      0 192.168.1.10:40406      0.0.0.0:*               LISTEN      336/python
+    tcp        0      0 127.0.0.1:40406         0.0.0.0:*               LISTEN      336/python
+
+If message queue broket and forwarder are up, you will see: ::
+    
+    tcp        0      0 192.168.1.10:40410      0.0.0.0:*               LISTEN      32562/python
+    tcp        0      0 192.168.1.10:40411      0.0.0.0:*               LISTEN      32583/python
+    tcp        0      0 192.168.1.10:40412      0.0.0.0:*               LISTEN      32583/python
+
+You can find more informations about the used ports in the :doc:`network ports page </technical/network_ports>`.
 
 
-Domogik 0.4
-===========
+Check xPL is working fine
+-------------------------
+
+If you think xPL is not working, do: ::
+
+    $ grep "HUB discovery" /var/log/domogik/xplgw.log
+
+You should have the following lines: ::
+
+    2013-12-06 14:12:23,435 domogik-xplgw INFO HUB discovery > starting
+    2013-12-06 14:12:23,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
+    2013-12-06 14:12:23,438 domogik-xplgw INFO HUB discovery > Received HBEAT echo, HUB detected
+    2013-12-06 14:12:23,438 domogik-xplgw INFO HUB discovery > hub found, configuration in progress
+
+If the following lines appears always, it means that the xPL hub is not found. So you should check your configurationor network access (firewall, ...): ::
+
+    2013-12-06 14:12:23,435 domogik-xplgw INFO HUB discovery > starting
+    2013-12-06 14:13:33,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
+    2013-12-06 14:13:35,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
+    2013-12-06 14:13:37,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
+    2013-12-06 14:13:39,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
+
+The python xPL hub configuration is set in **/etc/domogik/xplhub.cfg**. The logs are in **/var/log/xplhub/**
 
 
-Domogik 0.1/0.2/0.3
-===================
 
-!!Domogik doesn't work, how to debug it ?
 
-First, check the log files for ERROR messages.
 
-If you don't find any, check if your xpl hub is working. You can use the tool __send.py__ to send a test message and __dump_xpl.py__ to check if you received it.
 
-If all is OK at this point, you may try so start the plugin (or manager/rest/dbgmr) which has an issue in a shell with the -f option (example : ./onewire.py -f) and check if there are uncaught errors on stdout.
+Domogik 0.1/0.2/0.3 errors (that may still happen in 0.4)
+=========================================================
 
-!!Installation issues
-!!!libmysqlclient issue on Ubuntu 12.04
-!!!!Error
-{CODE()}
-ImportError: libmysqlclient_r.so.16: cannot open shared object file: No such file or directory
-{CODE}
+libmysqlclient issue on Ubuntu 12.04
+------------------------------------
 
-!!!!Solution
-Ubuntu install the libmysqlclient in release 18. Just create a symlink : 
-{CODE()}
-ln -v /usr/lib/i386-linux-gnu/libmysqlclient_r.so.18 /usr/lib/i386-linux-gnu/libmysqlclient_r.so.16
-{CODE}
+Error: ::
+
+    ImportError: libmysqlclient_r.so.16: cannot open shared object file: No such file or directory
+
+
+Solution: 
+
+    Ubuntu install the libmysqlclient in release 18. Just create a symlink: ::
+
+        ln -v /usr/lib/i386-linux-gnu/libmysqlclient_r.so.18 /usr/lib/i386-linux-gnu/libmysqlclient_r.so.16
+
 
 
 

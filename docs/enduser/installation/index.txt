@@ -140,5 +140,5 @@ Domoweb is not yet available for Domogik 0.4
 It doesn't work?
 ----------------
 
-* :doc:`See errors and solutions </enduser/errors/index>
+* :doc:`See errors and solutions </enduser/errors/index>`
 
