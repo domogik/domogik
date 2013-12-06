@@ -74,11 +74,13 @@ Rest uses http status codes to identify the error:
 
 get:
     code = 200
+
     data = the returned data from the get request (json)
 
 delete:
-    code = 204
-    data = empty
+
+* code = 204
+* data = empty
  
 put (update):
     code = 200
