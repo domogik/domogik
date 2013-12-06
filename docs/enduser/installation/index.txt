@@ -74,6 +74,11 @@ Create the user "domogik" to use the new database: ::
 Download Domogik
 ----------------
 
+.. warning::
+    You must put Domogik sources in a folder which can be read by all the system users:
+    
+    * don't download Domogik sources in */root* or */*
+
 The 0.4 release is still in development so you need to get domogik from the sources.
 
 Use git to get the sources: ::
@@ -94,13 +99,10 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
     During installation, a new user will be created if necessary.
     
-    If you want to use the C hub instead of the python hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hubs.
+    If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
 
 .. todo::
-
-    * This option is not yet available in Domogik 0.4
-    * Describe all the steps
-    * Describe how to use the command line
+    Describe all the steps
 
 
 Optional : postgresql (instead of mysql)

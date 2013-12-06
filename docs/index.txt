@@ -87,8 +87,22 @@ Technical Documentation
 .. todo::
     All this part is to review. 
 
-* :doc:`The xPL hub </xplhub/index>`
+General informations
+-------------------
+
 * :doc:`Network ports used by Domogik </technical/network_ports>`
+
+xPL Hub
+-------
+* :doc:`The xPL hub </xplhub/index>`
+
+Message queue (zeroMQ)
+----------------------
+
+
+???
+---
+
 * :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
 * **Database:**
