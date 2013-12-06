@@ -28,11 +28,7 @@ Installation
 ------------
 
 .. todo::
-    external access page still good ? To check
-    and should be only for the admin ! For domoweb, this should be in the domoweb doc
-
     complete standard installation part
-
     links to domoweb/domodroid doc
   
 Basic installation
@@ -47,6 +43,11 @@ Then, you will need to:
 * Configure Domogik over the administration interface
 * Install a control user interface like Domoweb or Domodroid
 
+Uninstallation
+**************
+
+If you want to uninstall Domogik, you will need to :doc:`use the uninstall tool </enduser/installation/uninstall>` .
+
 Advanced installation tutorials
 *******************************
 
@@ -54,34 +55,28 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 
 * :doc:`Install Domogik from a script </enduser/installation/install_from_a_script>`
 * :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
-* :doc:`Configure external access to Domogik </enduser/installation/external>`
+* Configure external access to Domogik administration interface
 * Install Domogik in a python virtualenv (and what is a virtualenv ?)
 
 
-Start to use Domogik
---------------------
+Quick start guide
+-----------------
 
 .. todo::
     All this part is to rewrite. 
 
-* **First steps:**
+    * Terms
+    * First use : go to the admin
+    * admin :  change admin password
+    * find and install a package
+    * configure a client and create its devices
+    * start a client
 
-  * :doc:`First Use </enduser/configuration/index>` (*)
-  * :doc:`Accounts management </enduser/administration/account>`
+Detailed guide
+--------------
 
-* :doc:`**Packages** </enduser/packages/index>` 
+* :doc:`Manage packages </enduser/packages/index>` 
 
-  * **TODO**: configuration, ...
-  * **TODO**: dev
-
-* **Devices:**
-
-  * :doc:`Devices management </enduser/administration/device>` (*)
-  * :doc:`Set up your devices </enduser/configuration/devices>` (*)
-
-* **Uninstallation:**
-
-  * :doc:`How to uninstall Domogik </enduser/installation/uninstall>` 
  
 Technical Documentation
 =======================
@@ -93,6 +88,7 @@ General informations
 -------------------
 
 * :doc:`Network ports used by Domogik </technical/network_ports>`
+* :doc:`Database model </technical/database>`
 
 xPL Hub
 -------
@@ -101,14 +97,56 @@ xPL Hub
 Message queue (zeroMQ)
 ----------------------
 
+* :doc:`Overview </technical/mq/overview>`
+* :doc:`Request Reply </technical/mq/reqrep>`
+* :doc:`Publish Subscribe </technical/mq/pubsub>`
+* :doc:`Used messages </technical/mq/used>`
+* :doc:`Detail on Request Reply used messages </technical/mq/reqrep_detailed>`
+* :doc:`Detail on Publish Subscribe used messages</technical/mq/pubsub_detailed>`
+
+Core component : manager
+------------------------
+
+.. todo::
+    TODO
+
+Core component : dbmgr
+----------------------
+
+.. todo::
+    TODO
+
+Core component : xplgw
+----------------------
+
+.. todo::
+    TODO
+
+Core component : admin
+----------------------
+
+.. todo::
+    TODO
+
+Core component : REST
+---------------------
+
+.. todo::
+    TODO
+
+Packages
+--------
+
+.. todo::
+    review
+
+* :doc:`Packages overview </technical/packages>`
 
 ???
 ---
 
 * :doc:`Commands </technical/command>`
 * :doc:`Sensors </technical/sensor>`
-* **Database:**
-  :doc:`Model </technical/database>`
 * **REST:**
     * :doc:`Overview </technical/rest/index>`
     * :doc:`/ </technical/rest/status>`: Status ouput for rest
@@ -127,17 +165,6 @@ Message queue (zeroMQ)
     * Command sending
         * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
 
-* **Db manager:**
-* **XPL Event manager:**
-* **Packages:**
-  :doc:`Packages overview </technical/packages>`
-* **Message Queue:**
-    * :doc:`Overview </technical/mq/overview>`
-    * :doc:`Request Reply </technical/mq/reqrep>`
-    * :doc:`Publish Subscribe </technical/mq/pubsub>`
-    * :doc:`Used messages </technical/mq/used>`
-    * :doc:`Detail on Request Reply used messages </technical/mq/reqrep_detailed>`
-    * :doc:`detail on Publish Subscribe used messages</technical/mq/pubsub_detailed>`
 
 Developers Documentation
 ========================
