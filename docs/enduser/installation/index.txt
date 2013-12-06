@@ -13,33 +13,28 @@ Installation
 Dependencies
 ------------
 
-Check your Python version with: 
+Check your Python version with: ::
 
-::
     python -V
 
 .. warning::
     Right now Domogik **requires Python 2.7**. Python 3 is not (yet) fully supported.
 
-If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: 
+If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
 
-::
     $ sudo apt-get install python2.7
     $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Even if you have python2.7 or higher installed, check that the development package is also installed, or do: 
+Even if you have python2.7 or higher installed, check that the development package is also installed, or do: ::
 
-::
     $ sudo apt-get install python2.7-dev gcc
 
-Install SSL libraries: 
+Install SSL libraries: ::
 
-::
     $ sudo apt-get install libssl-dev 
 
-Install libraries for postgresql: 
+Install libraries for postgresql: ::
 
-::
     $ sudo apt-get install python-psycopg2
 
 .. note::
@@ -55,26 +50,22 @@ Mysql server
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
     * It is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
-Install packages for mysql server: 
+Install packages for mysql server: ::
 
-::
     $ sudo apt-get install mysql-server
 
-Log on the mysql database as root user: 
+Log on the mysql database as root user: ::
 
-::
     $ mysql -u root -p
     Enter password: 
 
-Create a database called "domogik": 
+Create a database called "domogik": ::
 
-::
     mysql> CREATE DATABASE domogik;
     Query OK, 1 row affected (0.00 sec)
 
-Create the user "domogik" to use the new database: 
+Create the user "domogik" to use the new database: ::
 
-::
     mysql> GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'domopass';
     Query OK, 0 rows affected (0.00 sec)
 
@@ -90,9 +81,8 @@ Download Domogik
 
 The 0.4 release is still in development so you need to get domogik from the sources.
 
-Use git to get the sources: 
+Use git to get the sources: ::
 
-::
     $ sudo apt-get install git
     $ git clone https://github.com/domogik/domogik.git
     $ git checkout master
@@ -100,9 +90,8 @@ Use git to get the sources:
 Install Domogik 
 ---------------
 
-Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: 
+Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
-::
     $ cd domogik/
     $ sudo ./install.py
 
@@ -119,15 +108,15 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 Make Domogik start with your computer
 -------------------------------------
 
-For Debian or Ubuntu systems: 
+For Debian or Ubuntu systems: ::
 
-::
     $ sudo update-rc.d domogik defaults
 
 Start domogik
 -------------
 
 ::
+
     $ sudo /etc/init.d/domogik start
     * Starting 0MQ broker ... Done.
     * Starting 0MQ forwarder ... Done.
@@ -150,5 +139,6 @@ Domoweb is not yet available for Domogik 0.4
 
 It doesn't work?
 ----------------
+
 * `See errors and solutions <http://wiki.domogik.org/Errors_and_solutions>`_
 
