@@ -38,9 +38,9 @@ Installation
 Basic installation
 ******************
 
-* :doc:`Standard Installation </enduser/installation/index>`
+First, you will need to do the :doc:`standard snstallation </enduser/installation/index>`
 
-Next steps:
+Then, you will need to:
 
 * Configure Domogik over the administration interface
 * Install a control user interface like Domoweb or Domodroid
@@ -50,6 +50,7 @@ Advanced installation tutorials
 
 The following tutorials are not mandatory to use Domogik. You can pick just what you need for what you want.
 
+* :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
 * :doc:`Configure external access to Domogik </enduser/installation/external>`
 * Install Domogik in a python virtualenv (and what is a virtualenv ?)
 

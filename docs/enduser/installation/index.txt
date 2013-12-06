@@ -6,10 +6,9 @@ Installation
 ============
 
 .. note::
-    * These examples assume Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
-    * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to stop it before installation.
-
-.. todo:: Mac installation
+    * These examples assume you are using Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
+    * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
+    * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to `the specific installations steps for postgresql <postgresql>`_.
 
 Dependencies
 ------------
@@ -26,7 +25,7 @@ If you don't already have Python 2.7 or above (you have it if you are running a 
     $ apt-get install python2.7
     $ ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Even if you have python2.7 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
+Even if you have python2.7 or higher installed, check that the development package is also installed, or do: ::
 
     $ apt-get install python2.7-dev gcc
 
@@ -38,8 +37,14 @@ Install libraries for postgresql: ::
 
     $ apt-get install python-psycopg2
 
+.. note::
+    Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
+
 Mysql server
 ------------
+
+.. warning::
+    If you plan to use *postgresql*, please check the `postgresql installation steps <postgresql>`_.
 
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
