@@ -801,7 +801,7 @@ class DbHelper():
                 # insert new recored in core_sensor_history
                 # store the history value if requested
                 if sensor.history_store:
-                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value)
+                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=value)
                     self.__session.add(h)
                 sensor.last_received = date
                 sensor.last_value = ucode(value)

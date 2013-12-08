@@ -424,12 +424,14 @@ class SensorHistory(Base):
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float, nullable=True)
     value_str = Column(Unicode(32), nullable=False)
+    original_value_num = Column(Float, nullable=True)
 
-    def __init__(self, sensor_id, date, value):
+    def __init__(self, sensor_id, date, value, orig_value):
         self.sensor_id = sensor_id
         self.date = date
         try:
             self.value_num = float(value)
+            self.original_value_num = float(orig_value)
         except ValueError:
             pass
         except TypeError:
@@ -438,8 +440,8 @@ class SensorHistory(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<SensorHistory(sensor_id=%s date=%s value_str='%s' value_num=%s)>"\
-               % (self.sensor_id, self.date, self.value_str, self.value_num)
+        return "<SensorHistory(sensor_id=%s date=%s value_str='%s' value_num=%s orig_value_num=%s)>"\
+               % (self.sensor_id, self.date, self.value_str, self.value_num, self.original_value_num)
 
     @staticmethod
     def get_tablename():
