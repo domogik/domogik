@@ -224,7 +224,7 @@ class PackageJson():
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'data_type', 'conversion', 'history']
+                expected = ['name', 'data_type', 'conversion', 'history', 'type']
                 hexpected = ['store', 'max', 'expire', 'round_value']
                 self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), sens['history'].keys())
