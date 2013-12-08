@@ -405,6 +405,7 @@ class DbHelper():
         for a_sensor in device.sensors:
             json_sensor = { 'id' : a_sensor.id,
                             'name' : a_sensor.name,
+                            'type' : a_sensor.type,
                             'data_type' : a_sensor.data_type,
                             'conversion' : a_sensor.conversion, 
                             'last_value' : a_sensor.last_value, 
@@ -556,6 +557,7 @@ class DbHelper():
             sensor = Sensor(name = sensor_in_client_data['name'], \
                             device_id  = device.id, \
                             reference = a_sensor, \
+                            type = sensor_in_client_data['type'], \
                             data_type = sensor_in_client_data['data_type'], \
                             conversion = sensor_in_client_data['conversion'], \
                             h_store = sensor_in_client_data['history']['store'], \
@@ -777,6 +779,21 @@ class DbHelper():
         self.__session.expire_all()
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is not None:
+            orig_value = value
+            # check the sensorTypes
+            # sensor.type is absolute => do nothing
+            if sensor.type == 'incremental':
+                # get the last orig_value and substract value and orig_value and set the enw value
+                last = self.__session.query(SensorHistory) \
+                    .filter(SensorHistory.sensor_id == sid) \
+                    .order_by(SensorHistory.date.desc()) \
+                    .first()
+                if last is not None:
+                    if last.original_value_num is not None:
+                        value = float(value) - last.original_value_num
+                else:
+                    # set the begin value to 0
+                    value = 0
             # only store stats if the value is different
             if sensor.last_value is not str(value):
                 # handle history_round
@@ -801,7 +818,7 @@ class DbHelper():
                 # insert new recored in core_sensor_history
                 # store the history value if requested
                 if sensor.history_store:
-                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=value)
+                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
                 sensor.last_received = date
                 sensor.last_value = ucode(value)
