@@ -29,8 +29,9 @@ import traceback
 
 from domogik.mq.common import split_address
 from domogik.common.configloader import Loader
-from domogik.common.daemonize import createDaemon
+from domogik.common.daemon.daemon import DaemonContext
 from domogik.common import logger
+from domogik.mq.socket import ZmqSocket
 
 ###
 
@@ -80,12 +81,12 @@ class MDPBroker(object):
         self.log = l.get_logger()
         self.log.info("MDP broker startup...")
 
-        socket = context.socket(zmq.ROUTER)
+        socket = ZmqSocket(context, zmq.ROUTER)
         socket.bind(main_ep)
         self.main_stream = ZMQStream(socket)
         self.main_stream.on_recv(self.on_message)
         if opt_ep:
-            socket = context.socket(zmq.ROUTER)
+            socket = ZmqSocket(context, zmq.ROUTER)
             socket.bind(opt_ep)
             self.client_stream = ZMQStream(socket)
             self.client_stream.on_recv(self.on_message)
@@ -184,11 +185,11 @@ class MDPBroker(object):
                 wrep = self._workers[wid]
             except KeyError:
                 # not registered, ignore
-                self.log.warning("The worker wid={0} is not registered, ignoring the disconnect request".format(wid))
+                self.log.warning("The worker wid={0} service={1} is not registered, ignoring the disconnect request".format(wid, wrep.service))
                 return
             to_send = [ wid, self.WORKER_PROTO, b'\x05' ]
             self.main_stream.send_multipart(to_send)
-            self.log.info("Request to unregister a worker : wid={0}".format(wid))
+            self.log.info("Request to unregister a worker : wid={0} service={1}".format(wid, wrep.service))
         except:
             self.log.error("Error while disconnecting a worker : wid={0}, trace={1}".format(wid, traceback.format_exc()))
         self.unregister_worker(wid)
@@ -253,9 +254,9 @@ class MDPBroker(object):
         :rtype: None
         """
         self.log.debug("Check for dead workers...")
-        for wrep in self._workers.values():
+        for wrep in list(self._workers.values()):
             if not wrep.is_alive():
-                self.log.info("A worker seems to be dead : wid={0}".format(wrep.id))
+                self.log.info("A worker seems to be dead : wid={0} service={1}".format(wrep.id, wrep.service))
                 self.unregister_worker(wrep.id)
         return
 
@@ -288,10 +289,10 @@ class MDPBroker(object):
         :rtype: None
         """
         ret_id = rp[0]
-        wrep = self._workers[ret_id]
-        service = wrep.service
         # make worker available again
         try:
+	    wrep = self._workers[ret_id]
+	    service = wrep.service
             wq, wr = self._services[service]
             cp, msg = split_address(msg)
             self.client_response(cp, service, msg)
@@ -358,11 +359,16 @@ class MDPBroker(object):
         if service == b'mmi.service':
             s = msg[0]
             ret = b'404'
-            for wr in self._workers.values():
+            for wr in list(self._workers.values()):
                 if s == wr.service:
                     ret = b'200'
                     break
             self.client_response(rp, service, [ret])
+        elif service == b'mmi.services':
+	    ret = []
+            for wr in list(self._workers.values()):
+                ret.append(wr.service)
+	    self.client_response(rp, service, [b', '.join(ret)])
         else:
             self.client_response(rp, service, [b'501'])
         return
@@ -424,7 +430,7 @@ class MDPBroker(object):
             # unknwon service
             # ignore request
             msg = "broker has no service {0}".format(service)
-            print msg
+            print(msg)
             self.log.warning(msg)
         return
 
@@ -595,8 +601,11 @@ def main():
     my_conf = cfg.load()
     config = dict(my_conf[1])
 
-    createDaemon()
+    ctx = DaemonContext()
+    ctx.open()
+
     context = zmq.Context()
+    print(("tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])))
     broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
     IOLoop.instance().start()
     broker.shutdown()

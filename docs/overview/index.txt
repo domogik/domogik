@@ -5,32 +5,82 @@ Quick overview
 What is Domogik in few words ?
 ==============================
 
-Domogik is a free home automation solution based on xPL. It allows to use several User Interfaces (you can even create your own interface if you are want).
+Domogik is a free home automation solution based on xPL. It allows to use several User Interfaces (you can even create your own interface if you want).
 Domogik is modular : you can add and remove plugins easily and create your own plugins. A plugin is based on a technology (or part of a technology).
 
 How does it work ?
 ==================
 
-.. image:: domogik_overview_schema.png
+Domogik is made of several core components. Each core component has some dedicated tasks. All components interact between them thanks to a message queue : `Zero MQ <http://zeromq.org/>`_. As Domogik uses xPL for automation purpose, some core components are plugged to the xPL network which is used by the xPL plugins. There is also one database to store configuration and data of all the sensors.
 
-RINOR
+Here is an overview of all the Domogik components :
+
+.. image:: overview.svg
+
+Components overview
+===================
+
+Database
+--------
+
+The database will store all configuration parameters, all device parameters and all the sensors history.
+
+Message queue (MQ)
+------------------
+
+The message queue is very important for Domogik. All the domogik internal communications are sent and receive over the MQ. The plugins also use the MQ to interact with core components. Hopefully, the plugin developpers don't need to focus on the MQ : all is handled by some generic functions, so the developpers can focus on their plugin features.
+
+xPL hub
+-------
+
+The xPL hub is just a hub dedicated to xPL. All xPL clients (domogik plugins for example) must first connect themself to the hub and then the hub will deliver all xPL messages to the appropriate targets. 
+If an automation installation has several servers, each server will have its own xPL hub.
+
+xPL plugins
+-----------
+
+A xPL plugin is currently (0.4 release) the only kind of package on Domogik side. One day, there will be some other kind of packages, but this is another story ;).
+A xPL plugin can handle some automation hardware (x10, plcbus, zwave, knx, ...) or some online services (Yahoo Weather, ...). The plugin will send or receive some xPL messages to send sensor data (light status, temperature, ...) or receive commands to apply (switch on, switch off, ...).
+
+With Domogik, the developper won't need to focus on the xPL protocol specification (heart beat messages, hub discovery, etc) : all is handle by some generic functions and the developper will only need to focus on sending and receiving the xPL messages related to his plugins features.
+
+Manager
+-------
+
+The manager is the core component which will monitor all the other components (core or plugins). When a component start, it will send its status to the manager and this one will look on it during all its life. The manager start and stop plugins (depending on the user actions on the user interface or during the startup sequence).
+
+Dbmgr
 -----
-RINOR is a kind of gateway server between User Interfaces, database and xPL world. It allows to :
 
-* read and write data from / to the database
-* listen to the xPL network and send xPL commands
-* record statistics
-* start, stop and configure plugins
-* provide the REST API server for UIs
+The dbmgr (database manager) is used to manage the plugin configuration. When a plugin need some configuration parameters, it will query the dbmgr over the message queue.
 
-User Interface
---------------
-The user interfaces allow you to manage your Domogik system : switch on the lights, check the temperatures, ...
+Rest
+----
 
-All UIs will need to access the REST API server to communicate with the Domogik core. REST is the **UNIQUE** entry point for all UI interactions (for database access, xPL communication or everything else an UI needs and REST allows).
+Rest is a REST service which is used by the user interfaces to manage devices, send commands, get the sensors data, ...
 
-xPL
----
+XplGW
+-----
+
+XplGW (xPL gateway) is the gateway between the xPL world and the database. This component store in memory the plugin xpl interfaces (thanks to the manager) and is able to translate all received xPL messages into informations that can be stored in database. This component is also used by Rest (over the MQ) to send xPL commands.
+
+Scenario
+--------
+
+The scenario component handle the scenarii management.
+
+Admin
+-----
+
+This component is very important, this is the only user interface delivered in Domogik. This user interface will allow you to configure and manage your Domogik installation. This is not a control interface for your automation system! This is an interface to configure your automation system. To control your automation system, you will need to install another user interface like *Domoweb* or *Domodroid*
+
+Domoweb and Domodroid
+---------------------
+
+These are not components of Domogik. These are some user interfaces to control your automation system over Domogik. You can install them if you want, but you can also develop your own user interface if you prefer to do so.
+
+Why xPL ?
+=========
 
 .. epigraph::
 
@@ -39,28 +89,4 @@ xPL
 
     -- From `xPL official website <http://xplproject.org.uk/>`_
 
-Database
---------
-The database is used in two ways : 
-
-* directly by RINOR (request of stats, devices...)
-* when plugins ask for their configuration. The configuration is stored in the database but plugins do not have a direct access to it (this is required for modularity purposes). So the database can provide the configuration to plugins by communicating over the xPL network (in fact RINOR asks the database to retrieve this information).
-
-Plugins
--------
-Plugins (X10, 1wire, Plcbus, etc) are standalone and can only communicate over the xPL network. This is the key of modularity.
-
-Packages
---------
-As Domogik is delivered by default without plugins you need to install them explicitely. Plugins are available as packages in online repositories and you can install them from the administration of Domoweb (the web user interface).
-
-Web user interface (Web UI)
----------------------------
-Domoweb supports the latest HTML5 and CSS features to give users the best experience possible with a Web UI. But this choice implies that you won't be able to use Domogik Web UI with older browsers. 
-
-If your browser doesn't support all HTML5 features used by Domogik, you will get this kind of notification :
-
-.. image:: firefox_html5_warning.png
-
-We recommend you to use browsers like Firefox, Chrome (Chromium) or any other that respects the latest web standards.
-
+xPL is really a usefull protocol for automation. It is quite easy to implement of small electronic devices like `arduino <http://www.arduino.cc>`_ and it is used by other automation systems. Thanks to xPL you may plug 2 (or more) automation systems together, for example Domogik and xPL-perl.

@@ -49,7 +49,7 @@ from optparse import OptionParser
 
 
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
-from domogik.common import daemonize
+#from domogik.common import daemonize
 
 from datetime import datetime
 from time import time
@@ -415,7 +415,7 @@ class UdpHub(DatagramProtocol):
         """
         self._client_list.append({'id' : self._get_client_id(ip, port),
                                  'ip' : ip,   # TODO : replace with  xpl.data['remote-ip']???
-                                 'port' : port,
+                                 'port' : int(xpl.data['port']),
                                  'source' : xpl.source,
                                  'interval' : int(xpl.data['interval']),
                                  'last_seen' : time(),
@@ -484,6 +484,8 @@ class UdpHub(DatagramProtocol):
             @param xpl : xpl message to send
         """
         for address in delivery_addresss:
+            # Activate this log line only if hub debug is needed ! Too verbose for a real use
+            #self.log.info("Deliver xpl to '%s' : %s" % (address, str(xpl)))
             self.transport.write(str(xpl), address)
         pass
 
@@ -638,6 +640,7 @@ class UdpHub(DatagramProtocol):
         """        
         self.log.info(u"Data received from %s : %s" % (repr(address), repr(datagram)))
         ip = address[0]
+        # the port to use to send messages to the clients is not this port! we will use the prot defined in the xpl message (which is the same in Domogik but which is not the same in xpl-perl). This port will be defined in the _add_client function
         port = address[1]
         client_id = self._get_client_id(ip, port)
  

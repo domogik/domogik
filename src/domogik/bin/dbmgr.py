@@ -194,6 +194,7 @@ class DBConnector(XplPlugin, MQRep):
         """ Reply to config.set MQ req
             @param data : MQ req message
         """
+        print "#################"
         msg = MQMessage()
         msg.set_action('config.result')
         status = True
@@ -390,6 +391,7 @@ class DBConnector(XplPlugin, MQRep):
             @param name : package name
             @param host : host
         """
+        self.log.debug("Publish configuration update notification for {0}-{1}.{2}".format(type, name, host))
         self._pub.send_event('plugin.configuration',
                              {"type" : type,
                               "name" : name,

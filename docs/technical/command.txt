@@ -7,13 +7,15 @@ Commands
     All the actuators are not listed in this page. This page purpose is to give some examples.
 
 A command is an action that can be done on a device, like switching it on or off, setting the dimmer value, ...
+
 The opposit of a command is a :doc:`Sensor </technical/sensor>`.
-Note that some devices can be both. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
 
-A command is defined in the the plugin :doc:`json file </package_development/json_file>`, on device creation the commands devined in the plugin json file and linked to the to create device type will be inserted in the DB. A command can be executed by calling a rest url :doc:`/cmd </technical/rinor/rest_command.txt>`.
+Note that some devices can have both commands and sensors. Typically this is the case of a thermostat which can be controled and can send back a value (the temperature).
 
-A command can have parameters that are required to successfully execute the command, typically the result of a widget.
+A command is defined in the the plugin :doc:`json file </package_development/plugins/json/index>`. On device creation the commands defined in the plugin json file and linked to the to device type of the created device will be inserted in the database for this device. A command can be executed by calling a rest url :doc:`/cmd </technical/rest/cmd>`.
 
-In the 0.4 release a command has a one on one relationship with an xplcommand, an xplcommand is the part thats sent in the background to make a plugin do an action/command.
+A command can have parameters that are required to successfully execute the command, for example the dimmer level for a light.
 
-A command has a list of required parameters that are needed to handle it, for example to set the level on a dimmer the command needs a level to set the dimmer, this, this level parameter is a required parameter to be able to complete the command.
+In the 0.4 release a command has a one on one relationship with an *xplcommand*, an xplcommand is a part of the plugin json file and define the way a xPL message which will be sent to the plugin.
+
+A command has a list of required parameters that are needed to handle it, for example to set the level on a dimmer the command needs a level to set the dimmer, this level parameter is a required parameter to be able to complete the command.

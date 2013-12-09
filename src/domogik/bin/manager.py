@@ -71,7 +71,7 @@ from subprocess import Popen, PIPE
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
-from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID
+from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID, STATUS_HBEAT
 from domogik.common.queryconfig import Query
 
 import zmq
@@ -83,20 +83,6 @@ from domogik.mq.pubsub.publisher import MQPub
 
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
-
-##### packages management #####
-# TODO : use later : package management related
-#from distutils2.version import VersionPredicate, IrrationalVersionError
-#from domogik.common.packagemanager import PackageManager, PKG_PART_XPL
-## the try/except it to handle http://bugs.python.org/issue14317
-#try:
-#    from distutils2.index.simple import Crawler
-#except ImportError:  
-#    from distutils2.pypi.simple import Crawler
-
-#PATTERN_DISTUTILS_VERSION = re.compile(".*\(.*\).*")
-
-
 
 ### constants
 FIFO_DIR = "/var/run/domogik/"
@@ -144,7 +130,7 @@ class Manager(XplPlugin):
         # TODO : add -E option for externals ?
 
         ### Call the XplPlugin init  
-        XplPlugin.__init__(self, name = 'manager', parser=parser)
+        XplPlugin.__init__(self, name = 'manager', parser=parser, nohub=True)
 
         ### Logger
         self.log.info(u"Manager startup")
@@ -180,7 +166,7 @@ class Manager(XplPlugin):
         # notice that MQRep.__init__(self, self.zmq, self.name) is already done in XplPlugin
 
         ### Create the clients list
-        self._clients = Clients()
+        self._clients = Clients(self._stop)
         # note that a core component or plugin are also clients but for the self._clients object is managed directly from the Plugin and CoreComponent objects
         # so, self._clients here is only the reference to the Clients object refreshed by all plugins and core components
 
@@ -214,15 +200,6 @@ class Manager(XplPlugin):
                 self.log.error(u"Unable to start scenario manager")
 
         ### Check for the available packages
-        #self._check_available_packages()
-        #self.p = self
-        # TODO : use a thread instead of XplTimer to be independent of xpl libraries
-        # or rename XplTimer :)
-        #self.packageTimer = XplTimer(\
-        #        CHECK_FOR_NEW_PACKAGES, \
-        #        self._check_available_packages, \
-        #        self)
-        #self.packageTimer.start()
         thr_check_available_packages = Thread(None,
                                               self._check_available_packages,
                                               "check_check_available_packages",
@@ -622,6 +599,14 @@ class GenericComponent():
         """ register the component as a client
         """
         self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.configured)
+        #self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data)
+
+
+    def set_configured(self, new_status):
+        """ set the flag configured
+            @param status : new flag value
+        """
+        self._clients.set_configured(self.client_id, new_status)
 
 
     def set_status(self, new_status):
@@ -813,8 +798,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         if configured == '1':
             configured = True
         if configured == True:
+            #self.set_configured(True)
             self.configured = True
         else:
+            #self.set_configured(False)
             self.configured = False
 
         ### register the plugin as a client
@@ -891,7 +878,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         if config != None:
             for key in config:
                 # filter on the 'configured' key
-                if key != 'configured':
+                if key == 'configured':
+                    self.configured = True
+                    self.set_configured(True)
+                else:
                     # check if the key exists in the plugin configuration
                     key_found = False
                     # search the key in the configuration json part
@@ -1000,10 +990,11 @@ class Clients():
         So, all updates will be done on a client_id
     """
 
-    def __init__(self):
+    def __init__(self, stop):
         """ prepare an empty package list 
         """
         ### init vars
+        self._stop = stop
         self._clients = {}
         self._clients_with_details = {}
 
@@ -1013,6 +1004,30 @@ class Clients():
         self.log.info(u"Clients initialisation")
         self._pub = MQPub(zmq.Context(), 'manager')
 
+        ### Check for dead clients
+        thr_check_dead_clients = Thread(None,
+                                        self._check_dead_clients,
+                                        "check_dead_clients",
+                                        (),
+                                        {})
+        thr_check_dead_clients.start()
+
+    def _check_dead_clients(self):
+        """ Check if some clients are dead
+            If the last time a client n a alive state has been seen is greater than twice STATUS_HBEAT seconds, set the client as dead
+        """
+        while not self._stop.isSet():
+            now = time.time()
+            for a_client in self._clients:
+                # check if the client is dead only when the client is alive (or partially alive)
+                if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
+                    delta = now - self._clients[a_client]['last_seen']
+                    if delta > 2*STATUS_HBEAT:
+                        # client is dead!
+                        self.set_status(a_client, STATUS_DEAD)
+            self._stop.wait(STATUS_HBEAT)
+
+    #def add(self, host, type, name, client_id, xpl_source, data):
     def add(self, host, type, name, client_id, xpl_source, data, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
@@ -1030,6 +1045,7 @@ class Clients():
                    "xpl_source" : xpl_source,
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
+                   "last_seen" : time.time(),
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured}
         client_with_details = { "host" : host,
@@ -1038,11 +1054,26 @@ class Clients():
                    "xpl_source" : xpl_source,
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
+                   "last_seen" : time.time(),
                    "status" : STATUS_UNKNOWN,
                    "configured" : configured,
                    "data" : data}
         self._clients[client_id] = client
         self._clients_with_details[client_id] = client_with_details
+        self.publish_update()
+
+    def set_configured(self, client_id, new_status):
+        """ Set a new status to a client
+        """
+        # the first time this function is called, the client is not already registered (on client startup)
+        # so we need to handle this case to avoid a KeyError exception
+        if client_id not in self._clients:
+            return
+        old_status = self._clients[client_id]['configured']
+        if old_status == new_status:
+            return
+        self._clients[client_id]['configured'] = new_status
+        self.log.info("The client 'configured' flag is now set to : {0}".format(new_status))
         self.publish_update()
 
     def set_status(self, client_id, new_status):
@@ -1053,6 +1084,9 @@ class Clients():
             self.log.error(u"Invalid status : {0}".format(new_status))
             return
         old_status = self._clients[client_id]['status']
+        # in all cases, set the 'last seen' time for the clients which are not dead
+        if new_status == STATUS_DEAD:
+            self._clients[client_id]['last_seen'] = time.time()
         if old_status == new_status:
             self.log.debug(u"The status was already {0} : nothing to do".format(old_status))
             return

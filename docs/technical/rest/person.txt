@@ -76,8 +76,8 @@ Example: ::
         ]
     }
 
-POST
-====
+POST /person
+============
 
 This method is used to create a new person.
 
@@ -111,8 +111,8 @@ Example: ::
         ]
     }
 
-PUT
-===
+PUT /person
+===========
 
 This method is used to update the information about a person.
 
@@ -146,8 +146,8 @@ Example: ::
         ]
     }
 
-DELETE
-======
+DELETE /person
+==============
 
 This method is used to delete a person.
 

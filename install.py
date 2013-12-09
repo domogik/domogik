@@ -318,7 +318,7 @@ def install():
                    default=False, help='Don\'t run a config writer')
     parser.add_argument('--no-create-user', dest='user_creation', \
                    action="store_false", \
-                   default=False, help='Don\'t create a user')
+                   default=True, help='Don\'t create a user')
     parser.add_argument('--no-db-upgrade', dest='db', action="store_true",
                    default=False, help='Don\'t do a db upgrade')
     parser.add_argument("--user",
@@ -383,21 +383,25 @@ def install():
 
         # upgrade db
         if not args.db:
-            try:
-                user_entry = pwd.getpwnam(user)
-            except KeyError:
-                raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
+            #try:
+            #    user_entry = pwd.getpwnam(user)
+            #except KeyError:
+            #    raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
 
-            uid = user_entry.pw_uid
-            user_home = user_entry.pw_dir
-            os.setreuid(0,uid)
-            old_home = os.environ['HOME']
-            os.environ['HOME'] = user_home
+            # launch db_install as the domogik user
+            #uid = user_entry.pw_uid
+            #user_home = user_entry.pw_dir
+            #os.setreuid(0,uid)
+            #old_home = os.environ['HOME']
+            #os.environ['HOME'] = user_home
+            #os.system('python src/domogik/install/db_install.py')
+            #os.setreuid(0,0)
+            #os.environ['HOME'] = old_home
 
-            os.system('python src/domogik/install/db_install.py')
+            from domogik.install.db_install import DbInstall
+            dbi = DbInstall()
+            dbi.install_or_upgrade_db()
 
-            os.setreuid(0,0)
-            os.environ['HOME'] = old_home
 
         if not args.test:
             os.system('python test_config.py')

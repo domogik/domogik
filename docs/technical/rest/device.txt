@@ -60,8 +60,8 @@ Example: ::
         "name": "a name for the device"
     }
 
-POST
-====
+POST /device
+============
 
 This method is used to create a new device.
 
@@ -92,8 +92,8 @@ Example: ::
     }
 
 
-PUT
-===
+PUT /device
+===========
 
 This method is used to update the basic informations about a device:
 
@@ -128,8 +128,8 @@ Example: ::
     }
 
 
-DELETE
-======
+DELETE /device
+==============
 
 This method is used to delete a device. The device corresponding to the given id will be returned in a json.
 

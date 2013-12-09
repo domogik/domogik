@@ -80,6 +80,9 @@ Each item has several properties:
 
 * **name** : it is a string used to display this sensor on the UI
 * **data_type** : the data type used for this sensor
+* **type** : defines the sensor type, it can have the folowing values
+    * **absolutes** : store the value after the conversion
+    * **incremental** : store the difference between the last value and the current value
 * **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format acording to the data_type
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table

@@ -36,7 +36,7 @@ Usage
 import zmq
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.configloader import Loader
-from domogik.common.utils import get_ip_for_interfaces
+from domogik.common.utils import get_ip_for_interfaces, is_already_launched
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 
@@ -69,10 +69,25 @@ def ask(question):
 def check_domogik_is_running():
     """ a function to check if domogik is running, and so if the tests can be done
     """
-    # currently, we only ask the user to check
-    #return ask("Notice that the plugin configuration will be reset for the tests!\nTests should only be done on dedicated environments!!!!!!!!!! Check that Domogik is up and.... are you ready ?")
-    return True
-    
+    ret = True
+    to_check = ['dmg_hub', 'dmg_broker', 'dmg_forwarder']
+    for chk in to_check:
+        status = is_already_launched(None, chk, False)
+        if not status[0]:
+            print("ERROR : component {0} is not running".format(chk))
+            ret = False
+        else:
+            print("component {0} is running".format(chk))
+
+    to_check = ['rest', 'xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
+    for chk in to_check:
+        status = is_already_launched(None, chk, False)
+        if not status[0]:
+            print("ERROR : component {0} is not running".format(chk))
+            ret = False
+        else:
+            print("component {0} is running".format(chk))
+    return ret
 
 def get_rest_url():
     """ Return the REST server url (constructed from the configuration file of the host)
@@ -96,8 +111,16 @@ def delete_configuration(type, name, host):
     msg.add_data('name', name)
     result = cli.request('dbmgr', msg.get(), timeout=10)
     if result:
-        print(result.get())
-        return True
+	data = result.get_data()
+	if 'status' in data:
+	    if not data['status']:
+                print(result.get())
+	        raise RuntimeError("DbMgr did not return status true on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+            else:
+                return True
+        else:
+            print(result.get())
+	    raise RuntimeError("DbMgr did not return a status on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
     else:
         raise RuntimeError("Timeout while deleting configuration for {0}-{1}.{2}".format(type, name, host))
 
@@ -111,8 +134,48 @@ def configure(type, name, host, key, value):
     msg.add_data('data', {key : value})
     result = cli.request('dbmgr', msg.get(), timeout=10)
     if result:
-        print(result.get())
-        return True
+	data = result.get_data()
+	if 'status' in data:
+	    if not data['status']:
+                print(result.get())
+	        raise RuntimeError("DbMgr did not return status true on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+            else:
+                return True
+        else:
+            print(result.get())
+	    raise RuntimeError("DbMgr did not return a status on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
     else:
         raise RuntimeError("Error while setting configuration for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+
+def check_config(type, name, host, key, exp_value):
+    cli = MQSyncReq(zmq.Context())
+    msg = MQMessage()
+    msg.set_action('config.get')
+    msg.add_data('type', type)
+    msg.add_data('host', host)
+    msg.add_data('name', name)
+    msg.add_data('key', key)
+    result = cli.request('dbmgr', msg.get(), timeout=10)
+    if result:
+	data = result.get_data()
+	if 'status' in data:
+	    if not data['status']:
+                print(result.get())
+	        raise RuntimeError("DbMgr did not return status true on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+            else:
+                if 'value' in data:
+                    if data['value'] != exp_value:
+       			print(result.get())
+                        raise RuntimeError("The returned value is not the expected value for {0}-{1}.{2} : {3} = {4} but received {5}".format(type, name, host, key, exp_value, data['value']))
+		    else:
+                        return True
+                else:
+                    print(result.get())
+	            raise RuntimeError("DbMgr did not return a value on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+        else:
+	    print(result.get())
+	    raise RuntimeError("DbMgr did not return a status on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+    else:
+        raise RuntimeError("Error while setting configuration for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+
 

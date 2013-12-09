@@ -66,6 +66,9 @@ STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
 
+# time between each send of the status
+STATUS_HBEAT = 15
+
 # core components
 CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin']
 
@@ -135,7 +138,16 @@ class XplPlugin(BasePlugin, MQRep):
         # MQ publisher and REP
         self.zmq = zmq.Context()
         self._pub = MQPub(self.zmq, self._mq_name)
-        self._send_status(STATUS_STARTING)
+        self._set_status(STATUS_STARTING)
+
+        # MQ : start the thread which sends the status each N seconds
+        thr_send_status = threading.Thread(None,
+                                           self._send_status_loop,
+                                           "send_status_loop",
+                                           (),
+                                           {})
+        thr_send_status.start()
+
         ### MQ
         # for stop requests
         MQRep.__init__(self, self.zmq, self._mq_name)
@@ -344,15 +356,23 @@ class XplPlugin(BasePlugin, MQRep):
                                                                                     a_device['device_type_id']))
                 # log some informations about the device
                 # first : the stats
-                self.log.info(u"  Features :")
+                self.log.info(u"  xpl_stats features :")
                 for a_xpl_stat in a_device['xpl_stats']:
                     self.log.info(u"  - {0}".format(a_xpl_stat))
-                    self.log.info(u"    Parameters :")
-                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['device']:
+                    self.log.info(u"    Static Parameters :")
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['static']:
                         self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
+                    self.log.info(u"    Dynamic Parameters :")
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['dynamic']:
+                        self.log.info(u"    - {0}".format(a_feature['key']))
 
                 # then, the commands
-                # TODO !!!!!!
+                self.log.info(u"  xpl_commands features :")
+                for a_xpl_cmd in a_device['xpl_commands']:
+                    self.log.info(u" - {0}".format(a_xpl_cmd))
+                    self.log.info(u" + Parameters :")
+                    for a_feature in a_device['xpl_commands'][a_xpl_cmd]['parameters']:
+                        self.log.info(u" - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
             self.devices = device_list
             return device_list
@@ -379,7 +399,7 @@ class XplPlugin(BasePlugin, MQRep):
         for a_device in self.devices:
             # first, search for device type
             if a_device['device_type_id'] == device_type:
-                params = a_device[type][feature]['parameters']['device']
+                params = a_device[type][feature]['parameters']['static']
                 found = True
                 for key in data:
                     for a_param in params:
@@ -421,17 +441,35 @@ class XplPlugin(BasePlugin, MQRep):
 
 
 
+    def get_parameter(self, a_device, key):
+        """ For a device feature, return the required parameter value
+            @param a_device: the device informations
+            @param key: the parameter key
+        """
+        try:
+            self.log.debug(u"Get parameter '{0}'".format(key))
+            for a_param in a_device['parameters']:
+                if a_param == key:
+                    value = self.cast(a_device['parameters'][a_param]['value'], a_device['parameters'][a_param]['type'])
+                    self.log.debug(u"Parameter value found: {0}".format(value))
+                    return value
+            self.log.warning(u"Parameter not found : return None")
+            return None
+        except:
+            self.log.error(u"Error while looking for a device parameter. Return None. Error: {0}".format(traceback.format_exc()))
+            return None
+         
+
     def get_parameter_for_feature(self, a_device, type, feature, key):
         """ For a device feature, return the required parameter value
-            Example with : a_device = {u'xpl_stats': {u'get_total_space': {u'name': u'get_total_space', u'id': 49, u'parameters': {u'device': [{u'xplstat_id': 49, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 49, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 49, u'key': u'type', u'value': u'total_space'}], u'dynamic': [{u'xplstat_id': 49, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_free_space': {u'name': u'get_free_space', u'id':51, u'parameters': {u'device': [{u'xplstat_id': 51, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 51, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 51, u'key': u'type', u'value': u'free_space'}], u'dynamic': [ {u'xplstat_id': 51, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_used_space': {u'name': u'get_used_space', u'id': 52, u'parameters': {u'device': [{u'xplstat_id': 52, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 52, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 52, u'key': u'type', u'value': u'used_space'}], u'dynamic': [{u'xplstat_id': 52, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}, u'get_percent_used': {u'name': u'get_percent_used', u'id': 50, u'parameters': {u'device': [{u'xplstat_id': 50, u'key': u'device', u'value': u'/home'}, {u'xplstat_id': 50, u'key': u'interval', u'value': u'1'}], u'static': [{u'xplstat_id': 50, u'key': u'type', u'value': u'percent_used'}], u'dynamic': [{u'xplstat_id': 50, u'ignore_values': u'', u'key': u'current', u'value': None}]}, u'schema': u'sensor.basic'}}, u'commands': {}, u'description': u'/home sur darkstar', u'reference': u'ref', u'id': 49, u'device_type_id': u'diskfree.disk_usage', u'sensors': {u'get_total_space': {u'conversion': u'', u'name': u'Total Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 80}, u'get_free_space': {u'conversion': u'', u'name': u'Free Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 82}, u'get_used_space': {u'conversion': u'', u'name': u'Used Space', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 83}, u'get_percent_used': {u'conversion': u'', u'name': u'Percent used', u'data_type': u'DT_Scaling', u'last_received': None, u'last_value': None, u'id': 81}}, u'client_id': u'domogik-diskfree.darkstar', u'name': u'darkstar:/home'}
-                         type = xpl_stats
-                         feature = get_percent_used
-                         key = device
-            Return : /home
+            @param a_device: the device informations
+            @param type: the parameter type (xpl_stats, ...)
+            @param feature: the parameter feature
+            @param key: the parameter key
         """
         try:
             self.log.debug(u"Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
-            for a_param in a_device[type][feature]['parameters']['device']:
+            for a_param in a_device[type][feature]['parameters']['static']:
                 if a_param['key'] == key:
                     value = self.cast(a_param['value'], a_param['type'])
                     self.log.debug(u"Parameter value found: {0}".format(value))
@@ -489,7 +527,7 @@ class XplPlugin(BasePlugin, MQRep):
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self._name = "unknown"
-        self._send_status(STATUS_ALIVE)
+        self._set_status(STATUS_ALIVE)
 
         ### Instantiate the MQ
         # nothing can be launched after this line (blocking call!!!!)
@@ -523,12 +561,12 @@ class XplPlugin(BasePlugin, MQRep):
         contens = msg.get_data()
         if 'command' in contens.keys():
             if contens['command'] in self.helpers.keys():
-                if 'params' not in contens.keys():
-                    contens['params'] = {}
+                if 'parameters' not in contens.keys():
+                    contens['parameters'] = {}
                     params = []
                 else:
                     params = []
-                    for key, value in contens['params'].items():
+                    for key, value in contens['parameters'].items():
                         params.append( "{0}='{1}'".format(key, value) )
                 command = "self.{0}(".format(self.helpers[contens['command']]['call'])
                 command += ", ".join(params)
@@ -539,7 +577,7 @@ class XplPlugin(BasePlugin, MQRep):
                 msg = MQMessage()
                 msg.set_action('helper.do.result')
                 msg.add_data('command', contens['command'])
-                msg.add_data('params', contens['params'])
+                msg.add_data('parameters', contens['parameters'])
                 msg.add_data('result', result)
                 self.reply(msg.get())
 
@@ -577,7 +615,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.reply(msg.get())
 
         ### Change the plugin status
-        self._send_status(STATUS_STOP_REQUEST)
+        self._set_status(STATUS_STOP_REQUEST)
 
         ### Try to stop the plugin
         # if it fails, the manager should try to kill the plugin
@@ -593,7 +631,22 @@ class XplPlugin(BasePlugin, MQRep):
         msg.add_data('actions', self.helpers.keys())
         self.reply(msg.get())
 
-    def _send_status(self, status):
+    def _set_status(self, status):
+        """ Set the plugin status and send it
+        """
+        self._status = status
+        self._send_status()
+
+    def _send_status_loop(self):
+        """ send the status each STATUS_HBEAT seconds
+        """
+        # TODO : we could optimize by resetting the timer each time the status is sent
+        # but as this is used only to check for dead plugins by the manager, it is not very important ;)
+        while not self._stop.isSet():
+            self._send_status()
+            self._stop.wait(STATUS_HBEAT)
+
+    def _send_status(self):
         """ Send the plugin status over the MQ
         """ 
         if hasattr(self, "_pub"):
@@ -601,11 +654,12 @@ class XplPlugin(BasePlugin, MQRep):
                 type = "core"
             else:
                 type = "plugin"
+            self.log.debug("Send plugin status : {0}".format(self._status))
             self._pub.send_event('plugin.status', 
                                  {"type" : type,
                                   "name" : self._name,
                                   "host" : self.get_sanitized_hostname(),
-                                  "event" : status})
+                                  "event" : self._status})
 
     def get_config_files(self):
        """ Return list of config files
@@ -824,9 +878,9 @@ class XplPlugin(BasePlugin, MQRep):
             self.log.debug(u"force_leave called")
         # send stopped status over the MQ
         if status:
-            self._send_status(status)
+            self._set_status(status)
         else:
-            self._send_status(STATUS_STOPPED)
+            self._set_status(STATUS_STOPPED)
 
         # send hbeat.end message
         self._send_hbeat_end()

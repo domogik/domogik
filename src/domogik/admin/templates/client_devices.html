@@ -17,22 +17,21 @@
             </thead>
             <tbody>
             {% for data in devices %}
-                    <tr>
+                    <tr data-toggle="collapse" data-target=".detail-{{ data.id }}" class="accordion-toggle">
                             <td>{{ data.id }}</td>
                             <td>{{ data.name }}</td>
                             <td>{{ data.device_type_id }}</td>
                             <td>{{ data.description }}</td>
                             <td>
-                                <a onclick="$('#detail-{{ data.id }}').toggle()">{% trans %}Details{% endtrans %}</a>
-                                &nbsp;&nbsp;|&nbsp;&nbsp;
                                 <a href="/client/{{ clientid }}/devices/delete/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
                             </td>
                     </tr>
-                    <tr id="detail-{{ data.id }}" style="display: none;">
-                            <td colspan="5"> 
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">{% trans %}Sensors{% endtrans %}</div>
-                                        <table>
+                    <tr>
+                            <td colspan="5" class="hiddenRow"> 
+                                <div class="accordian-body collapse detail-{{ data.id }}">
+				{% if data.sensors|length > 0 %}
+				    <span class="label label-default">{% trans %}Sensors{% endtrans %}</span>
+                                        <table class="table table-bordered">
                                               <thead>
                                                 <tr>
                                                     <td>{% trans %}ID{% endtrans %}</td>
@@ -54,10 +53,10 @@
                                                 {% endfor %}
                                                 </tbody>
                                         </table>
-                                </div> 
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">{% trans %}Commands{% endtrans %}</div>
-                                        <table>
+				{% endif %}
+				{% if data.commands|length > 0 %}
+				    <span class="label label-default">{% trans %}Commands{% endtrans %}</span>
+                                        <table class="table table-bordered">
                                               <thead>
                                                 <tr>
                                                     <td>{% trans %}ID{% endtrans %}</td>
@@ -76,6 +75,7 @@
                                                 {% endfor %}
                                                 </tbody>
                                         </table>
+				{% endif %}
                                 </div> 
  
                             </td>

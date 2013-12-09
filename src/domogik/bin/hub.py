@@ -34,7 +34,7 @@ Implements
 
 
 from argparse import ArgumentParser
-from domogik.common import daemonize
+from domogik.common.daemon.daemon import DaemonContext
 from sys import stdout
 
 # version
@@ -58,7 +58,9 @@ def main():
         return
     if not options.run_in_foreground:
         daemon = True
-        daemonize.createDaemon()
+
+        ctx = DaemonContext()
+        ctx.open()
 
         #from twisted.internet.protocol import DatagramProtocol
         from twisted.internet import reactor

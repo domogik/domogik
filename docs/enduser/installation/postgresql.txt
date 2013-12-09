@@ -1,0 +1,39 @@
+================================
+Install Domogik using postgresql 
+================================
+
+This documentation assume you will follow `the standard installation steps <enduser/installation/index.html>`_ and replace the *mysql* related actions by some *postgresql* actions which are described below.
+
+Postgresql server
+-----------------
+
+Install packages for postgresql  server: ::
+
+    $ sudo apt-get install postgresql postgresql-client
+
+Log on the postgressql server as root user: ::
+
+    $ su - postgres
+    $ pgsql
+
+Create the user "domogik" to use the new database: ::
+    
+    postgres=# CREATE USER domogik WITH PASSWORD 'domopass';
+
+Create a database called "domogik": ::
+    
+    postgres=# CREATE DATABASE domogik OWNER domogik;
+    
+Exit the postgress shell: ::
+
+    postgres=# \q
+    $ exit
+
+
+
+Domogik configuration
+---------------------
+
+Edit your */etc/domogik/domogik.cfg* file and edit the *[database]* section: ::
+
+     type = postgresql

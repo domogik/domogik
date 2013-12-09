@@ -14,10 +14,13 @@
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
     <link href="/static/css/bootstrap-notify.css" rel="stylesheet" media="screen">
+    <!-- Domogik -->
+    <link href="/static/css/default.css" rel="stylesheet" media="screen">
     {%- endblock styles %}
     {%- endblock head %}
   </head>
   <body{% block body_attribs %}{% endblock body_attribs %}>
+    <div id="now"></div>
     <div class="notifications bottom-right"></div>
     {% block body -%}
     {% block navbar %}
@@ -44,6 +47,23 @@
             </script>
     {% endif %}
     {% endwith %}
+      <script type="text/javascript">
+	 if ("WebSocket" in window) {
+		var ws=new WebSocket("ws://" + location.host + "/ws");
+		var now_el=document.getElementById("now");
+		ws.onmessage=function(e){
+			now_el.innerHTML=e.data;
+		}
+		ws.onclose=function(){
+			now_el.innerHTML='closed';
+		}
+		ws.onopen=function(){
+			now_el.innerHTML='open';
+		}
+	} else {
+		alert('No WS support');
+	}
+       </script>
     {%- endblock scripts %}
     {%- endblock body %}
   </body>

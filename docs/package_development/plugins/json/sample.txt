@@ -23,6 +23,7 @@ Sample
                         "key": "key1_devicetype",                       # key copied to the xpl messages, this a static key like device address
                         "description": "A short description",
                         "type": "string"                                # key appears in the xpl as : {key1_devicetype : this a string type}
+                        "xpl": True                                     # if the params is in the xpl messages : True. For example, an interval will not be in a xpl message
                     },
                     {
                         "key": "key2_devicetype",

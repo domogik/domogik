@@ -1,0 +1,92 @@
+===================
+Packages management
+===================
+
+
+Install a package
+=================
+
+In Domogik 0.4.0 the packages installation can only be done from the command line. In 0.4.1 we should restore an installation process from the administration user interface.
+
+There are 3 ways to install a package from the command line:
+
+* install from an existing directory on your server. This will happen mainly for developpers which use git repositories for example. In this case, a symbolic link will be created to link the folder.
+* install from a zip file on your server. 
+* install from an online file.
+
+Notice that in all cases, the package name will be created thanks to the **info.json** file included in the package. So you can have folders or zip files with stranges names like *master.zip*, *foo.zip*, ...
+
+Install from an existing folder
+-------------------------------
+
+Just launch the **dmg_package** tool with the **--install** option and the folder path as parameter. Example: ::
+
+    $ dmg_package --install /media/stock/domotique/git/domogik-plugin-diskfree
+    2013-11-22 22:50:17,560 domogik-package INFO Install a package from a folder : /media/stock/domotique/git/domogik-plugin-diskfree
+    2013-11-22 22:50:17,562 domogik-package INFO Create the symbolic link to /media/stock/domotique/git/domogik-plugin-diskfree as /var/lib/domogik/domogik_packages/plugin_diskfree
+    2013-11-22 22:50:17,562 domogik-package INFO Package installed!
+
+When you will uninstall such a package, the symbolic link will just be deleted.
+
+Install from a zip file on your server
+--------------------------------------
+
+Just launch the **dmg_package** tool with the **--install** option and the zip file path as parameter. Example: ::
+
+    $ dmg_package --install /tmp/master.zip
+    2013-11-22 22:52:02,115 domogik-package INFO Install a package from a zip file : /tmp/master.zip
+    2013-11-22 22:52:02,125 domogik-package INFO Extract the zip file /tmp/master.zip as /var/lib/domogik/domogik_packages/plugin_onewire
+    2013-11-22 22:52:02,134 domogik-package INFO Package installed!
+
+When you will uninstall such a package, a backup of the folder will be done and saved in the domogik packages folders. Example: ::
+
+    $ ls -l /var/lib/domogik/domogik_packages/backup*
+    -rw-r--r-- 1 fritz fritz 144318 nov.  22 22:40 backup_plugin_onewire_20131122224038.zip
+
+Install from an online zip
+--------------------------
+
+Just launch the **dmg_package** tool with the **--install** option and the url of zip file path as parameter. This is very usefull to install a package from a git repository of a developper. Example: ::
+
+    $ dmg_package --install https://github.com/Cereal2nd/domogik-plugin-onewire/archive/master.zip
+    2013-11-22 23:04:53,348 domogik-package INFO Start downloading https://github.com/Cereal2nd/domogik-plugin-onewire/archive/master.zip
+    2013-11-22 23:04:55,611 domogik-package INFO Download finished
+    2013-11-22 23:04:55,618 domogik-package INFO Install a package from a zip file : /tmp/tmpfF3eP5
+    2013-11-22 23:04:55,629 domogik-package INFO Extract the zip file /tmp/tmpfF3eP5 as /var/lib/domogik/domogik_packages/plugin_onewire
+    2013-11-22 23:04:55,638 domogik-package INFO Package installed!
+
+When you will uninstall such a package, a backup of the folder will be done and saved in the domogik packages folders as the installation acts as a zip file installation.
+
+List the installed packages
+===========================
+
+To list the installed packages, just launch the **dmg_package** tools without any parameters: ::
+
+    $ dmg_package 
+    2013-11-22 23:11:35,993 domogik-package INFO Domogik release : 0.4.0
+    2013-11-22 23:11:35,994 domogik-package INFO 
+    2013-11-22 23:11:35,994 domogik-package INFO Package plugin_onewire 
+    2013-11-22 23:11:35,995 domogik-package INFO  - version : 0.4
+    2013-11-22 23:11:35,996 domogik-package INFO  - install mode : folder
+    2013-11-22 23:11:35,996 domogik-package INFO 
+    2013-11-22 23:11:35,996 domogik-package INFO Package plugin_diskfree 
+    2013-11-22 23:11:35,999 domogik-package INFO  - version : 1.0a0
+    2013-11-22 23:11:35,999 domogik-package INFO  - install mode : symbolic link to : /media/stock/domotique/git/domogik-plugin-diskfree
+
+Uninstall a package
+===================
+
+You just need to call the **dmg_package** tool with the **--uninstall** option and the package name in this format : **<type>_<name>**. Basically, the package name is the name of the package folder in **/var/lib/domogik/domogik_packages/**. You can easily get the package name by launching **dmg_package** without any parameter as seen in the previous chapter.
+
+Example for a folder: ::
+
+    $ dmg_package --uninstall plugin_onewire
+    2013-11-22 23:04:50,910 domogik-package INFO Creating a backup of '/var/lib/domogik/domogik_packages/plugin_onewire' as '/var/lib/domogik/domogik_packages/backup_plugin_onewire_20131122230450.zip'
+    2013-11-22 23:04:50,921 domogik-package INFO Package uninstalled from /var/lib/domogik/domogik_packages/plugin_onewire
+
+Example for a symbolic link: ::
+
+    $ dmg_package --uninstall plugin_rfxcom
+    2013-11-22 23:11:20,717 domogik-package INFO Package uninstalled from /var/lib/domogik/domogik_packages/plugin_rfxcom
+
+

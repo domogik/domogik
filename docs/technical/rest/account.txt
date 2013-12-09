@@ -16,9 +16,9 @@ GET
 This method is used to get informations about existing accounts. There are several way to call the **/account** url with the GET method.
 
 /account
--------
+--------
 
-All the accountss will be returned in a json table. 
+All the accounts will be returned in a json table. 
 
 Example: ::
 
@@ -110,8 +110,8 @@ Example: ::
        "id": 1
     }
 
-POST
-====
+POST /person
+============
 
 This method is used to create a new account, this can be called with or without a person id, without a person id, then the parameters last_name, first_name and birthday are required. if you provide the parameter person_id then these are not required.
 
@@ -198,7 +198,7 @@ Example: ::
     }
 
 /account/
------------------
+---------
 
 This method is used to update the information about an account. All info except the password can be updated.
 The same rules as the POST method apply about the person_id
@@ -244,8 +244,8 @@ Example: ::
         "id": 3
     }
 
-DELETE
-======
+DELETE /account
+===============
 
 This method is used to delete an account. The account corresponding to the given id will be returned in a json.
 

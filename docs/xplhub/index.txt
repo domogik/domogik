@@ -13,7 +13,7 @@ F.A.Q
 =====
 
 * Q: I want to use the C hub instead of the python hub. How can I do ?
-* R: On Domogik installation, add the **--hub_c** option to the *./install.sh* command. After the installation, you can switch by editing **/etc/default/domogik** and setting **DOMOGIK_XPL_HUB** to **c** (or **python** for the new hub)
+* R: After the installation, you can switch by editing **/etc/default/domogik** and setting **DOMOGIK_XPL_HUB** to **c** (or **python** for the new hub)
 
 * Q: Where are the hub log files ?
 * R: The C hub has no log files. The python hub log files are in */var/log/xplhub/*. You can also customize the loglevel in the hub config file : **/etc/domogik/xplhub.cfg**.

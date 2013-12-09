@@ -9,6 +9,7 @@ syntax: glob
 .AppleDesktop/
 .AppleDB/
 *.pyc
+*.bak
 *.pyoeggs/*
 eggs
 .installed.cfg

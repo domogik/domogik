@@ -25,6 +25,7 @@ def clients():
 
     return render_template('clients.html',
         mactve="clients",
+	overview_state="collapse",
         clients=client_list
         )
 
@@ -42,8 +43,9 @@ def client_detail(client_id):
         detail = {}
 
     return render_template('client.html',
+            loop = {'index': 1},
             clientid = client_id,
-            detail = detail,
+            data = detail,
             mactve="clients",
             active = 'home'
             )
@@ -138,7 +140,7 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for arg, value in request.form.items():
+        for arg, value in list(request.form.items()):
             if arg in known_items:
                 data[arg] = value
         # build the message
@@ -183,7 +185,7 @@ def client_devices_new(client_id):
     if type(data["device_types"]) is not dict:
         dtypes = {}
     else:
-        dtypes = data["device_types"].keys()
+        dtypes = list(data["device_types"].keys())
     products = {}
     if "products" in data:
         for prod in data["products"]:
@@ -248,10 +250,15 @@ def client_devices_new_wiz(client_id, device_type_id):
             # add the global
             for x in app.db.get_xpl_command_by_device_id(created_device["id"]):
                 for p in params['global']:
-                    app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
+                    if p["xpl"] is True:
+                        app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
             for x in app.db.get_xpl_stat_by_device_id(created_device["id"]):
                 for p in params['global']:
-                    app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=False, type=p['type'])
+                    if p["xpl"] is True:
+                        app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
+            for p in params['global']:
+                if p["xpl"] is not True:
+                    app.db.add_device_param(created_device["id"], p["key"], request.form.get(p['key']), p['type'])
             # reload stats
             req = MQSyncReq(app.zmq_context)
             msg = MQMessage()

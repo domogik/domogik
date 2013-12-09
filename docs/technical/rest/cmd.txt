@@ -1,6 +1,6 @@
-=============
-REST /cmd
-=============
+===============================
+/cmd - send commands to devices
+===============================
 
 The **/cmd** entry in REST is used by User Interfaces to send commands to devices. The url is a direct link to a command
 
@@ -10,43 +10,45 @@ Flow
 ====
 .. actdiag::
 
-	actdiag {
-		get -> decode -> lookup -> gxpl -> precv -> psend -> stats -> lookup2 -> event -> encode -> http -> result
+    actdiag {
+        get -> decode -> lookup -> gxpl -> precv -> psend -> xplgw -> lookup2 -> event -> encode -> http -> result
 
-		lane ui {
-              		label = "User"
-			get [label = "http get /cmd"];
-			result [label = "http 200"];
-		}
-		lane rest {
-			label = "Rest"
-			decode [label = "Decode /cmd"];
-			gxpl [label = "generate xpl-cmd"]
-			encode [label = "receive event"];
-			http [label = "generate http response"];
-		}
-		lane stat {
-			label = "Statsmanager"
-			stats [label = "lookup sensor and device"];
-			event [label = "generate device event"];
-		}
-		lane db {
-			label = "Database"
-                        lookup [label = "get command params from db"];
-			lookup2 [label = "get sensor params from db"];
-		}
-		lane plugin {
-			label = "Plugin"
-			precv [label = "receive xpl-cmd"];
-			psend [label = "send out xpl stats"];
-		}
-	}
+        lane ui {
+            label = "User"
+            get [label = "http get /cmd"];
+            result [label = "http 200"];
+        }
+        lane rest {
+            label = "Rest"
+            decode [label = "Decode /cmd"];
+            gxpl [label = "generate and send xpl-cmd"]
+            encode [label = "receive event"];
+            http [label = "generate http response"];
+        }
+        lane stat {
+            label = "XplGw"
+            xplgw [label = "lookup sensor and device"];
+            event [label = "generate device event"];
+        }
+        lane db {
+            label = "Database"
+            lookup [label = "get command params from db"];
+            lookup2 [label = "get sensor params from db"];
+        }
+        lane plugin {
+            label = "Plugin"
+            precv [label = "receive xpl-cmd"];
+            psend [label = "send out xpl stats"];
+        }
+    }
 
 Developper notes 
 ================
+
 Url description
 ---------------
-.. code-block:: none
+
+::
 
     http://ip:port/cmd/<command id>/<param 1>/<value 1>/.../<param n>/<value n>
 
@@ -59,11 +61,13 @@ The url is formatted like this :
 
 Example
 -------
+
 The folowiong data is in the DB:
 
 Device
 ++++++
-.. code-block:: none
+
+::
     
     id = 1
     name = test
@@ -72,7 +76,8 @@ Device
 
 Commands
 ++++++++
-.. code-block:: none
+
+::
     
     id = 10
     name = command1
@@ -80,14 +85,16 @@ Commands
 
 Command params
 ++++++++++++++
-.. code-block:: none
+
+::
     
     id = 11
     key = level
 
 Xpl command
 +++++++++++
-.. code-block:: none
+
+::
     
     id = 12
     device = 1
@@ -95,43 +102,27 @@ Xpl command
 
 Xpl command param 
 +++++++++++++++++
-.. code-block:: none
+
+::
 
     command = 12
     key = address
     value = 12
 
-Now if we call the '/cmd/10/level/100 we will generate the folowing xpl command:
-.. code-block:: none
-	
-	lighting.device {
-		level = 100
-		address = 12
-	}
+Now if we call the '/cmd/10/level/100 we will generate the folowing xpl command: ::
+    
+    lighting.device {
+        level = 100
+        address = 12
+    }
 
 This example demonstrates how the url can generate any type of xpl message, the number of command params or xpl command params is unlimited.
 
 The commands are dynamic parameters and need to be sent via the url, the xpl command params are staticly defined, these definitions are done during device creation and are not changeable afterwards.
 
-How REST gets xpl-trig for a /command 
-=====================================
-
-* REST start
-* REST do some init stuff
-* REST try to get QUEUE_COMMAND_* values from database. If not get default values 
-* REST create a queue for /command
-* REST get a /command call
-* REST create a thread for /command (like all others /foo)
-* REST create and send XPL message 
-* REST start counting for timeout (see QUEUE_COMMAND_TIMEOUT)
-* while timeout not reached, REST read queue to get xpl-trig
-* if timeout reached, REST send timeout message
-* else :
-    * REST transform xpl-trig in json data
-    * REST send data
 
 How UI will get status of device ?
 ==================================
 
-REST only send a OK/KO response with the xpl-trig xPL message received when a /command is successfull. 
-To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/stats** or **/events** REST feature to get info from this device.
+REST only send http code as response. If http code = 200, then the user interface should request REST to get the last sensor value.
+To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.

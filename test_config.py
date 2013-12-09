@@ -50,13 +50,13 @@ ENDC = '\033[0m'
 user = ''
 
 def info(msg):
-    print("%s [ %s ] %s" % (BLUE,msg,ENDC))
+    print("{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
 def ok(msg):
-    print("%s ==> %s  %s" % (OK,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(OK,msg,ENDC))
 def warning(msg):
-    print("%s ==> %s  %s" % (WARNING,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
 def fail(msg):
-    print("%s ==> %s  %s" % (FAIL,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
 
 def am_i_root():
     info("Check this script is started as root")
@@ -274,7 +274,7 @@ def test_version():
 def test_hostname():
     info("Check hostname")
     #assert len(gethostname().split('.')[0]) < 16, "Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
-    if len(gethostname().split('.')[0]) < 16:
+    if len(gethostname().split('.')[0]) > 16:
         warning("Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
             You should change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again.")
     #ok("Hostname length is < 16.")

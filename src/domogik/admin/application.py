@@ -21,8 +21,6 @@ babel = Babel()
 app = Flask(__name__)
 login_manager.init_app(app)
 babel.init_app(app)
-print babel.list_translations()
-print get_locale()
 
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter

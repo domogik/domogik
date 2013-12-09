@@ -112,6 +112,7 @@ class Device(Base):
     device_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
     client_version = Column(Unicode(32), nullable=False)
+    params = relationship("DeviceParam", backref=__tablename__, cascade="all", passive_deletes=True)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
@@ -142,6 +143,40 @@ class Device(Base):
                   self.device_type_id, self.client_id, self.client_version, \
                   self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return Device.__tablename__
+
+class DeviceParam(Base):
+    """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
+
+    __tablename__ = '%s_device_param' % _db_prefix
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value = Column(Unicode(255), nullable=True)
+    type = Column(Unicode(32), nullable=True)
+
+    def __init__(self, device_id, key, value, type):
+        """Class constructor
+
+        @param device_id : The device where this parameter is linked to 
+        @param key : The param name
+        @param value : The param value
+        @param type : The type param
+        """
+        self.device_id = device_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+        self.type = ucode(type)
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<DeviceParam(id={0}, device_id={1}, key='{2}', value='{3}', type='{4}')>"\
+               .format(self.id, self.device_id, self.key, self.value, self.type)\
 
     @staticmethod
     def get_tablename():
@@ -350,6 +385,7 @@ class Sensor(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
+    type = Column(Unicode(32), nullable=False)
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
@@ -359,10 +395,11 @@ class Sensor(Base):
     history_expire = Column(Integer, nullable=True)
     history_round = Column(Float, nullable=True)
 
-    def __init__(self, device_id, name, reference, data_type, conversion, h_store, h_max, h_expire, h_round):
+    def __init__(self, device_id, name, reference, type, data_type, conversion, h_store, h_max, h_expire, h_round):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
+        self.type = ucode(type)
         self.data_type = ucode(data_type)
         self.conversion = ucode(conversion)
         self.history_store = h_store
@@ -372,8 +409,8 @@ class Sensor(Base):
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s)>"\
-               % (self.id, self.device_id, self.reference, self.name, self.data_type, self.conversion, \
+        return "<Sensor(id=%s device_id=%s reference='%s' type='%s' name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s)>"\
+               % (self.id, self.device_id, self.reference, self.type, self.name, self.data_type, self.conversion, \
                    self.history_store, self.history_max, self.history_expire, self.history_round)
 
     @staticmethod
@@ -389,12 +426,14 @@ class SensorHistory(Base):
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float, nullable=True)
     value_str = Column(Unicode(32), nullable=False)
+    original_value_num = Column(Float, nullable=True)
 
-    def __init__(self, sensor_id, date, value):
+    def __init__(self, sensor_id, date, value, orig_value):
         self.sensor_id = sensor_id
         self.date = date
         try:
             self.value_num = float(value)
+            self.original_value_num = float(orig_value)
         except ValueError:
             pass
         except TypeError:
@@ -403,8 +442,8 @@ class SensorHistory(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<SensorHistory(sensor_id=%s date=%s value_str='%s' value_num=%s)>"\
-               % (self.sensor_id, self.date, self.value_str, self.value_num)
+        return "<SensorHistory(sensor_id=%s date=%s value_str='%s' value_num=%s orig_value_num=%s)>"\
+               % (self.sensor_id, self.date, self.value_str, self.value_num, self.original_value_num)
 
     @staticmethod
     def get_tablename():
@@ -493,8 +532,8 @@ class XplCommand(Base):
     
     def __repr__(self):
        """Return an internal representation of the class"""
-       return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat_id=%s params=%s)>"\
-               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat_id, self.params)
+       return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat=%s params=%s)>"\
+               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat, self.params)
 
     @staticmethod
     def get_tablename():

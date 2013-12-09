@@ -100,6 +100,15 @@ class Logger():
             my_logger.setLevel(LEVELS[level])
             self.logger[component_name] = my_logger
 
+    def set_format_mode(self, mode):
+        formatter = None
+        if mode == "messageOnly":
+            formatter = logging.Formatter('%(message)s')
+        if formatter:
+            for log in self.get_logger().handlers:
+                if type(log) is logging.StreamHandler:
+                    log.setFormatter(formatter)
+
     def get_logger(self, logger_name = None):
         '''
         returns the configured logger instance

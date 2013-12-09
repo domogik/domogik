@@ -6,10 +6,9 @@ Installation
 ============
 
 .. note::
-    * These examples assume Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
-    * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to stop it before installation.
-
-.. todo:: Mac installation
+    * These examples assume you are using Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
+    * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
+    * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
 
 Dependencies
 ------------
@@ -23,27 +22,29 @@ Check your Python version with: ::
 
 If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
 
-    $ apt-get install python2.7
-    $ ln -sf /usr/bin/python2.7 /usr/bin/python
+    $ sudo apt-get install python2.7
+    $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Even if you have python2.7 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
+Even if you have python2.7 or higher installed, check that the development package is also installed, or do: ::
 
-    $ apt-get install python2.7-dev gcc
+    $ sudo apt-get install python2.7-dev gcc
 
 Install SSL libraries: ::
 
-    $ apt-get install libssl-dev 
-
-Install libraries for mysql access and command line client: ::
-
-    $ apt-get install libmysqlclient-dev mysql-client
+    $ sudo apt-get install libssl-dev 
 
 Install libraries for postgresql: ::
 
-    $ apt-get install python-psycopg2
+    $ sudo apt-get install python-psycopg2
+
+.. note::
+    Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
 
 Mysql server
 ------------
+
+.. warning::
+    If you plan to use *postgresql*, please check the :doc:`postgresql installation steps <postgresql>`.
 
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
@@ -51,7 +52,7 @@ Mysql server
 
 Install packages for mysql server: ::
 
-    $ apt-get install mysql-server
+    $ sudo apt-get install mysql-server
 
 Log on the mysql database as root user: ::
 
@@ -73,13 +74,18 @@ Create the user "domogik" to use the new database: ::
 Download Domogik
 ----------------
 
-The 0.4 release is still in dev so you need to get domogik from the sources.
+.. warning::
+    You must put Domogik sources in a folder which can be read by all the system users:
+    
+    * don't download Domogik sources in */root* or */*
+
+The 0.4 release is still in development so you need to get domogik from the sources.
 
 Use git to get the sources: ::
 
     $ sudo apt-get install git
     $ git clone https://github.com/domogik/domogik.git
-    $ git checkout 0.4-candidate
+    $ git checkout master
 
 Install Domogik 
 ---------------
@@ -93,22 +99,10 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
     During installation, a new user will be created if necessary.
     
-    If you want to use the C hub instead of the python hub (the default one), use the **--hub_c** option. See :doc:`here </xplhub/index>` for more informations on the xpl hubs.
+    If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
 
 .. todo::
-
-    * This option is not yet available in Domogik 0.4
-    * Describe all the steps
-    * Describe how to use the command line
-
-
-Optional : postgresql (instead of mysql)
-----------------------------------------
-
-If you wish to use postgresql instead of mysql
-
-* Create your database
-* Edit your */etc/domogik/domogik.cfg* file and edit the *[database]* section : type = postgresql
+    Describe all the steps
 
 
 Make Domogik start with your computer
@@ -118,18 +112,17 @@ For Debian or Ubuntu systems: ::
 
     $ sudo update-rc.d domogik defaults
 
-For Archlinux: add *@domogik* at the very end of the line starting with *DAEMON*.
-
 Start domogik
 -------------
-.. code-block:: bash
+
+::
 
     $ sudo /etc/init.d/domogik start
     * Starting 0MQ broker ... Done.
     * Starting 0MQ forwarder ... Done.
     * Starting xPL (python version)... Done.
     * Starting Manager (with -d -r -x -s)... Done.
-
+    * Starting the admin interface ... Done.
 
 It will start : 
 
@@ -137,6 +130,7 @@ It will start :
 * The xpl hub
 * The Domogik manager on this host
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
+* The administration web interface
 
 Next step : domoweb, the web user interface
 -------------------------------------------
@@ -145,5 +139,6 @@ Domoweb is not yet available for Domogik 0.4
 
 It doesn't work?
 ----------------
-* `See errors and solutions <http://wiki.domogik.org/Errors_and_solutions>`_
+
+* :doc:`See errors and solutions </enduser/errors/index>`
 

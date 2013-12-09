@@ -1,0 +1,42 @@
+=================
+SSL configuration
+=================
+
+Activate ssl for REST
+=====================
+
+Generate the certificate 
+------------------------
+
+Tou will need to generate 2 files, the self signed certificate and the key file:
+
+First we need to generate the key file:
+    
+    $ openssl genrsa -des3 -out <hostname> 1024
+    
+You should now have a <hostname>.key file.
+
+The second file is the certificate itself, this is generated in 2 steps:
+
+1- generating the Certificate Signing Request
+
+    $ openssl req -new -key <hostname>.key -out <hostname>.csr
+    
+2- the self signed certificate
+
+    $ openssl x509 -req -days 365 -in <hostname>.csr -signkey <hostname>.key -out <hostname>.crt
+    
+If you followed the above steps you will have the 2 needed files, <hostname>.key and <hostname>.crt
+
+Configure REST
+--------------
+
+To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 2 importent keys for this
+
+    # ssl_certificate = should point to the .crt file
+    # ssl_key = should point to the .key file
+    
+One this is updated restart domogik, and rest should be running with ssl enabled.
+    
+
+Restart the REST server.

@@ -64,13 +64,14 @@ class PackageJson():
     """ PackageJson class
         load the file into a json and complete it
     """
-    def __init__(self, name = None, url = None, path = None, pkg_type = "plugin"):
+    def __init__(self, name = None, url = None, path = None, pkg_type = "plugin", data = None):
         """ Read json file of a plugin and make an object from it
             @param name : name of package
             @param url : url of file
             @param path : path of file
             @param pkg_type : package type (default : 'plugin')
                           To use only with name != None
+            @param data : json data as a python object. Used by package.py when installing a zip file : the json is read from memory
         """
         json_file = None
         try:
@@ -105,7 +106,13 @@ class PackageJson():
                 json_file = url
                 icon_file = None
                 json_data = urllib2.urlopen(json_file)
+                # TODO : there is an error here!!!!!
                 self.json = json.load(xml_data)
+
+            elif data != None:
+                json_file = None
+                icon_file = None
+                self.json = data
 
             self.validate()
 
@@ -198,7 +205,7 @@ class PackageJson():
                     if sens not in self.json["sensors"].keys():    
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
-                expected = ["key", "type", "description"]
+                expected = ["key", "type", "description", "xpl"]
                 optional = ["max_value", "min_value", "choices", "mask", "multiline"]
                 for par in devt["parameters"]:
                     self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
@@ -217,7 +224,7 @@ class PackageJson():
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'data_type', 'conversion', 'history']
+                expected = ['name', 'data_type', 'conversion', 'history', 'type']
                 hexpected = ['store', 'max', 'expire', 'round_value']
                 self._validate_keys(expected, "sensor {0}".format(senid), sens.keys())
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), sens['history'].keys())

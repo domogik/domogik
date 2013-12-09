@@ -38,7 +38,7 @@ from domogik.common.utils import get_sanitized_hostname
 from domogik.tests.common.templatetestcase import TemplateTestCase
 from domogik.tests.common.helpers import check_domogik_is_running
 from domogik.tests.common.helpers import delete_configuration
-from domogik.tests.common.helpers import configure
+from domogik.tests.common.helpers import configure, check_config
 from domogik.tests.common.testplugin import TestPlugin
 from domogik.xpl.common.plugin import STATUS_ALIVE, STATUS_STOPPED
 import time
@@ -74,6 +74,9 @@ class PluginTestCase(TemplateTestCase):
         for key in self.configuration:
             print(u"Set up configuration : {0} = {1}".format(key, self.configuration[key]))
             self.assertTrue(configure("plugin", self.name, get_sanitized_hostname(), key, self.configuration[key]))
+        for key in self.configuration:
+            print(u"Validate the configuration : {0} = {1}".format(key, self.configuration[key]))
+            self.assertTrue(check_config("plugin", self.name, get_sanitized_hostname(), key, self.configuration[key]))
 
     # this function is the same for all plugins
     def test_0020_create_the_devices(self):
@@ -100,4 +103,9 @@ class PluginTestCase(TemplateTestCase):
         tp = TestPlugin(self.name, get_sanitized_hostname())
         tp.request_stop()
         self.assertTrue(tp.wait_for_event(STATUS_STOPPED))
+    
+    def configure(self):
+        raise NotImplementedError
 
+    def create_device(self):
+        raise NotImplementedError

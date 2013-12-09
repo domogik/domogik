@@ -7,15 +7,10 @@ Available actions :
 * GET : a list of known urls and there options
 
 
-GET
-===
+GET /map
+========
 
-This method is used to get informations about all urls.
-
-/map
--------
-
-Returns a list of all known rest urls
+This method is used to get informations about all urls. It will returns a list of all known rest urls.
 
 Example: ::
 

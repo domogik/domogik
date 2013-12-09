@@ -1,0 +1,21 @@
+=============================
+Install Domogik from a script
+=============================
+
+
+.. todo::
+    Documentation
+
+Purpose
+=======
+
+Domogik can be installed with no user interaction : the *install.py* script has options for each configuration parameters. This is usefull for packagers or people who want to automatically deploy some Domogik systems.
+
+
+Usage
+=====
+
+
+
+Example
+=======

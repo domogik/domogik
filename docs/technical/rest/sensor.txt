@@ -10,7 +10,7 @@ Available actions :
 GET
 ===
 
-This method is used to get informations about existing sensors. There are several way to call the **/sensor** url with the GET method.
+This method is used to get informations about existing sensors. There are several way to call the **/sensor** url with the GET method. This url will give you informations about the sensor and the last value of the sensor.
 
 /sensor
 -------
@@ -73,8 +73,8 @@ Example: ::
         "device_id": 3
     }
 
-PUT
-===
+PUT /sensor
+===========
 
 This method is used to update the information about a sensor, only the hstory info is possible to update.
 

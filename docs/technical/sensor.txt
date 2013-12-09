@@ -2,150 +2,18 @@
 Sensors
 =======
 
-.. warning ::
+A sensor is used to store data received from the xpl network inside the database, this data can then be used to generate charts and display the evolution of some data.
 
-    All the features are not listed in this page. This purpose of this page is to give some examples.
+The data stored in the database is linked to a certain `Domogik datatype <package_development/plugins/data_types/index>`.
+This datatype is used to interprete the data and to display the correct unit.
 
+A sensor can have different types:
+    * **absolute**: store the value as its received
+    * **incremental**: store the difference between the last received and the last-1 received value
 
-Type of returned values
-=======================
-
-* boolean
-
-    * value : 'true' or 'false'
-
-* number
-
-    * value : integer or float
-
-* string
-    
-    * value : char string
-
-* complex
-    
-    * value : json structure
-
-Exemple Features
-================
-
-1Wire.Temperature 
------------------
-
-* DS18B20
-    =========== ====== ============= ===========
-    name        value  parameter     stat key
-    =========== ====== ============= ===========
-    Temperature number {"unit":"°C"} temperature
-    =========== ====== ============= ===========
-
-1Wire.ID
---------
-* DS2401
-    ======= ======= ========= ===========
-    name    value   parameter stat key
-    ======= ======= ========= ===========
-    Present boolean           present
-    ======= ======= ========= ===========
-
-Service.Teleinfo
-----------------
-* Dauguet
-    =============================================== ======= =============== ===========
-    name                                            value   parameter       stat key
-    =============================================== ======= =============== ===========
-    Instantaneous intensity (Intensité instantanée) number  {"unit":"A"}    iinst
-    Off Peak (Heures creuses)                       number  {"unit":"Wh"}   hchc
-    Maximum intensity (Intensité maximale)          number  {"unit":"A"}    imax
-    Tariff Period (Période tarifaire)               string                  ptec
-    Power (Puissance apparente)                     number  {"unit":"Va"}   papp
-    Group schedule (Groupe horaire)                 string                  hhphc
-    On Peak (Heures pleines)                        number  {"unit":"Wh"}   hchp
-    =============================================== ======= =============== ===========
-
-Communication.caller_id
------------------------
-========= ========= ========= ===========
-name      value     parameter stat key
-========= ========= ========= ===========
-Caller id string              phone
-========= ========= ========= ===========
-
-Computer.Control 
-----------------
-======= ======= ========= ===========
-name    value   parameter stat key
-======= ======= ========= ===========
-Ping    boolean           ping
-======= ======= ========= ===========
-
-Relayboard.Digital_Input
-------------------------
-======= ======= ========= ===========
-name    value   parameter stat key
-======= ======= ========= ===========
-Digital Input   boolean   input
-======= ======= ========= ===========
-
-Relayboard.Analog_Input
------------------------
-======= ======= ========= ===========
-name    value   parameter stat key
-======= ======= ========= ===========
-Analog  Input   number    voltage
-======= ======= ========= ===========
-
-Relayboard.Counter
-------------------
-======= ======= ========= ===========
-name    value   parameter stat key
-======= ======= ========= ===========
-Counter number            count
-======= ======= ========= ===========
-
-rfid.Mirror_Base
-----------------
-* Mir:ror
-    ========= ======= ========= ===========
-    name      value   parameter stat key
-    ========= ======= ========= ===========
-    Activated boolean           activated
-    ========= ======= ========= ===========
-
-rfid.Mirror_Tag
----------------
-* Mir:ror Tag
-    ======= ======= ========= ===========
-    name    value   parameter stat key
-    ======= ======= ========= ===========
-    Present boolean           present
-    ======= ======= ========= ===========
-
-Online_Services.Weather
------------------------
-.. note::
-    Units are to be defined
-
-Current data
-^^^^^^^^^^^^
-============== ======= ========= ==============
-name           value   parameter stat key
-============== ======= ========= ==============
-Temperature    number            temperature
-Pressure       number            pressure
-Humidity       number            humidity
-Visibility     number            visibility
-Rising         number            rising
-Chill          number            chill
-Direction      number            direction
-Speed          number            speed
-UV index       number            uv
-Rain fall      number            rainfall
-Drew point     number            drewpoint
-Condition code number            condition-code
-Condition text string            condition-text
-============== ======= ========= ==============
-
-Previsionnal data
-^^^^^^^^^^^^^^^^^
-*Data linked to ticket #586 are missing for the moment*
+Some examples of sensors:
+    * Temperature sensor
+    * Energy sensor (KwH)
+    * Power sensor (Watt)
+    * boolean input sensor
+    * ...

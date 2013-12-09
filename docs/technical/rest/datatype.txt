@@ -6,11 +6,8 @@ Available actions :
 
 * GET : a list of known datatypes and there options
 
-GET
-===
-
-/map
-----
+GET /datatype
+=============
 
 Returns a list of all known datatypes
 
