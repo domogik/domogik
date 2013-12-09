@@ -3,6 +3,7 @@ Packages development
 ====================
 
 * :doc:`What is new in 0.4 about Domogik plugins format ? <what_is_new_in_0.4>`
+* :doc:`Changelog of plugins format since Domogik 0.4 <changelog>`
 
 
 * :doc:`Release numbers rules <releases/release_numbers_rules>`
