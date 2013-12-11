@@ -27,51 +27,21 @@ For each sensor, we define a name and no conversion option. Then, depending of t
 ::
 
         "sensors": {
-            "get_free_space": {
-                    "name": "Free Space",
-                    "data_type": "DT_Byte",
-                    "conversion": "",
-                    "history": {
-                        "store": True,
-                        "max": 0,
-                        "expire": 0,
-                        "round_value": 0
-                    }
+            "get_total_pace": {
+                "name": "Total Space",
+                "data_type": "DT_Byte",
+                "conversion": "",
+                "incremental": false,
+                "history": {
+                    "store": true,
+                    "duplicate": false,
+                    "max": 0,
+                    "expire": 0,
+                    "round_value": 0
+                }
             },
-            "get_used_space": {
-                    "name": "Used Space",
-                    "data_type": "DT_Byte",
-                    "conversion": "",
-                    "history": {
-                        "store": True,
-                        "max": 0,
-                        "expire": 0,
-                        "round_value": 0
-                    }
-            },
-            "get_total_space": {
-                    "name": "Total Space",
-                    "data_type": "DT_Byte",
-                    "conversion": "",
-                    "history": {
-                        "store": True,
-                        "max": 0,
-                        "expire": 0,
-                        "round_value": 0
-                    }
-            },
-            "get_percent_used": {
-                    "name": "Percent used",
-                    "data_type": "DT_Scaling",
-                    "conversion": "",
-                    "history": {
-                        "store": True,
-                        "max": 0,
-                        "expire": 0,
-                        "round_value": 0
-                    }
-            }
-        },
+            ...
+        }
 
 Description
 ===========
@@ -80,12 +50,14 @@ Each item has several properties:
 
 * **name** : it is a string used to display this sensor on the UI
 * **data_type** : the data type used for this sensor
-* **type** : defines the sensor type, it can have the folowing values
-    * **absolutes** : store the value after the conversion
-    * **incremental** : store the difference between the last value and the current value
+* **incremental** : if set to True, store the difference between the last value and the current value
 * **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format acording to the data_type
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table
     * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate, this will only be evaluated if tstore is True
     * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days. This will only be evaluated if store is True
     * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if tstore is True
+    * **duplicate** : if set to true, duplicate values following each other will be stored, if set to false this will not happen
+
+What happens if a sensor value needs to be store
+================================================

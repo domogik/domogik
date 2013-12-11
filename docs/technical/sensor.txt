@@ -10,6 +10,7 @@ This datatype is used to interprete the data and to display the correct unit.
 A sensor can have different types:
     * **absolute**: store the value as its received
     * **incremental**: store the difference between the last received and the last-1 received value
+    * **calculated**: a calculated value, see the spcifick section below
 
 Some examples of sensors:
     * Temperature sensor
@@ -17,3 +18,21 @@ Some examples of sensors:
     * Power sensor (Watt)
     * boolean input sensor
     * ...
+
+Calculated sensors
+==================
+
+A calculated sensor is a sensor where the stored value is calculated. as an example lets use a power sensor that transmits the number of KWh used, and we want to calculate the cost for the electricity of that interval.
+
+If we then create a calculated sensor with the below formula we can store the price for the pwoer consumption during that time.
+
+:: python
+
+    def calculate(value):
+        result = value * 0,11
+        return result
+
+The above function wil return the value to store, note this function can contain any python code you want, but there are some rules to folow:
+    * the function name is always 'calculated'
+    * it has one input parameter names 'valua'
+    * it has one return parameter, a float

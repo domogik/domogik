@@ -405,7 +405,8 @@ class DbHelper():
         for a_sensor in device.sensors:
             json_sensor = { 'id' : a_sensor.id,
                             'name' : a_sensor.name,
-                            'type' : a_sensor.type,
+                            'incremental' : a_sensor.incremental,
+                            'formula' : a_sensor.formula,
                             'data_type' : a_sensor.data_type,
                             'conversion' : a_sensor.conversion, 
                             'last_value' : a_sensor.last_value, 
@@ -557,13 +558,15 @@ class DbHelper():
             sensor = Sensor(name = sensor_in_client_data['name'], \
                             device_id  = device.id, \
                             reference = a_sensor, \
-                            type = sensor_in_client_data['type'], \
+                            incremental = sensor_in_client_data['incremental'], \
                             data_type = sensor_in_client_data['data_type'], \
                             conversion = sensor_in_client_data['conversion'], \
                             h_store = sensor_in_client_data['history']['store'], \
                             h_max = sensor_in_client_data['history']['max'], \
                             h_expire = sensor_in_client_data['history']['expire'], \
                             h_round = sensor_in_client_data['history']['round_value'], \
+                            h_duplicate = sensor_in_client_data['history']['duplicate'], \
+                            formula = None \
                             )
             self.__session.add(sensor)
             self.__session.flush()
@@ -782,7 +785,7 @@ class DbHelper():
             orig_value = value
             # check the sensorTypes
             # sensor.type is absolute => do nothing
-            if sensor.type == 'incremental':
+            if sensor.incremental:
                 # get the last orig_value and substract value and orig_value and set the enw value
                 last = self.__session.query(SensorHistory) \
                     .filter(SensorHistory.sensor_id == sid) \
@@ -794,8 +797,10 @@ class DbHelper():
                 else:
                     # set the begin value to 0
                     value = 0
+            #if semsor.formula is not None:
+                # do the calculation
             # only store stats if the value is different
-            if sensor.last_value is not str(value):
+            if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
                 # handle history_round
                 # reduce device stats
                 if sensor.history_round > 0:
