@@ -86,31 +86,35 @@ class BroadcastServer(object):
     """Class de gestion du server websocket pour dialogue plugin UI"""
     def __init__(self,  port=5570,  cb_recept = None,  log = None ):
         fName = "//var//log/domogik//wsuiserver.log"
-        if log :
+        self.log = log
+        if self.log :
             for h in log.__dict__['handlers']:
                 if h.__class__.__name__ in ['FileHandler', 'TimedRotatingFileHandler','RotatingFileHandler', 'WatchedFileHandler']:
                     fName = os.path.dirname(h.baseFilename) + "/wsuiserver.log"
                     break
-        log.debug('Log WS Server on : {0}'.format(fName))
-        self._wsLogws = wsServer_logger(level = logging.DEBUG)
+            logLevel = self.log.getEffectiveLevel()
+        else : logLevel = logging.DEBUG
+        self._wsLogws = wsServer_logger(level = logLevel)
         logfmt = logging.Formatter("[%(asctime)s] %(levelname)s %(message)s")
         handler = logging.handlers.RotatingFileHandler(fName, maxBytes=10485760, backupCount=5)
         handler.setLevel(logging.DEBUG)
         handler.setFormatter(logfmt)
         self._wsLogws.addHandler(handler)
+        self.logMsg("info", "Log WS Server level {0} on : {1}".format(logLevel , fName))
+
         global __ctrlServer__
         # check free port
         for s in __ctrlServer__ :
             if s.port == port :
-                if log : log.error("Creating WS server error, port %d allready used."  % port)
+                self.logMsg("error", "Creating WS server error, port %d allready used."  % port)
                 raise WsUIServerException ("Creating WS server error, port %d allready used."  % port)
+        self.logMsg("debug", "Initializing WebSocket server plugin.....")
         self.buffer = []
         self.clients = set()
         self.fail_clients = set()
         self.running = False
         self.port = port
         self.cb_recept = cb_recept
-        self.log = log
         self.server = None
         self.server = make_server('', port, server_class=WSGIServer,
                      handler_class=WebSocketWSGIRequestHandler,
@@ -121,21 +125,21 @@ class BroadcastServer(object):
         servUI = threading.Thread(None, self.run, "th_WSserv_msg_to_ui", (), {} )
         servUI.start()
         time.sleep(0.1)
-        if self.log : self.log.info('WebSocket server started on port : %d' %self.port)
+        self.logMsg("info", "WebSocket server started on port : %d" %self.port)
         print "**************** WebSocket server is started on port %d ********************" %self.port
         
     def run(self):
         """Starting server in forever mode , calling by thread start.""" 
         # TODO : Ajouter la gestion d'une exception en cas d'erreur sur le server
         print "**************** Starting WebSocket server forever **************"
-        if self.log : self.log.info('Starting WebSocket server forever on port : %d' %self.port)
+        self.logMsg("info", "Starting WebSocket server forever on port : %d" %self.port)
         self.running = True
         self.server.serve_forever()
     
     def close(self):
         """Closing server"""
         self.server.server_close()
-        if self.log : self.log.info('WebSocket server forever on port : %d closed' %self.port)
+        self.logMsg("info",  "WebSocket server forever on port : %d closed" %self.port)
         
     def __del__(self):
         """Close server and Destroy class."""
@@ -143,7 +147,7 @@ class BroadcastServer(object):
         self.running = False
         if  self.server : self.server.server_close()
         if __ctrlServer__ : __ctrlServer__.remove(self)
-        if self.log : self.log.info('WebSocket server forever on port : %d Destroyed' %self.port)
+        self.logMsg("info",  "WebSocket server forever on port : %d Destroyed" %self.port)
 
     def broadcastMessage(self, msg):
         """broadcast Message to all clients"""
@@ -151,17 +155,17 @@ class BroadcastServer(object):
         header = {'type':'pub',  'idws' : 'for each' , 'ip' : '0.0.0.0',  'timestamp' : long(time.time()*100)}
         message['header'] = header
         info = 'Websocket server sending for %d client(s) : %s' % (len(self.server.manager.websockets),  str(message))
-     #   print info
-        if self.log : self.log.debug(info)
+      #  self.logMsg("debug",  info)
         for ws in self.server.manager.websockets.itervalues():
             try:
                 message['header']  = {'type':'pub', 'idws' : ws.peer_address[1] , 'ip' : ws.peer_address[0],  'timestamp' : long(time.time()*100)}
-                print "Server broadcasting send to : ",  message['header']['idws']
-                print message
                 ws.send(json.dumps(message))
+                print "Server broadcasting sended to : ",  message['header']['idws']
+                print message
+          #      self.logMsg("debug", "Server broadcasting sended to : {0}".format(message['header']['idws']))
             except Exception:
                 self.server.manager.remove(ws)
-                print "Failed sockets"
+                self.logMsg("debug",  "Failed sockets : {0}:{1}".format(ws.peer_address[0], ws.peer_address[1]))
                 continue
 
     def sendAck(self, ackMessage):
@@ -170,9 +174,32 @@ class BroadcastServer(object):
         if ackMsg['header'] :
             for ws in self.server.manager.websockets.itervalues():
                 if ws.peer_address[1] == ackMsg['header']['idws'] :
-                    print 'Send Ack on WebSocket client',  ackMsg['header']['idws'] 
                     ws.send(json.dumps(ackMsg))
+                    info = {}
+                    for k in ackMsg :
+                        if k != "data" and k != "header":  info[k] = ackMsg[k]
+                    self.logMsg("debug", "Ack sended to WebSocket client : {0}:{1} => {2}".format(ackMsg['header']['ip'], ackMsg['header']['idws'],  info))
 
+    def logMsg(self, type = "info", msg =""):
+        """Log msg in plugin and wsuiserver"""
+        if msg !="":
+            if type =='info' : 
+                if self.log : self.log.info(msg)
+                self._wsLogws.info(msg)
+            elif type == 'debug' :
+                if self.log : self.log.debug(msg)
+                self._wsLogws.debug(msg)
+            elif type == 'error' :
+                if self.log : self.log.error(msg)
+                self._wsLogws.error(msg)
+            elif type == 'warning' :
+                if self.log : self.log.warning(msg)
+                self._wsLogws.warning(msg)
+            elif type == 'critical' :
+                if self.log : self.log.critical(msg)
+                self._wsLogws.critical(msg)
+           
+            
 class WebSocketsHandler(WebSocket):
     """One Client Class par client, create by server, inherited from WebSocket class ."""
     def opened(self):
@@ -185,7 +212,7 @@ class WebSocketsHandler(WebSocket):
         if not self.server :
             raise WsUIServerException ("Openning WS client error, port %d not find in server list."  % port)
         print 'New WebSocket client detected ',  self.peer_address
-        if self.server.log : self.server.log.info('A new WebSocket client connected : %s : %s'  % (self.peer_address[0], self.peer_address[1]))
+        self.server.logMsg("info",  "A new WebSocket client connected : %s:%s"  % (self.peer_address[0], self.peer_address[1]))
         self.send(json.dumps({'header': {'type' : 'confirm-connect', 'id' : 'ws_serverUI',  'idws': self.peer_address[1]}}))
         print 'WebSockect Message confirmation send from open to client',  self.peer_address[1] 
         self.confirmed = False
@@ -193,7 +220,7 @@ class WebSocketsHandler(WebSocket):
     def closed(self, code,  status):
         """Call at client closing or lost"""
         print 'Client WebSocket supprimer',  code,  status,  self.connection
-        if self.server.log : self.server.log.info('WebSocket client disconnected : %s' % self.connection )
+        self.server.logMsg("info",  "WebSocket client disconnected : %s" % self.connection )
 
         
     def received_message(self, message):
@@ -206,12 +233,13 @@ class WebSocketsHandler(WebSocket):
             header = msg['header'] 
         except TypeError as e :
             print '   Error parsing websocket msg :',  e
-            if self.server.log : self.server.log.debug('WebSocket client error parsing msg : %s , Message : %s' % (e, str(message)))
+            self.server.logMsg("debug",  "WebSocket client error parsing msg : %s , Message : %s" % (e, str(message)))
         else :
+      #      self.server.logMsg("debug",  "client received msg : {0}".format(header))
             if header['type']  == 'ack-connect':
                 self.confirmed = True
                 self.send(json.dumps({'header': {'type' : 'confirm-connect', 'id' : 'ws_serverUI',  'idws': self.peer_address[1]}}))
-                print 'WebSockect client connection confirmed by received, send client identity : ',  self.peer_address[1] 
+                self.server.logMsg("debug", 'WebSockect client connection confirmed by received, send client identity : {0}'.format(self.peer_address[1]))
             elif header['type']  == 'server-hbeat':
                 self.sendAck(msg)
             elif self.confirmed == True :
@@ -222,9 +250,9 @@ class WebSocketsHandler(WebSocket):
         
     def sendAck(self, msg):
         """Send return confirmation message (Ack)."""
-        print 'WebSocket send Ack'
         msg.update({'header': {'type':'ack', 'idws' : self.peer_address[1] , 'ip' : self.peer_address[0],  'timestamp' : long(time.time()*100)}})
         self.send(json.dumps(msg))
+        self.server.logMsg("debug",  "WebSocket Client have send Ack : {0}".format(msg))
 
 def getServerOnPort(port):
     server = None

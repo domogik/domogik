@@ -3,7 +3,17 @@ Change log
 ==========
 
 New instructions to apply changes from immediatly previous version.
-
+- 0.2c3 : (10-12-2013) Compatibily library : OpenZwave >= 1.0.685, python_openzwave >= 0.2.5 (rev >= 2c0812df6a96), Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
+    - Target : OpenZwave, python-openzwave, domogik (0.2c3)
+    - Update, compile and install python_openzwave.
+    - Knows issue : At auto start plugin fail sometimes, stop it or kill process ($ps -ef | grep ozwave) and restart it.
+    - Change log :
+        - GetPollIntensity add in openzwave lib
+        - Add log debug information for wsServer.
+        - Fix automatique COMMAND_CLASS_SENSOR_BINARY type set for xpl (recreate devices and widget for changes).
+        - Fix issue in monitornodes xpl-report if no conforme xpl_msg.
+        - Force default name for controler device if not defined (CtrlMustBeCreate.1.1)
+        
 - 0.2c2 : (30-10-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
     - Target : domogik (0.2c2), domoweb (0.2c1)
     - An `insert_data <changelog.html#do-an-insert-data>`_ or a reinstall is necessary.

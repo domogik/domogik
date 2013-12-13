@@ -408,7 +408,7 @@ class OZWavemanager(threading.Thread):
                 if n : 
                     return "%s.1.1" % (n)
                 else :
-                    return None
+                    return "CtrlMustBeCreate.1.1"
 
     def cb_openzwave(self,  args):
         """Callback depuis la librairie py-openzwave 
