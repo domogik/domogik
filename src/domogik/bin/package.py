@@ -405,6 +405,7 @@ class PackageInstaller():
                 pkg_json = PackageJson(data = data)
         except:
             self.log.error(u"Error while reading the json file '{0}' : {1}".format(json_file, traceback.format_exc()))
+            return False
         try:
             pkg_json.validate()
         except PackageException as e:

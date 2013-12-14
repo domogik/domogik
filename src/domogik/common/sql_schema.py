@@ -385,7 +385,8 @@ class Sensor(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
-    type = Column(Unicode(32), nullable=False)
+    incremental = Column(Boolean, nullable=False)
+    formula = Column(UnicodeText(), nullable=True) 
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
@@ -394,24 +395,29 @@ class Sensor(Base):
     history_max = Column(Integer, nullable=True)
     history_expire = Column(Integer, nullable=True)
     history_round = Column(Float, nullable=True)
+    history_duplicate = Column(Boolean, nullable=False)
 
-    def __init__(self, device_id, name, reference, type, data_type, conversion, h_store, h_max, h_expire, h_round):
+    def __init__(self, device_id, name, reference, incremental, formula, data_type, conversion, h_store, h_max, h_expire, h_round, h_duplicate):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
-        self.type = ucode(type)
+        self.incremental = incremental
+        self.formula = ucode(formula)
         self.data_type = ucode(data_type)
         self.conversion = ucode(conversion)
         self.history_store = h_store
         self.history_max = h_max
         self.history_expire = h_expire
         self.history_round = h_round
+        self.history_duplicate = h_duplicate
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' type='%s' name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s)>"\
-               % (self.id, self.device_id, self.reference, self.type, self.name, self.data_type, self.conversion, \
-                   self.history_store, self.history_max, self.history_expire, self.history_round)
+        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s)>"\
+               % (self.id, self.device_id, self.reference, self.incremental, \
+                   self.name, self.data_type, self.conversion, \
+                   self.history_store, self.history_max, self.history_expire, \
+                   self.history_round, self.history_duplicate)
 
     @staticmethod
     def get_tablename():

@@ -59,12 +59,13 @@ class Serial():
     """ serial mock
     """
 
-    def __init__(self, device, baudrate = None, parity = None, stopbits = None):
+    def __init__(self, device, baudrate = None, parity = None, stopbits = None, timeout = None):
         """ Construtor
             @param device : the json file with the fake data
             @param baudrate : useless, just for compatibility
             @param parity : useless, just for compatibility
             @param stopbits : useless, just for compatibility
+            @param timeout : useless, just for compatibility
         """
         # there is nothing to do, excepting logging!
         print(u"Fake serial device created. The fake data in the file '{0}' will be used".format(device))

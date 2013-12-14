@@ -27,7 +27,7 @@ If you don't already have Python 2.7 or above (you have it if you are running a 
 
 Even if you have python2.7 or higher installed, check that the development package is also installed, or do: ::
 
-    $ sudo apt-get install python2.7-dev gcc
+    $ sudo apt-get install python2.7-dev gcc g++
 
 Install SSL libraries: ::
 

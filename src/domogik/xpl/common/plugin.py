@@ -396,6 +396,7 @@ class XplPlugin(BasePlugin, MQRep):
         self.log.debug(u"Device detected : device_type = {0}, data = {1}".format(device_type, data))
         #self.log.debug(u"Already existing devices : {0}".format(self.devices))
         # browse all devices to find if the device exists
+        found = False
         for a_device in self.devices:
             # first, search for device type
             if a_device['device_type_id'] == device_type:
