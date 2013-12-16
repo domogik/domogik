@@ -35,11 +35,13 @@ Implements
 """
 
 import unittest
+from unittest import TestCase
+
 import logging
 import datetime
 
 from domogik.common.scenario.parameters.cron import CronParameter
-from domogik.common.scenario.parameters.operator import ComparisonOperatorParameter 
+from domogik.common.scenario.parameters.operator import ComparisonOperatorParameter
 from domogik.common.cron import CronExpression
 
 
@@ -130,9 +132,56 @@ class ScenarioCronParameterTest(unittest.TestCase):
 
         now = datetime.datetime.now()
         minute = (now.minute + 10) % 60
-        parameters = {"cron": "%s * * * *" % minute }
+        parameters = {"cron": "%s * * * *" % minute}
         self._obj.fill(params=parameters)
         self.assertFalse(self._obj.evaluate())
+
+
+class ScenarioComparisonOperatorParameterTest(unittest.TestCase):
+    """ Test OperatorParameter
+    """
+
+    def setUp(self):
+        """ Create an Operator Parameter object
+        """
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+        self._obj = ComparisonOperatorParameter(log=logging)
+        self._triggered = False
+
+    def tearDown(self):
+        """ Destroy cron object
+        """
+        del self._obj
+        self._triggered = False
+
+    def test_get_expected_entries(self):
+        entries = self._obj.get_expected_entries()
+        assert entries == {'operator': {
+            'default': None,
+            'values': ['<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in'],
+            'type': 'string',
+            'description': 'Operator to use for comparison',
+            'filters': {}}}
+
+    def test_get_list_of_values(self):
+        assert self._obj.get_list_of_values('operator') == ['<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in']
+
+    def test_evaluate_with_operator(self):
+        for op in ['<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in']:
+            operator = {"operator": op}
+            self._obj.fill(operator)
+            assert self._obj.evaluate() == op
+
+    def test_evaluate_with_no_operator(self):
+        assert self._obj.evaluate() is None
+
+    def test_fill_with_bad_operator(self):
+        try:
+            self._obj.fill({'operator': "bad"})
+        except:
+            pass
+        else:
+            TestCase.fail(self, "Operator 'bad' doesn't exist, exception should be raised")
 
 if __name__ == "__main__":
     unittest.main()
