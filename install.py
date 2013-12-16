@@ -66,8 +66,8 @@ def build_file_list(user):
         ('/var/lib/domogik/resources', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \
                 ['src/domogik/common/datatypes.json']),
-        ('/var/lock/domogik', [user, None], []),
-        ('/var/log/domogik', [user, None], []),
+        ('/var/lock/domogik', [user, 0755], []),
+        ('/var/log/domogik', [user, 0755], []),
         ('/var/log/xplhub', [user, None], []),
     ]
 
