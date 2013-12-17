@@ -1,0 +1,25 @@
+=================================
+How to find and install a package
+=================================
+
+Where are the packages ?
+========================
+
+Well, as 0.4.0 is not really a full end user release there are still some features missing. The main feature missing is the packages management as you can did it with Domogik 0.2 or Domogik 0.3.
+
+As the packages format has been changed, we have also changed the tools related to the packages. Currently, there is a tool to install a package but there is no website to list all the available packages.
+
+Keep also in mind that during 0.4.0, packages are being migrated to the new format, so there may be not all the packages you are looking for today ;).
+
+You can ask us on the mailing list, irc or forum to keep you informed.
+
+
+When will I be able to easily find packages ?
+=============================================
+
+In Domogik 0.4.1 we will work on the website which will list the packages. So, the 0.4.1 (or maybe 0.4.2) should be the target release.
+
+How to install a package ?
+==========================
+
+:doc:`All informations about installing a package </enduser/packages/index>`

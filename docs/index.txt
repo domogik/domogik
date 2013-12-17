@@ -12,6 +12,7 @@ Overview
 ========
 
 * :doc:`Domogik overview </overview/index>` 
+* :doc:`Domogik requirements </overview/requirements>`
 
 End User Documentation
 ======================
@@ -22,7 +23,6 @@ Releases history
 * :doc:`Release 0.3.0 </releases/0.3.0>`
 * :doc:`Release 0.2.0 </releases/0.2.0>`
 * :doc:`Release 0.1.0 </releases/0.1.0>`
-* :doc:`Domogik requirements </enduser/requirements>`
 
 Installation
 ------------
@@ -56,22 +56,18 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 * :doc:`Install Domogik from a script </enduser/installation/install_from_a_script>`
 * :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
 * Configure external access to Domogik administration interface
-* Install Domogik in a python virtualenv (and what is a virtualenv ?)
+* :doc:`Install Domogik in a python virtualenv </enduser/installation/virtualenv>`
 * :doc:`Configure SSL </enduser/installation/ssl>`
 
 
 Quick start guide
 -----------------
 
-.. todo::
-    All this part is to rewrite. 
-
-    * Terms
-    * First use : go to the admin
-    * admin :  change admin password
-    * find and install a package
-    * configure a client and create its devices
-    * start a client
+* :doc:`Terms </enduser/quick_start/terms>`
+* :doc:`First use : go to the admin </enduser/quick_start/first_use>`
+* :doc:`Find and install a package </enduser/quick_start/install_a_package>`
+* configure a client and create its devices
+* start a client
 
 Detailed guide
 --------------

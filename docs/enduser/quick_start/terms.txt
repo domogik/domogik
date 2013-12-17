@@ -1,0 +1,53 @@
+==================================
+Terms to know before using Domogik
+==================================
+
+.. glossary::
+
+    RTFM
+        *Read the fucking manual*. Don't forget to search the information in the doc before asking ;). There are a lot of informations in the documentation. But of course if you don't find the information, we will help you!
+
+    Domogik
+        It is the core part of the Domogik automation system. Domogik is made of core components, a xPL hub, a message queue and a database. Domogik has no control user interface included : only an administration web interface is provided.
+
+    User interface
+        There are several user interfaces available for Domogik. 
+
+    xPL
+        xPL is an open protocol intended to permit the control and monitoring of home automation devices.
+
+    xPL hub
+        A xPL hub is a software hub which is used to handle xPL flows.
+
+    Message queue
+        Messages queues provide an asynchronous communication protocol. This is used by Domogik components to discuss together.
+
+    Core component
+        Domogik core components are the heart of Domogik, they have no automation features but they are needed to make all automation plugins to interact together.
+    
+    Package
+        A package is a group of files with a type (plugin, widget, icon, ...), a name and a version. Example : *plugin zwave 0.1*. Depending on the type, it will add features to Domogik or a user interface (Domoweb).
+
+    Plugin
+        This is a type of packages. Plugins are packages for Domogik. A plugin will handle one technology, one hardware gateway or some online services. A plugin is in fact a *xPL plugin* : than means that a plugin will send the events or the sensors values over xPL and will wait for xPL commands.
+
+    Client
+        A client is a package instance. For example, a plugin installed on a server is a client. The same plugin installed on another server is another client.
+
+    Device
+        A device is a reference to a hardware, software or online service element. A device is related to a device type. A device is linked to a client. If the client is uninstalled or disappear (is this is some external xPL device for example), the device will become orphan.
+
+    Device type
+        A plugin will allow to create various kind of devices (for example a temperature sensor or a temperature and humidity sensor). A kind of device is a device type. A device type can have several features. 
+
+    Device feature
+        A device feature can be a sensor or a command. Each device feature can have its own parameters (address, polling interval, ...).
+
+    Sensor
+        A sensor is something that read or catch some values (temperature, humidity, light status, ...)
+
+    Command
+        A command is something that do an action (switch on the light, ...)
+
+
+

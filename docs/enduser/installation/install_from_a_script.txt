@@ -2,10 +2,6 @@
 Install Domogik from a script
 =============================
 
-
-.. todo::
-    Documentation
-
 Purpose
 =======
 
@@ -15,7 +11,116 @@ Domogik can be installed with no user interaction : the *install.py* script has 
 Usage
 =====
 
+To know all the options available to install Domogik, you can just launch *install.py* with the -*h *option: ::
+
+    $ sudo ./install.py -h
+    usage: install.py [-h] [--no-setup] [--no-test] [--no-config]
+                      [--no-create-user] [--no-db-upgrade] [--user USER]
+                      [--command-line]
+                      [--domogik_libraries_path DOMOGIK_LIBRARIES_PATH]
+                      [--domogik_log_dir_path DOMOGIK_LOG_DIR_PATH]
+                      [--domogik_pid_dir_path DOMOGIK_PID_DIR_PATH]
+                      [--domogik_log_level DOMOGIK_LOG_LEVEL]
+                      [--domogik_bind_interface DOMOGIK_BIND_INTERFACE]
+                      [--domogik_broadcast DOMOGIK_BROADCAST]
+                      [--database_type DATABASE_TYPE] 
+                      [--database_user DATABASE_USER] 
+                      [--database_password DATABASE_PASSWORD]
+                      [--database_port DATABASE_PORT] 
+                      [--database_name DATABASE_NAME] 
+                      [--database_host DATABASE_HOST] 
+                      [--database_prefix DATABASE_PREFIX]
+                      [--rest_interfaces REST_INTERFACES] [--rest_port REST_PORT]
+                      [--rest_use_ssl REST_USE_SSL]   
+                      [--rest_ssl_certificate REST_SSL_CERTIFICATE]
+                      [--rest_ssl_key REST_SSL_KEY]   
+                      [--rest_clean_json REST_CLEAN_JSON] [--mq_ip MQ_IP]
+                      [--mq_req_rep_port MQ_REQ_REP_PORT]
+                      [--mq_pub_port MQ_PUB_PORT] [--mq_sub_port MQ_SUB_PORT]
+                      [--admin_interfaces ADMIN_INTERFACES]
+                      [--admin_port ADMIN_PORT] [--admin_use_ssl ADMIN_USE_SSL]
+                      [--admin_ssl_certificate ADMIN_SSL_CERTIFICATE]
+                      [--admin_ssl_key ADMIN_SSL_KEY] 
+                      [--hub_interfaces HUB_INTERFACES]
+                      [--hub_log_dir_path HUB_LOG_DIR_PATH]
+                      [--hub_log_level HUB_LOG_LEVEL] 
+                      [--hub_log_bandwidth HUB_LOG_BANDWIDTH]
+                      [--hub_log_invalid_data HUB_LOG_INVALID_DATA]
+    
+    Domogik installation.
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --no-setup            Don't install the python packages
+      --no-test             Don't run a config test   
+      --no-config           Don't run a config writer 
+      --no-create-user      Don't create a user
+      --no-db-upgrade       Don't do a db upgrade
+      --user USER           Set the domogik user
+      --command-line        Configure the configuration files from the command
+                            line only
+    ...
+
+All configuration options which start by *domogik*, *database*, *rest*, *mq*, *admin* or *hub* are related to parameters from the Domogik configuration file */etc/domogik/domogik.cfg*.
+
+The other options are specific:
+
+* **--no-setup**:  the *setup.py* script which install python dependencies and Domogik python package won't be run. This can be usefull for :doc:`setting a Domogik in a virtualenv <virtualenv>`.
+* **--no-test**: the *test_config.py* script won't be executed after the installation.
+* **--no-config**: there won't be any update of the configuration files.
+* **--no-create-user**: the user won't be created during installation.
+* **--user <login>**: set the login which will be used by Domogik (default is *domogik*)
+* **--command-line**: the configuration files will be update from the command line. If not set, the user will be prompted for the main parameters value.
+
+Usages examples
+===============
+
+I am a core developper, can these options help me ?
+---------------------------------------------------
+
+Of course! Here is an example of one developper script named *do_install.sh*. This developper uses it to stop the running domogik, drop the existing database, re-install domogik and start domogik. 
+
+::
+
+    # stop domogik
+    /etc/init.d/domogik stop
+    
+    # create database
+    mysql -uroot -pxxxxx << EOF
+      DROP database dmgtest10;
+      CREATE DATABASE dmgtest10;
+      GRANT ALL PRIVILEGES ON dmgtest10.* to domogik@localhost IDENTIFIED BY 'domopass';
+    EOF
+    
+    
+    # install domogik
+    python install.py \
+    --user fritz \
+    --command-line \
+    --domogik_log_level debug \
+    --domogik_bind_interface 192.168.1.10 \
+    --database_name dmgtest10 \
+    --rest_interfaces eth0 \
+    --rest_clean_json True \
+    --mq_ip 192.168.1.10 \
+    --hub_interfaces eth0 \
+    --hub_log_level info \
+    --hub_log_bandwidth True \
+    --hub_log_invalid_data True
+    
+    # start xml and mq
+    /etc/init.d/domogik start 
+
+As you can see, the developper only set the options he needed to change.
 
 
-Example
-=======
+Automated tests
+---------------
+
+These options can be used to set up some continuous integration environments. We use this with Travis-ci.org.
+
+
+Packagers
+---------
+
+Distribution packagers (Debian, Fedora, ...) can use these options to create their packages.
