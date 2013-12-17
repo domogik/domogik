@@ -27,6 +27,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.common.scenario.parameters.abstract import AbstractParameter
 
+
 class ComparisonOperatorParameter(AbstractParameter):
     """ This parameter  simply provides different operators
     List of operators can be restricted/extendded when instanciated using add_filter and set_list_of_values
@@ -34,13 +35,12 @@ class ComparisonOperatorParameter(AbstractParameter):
     This class basically provides those operators : [ '<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in' ]
     """
 
-    def __init__(self, log = None, trigger = None):
+    def __init__(self, log=None, trigger=None):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("list")
         self.add_expected_entry("operator", "string", "Operator to use for comparison")
-        list_operator = [ '<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in' ]
+        list_operator = ['<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in']
         self.set_list_of_values("operator", list_operator)
-
 
     def evaluate(self):
         """ Return chosen operator, or none if no operator choosed yet
@@ -62,12 +62,12 @@ if __name__ == "__main__":
     print("Evaluate should be None : {0}".format(t.evaluate()))
     print("List of possible values is {0}".format(t.get_list_of_values()))
     print("==> Setting some wrong value for entry 'operator', should raise some error")
-    data = { "operator" : "BAD" }
+    data = {"operator": "BAD"}
     try:
         t.fill(data)
     except ValueError:
         print("Received ValueError as expected, now try with a good operator")
-        t.fill({ "operator" : "<" })
+        t.fill({"operator": "<"})
         print("Evaluate should now return some string : {0}".format(t.evaluate()))
     else:
         print("I did not received the expected exception, check your code !")

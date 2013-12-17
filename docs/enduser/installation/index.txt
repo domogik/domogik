@@ -35,7 +35,7 @@ Install SSL libraries: ::
 
 Install libraries for postgresql: ::
 
-    $ sudo apt-get install python-psycopg2
+    $ sudo apt-get install libpq-dev python-psycopg2
 
 .. note::
     Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
