@@ -1,0 +1,11 @@
+======================
+Core component : dbmgr
+======================
+
+Purpose
+=======
+
+The dbmgr component is used to do some actions on the database over the MQ. It allows to : 
+
+* get and set configuration parameters values for the plugins
+* get the devices list for a client

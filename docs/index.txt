@@ -68,6 +68,7 @@ Quick start guide
 * :doc:`Find and install a package </enduser/quick_start/install_a_package>`
 * configure a client and create its devices
 * start a client
+* :doc:`Clients status </enduser/quick_start/clients_status>`
 
 Detailed guide
 --------------
@@ -108,26 +109,22 @@ Message queue (zeroMQ)
 Core component : manager
 ------------------------
 
-.. todo::
-    TODO
+* :doc:`Manager </technical/core/manager>`
 
 Core component : dbmgr
 ----------------------
 
-.. todo::
-    TODO
+* :doc:`Dbmgr </technical/core/dbmgr>`
 
 Core component : xplgw
 ----------------------
 
-.. todo::
-    TODO
+* :doc:`XplGW </technical/core/xplgw>`
 
 Core component : admin
 ----------------------
 
-.. todo::
-    TODO
+* :doc:`Administration user interface </technical/admin/index>`
 
 Core component : REST
 ---------------------

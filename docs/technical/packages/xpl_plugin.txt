@@ -11,3 +11,4 @@ How to develop a plugin ?
 =========================
 
 Just read the documentation on :doc:`how to develop a plugin </package_development/plugins/index>`.
+
