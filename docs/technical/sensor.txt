@@ -24,7 +24,7 @@ Calculated sensors
 
 A calculated sensor is a sensor where the stored value is calculated. as an example lets use a power sensor that transmits the number of KWh used, and we want to calculate the cost for the electricity of that interval.
 
-If we then create a calculated sensor with the below formula we can store the price for the pwoer consumption during that time.
+If we then create a calculated sensor with the below formula we can store the price for the power consumption during that time.
 
 ::
 
@@ -33,6 +33,6 @@ If we then create a calculated sensor with the below formula we can store the pr
         return result
 
 The above function wil return the value to store, note this function can contain any python code you want, but there are some rules to folow:
-    * the function name is always 'calculated'
-    * it has one input parameter names 'valua'
+    * the function name is always 'calculate'
+    * it has one input parameter named 'value'
     * it has one return parameter, a float
