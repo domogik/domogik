@@ -26,7 +26,7 @@ A calculated sensor is a sensor where the stored value is calculated. as an exam
 
 If we then create a calculated sensor with the below formula we can store the price for the pwoer consumption during that time.
 
-:: python
+::
 
     def calculate(value):
         result = value * 0,11
