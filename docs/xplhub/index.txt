@@ -12,6 +12,9 @@ As the C hub has an issue on some servers, the python hub is now used as the def
 F.A.Q
 =====
 
+* Q: Is this xPL hub compliant with other xPL systems (like xpl-perl for example) ?
+* R: Yes, of course. There was a bug in the hub included with Domogik 0.2/0.3 which blocked xpl-perl clients, but since Domogik 0.4, xpl-perl and Domogik can be used together with the Domogik xPL hub.
+
 * Q: I want to use the C hub instead of the python hub. How can I do ?
 * R: After the installation, you can switch by editing **/etc/default/domogik** and setting **DOMOGIK_XPL_HUB** to **c** (or **python** for the new hub)
 
