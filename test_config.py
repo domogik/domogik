@@ -285,6 +285,8 @@ def test_hostname():
 
 def test_config():
     try:
+        print("\n\n")
+        info("Start to test configuration")
         am_i_root()
         test_imports()
         test_hostname()

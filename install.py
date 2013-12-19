@@ -383,10 +383,10 @@ def install():
 
         # upgrade db
         if not args.db:
-            #try:
-            #    user_entry = pwd.getpwnam(user)
-            #except KeyError:
-            #    raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
+            try:
+                user_entry = pwd.getpwnam(user)
+            except KeyError:
+                raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
 
             # launch db_install as the domogik user
             #uid = user_entry.pw_uid
@@ -401,6 +401,10 @@ def install():
             from domogik.install.db_install import DbInstall
             dbi = DbInstall()
             dbi.install_or_upgrade_db()
+
+        # change permissions to some files created as root during the installation to the domogik user
+        os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
+        os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)
 
 
         if not args.test:
