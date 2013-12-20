@@ -221,6 +221,8 @@ class Manager(XplPlugin):
             if not is_ok:
                 self.log.error(u"Error while checking available packages. Exiting!")
                 sys.exit(1)
+
+            # first, check all the packages found and process them
             for pkg in pkg_list:
                 self.log.debug(u"Package available : {0}".format(pkg))
                 try:
@@ -284,6 +286,23 @@ class Manager(XplPlugin):
                                 #    self.log.error(u"Duplicate device type detected : {0} for package {1}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {3}".format(device_type, pkg_id, self._device_types[device_type]))
                                 self._device_types[device_type] = self._packages[pkg_id].get_json()
     
+            # finally, check if some packages has been uninstalled/removed
+            pkg_to_unregister = []
+            for pkg in self._packages:
+                # we build an id in the same format as the folders in the /var/lib/domogik/domogik_packages folder
+                if not self._packages[pkg].get_folder_basename() in pkg_list:
+                    pkg_to_unregister.append(pkg)
+            
+            # and unregister some packages if needed
+            for pkg in pkg_to_unregister:
+                type = self._packages[pkg].get_type()
+                name = self._packages[pkg].get_name()
+                del(self._packages[pkg])
+                if type == 'plugin':
+                    self.log.info("Unregister plugin '{0}'".format(name))
+                    self._plugins[name].unregister()
+                    del(self._plugins[name])
+
             # publish packages list if there are some updates or new packages
             if packages_updates:
                 msg_data = {}
@@ -550,6 +569,21 @@ class Package():
         """
         return self.valid
 
+    def get_type(self):
+        """ Return the package type only
+        """
+        return self.type
+
+    def get_name(self):
+        """ Return the package name only
+        """
+        return self.name
+
+    def get_folder_basename(self):
+        """ Return the folder installation basename of the package
+        """
+        return "{0}_{1}".format(self.type, self.name)
+
     def get_json(self):
         """ Return the json data (after some cleanup)
         """
@@ -562,6 +596,7 @@ class Package():
         for dt in self.json['device_types']:
             dt_list.append(dt)
         return dt_list
+
 
 
 
@@ -601,6 +636,11 @@ class GenericComponent():
         self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.configured)
         #self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data)
 
+    def unregister(self):
+        """ unregister the component 
+        """
+        self._clients.remove(self.client_id)
+
 
     def set_configured(self, new_status):
         """ set the flag configured
@@ -621,6 +661,7 @@ class GenericComponent():
             @param status : new status
         """
         self._clients.set_pid(self.client_id, pid)
+
 
 
 
@@ -715,21 +756,26 @@ class CoreComponent(GenericComponent, MQAsyncSub):
             WARNING : for core components : 
             notice that this function is not called when the manager starts with -r, -d, -x options as the IOLoop is not yet started. This function is only used after manager startup
         """
+
+        # TODO : the below if seems useless as this is a core component and not a plugin !
+        # to delete ?
+        pass
+
         #self.log.debug(u"New pub message received {0}".format(msgid))
         #self.log.debug(u"{0}".format(content))
-        if msgid == "plugin.status":
-            if content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
-                self.set_status(content["event"])
-                # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
-                if content["event"] == STATUS_STOP_REQUEST:
-                    self.log.info(u"The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
-                    thr_check_if_stopped = Thread(None,
-                                                  self._check_if_stopped,
-                                                  "check_if_{0}_is_stopped".format(self.name),
-                                                  (),
-                                                  {})
-                    thr_check_if_stopped.start()
+        #if msgid == "plugin.status":
+        #    if content["name"] == self.name and content["host"] == self.host:
+        #        self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
+        #        self.set_status(content["event"])
+        #        # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
+        #        if content["event"] == STATUS_STOP_REQUEST:
+        #            self.log.info(u"The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
+        #            thr_check_if_stopped = Thread(None,
+        #                                          self._check_if_stopped,
+        #                                          "check_if_{0}_is_stopped".format(self.name),
+        #                                          (),
+        #                                          {})
+        #            thr_check_if_stopped.start()
 
 
 
@@ -965,6 +1011,7 @@ class Plugin(GenericComponent, MQAsyncSub):
 
 
 
+
 class Clients():
     """ The clients list
           client_id : for a domogik plugin : plugin-<name>.<hostname>
@@ -1019,6 +1066,9 @@ class Clients():
         while not self._stop.isSet():
             now = time.time()
             for a_client in self._clients:
+                if self._clients[a_client]['type'] == 'core':
+                    continue
+
                 # check if the client is dead only when the client is alive (or partially alive)
                 if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                     delta = now - self._clients[a_client]['last_seen']
@@ -1027,7 +1077,6 @@ class Clients():
                         self.set_status(a_client, STATUS_DEAD)
             self._stop.wait(STATUS_HBEAT)
 
-    #def add(self, host, type, name, client_id, xpl_source, data):
     def add(self, host, type, name, client_id, xpl_source, data, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
@@ -1061,6 +1110,14 @@ class Clients():
         self._clients[client_id] = client
         self._clients_with_details[client_id] = client_with_details
         self.publish_update()
+
+    def remove(self, client_id):
+        """ Remove a client from the list
+        """
+        del(self._clients[client_id])
+        del(self._clients_with_details[client_id])
+        self.publish_update()
+
 
     def set_configured(self, client_id, new_status):
         """ Set a new status to a client

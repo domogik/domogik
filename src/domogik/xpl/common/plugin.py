@@ -635,8 +635,23 @@ class XplPlugin(BasePlugin, MQRep):
     def _set_status(self, status):
         """ Set the plugin status and send it
         """
-        self._status = status
-        self._send_status()
+        # when ctrl-c is done, there is no more self._name at this point...
+        # why ? because de force_leave method is called twice as show in the logs : 
+        #
+        # ^CKeyBoardInterrupt
+        # 2013-12-20 22:48:41,040 domogik-manager INFO Keyoard Interrupt detected, leave now.
+        # Traceback (most recent call last):
+        #   File "./manager.py", line 1176, in <module>
+        #     main()
+        #   File "./manager.py", line 1173, in main
+        # 2013-12-20 22:48:41,041 domogik-manager DEBUG force_leave called
+        # 2013-12-20 22:48:41,044 domogik-manager DEBUG __del__ Single xpl plugin
+        # 2013-12-20 22:48:41,045 domogik-manager DEBUG force_leave called
+
+        if hasattr(self, '_name'):
+            if self._name not in CORE_COMPONENTS:
+                self._status = status
+                self._send_status()
 
     def _send_status_loop(self):
         """ send the status each STATUS_HBEAT seconds
@@ -652,7 +667,8 @@ class XplPlugin(BasePlugin, MQRep):
         """ 
         if hasattr(self, "_pub"):
             if self._name in CORE_COMPONENTS:
-                type = "core"
+                #type = "core"
+                return
             else:
                 type = "plugin"
             self.log.debug("Send plugin status : {0}".format(self._status))
@@ -782,68 +798,11 @@ class XplPlugin(BasePlugin, MQRep):
         fil.write(str(pid))
         fil.close()
 
-    # TODO : remove
-    #def _system_handler(self, message):
-    #    """ Handler for domogik system messages
-    #    """
-    #    cmd = message.data['command']
-    #    if not self._is_manager and cmd in ["stop", "reload", "dump"]:
-    #        self._client_handler(message)
-    #    else:
-    #        self._manager_handler(message)
-
-    # TODO : remove
-    #def _client_handler(self, message):
-    #    """ Handle domogik system request for an xpl client
-    #    @param message : the Xpl message received
-    #    """
-    #    try:
-    #        cmd = message.data["command"]
-    #        plugin = message.data["plugin"]
-    #        host = message.data["host"]
-    #        if host != self.get_sanitized_hostname():
-    #            return
-    #    except KeyError as e:
-    #        self.log.error(u"command, plugin or host key does not exist : %s", e)
-    #        return
-    #    if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
-    #        self.log.info(u"Someone asked to stop %s, doing." % self.get_plugin_name())
-    #        self._answer_stop()
-    #        self.force_leave()
-    #    elif cmd == "reload":
-    #        if self._reload_cb is None:
-    #            self.log.info(u"Someone asked to reload config of %s, but the plugin \
-    #            isn't able to do it." % self.get_plugin_name())
-    #        else:
-    #            self._reload_cb()
-    #    elif cmd == "dump":
-    #        if self._dump_cb is None:
-    #            self.log.info(u"Someone asked to dump config of %s, but the plugin \
-    #            isn't able to do it." % self.get_plugin_name())
-    #        else:
-    #            self._dump_cb()
-    #    else: #Command not known
-    #        self.log.info(u"domogik.system command not recognized : %s" % cmd)
-
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single xpl plugin")
             # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
-
-    # TODO : remove
-    #def _answer_stop(self):
-    #    """ Ack a stop request
-    #    """
-    #    mess = XplMessage()
-    #    mess.set_type("xpl-trig")
-    #    mess.set_schema("domogik.system")
-    #    #mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-    #    #    "host": self.get_sanitized_hostname()})
-    #    mess.add_data({"command":"stop", 
-    #                   "host": self.get_sanitized_hostname(),
-    #                   "plugin": self.get_plugin_name()})
-    #    self.myxpl.send(mess)
 
     def _send_hbeat_end(self):
         """ Send the hbeat.end message
