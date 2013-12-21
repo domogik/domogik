@@ -72,6 +72,7 @@ setup(
               'Flask-Babel',
 	      'tornado >= 3.1',
               'requests >= 1.2.3',
+              'python-magic >= 0.4.3',
 	      'pyzmq >= 13.1.0'],
     zip_safe = False,
     license = 'GPL v3',
