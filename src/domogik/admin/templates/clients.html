@@ -20,12 +20,14 @@
                         <td>{{ data.status }}</td>
                         <td>{{ data.configured }}</td>
                         <td>
-                            {% if data.configured %}
-                                <a href="/client/{{ name }}">
-                            {% else %}
-                                <a href="/client/{{ name }}/config">
-                            {% endif %}
-                            {% trans %}Details{% endtrans %}
+			    {% if data.type != 'core' %}
+				    {% if data.configured %}
+					<a href="/client/{{ name }}">
+				    {% else %}
+					<a href="/client/{{ name }}/config">
+				    {% endif %}
+				    {% trans %}Details{% endtrans %}
+			    {% endif %}
                             </a>
                         </td>
                     </tr>
