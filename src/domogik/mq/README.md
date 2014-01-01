@@ -1,6 +1,7 @@
 zmq
 ===
 The common lib that will be used between domogik and domoweb for doing mq transactions
+its only used as subtree inside domogik and domoweb
 
 Installation
 ============
