@@ -73,21 +73,21 @@
     ], 
     "device_feature_models": [
         {
-            "device_type_id": "roowifi.comand", 
+            "device_type_id": "roowifi.command", 
             "feature_type": "actuator", 
-            "id": "foscam.relay.switch", 
+            "id": "roowifi.command.clean", 
             "name": "Clean", 
-            "parameters": "{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;cleaning&quot;}", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;cleaning&quot;}", 
             "return_confirmation": "1", 
             "stat_key": "output", 
             "value_type": "binary"
         }, 
         {
-            "device_type_id": "roowifi.comand", 
+            "device_type_id": "roowifi.command", 
             "feature_type": "actuator", 
-            "id": "foscam.relay.trigger", 
+            "id": "roowifi.command.dock", 
             "name": "Dock", 
-            "parameters": "{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;Docked&quot;, &quot;value1&quot;:&quot;Docking&quot;}", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;Docking&quot;, &quot;value1&quot;:&quot;Docked&quot;}", 
             "return_confirmation": "1", 
             "stat_key": "output", 
             "value_type": "binary"
@@ -96,7 +96,7 @@
     "device_types": [
         {
             "description": "Roomba", 
-            "id": "roowifi.comand", 
+            "id": "roowifi.command", 
             "name": "Roomba"
         }
     ], 
