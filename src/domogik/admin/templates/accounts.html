@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans %}Account list{% endtrans %}</h1>
+    {% if accounts|length > 0 %}
+      <table class="table table-condensed" style="border-collapse:collapse;">
+            <thead>
+                    <tr>
+                        <td>{% trans %}Login{% endtrans %}</td>
+                        <td>{% trans %}Admin{% endtrans %}</td>
+                    </tr>
+            </thead>
+            <tbody>
+            {% for data in accounts %}
+                    <tr>
+                        <td>{{ data.login }}</td>
+                        <td>{{ data.is_admin }}</td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    <div class="alert alert-warning">{% trans %}No accounts found{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -27,7 +27,9 @@ Plugin purpose
 Implements
 ==========
 
-class Rest(XplPlugin):
+class Admin(XplPlugin)
+class AdminWebSocket(WebSocketHandler, MQAsyncSub)
+
 @author: 	Friz <fritz.smh@gmail.com>
 		Maikel Punie <maikel.punie@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
@@ -39,39 +41,54 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
+from domogik.mq.pubsub.subscriber import MQAsyncSub
+from domogik.mq.message import MQMessage
+from domogik.mq.reqrep.client import MQSyncReq
+from domogik.admin.application import app as admin_app
 import locale
-from tornado.wsgi import WSGIContainer
 import traceback
+import zmq
+import signal
+import time
+import json
+zmq.eventloop.ioloop.install()
+from tornado.wsgi import WSGIContainer
+from tornado.ioloop import IOLoop, PeriodicCallback 
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler
-import zmq
-import signal
-zmq.eventloop.ioloop.install()
-from tornado.ioloop import IOLoop, PeriodicCallback 
-from domogik.admin.application import app as admin_app
-import time
 
 ################################################################################
-class AdminWebSocket(WebSocketHandler):
+class AdminWebSocket(WebSocketHandler, MQAsyncSub):
     clients = set()
 
-    @staticmethod
-    def send_message():
-        for cli in AdminWebSocket.clients:
-            cli.write_message(time.ctime())
-
     def open(self):
-	print"open"
-	print self
+        MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
         AdminWebSocket.clients.add(self)
 
     def on_close(self):
         AdminWebSocket.clients.remove(self)
 
+    def on_message(self, msg, content=None):
+        if not content:
+            # this is a websocket message
+            jsons = json.loads(msg)
+            if 'action' in jsons and 'data' in jsons:
+                print jsons
+                print type(jsons)
+                cli = MQSyncReq(zmq.Context())
+                msg = MQMessage()
+                msg.set_action(jsons['action'])
+                msg.set_data(jsons['data'])
+                print cli.request('manager', msg.get(), timeout=10).get()
+        else:
+            # this is a mq message
+            print(u"New pub message {0}".format(msg))
+            for cli in AdminWebSocket.clients:
+                cli.write_message({'msgid': msg, 'content': content})
 
 class Admin(XplPlugin):
-    """ REST Server 
+    """ Admin Server 
         - create a HTTP server 
         - handle the admin interface urls
     """
@@ -160,7 +177,6 @@ class Admin(XplPlugin):
         else:
             self.http_server.bind(int(self.port))
             self.http_server.start(1)
-        PeriodicCallback(AdminWebSocket.send_message,1000).start()
         return
 
     def stop_http(self):
