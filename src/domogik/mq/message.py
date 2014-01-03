@@ -34,6 +34,12 @@ class MQMessage():
         """
         self._action = action
 
+    def set_data(self, data):
+        """ set_data
+            sets the data field
+        """
+        self._data = data
+
     def add_data(self, key, value):
         """ addData
             append a data element to the stack
