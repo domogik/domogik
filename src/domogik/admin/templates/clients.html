@@ -8,6 +8,7 @@
             <thead>
                     <tr>
                         <td>{% trans %}ID{% endtrans %}</td>
+                        <td>{% trans %}Type{% endtrans %}</td>
                         <td>{% trans %}Status{% endtrans %}</td>
                         <td>{% trans %}Configured{% endtrans %}</td>
                         <td>{% trans %}Details{% endtrans %}</td>
@@ -17,20 +18,23 @@
             {% for name, data in clients.iteritems() %}
                     <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle">
                         <td>{{ name }}</td>
+                        <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
                         <td>{{ data.configured }}</td>
                         <td>
-                            {% if data.configured %}
-                                <a href="/client/{{ name }}">
-                            {% else %}
-                                <a href="/client/{{ name }}/config">
-                            {% endif %}
-                            {% trans %}Details{% endtrans %}
+			    {% if data.type != 'core' %}
+				    {% if data.configured %}
+					<a href="/client/{{ name }}">
+				    {% else %}
+					<a href="/client/{{ name }}/config">
+				    {% endif %}
+				    {% trans %}Details{% endtrans %}
+			    {% endif %}
                             </a>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="hiddenRow">
+                        <td colspan="5" class="hiddenRow">
                             {% include 'client_overview.html' %}
                         </td>
                     </tr>
