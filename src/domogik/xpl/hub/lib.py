@@ -45,7 +45,7 @@ from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 from twisted.python import log
 from optparse import OptionParser
-#from domogik.bin.hub import VERSION
+from domogik.bin.hub import VERSION
 
 
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
@@ -114,8 +114,8 @@ class Hub():
 
         self.is_daemon = daemon
 
-        #print(u"Domogik xPL Hub (python) v%s" % VERSION)
-        print(u"Domogik xPL Hub (python) v%s" % 666)
+        print(u"Domogik xPL Hub (python) v%s" % VERSION)
+        #print(u"Domogik xPL Hub (python) v%s" % 666)
         print(u"Starting...")
         print(u"- Reading configuration...")
 
