@@ -83,7 +83,7 @@ class Admin(XplPlugin):
             @param server_port :  port of HTTP server
         """
 
-        XplPlugin.__init__(self, name = 'admin')
+        XplPlugin.__init__(self, name = 'admin', nohub = True)
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
