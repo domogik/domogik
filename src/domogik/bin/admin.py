@@ -74,11 +74,9 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
             # this is a websocket message
             jsons = json.loads(msg)
             if 'action' in jsons and 'data' in jsons:
-                print jsons
-                print type(jsons)
                 cli = MQSyncReq(zmq.Context())
                 msg = MQMessage()
-                msg.set_action(jsons['action'])
+                msg.set_action(str(jsons['action']))
                 msg.set_data(jsons['data'])
                 print cli.request('manager', msg.get(), timeout=10).get()
         else:
