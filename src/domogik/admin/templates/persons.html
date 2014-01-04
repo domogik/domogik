@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans %}Person list{% endtrans %}</h1>
+    {% if persons|length > 0 %}
+      <table class="table table-condensed" style="border-collapse:collapse;">
+            <thead>
+                    <tr>
+                        <td>{% trans %}Last Name{% endtrans %}</td>
+                        <td>{% trans %}First Name{% endtrans %}</td>
+                        <td>{% trans %}Birthdate{% endtrans %}</td>
+                    </tr>
+            </thead>
+            <tbody>
+            {% for data in persons %}
+                    <tr>
+                        <td>{{ data.last_name }}</td>
+                        <td>{{ data.first_name }}</td>
+                        <td>{{ data.birthdate }}</td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    <div class="alert alert-warning">{% trans %}No persons found{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

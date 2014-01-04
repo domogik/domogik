@@ -16,6 +16,7 @@
     <link href="/static/css/bootstrap-notify.css" rel="stylesheet" media="screen">
     <!-- Domogik -->
     <link href="/static/css/default.css" rel="stylesheet" media="screen">
+    <script src="/static/js/jquery.min.js"></script>
     {%- endblock styles %}
     {%- endblock head %}
   </head>
@@ -32,7 +33,6 @@
     {%- endblock content %}
 
     {% block scripts %}
-    <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/bootstrap-notify.js"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -50,15 +50,7 @@
       <script type="text/javascript">
 	 if ("WebSocket" in window) {
 		var ws=new WebSocket("ws://" + location.host + "/ws");
-		var now_el=document.getElementById("now");
 		ws.onmessage=function(e){
-			now_el.innerHTML=e.data;
-		}
-		ws.onclose=function(){
-			now_el.innerHTML='closed';
-		}
-		ws.onopen=function(){
-			now_el.innerHTML='open';
 		}
 	} else {
 		alert('No WS support');

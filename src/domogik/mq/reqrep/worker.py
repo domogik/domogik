@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+	# -*- coding: utf-8 -*-
 
 """Module containing worker functionality for the MDP implementation.
 
@@ -88,7 +88,7 @@ class MQRep(object):
         socket = ZmqSocket(self.context, zmq.DEALER)
         ioloop = IOLoop.instance()
         self.stream = ZMQStream(socket, ioloop)
-        self.stream.on_recv(self._on_message)
+        self.stream.on_recv(self._on_mpd_message)
         self.stream.socket.setsockopt(zmq.LINGER, 0)
         self.stream.connect(self.endpoint)
         self.ticker = PeriodicCallback(self._tick, self.HB_INTERVAL)
@@ -162,7 +162,7 @@ class MQRep(object):
         self.stream.send_multipart(to_send)
         return
 
-    def _on_message(self, msg):
+    def _on_mpd_message(self, msg):
         """Helper method called on message receive.
 
         msg is a list w/ the message parts
