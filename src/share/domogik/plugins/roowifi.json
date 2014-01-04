@@ -32,7 +32,7 @@
         }, 
         {
             "default": "80", 
-            "description": "http port", 
+            "description": "roowifi SCI port", 
             "id": "3", 
             "interface": "yes", 
             "key": "port", 
