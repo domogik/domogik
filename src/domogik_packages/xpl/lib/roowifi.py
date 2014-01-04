@@ -41,35 +41,48 @@ import subprocess
 import time
 import traceback
 import urllib
-import time
+import socket
+
+tablecmd = ["clean","dock"]
+tablecode = [135,143]
+ 
+clean = 135
+SPOT_COMMAND = 134
+DOCK_COMMAND = 143
 
 class command:
 
-    def __init__(self, log):
-        """
-        Init object
-        @param log : logger instance
-        """
-        self._log = log
+	def __init__(self, log):
+		"""
+		Init object
+		@param log : logger instance
+		"""
+		#print("on est dans lib__init__")
+		self._log = log
 
-    def clean(self, ip, port, user, password,device):
-        """
-        close the relay 
-        """
-        self._log.info("Start processing Close Command on %s  " % (device))
-        
-        try:
-            self.url1 = "http://%s:%s/decoder_control.cgi?command=94&user=%s&pwd=%s" % (ip, port, user, password)
-            #print self.url1 
-            f = urllib.urlopen("http://192.168.1.32/decoder_control.cgi?command=94&user=admin&pwd=")
-            self._log.debug("Trying to acces to Close URL  %s  " % (self.url1))
-            if f.read().strip() == "ok.":
-               self._log.debug("Close Command Url response %s  " % (f.read().strip()))
-               return True
-            else:
-               self._log.error("Fail to closed Foscam relay : %s" % traceback.format_exc())
-               return False
-        except:
-            self._log.error("Fail to close Foscam relay : %s" % traceback.format_exc())
-            return False
-
+	def command(self, ip, port, user, password, device, command):
+		"""
+		close the relay 
+		"""
+		print("on est dans lib-command")
+		self._log.info("Start processing clean Command on %s  " % (device))
+		print("Start processing clean Command on %s  " % (device))
+		print("LA commande est %s  " % (command))
+		
+		try:
+#####################################################			
+			
+			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			time.sleep(1)
+			self.s.connect((ip , port))
+			time.sleep(1)
+			print("Le code de la fonction est %s  " % tablecode[(tablecmd.index(command))])
+			self.s.send(chr(tablecode[(tablecmd.index(command))]))
+			time.sleep(1)
+			self.s.close()
+			self._log.error("clean Command success on : %s" % device)
+			
+#######################################################			
+		except:
+			self._log.error("Fail to close Foscam relay : %s" % traceback.format_exc())
+			return False

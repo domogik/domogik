@@ -36,33 +36,52 @@ class roowifi(XplPlugin):
 ## Implements a listener for RooWifi messages on xPL network
 
 	def __init__(self):
-		##Create listener for rowifi
+		#####
+        ## Create listeners
+        ##  Listener(self._plcbus_cmnd_cb, self.myxpl, {'schema': 'plcbus.basic','xpltype': 'xpl-cmnd',})
+		##
+		##  device = self._config.query('plcbus', 'device')
+		#####
+		##Create listener for roowifi
 		##
 		print("On rentre dans __init__")
 		XplPlugin.__init__(self, name = 'roowifi')
+		print ("DDEDEDE")
 		self._config = Query(self.myxpl, self.log)
-		# Configuration : list of cameras
+		# creation d'un tableau pour recuperer les eventuels roombas
 		self.roombas = {}
 		num = 1
 		loop = True
 		while loop == True:
 			#Get each roomba settings
+			print ("On rentre dans while")
 			name = self._config.query('roowifi', 'name-%s' % str(num))
 			ip = self._config.query('roowifi', 'ip-%s' % str(num))
 			port = self._config.query('roowifi', 'port-%s' % str(num))
 			user = self._config.query('roowifi', 'user-%s' % str(num))
 			password = self._config.query('roowifi', 'password-%s' % str(num))
 			delay = self._config.query('roowifi', 'delay-%s' % str(num))
+			
+		## retirer les valeurs default, une fois le pb de reuperation de config du plugin regler
+			if name == None:
+				name = "roomba"
+			if ip == None:
+				ip = "192.168.1.64"
 			if port == None:
-				port = 80
+				port = 9001
 			if user == None:
-				user = ""
+				user = "admin"
 			if password == None:
-				password = ""
+				password = "roombawifi"
 			if delay == None:
-				delay = 0
+				delay = 60
+			print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (name, ip, port, user, delay))
+			loop = False
+		##				
+			
 			if name != None:
 				self.log.info("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (name, ip, port, user, delay))
+				print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (name, ip, port, user, delay))
 				self.roombas[name] = {"ip" : ip, "port" : port, "user" : user,"password" : password, "delay" : delay}
 			else:
 				loop = False
@@ -71,8 +90,9 @@ class roowifi(XplPlugin):
         ### Create Roomba object
 		self._roombamanager = command(self.log)
 		# Create listeners
-		Listener(self.roowifi_command, self.myxpl, {'schema': 'control.basic', 'xpltype': 'xpl-cmnd', 'type': 'output'})
-		self.log.info("Listener for rowifi created")
+		##Listener(self.roowifi_command, self.myxpl, {'schema': 'control.basic', 'xpltype': 'xpl-cmnd', 'type': 'command'})
+		Listener(self.roowifi_command, self.myxpl, {'schema': 'control.basic', 'xpltype': 'xpl-cmnd'})
+		self.log.info("Listener for roowifi created")
 		#print ("Listener for roowifi created")
 		self.enable_hbeat()
 		print(" FIN  __init__")
@@ -80,25 +100,34 @@ class roowifi(XplPlugin):
 	def roowifi_command(self, message):
 		##Call roowifi lib
 		##@param message : xPL message detected by listener
-		ip = self.roombas[device]["ip"]
-		port = int(self.roombas[device]["port"])
-		user = self.roombas[device]["user"]
-		password = self.roombas[device]["password"]
-		delay = int(self.roombas[device]["delay"])
+		print(" On rentre dans roowifi_comand")
+		
+
 		#except KeyError:
 		#	self.log.warning("Roomba named '%s' is not defined" % device)
 		#	return false
 		if 'device' in message.data:
 			device = message.data['device']
-		if 'current' in message.data:
-			msg_current = message.data['current'].upper() 
-		if 'type' in message.data:
-			msg_type = message.data['type'].lower()
-		if msg_type == 'command' and msg_current.lower() in ['clean']:
-			print ("Command clean recu")
+
+		ip = self.roombas[device]["ip"]
+		port = int(self.roombas[device]["port"])
+		user = self.roombas[device]["user"]
+		password = self.roombas[device]["password"]
+		delay = int(self.roombas[device]["delay"])
+
+		##if 'current' in message.data:
+		##	msg_current = message.data['current'].upper() 
+		##if 'type' in message.data:
+		##	msg_type = message.data['type'].lower()
+		##if msg_type == 'command' and msg_current.lower() in ['clean']:
+		#if msg_type == 'command' and msg_current.lower() in ['clean']:
+		if 'command' in message.data:
+			print (" Une commande est recue !")
+			lacommand = message.data['command']
+			print ("La comande est : clean !")
 			self.log.debug("Clean command receive for '%s'" % device)
 			# Our listener catch a Message with low output command
-			status = self._roombamanager.clean(ip, port, user, password, device)
+			status = self._roombamanager.command(ip, port, user, password, device, lacommand)
 			# Send xpl-trig to say plugin whell receive high command
 			if status == True:
 				#print ("high ACKed")
@@ -110,7 +139,11 @@ class roowifi(XplPlugin):
 				mess.add_data({'type' : 'command'})
 				mess.add_data({'current' : 'clean'})
 				self.myxpl.send(mess)
-
+			if'dock' in message.data['command']:
+				print ("La comande est : dock !")
+					########
+					##TODO##
+					########
 if __name__ == "__main__":
     inst = roowifi()
 
