@@ -1,0 +1,131 @@
+{
+    "configuration": [
+        {
+            "default": "False", 
+            "description": "Automatically start plugin at Domogik startup", 
+            "id": "0", 
+            "interface": "no", 
+            "key": "startup-plugin", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "boolean"
+        }, 
+        {
+            "default": "roomba", 
+            "description": "To report on widget address", 
+            "id": "1", 
+            "interface": "yes", 
+            "key": "name", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "192.168.1.39", 
+            "description": "Roomba Ip address", 
+            "id": "2", 
+            "interface": "yes", 
+            "key": "ip", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "80", 
+            "description": "roowifi SCI port", 
+            "id": "3", 
+            "interface": "yes", 
+            "key": "port", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "admin", 
+            "description": "User allowed to connect roomba", 
+            "id": "4", 
+            "interface": "yes", 
+            "key": "user", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
+            "default": "roombawifi", 
+            "description": "User Password", 
+            "id": "5", 
+            "interface": "yes", 
+            "key": "password", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "password"
+        },  
+        {
+            "default": "5", 
+            "description": "probe delay, use to refresh from time to time some information, such battery level, dock status, etc", 
+            "id": "6", 
+            "interface": "yes", 
+            "key": "delay", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }
+    ], 
+    "device_feature_models": [
+        {
+            "device_type_id": "roowifi.command", 
+            "feature_type": "actuator", 
+            "id": "roowifi.command.clean", 
+            "name": "Clean", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;stop&quot;, &quot;value1&quot;:&quot;cleaning&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "output", 
+            "value_type": "binary"
+        }, 
+        {
+            "device_type_id": "roowifi.command", 
+            "feature_type": "actuator", 
+            "id": "roowifi.command.dock", 
+            "name": "Dock", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;Docking&quot;, &quot;value1&quot;:&quot;Docked&quot;}", 
+            "return_confirmation": "1", 
+            "stat_key": "output", 
+            "value_type": "binary"
+        }
+    ], 
+    "device_types": [
+        {
+            "description": "Roomba", 
+            "id": "roowifi.command", 
+            "name": "Roomba"
+        }
+    ], 
+    "files": [
+        "src/share/domogik/design/plugin/roowifi/icon.png", 
+        "src/share/domogik/plugins/roowifi.json", 
+        "src/share/domogik/url2xpl/roowifi/clean.xml", 
+        "src/share/domogik/url2xpl/roowifi/dock.xml", 
+        "src/domogik_packages/xpl/bin/roowifi.py", 
+        "src/domogik_packages/xpl/lib/roofiwi.py"
+    ], 
+    "identity": {
+        "author": "Capof", 
+        "author_email": "capof1000 at gmail.com", 
+        "category": "Roomba", 
+        "changelog": "0.1\n- plugin creation", 
+        "dependencies": [], 
+        "description": "Allows to control your roomba with a roowifi interface, http://www.roomba-wifi-remote.com/", 
+        "documentation": "http://wiki.domogik.org/plugin_foscam_relay", 
+        "domogik_min_version": "0.3.0", 
+        "id": "roowifi", 
+        "type": "plugin", 
+        "version": "0.1a0"
+    }, 
+    "json_version": 1, 
+    "technology": {
+        "description": "roowifi", 
+        "id": "roowifi", 
+        "name": "roowifi"
+    }, 
+    "udev-rules": []
+}
