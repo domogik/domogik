@@ -31,6 +31,7 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage 
 from domogik.xpl.common.queryconfig import Query 
 from domogik_packages.xpl.lib.roowifi import command 
+from domogik.xpl.common.xplconnector import Listener, XplTimer
 
 class roowifi(XplPlugin):
 ## Implements a listener for RooWifi messages on xPL network
@@ -60,6 +61,7 @@ class roowifi(XplPlugin):
 			user = self._config.query('roowifi', 'user-%s' % str(num))
 			password = self._config.query('roowifi', 'password-%s' % str(num))
 			delay = self._config.query('roowifi', 'delay-%s' % str(num))
+			 
 			
 		## retirer les valeurs default, une fois le pb de reuperation de config du plugin regler
 			if name == None:
@@ -90,16 +92,26 @@ class roowifi(XplPlugin):
 		self._roombamanager = command(self.log)
 		# Create listeners
 		##Listener(self.roowifi_command, self.myxpl, {'schema': 'control.basic', 'xpltype': 'xpl-cmnd', 'type': 'command'})
-		Listener(self.roowifi_command, self.myxpl, {'schema': 'control.basic', 'xpltype': 'xpl-cmnd'})
+		Listener(self.roowifi_command, self.myxpl, {'schema': 'roowifi.basic', 'xpltype': 'xpl-cmnd'})
 		self.log.info("Listener for roowifi created")
 		#print ("Listener for roowifi created")
 		self.enable_hbeat()
-		print(" FIN  __init__")
+		#print(" FIN  __init__")
+#########################################
+		
+		self._probe_status = {}
+		self._probe_thr = XplTimer(delay, self._send_probe(ip, port ,name ), self.myxpl)
+		self._probe_thr.start()
+		self.enable_hbeat()
+
+	def _send_probe(self,ip,port,name):
+		print("On est dans send_probe")
+		self._roombamanager.sensor(ip, port, name)
 		
 	def roowifi_command(self, message):
 		##Call roowifi lib
 		##@param message : xPL message detected by listener
-		print(" On rentre dans roowifi_comand")
+		#print(" On rentre dans roowifi_comand")
 		
 
 		#except KeyError:
@@ -112,7 +124,7 @@ class roowifi(XplPlugin):
 		port = int(self.roombas[device]["port"])
 		#user = self.roombas[device]["user"]
 		#password = self.roombas[device]["password"]
-		delay = int(self.roombas[device]["delay"])
+		#delay = int(self.roombas[device]["delay"])
 
 		##if 'current' in message.data:
 		##	msg_current = message.data['current'].upper() 
@@ -123,26 +135,21 @@ class roowifi(XplPlugin):
 		if 'command' in message.data:
 			print (" Une commande est recue !")
 			lacommand = message.data['command']
-			print ("La comande est : clean !")
 			self.log.debug("Clean command receive for '%s'" % device)
 			# Our listener catch a Message with low output command
 			status = self._roombamanager.command(ip, port, device, lacommand)
 			# Send xpl-trig to say plugin whell receive high command
 			if status == True:
-				#print ("high ACKed")
-				self.log.debug("high command Ack on relay '%s'" % device)
+				print ("On va envoyer le xpl-trig pour acker la commande %s" % lacommand)
+				self.log.debug("Ack de la command %s on %s" % (lacommand, device))
 				mess = XplMessage()
 				mess.set_type('xpl-trig')
-				mess.set_schema('sensor.basic')
+				mess.set_schema('roowifi.basic')
 				mess.add_data({'device' : device})
-				mess.add_data({'type' : 'command'})
-				mess.add_data({'current' : 'clean'})
+				#mess.add_data({'type' : 'command'})
+				mess.add_data({'command' : lacommand})
 				self.myxpl.send(mess)
-			if'dock' in message.data['command']:
-				print ("La comande est : dock !")
-					########
-					##TODO##
-					########
+			
 if __name__ == "__main__":
     inst = roowifi()
 
