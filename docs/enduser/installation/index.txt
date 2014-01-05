@@ -33,6 +33,10 @@ Install SSL libraries: ::
 
     $ sudo apt-get install libssl-dev 
 
+Install Zero MQ libraries: ::
+
+    $ sudo apt-get install libzmq-dev
+
 Install libraries for postgresql: ::
 
     $ sudo apt-get install libpq-dev python-psycopg2
