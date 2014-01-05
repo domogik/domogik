@@ -398,7 +398,16 @@ def install():
             #os.setreuid(0,0)
             #os.environ['HOME'] = old_home
 
-            from domogik.install.db_install import DbInstall
+              
+            # TODO : remove, temporary debug
+            print("SYS.PATH={0}".format(sys.path))
+
+            try:
+                import traceback
+                from domogik.install.db_install import DbInstall
+            except:
+                print("Trace: {0}".format(traceback.format_exc()))
+
             dbi = DbInstall()
             dbi.install_or_upgrade_db()
 
