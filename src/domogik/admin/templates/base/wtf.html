@@ -116,7 +116,7 @@
   {%- if enctype %} enctype="{{enctype}}"{% endif -%}
   {%- if role %} role="{{role}}"{% endif -%}
   >
-  {{ form.hidden_tag() }}
+  {%- if form.hidden_tag() %}{{ form.hidden_tag() }}{% endif -%}
   {{ form_errors(form, hiddens='only') }}
 
   {%- for field in form %}

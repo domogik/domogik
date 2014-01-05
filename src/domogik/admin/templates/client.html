@@ -10,8 +10,18 @@
 	    <li>{% trans %}Email{% endtrans %} : {{ data.data.identity.author_email }}</li>
 	</ul>
 	<div>
-		<button type="button" class="btn btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
-		<button type="button" class="btn btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
+		<button id="start" type="button" class="btn btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
+		<button id="stop" type="button" class="btn btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
 	</div>
+	<script type="text/javascript">
+	$( document ).ready(function() {
+		$("#start").click(function() {
+			ws.send('{"action": "plugin.start.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
+		});
+		$("#stop").click(function() {
+			ws.send('{"action": "plugin.stop.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
+		});
+	});
+	</script>
 </div>
 {% endblock %}
