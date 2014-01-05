@@ -43,24 +43,14 @@ import traceback
 import urllib
 import socket
 
-tablecmd = ["clean","dock"]
-tablecode = [135,143]
- 
-clean = 135
-SPOT_COMMAND = 134
-DOCK_COMMAND = 143
+table = {"clean" : 135, "dock" : 143, "spot" : 143} 
 
 class command:
 
 	def __init__(self, log):
-		"""
-		Init object
-		@param log : logger instance
-		"""
-		#print("on est dans lib__init__")
 		self._log = log
 
-	def command(self, ip, port, user, password, device, command):
+	def command(self, ip, port, device, command):
 		"""
 		close the relay 
 		"""
@@ -76,13 +66,14 @@ class command:
 			time.sleep(1)
 			self.s.connect((ip , port))
 			time.sleep(1)
-			print("Le code de la fonction est %s  " % tablecode[(tablecmd.index(command))])
-			self.s.send(chr(tablecode[(tablecmd.index(command))]))
+			print("Le code de la fonction est %s  " % table[command])
+			self.s.send(chr(table[command]))
+			
 			time.sleep(1)
 			self.s.close()
-			self._log.error("clean Command success on : %s" % device)
-			
+			self._log.error("clean %sCommand success on : %s" % command, device)
+			print ("clean %s Command success on : %s" % (command, device))
 #######################################################			
 		except:
-			self._log.error("Fail to close Foscam relay : %s" % traceback.format_exc())
+			self._log.error("Fail execute command on : %s" % device)
 			return False
