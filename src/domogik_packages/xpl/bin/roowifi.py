@@ -46,7 +46,6 @@ class roowifi(XplPlugin):
 		##
 		print("On rentre dans __init__")
 		XplPlugin.__init__(self, name = 'roowifi')
-		print ("DDEDEDE")
 		self._config = Query(self.myxpl, self.log)
 		# creation d'un tableau pour recuperer les eventuels roombas
 		self.roombas = {}
@@ -111,8 +110,8 @@ class roowifi(XplPlugin):
 
 		ip = self.roombas[device]["ip"]
 		port = int(self.roombas[device]["port"])
-		user = self.roombas[device]["user"]
-		password = self.roombas[device]["password"]
+		#user = self.roombas[device]["user"]
+		#password = self.roombas[device]["password"]
 		delay = int(self.roombas[device]["delay"])
 
 		##if 'current' in message.data:
@@ -127,7 +126,7 @@ class roowifi(XplPlugin):
 			print ("La comande est : clean !")
 			self.log.debug("Clean command receive for '%s'" % device)
 			# Our listener catch a Message with low output command
-			status = self._roombamanager.command(ip, port, user, password, device, lacommand)
+			status = self._roombamanager.command(ip, port, device, lacommand)
 			# Send xpl-trig to say plugin whell receive high command
 			if status == True:
 				#print ("high ACKed")
