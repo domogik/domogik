@@ -9,6 +9,8 @@ import ConfigParser
 import argparse
 import shutil
 import logging
+import pkg_resources
+
 
 BLUE = '\033[94m'
 OK = '\033[92m'
@@ -399,11 +401,11 @@ def install():
             #os.environ['HOME'] = old_home
 
               
-            # TODO : remove, temporary debug
-            print("SYS.PATH={0}".format(sys.path))
-
             try:
                 import traceback
+                # we must activate the domogik module as setup.py is launched from install.py and just after we try 
+                # to import something from the domogik package but the module is not known without doing anything...
+                pkg_resources.get_distribution("domogik").activate()
                 from domogik.install.db_install import DbInstall
             except:
                 print("Trace: {0}".format(traceback.format_exc()))

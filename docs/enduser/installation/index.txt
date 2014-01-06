@@ -29,6 +29,13 @@ Even if you have python2.7 or higher installed, check that the development packa
 
     $ sudo apt-get install python2.7-dev gcc g++
 
+Install setuptools: ::
+
+    $ sudo apt-get install python-setuptools
+
+.. note::
+    Even if setuptools is installed automatically thanks to the *setup.py* script, we need to install it before launching *install.py* : it is needed to use the *pkg_resources* module which is needed during the installation for activating the *domogik* module.
+
 Install SSL libraries: ::
 
     $ sudo apt-get install libssl-dev 
