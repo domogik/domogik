@@ -506,6 +506,10 @@
             {
                 "id": "tailer (>=0.2.1)",
                 "type": "python"
+            },
+            {
+                "id": "ws4py (>=0.3.3)",
+                "type": "python"
             }
 		],
 		"version" : "0.2c3",
