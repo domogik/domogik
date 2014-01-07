@@ -11,21 +11,18 @@ Last change
 ===========
 New instructions to apply changes from immediatly previous version.
 
-- 0.2c2 : (30-10-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
-    - Target : domogik (0.2c2), domoweb (0.2c1)
-    - An `insert_data <changelog.html#do-an-insert-data>`_ or a reinstall is necessary.
-    - Knows issue : At auto start plugin fail sometimes, stop it or kill process ($ps -ef | grep ozwave) and restart it.
+- 0.2c3 : (06-01-2014) Compatibily library : OpenZwave >= 1.0.706, python_openzwave >= 0.2.5 (rev >= 75d9b6a8dd77), Compatibilty with ws4py last update >= 0.3.3
+    - Target : OpenZwave, python-openzwave, ws4py, domogik (0.2c3), domoweb (0.2c2)
+    - Update ws4py with pip or easy_install or update source and compile it.
+    - Update, compile and install python_openzwave.
     - Change log :
-        - Add individual monitoring node(s) in log file for debugging and helper develop device compatibilities.
-        - Add removing ghost node from groups capability.
-        - Add Dimmer multi-controls (FGD211) and bright/dim commands.
-        - Add Thermostat setpoint (Danfos living-connect)
-        - Add NotifyTransactions option (You must probably modify openzwave lib to fix issues failling plugin start, see doc section `options <ozwave.html#configuration>`_ .)
-        - Fix wsServer fail connection some time.
-        - Fix memory change during websocket sending Broadcast and Ack Message.
-        - Fix no display "Support tools" page with some browsers versions.
-        - Fix select last controleur action in reopen dialog box.
-        - Graph neighbors code improved.
+        - GetPollIntensity add in openzwave lib
+        - Add log debug information for wsServer.
+        - Fix auto-startup failure (rest no response)
+        - Fix automatique COMMAND_CLASS_SENSOR_BINARY type set for xpl (recreate devices and widget for changes).
+        - Fix issue in monitornodes xpl-report if no conforme xpl_msg.
+        - Fix wsClient error if ack = undefined (domoweb)
+        - Force default name for controler device if not defined (CtrlMustBeCreate.1.1)
         - Update doc
 
 - `Previous change <changelog.html>`_
@@ -55,7 +52,8 @@ Dependencies
 ============
 
 - `Python-openzwave <http://wiki.domogik.org/plugin_pyozw>`_ (>=0.2.5)
-- `WebSocket library for Python (ws4py). 0.3.0-beta <https://github.com/Lawouach/WebSocket-for-Python>`_
+- `tailer 0.3 library for Python <https://pypi.python.org/pypi/tailer>`_ (>=0.2.1)
+- `WebSocket library for Python (ws4py) <https://github.com/Lawouach/WebSocket-for-Python>`_ (>=0.3.3)
 
 Controller/devices Compatibility List
 =====================================

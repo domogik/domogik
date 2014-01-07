@@ -45,6 +45,7 @@ try:
     from domogik_packages.xpl.lib.ozwdefs import OZwaveException
     import threading
     import sys
+    import time
 except ImportError as exc :
     import logging
     logging.basicConfig(filename='/var/log/domogik/ozwave_start_error.log',level=logging.DEBUG)
@@ -65,10 +66,11 @@ class OZwave(XplPlugin):
         # Récupère la config 
         # - device
         self._config = Query(self.myxpl, self.log)
-        device = self._config.query('ozwave', 'device')
+   #     device = self._config.query('ozwave', 'device')
         ozwlogConf = self._config.query('ozwave', 'ozwlog')
         self._config = Query(self.myxpl, self.log)
         self.myzwave = None
+        self._ctrlHBeat = None
         print ('Mode log openzwave :',  ozwlogConf)
         # Recupère l'emplacement des fichiers de configuration OZW
         pathUser = self.get_data_files_directory()  +'/'
@@ -95,11 +97,50 @@ class OZwave(XplPlugin):
         # Validation avant l'ouverture du controleur, la découverte du réseaux zwave prends trop de temps -> RINOR Timeout
         self.add_stop_cb(self.myzwave.stop)
         self.enable_hbeat()
-        self._ctrlHBeat = XplTimer(60, self.myzwave._getXplCtrlState, self.myxpl)
-        self._ctrlHBeat.start()
-        # Ouverture du controleur principal
-        self.myzwave.openDevice(device)
-    
+        if self._waitForRest() :
+            self._ctrlHBeat = XplTimer(60, self.myzwave._getXplCtrlState, self.myxpl)
+            self._ctrlHBeat.start()
+            #lancement du thread de démarrage des sercices ozwave
+            self.myzwave.starter.start()
+            self.log.info('****** Init OZWave xPL manager completed ******')
+        else : self.force_leave()
+        
+    def _waitForRest(self):
+        """Attends  que le serveur rest http soit disponible, timeout de sortie = 60s"""
+        import urllib2
+        from domogik.common.configloader import Loader
+
+        cfg_rest = Loader('rest')
+        config_rest = cfg_rest.load()
+        conf_rest = dict(config_rest[1])
+        if conf_rest['rest_use_ssl'] == 'False' : protocol = 'http'
+        else : protocol = 'https'
+        rest = "%s://%s:%s" % (protocol, conf_rest['rest_server_ip'], conf_rest['rest_server_port'])
+        the_url = "%s/base/device/list" % (rest)
+        rest_ok = False
+        time_out = False
+        t = time.time()
+        while not self.get_stop().isSet() and not time_out and not rest_ok:
+            self.log.debug("Try to join rest at :{0}".format(the_url))
+            try :
+                req = urllib2.Request(the_url)
+                handle = urllib2.urlopen(req)
+                devices = handle.read()
+            except IOError,  e:
+                if time.time() - t >= 60 : time_out = True
+                else : 
+                    self.log.debug("Rest no response, wait 3s for next try. {0}".format(e.reason))
+                    self.get_stop().wait(3)
+            else : rest_ok = True
+        if rest_ok : return True
+        else:
+            if time_out :
+                self.log.error("Rest not response (by timeout) quit plugin :(")
+                return False
+            else :
+                self.log.error("Rest not response (by stop plugin) quit plugin :(")
+                return False
+   
     def getsize(self):
         return sys.getsizeof(self) + sum(sys.getsizeof(v) for v in self.__dict__.values())
 
@@ -108,7 +149,7 @@ class OZwave(XplPlugin):
         print ("commande xpl recue")
         print message
         self.log.debug(message)
-        if self.myzwave is not None : self.myzwave.monitorNodes.xpl_report(message)
+        if self.myzwave is not None and self.myzwave.monitorNodes is not None : self.myzwave.monitorNodes.xpl_report(message)
         if 'command' in message.data:
             if 'group'in message.data:
                 # en provenance de l'UI spéciale
@@ -195,6 +236,7 @@ class OZwave(XplPlugin):
                                     
     def send_xPL(self, xPLmsg,  args = None):
         """ Envoie une commande ou message zwave vers xPL"""
+        self.log.debug('********************* send_xPL *****************')
         mess = XplMessage()
         mess.set_type(xPLmsg['type']) 
         mess.set_schema(xPLmsg['schema'])
@@ -204,7 +246,7 @@ class OZwave(XplPlugin):
             mess.add_data({'data': self.getUIdata2dict(args)})
         print mess
         self.myxpl.send(mess)
-        if self.myzwave is not None : self.myzwave.monitorNodes.xpl_report(mess)
+        if self.myzwave is not None and self.myzwave.monitorNodes is not None : self.myzwave.monitorNodes.xpl_report(mess)
         
     def sendxPL_trig(self, msgtrig):
         """Envoie un message trig sur le hub xPL"""

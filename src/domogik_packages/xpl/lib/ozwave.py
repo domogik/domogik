@@ -115,8 +115,10 @@ class OZWavemanager(threading.Thread):
         self._initFully = False
         self._ctrlActProgress = None
         self.lastTest = 0
+        self.serverUI = None
         self._completMsg = self._configPlug.query('ozwave', 'cpltmsg')
         self._wsPort = int(self._configPlug.query('ozwave', 'wsportserver'))
+        self._device = self._configPlug.query('ozwave', 'device')
         # récupération des associations nom de réseaux et homeID
         self._nameAssoc = {}
         if self._configPlug != None :
@@ -182,18 +184,9 @@ class OZWavemanager(threading.Thread):
         self._log.info('Openzwave options : {0}, NotifyTransactions : {1}'.format(opts, self._completMsg))
         print 'User config : {0}; Openzwave options : {1}, NotifyTransactions : {2}'.format(self._userPath, opts, self._completMsg)
         print self.pyOZWLibVersion + " -- plugin version :" + OZWPLuginVers
-        self.serverUI =  BroadcastServer(self._wsPort,  self.cb_ServerWS,  self._log) # demarre le websocket server
-        self._cb_send_xPL({'type':'xpl-trig', 'schema':'ozwctrl.basic',
-                                    'data': {'device': self._getCtrlDeviceName(),
-                                            'status':'started plugin',
-                                            'type': 'status',
-                                            'node': 'controller',
-                                            'usermsg': 'Plugin is in intialization process, be patient...',
-                                            'data': {'state':'wsserver_started', 'wsport': self._wsPort}}})
-        self.monitorNodes = ManageMonitorNodes(self)
-        self.monitorNodes.start()  # demarrer la surveillance des nodes pour helper log
         self.getManufacturers()
-        
+        self.starter = threading.Thread(None, self.startServices, "th_Start_Ozwave_Services", (), {} )
+                
      # On accède aux attributs uniquement depuis les property
     device = property(lambda self: self._device)
     homeId = property(lambda self: self._homeId)
@@ -210,6 +203,24 @@ class OZWavemanager(threading.Thread):
     ready = property(lambda self: self._ready)
     pyOZWLibVersion = property(lambda self: self._getPyOZWLibVersion())
 
+    def startServices(self):
+        """démarre les differents services (wsServer, monitorNodes, le controleurZwave.
+            A appeler dans un thread à la fin de l'init du pluginmanager."""
+        self._log.info("Start Ozwave services in 100ms...")
+        self._stop.wait(0.1) # s'assurer que l'init du pluginmanager est achevé
+        self.serverUI =  BroadcastServer(self._wsPort,  self.cb_ServerWS,  self._log) # demarre le websocket server
+        self._cb_send_xPL({'type':'xpl-trig', 'schema':'ozwctrl.basic',
+                                      'data': {'device': self._getCtrlDeviceName(),
+                                            'status':'started plugin',
+                                            'type': 'status',
+                                            'node': 'controller', 
+                                            'usermsg': 'Plugin is in intialization process, be patient...',
+                                            'data': {'state':'wsserver_started', 'wsport': self._wsPort}}})
+        self.monitorNodes = ManageMonitorNodes(self)
+        self.monitorNodes.start()  # demarrer la surveillance des nodes pour helper log
+        # Ouverture du controleur principal
+        self.openDevice(self._device)
+                
     def openDevice(self, device):
         """Ajoute un controleur au manager (en developpement 1 seul controleur actuellement)"""
         # TODO: Gérer une liste de controleurs
@@ -241,13 +252,12 @@ class OZWavemanager(threading.Thread):
         """ Stop class OZWManager."""
         print("Stopping plugin, Remove driver from openzwave : %s" %self._device)
         self._log.info("Stopping plugin, Remove driver from openzwave : %s",  self._device)
- #       sleep(1)
         self.closeDevice(self._device)
         self._device = None
-        self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-remove', 'usermsg' : 'Plugin stopped.', 'data': False})
-   #     sleep(2)
-        self.serverUI.close()
-        self._main. _ctrlHBeat.stop()
+        if self.serverUI : 
+            self.serverUI.broadcastMessage({'node': 'controller', 'type': 'driver-remove', 'usermsg' : 'Plugin stopped.', 'data': False})
+            self.serverUI.close()
+        if self._main. _ctrlHBeat: self._main. _ctrlHBeat.stop()
     
     def _getXplCtrlState(self):
         """Envoi un hbeat de l'atat du controlleur zwave sur le hub xPl"""
@@ -271,11 +281,11 @@ class OZWavemanager(threading.Thread):
         return retval
     
     def getManufacturers(self):
-        """"Renvoi la list (dict) de tous le fabriquants et produits reconnus par la lib penzwave."""
+        """"Renvoi la list (dict) de tous le fabriquants et produits reconnus par la lib openzwave."""
         self.manufacturers = Manufacturers(self._configPath)
         
     def getAllProducts(self):
-        """"Renvoi la list (dict) de tous le fabriquants et produits reconnus par la lib penzwave."""
+        """"Renvoi la list (dict) de tous le fabriquants et produits reconnus par la lib openzwave."""
         if self.manufacturers :
             return self.manufacturers.getAllProductsName()
         else :
@@ -389,26 +399,36 @@ class OZWavemanager(threading.Thread):
         
     def _getCtrlDeviceName(self):
         if self._controller :
+            self._log.debug("_getCtrlDeviceName return self._controller : {0}".format(self._controller.ctrlDeviceName))
             return self._controller.ctrlDeviceName
         else : 
             if self.conf_rest['rest_use_ssl'] == 'False' : protocol = 'http'
             else : protocol = 'https'
             rest = "%s://%s:%s" % (protocol, self.conf_rest['rest_server_ip'], self.conf_rest['rest_server_port'])
             the_url = "%s/base/device/list" % (rest)
-            req = urllib2.Request(the_url)
-            handle = urllib2.urlopen(req)
-            devices = handle.read()
-            ret = json.loads(devices)
-            if ret["status"] == "OK" :
-                for dev in ret["device"]:
-                    if  dev['device_type_id'] == 'ozwave.ctrl' : 
-                        return dev['address']
-            else :
-                n = str(self._nameAssoc.keys() [0])
-                if n : 
-                    return "%s.1.1" % (n)
+            try :
+                req = urllib2.Request(the_url)
+                handle = urllib2.urlopen(req)
+                devices = handle.read()
+            except IOError,  e:
+                self._log.warning("_getCtrlDeviceName rest error url :{0}, result :{1}".format(the_url,  e.reason))
+                raise OZwaveManagerException ("rest url :{0}, {1}".format(the_url,  e.reason))
+                return "UnresearchableCtrl.1.1"
+            else :    
+                ret = json.loads(devices)
+                if ret["status"] == "OK" :
+                    for dev in ret["device"]:
+                        if  dev['device_type_id'] == 'ozwave.ctrl' : 
+                            self._log.debug("_getCtrlDeviceName return dev['address']: {0}".format(dev['address']))
+                            return dev['address']
                 else :
-                    return None
+                    n = str(self._nameAssoc.keys() [0])
+                    if n : 
+                        self._log.debug("_getCtrlDeviceName return self._nameAssoc.keys() [0]): {0}.1.1".format(n))
+                        return "%s.1.1" % (n)
+                    else :
+                        self._log.warning("_getCtrlDeviceName return default: CtrlMustBeCreate.1.1")
+                        return "CtrlMustBeCreate.1.1"
 
     def cb_openzwave(self,  args):
         """Callback depuis la librairie py-openzwave 

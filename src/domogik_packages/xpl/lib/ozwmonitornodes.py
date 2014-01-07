@@ -92,12 +92,16 @@ class ManageMonitorNodes(threading.Thread):
     
     def xpl_report(self,  xplMsg):
         """Callback un message Xpl"""
-        if xplMsg.data.has_key('device') :
-            zN,  nodeId,  instance = xplMsg.data['device'].split(".")
-            nodeId = int(nodeId)
-            if self.isMonitored(nodeId) : 
-                self.__reports.append({'date': datetime.now(),'type': "Xpl report : ", 'nodeId': nodeId, 'datas': str(xplMsg)})
-    
+        if xplMsg.data.has_key('device') and xplMsg.data['device'] != None :
+            try :
+                zN,  nodeId,  instance = xplMsg.data['device'].split(".")
+                nodeId = int(nodeId)
+                if self.isMonitored(nodeId) : 
+                    self.__reports.append({'date': datetime.now(),'type': "Xpl report : ", 'nodeId': nodeId, 'datas': str(xplMsg)})
+            except Exception as e :
+                raise OZwaveMonitorNodeException(e)
+    #    else : self._pluginLog.debug("Monitoring nodes, No 'device' key defined in xPL msg ({0})".format(xplMsg))
+            
     def nodeChange_report(self,  nodeId,  msg):
         """Callback de node lui même"""
         if self.isMonitored(nodeId) :

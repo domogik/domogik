@@ -332,7 +332,10 @@ class ZWaveValueNode:
         except Exception as e:
             self._log.error('value.enablePoll(intensity) :' + e.message)
             return {"error" : "Enable poll, error : %s" %e.message}
-        return self._node._manager.enablePoll(self.valueData['id'], intensity)
+        if self.isPolled :
+            self.setPollIntensity(intensity)
+            return True
+        else : return self._node._manager.enablePoll(self.valueData['id'], intensity)
         
     def disablePoll(self):
         """Disable polling of a value.
@@ -358,10 +361,8 @@ class ZWaveValueNode:
             :param id: The ID of the value whose intensity should be set
             :type id: int
             :param intensity: the intensity of the poll
-            :type intensity: int
-            :return: True if polling is active.
-            :rtype: bool"""
-        return self._node._manager.setPollIntensity(self.valueData['id'], intensity)
+            :type intensity: int"""
+        self._node._manager.setPollIntensity(self.valueData['id'], intensity)
     
     def valueToxPLTrig(self):
         """Renvoi le message xPL à trigger en fonction de la command_class de la value.
@@ -403,7 +404,7 @@ class ZWaveValueNode:
             elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_BINARY' : 
                 if self.valueData['type'] == 'Bool' :
                     msgtrig['schema'] = 'sensor.basic'
-                    msgtrig ['data'] = {'type': 'status', 'current' : 'true' if self.valueData['value']   else 'false'} # gestion du sensor binary pour widget binary
+                    msgtrig ['data'] = {'type': self.labelDomogik, 'current' : 'true' if self.valueData['value']   else 'false'} # gestion du sensor binary pour widget binary
             elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_MULTILEVEL' :
                 msgtrig['schema'] = 'sensor.basic'
                 if self.valueData['type'] ==  'Decimal' :   #TODO: A supprimer quand Widget gerera les digits.

@@ -180,7 +180,7 @@ controller to learn new data.
             Pour l'instant utilise le reseaux xPL, doit basculer vers MQ.
         """
         #TODO: reportChangeToUI utilise le hub xPL, a basculer sur MQ
-        msg = report
+        msg = report.copy()
         msg['ctrldevice'] = self.ctrlDeviceName
         print 'Send report to WebSockect server for UI : '
    #     print msg
@@ -789,7 +789,7 @@ controller to learn new data.
             retval = value.enablePoll(intensity)
             if retval == True :
                 return {'error': ""}
-            else: {'error' : "Fail enable poll %d" % valueId + retval['error']}
+            else: {'error' : "Fail enable poll node {0}, value {1}, with intensity : {3}, {4}".format(nodeId,  valueId, intensity,  retval['error'])}
         else : return {'error' : "Unknown value %d" % valueId}
     
     def disablePoll(self, nodeId,  valueId):
