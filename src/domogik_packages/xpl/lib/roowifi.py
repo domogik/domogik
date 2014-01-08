@@ -42,6 +42,8 @@ import time
 import traceback
 import urllib
 import socket
+import urllib2
+import json
 
 table = {
 		"clean" : 135, 
@@ -90,21 +92,32 @@ class command:
 			self._log.error(" %s Command Failed on %s" % (command,device))
 			return False
 		
-	def sensor(self, ip, port, device):
-		print("on est dans batterie")
-		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		time.sleep(1)
-		self.s.connect((ip , port))
-		time.sleep(1)
-		self.s.send(chr(132))
-		time.sleep(1)
+	def sensor(self, ip, port, device, user, password):
+		print("on est dans lib.sensor")
+				
+		try:
+			password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+			username = user
+			password = password
+			top_level_url = "http://" + ip 
+			password_mgr.add_password(None, top_level_url, username, password)
+			handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+			opener = urllib2.build_opener(handler)
+			urllib2.install_opener(opener)
+			response = urllib2.urlopen('http://192.168.1.64/roomba.json')
+			page = response.read()
+			j = json.loads(page)
+			
+			sensor_name = j['response']['r17']['name']
+			sensor_value = j['response']['r17']['value']
+			
+			print sensor_name
+			print sensor_value
+			#print ("%s : %S"% (sensor_name ,sensor_value))
+			
+			return j			
+		except:
+            #self._log.error("Sensor read Failed ")
+			return "N/A"
+			
 		
-		self.s.send(chr(table["SENSOR_COMMAND"]))
-		self.s.send(chr(table["SENSOR_PACKET_0"]))
-		time.sleep(1)
-		data = self.s.recv(table["NUM_BYTES_PACKET_0"])
-		aux1 = 100*(ord(data[22])*256+ord(data[23]))
-		aux2 = ord(data[24])*256+ord(data[25])
-		print ("Battery: " + str(aux1/aux2) + "%")
-		time.sleep(1)
-		self.s.close()

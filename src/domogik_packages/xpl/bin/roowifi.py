@@ -25,13 +25,13 @@ Command roomba vaccum
 @organization: Domogik 
 
 """
-
-from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.plugin import XplPlugin 
 from domogik.xpl.common.xplmessage import XplMessage 
 from domogik.xpl.common.queryconfig import Query 
 from domogik_packages.xpl.lib.roowifi import command 
 from domogik.xpl.common.xplconnector import Listener, XplTimer
+
+
 
 class roowifi(XplPlugin):
 ## Implements a listener for RooWifi messages on xPL network
@@ -55,35 +55,35 @@ class roowifi(XplPlugin):
 		while loop == True:
 			#Get each roomba settings
 			print ("On rentre dans while")
-			name = self._config.query('roowifi', 'name-%s' % str(num))
-			ip = self._config.query('roowifi', 'ip-%s' % str(num))
-			port = self._config.query('roowifi', 'port-%s' % str(num))
-			user = self._config.query('roowifi', 'user-%s' % str(num))
-			password = self._config.query('roowifi', 'password-%s' % str(num))
-			delay = self._config.query('roowifi', 'delay-%s' % str(num))
+			self._name = self._config.query('roowifi', 'name-%s' % str(num))
+			self._ip = self._config.query('roowifi', 'ip-%s' % str(num))
+			self._port = self._config.query('roowifi', 'port-%s' % str(num))
+			self._user = self._config.query('roowifi', 'user-%s' % str(num))
+			self._password = self._config.query('roowifi', 'password-%s' % str(num))
+			self._delay = self._config.query('roowifi', 'delay-%s' % str(num))
 			 
 			
 		## retirer les valeurs default, une fois le pb de reuperation de config du plugin regler
-			if name == None:
-				name = "roomba"
-			if ip == None:
-				ip = "192.168.1.64"
-			if port == None:
-				port = 9001
-			if user == None:
-				user = "admin"
-			if password == None:
-				password = "roombawifi"
-			if delay == None:
-				delay = 60
-			print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (name, ip, port, user, delay))
+			if self._name == None:
+				self._name = "roomba"
+			if self._ip == None:
+				self._ip = "192.168.1.64"
+			if self._port == None:
+				self._port = 9001
+			if self._user == None:
+				self._user = "admin"
+			if self._password == None:
+				self._password = "roombawifi"
+			if self._delay == None:
+				self._delay = 15
+			print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
 			loop = False
 		##				
 			
-			if name != None:
-				self.log.info("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (name, ip, port, user, delay))
-				print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (name, ip, port, user, delay))
-				self.roombas[name] = {"ip" : ip, "port" : port, "user" : user,"password" : password, "delay" : delay}
+			if self._name != None:
+				self.log.info("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
+				print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
+				self.roombas[self._name] = {"ip" : self._ip, "port" : self._port, "user" : self._user,"password" : self._password, "delay" : self._delay}
 			else:
 				loop = False
 			num += 1
@@ -98,15 +98,39 @@ class roowifi(XplPlugin):
 		self.enable_hbeat()
 		#print(" FIN  __init__")
 #########################################
-		
-		self._probe_status = {}
-		self._probe_thr = XplTimer(delay, self._send_probe(ip, port ,name ), self.myxpl)
+		## call send probe from time to time :
+		self._probe_thr = XplTimer(self._delay, self._send_probe, self.myxpl)
 		self._probe_thr.start()
-		self.enable_hbeat()
 
-	def _send_probe(self,ip,port,name):
-		print("On est dans send_probe")
-		self._roombamanager.sensor(ip, port, name)
+#############################
+
+		
+
+
+		
+
+	def _send_probe(self):
+		#print("On est dans send_probe")
+		batterylevel = ()
+		batterylevel = self._roombamanager.sensor(self._ip, self._port, self._name,self._user,self._password)
+		
+		
+		
+		
+		
+		
+		batterylevel = 50
+		print ("On va envoyer le xpl-stat la batterie")
+		self.log.debug("Valeur de la batterie pour %s : %s" % (self._name,batterylevel))
+		mess = XplMessage()
+		mess.set_type('xpl-stat')
+		mess.set_schema('sensor.basic')
+		mess.add_data({'device' : self._name})
+		mess.add_data({'type' : 'battery-level'})
+		mess.add_data({'current' : batterylevel})
+		self.myxpl.send(mess)
+		
+		print ("Batterie from bin : %s" % (batterylevel))
 		
 	def roowifi_command(self, message):
 		##Call roowifi lib
