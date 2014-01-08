@@ -154,31 +154,43 @@ class BroadcastServer(object):
         message = msg.copy()  # copy dict to ensure a memory change during process
         header = {'type':'pub',  'idws' : 'for each' , 'ip' : '0.0.0.0',  'timestamp' : long(time.time()*100)}
         message['header'] = header
-        info = 'Websocket server sending for %d client(s) : %s' % (len(self.server.manager.websockets),  str(message))
-      #  self.logMsg("debug",  info)
-        for ws in self.server.manager.websockets.itervalues():
-            try:
-                message['header']  = {'type':'pub', 'idws' : ws.peer_address[1] , 'ip' : ws.peer_address[0],  'timestamp' : long(time.time()*100)}
-                ws.send(json.dumps(message))
-                print "Server broadcasting sended to : ",  message['header']['idws']
-                print message
-          #      self.logMsg("debug", "Server broadcasting sended to : {0}".format(message['header']['idws']))
-            except Exception:
-                self.server.manager.remove(ws)
-                self.logMsg("debug",  "Failed sockets : {0}:{1}".format(ws.peer_address[0], ws.peer_address[1]))
-                continue
+        # It's a copy of ws4py part lib (ws4py/manager.py  def broadcast(self, message, binary=False):) to add individual header infos. For python 3 
+        # TODO : For python 3 compatibility check code : ws_iter = websockets.itervalues() must be ws_iter = iter(websockets.values())
+        with self.server.manager.lock: # to prevent some change in websocket list client
+            websockets = self.server.manager.websockets.copy()
+            ws_iter = websockets.itervalues()
+        for ws in ws_iter:
+            if not ws.terminated:                
+                try:
+                    message['header']  = {'type':'pub', 'idws' : ws.peer_address[1] , 'ip' : ws.peer_address[0],  'timestamp' : long(time.time()*100)}
+                    ws.send(json.dumps(message))
+                    print "Server broadcasting sended to : ",  message['header']['idws']
+                    print message
+              #      self.logMsg("debug", "Server broadcasting sended to : {0}".format(message['header']['idws']))
+                except Exception:
+                    self.logMsg("debug",  "Failed sockets : {0}:{1}".format(ws.peer_address[0], ws.peer_address[1]))
+                    pass
 
     def sendAck(self, ackMessage):
         """Send a confirmation message  'Ack'  to client"""
         ackMsg = ackMessage.copy()  # copy dict to ensure a memory change during process
         if ackMsg['header'] :
-            for ws in self.server.manager.websockets.itervalues():
-                if ws.peer_address[1] == ackMsg['header']['idws'] :
-                    ws.send(json.dumps(ackMsg))
-                    info = {}
-                    for k in ackMsg :
-                        if k != "data" and k != "header":  info[k] = ackMsg[k]
-                    self.logMsg("debug", "Ack sended to WebSocket client : {0}:{1} => {2}".format(ackMsg['header']['ip'], ackMsg['header']['idws'],  info))
+            # TODO : For python 3 compatibility check code : ws_iter = websockets.itervalues() must be ws_iter = iter(websockets.values())
+            with self.server.manager.lock: # to prevent some change in websocket list client
+                websockets = self.server.manager.websockets.copy()
+                ws_iter = websockets.itervalues()
+            for ws in ws_iter :
+                if not ws.terminated:                
+                    if ws.peer_address[1] == ackMsg['header']['idws'] :
+                        try :
+                            ws.send(json.dumps(ackMsg))
+                            info = {}
+                            for k in ackMsg :
+                                if k != "data" and k != "header":  info[k] = ackMsg[k]
+                            self.logMsg("debug", "Ack sended to WebSocket client : {0}:{1} => {2}".format(ackMsg['header']['ip'], ackMsg['header']['idws'],  info))
+                        except Exception:
+                            self.logMsg("debug",  "Failed sockets : {0}:{1}".format(ws.peer_address[0], ws.peer_address[1]))
+                            pass
 
     def logMsg(self, type = "info", msg =""):
         """Log msg in plugin and wsuiserver"""
