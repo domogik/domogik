@@ -9,6 +9,8 @@ import ConfigParser
 import argparse
 import shutil
 import logging
+import pkg_resources
+
 
 BLUE = '\033[94m'
 OK = '\033[92m'
@@ -398,7 +400,16 @@ def install():
             #os.setreuid(0,0)
             #os.environ['HOME'] = old_home
 
-            from domogik.install.db_install import DbInstall
+              
+            try:
+                import traceback
+                # we must activate the domogik module as setup.py is launched from install.py and just after we try 
+                # to import something from the domogik package but the module is not known without doing anything...
+                pkg_resources.get_distribution("domogik").activate()
+                from domogik.install.db_install import DbInstall
+            except:
+                print("Trace: {0}".format(traceback.format_exc()))
+
             dbi = DbInstall()
             dbi.install_or_upgrade_db()
 

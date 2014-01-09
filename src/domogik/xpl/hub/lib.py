@@ -162,16 +162,23 @@ class Hub():
         print(u"- Initiating the multicast UDP client...")
         self.log.info(u"Initiating the multicast UDP client...")
         self.log.info(u"- creation...")
-        self.MPP = UdpHub(log = self.log,
-                                     allowed_interfaces = allowed_interfaces,
-                                     file_clients = file_clients,
-                                     do_log_bandwidth = do_log_bandwidth,
-                                     file_bandwidth = file_bandwidth,
-                                     do_log_invalid_data = do_log_invalid_data,
-                                     file_invalid_data = file_invalid_data)
-        self.log.info(u"- start reactor...")
-        xpl_port = reactor.listenMulticast(3865, self.MPP)   #,
-                                           #listenMultiple=True)
+        try:
+            self.MPP = UdpHub(log = self.log,
+                                         allowed_interfaces = allowed_interfaces,
+                                         file_clients = file_clients,
+                                         do_log_bandwidth = do_log_bandwidth,
+                                         file_bandwidth = file_bandwidth,
+                                         do_log_invalid_data = do_log_invalid_data,
+                                         file_invalid_data = file_invalid_data)
+            self.log.info(u"- start reactor...")
+            xpl_port = reactor.listenMulticast(3865, self.MPP)   #,
+                                               #listenMultiple=True)
+        except:
+            msg = u"Error while starting the hub reactor. Exiting. Error : {0}".format(traceback.format_exc())
+            self.log.error(msg)
+            print(msg)
+            self.stop_hub()
+            return
 
         self.log.info(u"- add triggers...")
         reactor.addSystemEventTrigger('during', 'shutdown', self.stop_hub)
