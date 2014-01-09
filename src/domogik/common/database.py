@@ -170,6 +170,9 @@ class DbHelper():
             self.__session.close()
             self.__session = None
 
+    def get_session(self):
+        return self.__session
+
     def open_session(self):
         self.__session = DbHelper.__session_object()
 
@@ -1089,7 +1092,10 @@ class DbHelper():
                             UserAccount
                         ).filter_by(login=ucode(a_login)
                         ).first()
-        return user_acc is not None and user_acc._UserAccount__password == _make_crypted_password(a_password)
+	if user_acc.password == _make_crypted_password(a_password):
+	    return user_acc
+        else:
+            return None
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
         """Add a user account

@@ -9,7 +9,6 @@ from flask.ext.babel import gettext, ngettext, get_locale
 class LoginForm(form.Form):
     user = fields.TextField('user', [validators.Required()])
     passwd = fields.PasswordField('passwd', [validators.Required()])
-    submit = fields.SubmitField("Login")
     def hidden_tag(self):
         pass
 
