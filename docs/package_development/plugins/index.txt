@@ -21,7 +21,7 @@ First, create a repository and write some specifications
 Prepare the plugin
 ==================
 
-First, you will have to create a few files for your plugin.
+Now, you will have to create a few files for your plugin.
 
 * :doc:`Plugin file tree <plugin_file_tree/index>`
 * :doc:`Readme and changelog files <readme_and_changelog/index>`
@@ -40,18 +40,20 @@ You should first read all this chapter, then make sure that you already defined 
 
 Starting to create the json file without being clear on these elements is useless!
 
-* :doc:`Json file <json/index>`
+.. note::
+    To help you to understand the way to create a json file, you can look on already existing plugins to see real examples.
 
-  * :doc:`Sample json file <json/sample>`
-  * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
-  * :doc:`Identity part <json/identity>`
-  * :doc:`Configuration part <json/configuration>`
-  * :doc:`Device types part <json/device_types>`
-  * :doc:`Sensors part <json/sensors>` 
-  * :doc:`Xpl stats part <json/xpl_stats>`
-  * :doc:`Commands part <json/commands>` ....................................TODO 
-  * :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
-  * :doc:`Json version part <json/version>` ....................................TODO
+* :doc:`Json file overview <json/index>`
+* :doc:`Sample json file <json/sample>`
+* :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
+* :doc:`Identity part <json/identity>`
+* :doc:`Configuration part <json/configuration>`
+* :doc:`Device types part <json/device_types>`
+* :doc:`Sensors part <json/sensors>` 
+* :doc:`Xpl stats part <json/xpl_stats>`
+* :doc:`Commands part <json/commands>` ....................................TODO 
+* :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
+* :doc:`Json version part <json/version>` ....................................TODO
 
 * Resources : 
 
