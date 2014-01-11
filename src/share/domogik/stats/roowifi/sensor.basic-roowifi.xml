@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="roowifi">
+    <schema name="sensor.basic">
+        <xpltype type="*">
+            <listener>
+                <filter>
+                    <key name="type" value="bumps-wheeldrops"/>
+					<key name="type" value="wall"/>
+					<key name="type" value="cliff-left"/>
+					<key name="type" value="cliff-front-left"/>
+					<key name="type" value="cliff-front-right"/>
+					<key name="type" value="cliff-right"/>
+					<key name="type" value="virtual-wall"/>
+					<key name="type" value="motor-overcurrents"/>
+					<key name="type" value="remote-opcode"/>
+					<key name="type" value="buttons"/>
+					<key name="type" value="distance"/>
+					<key name="type" value="angle"/>
+					<key name="type" value="charging-state"/>
+					<key name="type" value="voltage"/>
+					<key name="type" value="current"/>
+					<key name="type" value="temperature"/>
+					<key name="type" value="charge"/>
+					<key name="type" value="capacity"/>          
+                    <key name="type" value="battery-level"/>
+                    
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="units"/>
+				<value field="current" new_name="bumps-wheeldrops" 
+                       filter_key="type" filter_value="bumps-wheeldrops" />
+				<value field="current" new_name="wall" 
+                       filter_key="type" filter_value="wall" />
+				<value field="current" new_name="cliff-left" 
+					   filter_key="type" filter_value="cliff-left" />
+				<value field="current" new_name="cliff-front-left" 
+					filter_key="type" filter_value="cliff-front-left" />
+				<value field="current" new_name="cliff-front-right" 
+					   filter_key="type" filter_value="cliff-front-right" />
+				<value field="current" new_name="cliff-right" 
+					   filter_key="type" filter_value="cliff-right" />
+				<value field="current" new_name="virtual-wall" 
+					   filter_key="type" filter_value="virtual-wall" />
+				<value field="current" new_name="motor-overcurrents" 
+					   filter_key="type" filter_value="motor-overcurrents" />
+				<value field="current" new_name="remote-opcode" 
+					   filter_key="type" filter_value="remote-opcode" />
+				<value field="current" new_name="buttons" 
+					   filter_key="type" filter_value="buttons" />
+				<value field="current" new_name="distance" 
+					   filter_key="type" filter_value="distance" />
+				<value field="current" new_name="angle" 
+					   filter_key="type" filter_value="angle" />
+				<value field="current" new_name="charging-state" 
+					   filter_key="type" filter_value="charging-state" />
+				<value field="current" new_name="voltage" 
+					   filter_key="type" filter_value="voltage" />
+				<value field="current" new_name="current" 
+					   filter_key="type" filter_value="current" />
+	            <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temperature" />
+				<value field="current" new_name="charge"
+                       filter_key="type" filter_value="charge" />
+                <value field="current" new_name="capacity"
+                       filter_key="type" filter_value="capacity" />
+                <value field="current" new_name="battery-level"
+                       filter_key="type" filter_value="battery-level" />
+             </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

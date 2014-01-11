@@ -61,9 +61,44 @@ table = {
 		"SENSOR_PACKET_2" : 2,
 		"SENSOR_PACKET_3" : 3,
 		"NUM_BYTES_PACKET_0" : 26
-		} 
+		}
 
-class command:
+
+
+sensors = {
+		"Bumps Wheeldrops" : 0 ,
+		"Wall" : 0 ,
+		"Cliff Left" : 0 ,
+		"Cliff Front Left" : 0 ,
+		"Cliff Front Right" : 0 ,
+		"Cliff Right" : 0 ,
+		"Virtual Wall" : 0 ,
+		"Motor Overcurrents" : 0 ,
+		"Dirt Detector - Left" : 0 ,
+		"Dirt Detector - Right" : 0 ,
+		"Remote Opcode" : 0,
+		"Buttons" : 0 ,
+		"Distance" : 0 ,
+		"Angle" : 0 ,
+		"Charging State" : 0 ,
+		"Voltage" : 0 ,
+		"Current" : 0 ,
+		"Temperature" : 0 ,
+		"Charge" : 0 ,
+		"Capacity" : 0,
+		"Battery-level" : 0
+		}
+
+ChargingState = {
+		0 : "Not charging" ,
+		1 : "Charging Recovery" ,
+		2 : "Charging" ,
+		3 : "Trickle charging" ,
+		4 : "Waiting" ,
+		5 : "Charging Error" ,
+		}
+
+class Command:
 
 	def __init__(self, log):
 		self._log = log
@@ -91,31 +126,68 @@ class command:
 			print (" %s Command Failed on %s" % (command,device))
 			self._log.error(" %s Command Failed on %s" % (command,device))
 			return False
-		
-	def sensor(self, ip, port, device, user, password):
-		print("on est dans lib.sensor")
-				
+
+	def commandweb(self, device, command, ip, port, user, password):
+		# NON-UTILISEE, TO DELETE ?
 		try:
 			password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-			username = user
-			password = password
 			top_level_url = "http://" + ip 
-			password_mgr.add_password(None, top_level_url, username, password)
+			password_mgr.add_password(None, top_level_url, user, password)
 			handler = urllib2.HTTPBasicAuthHandler(password_mgr)
 			opener = urllib2.build_opener(handler)
 			urllib2.install_opener(opener)
-			response = urllib2.urlopen('http://192.168.1.64/roomba.json')
+			response = urllib2.urlopen(top_level_url + '/rwr.cgi?exec=1')
+			response = urllib2.urlopen(top_level_url + '/roomba.cgi?button=' + (command).upper())
+			page = response.read()
+			print page 
+			if page == "1" :		
+				print ("%s command Success on %s" % (command,device))
+				self._log.info("%s command Success on %s" % (command,device))
+				return True
+		except:
+			print (" %s Command Failed on %s" % (command,device))
+			self._log.error(" %s Command Failed on %s" % (command,device))
+			return False
+			
+	def sensor(self, ip, port, device, user, password):
+		#print("on est dans lib.sensor")
+		try:
+			password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+			top_level_url = "http://" + ip 
+			password_mgr.add_password(None, top_level_url, user, password)
+			handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+			opener = urllib2.build_opener(handler)
+			urllib2.install_opener(opener)
+			response = urllib2.urlopen(top_level_url + '/roomba.json')
 			page = response.read()
 			j = json.loads(page)
+				
+			sensors['Bumps Wheeldrops'] = j['response']['r0']['value']
+			sensors['Wall'] = j['response']['r1']['value']
+			sensors['Cliff Left'] = j['response']['r2']['value']
+			sensors['Cliff Front Left'] = j['response']['r3']['value']
+			sensors['Cliff Front Right'] = j['response']['r4']['value']
+			sensors['Cliff Right'] = j['response']['r5']['value']
+			sensors['Virtual Wall'] = j['response']['r6']['value']
+			sensors['Motor Overcurrents'] = j['response']['r7']['value']
+			sensors['Dirt Detector - Left'] = j['response']['r8']['value']
+			sensors['Dirt Detector - Right'] = j['response']['r9']['value']
+			sensors['Remote Opcode'] = j['response']['r10']['value']
+			sensors['Buttons'] = j['response']['r11']['value'] 
+			sensors['Distance'] = j['response']['r12']['value']
+			sensors['Angle'] = j['response']['r13']['value']
+			sensors['Charging State'] = ChargingState[int(j['response']['r14']['value'])]
+			#sensors['Charging State'] = j['response']['r14']['value']
+			sensors['Voltage'] = j['response']['r15']['value']
+			sensors['Current'] = j['response']['r16']['value']
+			sensors['Temperature'] = j['response']['r17']['value']
+			sensors['Charge'] = j['response']['r18']['value']
+			sensors['Capacity'] = j['response']['r19']['value']
+			sensors['battery-level'] =  int(j['response']['r18']['value'])*100 / int (j['response']['r19']['value'])
 			
-			sensor_name = j['response']['r17']['name']
-			sensor_value = j['response']['r17']['value']
+			#print sensors
 			
-			print sensor_name
-			print sensor_value
-			#print ("%s : %S"% (sensor_name ,sensor_value))
-			
-			return j			
+			return sensors	
 		except:
             #self._log.error("Sensor read Failed ")
 			return "N/A"
