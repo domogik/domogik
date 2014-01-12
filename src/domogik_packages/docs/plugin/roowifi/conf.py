@@ -40,8 +40,8 @@ source_suffix = '.txt'
 master_doc = 'contents'
 
 # General information about the project.
-project = u'plugin plcbus'
-copyright = u'2012, Domogik'
+project = u'plugin roowifi'
+copyright = u'2014, Domogik'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -186,7 +186,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'plugin_plcbus.tex', u'plugin plcbus documentation',
+  ('index', 'plugin_roowifi.tex', u'plugin roowifi documentation',
    u'Domogik team', 'manual'),
 ]
 
@@ -216,7 +216,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'plugin_plcbus', u'plugin plcbus documentation',
+    ('index', 'plugin_roowifi', u'plugin roowifi documentation',
      [u'Domogik team'], 1)
 ]
 
@@ -230,7 +230,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'plugin plcbus', u'plugin plcbus documentation',
+  ('index', 'plugin roowifi', u'plugin roowifi documentation',
    u'Domogik team', 'Domogik', 'One line description of project.',
    'Miscellaneous'),
 ]
