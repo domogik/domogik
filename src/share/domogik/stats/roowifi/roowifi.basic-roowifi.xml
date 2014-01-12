@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="roowifi">
+    <schema name="roowifi.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="command"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
