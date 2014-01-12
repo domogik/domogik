@@ -5,28 +5,30 @@ Plugin documentation
 Purpose
 =======
 
-Plcbus is an automation technology wich allows to switch and dim lights, control appliances, etc. This plugin allows to control plcbus devices. 
+Roowifi is a wifi interface  which allows to control your roomba.
+http://www.roomba-wifi-remote.com/
 
 The following interfaces are supported :
 
-* PLCBUS-1141U  
+* roowifi
+* roowifi v2
 
 Dependencies
 ============
 
-* Python library **pyserial**.
+* Python library **urllib**
+* Python library **urllib2**
+* Python library **socket**
+* Python library **json**
 
 How to plug
 ===========
 
-Simply plug the interface into some USB port, and on the power line.
+Simply plug the interface into your roomba.
+.. image:: roowifi.png
 
-.. image:: 1141.jpg
-
-Create the udev rule
---------------------
-
-You may create a udev rule for this device. The rule and filename are given in the **Requirements** tab of the plugin configuration page.
+Setup  wifi connection. (http://www.roomba-wifi-remote.com/wp-content/uploads/RwRemote_User_Guide_v2_rev15.pdf).
+Ensure domogik server is able to ping your roomba.
 
 Plugin configuration
 ====================
@@ -38,79 +40,47 @@ In Domogik administration, go to the plcbus configuration page.
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 |Key            | Default value | Description                                                                                         |
 +===============+===============+=====================================================================================================+
-| device        | /dev/plcbus   | Path to the plcbus device interface.                                                                |
+| name          | roomba	    | To report on widget adress                                                                          |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
-| usercode      |               | The user code you want to use in your house. You can safely keep the default value or choose your   |
-|               |               | one. It is only really usefull if you have more than 255 plcbus items or if your neighbours also    |
-|               |               | have plcbus devices.                                                                                |
+| ip            |               | Roomba Ip adress                                                                                    |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
-| probe-interval| 5             | To detect changes made by other controllers than Domogik (remotes, switches, etc), Domogik uses     |
-|               |               | fastpolling. It also helps to discover new devices. You can start setting this value to 5 seconds   |
-|               |               | and then adapt it to your needs.                                                                    |
+| port          | 9001          | SCI Port                                                                                            |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
-| probe-list    |               | The plugin will scan devices in all housecodes indicated by this field. If you know you only have   |
-|               |               | devices with housecodes "A" and "B", then only keep "AB" in this field, so that the plugin won't    |
-|               |               | scan other roomcodes.                                                                               |
+| user          | admin         | Rooma http user                                                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| password      | roombawifi    | Rooma http password                                                                                 |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay         | 5             | Delay in seconds, use to probe roomba sensors                                                       |
+|               |               | Smallest value can impact cpu performance                                                           |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
-.. note ::
 
-    The plugin will do a fastpoll every **probe-interval** seconds. In fact, it uses 2 commands : 
+image:: pluginconfig.png
 
-    * First do a "GET_ALL_ID_PULSE", to detect all devices.
-    * Then do a "GET_ALL_ON_ID_PULSE", to detect the state of all devices.
-
-Creating devices for plcbus
+Creating devices for roowifi
 -----------------------------
 In administration, go to Organization > Devices page to create your devices.
 
-Switch
-******
+image:: createdeive.png
 
-.. |feature_switch| image:: feature_switch.png
-    :width: 200px
-
+note : when i write those line, roomba usage is not yet done, so choose another one...
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
 | Example            | Key               | Description                                                                                |
 +====================+===================+============================================================================================+
-| |feature_switch|   | Name              | The name you want to give to the device : kitchen light, hall light, ...                   |
+| |feature_switch|   | Name              | The name you want to give to the device.                   |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Address           | The device address : A3 (for example)                                                      |
+|                    | Address           | you have to report here, the adress you put in plugin configuratin page                    |
 |                    |                   |                                                                                            |
-|                    |                   | You can use the helper **plcbus all <home code> <user code>** to get the device list.      |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Feature           | Plcbus.switch                                                                              |
+|                    | Feature           | roowifi.roomba                                                                             |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Usage             | An appropriate usage (light, appliance, ...)                                               |
+|                    | Usage             | chose roomba usage     																	  |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Description       | Whatever you want                                                                          |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Reference         | Whatever you want                                                                          |
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
 
-Dimmer
-******
-
-.. |feature_dimmer| image:: feature_dimmer.png
-    :width: 200px
-
-+--------------------+-------------------+--------------------------------------------------------------------------------------------+
-| Example            | Key               | Description                                                                                |
-+====================+===================+============================================================================================+
-| |feature_dimmer|   | Name              | The name you want to give to the device : kitchen light, hall light, ...                   |
-|                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Address           | The device address : A3 (for example)                                                      |
-|                    |                   |                                                                                            |
-|                    |                   | You can use the helper **plcbus all <home code> <user code>** to get the device list.      |
-|                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Feature           | Plcbus.dimmer                                                                              |
-|                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Usage             | An appropriate usage (light)                                                               |
-|                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Description       | Whatever you want                                                                          |
-|                    +-------------------+--------------------------------------------------------------------------------------------+
-|                    | Reference         | Whatever you want                                                                          |
-+--------------------+-------------------+--------------------------------------------------------------------------------------------+
 
 Start the plugin
 ----------------
@@ -118,5 +88,28 @@ You can now start the plugin (start button) and use the created devices.
 
 Configure the features widgets on Domoweb
 -----------------------------------------
-You can now place the widgets of your devices features on Domoweb.
+You can now place widgets on Domoweb main page. immage:: placeelement.png
+then choose your roomba on the left, a list of 6 features will appear.
+
+image:: widgetchoice.png
+
+..Docker : will display docker status :
+	- charging when roomba is docking and charging
+	- waiting when roomba is out
+	- can also report charging error...etc
+..Battery temperature
+..Battery level, in %
+..dock order roomba to docking, immediately
+..clean will alternatively run clean and dock command. After running clean command, roomba should dock itself.
+..Max will alternatively run max and dock command, max command mean roomba only stop runnnig when out of battery, without docking it self.
+
+
+For advenced users
+------------------
+
+This plugin can read 19 roomba sensors, but to not make grown our database, and because only some of them as usefully, xpl-stat message was restrict to some sensors.
+If you want more sensors xpl-stat message simply uncomment line in bin/roowifi.py, under  _send_probe funtion.
+
+
+
 

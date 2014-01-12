@@ -7,6 +7,6 @@ Table Of Content
 .. toctree::
 
     /index
-    /plcbus
+    /roowifi
     /helpers
 
