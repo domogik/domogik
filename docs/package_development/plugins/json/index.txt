@@ -26,15 +26,3 @@ Overview
 ========
 
 .. image:: DeviveJsonStruct.png
-
-Detailed informations
-=====================
-
-You will find detailed instructions about each part in this chapters:
-
-* :doc:`identity <identity>`
-* ...
-
-..todo ::
-
-    finish to set all the links. Notice that they are available in the global index for plugin development.
