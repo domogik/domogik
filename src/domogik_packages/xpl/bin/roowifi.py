@@ -19,7 +19,6 @@ Plugin purpose
 ============== 
 Command roomba vaccum  
 ========== 
--FoscamListener 
 @author: capof <capof1000 at gmail.com> 
 @copyright: (C) 2011 Domogik project @license: GPL(v3) 
 @organization: Domogik 
