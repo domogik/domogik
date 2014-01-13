@@ -199,9 +199,17 @@ def client_devices_new(client_id):
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/new/<device_type_id>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
-def client_devices_new_wiz(client_id, device_type_id):
+def client_devices_new_type(client_id, device_type_id):
+    return client_devices_new_wiz(client_id, device_type_id, None)
+
+@app.route('/client/<client_id>/devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
+@login_required
+def client_devices_new_prod(client_id, device_type_id, product):
+    return client_devices_new_wiz(client_id, device_type_id, product)
+
+def client_devices_new_wiz(client_id, device_type_id, product):
     # TODO get them
     params = get_device_params(device_type_id, app.zmq_context)
 
@@ -209,8 +217,11 @@ def client_devices_new_wiz(client_id, device_type_id):
     class F(Form):
         name = TextField("Device", [Required()], description=gettext("the display name for this device"))
         description = TextField("Description", description=gettext("A description for this device"))
-        reference = TextField("Reference", description=gettext("A reference for this device"))
-        submit = SubmitField("Send")
+        if product:
+            default = product
+        else:
+            default = None
+        reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
         pass
     # add the global params
     for item in params["global"]:
@@ -219,10 +230,6 @@ def client_devices_new_wiz(client_id, device_type_id):
         else:
             field = TextField("Global {0}".format(item["key"]), [Required()], description=item["description"])
         setattr(F, item["key"], field)
-    # add the submit button
-    field = submit = SubmitField("Send")
-    setattr(F, "submit", field)
-
     form = F()
 
     if request.method == 'POST' and form.validate():

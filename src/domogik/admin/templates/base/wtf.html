@@ -50,6 +50,7 @@
                     horizontal_columns=('lg', 2, 10),
                     enctype=None,
                     add_submit="",
+                    submit_title="Save",
                     button_map={}) %}
 <form
   {%- if action %} action="{{action}}"{% endif -%}
@@ -64,7 +65,7 @@
   {%- if role %} role="{{role}}"{% endif -%}
   >
   {{ form_fields(form) }}
-  {%- if add_submit %}{{ action_buttons(submit_title="Save") }}{% endif -%}
+  {%- if add_submit %}{{ action_buttons(submit_title=submit_title) }}{% endif -%}
 </form>
 {%- endmacro %}
 
