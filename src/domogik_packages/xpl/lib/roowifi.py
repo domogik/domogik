@@ -21,7 +21,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Command Relay on Foscam camera
+
 
 Implements
 ==========
