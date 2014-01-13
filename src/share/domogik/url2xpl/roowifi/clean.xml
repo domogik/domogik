@@ -1,0 +1,17 @@
+<technology id="roowifi">
+  <command name="clean">
+    <schema>roowifi.basic</schema>
+    <command-key>command</command-key>    
+    <address-key>device</address-key>    
+    <command-xpl-value>clean</command-xpl-value>          
+    <parameters/>
+  </command>    
+  <listener>
+    <schema>roowifi.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="clean" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
