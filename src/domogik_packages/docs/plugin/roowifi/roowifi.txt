@@ -54,14 +54,13 @@ In Domogik administration, go to the plcbus configuration page.
 |               |               | Smallest value can impact cpu performance                                                           |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
-
-image:: pluginconfig.png
+.. image:: pluginconfig.png
 
 Creating devices for roowifi
 -----------------------------
 In administration, go to Organization > Devices page to create your devices.
 
-image:: createdeive.png
+.. image:: createdeive.png
 
 note : when i write those line, roomba usage is not yet done, so choose another one...
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
@@ -91,7 +90,8 @@ Configure the features widgets on Domoweb
 You can now place widgets on Domoweb main page. immage:: placeelement.png
 then choose your roomba on the left, a list of 6 features will appear.
 
-image:: widgetchoice.png
+
+.. image:: widgetchoice.png
 
 ..Docker : will display docker status :
 	- charging when roomba is docking and charging
