@@ -137,8 +137,8 @@
         "src/share/domogik/url2xpl/roowifi/dock.xml",
 		"src/share/domogik/url2xpl/roowifi/max.xml",
 		"src/share/domogik/url2xpl/roowifi/spot.xml",
-		"src/share/domogik/stats/roowifi/roowifi.basic-roowifi.xml
-		"src/share/domogik/stats/roowifi/sensor.basic-roowifi.xml
+		"src/share/domogik/stats/roowifi/roowifi.basic-roowifi.xml",
+		"src/share/domogik/stats/roowifi/sensor.basic-roowifi.xml",
         "src/domogik_packages/xpl/bin/roowifi.py", 
         "src/domogik_packages/xpl/lib/roowifi.py"
     ], 
