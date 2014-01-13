@@ -224,7 +224,7 @@ An xpl command for cmd_two without confirmation
 
 .. note::
 
-    This case should not happen! xPL protocol tell us that a trigger (xpl-trig) message should be sent after each successfully processed command (xpl-cmnd) received!
+    This case should not happen! xPL protocol tell us that a trigger (xpl-trig) message should be sent after each successfully processed command (xpl-cmnd) received! 
 
 Command: ::
     
