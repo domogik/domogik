@@ -78,7 +78,10 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
                 msg = MQMessage()
                 msg.set_action(str(jsons['action']))
                 msg.set_data(jsons['data'])
-                print cli.request('manager', msg.get(), timeout=10).get()
+                if 'dst' in jsons:
+                    print cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
+                else:
+                    print cli.request('manager', msg.get(), timeout=10).get()
         else:
             # this is a mq message
             print(u"New pub message {0}".format(msg))
