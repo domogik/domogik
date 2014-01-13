@@ -52,12 +52,12 @@ def persons_edit(person_id):
                 app.db.update_person(person_id, \
 					p_first_name=request.form['first_name'], \
 					p_last_name=request.form['last_name'], \
-					p_birthdate=None)
+					p_birthdate=request.form['birthdate'])
 	    else:
                 app.db.add_person(\
 					p_first_name=request.form['first_name'], \
 					p_last_name=request.form['last_name'], \
-					p_birthdate=None)
+					p_birthdate=request.form['birthdate'])
             flash(gettext("Changes saved"), "success")
             return redirect("/persons")
 	    pass
