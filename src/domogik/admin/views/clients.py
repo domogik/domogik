@@ -10,6 +10,8 @@ from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
 from domogik.rest.urls.device import get_device_params
+from domogik.common.sql_schema import Device
+from wtforms.ext.sqlalchemy.orm import model_form
 
 @app.route('/clients')
 @login_required
@@ -73,6 +75,55 @@ def client_devices_detected(client_id):
             mactve="clients",
             active = 'devices'
             )
+
+@app.route('/client/<client_id>/devices/edit/<did>', methods=['GET', 'POST'])
+@login_required
+def client_devices_edit(client_id, did):
+    with app.db.session_scope():
+        device = app.db.get_device_sql(did)
+        MyForm = model_form(Device, \
+                        base_class=Form, \
+                        db_session=app.db.get_session(),
+                        exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'device_type_id', 'client_id', 'client_version'])
+        form = MyForm(request.form, device)
+
+	if request.method == 'POST' and form.validate():
+            # save it
+	    app.db.update_device(did, \
+				d_name=request.form['name'], \
+				d_description=request.form['description'], \
+				d_reference=request.form['reference'])
+            # message the suer
+            flash(gettext("Device saved"), 'success')
+            # reload stats
+            req = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action( 'reload' )
+            resp = req.request('xplgw', msg.get(), 100)
+            # redirect
+            return redirect("/client/{0}/devices/known".format(client_id))
+	else:
+            return render_template('client_device_edit.html',
+	        form = form,
+                clientid = client_id,
+                mactve="clients",
+                active = 'devices'
+                )
+
+app.route('/client/<client_id>/devices/delete/<did>')
+@login_required
+def client_devices_delete(client_id, did):
+    with app.db.session_scope():
+        app.db.del_device(did)
+    flash(gettext("Device deleted"), 'success')
+    # reload stats
+    req = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action( 'reload' )
+    resp = req.request('xplgw', msg.get(), 100)
+    return redirect("/client/{0}/devices/known".format(client_id))
+
+
 
 @app.route('/client/<client_id>/devices/delete/<did>')
 @login_required

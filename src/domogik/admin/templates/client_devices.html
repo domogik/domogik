@@ -25,6 +25,7 @@
                             <td>{{ data.device_type_id }}</td>
                             <td>{{ data.description }}</td>
                             <td>
+                                <a href="/client/{{ clientid }}/devices/edit/{{ data.id }}">{% trans %}Edit{% endtrans %}</a> |
                                 <a href="/client/{{ clientid }}/devices/delete/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
                             </td>
                     </tr>
