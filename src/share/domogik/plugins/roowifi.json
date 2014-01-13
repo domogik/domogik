@@ -77,7 +77,7 @@
             "feature_type": "actuator", 
             "id": "roowifi.command.clean", 
             "name": "Clean", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;clean&quot;, &quot;value1&quot;:&quot;dock&quot;}",
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;dock&quot;, &quot;value1&quot;:&quot;clean&quot;}",
 			"return_confirmation": "1", 
             "stat_key": "command", 
             "value_type": "binary"
@@ -87,7 +87,7 @@
             "feature_type": "actuator", 
             "id": "roowifi.command.max", 
             "name": "Max", 
-            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;max&quot;, &quot;value1&quot;:&quot;dock&quot;}", 
+            "parameters": "{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;dock&quot;, &quot;value1&quot;:&quot;max&quot;}", 
             "return_confirmation": "1", 
             "stat_key": "command", 
             "value_type": "binary"
