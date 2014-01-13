@@ -35,7 +35,7 @@ Plugin configuration
 
 Configuration
 -------------
-In Domogik administration, go to the plcbus configuration page.
+In Domogik administration, go to the roowifi configuration page.
 
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 |Key            | Default value | Description                                                                                         |
@@ -54,23 +54,32 @@ In Domogik administration, go to the plcbus configuration page.
 |               |               | Smallest value can impact cpu performance                                                           |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
+<<<<<<< HEAD
 .. image:: pluginconfig.png
+=======
+
+.. image:: pluginconfig.png.png
+>>>>>>> capof-0.3
 
 Creating devices for roowifi
 -----------------------------
 In administration, go to Organization > Devices page to create your devices.
 
+<<<<<<< HEAD
 .. image:: createdeive.png
+=======
+.. image:: createdevice.png
+>>>>>>> capof-0.3
 
-note : when i write those line, roomba usage is not yet done, so choose another one...
+note : when i write those lines, roomba usage is not yet done, so choose another one...
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
 | Example            | Key               | Description                                                                                |
 +====================+===================+============================================================================================+
-| |feature_switch|   | Name              | The name you want to give to the device.                   |
+| 				     | Name              | The name you want to give to the device.          								          |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Address           | you have to report here, the adress you put in plugin configuratin page                    |
-|                    |                   |                                                                                            |
-|                    +-------------------+--------------------------------------------------------------------------------------------+
+|      See           |                   |                                                                                            |
+|     Picture        +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Feature           | roowifi.roomba                                                                             |
 |                    +-------------------+--------------------------------------------------------------------------------------------+
 |                    | Usage             | chose roomba usage     																	  |
@@ -83,14 +92,19 @@ note : when i write those line, roomba usage is not yet done, so choose another 
 
 Start the plugin
 ----------------
-You can now start the plugin (start button) and use the created devices.
+You can now start the plugin (start button).
 
 Configure the features widgets on Domoweb
 -----------------------------------------
-You can now place widgets on Domoweb main page. immage:: placeelement.png
-then choose your roomba on the left, a list of 6 features will appear.
+You can now place widgets on Domoweb main page. 
+.. image:: placeelement.png
 
+Then choose your roomba on the left, a list of 6 features will appear.
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> capof-0.3
 .. image:: widgetchoice.png
 
 ..Docker : will display docker status :
@@ -104,12 +118,8 @@ then choose your roomba on the left, a list of 6 features will appear.
 ..Max will alternatively run max and dock command, max command mean roomba only stop runnnig when out of battery, without docking it self.
 
 
-For advenced users
+For advanced users
 ------------------
 
-This plugin can read 19 roomba sensors, but to not make grown our database, and because only some of them as usefully, xpl-stat message was restrict to some sensors.
+This plugin can read 19 roomba sensors, but to avoid database grow, and because only some of them are usefully, xpl-stat message was restrict to some sensors.
 If you want more sensors xpl-stat message simply uncomment line in bin/roowifi.py, under  _send_probe funtion.
-
-
-
-
