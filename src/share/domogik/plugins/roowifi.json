@@ -144,10 +144,10 @@
     ], 
     "identity": {
         "author": "Capof", 
-        "author_email": "capof1000 at gmail.com", 
+        "author_email": "capof1000 at gmail.com",  
         "category": "Roomba", 
         "changelog": "0.1\n- plugin creation", 
-        "dependencies": [], 
+        "dependencies": [* Python libraries : urllib, urllib2, socket, json *], 
         "description": "Allows to control your roomba with a roowifi interface, http://www.roomba-wifi-remote.com/", 
         "documentation": "http://wiki.domogik.org/plugin_roowifi", 
         "domogik_min_version": "0.3.0", 

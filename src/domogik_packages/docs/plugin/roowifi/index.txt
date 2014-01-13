@@ -5,4 +5,3 @@ Table of content
 ================
 
 * :doc:`Plugin documentation </roowifi>`
-* :doc:`Helpers documentation </helpers>`

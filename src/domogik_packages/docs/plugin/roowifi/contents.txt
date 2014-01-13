@@ -4,9 +4,8 @@
 Table Of Content
 ================
 
-.. toctree::
+.. doctree::
 
     /index
     /roowifi
-    /helpers
 
