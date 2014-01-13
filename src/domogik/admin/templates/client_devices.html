@@ -10,6 +10,7 @@
                     <tr>
                         <td>{% trans %}ID{% endtrans %}</td>
                         <td>{% trans %}Name{% endtrans %}</td>
+                        <td>{% trans %}Reference{% endtrans %}</td>
                         <td>{% trans %}Device Type{% endtrans %}</td>
                         <td>{% trans %}Description{% endtrans %}</td>
                         <td>{% trans %}Details{% endtrans %}</td>
@@ -20,9 +21,11 @@
                     <tr data-toggle="collapse" data-target=".detail-{{ data.id }}" class="accordion-toggle">
                             <td>{{ data.id }}</td>
                             <td>{{ data.name }}</td>
+                            <td>{{ data.reference }}</td>
                             <td>{{ data.device_type_id }}</td>
                             <td>{{ data.description }}</td>
                             <td>
+                                <a href="/client/{{ clientid }}/devices/edit/{{ data.id }}">{% trans %}Edit{% endtrans %}</a> |
                                 <a href="/client/{{ clientid }}/devices/delete/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
                             </td>
                     </tr>
@@ -42,7 +45,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% for name, sen in data.sensors.items() %}
+                                                {% for name, sen in data.sensors.iteritems() %}
                                                         <tr>
                                                                 <td>{{ sen.id }}</td>
                                                                 <td>{{ sen.name }}</td>
@@ -65,7 +68,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% for name, cmd in data.commands.items() %}
+                                                {% for name, cmd in data.commands.iteritems() %}
                                                         <tr>
                                                                 <td>{{ cmd.id }}</td>
                                                                 <td>{{ cmd.name }}</td>

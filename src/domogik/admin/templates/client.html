@@ -19,7 +19,7 @@
 			ws.send('{"action": "plugin.start.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
 		});
 		$("#stop").click(function() {
-			ws.send('{"action": "plugin.stop.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
+			ws.send('{"dst": "plugin-{{ data.name }}.{{ data.host }}", "action": "plugin.stop.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
 		});
 	});
 	</script>

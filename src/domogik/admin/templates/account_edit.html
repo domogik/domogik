@@ -1,0 +1,9 @@
+{% extends "base/base.html" %}
+{% import "base/wtf.html" as wtf %}
+
+{% block content %}
+<div class="container">
+    <h2>{% trans %}Account Edit{% endtrans %}</h2>
+    {{ wtf.quick_form(form, add_submit=True) }}
+</div>
+{% endblock %}

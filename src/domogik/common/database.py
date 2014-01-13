@@ -372,6 +372,9 @@ class DbHelper():
         """
         return self.__session.query(Device).filter(Device.address!=None).all()
 
+    def get_device_sql(self, d_id):
+        return self.__session.query(Device).filter_by(id=d_id).first()
+
     def get_device(self, d_id=None, device=None):
         """Return a device by its id
 

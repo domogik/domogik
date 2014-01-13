@@ -7,14 +7,14 @@
     {% if products|length > 0 %}
     <h3>{% trans %}Create by product{% endtrans %}</h3>
         {% for name, type in products.items() %}
-        <a href="/client/{{ clientid }}/devices/new/{{ type }}"><button type="button" class="btn btn-default btn-sm">{{ name }}</button></a>
+        <a href="/client/{{ clientid }}/devices/new/type/{{ type }}/prod/{{ name }}"><button type="button" class="btn btn-default btn-sm">{{ name }}</button></a>
         {% endfor %}
     {% endif %}
 
     {% if device_types|length > 0 %}
     <h3>{% trans %}Create by device type{% endtrans %}</h3>
         {% for dev in device_types %}
-        <a href="/client/{{ clientid }}/devices/new/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ dev }}</button></a>
+        <a href="/client/{{ clientid }}/devices/new/type/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ dev }}</button></a>
         {% endfor %}
     {% else %}
     <div class="alert alert-warning">{% trans %}No device types found{% endtrans %}</div>
