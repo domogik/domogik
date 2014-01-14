@@ -30,7 +30,7 @@ Description
 
 * **type** : the package type. For a plugin, the value will always be **plugin**
 * **name** : the plugin name. Example : ipx800, diskfree, ... 
-* **version** : the plugin version
+* **version** : the plugin version. It must respect the :doc:`rules about version numbers </package_development/plugins/releases/release_numbers_rules>`
 * **domogik_min_version** : the minimum Domogik compliant release. It can't be lower than 0.4.0
 * **description** : the plugin description
 * **author** : nickname, full name, society or anaything to identify the author of the plugin
