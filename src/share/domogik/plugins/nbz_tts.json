@@ -21,6 +21,16 @@
             "type": "string"
         }, 
         {
+            "default": "api.wizz.cc", 
+            "description": "Server used by your Nabaztag.", 
+            "id": "5", 
+            "interface": "yes", 
+            "key": "server", 
+            "optionnal": "no", 
+            "options": [], 
+            "type": "string"
+        }, 
+        {
             "default": "0000000000", 
             "description": "Serial of your Nabaztag to control it with Wizz.cc's API.", 
             "id": "2", 

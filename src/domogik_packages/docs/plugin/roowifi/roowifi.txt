@@ -1,0 +1,125 @@
+====================
+Plugin documentation
+====================
+
+Purpose
+=======
+
+Roowifi is a wifi interface  which allows to control your roomba.
+http://www.roomba-wifi-remote.com/
+
+The following interfaces are supported :
+
+* roowifi
+* roowifi v2
+
+Dependencies
+============
+
+* Python library **urllib**
+* Python library **urllib2**
+* Python library **socket**
+* Python library **json**
+
+How to plug
+===========
+
+Simply plug the interface into your roomba.
+.. image:: roowifi.png
+
+Setup  wifi connection. (http://www.roomba-wifi-remote.com/wp-content/uploads/RwRemote_User_Guide_v2_rev15.pdf).
+Ensure domogik server is able to ping your roomba.
+
+Plugin configuration
+====================
+
+Configuration
+-------------
+In Domogik administration, go to the roowifi configuration page.
+
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+|Key            | Default value | Description                                                                                         |
++===============+===============+=====================================================================================================+
+| name          | roomba	    | To report on widget adress                                                                          |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| ip            |               | Roomba Ip adress                                                                                    |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| port          | 9001          | SCI Port                                                                                            |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| user          | admin         | Rooma http user                                                                                     |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| password      | roombawifi    | Rooma http password                                                                                 |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+| delay         | 5             | Delay in seconds, use to probe roomba sensors                                                       |
+|               |               | Smallest value can impact cpu performance                                                           |
++---------------+---------------+-----------------------------------------------------------------------------------------------------+
+
+<<<<<<< HEAD
+.. image:: pluginconfig.png
+=======
+
+.. image:: pluginconfig.png.png
+>>>>>>> capof-0.3
+
+Creating devices for roowifi
+-----------------------------
+In administration, go to Organization > Devices page to create your devices.
+
+<<<<<<< HEAD
+.. image:: createdeive.png
+=======
+.. image:: createdevice.png
+>>>>>>> capof-0.3
+
+note : when i write those lines, roomba usage is not yet done, so choose another one...
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+| Example            | Key               | Description                                                                                |
++====================+===================+============================================================================================+
+| 				     | Name              | The name you want to give to the device.          								          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Address           | you have to report here, the adress you put in plugin configuratin page                    |
+|      See           |                   |                                                                                            |
+|     Picture        +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Feature           | roowifi.roomba                                                                             |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Usage             | chose roomba usage     																	  |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Description       | Whatever you want                                                                          |
+|                    +-------------------+--------------------------------------------------------------------------------------------+
+|                    | Reference         | Whatever you want                                                                          |
++--------------------+-------------------+--------------------------------------------------------------------------------------------+
+
+
+Start the plugin
+----------------
+You can now start the plugin (start button).
+
+Configure the features widgets on Domoweb
+-----------------------------------------
+You can now place widgets on Domoweb main page. 
+.. image:: placeelement.png
+
+Then choose your roomba on the left, a list of 6 features will appear.
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> capof-0.3
+.. image:: widgetchoice.png
+
+..Docker : will display docker status :
+	- charging when roomba is docking and charging
+	- waiting when roomba is out
+	- can also report charging error...etc
+..Battery temperature
+..Battery level, in %
+..dock order roomba to docking, immediately
+..clean will alternatively run clean and dock command. After running clean command, roomba should dock itself.
+..Max will alternatively run max and dock command, max command mean roomba only stop runnnig when out of battery, without docking it self.
+
+
+For advanced users
+------------------
+
+This plugin can read 19 roomba sensors, but to avoid database grow, and because only some of them are usefully, xpl-stat message was restrict to some sensors.
+If you want more sensors xpl-stat message simply uncomment line in bin/roowifi.py, under  _send_probe funtion.

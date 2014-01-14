@@ -1,0 +1,15 @@
+.. _toc:
+
+================
+Table Of Content
+================
+
+.. doctree::
+
+    /index
+    /roowifi
+<<<<<<< HEAD
+    
+=======
+>>>>>>> capof-0.3
+
