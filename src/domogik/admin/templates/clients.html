@@ -47,7 +47,6 @@
 			if (data.msgid == "client.list" ) {
 				for (plugin in data.content) {
                                         content = data.content[plugin]
-					oldstatus = $('tr#' + content.pid + " td:nth-child(3)").html();
 					$('tr#d' + content.pid + ' div.status div').removeClass('current_status');
 					$('tr#d' + content.pid + ' div.status div.status_' + content.status).addClass('current_status');
 					$('tr#' + content.pid + " td:nth-child(3)").html(content.status);

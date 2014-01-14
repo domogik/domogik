@@ -21,7 +21,30 @@
 		$("#stop").click(function() {
 			ws.send('{"dst": "plugin-{{ data.name }}.{{ data.host }}", "action": "plugin.stop.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
 		});
+                ws.onmessage = function(e) {
+                        data = JSON.parse(e.data);
+                        if (data.msgid == "client.list" ) {
+                                for (plugin in data.content) {
+					if ( plugin == '{{data.package_id}}.{{data.host}}' ) { 
+						content = data.content[plugin]
+						$('div.status div').removeClass('current_status');
+						$('div.status div.status_' + content.status).addClass('current_status');
+						if ( content.status == "alive" || content.status == "starting" ) {
+							$('#start').attr('disabled','disabled'); 	
+							$('#stop').removeAttr('disabled');
+						} else if ( content.status == "stopped" || content.status == "stop-request" ) {
+							$('#stop').attr('disabled','disabled'); 	
+							$('#start').removeAttr('disabled');
+						} else {
+							$('#stop').attr('disabled','disabled'); 	
+							$('#start').attr('disabled','disabled');
+						}
+					}
+                                }
+                        }
+                }
 	});
-	</script>
+	
+</script>
 </div>
 {% endblock %}
