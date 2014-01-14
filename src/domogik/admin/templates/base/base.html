@@ -17,7 +17,14 @@
     <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
     <!-- Domogik -->
     <link href="/static/css/default.css" rel="stylesheet" media="screen">
-    <script src="/static/js/jquery.min.js"></script>
+       <script type="text/javascript">
+	 if ("WebSocket" in window) {
+		var ws=new WebSocket("ws://" + location.host + "/ws");
+	} else {
+		alert('No WS support');
+	}
+       </script>
+   <script src="/static/js/jquery.min.js"></script>
     {%- endblock styles %}
     {%- endblock head %}
   </head>
@@ -49,15 +56,6 @@
             </script>
     {% endif %}
     {% endwith %}
-      <script type="text/javascript">
-	 if ("WebSocket" in window) {
-		var ws=new WebSocket("ws://" + location.host + "/ws");
-		ws.onmessage=function(e){
-		}
-	} else {
-		alert('No WS support');
-	}
-       </script>
     {%- endblock scripts %}
     {%- endblock body %}
   </body>
