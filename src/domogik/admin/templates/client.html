@@ -10,16 +10,22 @@
 	    <li>{% trans %}Email{% endtrans %} : {{ data.data.identity.author_email }}</li>
 	</ul>
 	<div>
-		<button id="start" type="button" class="btn btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
-		<button id="stop" type="button" class="btn btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
+		<button id="start" type="button" class="btn btn-primary btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
+		<button id="stop" type="button" class="btn btn-primary btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
 	</div>
 	<script type="text/javascript">
 	$( document ).ready(function() {
 		$("#start").click(function() {
+			$("#start").attr('disabled','disabled');
+			$("#start").removeClass('btn-success');
 			ws.send('{"action": "plugin.start.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
+			setTimeout(function () {$("#start").addClass('btn-success');}, 2000);
 		});
 		$("#stop").click(function() {
+			$("#stop").attr('disabled','disabled');
+			$("#stop").removeClass('btn-danger');
 			ws.send('{"dst": "plugin-{{ data.name }}.{{ data.host }}", "action": "plugin.stop.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
+			setTimeout(function () {$("#stop").addClass('btn-danger');}, 2000);;
 		});
                 ws.onmessage = function(e) {
                         data = JSON.parse(e.data);
