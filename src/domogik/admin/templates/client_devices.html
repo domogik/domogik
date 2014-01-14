@@ -51,7 +51,7 @@
                                                                 <td>{{ sen.name }}</td>
                                                                 <td>{{ sen.data_type }}</td>
                                                                 <td>{{ sen.last_value }}</td>
-                                                                <td>{{ sen.last_received }} </td>
+                                                                <td>{{ sen.last_received|datetime }} </td>
                                                         </tr>
                                                 {% endfor %}
                                                 </tbody>
