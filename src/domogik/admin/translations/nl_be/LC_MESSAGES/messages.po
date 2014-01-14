@@ -1,7 +1,7 @@
-# Translations template for PROJECT.
+# Dutch (Belgium) translations for Domo.
 # Copyright (C) 2013 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# 
+# This file is distributed under the same license as the Domo project.
+#
 # Translators:
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2013
 # cereal <maikel.punie@gmail.com>, 2013
@@ -9,19 +9,71 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Domo Admin\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-12 16:58+0100\n"
+"POT-Creation-Date: 2014-01-14 11:56+0100\n"
 "PO-Revision-Date: 2013-11-12 16:05+0000\n"
 "Last-Translator: cereal <maikel.punie@gmail.com>\n"
-"Language-Team: Dutch (Belgium) (http://www.transifex.com/projects/p/domo-admin/language/nl_BE/)\n"
+"Language-Team: Dutch (Belgium) (http://www.transifex.com/projects/p/domo-"
+"admin/language/nl_BE/)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
-"Language: nl_BE\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: templates/client_config.html:7 templates/base/nav.html:13
-#: templates/base/nav.html:26
+#: templates/account_edit.html:6 templates/accounts_edit.html:6
+msgid "Account Edit"
+msgstr ""
+
+#: templates/accounts.html:5
+#, fuzzy
+msgid "Account list"
+msgstr "Client lijst"
+
+#: templates/accounts.html:6 templates/persons.html:6
+msgid "Add new"
+msgstr ""
+
+#: templates/accounts.html:11 templates/login.html:6
+msgid "Login"
+msgstr "Login"
+
+#: templates/accounts.html:12
+msgid "Admin"
+msgstr ""
+
+#: templates/accounts.html:22 templates/client_devices.html:16
+#: templates/clients.html:14 templates/clients.html:31
+#: templates/orphans.html:15
+msgid "Details"
+msgstr "Details"
+
+#: templates/accounts.html:25 templates/client_devices.html:29
+#: templates/persons.html:28
+msgid "Delete"
+msgstr "Verwijder"
+
+#: templates/accounts.html:34
+#, fuzzy
+msgid "No accounts found"
+msgstr "Geen clients gevonden"
+
+#: templates/client.html:7
+#, fuzzy
+msgid "Author"
+msgstr "Auth"
+
+#: templates/client.html:9 templates/client_devices.html:12
+#: templates/client_devices.html:41 templates/client_devices.html:67
+#: templates/orphans.html:12
+msgid "Name"
+msgstr "Naam"
+
+#: templates/client.html:10
+#, fuzzy
+msgid "Email"
+msgstr "Details"
+
+#: templates/client_config.html:7
 msgid "Configuration"
 msgstr "Configuratie"
 
@@ -29,7 +81,12 @@ msgstr "Configuratie"
 msgid "Detected devices"
 msgstr "Gedetecteerde toestellen"
 
-#: templates/client_device_new.html:6 templates/client_device_new_wiz.html:8
+#: templates/client_device_edit.html:6
+#, fuzzy
+msgid "Device Edit"
+msgstr "Toestel aangemaakt"
+
+#: templates/client_device_new.html:6 templates/client_device_new_wiz.html:7
 msgid "Create a new device"
 msgstr "Maak een nieuwe toestel aan"
 
@@ -49,60 +106,57 @@ msgstr "Geen toestel types gevonden"
 msgid "Known Devices"
 msgstr "Gekende toestellen"
 
-#: templates/client_devices.html:11 templates/client_devices.html:38
-#: templates/client_devices.html:63 templates/clients.html:10
+#: templates/client_devices.html:11 templates/client_devices.html:40
+#: templates/client_devices.html:65 templates/clients.html:10
 #: templates/orphans.html:10
 msgid "ID"
 msgstr "ID"
 
-#: templates/client_devices.html:12 templates/client_devices.html:39
-#: templates/client_devices.html:64 templates/orphans.html:12
-msgid "Name"
-msgstr "Naam"
+#: templates/client_devices.html:13
+msgid "Reference"
+msgstr ""
 
-#: templates/client_devices.html:13 templates/orphans.html:13
+#: templates/client_devices.html:14 templates/orphans.html:13
 msgid "Device Type"
 msgstr "Toestel Type"
 
-#: templates/client_devices.html:14 templates/orphans.html:14
+#: templates/client_devices.html:15 templates/orphans.html:14
 msgid "Description"
 msgstr "Omschrijving"
 
-#: templates/client_devices.html:15 templates/client_devices.html:26
-#: templates/clients.html:13 templates/clients.html:28
-#: templates/orphans.html:15
-msgid "Details"
-msgstr "Details"
+#: templates/client_devices.html:28 templates/persons.html:25
+msgid "Edit"
+msgstr ""
 
-#: templates/client_devices.html:28
-msgid "Delete"
-msgstr "Verwijder"
-
-#: templates/client_devices.html:34
+#: templates/client_devices.html:36
 msgid "Sensors"
 msgstr "Sensor"
 
-#: templates/client_devices.html:40
+#: templates/client_devices.html:42 templates/client_devices.html:72
 msgid "Data Type"
 msgstr "Data type"
 
-#: templates/client_devices.html:41
+#: templates/client_devices.html:43
 msgid "Last value"
 msgstr "Laatste waarde"
 
-#: templates/client_devices.html:42
+#: templates/client_devices.html:44
 msgid "Last received"
 msgstr "Laatst ontvangen"
 
-#: templates/client_devices.html:59
+#: templates/client_devices.html:61
 msgid "Commands"
 msgstr "Commando"
 
-#: templates/client_devices.html:65
-msgid "Params"
-msgstr "Parameters"
+#: templates/client_devices.html:71
+msgid "Key"
+msgstr ""
 
-#: templates/client_devices.html:87
+#: templates/client_devices.html:74
+msgid "Example REST Url"
+msgstr ""
+
+#: templates/client_devices.html:95
 msgid "No devices found"
 msgstr "Geen toestel gevonden"
 
@@ -110,7 +164,7 @@ msgstr "Geen toestel gevonden"
 msgid "Client"
 msgstr "Clients"
 
-#: templates/client_menu.html:5 templates/base/nav.html:22
+#: templates/client_menu.html:5 templates/base/nav.html:27
 msgid "Home"
 msgstr "Home"
 
@@ -134,25 +188,48 @@ msgstr "Gedetecteerd"
 msgid "New"
 msgstr "Nieuw"
 
+#: templates/client_overview.html:3 templates/clients.html:12
+msgid "Status"
+msgstr "Status"
+
+#: templates/client_overview.html:7
+#, fuzzy, python-format
+msgid "%(status)s"
+msgstr "Status"
+
+#: templates/client_overview.html:12
+#, fuzzy
+msgid "Informations"
+msgstr "Configuratie"
+
+#: templates/client_overview.html:14
+msgid "Package"
+msgstr ""
+
+#: templates/client_overview.html:15
+msgid "Host"
+msgstr ""
+
+#: templates/client_overview.html:16
+msgid "Process id"
+msgstr ""
+
 #: templates/clients.html:5
 msgid "Client list"
 msgstr "Client lijst"
 
 #: templates/clients.html:11
-msgid "Status"
-msgstr "Status"
+#, fuzzy
+msgid "Type"
+msgstr "Data type"
 
-#: templates/clients.html:12
+#: templates/clients.html:13
 msgid "Configured"
 msgstr "Geconfigureerd"
 
-#: templates/clients.html:36
+#: templates/clients.html:59
 msgid "No clients found"
 msgstr "Geen clients gevonden"
-
-#: templates/login.html:6
-msgid "Login"
-msgstr "Login"
 
 #: templates/orphans.html:5
 msgid "Orphan Devices"
@@ -162,74 +239,130 @@ msgstr "Wees toestellen"
 msgid "Hooray, no orphans found"
 msgstr "Hoera, geen wezen gevonden"
 
-#: templates/base/nav.html:10 templates/base/nav.html:23
+#: templates/person_edit.html:6
+msgid "Person Edit"
+msgstr ""
+
+#: templates/persons.html:5
+#, fuzzy
+msgid "Person list"
+msgstr "Client lijst"
+
+#: templates/persons.html:11
+#, fuzzy
+msgid "Last Name"
+msgstr "Laatste waarde"
+
+#: templates/persons.html:12
+msgid "First Name"
+msgstr ""
+
+#: templates/persons.html:13
+msgid "Birthdate"
+msgstr ""
+
+#: templates/persons.html:36
+#, fuzzy
+msgid "No persons found"
+msgstr "Geen clients gevonden"
+
+#: templates/base/nav.html:10 templates/base/nav.html:28
 msgid "Clients"
 msgstr "Clients"
 
-#: templates/base/nav.html:11 templates/base/nav.html:24
+#: templates/base/nav.html:11 templates/base/nav.html:29
 msgid "Orphans"
 msgstr "Wezen"
 
-#: templates/base/nav.html:12 templates/base/nav.html:25
+#: templates/base/nav.html:13
 msgid "Auth"
 msgstr "Auth"
 
-#: templates/base/nav.html:16 templates/base/nav.html:28
+#: templates/base/nav.html:15 templates/base/nav.html:30
+msgid "Accounts"
+msgstr ""
+
+#: templates/base/nav.html:16 templates/base/nav.html:31
+msgid "Persons"
+msgstr ""
+
+#: templates/base/nav.html:21 templates/base/nav.html:33
 msgid "Logout"
 msgstr "Logout"
 
-#: templates/base/nav.html:20
+#: templates/base/nav.html:25
 msgid "Menu"
 msgstr "Menu"
 
-#: views/clients.py:156
+#: templates/base/wtf.html:15
+msgid "Reset"
+msgstr ""
+
+#: views/account.py:67 views/person.py:61
+msgid "Changes saved"
+msgstr ""
+
+#: views/account.py:71 views/person.py:65
+msgid "Invallid input"
+msgstr ""
+
+#: views/clients.py:97
+#, fuzzy
+msgid "Device saved"
+msgstr "Toestel aangemaakt"
+
+#: views/clients.py:118 views/orphans.py:44
+msgid "Device deleted"
+msgstr "Toestel verwijderd"
+
+#: views/clients.py:210
 msgid "Config saved successfull"
 msgstr "Config opgeslagen"
 
-#: views/clients.py:158
+#: views/clients.py:212
 msgid "Config saved failed"
 msgstr "Config opslaan gefaald"
 
-#: views/clients.py:161
+#: views/clients.py:215
 msgid "DbMgr did not respond on the config.set, check the logs"
 msgstr "DbMgr reageert niet op een config.set commando. Bekijk de log files."
 
-#: views/clients.py:207
+#: views/clients.py:269
 msgid "the display name for this device"
 msgstr "De getoonde naam van het toestel"
 
-#: views/clients.py:208
+#: views/clients.py:270
 msgid "A description for this device"
 msgstr "Een omschrijving van het toestel"
 
-#: views/clients.py:209
+#: views/clients.py:275
 msgid "A reference for this device"
 msgstr "Een referentie voor dit toestel"
 
-#: views/clients.py:234
+#: views/clients.py:295
 msgid "Device creation failed"
 msgstr "Toestel aanmaken is gefaald"
 
-#: views/clients.py:235
+#: views/clients.py:296
 msgid "Can not find this client id"
 msgstr "Kan deze client-id niet vinden"
 
-#: views/clients.py:260
+#: views/clients.py:326
 msgid "device created"
 msgstr "Toestel aangemaakt"
 
-#: views/login.py:51
+#: views/login.py:49
 msgid "Login successfull"
 msgstr "Inloggen geslaagd"
 
-#: views/login.py:54
+#: views/login.py:52
 msgid "This user is not an admin"
 msgstr "De gebruiker is geen admin"
 
-#: views/login.py:56
+#: views/login.py:54
 msgid "Combination of username and password wrong"
 msgstr "De combinatie van gebruiksnaam en paswoord is verkeerd"
 
-#: views/orphans.py:44
-msgid "Device deleted"
-msgstr "Toestel verwijderd"
+#~ msgid "Params"
+#~ msgstr "Parameters"
+

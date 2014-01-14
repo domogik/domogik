@@ -84,9 +84,8 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
                     print cli.request('manager', msg.get(), timeout=10).get()
         else:
             # this is a mq message
-            print(u"New pub message {0}".format(msg))
             for cli in AdminWebSocket.clients:
-                cli.write_message({'msgid': msg, 'content': content})
+                cli.write_message({"msgid": msg, "content": content})
 
 class Admin(XplPlugin):
     """ Admin Server 
