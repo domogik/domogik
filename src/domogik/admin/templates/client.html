@@ -32,7 +32,7 @@
 						if ( content.status == "alive" || content.status == "starting" ) {
 							$('#start').attr('disabled','disabled'); 	
 							$('#stop').removeAttr('disabled');
-						} else if ( content.status == "stopped" || content.status == "stop-request" ) {
+						} else if ( content.status == "stopped" || content.status == "unknown" || content.status == "dead") {
 							$('#stop').attr('disabled','disabled'); 	
 							$('#start').removeAttr('disabled');
 						} else {
