@@ -60,23 +60,28 @@
 				{% if data.commands|length > 0 %}
 				    <span class="label label-default">{% trans %}Commands{% endtrans %}</span>
                                         <table class="table table-bordered">
-                                              <thead>
+					{% for name, cmd in data.commands.iteritems() %}
                                                 <tr>
-                                                    <td>{% trans %}ID{% endtrans %}</td>
-                                                    <td>{% trans %}Name{% endtrans %}</td>
-                                                    <td>{% trans %}Params{% endtrans %}</td>
+                                                    <th>{% trans %}ID{% endtrans %}</th>
+                                                    <td>{{ cmd.id }}</td>
+                                                    <th>{% trans %}Name{% endtrans %}</th>
+                                                    <td>{{ cmd.name }}</td>
                                                 </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for name, cmd in data.commands.iteritems() %}
-                                                        <tr>
-                                                                <td>{{ cmd.id }}</td>
-                                                                <td>{{ cmd.name }}</td>
-                                                                <td>{{ cmd.parameters }}</td>
-                                                        </tr>
-                                                        
-                                                {% endfor %}
-                                                </tbody>
+						<tr>
+						    <th>{% trans %}Key{% endtrans %}</th>
+						    <th>{% trans %}Data Type{% endtrans %}</th>
+						    <td colspan="2" rowspan="{{cmd.parameters|length + 1}}">
+							<b>{% trans %}Example REST Url{% endtrans %}:</b><br />
+							/cmd/id/{{cmd.id}}?{% for param in cmd.parameters %}{{param.key}}=&lt;key&gt;{% endfor %}
+						    </td>
+						</tr>
+						{% for param in cmd.parameters %}
+						<tr>
+						    <td>{{ param.key }}</td>
+						    <td>{{ param.data_type }}</td>
+						</tr>
+						{% endfor %}
+					{% endfor %}
                                         </table>
 				{% endif %}
                                 </div> 
