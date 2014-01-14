@@ -9,7 +9,6 @@ Sample
 
 .. todo:: 
     update conversion related fields after conversion has been implemented in the final state
-    xpl_commands part is not clear (parameters for device and static
 
 Part of the json sample 
 -----------------------
@@ -120,6 +119,13 @@ Part of the json sample
                         }
                     ],
                     "device":                                           # key copied to the xPL message. Satic value defined on a per device basis (input is requested) in the user interface. 
+                                                                        # The device key is used for parameters that depend on a device, that require an input by the user, 
+                                                                        # but that do not change once the device is created, once the device is cerated these parameters 
+                                                                        # are static, but the value is requested during the device creation process.
+                                                                        # an example of a device parameter is the datatype in knx, this can be different for xplstat and xplcommand, 
+                                                                        # but it will stay the same once the device is created
+
+
                         {
                             "key": "device_key1_xpl_cmd_one",           # key appears in the xpl as : {device_key1_xpl_cmd_one : static value}
                             "value" : "value_device_key1_xpl_cmd_one"
