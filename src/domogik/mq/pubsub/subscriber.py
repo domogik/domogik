@@ -126,7 +126,11 @@ class MQAsyncSub():
         # build up the id again
         mid = '.'.join(mid)
 
-        self.on_message(mid, json.loads(msg[1]))
+	try:
+	    json = json.loads(msg[1])
+            self.on_message(mid, json.loads(msg[1]))
+        except valueError as e:
+            pass
   
     def on_message(self, msg_id, content):
         """Public method called when a message arrived.
