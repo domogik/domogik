@@ -21,17 +21,14 @@ This document only describes how to upgrade.
 Configuration part
 ==================
 
-.. todo::
-
-    Add this in the removed stuff when it will be developped (#1869)
-    * startup-plugin => auto_startup
-
 The following keys had been removed:
 
 * *id* : just define the options in the appropriate order in the table
 * *interface* (as now the way of handling multiple devices will change)
 
 In the json file, the following keys are renamed:
+
+* startup-plugin => auto_startup. And this key is also removed! You don't need to add it in the json anymore, it is dynamically added by Domogik as all plugins needs it.
 
 The following way of writing have changed:
 

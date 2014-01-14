@@ -5,31 +5,19 @@ info.json for plugins - configuration section
 Purpose
 =======
 
-The configuration section describes the plugin configuration items. The configuration section will always have at least one item : **auto_startup**.
+The configuration section describes the plugin configuration items. 
 
-.. todo::
-
-    Update for the removal of auto_startup after #1869
 
 Example
 =======
 
-For this example we assume that your plugin has several configuration items: 
+For this example we assume that your plugin has this configuration item: 
 
-* the mandatory **auto_startup** item
-* an optionnal **interval** item : if not configured, the default value configured in the json will be used y the plugin
+* an **interval** item : if not configured, the default value configured in the json will be used y the plugin
 
 Here is the corresponding section: ::
 
     "configuration": [
-        {
-            "default": false,
-            "description": "Automatically start the plugin at Domogik startup",
-            "key": "auto_startup",
-            "name" : "Start the plugin with Domogik",
-            "required": true,
-            "type": "boolean"
-        },
         {
             "default": 5,
             "description": "Interval between each poll (minute)",
@@ -40,6 +28,21 @@ Here is the corresponding section: ::
             ...
         }
 
+Notice about the auto_startup parameter
+=======================================
+
+One parameter is automatically added by Domogik to your configuration parameters : the **auto_startup** element. The following data is dynamically added by Domogik when loading the **info.json** file: ::
+
+        {
+            "default": false,
+            "description": "Automatically start the plugin at Domogik startup",
+            "key": "auto_startup",
+            "name" : "Start the plugin with Domogik",
+            "required": true,
+            "type": "boolean"
+        }
+
+This element allows the user to enable a plugin to be started on Domogik startup (usefull during a server reboot).
 
 Description
 ===========

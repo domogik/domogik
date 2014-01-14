@@ -116,10 +116,29 @@ class PackageJson():
 
             self.validate()
 
-            # complete json
+            ### complete json
+            # identity data
             self.json["identity"]["package_id"] = "%s-%s" % (self.json["identity"]["type"],
                                                            self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
+
+            # common configuration items
+            auto_startup = {
+                               "default": False,
+                               "description": "Automatically start the plugin at Domogik startup",
+                               "key": "auto_startup",
+                               "name" : "Start the plugin with Domogik",
+                               "required": True,
+                               "type": "boolean"
+                           }
+            # check that auto_startup key is not already defined in the json
+            for config_elt in self.json["configuration"]:
+                if config_elt["key"] == "auto_startup":
+                    raise PackageException("Configuration parameter 'auto_startup' has not to be defined in the json file. Please remove it")
+            self.json["configuration"].insert(0, auto_startup)
+                  
+
+
         except PackageException as exp:
             raise PackageException(exp.value)
         except:
@@ -177,20 +196,24 @@ class PackageJson():
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
             self._validate_keys(expected, "file", self.json.keys(), ["products", "external"])
+
             # validate identity
             expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
             optional = ["tags", "dependencies", "package_id", "icon_file"]
             self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)
+
             # validate configuration
             expected = ["default", "description", "key", "name", "required", "type"]
             optional = ["sort", "max_value", "min_value", "choices", "mask", "multiline"]
             for conf in self.json["configuration"]:
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
-            # validate procuts
+
+            # validate products
             if 'products' in self.json.keys():
                 expected = ["name", "id", "documentation", "type"]
                 for prod in self.json['products']:
                     self._validate_keys(expected, "a product", prod.keys())
+
             #validate the device_type
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
@@ -209,6 +232,7 @@ class PackageJson():
                 optional = ["max_value", "min_value", "choices", "mask", "multiline"]
                 for par in devt["parameters"]:
                     self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
+
             #validate the commands
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
@@ -221,6 +245,7 @@ class PackageJson():
                 # see that the xpl_command is defined
                 if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
+
             #validate the sensors
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
@@ -228,6 +253,7 @@ class PackageJson():
                 hexpected = ['store', 'max', 'expire', 'round_value', 'duplicate']
                 self._validate_keys(expected, "sensor {0}".format(senid), list(sens.keys()))
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), list(sens['history'].keys()))
+
             #validate the xpl command
             for xcmdid in self.json["xpl_commands"]:
                 xcmd = self.json["xpl_commands"][xcmdid]
@@ -247,6 +273,7 @@ class PackageJson():
                 # see that the xpl_stat is defined
                 if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
+
             #validate the xpl stats
             for xstatid in self.json["xpl_stats"]:
                 xstat = self.json["xpl_stats"][xstatid]

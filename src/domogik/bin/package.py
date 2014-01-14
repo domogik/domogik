@@ -374,20 +374,26 @@ class PackageInstaller():
             # this is a directory
             path = os.path.join(self.pkg_path, a_package)
             if os.path.isdir(path):
-                self.log.info("Package {0} ".format(a_package))
+                try:
+                    self.log.info("Package {0} ".format(a_package))
+    
+                    # try to load json
+                    is_ok = self.is_json_ok(json_file = os.path.join(path, JSON_FILE))
+                    if is_ok == False:
+                        continue
+    
+                    # display some informations
+                    self.log.info(" - version : {0}".format(self.json['identity']['version']))
+    
+                    # installation informations
+                    if os.path.islink(path):
+                        self.log.info(" - install mode : symbolic link to : {0}".format(os.path.realpath(path)))
+                    else:
+                        self.log.info(" - install mode : folder")
 
-                # try to load json
-                self.is_json_ok(json_file = os.path.join(path, JSON_FILE))
-
-                # display some informations
-                self.log.info(" - version : {0}".format(self.json['identity']['version']))
-
-                # installation informations
-                if os.path.islink(path):
-                    self.log.info(" - install mode : symbolic link to : {0}".format(os.path.realpath(path)))
-                else:
-                    self.log.info(" - install mode : folder")
-
+                except:
+                    self.log.error("ERROR : {0}".format(traceback.format_exc()))
+    
                 # add an empty line to be clearer
                 self.log.info("")
 
