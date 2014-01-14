@@ -844,7 +844,8 @@ class OZWavemanager(threading.Thread):
         retval["OZWPluginVers"] = OZWPLuginVers
         if self.ready :
             retval["HomeID"] ="0x%.8x" % self.homeId
-            retval["Model"]= self.controllerNode.manufacturer + " -- " + self.controllerNode.product
+            retval["Model"] = self.controllerNode.manufacturer + " -- " + self.controllerNode.product
+            retval["Protocol"] = self._manager.getControllerInterfaceType(self.homeId)
             retval["Primary controller"] = self.controllerDescription
             retval["Device"] = self.device
             retval["Node"] = self.controllerNode.nodeId
@@ -998,6 +999,17 @@ class OZWavemanager(threading.Thread):
             else : retval['error'] = "Can't test primary controller, node %d." %nodeId
             return retval
         else : return {"error" : "Zwave network not ready, can't find node %d" % nodeId}
+    
+    def healNetwork(self, homeId, upNodeRoute):
+        """Tente de 'réparé' des nodes pouvant avoir un problème. Passe tous les nodes un par un"""
+        if self.ready :
+            self._manager.healNetwork(homeId, upNodeRoute)
+
+    def healNetworkNode(self, homeId, nodeId,  upNodeRoute):
+        """Tente de 'réparé' un node particulier pouvant avoir un problème."""
+        if self.ready :
+            node = self._getNode(homeId,  nodeId)
+            if node : self._manager.healNetworkNode(homeId, nodeId,  upNodeRoute)
         
     def getGeneralStatistics(self):
         """Retourne les statistic générales du réseaux"""
@@ -1122,6 +1134,15 @@ class OZWavemanager(threading.Thread):
                     else : report = {'error':  'Invalide nodeId format.'}
                     ackMsg['node'] = message['node']
                     print "Refresh node :", report
+                elif message['request'] == 'HealNode' :
+                    if self._IsNodeId(message['node']):
+                        self.healNetworkNode(self.homeId,  message['node'],  message['forceroute'])
+                        report = {'usermsg':'Command sended, please wait for result...'}
+                    else : report = {'error':  'Invalide nodeId format.'}
+                    ackMsg['node'] = message['node']
+                elif message['request'] == 'HealNetwork' :
+                    self.healNetwork(self.homeId, message['forceroute'])
+                    report = {'usermsg':'Command sended node by node, please wait for each result...'}
                 elif message['request'] == 'SaveConfig':
                     report = self.saveNetworkConfig()
                 elif message['request'] == 'GetMemoryUsage':

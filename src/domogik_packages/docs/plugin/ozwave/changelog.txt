@@ -3,6 +3,12 @@ Change log
 ==========
 
 New instructions to apply changes from immediatly previous version.
+- 0.2c4 : (xx-01-2014) Compatibily library : OpenZwave >= 1.0.706, python_openzwave >= 0.2.5 (rev >= b0c4e796ea84)
+    - Target : python-openzwave, domogik (0.2c4), domoweb (0.2c3)
+    - Update, compile and install python_openzwave.
+    - Change log :
+        - Add heal node/network functions
+        - Add command_class_sensor_alarm
 
 - 0.2c3 : (06-01-2014) Compatibily library : OpenZwave >= 1.0.706, python_openzwave >= 0.2.5 (rev >= 75d9b6a8dd77), Compatibilty with ws4py last update >= 0.3.3
     - Target : OpenZwave, python-openzwave, ws4py, domogik (0.2c3), domoweb (0.2c2)
