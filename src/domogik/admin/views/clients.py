@@ -10,6 +10,8 @@ from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
 from domogik.rest.urls.device import get_device_params
+from domogik.common.sql_schema import Device
+from wtforms.ext.sqlalchemy.orm import model_form
 
 @app.route('/clients')
 @login_required
@@ -73,6 +75,55 @@ def client_devices_detected(client_id):
             mactve="clients",
             active = 'devices'
             )
+
+@app.route('/client/<client_id>/devices/edit/<did>', methods=['GET', 'POST'])
+@login_required
+def client_devices_edit(client_id, did):
+    with app.db.session_scope():
+        device = app.db.get_device_sql(did)
+        MyForm = model_form(Device, \
+                        base_class=Form, \
+                        db_session=app.db.get_session(),
+                        exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'device_type_id', 'client_id', 'client_version'])
+        form = MyForm(request.form, device)
+
+	if request.method == 'POST' and form.validate():
+            # save it
+	    app.db.update_device(did, \
+				d_name=request.form['name'], \
+				d_description=request.form['description'], \
+				d_reference=request.form['reference'])
+            # message the suer
+            flash(gettext("Device saved"), 'success')
+            # reload stats
+            req = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action( 'reload' )
+            resp = req.request('xplgw', msg.get(), 100)
+            # redirect
+            return redirect("/client/{0}/devices/known".format(client_id))
+	else:
+            return render_template('client_device_edit.html',
+	        form = form,
+                clientid = client_id,
+                mactve="clients",
+                active = 'devices'
+                )
+
+app.route('/client/<client_id>/devices/delete/<did>')
+@login_required
+def client_devices_delete(client_id, did):
+    with app.db.session_scope():
+        app.db.del_device(did)
+    flash(gettext("Device deleted"), 'success')
+    # reload stats
+    req = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action( 'reload' )
+    resp = req.request('xplgw', msg.get(), 100)
+    return redirect("/client/{0}/devices/known".format(client_id))
+
+
 
 @app.route('/client/<client_id>/devices/delete/<did>')
 @login_required
@@ -199,9 +250,17 @@ def client_devices_new(client_id):
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/new/<device_type_id>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
-def client_devices_new_wiz(client_id, device_type_id):
+def client_devices_new_type(client_id, device_type_id):
+    return client_devices_new_wiz(client_id, device_type_id, None)
+
+@app.route('/client/<client_id>/devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
+@login_required
+def client_devices_new_prod(client_id, device_type_id, product):
+    return client_devices_new_wiz(client_id, device_type_id, product)
+
+def client_devices_new_wiz(client_id, device_type_id, product):
     # TODO get them
     params = get_device_params(device_type_id, app.zmq_context)
 
@@ -209,8 +268,11 @@ def client_devices_new_wiz(client_id, device_type_id):
     class F(Form):
         name = TextField("Device", [Required()], description=gettext("the display name for this device"))
         description = TextField("Description", description=gettext("A description for this device"))
-        reference = TextField("Reference", description=gettext("A reference for this device"))
-        submit = SubmitField("Send")
+        if product:
+            default = product
+        else:
+            default = None
+        reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
         pass
     # add the global params
     for item in params["global"]:
@@ -219,10 +281,6 @@ def client_devices_new_wiz(client_id, device_type_id):
         else:
             field = TextField("Global {0}".format(item["key"]), [Required()], description=item["description"])
         setattr(F, item["key"], field)
-    # add the submit button
-    field = submit = SubmitField("Send")
-    setattr(F, "submit", field)
-
     form = F()
 
     if request.method == 'POST' and form.validate():

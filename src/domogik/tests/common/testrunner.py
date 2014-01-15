@@ -140,38 +140,15 @@ class TestRunner():
                 to_add = False
 	    if config['automatic'] != self.options.automatic:
                 to_add = False
+            print to_add
             if to_add:
                self.testcases[test] = config
         return True
 
     def _run_testcases(self):
         for (test, config) in self.testcases.items():
-            self._run_testfile(self.path, test, config)
+	    os.system("python {0}{1}.py".format(self.path, test))
 
-    def _run_testfile(self, path, test, config):
-        # load the module
-        mod = imp.load_source(test, "{0}/{1}".format(path, config['file']))
-        cls = getattr(mod, config['class'])
-        # start a unittest suite
-        suite = unittest.TestSuite()
-        # start an xplplugin
-        xpl_plugin = XplPlugin(name = 'testrunner', 
-                           daemonize = False, 
-                           parser = None,
-                           nohub = True,
-                           test  = True)
-        # run the config module
-        cfg = cls.configure()
-        cls.create_device()
-
-        # add the suites
-        for totest in dir(cls):
-            if totest.startswith('test_'):
-                suite.addTest(cls(totest, xpl_plugin, 'name', cfg))
-        # run
-        res = unittest.TextTestRunner().run(suite)
-        self.results['test'] = res
-        # store the result
 
 def main():
     testr = TestRunner()

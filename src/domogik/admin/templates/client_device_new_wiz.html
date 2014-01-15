@@ -4,8 +4,7 @@
 {% block content %}
 {% include "client_menu.html" %}
 <div class="container">
-    {{ params }}
     <h2>{% trans %}Create a new device{% endtrans %} {{ dtype }}</h2>
-    {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+    {{ wtf.quick_form(form, submit_title="Create", add_submit=True) }}
 </div>
 {% endblock %}

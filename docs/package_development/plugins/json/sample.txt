@@ -7,15 +7,21 @@ Here is a sample of the json file. There are some comments in the sample. Please
 Sample
 ======
 
+.. todo:: 
+    update conversion related fields after conversion has been implemented in the final state
+
+Part of the json sample 
+-----------------------
+
 ::
 
     # Here part of json declaration
     
-         "device_type_one": {                                           # device type declaration who appears in user interface list to create device
+        "device_types": {                                           # device type declaration who appears in user interface list to create device
             "fooplugin.device_name": {
-                "description": "A short description", 
                 "id": "fooplugin.device_name",                          # device id for internal reference (no Xpl)
-                "name": "The device name",
+                "description": "A short description", 
+                "name": "The device type name",
                 "commands": ["cmd_one", "cmd_two"],                     # link to list of commands
                 "sensors": ["sensor_one", "sensor_two"],                # link to list of sensors
                 "params": [                                             # parameters that are common to ALL xpl messages for this device type
@@ -30,7 +36,8 @@ Sample
                         "description": "A short description",
                         "type": "integer",
                         "max_value": 255,                               # depending on the type the are other posibilitys
-                        "min_value": 0
+                        "min_value": 0,
+                        "xpl": True                                     # if the params is in the xpl messages : True. For example, an interval will not be in a xpl message
                     }
                 ]
             }
@@ -44,9 +51,11 @@ Sample
                "params": [                                              # parameters that are common to ALL xpl messages for this command
                    {
                        "key": "key1_cmd_one",                           # key copied to the xpl messages, this a dynamic key that can be set in each Xpl message (dynamic)
+                                                                        # key appears in the xpl as : {key1_cmd_two : dynamic value}
                        "data_type": "DT_Switch",                        # link to Domogik Type of Data used by widgets in UI.
                        "conversion": "from_DT_Switch_to_level"          # if needed define proper conversion fuction in file <plugindirectory>/conversion/<fooplugin>.py
-                   }                                                    # conversion have utility when hard device receive a particular scale or data type who are not directly compatible with Domogik Types
+                                                                        # conversion have utility when hard device receive a particular scale or data type who are not directly compatible with Domogik Types
+                   }
                ],
                "xpl_command": "xpl_cmd_one"                             # link to xpl_command format to use
             },
@@ -55,7 +64,7 @@ Sample
                "return_confirmation": false,
                "params": [
                    {
-                       "key": "key1_cmd_two",                          # key appears in the xpl as : {key1_cmd_two : dynamic value}
+                       "key": "key1_cmd_two",             
                        "data_type": "DT_Scale",
                        "conversion": "from_DT_Scale_to_level"            
                    }
@@ -68,12 +77,29 @@ Sample
             "sensor_one": {
                 "name": "The sensor name",
                 "data_type": "DT_Switch",
-                "conversion": "from_level_to_DT_Switch"                 # if needed define proper conversion fuction in file <plugindirectory>/conversion/<fooplugin>.py
-             },                                                         # conversion have utility when hard device send a particular scale or data type who are not directly compatible with Domogik Types
+                "conversion": "from_level_to_DT_Switch",                # if needed define proper conversion fuction in file <plugindirectory>/conversion/<fooplugin>.py
+                                                                        # conversion have utility when hard device send a particular scale or data type who are not directly compatible with Domogik Types
+                "incremental" : false,                                  # does the sensor is about incremental values
+                "history": {                                            # how is managed the sensor history.
+                    "store": true,                                       
+                    "duplicate": false,
+                    "max": 0,
+                    "expire": 0,
+                    "round_value": 0
+                } 
+             },                                                         
             "sensor_two": {
                 "name": "The sensor name",
                 "data_type": "DT_Scaling",
-                "conversion": "from_level_to_DT_Scaling"
+                "conversion": "from_level_to_DT_Scaling",
+                "incremental" : false,
+                "history": {
+                    "store": true,
+                    "duplicate": false,
+                    "max": 0,
+                    "expire": 0,
+                    "round_value": 0
+                }
          },
          
         "xpl_commands": {                                               # declaration for linking commands to xpl schema and keys
@@ -86,16 +112,25 @@ Sample
                         {
                             "key": "static_key1_xpl_cmd_one",           # key appears in the xpl as : {static_key1_xpl_cmd_one : static value}
                             "value" : "value_static_key1_xpl_cmd_one"
-                        },{
+                        },
+                        {
                             "key": "static_key2_xpl_cmd_one",
                             "value" : "value_static_key2_xpl_cmd_one"
                         }
                     ],
                     "device":                                           # key copied to the xPL message. Satic value defined on a per device basis (input is requested) in the user interface. 
+                                                                        # The device key is used for parameters that depend on a device, that require an input by the user, 
+                                                                        # but that do not change once the device is created, once the device is cerated these parameters 
+                                                                        # are static, but the value is requested during the device creation process.
+                                                                        # an example of a device parameter is the datatype in knx, this can be different for xplstat and xplcommand, 
+                                                                        # but it will stay the same once the device is created
+
+
                         {
                             "key": "device_key1_xpl_cmd_one",           # key appears in the xpl as : {device_key1_xpl_cmd_one : static value}
                             "value" : "value_device_key1_xpl_cmd_one"
-                        },{
+                        },
+                        {
                             "key": "device_key2_xpl_cmd_one",
                             "value" : "value_device_key2_xpl_cmd_one"
                         }
@@ -133,11 +168,7 @@ Sample
                             "key": "static_key1_xplstat_one",           # key appears in the xpl as : {static_key1_xplstat_one : static value}
                             "value" : "value_static_key1_xplstat_one"
                         }],
-                    "device": [                                         # key copied to the xPL message. Satic value defined on a per device basis (input is requested) in the user interface.
-                        {
-                            "key": "device_key1_xpl_xplstat_one",       # key appears in the xpl as : {device_key1_xpl_cmd_one : static value}
-                            "value" : "value_device_key1_xpl_xplstat_one"
-                        }],
+                    "device": [],                                       # will always be empty
                     "dynamic": [                                        # key copied to the xPL message. keys which are values for the sensors. They are stored in the sensor history table.
                         {
                              "key": "dynamic_key1_xpl_xplstat_one",     # key appears in the xpl as : {dynamic_key1_xpl_xplstat_one : dynamic value}
@@ -154,9 +185,12 @@ Sample
            }
         }
         
-    # An xpl command for cmd_one with confirmation
+An xpl command for cmd_one with confirmation
+--------------------------------------------
+
+Command: ::
     
-    xpl-cmd
+    xpl-cmnd
     {
         hop1 = 1
         source = xpl-rest.domogik
@@ -173,7 +207,8 @@ Sample
         device_key2_xpl_cmd_one = value_device_key2_xpl_cmd_one     # ex : {"sleep" : 2}
     }
     
-    # The confirmation message
+The confirmation message: ::
+
     xpl-trig
     {
         hop = 1
@@ -190,9 +225,16 @@ Sample
         dynamic_key2_xpl_xplstat_one = dynamic-value-sensor-two-DT_Scaling      # ex : {"battery" : 80} 
     }
     
-    # An xpl command for cmd_two without confirmation
+An xpl command for cmd_two without confirmation
+-----------------------------------------------
+
+.. note::
+
+    This case should not happen! xPL protocol tell us that a trigger (xpl-trig) message should be sent after each successfully processed command (xpl-cmnd) received! 
+
+Command: ::
     
-    xpl-cmd
+    xpl-cmnd
     {
         hop1 = 1
         source = xpl-rest.domogik
@@ -208,6 +250,7 @@ Sample
     
     }
     
-    # No confirmation message
+There is no confirmation message
+
         
     

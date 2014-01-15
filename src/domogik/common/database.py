@@ -170,6 +170,9 @@ class DbHelper():
             self.__session.close()
             self.__session = None
 
+    def get_session(self):
+        return self.__session
+
     def open_session(self):
         self.__session = DbHelper.__session_object()
 
@@ -368,6 +371,9 @@ class DbHelper():
         @return a list of Device objects (only the devices that are inot known by this realease)
         """
         return self.__session.query(Device).filter(Device.address!=None).all()
+
+    def get_device_sql(self, d_id):
+        return self.__session.query(Device).filter_by(id=d_id).first()
 
     def get_device(self, d_id=None, device=None):
         """Return a device by its id
@@ -1089,7 +1095,10 @@ class DbHelper():
                             UserAccount
                         ).filter_by(login=ucode(a_login)
                         ).first()
-        return user_acc is not None and user_acc._UserAccount__password == _make_crypted_password(a_password)
+	if user_acc.password == _make_crypted_password(a_password):
+	    return user_acc
+        else:
+            return None
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
         """Add a user account

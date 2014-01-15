@@ -5,32 +5,22 @@ info.json for plugins - configuration section
 Purpose
 =======
 
-The configuration section describes the plugin configuration items. The configuration section will always have at least one item : **auto_startup**.
+The configuration section describes the plugin configuration items. 
+
 
 Example
 =======
 
-For this example we assume that your plugin has several configuration items: 
+For this example we assume that your plugin has this configuration item: 
 
-* the mandatory **auto_startup** item
-* an optionnal **interval** item : if not configured, the default value configured in the json will be used y the plugin
+* an **interval** item : if not configured, the default value configured in the json will be used y the plugin
 
 Here is the corresponding section: ::
 
     "configuration": [
         {
-            "default": false,
-            "description": "Automatically start the plugin at Domogik startup",
-            "sort": "0",
-            "key": "auto_startup",
-            "name" : "Start the plugin with Domogik",
-            "required": true,
-            "type": "boolean"
-        },
-        {
             "default": 5,
             "description": "Interval between each poll (minute)",
-            "sort": "1",
             "key": "interval",
             "name": "Interval",
             "required": false,
@@ -38,13 +28,27 @@ Here is the corresponding section: ::
             ...
         }
 
+Notice about the auto_startup parameter
+=======================================
+
+One parameter is automatically added by Domogik to your configuration parameters : the **auto_startup** element. The following data is dynamically added by Domogik when loading the **info.json** file: ::
+
+        {
+            "default": false,
+            "description": "Automatically start the plugin at Domogik startup",
+            "key": "auto_startup",
+            "name" : "Start the plugin with Domogik",
+            "required": true,
+            "type": "boolean"
+        }
+
+This element allows the user to enable a plugin to be started on Domogik startup (usefull during a server reboot).
 
 Description
 ===========
 
 Each item has several properties: 
 
-* **sort** : it is an integer which allows to order the items on the user interface. *sort=0* is reserved for *auto_startup*.
 * **key** : the configuration key. This is used to store the value in database. The key must be lower case, limited to 255 characters. The only separator allowed in the *underscore*. This won't be displayed on the user interface.
 * **name** : a human readable equivalent of the **key**. This wil be displayed on the user interface.
 * **description** : the configuration item description. If the item type is an interger, a float or something like this, you must specify the unity (minutes, seconds, ...) in the description.
@@ -130,8 +134,8 @@ Example: ::
             ...
         }
 
-choice
-******
+enum
+****
 
 Parameters:
 
@@ -146,7 +150,7 @@ Example: ::
         {
             ...
             "key": "some_choice_item",
-            "type": "choice",
+            "type": "enum",
             "choices" : {"a":"A", "b":"B", "c":"C"},
             ...
         }

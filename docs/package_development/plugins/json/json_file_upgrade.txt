@@ -5,28 +5,58 @@ Plugins json file upgrade from version 1 to json version 2
 Purpose
 =======
 This document describes the step to follow for upgrading the plugin json file from version 1 to 2.
-With json version 2 the url2xpl and the stats xml files are deprecated, the contens of these files are moved to the plugin json file.
+With json version 2 the url2xpl and the stats xml files are deprecated, the content of these files are moved to the plugin json file (*sensors* and *commands* parts).
 This document only describes how to upgrade.
 
-TODO : finish
+.. todo::
 
-* configuration
+    Finish:
+   
+    * give more details
 
-  * id => sort
-  * minus => underscore in keys
-  * yes/no => true/false
-  * empty => null
-  * no more interface
-  * optionnal => required
-  * startup-plugin => auto_startup
-  * ajout de name
-  * option optionnelles en fonction de type
+.. note::
 
-* no more files section
-* identity
+    Please notice that this page is mainly for information. To migrate your plugin json file from *version 1* (Domogik 0.3) to *version 2* (Domogik 0.4+) you should check also all the other pages related to the **info.json** file!
 
-  * no more changelog
-  * category => tags
-  * id => name
+Configuration part
+==================
 
-* ...
+The following keys had been removed:
+
+* *id* : just define the options in the appropriate order in the table
+* *interface* (as now the way of handling multiple devices will change)
+
+In the json file, the following keys are renamed:
+
+* startup-plugin => auto_startup. And this key is also removed! You don't need to add it in the json anymore, it is dynamically added by Domogik as all plugins needs it.
+
+The following way of writing have changed:
+
+* minus => underscore in keys
+* yes/no => true/false
+* empty => null
+* optionnal => required
+* the *option* part is optionnal if not required by the type.
+
+The following items has been added:
+
+* *name* : a human readable name for the configuration item. 
+
+Files part
+==========
+
+There is no more *files* part as now the plugin files are contained in the same root directory. So when the package is created, all files are included.
+
+Identity part
+=============
+
+The following keys had been removed:
+
+* no more changelog
+
+The following way of writing have changed:
+
+* *category* => *tags*
+* *id* => *name*
+
+

@@ -16,7 +16,7 @@
             </thead>
             <tbody>
             {% for name, data in clients.iteritems() %}
-                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle">
+                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
@@ -33,7 +33,7 @@
                             </a>
                         </td>
                     </tr>
-                    <tr>
+                    <tr id="d{{data.pid}}">
                         <td colspan="5" class="hiddenRow">
                             {% include 'client_overview.html' %}
                         </td>
@@ -41,6 +41,20 @@
             {% endfor %}
             </tbody>
         </table>
+	<script type="text/javascript">
+		ws.onmessage = function(e) {
+			data = JSON.parse(e.data);
+			if (data.msgid == "client.list" ) {
+				for (plugin in data.content) {
+                                        content = data.content[plugin]
+					$('tr#d' + content.pid + ' div.status div').removeClass('current_status');
+					$('tr#d' + content.pid + ' div.status div.status_' + content.status).addClass('current_status');
+					$('tr#' + content.pid + " td:nth-child(3)").html(content.status);
+					$('tr#' + content.pid + " td:nth-child(4)").html(content.configured);
+				}
+			}
+		}
+	</script>
     {% else %}
     <div class="alert alert-warning">{% trans %}No clients found{% endtrans %}</div>
     {% endif %}

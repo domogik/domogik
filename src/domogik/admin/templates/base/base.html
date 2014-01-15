@@ -14,9 +14,17 @@
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/static/css/bootstrap-notify.css" rel="stylesheet" media="screen">
+    <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
     <!-- Domogik -->
     <link href="/static/css/default.css" rel="stylesheet" media="screen">
-    <script src="/static/js/jquery.min.js"></script>
+       <script type="text/javascript">
+	 if ("WebSocket" in window) {
+		var ws=new WebSocket("ws://" + location.host + "/ws");
+	} else {
+		alert('No WS support');
+	}
+       </script>
+   <script src="/static/js/jquery.min.js"></script>
     {%- endblock styles %}
     {%- endblock head %}
   </head>
@@ -35,6 +43,7 @@
     {% block scripts %}
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/bootstrap-notify.js"></script>
+    <script src="/static/js/bootstrap-datepicker.js"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <script type="text/javascript">
@@ -47,15 +56,6 @@
             </script>
     {% endif %}
     {% endwith %}
-      <script type="text/javascript">
-	 if ("WebSocket" in window) {
-		var ws=new WebSocket("ws://" + location.host + "/ws");
-		ws.onmessage=function(e){
-		}
-	} else {
-		alert('No WS support');
-	}
-       </script>
     {%- endblock scripts %}
     {%- endblock body %}
   </body>

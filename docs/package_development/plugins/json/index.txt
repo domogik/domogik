@@ -8,8 +8,8 @@ The **info.json** file is maybe the most important part of a plugin : it will de
         "json_version": 2,
         "identity": {...},
         "configuration": [...],
-        "commands": [...],
-        "xpl_commands": [...],
+        "commands": {...},
+        "xpl_commands": {...},
         "sensors": {...},
         "xpl_stats": {...},
         "device_types": {...},
@@ -25,16 +25,7 @@ The **json_version** must be set to **2** for Domogik 0.4 compliant plugins.
 Overview
 ========
 
+.. todo::
+    Update picture
+
 .. image:: DeviveJsonStruct.png
-
-Detailed informations
-=====================
-
-You will find detailed instructions about each part in this chapters:
-
-* :doc:`identity <identity>`
-* ...
-
-..todo ::
-
-    finish to set all the links. Notice that they are available in the global index for plugin development.

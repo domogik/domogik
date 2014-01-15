@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-12 16:58+0100\n"
+"POT-Creation-Date: 2014-01-14 11:56+0100\n"
 "PO-Revision-Date: 2013-11-12 12:53+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -18,8 +18,56 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: templates/client_config.html:7 templates/base/nav.html:13
-#: templates/base/nav.html:26
+#: templates/account_edit.html:6 templates/accounts_edit.html:6
+msgid "Account Edit"
+msgstr ""
+
+#: templates/accounts.html:5
+msgid "Account list"
+msgstr ""
+
+#: templates/accounts.html:6 templates/persons.html:6
+msgid "Add new"
+msgstr ""
+
+#: templates/accounts.html:11 templates/login.html:6
+msgid "Login"
+msgstr ""
+
+#: templates/accounts.html:12
+msgid "Admin"
+msgstr ""
+
+#: templates/accounts.html:22 templates/client_devices.html:16
+#: templates/clients.html:14 templates/clients.html:31
+#: templates/orphans.html:15
+msgid "Details"
+msgstr ""
+
+#: templates/accounts.html:25 templates/client_devices.html:29
+#: templates/persons.html:28
+msgid "Delete"
+msgstr ""
+
+#: templates/accounts.html:34
+msgid "No accounts found"
+msgstr ""
+
+#: templates/client.html:7
+msgid "Author"
+msgstr ""
+
+#: templates/client.html:9 templates/client_devices.html:12
+#: templates/client_devices.html:41 templates/client_devices.html:67
+#: templates/orphans.html:12
+msgid "Name"
+msgstr ""
+
+#: templates/client.html:10
+msgid "Email"
+msgstr ""
+
+#: templates/client_config.html:7
 msgid "Configuration"
 msgstr ""
 
@@ -27,7 +75,11 @@ msgstr ""
 msgid "Detected devices"
 msgstr ""
 
-#: templates/client_device_new.html:6 templates/client_device_new_wiz.html:8
+#: templates/client_device_edit.html:6
+msgid "Device Edit"
+msgstr ""
+
+#: templates/client_device_new.html:6 templates/client_device_new_wiz.html:7
 msgid "Create a new device"
 msgstr ""
 
@@ -47,60 +99,57 @@ msgstr ""
 msgid "Known Devices"
 msgstr ""
 
-#: templates/client_devices.html:11 templates/client_devices.html:38
-#: templates/client_devices.html:63 templates/clients.html:10
+#: templates/client_devices.html:11 templates/client_devices.html:40
+#: templates/client_devices.html:65 templates/clients.html:10
 #: templates/orphans.html:10
 msgid "ID"
 msgstr ""
 
-#: templates/client_devices.html:12 templates/client_devices.html:39
-#: templates/client_devices.html:64 templates/orphans.html:12
-msgid "Name"
+#: templates/client_devices.html:13
+msgid "Reference"
 msgstr ""
 
-#: templates/client_devices.html:13 templates/orphans.html:13
+#: templates/client_devices.html:14 templates/orphans.html:13
 msgid "Device Type"
 msgstr ""
 
-#: templates/client_devices.html:14 templates/orphans.html:14
+#: templates/client_devices.html:15 templates/orphans.html:14
 msgid "Description"
 msgstr ""
 
-#: templates/client_devices.html:15 templates/client_devices.html:26
-#: templates/clients.html:13 templates/clients.html:28
-#: templates/orphans.html:15
-msgid "Details"
+#: templates/client_devices.html:28 templates/persons.html:25
+msgid "Edit"
 msgstr ""
 
-#: templates/client_devices.html:28
-msgid "Delete"
-msgstr ""
-
-#: templates/client_devices.html:34
+#: templates/client_devices.html:36
 msgid "Sensors"
 msgstr ""
 
-#: templates/client_devices.html:40
+#: templates/client_devices.html:42 templates/client_devices.html:72
 msgid "Data Type"
 msgstr ""
 
-#: templates/client_devices.html:41
+#: templates/client_devices.html:43
 msgid "Last value"
 msgstr ""
 
-#: templates/client_devices.html:42
+#: templates/client_devices.html:44
 msgid "Last received"
 msgstr ""
 
-#: templates/client_devices.html:59
+#: templates/client_devices.html:61
 msgid "Commands"
 msgstr ""
 
-#: templates/client_devices.html:65
-msgid "Params"
+#: templates/client_devices.html:71
+msgid "Key"
 msgstr ""
 
-#: templates/client_devices.html:87
+#: templates/client_devices.html:74
+msgid "Example REST Url"
+msgstr ""
+
+#: templates/client_devices.html:95
 msgid "No devices found"
 msgstr ""
 
@@ -108,7 +157,7 @@ msgstr ""
 msgid "Client"
 msgstr ""
 
-#: templates/client_menu.html:5 templates/base/nav.html:22
+#: templates/client_menu.html:5 templates/base/nav.html:27
 msgid "Home"
 msgstr ""
 
@@ -132,24 +181,45 @@ msgstr ""
 msgid "New"
 msgstr ""
 
+#: templates/client_overview.html:3 templates/clients.html:12
+msgid "Status"
+msgstr ""
+
+#: templates/client_overview.html:7
+#, python-format
+msgid "%(status)s"
+msgstr ""
+
+#: templates/client_overview.html:12
+msgid "Informations"
+msgstr ""
+
+#: templates/client_overview.html:14
+msgid "Package"
+msgstr ""
+
+#: templates/client_overview.html:15
+msgid "Host"
+msgstr ""
+
+#: templates/client_overview.html:16
+msgid "Process id"
+msgstr ""
+
 #: templates/clients.html:5
 msgid "Client list"
 msgstr ""
 
 #: templates/clients.html:11
-msgid "Status"
+msgid "Type"
 msgstr ""
 
-#: templates/clients.html:12
+#: templates/clients.html:13
 msgid "Configured"
 msgstr ""
 
-#: templates/clients.html:36
+#: templates/clients.html:59
 msgid "No clients found"
-msgstr ""
-
-#: templates/login.html:6
-msgid "Login"
 msgstr ""
 
 #: templates/orphans.html:5
@@ -160,81 +230,132 @@ msgstr ""
 msgid "Hooray, no orphans found"
 msgstr ""
 
-#: templates/base/nav.html:10 templates/base/nav.html:23
+#: templates/person_edit.html:6
+msgid "Person Edit"
+msgstr ""
+
+#: templates/persons.html:5
+msgid "Person list"
+msgstr ""
+
+#: templates/persons.html:11
+msgid "Last Name"
+msgstr ""
+
+#: templates/persons.html:12
+msgid "First Name"
+msgstr ""
+
+#: templates/persons.html:13
+msgid "Birthdate"
+msgstr ""
+
+#: templates/persons.html:36
+msgid "No persons found"
+msgstr ""
+
+#: templates/base/nav.html:10 templates/base/nav.html:28
 msgid "Clients"
 msgstr ""
 
-#: templates/base/nav.html:11 templates/base/nav.html:24
+#: templates/base/nav.html:11 templates/base/nav.html:29
 msgid "Orphans"
 msgstr ""
 
-#: templates/base/nav.html:12 templates/base/nav.html:25
+#: templates/base/nav.html:13
 msgid "Auth"
 msgstr ""
 
-#: templates/base/nav.html:16 templates/base/nav.html:28
+#: templates/base/nav.html:15 templates/base/nav.html:30
+msgid "Accounts"
+msgstr ""
+
+#: templates/base/nav.html:16 templates/base/nav.html:31
+msgid "Persons"
+msgstr ""
+
+#: templates/base/nav.html:21 templates/base/nav.html:33
 msgid "Logout"
 msgstr ""
 
-#: templates/base/nav.html:20
+#: templates/base/nav.html:25
 msgid "Menu"
 msgstr ""
 
-#: views/clients.py:156
+#: templates/base/wtf.html:15
+msgid "Reset"
+msgstr ""
+
+#: views/account.py:67 views/person.py:61
+msgid "Changes saved"
+msgstr ""
+
+#: views/account.py:71 views/person.py:65
+msgid "Invallid input"
+msgstr ""
+
+#: views/clients.py:97
+msgid "Device saved"
+msgstr ""
+
+#: views/clients.py:118 views/orphans.py:44
+msgid "Device deleted"
+msgstr ""
+
+#: views/clients.py:210
 msgid "Config saved successfull"
 msgstr ""
 
-#: views/clients.py:158
+#: views/clients.py:212
 msgid "Config saved failed"
 msgstr ""
 
-#: views/clients.py:161
+#: views/clients.py:215
 msgid "DbMgr did not respond on the config.set, check the logs"
 msgstr ""
 
-#: views/clients.py:207
+#: views/clients.py:269
 msgid "the display name for this device"
 msgstr ""
 
-#: views/clients.py:208
+#: views/clients.py:270
 msgid "A description for this device"
 msgstr ""
 
-#: views/clients.py:209
+#: views/clients.py:275
 msgid "A reference for this device"
 msgstr ""
 
-#: views/clients.py:234
+#: views/clients.py:295
 msgid "Device creation failed"
 msgstr ""
 
-#: views/clients.py:235
+#: views/clients.py:296
 msgid "Can not find this client id"
 msgstr ""
 
-#: views/clients.py:260
+#: views/clients.py:326
 msgid "device created"
 msgstr ""
 
-#: views/login.py:51
+#: views/login.py:49
 msgid "Login successfull"
 msgstr ""
 
-#: views/login.py:54
+#: views/login.py:52
 msgid "This user is not an admin"
 msgstr ""
 
-#: views/login.py:56
+#: views/login.py:54
 msgid "Combination of username and password wrong"
-msgstr ""
-
-#: views/orphans.py:44
-msgid "Device deleted"
 msgstr ""
 
 #~ msgid "onfiguration"
 #~ msgstr ""
 
 #~ msgid "lient"
+#~ msgstr ""
+
+#~ msgid "Params"
 #~ msgstr ""
 

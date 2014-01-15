@@ -2,38 +2,70 @@
 Packages development
 ====================
 
+.. note::
+    If you think something is not clear or is missing in this documentation, please send an email to our developpers mailing list : *domogik-developers@lists.labs.libre-entreprise.org* and explain us clearly what is not clear or what could be added.
+
+General informations
+====================
+
 * :doc:`What is new in 0.4 about Domogik plugins format ? <what_is_new_in_0.4>`
 * :doc:`Changelog of plugins format since Domogik 0.4 <changelog>`
-
-
 * :doc:`Release numbers rules <releases/release_numbers_rules>`
+
+First, create a repository and write some specifications
+========================================================
+
 * :doc:`Create the plugin repository on GitHub <create_repository/index>`
 * :doc:`Write specifications <specifications/index>`
+
+Prepare the plugin
+==================
+
+Now, you will have to create a few files for your plugin.
+
 * :doc:`Plugin file tree <plugin_file_tree/index>`
 * :doc:`Readme and changelog files <readme_and_changelog/index>`
 * :doc:`.gitignore file <git/gitignore>`
+
+Json file
+=========
+
+The **info.json** file it surely the most important part of a plugin. It will describe the configuration of the plugins, the features, the xPL messages to send and to listen, ...
+You should first read all this chapter, then make sure that you already defined the following part in your specifications :
+
+* configuration parameters
+* devices features, splitted in sensors and commands
+* xPL messages used by these features
+* the data to store in database 
+
+Starting to create the json file without being clear on these elements is useless!
+
+.. note::
+    To help you to understand the way to create a json file, you can look on already existing plugins to see real examples.
+
+* :doc:`Json file overview <json/index>`
+* :doc:`Sample json file <json/sample>`
+* :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
+* :doc:`Identity part <json/identity>`
+* :doc:`Configuration part <json/configuration>`
+* :doc:`Device types part <json/device_types>`
+* :doc:`Sensors part <json/sensors>` 
+* :doc:`Xpl stats part <json/xpl_stats>`
+* :doc:`Commands part <json/commands>` ....................................TODO 
+* :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
+* :doc:`Json version part <json/version>` ....................................TODO
+
+* Resources : 
+
+  * :doc:`Data types <data_types/index>`
+  * :doc:`Field types <field_types/index>`
+
+Python part
+===========
+
+After creating a start script (used only by the developpers), you will now create the python part of your plugin. 
+
 * :doc:`start.sh file <start_file/index>`
-* :doc:`Json file <json/index>`
-
-  * :doc:`Sample json file <json/sample>`
-  * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
-  * :doc:`Identity part <json/identity>`
-  * :doc:`Configuration part <json/configuration>`
-  * :doc:`Device types part <json/device_types>`
-  * :doc:`Sensors part <json/sensors>` 
-  * :doc:`Xpl stats part <json/xpl_stats>`
-  * :doc:`Commands part <json/commands>` ....................................TODO 
-  * :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
-  * :doc:`Json version part <json/version>` ....................................TODO
-
-* :doc:`Udev files <udev_rules/index>`
-* :doc:`Data types <data_types/index>`
-* :doc:`Field types <field_types/index>`
-
-* :doc:`Tests <tests/index>` ....................................TODO
-
-  * :doc:`Travis CI templates <tests/travis_templates>` ....................................TODO
-
 * Python part
   
   * :doc:`__init__.py files <python/init_files>`
@@ -46,9 +78,18 @@ Packages development
     * create a timer
     * ...
 
+To finish...
+============
+
   * Helpers
 
     * ...
+
+* :doc:`Udev files <udev_rules/index>`
+
+* :doc:`Tests <tests/index>` ....................................TODO
+
+  * :doc:`Travis CI templates <tests/travis_templates>` ....................................TODO
 
 * Graphical resources
 
