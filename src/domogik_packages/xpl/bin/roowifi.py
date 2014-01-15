@@ -36,15 +36,13 @@ class roowifi(XplPlugin):
 
         def __init__(self):
 
-                print("On rentre dans __init__")
                 XplPlugin.__init__(self, name = 'roowifi')
 
-        ### Create Roomba object
+				### Create Roomba object
                 self._roombamanager = Command(self.log)
                 # Create listeners
                 Listener(self.roowifi_command, self.myxpl, {'schema': 'roowifi.basic', 'xpltype': 'xpl-cmnd'})
                 self.log.info("Listener for roowifi created")
-                #print ("Listener for roowifi created")
                 self.enable_hbeat()
 
                 # creation d'un tableau pour recuperer les eventuels roombas
@@ -56,7 +54,6 @@ class roowifi(XplPlugin):
                         #Get each roomba settings
                         print ("Boucle dans While %s" %(num))
                         if self._config.query('roowifi', 'name-%s' % str(num)) != None:
-
                                 self._name = str(self._config.query('roowifi', 'name-%s' % str(num)))
                                 self._ip = str(self._config.query('roowifi', 'ip-%s' % str(num)))
                                 self._port = int(self._config.query('roowifi', 'port-%s' % str(num)))
@@ -64,16 +61,13 @@ class roowifi(XplPlugin):
                                 self._password = str(self._config.query('roowifi', 'password-%s' % str(num)))
                                 self._delay = int(self._config.query('roowifi', 'delay-%s' % str(num)))
 
-                        #if self._name != None:
-                                self.log.info("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._us
-er, self._delay))
-                                print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, sel
-f._delay))
-                                self.roombas[self._name] = {"ip" : self._ip, "port" : self._port, "user" : self._user,"password" : self._password, "delay" : self._delay}
+                                self.log.info("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
+                                #print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
+                                
+								self.roombas[self._name] = {"ip" : self._ip, "port" : self._port, "user" : self._user,"password" : self._password, "delay" : self._delay}
 
                                 self._probe_thr = XplTimer(int(self._delay), self._send_probe, self.myxpl)
                                 self._probe_thr.start()
-
                         else:
                                 loop = False
                                 print ("fin while")
@@ -84,18 +78,8 @@ f._delay))
                 ##
                 #Uncomment line to get according XPL-Stat message !
                 ##
-                print("On est dans send_probe : %s" % self._name)
-
+                
                 self._sensors = self._roombamanager.sensor(self._ip, self._port, self._name, self._user,self._password)
-
-                #print self.roombas[device]["ip"]
-                #print self.roombas[device]["port"]
-
-                #print  self.roombas[device]["user"]
-
-
-                #self._sensors = self._roombamanager.sensor( self.roombas[device]["ip"],  self.roombas[device]["port"], device,  self.roombas[device]["user"], self.roomb
-as[device]["password"])
 
                 if self._sensors <> "N/A" :
                         #self._send_XPL_STAT("xpl-stat", self._name, "bumps-wheeldrops", self._sensors["Bumps Wheeldrops"])
@@ -118,11 +102,10 @@ as[device]["password"])
                         #self._send_XPL_STAT("xpl-stat", self._name, "capacity", self._sensors["Capacity"])
                         self._send_XPL_STAT("xpl-stat", self._name,"battery-level", self._sensors["battery-level"])
 
-                print("Fin send_probe")
 
         def _send_XPL_STAT(self, xpl_xxx, xpl_device, xpl_type, xpl_current):
                 #genere le xpl stat
-                print ("On va envoyer le xpl-stat %s . %s : %s" %(xpl_device, xpl_type, xpl_current))
+                #print ("On va envoyer le xpl-stat %s . %s : %s" %(xpl_device, xpl_type, xpl_current))
                 self.log.debug("Valeur de %s de %s : %s" % (xpl_type,xpl_device, xpl_current))
                 mess = XplMessage()
                 mess.set_type(xpl_xxx)
@@ -138,15 +121,13 @@ as[device]["password"])
                         device = message.data['device']
 
                 if 'command' in message.data:
-                        #print (" Une commande est recue !")
+                        
                         lacommand = message.data['command']
-                        self.log.debug("Command receive for '%s'" % device)
-                        print ("Command %s receive for %s" % (lacommand,device))
-                        #print self.roombas[device]
-                        #print self.roombas[device]["ip"]
+                        self.log.debug("%s command receive for %s" % (lacommand,device))
+                        print ("%s command receive for %s" % (lacommand,device))
+                        
                         status = self._roombamanager.command( self.roombas[device]["ip"], self.roombas[device]["port"],device, lacommand)
-                        #status = self._roombamanager.commandweb( device, lacommand, self._ip, self._port, self._user, self._password,)
-
+                     
                         if status == True:
                                 print ("On va envoyer le xpl-trig pour acker la commande %s" % lacommand)
                                 self.log.debug("Ack de la command %s on %s" % (lacommand, device))
