@@ -851,6 +851,28 @@ class Plugin(GenericComponent, MQAsyncSub):
             #self.set_configured(False)
             self.configured = False
 
+        ### get udev rules informations
+        udev_rules = {}
+        udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
+        
+        # parse all conversion files
+        try:
+            for udev_file in os.listdir(udev_dir): 
+                if udev_file.endswith(".rules"):
+                    self.log.info("Udev rule discovered for '{0}' : {1}".format(self.client_id, udev_file))
+                    # read the content of the file
+                    with open ("{0}/{1}".format(udev_dir, udev_file), "r") as myfile:
+                        data = myfile.read()
+                        udev_rules[os.path.splitext(udev_file)[0]] = data
+        except OSError as err:
+            if err.errno == 2:
+                self.log.info("There is no udev rules file for '{0}'".format(self.client_id))
+            else:
+                self.log.error("Error while looking for udev rules for '{0}' : {1}".format(self.client_id, err))
+
+        # add in the data
+        self.data["udev_rules"] = udev_rules
+
         ### get conversion informations
         self.conversions = {}
         conv_dir = "{0}/{1}/conversion/".format(self._packages_directory, self.folder)
@@ -868,7 +890,7 @@ class Plugin(GenericComponent, MQAsyncSub):
             if err.errno == 2:
                 self.log.info("There is no conversion file for '{0}'".format(self.client_id))
             else:
-                self.log.error("Error while looking for conversions : {0}".format(err))
+                self.log.error("Error while looking for udev rules for '{0}' : {1}".format(self.client_id, err))
 
         ### register the plugin as a client
         self.register_component()
