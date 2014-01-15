@@ -127,9 +127,9 @@ class MQAsyncSub():
         mid = '.'.join(mid)
 
 	try:
-	    json = json.loads(msg[1])
-            self.on_message(mid, json.loads(msg[1]))
-        except valueError as e:
+	    jsons = json.loads(msg[1])
+            self.on_message(mid, jsons)
+        except ValueError as e:
             pass
   
     def on_message(self, msg_id, content):
