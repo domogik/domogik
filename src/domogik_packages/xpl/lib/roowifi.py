@@ -63,8 +63,6 @@ table = {
 		"NUM_BYTES_PACKET_0" : 26
 		}
 
-
-
 sensors = {
 		"Bumps Wheeldrops" : 0 ,
 		"Wall" : 0 ,
@@ -104,10 +102,8 @@ class Command:
 		self._log = log
 
 	def command(self, ip, port, device, command):
-		#print("on est dans lib-command")
 		self._log.info("Start processing clean Command on %s  " % (device))
-		#print("Start processing Command on %s  " % (device))
-		#print("LA commande est %s  " % (command))
+
 		try:			
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			time.sleep(1)
@@ -127,28 +123,6 @@ class Command:
 			self._log.error(" %s Command Failed on %s" % (command,device))
 			return False
 
-	def commandweb(self, device, command, ip, port, user, password):
-		# NON-UTILISEE, TO DELETE ?
-		try:
-			password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-			top_level_url = "http://" + ip 
-			password_mgr.add_password(None, top_level_url, user, password)
-			handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-			opener = urllib2.build_opener(handler)
-			urllib2.install_opener(opener)
-			response = urllib2.urlopen(top_level_url + '/rwr.cgi?exec=1')
-			response = urllib2.urlopen(top_level_url + '/roomba.cgi?button=' + (command).upper())
-			page = response.read()
-			print page 
-			if page == "1" :		
-				print ("%s command Success on %s" % (command,device))
-				self._log.info("%s command Success on %s" % (command,device))
-				return True
-		except:
-			print (" %s Command Failed on %s" % (command,device))
-			self._log.error(" %s Command Failed on %s" % (command,device))
-			return False
-			
 	def sensor(self, ip, port, device, user, password):
 		#print("on est dans lib.sensor")
 		try:
@@ -185,11 +159,8 @@ class Command:
 			sensors['Capacity'] = j['response']['r19']['value']
 			sensors['battery-level'] =  int(j['response']['r18']['value'])*100 / int (j['response']['r19']['value'])
 			
-			#print sensors
-			
 			return sensors	
 		except:
-            #self._log.error("Sensor read Failed ")
+            self._log.error("Sensor read Failed ")
 			return "N/A"
 			
-		
