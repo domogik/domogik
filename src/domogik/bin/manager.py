@@ -620,6 +620,7 @@ class GenericComponent():
         self.host = host
         self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.name, self.host)
         self.client_id = "{0}-{1}.{2}".format("plugin", self.name, self.host)
+        self.folder = "{0}_{1}".format("plugin", self.name)
         self.type = "unknown - not setted yet"
         self.configured = None
         self._clients = clients
@@ -849,6 +850,25 @@ class Plugin(GenericComponent, MQAsyncSub):
         else:
             #self.set_configured(False)
             self.configured = False
+
+        ### get conversion informations
+        self.conversions = {}
+        conv_dir = "{0}/{1}/conversion/".format(self._packages_directory, self.folder)
+        
+        # parse all conversion files
+        try:
+            for conv_file in os.listdir(conv_dir): 
+                if conv_file.endswith(".py") and conv_file != "__init__.py":
+                    self.log.info("Conversion discovered for '{0}' : {1}".format(self.client_id, conv_file))
+                    # read the content of the file
+                    with open ("{0}/{1}".format(conv_dir, conv_file), "r") as myfile:
+                        data = myfile.read()
+                        self.conversions[os.path.splitext(conv_file)[0]] = data
+        except OSError as err:
+            if err.errno == 2:
+                self.log.info("There is no conversion file for '{0}'".format(self.client_id))
+            else:
+                self.log.error("Error while looking for conversions : {0}".format(err))
 
         ### register the plugin as a client
         self.register_component()
@@ -1170,6 +1190,11 @@ class Clients():
         """ Return the clients details
         """
         return self._clients_with_details
+
+    def get_conversions(self):
+        """ Return the clients conversions elements
+        """
+        return "TODO TODO TODO"
 
     def publish_update(self):
         """ Publish the clients list update over the MQ
