@@ -432,14 +432,19 @@ class XplPlugin(BasePlugin, MQRep):
                              'data' : data}
                 self.log.info(u"New device feature detected and added in the new devices list : {0}".format(new_device))
                 self.new_devices.append(new_device)
+
+                # publish new devices update
+                self._pub.send_event('device.new',
+                                     {"type" : type,
+                                      "name" : self._name,
+                                      "host" : self.get_sanitized_hostname(),
+                                      "devices" : self.new_devices})
+
+                # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
+
             else:
                 self.log.debug(u"The device has already been detected since the plugin startup")
-            print self.new_devices
-
-
-
-
-
+            #print self.new_devices
 
 
     def get_parameter(self, a_device, key):
@@ -557,6 +562,9 @@ class XplPlugin(BasePlugin, MQRep):
         elif msg.get_action() == "helper.do":
             self.log.info(u"Plugin helper action request : {0}".format(msg))
             self._mdp_reply_helper_do(msg)
+        elif msg.get_action() == "device.new.get":
+            self.log.info(u"Plugin new devices request : {0}".format(msg))
+            self._mdp_reply_device_new_get(msg)
     
     def _mdp_reply_helper_do(self, msg):
         contens = msg.get_data()
@@ -631,6 +639,17 @@ class XplPlugin(BasePlugin, MQRep):
         msg.set_action('helper.list.result')
         msg.add_data('actions', self.helpers.keys())
         self.reply(msg.get())
+
+    def _mdp_reply_device_new_get(self, data):
+        """ Return a list of new devices detected
+            @param data : MQ req message
+        """
+        ### Send the ack over MQ Rep
+        msg = MQMessage()
+        msg.set_action('device.new.result')
+        msg.add_data('devices', self.new_devices)
+        self.reply(msg.get())
+
 
     def _set_status(self, status):
         """ Set the plugin status and send it

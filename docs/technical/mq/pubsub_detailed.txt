@@ -112,6 +112,22 @@ You will get messages like this: ::
     {u'plugin-onewire.darkstar': {}, u'plugin-rfxcom.darkstar': {}, u'plugin-velbus.darkstar': {u'from_level_to_DT_Switch': u"def from_level_to_DT_Switch(x):\n    if x == '255':\n        return int(1)\n    if x == '0':\n        return int(0)\n\n", u'from_DT_Scaling_to_level': u'def from_DT_Scaling_to_level(x):\n    # 0 - 100 translated to 0 - 255\n    return round(int(x) / 100 * 255)\n\n', u'from_level_to_DT_Scaling': u'def from_level_to_DT_Scaling(x):\n    # 0 - 255 translated to 0 - 100\n    return round(int(x) / 255 * 100)\n', u'from_input_to_DT_State': u"def from_input_to_DT_State(x):\n    if x == 'LOW':\n        return 0\n    else:\n        return 1\n\n", u'from_DT_Switch_to_level': u"def from_DT_Switch_to_level(x):\n    if x == '1':\n        return int(255)\n    else:\n        return int(0)\n\n"}, u'plugin-diskfree.darkstar': {}}
 
 
+device.new
+==========
+
+Publisher: 
+* plugin
+
+Subscriber: any member who wants to be aware of the detected devices
+* UIs
+
+An example to catch these messages is available as *src/domogik/examples/mq-python/sub_device_new.py*.
+
+You will get messages like this: ::
+
+    {u'host': u'darkstar', u'type': u'xpl_stats', u'name': u'rfxcom', u'devices': [{u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'temperature', u'data': {u'address': u'th1 0x2504'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'humidity', u'data': {u'address': u'th1 0x2504'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'temperature', u'data': {u'address': u'th1 0xd601'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'humidity', u'data': {u'address': u'th1 0xd601'}}]}
+
+
 
 
 packagesdetail

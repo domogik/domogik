@@ -55,6 +55,23 @@ You will get a reply like this: ::
     ['client.conversion.result', '{"plugin-onewire.darkstar": {}, "plugin-rfxcom.darkstar": {}, "plugin-velbus.darkstar": {"from_level_to_DT_Switch": "def from_level_to_DT_Switch(x):\\n    if x == \'255\':\\n        return int(1)\\n    if x == \'0\':\\n        return int(0)\\n\\n", "from_DT_Scaling_to_level": "def from_DT_Scaling_to_level(x):\\n    # 0 - 100 translated to 0 - 255\\n    return round(int(x) / 100 * 255)\\n\\n", "from_level_to_DT_Scaling": "def from_level_to_DT_Scaling(x):\\n    # 0 - 255 translated to 0 - 100\\n    return round(int(x) / 255 * 100)\\n", "from_input_to_DT_State": "def from_input_to_DT_State(x):\\n    if x == \'LOW\':\\n        return 0\\n    else:\\n        return 1\\n\\n", "from_DT_Switch_to_level": "def from_DT_Switch_to_level(x):\\n    if x == \'1\':\\n        return int(255)\\n    else:\\n        return int(0)\\n\\n"}, "plugin-diskfree.darkstar": {}}']
 
 
+device.new.get
+==============
+
+Request : UIs
+Reply : a client
+
+To get the new devices of a client, the UI send on startup a MQ request *device.new.get* to the client
+
+To get updates, the UIs should subscribe to the appropriate MQ publisher : *device.new*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_device_new.py*.
+
+You will get a reply like this: ::
+
+    ['device.new.result', '{"devices": [{"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "temperature", "data": {"address": "th1 0x2504"}}, {"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "humidity", "data": {"address": "th1 0x2504"}}, {"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "temperature", "data": {"address": "th1 0xd601"}}, {"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "humidity", "data": {"address": "th1 0xd601"}}]}']
+
+
 config.get
 ==========
 

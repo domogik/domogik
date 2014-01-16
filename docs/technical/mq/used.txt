@@ -52,6 +52,8 @@ UIs                     manager             plugin.start.do       plugin.start.r
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     plugin (by id)      plugin.stop.do        plugin.stop.result       req_plugin_stop.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     plugin (by id)      device.new.get        device.new.result        req_device_new.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     plugin (by id)      helper.list.get       helper.list.result       req_helper_list.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     plugin (by id)      helper.help.get       helper.help.result       req_helper_help.py
@@ -98,6 +100,8 @@ plugin (any)            manager             plugin.status          sub_plugin_st
 ----------------------- ------------------- ---------------------- ---------------------
 plugin (any)            manager             plugin.configuration   sub_plugin_configuration.py
                         UIs
+----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            UIs                 device.new             sub_device_new.py
 ----------------------- ------------------- ---------------------- ---------------------
 manager                 UIs                 client.list            sub_client_list.py
 ----------------------- ------------------- ---------------------- ---------------------
